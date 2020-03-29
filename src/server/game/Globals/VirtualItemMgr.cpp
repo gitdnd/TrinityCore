@@ -341,6 +341,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     delete store[entry];
     store[entry] = temp;
 
+    if(sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
+        temp->InitializeQueryData();
+
     return temp;
 }
 

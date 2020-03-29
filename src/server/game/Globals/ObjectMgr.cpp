@@ -3463,6 +3463,10 @@ void ObjectMgr::LoadVirtualItemTemplates()
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))
             delete itemTemplate;
         ++count;
+
+        if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
+            itemTemplate->InitializeQueryData();
+
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u virtual item templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
