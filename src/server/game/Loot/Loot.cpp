@@ -27,6 +27,9 @@
 #include "Random.h"
 #include "World.h"
 
+// VirtualItem
+#include "VirtualItemMgr.h"
+
  //
  // --------- LootItem ---------
  //
@@ -145,6 +148,11 @@ void Loot::AddItem(LootStoreItem const& item)
     if (!proto)
         return;
 
+    // VirtualItem
+    if (VirtualItemMgr::IsVirtualTemplate(proto))
+        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, ""))
+            proto = newProto;
+
     uint32 count = urand(item.mincount, item.maxcount);
     uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
 
@@ -154,6 +162,10 @@ void Loot::AddItem(LootStoreItem const& item)
     for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
     {
         LootItem generatedLoot(item);
+
+        if (item.itemid != proto->ItemId)
+            generatedLoot.itemid = proto->ItemId;
+
         generatedLoot.count = std::min(count, proto->GetMaxStackSize());
         lootItems.push_back(generatedLoot);
         count -= proto->GetMaxStackSize();

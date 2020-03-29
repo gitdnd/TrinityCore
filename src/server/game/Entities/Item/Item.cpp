@@ -37,6 +37,9 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+// VirtualItem
+#include "VirtualItemMgr.h"
+
 void AddItemsSetItem(Player* player, Item* item)
 {
     ItemTemplate const* proto = item->GetTemplate();
@@ -267,6 +270,20 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
 {
     Object::_Create(guidlow, 0, HighGuid::Item);
 
+    ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemId);
+    if (!itemProto)
+        return false;
+
+    // VirtualItem
+    if (VirtualItemMgr::IsVirtualTemplate(itemProto))
+    {
+        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto, ""))
+        {
+            itemProto = newProto;
+            itemId = itemProto->ItemId;
+        }
+    }
+
     SetEntry(itemId);
     SetObjectScale(1.0f);
 
@@ -275,10 +292,6 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
         SetGuidValue(ITEM_FIELD_OWNER, owner->GetGUID());
         SetGuidValue(ITEM_FIELD_CONTAINED, owner->GetGUID());
     }
-
-    ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemId);
-    if (!itemProto)
-        return false;
 
     SetUInt32Value(ITEM_FIELD_STACK_COUNT, 1);
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, itemProto->MaxDurability);
@@ -370,6 +383,41 @@ void Item::SaveToDB(SQLTransaction& trans)
                 stmt->setUInt32(0, GetOwnerGUID().GetCounter());
                 stmt->setUInt32(1, guid);
                 trans->Append(stmt);
+            }
+            // VirtualItem
+            if (uState == ITEM_NEW)
+            {
+                if (VirtualItemTemplate const* itemTemplate = sVirtualItemMgr.GetVirtualTemplate(GetEntry()))
+                {
+                    uint8 i = 0;
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_VIRTUAL_TEMPLATE);
+                    stmt->setUInt32(i++, itemTemplate->ItemId);
+                    stmt->setUInt32(i++, itemTemplate->base_entry);
+                    stmt->setUInt32(i++, GetGUID().GetCounter());
+                    stmt->setString(i++, itemTemplate->Name1);
+                    stmt->setUInt8(i++, itemTemplate->Quality);
+                    stmt->setUInt16(i++, itemTemplate->ItemLevel);
+                    stmt->setUInt8(i++, itemTemplate->StatsCount);
+                    for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
+                    {
+                        if (j < itemTemplate->StatsCount)
+                        {
+                            stmt->setUInt8(i++, itemTemplate->ItemStat[j].ItemStatType);
+                            stmt->setInt16(i++, itemTemplate->ItemStat[j].ItemStatValue);
+                        }
+                        else
+                        {
+                            stmt->setUInt8(i++, 0);
+                            stmt->setInt16(i++, 0);
+                        }
+                    }
+                    stmt->setUInt16(i++, itemTemplate->Armor);
+                    stmt->setUInt32(i++, itemTemplate->Bonding);
+                    stmt->setUInt32(i++, itemTemplate->ItemSet);
+                    for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
+                        stmt->setInt8(i++, itemTemplate->Socket[j].Color);
+                    trans->Append(stmt);
+                }
             }
             break;
         }

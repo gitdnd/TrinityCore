@@ -1426,6 +1426,16 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WARDEN_CLIENT_FAIL_ACTION]    = sConfigMgr->GetIntDefault("Warden.ClientCheckFailAction", 0);
     m_int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetIntDefault("Warden.ClientResponseDelay", 600);
 
+    // VirtualItem
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_POOR]         = sConfigMgr->GetIntDefault("ItemGenerator.Poor", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_COMMON]       = sConfigMgr->GetIntDefault("ItemGenerator.Common", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_UNCOMMON]     = sConfigMgr->GetIntDefault("ItemGenerator.Uncommon", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_RARE]         = sConfigMgr->GetIntDefault("ItemGenerator.Rare", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_EPIC]         = sConfigMgr->GetIntDefault("ItemGenerator.Epic", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_LEGENDARY]    = sConfigMgr->GetIntDefault("ItemGenerator.Legendary", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_ARTIFACT]     = sConfigMgr->GetIntDefault("ItemGenerator.Artifact", 0);
+    m_int_configs[CONFIG_ITEMGEN_QUALITY_HEIRLOOM]     = sConfigMgr->GetIntDefault("ItemGenerator.Heirloom", 0);
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 
@@ -1750,6 +1760,10 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
 
+    // VirtualItem
+    TC_LOG_INFO("server.loading", "Loading Virtual Items...");                 // must be after LoadItemTemplates
+    sObjectMgr->LoadVirtualItemTemplates();
+
     TC_LOG_INFO("server.loading", "Loading Item set names...");                // must be after LoadItemPrototypes
     sObjectMgr->LoadItemSetNames();
 
@@ -2072,6 +2086,10 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
+
+    // VirtualItem
+    TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
+    sVirtualItemMgr.LoadNamesFromDB();
 
     TC_LOG_INFO("server.loading", "Loading Petitions...");
     sPetitionMgr->LoadPetitions();

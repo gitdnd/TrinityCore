@@ -25,6 +25,9 @@
 #include <list>
 #include <vector>
 
+// VirtualItem
+#include "VirtualItemMgr.h"
+
 class LootStore;
 class LootTemplate;
 class Player;
