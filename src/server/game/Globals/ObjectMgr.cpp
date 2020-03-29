@@ -3470,9 +3470,9 @@ void ObjectMgr::LoadVirtualItemTemplates()
 
 ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry) const
 {
+    if (auto vIT = sVirtualItemMgr.GetVirtualTemplate(entry))
+        return vIT;
     return Trinity::Containers::MapGetValuePtr(_itemTemplateStore, entry);
-    // TODO
-    // return sVirtualItemMgr.GetVirtualItemTemplate(entry);
 }
 
 void ObjectMgr::LoadItemSetNameLocales()
