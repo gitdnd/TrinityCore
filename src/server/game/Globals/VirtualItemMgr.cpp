@@ -323,8 +323,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     if (!base)
         return nullptr;
 
-    if (seed == "")
-        seed = GenerateSeed();
+    //if (seed == "")
+    //    seed = GenerateSeed();
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
     GenerateStats(temp, seed, modifier);

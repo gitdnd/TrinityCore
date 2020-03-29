@@ -51,6 +51,13 @@ uint32 urand(uint32 min, uint32 max)
     return uid(engine);
 }
 
+uint32 urand(uint32 min, uint32 max, char* seed)
+{
+    ASSERT(max >= min);
+    std::uniform_int_distribution<uint32> uid(min, max);
+    return uid(engine);
+}
+
 uint32 urandms(uint32 min, uint32 max)
 {
     ASSERT(std::numeric_limits<uint32>::max() / Milliseconds::period::den >= max);
