@@ -277,7 +277,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(itemProto))
     {
-        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto, ""))
+        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto))
         {
             itemProto = newProto;
             itemId = itemProto->ItemId;

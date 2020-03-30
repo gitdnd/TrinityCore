@@ -182,7 +182,7 @@ public:
      * Uses passed base and modifier to generate a new VirtualItemTemplate.
      * Returns the newly created VirtualItemTemplate.
      */
-    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, char* seed, VirtualModifier const& modifier = VirtualModifier());
+    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, uint32 seed = 0, VirtualModifier const& modifier = VirtualModifier());
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.

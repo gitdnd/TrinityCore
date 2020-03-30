@@ -7,6 +7,7 @@
 #include "Random.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
+#include "SFMTRand.h"
 
 VirtualModifier::StatGroupData const VirtualModifier::premadeStatGroupData;
 
@@ -241,6 +242,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
 {
     std::string fullName = "";
 
+
     // TODO: Add armor case if this is something we need/want
     if (type == ITEM_CLASS_WEAPON)
     {
@@ -318,16 +320,25 @@ VirtualItemTemplate const* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
     return nullptr;
 }
 
-VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, char* seed, VirtualModifier const& modifier)
+VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, uint32 seed, VirtualModifier const& modifier)
 {
     if (!base)
         return nullptr;
 
-    //if (seed == "")
-    //    seed = GenerateSeed();
+    char cseed[11] = "";
+
+    // If no seed supplied, generate a new seed.
+    if (seed == 0)
+    {
+        SFMTRand sfmt;
+        seed = sfmt.RandomUInt32(); 
+    }
+
+    // Convert seed from uint32 to char* for urand.
+    sprintf(cseed, "%u", seed);
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
-    GenerateStats(temp, seed, modifier);
+    GenerateStats(temp, cseed, modifier);
 
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);

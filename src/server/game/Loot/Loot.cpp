@@ -150,7 +150,7 @@ void Loot::AddItem(LootStoreItem const& item)
 
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(proto))
-        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, ""))
+        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto))
             proto = newProto;
 
     uint32 count = urand(item.mincount, item.maxcount);
