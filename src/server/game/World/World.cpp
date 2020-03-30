@@ -3428,7 +3428,8 @@ void World::LoadDBVersion()
 
         m_DBVersion = fields[0].GetString();
         // will be overwrite by config values if different and non-0
-        m_int_configs[CONFIG_CLIENTCACHE_VERSION] = fields[1].GetUInt32();
+        m_int_configs[CONFIG_CLIENTCACHE_VERSION] = fields[1].GetUInt32() + 1;
+        WorldDatabase.PExecute("update version set cache_id = cache_id + 1");
     }
 
     if (m_DBVersion.empty())
