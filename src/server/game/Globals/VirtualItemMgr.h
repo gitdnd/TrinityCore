@@ -121,7 +121,7 @@ public:
      * All virtual entries are assumed to be between this range.
      */
     static const uint32 minEntry = 1000000;
-    static const uint32 maxEntry = 0xFFFFFFF;
+    static const uint32 maxEntry = 0xFFFFFF;
     static_assert(minEntry < maxEntry, "Min entry must be smaller than max entry");
 
     /**
