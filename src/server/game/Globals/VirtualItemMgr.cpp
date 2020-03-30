@@ -62,7 +62,7 @@ const std::vector<ItemSubclassWeapon> VirtualItemMgr::weaponSubclasses = {
     //ITEM_SUBCLASS_WEAPON_THROWN,
     //ITEM_SUBCLASS_WEAPON_SPEAR,
     ITEM_SUBCLASS_WEAPON_CROSSBOW,
-    //ITEM_SUBCLASS_WEAPON_WAND,
+    ITEM_SUBCLASS_WEAPON_WAND,
     //ITEM_SUBCLASS_WEAPON_FISHING_POLE,
 };
 
@@ -165,15 +165,19 @@ VirtualItemMgr::VirtualItemMgr()
     for (auto InventoryType : armorInventoryType)
     {
         uint32 min = minEntry + (blockCounter*block);
+        uint32 max = min + block - 1;
         armorGenerator[InventoryType] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
+        TC_LOG_INFO("server.loading", "ItemGenerator Inventory[%d] %d - %d", static_cast<int>(InventoryType), min, max);
     }
 
     for (auto subclass : weaponSubclasses)
     {
         uint32 min = minEntry + (blockCounter*block);
+        uint32 max = min + block - 1;
         weaponGenerator[subclass] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
+        TC_LOG_INFO("server.loading", "ItemGenerator Weapon[%d] %d - %d", subclass, min, max);
     }
 }
 
