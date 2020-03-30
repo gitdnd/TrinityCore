@@ -313,6 +313,131 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
     return fullName;
 }
 
+std::vector<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) const
+{
+    if (!info)
+        return std::vector<uint32>();
+
+    std::vector<uint32> displays;
+    for (auto displaysitr : availableDisplays)
+    {
+        if (info->quality != displaysitr.quality)
+            continue;
+
+        if (info->iInventoryType != displaysitr.iInventoryType)
+            continue;
+
+        if (info->iClass != displaysitr.iClass)
+            continue;
+
+        if (info->isubClass != displaysitr.isubClass)
+            continue;
+
+        displays.push_back(displaysitr.displayId);
+    }
+    return displays;
+}
+
+uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const
+{
+    uint32 display = 0;
+
+
+    // TODO: Add armor case if this is something we need/want
+    if (_class == ITEM_CLASS_WEAPON)
+    {
+        // Some subclasses use the same database name lists.
+        // No need to have duplicate db entries, so switch item subclass.
+        if (subclass == ITEM_SUBCLASS_WEAPON_SWORD2)
+            subclass = ITEM_SUBCLASS_WEAPON_SWORD;
+        else if (subclass == ITEM_SUBCLASS_WEAPON_MACE2)
+            subclass = ITEM_SUBCLASS_WEAPON_MACE;
+        else if (subclass == ITEM_SUBCLASS_WEAPON_AXE2)
+            subclass = ITEM_SUBCLASS_WEAPON_AXE;
+        else if (subclass == ITEM_SUBCLASS_WEAPON_CROSSBOW)
+            subclass = ITEM_SUBCLASS_WEAPON_BOW;
+
+        // Retrieve all the string lists
+        std::map<uint32, std::vector<uint32>> displayLists;
+        for (size_t i = 1; i <= 7; ++i)
+        {
+            displayInfo dInfo(quality, _class, subclass, inventoryType);
+            auto list = GetDisplaysForDisplayInfo(&dInfo);
+
+            // Make sure the current list is not empty. If it is, fall back to template item name.
+            if (list.empty())
+                return display;
+
+            displayLists.insert(std::make_pair(i, list));
+        }
+
+        
+        // Concat the correct full item name for the item quality
+        switch (quality)
+        {
+        case ITEM_QUALITY_NORMAL:
+        {
+            display = displayLists[4][urand(0, displayLists[4].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_UNCOMMON:
+        {
+            display = displayLists[3][urand(0, displayLists[3].size() - 1)] << " " << displayLists[4][urand(0, displayLists[4].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_RARE:
+        {
+            display = displayLists[2][urand(0, displayLists[2].size() - 1)] << " " << displayLists[4][urand(0, displayLists[4].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_EPIC:
+        {
+            display = displayLists[1][urand(0, displayLists[1].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_LEGENDARY:
+        {
+            display = displayLists[7][urand(0, displayLists[7].size() - 1)] << ", " << displayLists[5][urand(0, displayLists[5].size() - 1)] << " " << displayLists[6][urand(0, displayLists[6].size() - 1, seed)];
+            break;
+        }
+        default:
+            return display;
+        }
+    }
+
+    return display;
+}
+
+void VirtualItemMgr::LoadDisplaysFromDB()
+{
+    WriteGuard guard(lock);
+
+    uint32 count = 0;
+    uint32 beginTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_displays`");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item displays, table item_generator_displays is empty.");
+        return;
+    }
+
+    do {
+        Field* fields = result->Fetch();
+        uint32 quality = fields[0].GetUInt32();
+        uint32 classType = fields[1].GetUInt32();
+        uint32 subclassType = fields[2].GetUInt32();
+        uint32 inventoryType = fields[3].GetUInt32();
+        uint32 displayId = fields[4].GetUInt32();
+
+        availableDisplays.push_back(displayInfo(quality, classType, subclassType, inventoryType, displayId));
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", "Loaded %u available virtual item displays in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+}
+
 VirtualItemTemplate const* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 {
     if (entry < minEntry || entry >= maxEntry)
@@ -351,7 +476,11 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     uint32 entry = generator->GenerateEntry(store);
     temp->ItemId = entry;
-    temp->UpdateDisplay();
+    uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, cseed);
+    if (display == 0)
+        temp->UpdateDisplay();
+    else
+        temp->DisplayInfoID = display;
 
     delete store[entry];
     store[entry] = temp;
@@ -362,6 +491,47 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return temp;
 }
 
+VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, uint32 seed, VirtualModifier const& modifier)
+{
+    if (!base)
+        return nullptr;
+
+    char cseed[11] = "";
+
+    // If no seed supplied, generate a new seed.
+    if (seed == 0)
+    {
+        SFMTRand sfmt;
+        seed = sfmt.RandomUInt32();
+    }
+
+    // Convert seed from uint32 to char* for urand.
+    sprintf(cseed, "%u", seed);
+
+    VirtualItemTemplate* temp = new VirtualItemTemplate(base);
+    GenerateStats(temp, cseed, modifier);
+
+    WriteGuard guard(lock);
+    EntryGenerator* generator = Generator(temp);
+    if (!generator)
+        return nullptr;
+
+    uint32 entry = generator->GenerateEntry(store);
+    temp->ItemId = entry;
+    uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, cseed);
+    if (display == 0)
+        temp->UpdateDisplay();
+    else
+        temp->DisplayInfoID = display;
+
+    delete store[entry];
+    store[entry] = temp;
+
+    if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
+        temp->InitializeQueryData();
+
+    return temp;
+}
 void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModifier const& modifier) const
 {
     // decide quality

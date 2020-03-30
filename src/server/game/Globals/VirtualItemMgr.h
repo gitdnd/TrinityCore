@@ -153,6 +153,29 @@ public:
 	};
 
     /**
+     * Not thread safe.
+     * Loads all possible displays from the generator table into memory.
+     */
+
+    void LoadDisplaysFromDB();
+
+    struct displayInfo
+    {
+        displayInfo(uint32 iQ, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 dId) : quality(iQ), iClass(_class), isubClass(subclass), iInventoryType(inventoryType), displayId(dId) {}
+        displayInfo(uint32 iQ, uint32 _class, uint32 subclass, uint32 inventoryType) : quality(iQ), iClass(_class), isubClass(subclass), iInventoryType(inventoryType) {}
+        uint32 quality;
+        uint32 iClass;
+        uint32 isubClass;
+        uint32 iInventoryType;
+        uint32 displayId;
+    };
+
+    /**
+     * Returns a randomly generated item display depending on item type, subclass and quality
+     */
+    uint32 GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const;
+
+    /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
     std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, char* seed) const;
@@ -161,6 +184,11 @@ public:
 	 * Return a vector of available names for the specified subclass.
 	 */
 	std::vector<std::string> GetNamesForNameInfo(NameInfo* info) const;
+
+    /**
+     * Return a vector of available displays for the specified requirements.
+     */
+    std::vector<uint32> GetDisplaysForDisplayInfo(displayInfo* info) const;
 
     /**
      * Creates all used generators and sets their entry ranges in addition to constructing the object itself.
@@ -239,6 +267,7 @@ private:
     std::vector<uint32> freed_entries;
 
 	std::vector<NameInfo> availableNames;
+    std::vector<displayInfo> availableDisplays;
 
     /**
      * Not thread safe.

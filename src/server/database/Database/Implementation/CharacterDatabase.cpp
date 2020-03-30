@@ -606,7 +606,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME, "UPDATE quest_tracker SET quest_abandon_time = NOW() WHERE id = ? AND character_guid = ? ORDER BY quest_accept_time DESC LIMIT 1", CONNECTION_ASYNC);
 
     // VirtualItem
-    PrepareStatement(CHAR_INS_VIRTUAL_TEMPLATE, "REPLACE INTO item_template_virtual (entry, base_entry, itemguid, name, Quality, ItemLevel, StatsCount, "
+    PrepareStatement(CHAR_INS_VIRTUAL_TEMPLATE, "REPLACE INTO item_template_virtual (entry, base_entry, itemguid, name, Quality, displayId, ItemLevel, StatsCount, "
         "stat_type1, stat_value1, stat_type2, stat_value2, stat_type3, stat_value3, stat_type4, stat_value4, stat_type5, stat_value5, "
         "stat_type6, stat_value6, stat_type7, stat_value7, stat_type8, stat_value8, stat_type9, stat_value9, stat_type10, stat_value10, "
         "armor, bonding, itemset, socket1, socket2, socket3) VALUES "

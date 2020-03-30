@@ -396,6 +396,7 @@ void Item::SaveToDB(SQLTransaction& trans)
                     stmt->setUInt32(i++, GetGUID().GetCounter());
                     stmt->setString(i++, itemTemplate->Name1);
                     stmt->setUInt8(i++, itemTemplate->Quality);
+                    stmt->setUInt32(i++, itemTemplate->DisplayInfoID);
                     stmt->setUInt16(i++, itemTemplate->ItemLevel);
                     stmt->setUInt8(i++, itemTemplate->StatsCount);
                     for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
