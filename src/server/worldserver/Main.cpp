@@ -584,8 +584,12 @@ bool StartDB()
     ///- Clean the database before starting
     ClearOnlineAccounts();
 
+    // Increment cache version, assume this data exists
+    QueryResult res = WorldDatabase.PQuery("SELECT cache_id FROM version");
+    uint32 cacheId = res->Fetch()[0].GetUInt32() + 1;
+
     ///- Insert version info into DB
-    WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
+    WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s', cache_id = '%u'", GitRevision::GetFullVersion(), GitRevision::GetHash(), cacheId);
 
     sWorld->LoadDBVersion();
 
