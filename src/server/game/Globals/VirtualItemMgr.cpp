@@ -373,36 +373,10 @@ uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32
 
         
         // Concat the correct full item name for the item quality
-        switch (quality)
-        {
-        case ITEM_QUALITY_NORMAL:
-        {
-            display = displayLists[4][urand(0, displayLists[4].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_UNCOMMON:
-        {
-            display = displayLists[3][urand(0, displayLists[3].size() - 1)] << " " << displayLists[4][urand(0, displayLists[4].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_RARE:
-        {
-            display = displayLists[2][urand(0, displayLists[2].size() - 1)] << " " << displayLists[4][urand(0, displayLists[4].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_EPIC:
-        {
-            display = displayLists[1][urand(0, displayLists[1].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_LEGENDARY:
-        {
-            display = displayLists[7][urand(0, displayLists[7].size() - 1)] << ", " << displayLists[5][urand(0, displayLists[5].size() - 1)] << " " << displayLists[6][urand(0, displayLists[6].size() - 1, seed)];
-            break;
-        }
-        default:
-            return display;
-        }
+
+
+        display = displayLists[quality][urand(0, displayLists[quality].size() - 1, seed)];
+   
     }
 
     return display;
