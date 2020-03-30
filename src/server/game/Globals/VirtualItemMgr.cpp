@@ -465,47 +465,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return temp;
 }
 
-VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, uint32 seed, VirtualModifier const& modifier)
-{
-    if (!base)
-        return nullptr;
-
-    char cseed[11] = "";
-
-    // If no seed supplied, generate a new seed.
-    if (seed == 0)
-    {
-        SFMTRand sfmt;
-        seed = sfmt.RandomUInt32();
-    }
-
-    // Convert seed from uint32 to char* for urand.
-    sprintf(cseed, "%u", seed);
-
-    VirtualItemTemplate* temp = new VirtualItemTemplate(base);
-    GenerateStats(temp, cseed, modifier);
-
-    WriteGuard guard(lock);
-    EntryGenerator* generator = Generator(temp);
-    if (!generator)
-        return nullptr;
-
-    uint32 entry = generator->GenerateEntry(store);
-    temp->ItemId = entry;
-    uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, cseed);
-    if (display == 0)
-        temp->UpdateDisplay();
-    else
-        temp->DisplayInfoID = display;
-
-    delete store[entry];
-    store[entry] = temp;
-
-    if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
-        temp->InitializeQueryData();
-
-    return temp;
-}
 void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModifier const& modifier) const
 {
     // decide quality
