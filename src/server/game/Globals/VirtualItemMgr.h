@@ -98,6 +98,12 @@ struct VirtualModifier
     static float GetSlotStatModifier(InventoryType invtype);
 
     /**
+     * Fetches the armor modifier for the subclass and inventory type combination.
+     * Returns the armor modifier.
+     */
+    static float GetTypeSlotArmorModifier(ItemSubclassArmor subclass, InventoryType invtype);
+
+    /**
      * Fetches the rate (point*rate = stat_amount) for the given stat type.
      * Returns the stat rate.
      */
