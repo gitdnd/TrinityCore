@@ -148,6 +148,108 @@ float VirtualModifier::GetStatRate(ItemModType stat)
     return 1.0f;
 }
 
+float VirtualModifier::GetTypeSlotArmorModifier(ItemSubclassArmor subclass, InventoryType invtype)
+{
+    switch (subclass)
+    {
+    case ITEM_SUBCLASS_ARMOR_CLOTH:
+        switch (invtype)
+        {
+            case INVTYPE_HEAD:
+                return 1.05f;
+            case INVTYPE_SHOULDERS:
+                return 0.97f;
+            case INVTYPE_CHEST:
+                return 1.28f;
+            case INVTYPE_WAIST:
+                return 0.73f;
+            case INVTYPE_LEGS:
+                return 1.13f;
+            case INVTYPE_FEET:
+                return 0.9f;
+            case INVTYPE_WRISTS:
+                return 0.56f;
+            case INVTYPE_HANDS:
+                return 0.80f;
+            case INVTYPE_CLOAK:
+                return 0.66f;
+            default:
+                return 1.0f;
+        }
+    case ITEM_SUBCLASS_ARMOR_LEATHER:
+        switch (invtype)
+        {
+            case INVTYPE_HEAD:
+                return 2.13f;
+            case INVTYPE_SHOULDERS:
+                return 2.0f;
+            case INVTYPE_CHEST:
+                return 2.63f;
+            case INVTYPE_WAIST:
+                return 1.95f;
+            case INVTYPE_LEGS:
+                return 2.32f;
+            case INVTYPE_FEET:
+                return 1.82f;
+            case INVTYPE_WRISTS:
+                return 1.17f;
+            case INVTYPE_HANDS:
+                return 1.66f;
+            default:
+                return 1.0f;
+        }
+    case ITEM_SUBCLASS_ARMOR_MAIL:
+        switch (invtype)
+        {
+            case INVTYPE_HEAD:
+                return 4.35f;
+            case INVTYPE_SHOULDERS:
+                return 4.0f;
+            case INVTYPE_CHEST:
+                return 5.34f;
+            case INVTYPE_WAIST:
+                return 3.0f;
+            case INVTYPE_LEGS:
+                return 4.68f;
+            case INVTYPE_FEET:
+                return 3.69f;
+            case INVTYPE_WRISTS:
+                return 2.35;
+            case INVTYPE_HANDS:
+                return 3.34f;
+            default:
+                return 1.0f;
+        }
+    case ITEM_SUBCLASS_ARMOR_PLATE:
+        switch (invtype)
+        {
+            case INVTYPE_HEAD:
+                return 5.38f;
+            case INVTYPE_SHOULDERS:
+                return 5.28f;
+            case INVTYPE_CHEST:
+                return 8.48;
+            case INVTYPE_WAIST:
+                return 3.73f;
+            case INVTYPE_LEGS:
+                return 6.58f;
+            case INVTYPE_FEET:
+                return 4.55f;
+            case INVTYPE_WRISTS:
+                return 2.9f;
+            case INVTYPE_HANDS:
+                return 4.15f;
+            default:
+                return 1.0f;
+        }
+    case ITEM_SUBCLASS_ARMOR_SHIELD:
+        return 18.2f;
+    default:
+        return 1.0f;
+    }
+    return 1.0f;
+}
+
 VirtualItemMgr & VirtualItemMgr::instance()
 {
     static VirtualItemMgr obj;
@@ -533,14 +635,20 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModi
 
     output->ItemLevel = ilevel;
 
-    // decide armor
+    // decide armor, if item class is armor, armor should always be applied.
     uint32 armor = 0;
     if (output->Class == ITEM_CLASS_ARMOR)
     {
-        float divider = ((int32(output->Quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
-        float white = output->Armor / divider;
-        float multiplier = ((int32(quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
-        armor = white * multiplier;
+        // by default we assume 1 ilevel = 1 armor
+        armor = 1*ilevel;
+
+        // retrieve armor slot and type multiplier
+        float typeslotmod = VirtualModifier::GetTypeSlotArmorModifier((ItemSubclassArmor)output->SubClass, (InventoryType)output->InventoryType);
+        armor = armor * typeslotmod;
+
+        // depending on quality, add multiplier to armor piece
+        float qmulti = ((int32(quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
+        armor = armor * qmulti;
     }
 
     // clear old stats
