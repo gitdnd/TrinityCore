@@ -28,6 +28,7 @@ EndScriptData */
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "DynamicObject.h"
 #include "GameTime.h"
 #include "GossipDef.h"
 #include "GridNotifiersImpl.h"
@@ -120,7 +121,8 @@ public:
             { "dummy",         rbac::RBAC_PERM_COMMAND_DEBUG_DUMMY,         false, &HandleDebugDummyCommand,            "" },
             { "asan",          rbac::RBAC_PERM_COMMAND_DEBUG_ASAN,          true,  nullptr,                             "", debugAsanCommandTable },
             { "guidlimits",    rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugGuidLimitsCommand,       "" },
-            { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" }
+            { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
+            { "spawndynobj",    rbac::RBAC_PERM_COMMAND_DEBUG,              false, &HandleSpawnDynamicObject,           "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -1948,6 +1950,25 @@ public:
     {
         handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
         return true;
+    }
+
+    static bool HandleSpawnDynamicObject(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+        char* spell_str = strtok((char*)args, " ");
+        char* radius_str = args ? strtok(nullptr, " ") : "10";
+        char* type_str = args ? strtok(nullptr, " ") : "0";
+        char* duration_str = args ? strtok(nullptr, " ") : nullptr;
+        uint32 spell = atoi(spell_str);
+        uint32 radius = atoi(radius_str);
+        uint32 type = atoi(type_str);
+        uint32 duration = duration_str ? atoi(duration_str) * MINUTE : 2 * MINUTE;
+        DynamicObject* dynObj = new DynamicObject(false);
+        if (!dynObj->CreateDynamicObject(player->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), player, spell, player->GetPosition(), radius, DynamicObjectType(type)))
+            dynObj->SetDuration(duration);
+
     }
 };
 
