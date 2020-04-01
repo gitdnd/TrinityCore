@@ -223,7 +223,7 @@ void Eluna::OpenLua()
     }
     std::ostringstream command;
     command << "cd " << std::experimental::filesystem::current_path() << "\lua_scripts" << " & git pull";
-    system(command.str.c_str());
+    system(command.str);
 
     L = luaL_newstate();
 
