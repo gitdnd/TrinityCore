@@ -13,6 +13,7 @@
 #include "ElunaUtility.h"
 #include "ElunaCreatureAI.h"
 #include "ElunaInstanceAI.h"
+#include <experimental/filesystem>
 
 #if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
