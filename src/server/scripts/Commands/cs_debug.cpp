@@ -1966,7 +1966,7 @@ public:
         uint32 type = atoi(type_str);
         uint32 duration = duration_str ? atoi(duration_str) * MINUTE : 2 * MINUTE;
         DynamicObject* dynObj = new DynamicObject(false);
-        if (!dynObj->CreateDynamicObject(player->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), player, spell, player->GetPosition(), radius, DynamicObjectType(type)))
+        if (dynObj->CreateDynamicObject(player->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), player, spell, player->GetPosition(), radius, DynamicObjectType(type)))
             dynObj->SetDuration(duration);
 
     }
