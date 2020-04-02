@@ -103,6 +103,9 @@ void Eluna::Uninitialize()
 
 void Eluna::LoadScriptPaths()
 {
+    std::ostringstream command;
+    command << "cd " << std::experimental::filesystem::current_path() << "\\lua_scripts" << " & git pull";
+    system(command.str().c_str());
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
 
     lua_scripts.clear();
@@ -221,9 +224,7 @@ void Eluna::OpenLua()
         ELUNA_LOG_INFO("[Eluna]: Eluna is disabled in config");
         return;
     }
-    std::ostringstream command;
-    command << "cd " << std::experimental::filesystem::current_path() << "\\lua_scripts" << " & git pull";
-    system(command.str().c_str());
+
 
     L = luaL_newstate();
 
