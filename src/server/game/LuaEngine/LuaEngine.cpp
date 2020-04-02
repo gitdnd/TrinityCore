@@ -13,7 +13,7 @@
 #include "ElunaUtility.h"
 #include "ElunaCreatureAI.h"
 #include "ElunaInstanceAI.h"
-#include <experimental/filesystem>
+#include <filesystem>
 
 #if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
@@ -104,7 +104,7 @@ void Eluna::Uninitialize()
 void Eluna::LoadScriptPaths()
 {
     std::ostringstream command;
-    command << "cd " << std::experimental::filesystem::current_path() << "\\lua_scripts" << " & git pull";
+    command << "cd " << std::filesystem::current_path() << "\\lua_scripts" << " & git pull";
     system(command.str().c_str());
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
 
