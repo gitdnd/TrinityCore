@@ -747,6 +747,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "ResetHonor", &LuaPlayer::ResetHonor },
     { "ClearHonorInfo", &LuaPlayer::ClearHonorInfo },
 #endif
+    { "GetAvgItemLevel", &LuaPlayer::GetAvgItemLevel },
 
     { NULL, NULL }
 };

@@ -4136,5 +4136,15 @@ namespace LuaPlayer
     player->RemovePet(player->GetPet(), (PetSaveMode)mode, returnreagent);
     return 0;
     }*/
+    /**
+     * Returns players average item level.
+     *
+      * @return average item level.
+     */
+    int GetAvgItemLevel(lua_State* L, Player* player)
+    {
+        Eluna::Push(L, player->GetAverageItemLevel());
+        return 1;
+    }
 };
 #endif
