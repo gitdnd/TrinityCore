@@ -718,6 +718,10 @@ void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     if (!caster)
         return;
 
+    auto mover = _player->GetUnitBeingMoved();
+    if (mover->GetGUID() != caster->GetGUID())
+        return;
+
     Spell* spell = caster->FindCurrentSpellBySpellId(spellId);
     if (!spell || !spell->m_targets.HasDst())
         return;
