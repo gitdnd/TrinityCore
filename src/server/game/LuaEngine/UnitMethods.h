@@ -3026,5 +3026,41 @@ namespace LuaUnit
     Eluna::Push(L, summon);
     return 1;
     }*/
+
+    /**
+     * Spawns a dynamic object
+     *
+     * @param uint32 spell id
+     * @param float radius
+     * @param uint8 type (only 0-2 valid)
+     * @param uint32 duration (in seconds)
+     * @param float x cord
+     * @param float y cord
+     * @param float z cord
+     */
+    int SpawnDynObject(lua_State* L, Unit* unit)
+    {
+        uint32 spellId = Eluna::CHECKVAL<uint32>(L, 2);
+        float radius = Eluna::CHECKVAL<float>(L, 3);
+        uint8 type = Eluna::CHECKVAL<uint8>(L, 4);
+        uint32 duration = Eluna::CHECKVAL<uint32>(L, 5);
+        float x = Eluna::CHECKVAL<float>(L, 6);
+        float y = Eluna::CHECKVAL<float>(L, 7);
+        float z = Eluna::CHECKVAL<float>(L, 8);
+        if(!sSpellMgr->GetSpellInfo(spellId))
+            return luaL_argerror(L, 2, "invalid spell supplied .");
+        if (type >= 3)
+            return luaL_argerror(L, 4, "valid dynamic object type expected");
+        DynamicObject* dynObj = new DynamicObject(false);
+        if (dynObj->CreateDynamicObject(unit->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), unit, spellId, Position(x, y, z), radius, DynamicObjectType(type)))
+            dynObj->SetDuration(duration);
+        else
+        {
+            delete dynObj;
+            return luaL_error(L, "Unexpected error occured creating dynamic object.");
+        }
+          
+        return 0;
+    }
 };
 #endif

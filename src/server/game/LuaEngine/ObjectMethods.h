@@ -460,5 +460,6 @@ namespace LuaObject
         Eluna::Push(L, obj->ToPlayer());
         return 1;
     }
+
 };
 #endif

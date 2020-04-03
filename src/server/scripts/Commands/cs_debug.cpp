@@ -1969,7 +1969,10 @@ public:
         if (dynObj->CreateDynamicObject(player->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), player, spell, player->GetPosition(), radius, DynamicObjectType(type)))
             dynObj->SetDuration(duration);
         else
+        {
             handler->PSendSysMessage("Dyn Obj spawn failed.");
+            delete dynObj;
+        }
         return true;
     }
 };

@@ -185,7 +185,7 @@ ElunaRegister<Object> ObjectMethods[] =
     { "ToPlayer", &LuaObject::ToPlayer },
     { "ToCorpse", &LuaObject::ToCorpse },
     { "RemoveFlag", &LuaObject::RemoveFlag },
-
+ 
     { NULL, NULL }
 };
 
@@ -432,6 +432,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "DealDamage", &LuaUnit::DealDamage },
     { "DealHeal", &LuaUnit::DealHeal },
     { "AddThreat", &LuaUnit::AddThreat },
+    { "SpawnDynObject", &LuaUnit::SpawnDynObject },
 
     { NULL, NULL }
 };
