@@ -120,7 +120,6 @@ public:
                     case Z: GOMove::MoveGameObject(player, x, y, player->GetPositionZ(), o, p, lowguid);       break;
                     case O: GOMove::MoveGameObject(player, x, y, z, player->GetOrientation(), p, lowguid);     break;
                     case RESPAWN: GOMove::SpawnGameObject(player, x, y, z, o, p, target->GetEntry());          break;
-                    case ACTIVATE: GOMove::ActivateGameObject(player, lowguid);                                break;
                     case GOTO:
                     {
                         // stop flight if need
@@ -208,6 +207,7 @@ public:
             {
                 switch (ID)
                 {
+                case ACTIVATE: GOMove::ActivateGameObject(player, lowguid); break;
                 case SPAWN:
                 {
                     if (GOMove::SpawnGameObject(player, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), player->GetPhaseMaskForSpawn(), ARG))
