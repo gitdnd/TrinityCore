@@ -108,7 +108,7 @@ void GOMove::ActivateGameObject(Player* player, ObjectGuid::LowType lowguid)
     uint32_t const autoCloseTime = object->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
 
     object->SetLootState(GO_READY);
-    object->UseDoorOrButton(autoCloseTime, false, handler->GetSession()->GetPlayer());
+    object->UseDoorOrButton(autoCloseTime, false, player);
 
 }
 
