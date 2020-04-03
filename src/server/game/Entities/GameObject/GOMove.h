@@ -42,6 +42,7 @@ public:
     static void SendAddonMessage(Player* player, const char* msg);
 
     static void DeleteGameObject(GameObject* object);
+    static void ActivateGameObject(Player* player, ObjectGuid::LowType lowguid);
     static GameObject* GetGameObject(Player* player, ObjectGuid::LowType lowguid);
     static GameObject* SpawnGameObject(Player* player, float x, float y, float z, float o, uint32 p, uint32 entry);
     static GameObject* MoveGameObject(Player* player, float x, float y, float z, float o, uint32 p, ObjectGuid::LowType lowguid);

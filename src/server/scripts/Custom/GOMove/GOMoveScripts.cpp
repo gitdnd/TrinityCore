@@ -63,6 +63,7 @@ public:
         PHASE,
         SELECTALLNEAR,
         SPAWNSPELL,
+        ACTIVATE,
     };
 
     std::vector<ChatCommand> GetCommands() const override
@@ -113,12 +114,13 @@ public:
                     uint32 p = target->GetPhaseMask();
                     switch (ID)
                     {
-                    case DELET: GOMove::DeleteGameObject(target); GOMove::SendRemove(player, lowguid); break;
+                    case DELET: GOMove::DeleteGameObject(target); GOMove::SendRemove(player, lowguid);         break;
                     case X: GOMove::MoveGameObject(player, player->GetPositionX(), y, z, o, p, lowguid);       break;
                     case Y: GOMove::MoveGameObject(player, x, player->GetPositionY(), z, o, p, lowguid);       break;
                     case Z: GOMove::MoveGameObject(player, x, y, player->GetPositionZ(), o, p, lowguid);       break;
                     case O: GOMove::MoveGameObject(player, x, y, z, player->GetOrientation(), p, lowguid);     break;
-                    case RESPAWN: GOMove::SpawnGameObject(player, x, y, z, o, p, target->GetEntry());                   break;
+                    case RESPAWN: GOMove::SpawnGameObject(player, x, y, z, o, p, target->GetEntry());          break;
+                    case ACTIVATE: GOMove::ActivateGameObject(player, lowguid);                                break;
                     case GOTO:
                     {
                         // stop flight if need

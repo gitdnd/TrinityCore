@@ -95,6 +95,23 @@ void GOMove::DeleteGameObject(GameObject * object)
     GameObject::DeleteFromDB(spawnid);
 }
 
+void GOMove::ActivateGameObject(Player* player, ObjectGuid::LowType lowguid)
+{
+    // copy paste .gob activate command
+    GameObject* object = ChatHandler(player->GetSession()).GetObjectFromPlayerMapByDbGuid(lowguid);
+    if (!object)
+    {
+        SendRemove(player, lowguid);
+        return;
+    }
+
+    uint32_t const autoCloseTime = object->GetGOInfo()->GetAutoCloseTime() ? 10000u : 0u;
+
+    object->SetLootState(GO_READY);
+    object->UseDoorOrButton(autoCloseTime, false, handler->GetSession()->GetPlayer());
+
+}
+
 GameObject * GOMove::SpawnGameObject(Player* player, float x, float y, float z, float o, uint32 p, uint32 entry)
 {
     if (!player || !entry)
