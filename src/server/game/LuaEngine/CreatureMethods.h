@@ -732,7 +732,7 @@ namespace LuaCreature
 #else
             Unit* target = (*itr)->getTarget();
 #endif
-            if (!target)
+            if (!target || itr->IsOffline())
                 continue;
             if (playerOnly && target->GetTypeId() != TYPEID_PLAYER)
                 continue;
