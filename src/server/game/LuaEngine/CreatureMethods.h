@@ -728,7 +728,7 @@ namespace LuaCreature
         for (ThreatReference const* itr : threatlist)
         {
 #ifdef TRINITY
-            Unit* target = itr->GetOwner();
+            Unit* target = itr->GetVictim();
 #else
             Unit* target = (*itr)->getTarget();
 #endif
