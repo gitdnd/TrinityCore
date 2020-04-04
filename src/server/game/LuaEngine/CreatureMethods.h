@@ -718,22 +718,17 @@ namespace LuaCreature
         ThreatList const& threatlist = creature->GetThreatManager().getThreatList();
 #endif
 #ifdef TRINITY
-        auto const& threatlist = creature->GetThreatManager().GetThreatenedByMeList();
+        auto const& threatlist = creature->GetThreatManager().GetSortedThreatList();
 #endif
 #ifdef AZEROTHCORE
         auto const& threatlist = creature->getThreatManager().getThreatList();
 #endif
 
-        if (threatlist.empty())
-            return 1;
-        if (position >= threatlist.size())
-            return 1;
-
         std::list<Unit*> targetList;
-        for (auto itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+        for (ThreatReference const* itr : threatlist)
         {
 #ifdef TRINITY
-            Unit* target = itr->second->GetOwner();
+            Unit* target = itr->GetOwner();
 #else
             Unit* target = (*itr)->getTarget();
 #endif
