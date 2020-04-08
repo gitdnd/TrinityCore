@@ -16,11 +16,20 @@
 #define linit_c
 #define LUA_LIB
 
+#include <WinSock2.h>
+
 #include "lua.h"
 
 #include "lualib.h"
 #include "lauxlib.h"
 
+// LuaSocket
+#include "mime.h"
+#include "luasocket.h"
+
+// LuaSec
+#include "ssl.h"
+#include "x509.h"
 
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
@@ -45,6 +54,11 @@ static const luaL_Reg loadedlibs[] = {
 ** these libs are preloaded and must be required before used
 */
 static const luaL_Reg preloadedlibs[] = {
+  { "mime.core", luaopen_mime_core },
+  { "socket.core", luaopen_socket_core },
+  { "ssl.core", luaopen_ssl_core },
+  { "ssl.context", luaopen_ssl_context },
+  { "ssl.x509", luaopen_ssl_x509 },
   {NULL, NULL}
 };
 
