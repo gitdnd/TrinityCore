@@ -417,7 +417,7 @@ void Item::SaveToDB(SQLTransaction& trans)
                     stmt->setUInt32(i++, itemTemplate->ItemSet);
                     for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
                         stmt->setInt8(i++, itemTemplate->Socket[j].Color);
-                    stmt->setInt8(i++, itemTemplate->DisenchantID);
+                    stmt->setUInt32(i++, itemTemplate->DisenchantID);
                     trans->Append(stmt);
                 }
             }

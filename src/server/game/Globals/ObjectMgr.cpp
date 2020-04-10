@@ -3459,7 +3459,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
             itemTemplate->Socket[j].Color = uint32(fields[i++].GetUInt8());
 
-        itemTemplate->DisenchantID = uint32(fields[i++].GetUInt8());
+        itemTemplate->DisenchantID = uint32(fields[i++].GetUInt32());
 
         //itemTemplate->UpdateDisplay();
 
