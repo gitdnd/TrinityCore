@@ -612,13 +612,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModi
     }
     ASSERT(quality < MAX_ITEM_QUALITY);
 
-    // apply bonding type
-    if (quality >= ITEM_QUALITY_POOR && quality < ITEM_QUALITY_UNCOMMON)
-        output->Bonding = 0;
-    else if (quality <= ITEM_QUALITY_EPIC && quality >= ITEM_QUALITY_UNCOMMON)
-        output->Bonding = 2;
-    else if (quality >= ITEM_QUALITY_LEGENDARY)
-        output->Bonding = 1;
+    // always bind on pickup
+    output->Bonding = 1;
 
     // decide stat amount
     uint32 statscount = quality - 1;
@@ -741,6 +736,25 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModi
                 continue;
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
+    }
+
+    // Hardcode disenchant ID
+    switch (quality) {
+    case ITEM_QUALITY_LEGENDARY:
+        output->DisenchantID = 60004;
+        break;
+    case ITEM_QUALITY_EPIC:
+        output->DisenchantID = 60003;
+        break;
+    case ITEM_QUALITY_RARE:
+        output->DisenchantID = 60002;
+        break;
+    case ITEM_QUALITY_UNCOMMON:
+        output->DisenchantID = 60001;
+        break;
+    case ITEM_QUALITY_NORMAL:
+        output->DisenchantID = 60000;
+        break;
     }
 
     // Generate random item name
