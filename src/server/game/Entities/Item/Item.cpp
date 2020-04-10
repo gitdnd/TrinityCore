@@ -266,7 +266,7 @@ Item::Item()
     m_paidExtendedCost = 0;
 }
 
-bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owner)
+bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owner, VirtualModifier modifier)
 {
     Object::_Create(guidlow, 0, HighGuid::Item);
 
@@ -277,7 +277,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(itemProto))
     {
-        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto))
+        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto, modifier))
         {
             itemProto = newProto;
             itemId = itemProto->ItemId;
@@ -1029,7 +1029,7 @@ void Item::SendTimeUpdate(Player* owner)
     owner->SendDirectMessage(&data);
 }
 
-Item* Item::CreateItem(uint32 itemEntry, uint32 count, Player const* player /*= nullptr*/)
+Item* Item::CreateItem(uint32 itemEntry, uint32 count, Player const* player /*= nullptr*/, VirtualModifier modifier)
 {
     if (count < 1)
         return nullptr;                                        //don't create item at zero count
@@ -1043,7 +1043,7 @@ Item* Item::CreateItem(uint32 itemEntry, uint32 count, Player const* player /*= 
         ASSERT_NODEBUGINFO(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* item = NewItemOrBag(proto);
-        if (item->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), itemEntry, player))
+        if (item->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), itemEntry, player, modifier))
         {
             item->SetCount(count);
             return item;

@@ -26,6 +26,9 @@
 #include "ItemTemplate.h"
 #include "Loot.h"
 
+// Virtual Item Generator
+#include "VirtualItemMgr.h"
+
 class SpellInfo;
 class Bag;
 class Unit;
@@ -64,12 +67,12 @@ class TC_GAME_API Item : public Object
     friend void RemoveItemFromUpdateQueueOf(Item* item, Player* player);
 
     public:
-        static Item* CreateItem(uint32 itemEntry, uint32 count, Player const* player = nullptr);
+        static Item* CreateItem(uint32 itemEntry, uint32 count, Player const* player = nullptr, VirtualModifier modifier = VirtualModifier());
         Item* CloneItem(uint32 count, Player const* player = nullptr) const;
 
         Item();
 
-        virtual bool Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owner);
+        virtual bool Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owner, VirtualModifier modifier = VirtualModifier());
 
         ItemTemplate const* GetTemplate() const;
 

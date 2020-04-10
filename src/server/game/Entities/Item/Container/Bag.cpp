@@ -68,7 +68,7 @@ void Bag::RemoveFromWorld()
     Item::RemoveFromWorld();
 }
 
-bool Bag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner)
+bool Bag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner, VirtualModifier modifier)
 {
     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemid);
 

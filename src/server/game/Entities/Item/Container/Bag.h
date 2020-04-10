@@ -32,7 +32,7 @@ class TC_GAME_API Bag : public Item
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner) override;
+        bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner, VirtualModifier modifier) override;
 
         void StoreItem(uint8 slot, Item* pItem, bool update);
         void RemoveItem(uint8 slot, bool update);
