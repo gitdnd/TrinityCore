@@ -556,6 +556,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         return nullptr;
 
     uint32 entry = generator->GenerateEntry(store);
+    temp->seed = modifier.seed;
     temp->ItemId = entry;
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
     if (display == 0)

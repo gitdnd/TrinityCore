@@ -40,6 +40,11 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 base_entry;
 
     /**
+     * The items randomly generated seed
+     */
+    uint32 seed;
+
+    /**
      * Updates the displayId used by the item from DBC data to match the current item entry's displayid.
      */
     void UpdateDisplay();
