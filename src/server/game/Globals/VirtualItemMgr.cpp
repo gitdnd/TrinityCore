@@ -674,6 +674,9 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         pool = modifier.statpool;
     ASSERT(pool >= 0 && pool < 0x7FFF);
 
+    // modify stat pool size depending on item quality
+    pool = (pool * quality) / 2;
+
     // select stat group
     StatGroup statgroupid = modifier.statgroup;
     if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
