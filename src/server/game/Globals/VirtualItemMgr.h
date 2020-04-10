@@ -56,6 +56,7 @@ struct VirtualModifier
     uint8 quality;
     int16 statpool;
     StatGroup statgroup;
+    uint32 seed;
 
     class StatGroupData
     {
@@ -147,6 +148,9 @@ public:
 	 */
 	void LoadNamesFromDB();
 
+    // Convert seed from uint32 to char* for urand.
+    char* ConvertSeed(uint32 seed) const;
+
 	struct NameInfo
 	{
 		NameInfo() {}
@@ -216,12 +220,12 @@ public:
      * Uses passed base and modifier to generate a new VirtualItemTemplate.
      * Returns the newly created VirtualItemTemplate.
      */
-    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, uint32 seed = 0, VirtualModifier const& modifier = VirtualModifier());
+    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier = VirtualModifier());
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStats(ItemTemplate* output, char* seed, VirtualModifier const& modifier = VirtualModifier()) const;
+    void GenerateStats(ItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
 
     /**
      * Checks if the passed template is a valid virtual item template.

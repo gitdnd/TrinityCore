@@ -73,7 +73,7 @@ void VirtualItemTemplate::UpdateDisplay()
         DisplayInfoID = dbcitem->DisplayId;
 }
 
-VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM)
+VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0)
 {
 }
 
@@ -291,6 +291,14 @@ VirtualItemMgr::~VirtualItemMgr()
         delete it.second;
     }
     store.clear();
+}
+
+char* VirtualItemMgr::ConvertSeed(uint32 seed) const
+{
+    char cseed[11] = "";
+    sprintf(cseed, "%u", seed);
+
+    return cseed;
 }
 
 void VirtualItemMgr::LoadNamesFromDB()
@@ -525,25 +533,22 @@ VirtualItemTemplate const* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
     return nullptr;
 }
 
-VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, uint32 seed, VirtualModifier const& modifier)
+VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
 {
     if (!base)
         return nullptr;
 
-    char cseed[11] = "";
-
     // If no seed supplied, generate a new seed.
-    if (seed == 0)
+    if (modifier.seed == 0)
     {
         SFMTRand sfmt;
-        seed = sfmt.RandomUInt32(); 
+        modifier.seed = sfmt.RandomUInt32();
     }
 
-    // Convert seed from uint32 to char* for urand.
-    sprintf(cseed, "%u", seed);
+    char* seed = ConvertSeed(modifier.seed);
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
-    GenerateStats(temp, cseed, modifier);
+    GenerateStats(temp, modifier);
 
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);
@@ -552,7 +557,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     uint32 entry = generator->GenerateEntry(store);
     temp->ItemId = entry;
-    uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, cseed);
+    uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
     if (display == 0)
         temp->UpdateDisplay();
     else
@@ -567,10 +572,13 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return temp;
 }
 
-void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModifier const& modifier) const
+void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifier) const
 {
     // decide quality
     uint32 quality = output->Quality;
+
+    char* seed = ConvertSeed(modifier.seed);
+
     if (modifier.quality < MAX_ITEM_QUALITY)
         quality = modifier.quality;
     else
@@ -616,7 +624,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModi
     output->Bonding = 1;
 
     // decide stat amount
-    uint32 statscount = quality - 1;
+    uint32 statscount = quality;
     if (statscount < 0)
         statscount = 0;
     ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
@@ -644,6 +652,10 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, char* seed, VirtualModi
         // depending on quality, add multiplier to armor piece
         float qmulti = ((int32(quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
         armor = armor * qmulti;
+
+        // add a random 10% increase or decrease of stats
+        float randmulti = (urand(90, 110, seed) / 100.0f);
+        armor = armor * randmulti;
     }
 
     // clear old stats
