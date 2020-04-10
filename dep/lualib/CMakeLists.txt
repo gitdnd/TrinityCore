@@ -12,13 +12,30 @@ set(lua_STAT_SRCS
   ${sources}
 )
 
+#LuaSocket
+file(GLOB LuaSocket LuaSocket/*.C)
+    LIST(APPEND lua_STAT_SRCS ${LuaSocket})
+    source_group("LuaSocket" FILES ${LuaSocket})
+
+#LuaSec
+file(GLOB LuaSec LuaSec/*.C)
+    LIST(APPEND lua_STAT_SRCS ${LuaSec})
+    source_group("LuaSec" FILES ${LuaSec})
+
 add_library(lualib STATIC ${lua_STAT_SRCS})
 
 
 target_include_directories(lualib
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaSocket
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaSec)
 
 target_link_libraries(lualib
   PRIVATE
-    trinity-dependency-interface)
+    trinity-dependency-interface
+  PUBLIC
+    openssl)
+
+add_definitions(-DLUASOCKET_DEBUG)
+add_definitions(-DLUA_COMPAT_MODULE)
