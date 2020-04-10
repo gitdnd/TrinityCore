@@ -214,7 +214,7 @@ float VirtualModifier::GetTypeSlotArmorModifier(ItemSubclassArmor subclass, Inve
             case INVTYPE_FEET:
                 return 3.69f;
             case INVTYPE_WRISTS:
-                return 2.35;
+                return 2.35f;
             case INVTYPE_HANDS:
                 return 3.34f;
             default:
@@ -228,7 +228,7 @@ float VirtualModifier::GetTypeSlotArmorModifier(ItemSubclassArmor subclass, Inve
             case INVTYPE_SHOULDERS:
                 return 5.28f;
             case INVTYPE_CHEST:
-                return 8.48;
+                return 8.48f;
             case INVTYPE_WAIST:
                 return 3.73f;
             case INVTYPE_LEGS:
@@ -423,12 +423,12 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
     return fullName;
 }
 
-std::vector<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) const
+std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) const
 {
     if (!info)
-        return std::vector<uint32>();
+        return std::list<uint32>();
 
-    std::vector<uint32> displays;
+    std::list<uint32> displays;
     for (auto displaysitr : availableDisplays)
     {
         if (info->quality != displaysitr.quality)
@@ -450,46 +450,15 @@ std::vector<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info)
 
 uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const
 {
-    uint32 display = 0;
+    std::list<uint32> displayLists;
+    displayInfo dInfo(quality, _class, subclass, inventoryType);
+    displayLists = GetDisplaysForDisplayInfo(&dInfo);
 
-
-    // TODO: Add armor case if this is something we need/want
-    if (_class == ITEM_CLASS_WEAPON)
-    {
-        // Some subclasses use the same database name lists.
-        // No need to have duplicate db entries, so switch item subclass.
-        if (subclass == ITEM_SUBCLASS_WEAPON_SWORD2)
-            subclass = ITEM_SUBCLASS_WEAPON_SWORD;
-        else if (subclass == ITEM_SUBCLASS_WEAPON_MACE2)
-            subclass = ITEM_SUBCLASS_WEAPON_MACE;
-        else if (subclass == ITEM_SUBCLASS_WEAPON_AXE2)
-            subclass = ITEM_SUBCLASS_WEAPON_AXE;
-        else if (subclass == ITEM_SUBCLASS_WEAPON_CROSSBOW)
-            subclass = ITEM_SUBCLASS_WEAPON_BOW;
-
-        // Retrieve all the string lists
-        std::map<uint32, std::vector<uint32>> displayLists;
-        for (size_t i = 1; i <= 7; ++i)
-        {
-            displayInfo dInfo(quality, _class, subclass, inventoryType);
-            auto list = GetDisplaysForDisplayInfo(&dInfo);
-
-            // Make sure the current list is not empty. If it is, fall back to template item name.
-            if (list.empty())
-                return display;
-
-            displayLists.insert(std::make_pair(i, list));
-        }
-
-        
-        // Concat the correct full item name for the item quality
-
-
-        display = displayLists[quality][urand(0, displayLists[quality].size() - 1, seed)];
-   
-    }
-
-    return display;
+    if (displayLists.empty())
+        return 0;
+    auto display = std::begin(displayLists);
+    std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, seed));
+    return *display;
 }
 
 void VirtualItemMgr::LoadDisplaysFromDB()
