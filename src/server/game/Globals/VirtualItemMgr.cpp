@@ -545,7 +545,10 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         modifier.seed = sfmt.RandomUInt32();
     }
 
-    char* seed = ConvertSeed(modifier.seed);
+    //char* seed = ConvertSeed(modifier.seed);
+
+    char seed[11] = "";
+    sprintf(seed, "%u", modifier.seed);
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
     GenerateStats(temp, modifier);
@@ -578,7 +581,10 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     // decide quality
     uint32 quality = output->Quality;
 
-    char* seed = ConvertSeed(modifier.seed);
+    //char* seed = ConvertSeed(modifier.seed);
+
+    char seed[11] = "";
+    sprintf(seed, "%u", modifier.seed);
 
     if (modifier.quality < MAX_ITEM_QUALITY)
         quality = modifier.quality;
