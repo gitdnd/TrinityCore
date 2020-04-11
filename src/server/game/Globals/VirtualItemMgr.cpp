@@ -747,6 +747,65 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     if (!name.empty())
         output->Name1 = name;
 
+    // If item is a weapon, then generate bot and top damage + speed
+    if (output->Class == ITEM_CLASS_WEAPON)
+    {
+        switch (output->SubClass)
+        {
+            case ITEM_SUBCLASS_WEAPON_SWORD2:
+            case ITEM_SUBCLASS_WEAPON_AXE2:
+            case ITEM_SUBCLASS_WEAPON_MACE2:
+            case ITEM_SUBCLASS_WEAPON_POLEARM:
+            case ITEM_SUBCLASS_WEAPON_STAFF:
+            {
+                output->Delay = (urand(20, 40, seed) * 100);
+                output->Damage[0].DamageMin = (0.87f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageMax = (1.31f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageType = 0;
+                break;
+            }
+            case ITEM_SUBCLASS_WEAPON_AXE:
+            case ITEM_SUBCLASS_WEAPON_MACE:
+            case ITEM_SUBCLASS_WEAPON_SWORD:
+            case ITEM_SUBCLASS_WEAPON_FIST:
+            case ITEM_SUBCLASS_WEAPON_DAGGER:
+            {
+                output->Delay = (urand(13, 30, seed) * 100);
+                output->Damage[0].DamageMin = (0.87f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageMax = (1.31f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageType = 0;
+                break;
+            }
+            case ITEM_SUBCLASS_WEAPON_BOW:
+            case ITEM_SUBCLASS_WEAPON_GUN:
+            case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+            {
+                output->Delay = (urand(15, 34, seed) * 100);
+                output->Damage[0].DamageMin = (0.78f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageMax = (1.08f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageType = 0;
+                break;
+            }
+            case ITEM_SUBCLASS_WEAPON_WAND:
+            {
+                output->Delay = (urand(12, 20, seed) * 100);
+                output->Damage[0].DamageMin = (1.05f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageMax = (1.95f * (float)(output->Delay / 1000));
+                output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, seed);
+                break;
+            }
+
+            default:
+                break;
+        }
+
+        // Make sure top and bottom damage has a random damage distribution as well as multiplied by item level
+        float randmulti = (urand(90, 110, seed) / 100.0f);
+
+        output->Damage[0].DamageMin = (output->Damage[0].DamageMin * ilevel) * randmulti;
+        output->Damage[0].DamageMax = (output->Damage[0].DamageMax * ilevel) * randmulti;
+    }
+
     // apply other item data
     output->Quality = quality;
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked

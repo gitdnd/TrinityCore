@@ -412,6 +412,10 @@ void Item::SaveToDB(SQLTransaction& trans)
                             stmt->setInt16(i++, 0);
                         }
                     }
+                    stmt->setFloat(i++, itemTemplate->Damage[0].DamageMin);
+                    stmt->setFloat(i++, itemTemplate->Damage[0].DamageMax);
+                    stmt->setUInt8(i++, itemTemplate->Damage[0].DamageType);
+                    stmt->setUInt16(i++, itemTemplate->Delay);
                     stmt->setUInt16(i++, itemTemplate->Armor);
                     stmt->setUInt32(i++, itemTemplate->Bonding);
                     stmt->setUInt32(i++, itemTemplate->ItemSet);
