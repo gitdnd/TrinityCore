@@ -312,7 +312,16 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
-        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask) != 0; }
+        bool InSamePhase(uint32 phasemask) const
+        {
+            uint32 myMask = GetPhaseMask();
+            // If the objects phase is >= 64 then it should always be able to see phase 1 and its own phase
+            if (myMask >= 64)
+            {
+                return phasemask == 1 || myMask == phasemask;
+            }
+            return (GetPhaseMask() & phasemask) != 0;
+        }
         bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
         static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
 
