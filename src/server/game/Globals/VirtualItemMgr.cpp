@@ -798,12 +798,6 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             default:
                 break;
         }
-
-        // Make sure top and bottom damage has a random damage distribution as well as multiplied by item level
-        float randmulti = (urand(90, 110, seed) / 100.0f);
-
-        output->Damage[0].DamageMin = output->Damage[0].DamageMin * randmulti;
-        output->Damage[0].DamageMax = output->Damage[0].DamageMax * randmulti;
     }
 
     // apply other item data
