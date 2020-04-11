@@ -759,8 +759,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             case ITEM_SUBCLASS_WEAPON_STAFF:
             {
                 output->Delay = (urand(20, 40, seed) * 100);
-                output->Damage[0].DamageMin = (1.08f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
-                output->Damage[0].DamageMax = (1.08f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMin = (1.08f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMax = (1.08f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
                 output->Damage[0].DamageType = 0;
                 break;
             }
@@ -771,8 +771,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             case ITEM_SUBCLASS_WEAPON_DAGGER:
             {
                 output->Delay = (urand(13, 30, seed) * 100);
-                output->Damage[0].DamageMin = (0.83f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
-                output->Damage[0].DamageMax = (0.83f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMin = (0.83f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMax = (0.83f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
                 output->Damage[0].DamageType = 0;
                 break;
             }
@@ -781,16 +781,16 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             {
                 output->Delay = (urand(15, 34, seed) * 100);
-                output->Damage[0].DamageMin = (0.93f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
-                output->Damage[0].DamageMax = (0.93f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMin = (0.93f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMax = (0.93f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
                 output->Damage[0].DamageType = 0;
                 break;
             }
             case ITEM_SUBCLASS_WEAPON_WAND:
             {
                 output->Delay = (urand(12, 20, seed) * 100);
-                output->Damage[0].DamageMin = (1.5f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
-                output->Damage[0].DamageMax = (1.5f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMin = (1.5f * (float)(output->Delay / 1000) * ilevel) * 0.85f;
+                output->Damage[0].DamageMax = (1.5f * (float)(output->Delay / 1000) * ilevel) * 1.15f;
                 output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, seed);
                 break;
             }
