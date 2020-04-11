@@ -412,12 +412,12 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo) const
         case CONDITION_PHASEMASK:
         {
             // If the objects phase is >= 64 then it should always be able to see phase 1 and its own phase
-            uint32 myMask = object->GetPhaseMask();
-            if (myMask >= 64)
+            uint32 otherMask = object->GetPhaseMask();
+            if (ConditionValue1 >= 64)
             {
-                return ConditionValue1 == 1 || myMask == ConditionValue1;
+                return otherMask == 1 || otherMask == ConditionValue1;
             }
-            condMeets = (myMask & ConditionValue1) != 0;
+            condMeets = (otherMask & ConditionValue1) != 0;
             break;
         }
         case CONDITION_TITLE:
