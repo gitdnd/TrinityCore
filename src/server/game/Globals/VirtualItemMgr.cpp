@@ -797,6 +797,13 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             default:
                 break;
         }
+
+        // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
+        if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
+        {
+            output->Damage[0].DamageMin = output->Damage[0].DamageMin / 2.0f;
+            output->Damage[0].DamageMax = output->Damage[0].DamageMax / 2.0f;
+        }
     }
 
     // apply other item data
