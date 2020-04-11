@@ -314,11 +314,11 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         uint32 GetPhaseMask() const { return m_phaseMask; }
         bool InSamePhase(uint32 phasemask) const
         {
-            uint32 otherMask = GetPhaseMask();
+            uint32 myMask = GetPhaseMask();
             // If the objects phase is >= 64 then it should always be able to see phase 1 and its own phase
-            if (phasemask >= 64)
+            if (myMask >= 64)
             {
-                return otherMask == 1 || otherMask == phasemask;
+                return phasemask == 1 || myMask == phasemask;
             }
             return (GetPhaseMask() & phasemask) != 0;
         }
