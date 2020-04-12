@@ -423,24 +423,21 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
     return fullName;
 }
 
-std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) const
+std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const
 {
-    if (!info)
-        return std::list<uint32>();
-
     std::list<uint32> displays;
     for (auto displaysitr : availableDisplays)
     {
-        if (info->quality != displaysitr.quality)
+        if (quality != displaysitr.quality)
             continue;
 
-        if (info->iInventoryType != displaysitr.iInventoryType)
+        if (inventoryType != displaysitr.iInventoryType)
             continue;
 
-        if (info->iClass != displaysitr.iClass)
+        if (_class != displaysitr.iClass)
             continue;
 
-        if (info->isubClass != displaysitr.isubClass)
+        if (subclass != displaysitr.isubClass)
             continue;
 
         displays.push_back(displaysitr.displayId);
@@ -451,8 +448,7 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) c
 uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const
 {
     std::list<uint32> displayLists;
-    displayInfo dInfo(quality, _class, subclass, inventoryType);
-    displayLists = GetDisplaysForDisplayInfo(&dInfo);
+    displayLists = GetDisplaysForDisplayInfo(quality, _class, subclass, inventoryType);
 
     if (displayLists.empty())
     {
@@ -530,7 +526,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     uint32 entry = generator->GenerateEntry(store);
     temp->seed = modifier.seed;
     temp->ItemId = entry;
-    sWorld->SendGlobalText("Generated item with display ",nullptr);
+    std::stringstream d1;
+    d1 << "Looking for " << temp->Quality << " " << temp->Class << " " << temp->SubClass << " " << temp->InventoryType;
+    sWorld->SendWorldText(d1.str().c_str());
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
     std::stringstream ss;
     ss << "Generated item with display " << display;

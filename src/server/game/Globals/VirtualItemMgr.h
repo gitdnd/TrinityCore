@@ -203,7 +203,7 @@ public:
     /**
      * Return a vector of available displays for the specified requirements.
      */
-    std::list<uint32> GetDisplaysForDisplayInfo(displayInfo* info) const;
+    std::list<uint32> GetDisplaysForDisplayInfo(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
 
     /**
      * Creates all used generators and sets their entry ranges in addition to constructing the object itself.
