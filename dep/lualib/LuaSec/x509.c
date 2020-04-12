@@ -293,11 +293,11 @@ int meth_extensions(lua_State* L)
       break;
 
     /* Push ret[oid] */
-    push_asn1_objname(L, extension->object, 1);
+    push_asn1_objname(L, X509_EXTENSION_get_object(extension), 1);
     push_subtable(L, -2);
 
     /* Set ret[oid].name = name */
-    push_asn1_objname(L, extension->object, 0);
+    push_asn1_objname(L, X509_EXTENSION_get_object(extension), 0);
     lua_setfield(L, -2, "name");
 
     n_general_names = sk_GENERAL_NAME_num(values);
@@ -404,7 +404,7 @@ static int meth_pubkey(lua_State* L)
     bytes = BIO_get_mem_data(bio, &data);
     if (bytes > 0) {
       lua_pushlstring(L, data, bytes);
-      switch(EVP_PKEY_type(pkey->type)) {
+      switch(EVP_PKEY_base_id(pkey)) {
         case EVP_PKEY_RSA:
           lua_pushstring(L, "RSA");
           break;
