@@ -614,6 +614,11 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         ilevel = modifier.ilevel;
     else
     {
+        // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.
+        // To prevent too small of a stat pool on early items.
+        if (modifier.plrAvgLvl < 20)
+            modifier.plrAvgLvl = 20;
+
         uint32 lvlMod = urand(0, 5, seed);
         ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5);
 
