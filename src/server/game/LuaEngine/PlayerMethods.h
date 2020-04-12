@@ -4146,5 +4146,12 @@ namespace LuaPlayer
         Eluna::Push(L, player->GetAverageItemLevel());
         return 1;
     }
+
+    int QuestKillCredit(lua_State* L, Player* player)
+    {
+        uint32 id = Eluna::CHECKVAL<uint32>(L, 2);
+        player->KillCreditGO(id);
+        return 0;
+    }
 };
 #endif
