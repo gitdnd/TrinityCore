@@ -16513,6 +16513,48 @@ void Player::KilledPlayerCreditForQuest(uint16 count, Quest const* quest)
         CompleteQuest(questId);
 }
 
+void Player::AdvanceQuestCredit(uint32 entry, ObjectGuid guid)
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (!questid)
+            continue;
+
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
+        if (!qInfo)
+            continue;
+
+        QuestStatusData& q_status = m_QuestStatus[questid];
+
+        if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+        {
+            for (uint8 j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
+            {
+                if (qInfo->GetQuestId() != entry)
+                    continue;
+
+                uint32 reqCastCount = qInfo->RequiredNpcOrGoCount[j];
+                uint16 curCastCount = q_status.CreatureOrGOCount[j];
+                if (curCastCount < reqCastCount)
+                {
+                    q_status.CreatureOrGOCount[j] = curCastCount + 1;
+
+                    m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
+
+                    SendQuestUpdateAddCreatureOrGo(qInfo, guid, j, curCastCount, 1);
+                }
+
+                if (CanCompleteQuest(questid))
+                    CompleteQuest(questid);
+
+                // same objective target can be in many active quests, but not in 2 objectives for single quest (code optimization).
+                break;
+            }
+        }
+    }
+}
+
 void Player::KillCreditGO(uint32 entry, ObjectGuid guid)
 {
     uint16 addCastCount = 1;

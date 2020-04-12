@@ -1277,6 +1277,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void KilledPlayerCredit(uint16 count = 1);
         void KilledPlayerCreditForQuest(uint16 count, Quest const* quest);
         void KillCreditGO(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
+        void AdvanceQuestCredit(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
         void TalkedToCreature(uint32 entry, ObjectGuid guid);
         void MoneyChanged(uint32 value);
         void ReputationChanged(FactionEntry const* factionEntry);
