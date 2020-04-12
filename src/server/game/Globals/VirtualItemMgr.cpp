@@ -431,7 +431,7 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) c
     std::list<uint32> displays;
     for (auto displaysitr : availableDisplays)
     {
-        if (info->quality != displaysitr.quality)
+        if (info->quality == displaysitr.quality)
             continue;
 
         if (info->iInventoryType != displaysitr.iInventoryType)
