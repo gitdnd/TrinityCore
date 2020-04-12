@@ -434,13 +434,13 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) c
         if (info->quality == displaysitr.quality)
             continue;
 
-        if (info->iInventoryType != displaysitr.iInventoryType)
+        if (info->iInventoryType == displaysitr.iInventoryType)
             continue;
 
-        if (info->iClass != displaysitr.iClass)
+        if (info->iClass == displaysitr.iClass)
             continue;
 
-        if (info->isubClass != displaysitr.isubClass)
+        if (info->isubClass == displaysitr.isubClass)
             continue;
 
         displays.push_back(displaysitr.displayId);
