@@ -821,6 +821,10 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         }
     }
 
+    // TODO: add custom descriptions to legendaries possibly?
+    // currently used to clean description of base template for crafting etc.
+    output->Description = "";
+
     // apply other item data
     output->Quality = quality;
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked

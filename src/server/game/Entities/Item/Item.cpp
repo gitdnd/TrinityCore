@@ -421,6 +421,7 @@ void Item::SaveToDB(SQLTransaction& trans)
                     stmt->setUInt16(i++, itemTemplate->Delay);
                     stmt->setUInt16(i++, itemTemplate->Armor);
                     stmt->setUInt32(i++, itemTemplate->Bonding);
+                    stmt->setString(i++, itemTemplate->Description);
                     stmt->setUInt32(i++, itemTemplate->ItemSet);
                     for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
                         stmt->setInt8(i++, itemTemplate->Socket[j].Color);
