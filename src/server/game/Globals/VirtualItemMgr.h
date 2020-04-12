@@ -57,12 +57,12 @@ struct VirtualModifier
     /**
      * Different modifiers that can be edited to change the output when the modifier is used to generate stats.
      */
-    uint8 ilevel;
+    uint32 ilevel;
     uint8 quality;
     int16 statpool;
     StatGroup statgroup;
     uint32 seed;
-    uint8 plrAvgLvl;
+    uint32 plrAvgLvl;
 
     class StatGroupData
     {
