@@ -428,10 +428,6 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(uint32 quality, uint
     std::list<uint32> displays;
     for (auto displaysitr : availableDisplays)
     {
-        std::stringstream beep;
-        beep << "Looking at " << displaysitr.quality << " " << displaysitr.iInventoryType << " " << displaysitr.iClass << " " << displaysitr.isubClass << " " << displaysitr.displayId;
-        sWorld->SendGlobalText(beep.str().c_str(), nullptr);
-
         if (quality != displaysitr.quality)
             continue;
 
@@ -531,8 +527,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     temp->seed = modifier.seed;
     temp->ItemId = entry;
     std::stringstream d1;
-    d1 << "Looking for " << temp->Quality << " " << temp->Class << " " << temp->SubClass << " " << temp->InventoryType;
-    sWorld->SendGlobalText(d1.str().c_str(), nullptr);
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
     std::stringstream ss;
     ss << "Generated item with display " << display;
