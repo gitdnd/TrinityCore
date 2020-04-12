@@ -277,6 +277,10 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(itemProto))
     {
+        // if no ilevel has been specifically set till now, set the item level to the players' average item level
+        if (!modifier.ilevel)
+            modifier.ilevel = owner->GetAverageItemLevel();
+
         if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto, modifier))
         {
             itemProto = newProto;
