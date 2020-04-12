@@ -62,6 +62,7 @@ struct VirtualModifier
     int16 statpool;
     StatGroup statgroup;
     uint32 seed;
+    uint8 plrAvgLvl;
 
     class StatGroupData
     {

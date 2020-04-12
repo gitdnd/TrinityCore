@@ -609,11 +609,16 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
 
     // decide itemlevel
+    // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
+    // if ilevel is not set, use the players average item level +/- 5 item levels.
     uint32 ilevel = output->ItemLevel;
     if (modifier.ilevel)
         ilevel = modifier.ilevel;
     else
-        ilevel = output->ItemLevel + ((int32(quality) - int32(output->Quality)) * 5);
+    {
+        uint32 lvlMod = urand(-5, 5, seed);
+        ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5) + lvlMod;
+    }
 
     output->ItemLevel = ilevel;
 
