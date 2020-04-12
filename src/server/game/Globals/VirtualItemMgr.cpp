@@ -627,24 +627,29 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
 
     output->ItemLevel = ilevel;
 
-    // decide armor, if item class is armor, armor should always be applied.
-    uint32 armor = 0;
-    if (output->Class == ITEM_CLASS_ARMOR)
+    // decide armor, if item class is armor and not of type misc, armor should always be applied.
+    if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
     {
         // by default we assume 1 ilevel = 1 armor
-        armor = 1*ilevel;
+        output->Armor = 1*ilevel;
 
         // retrieve armor slot and type multiplier
         float typeslotmod = VirtualModifier::GetTypeSlotArmorModifier((ItemSubclassArmor)output->SubClass, (InventoryType)output->InventoryType);
-        armor = armor * typeslotmod;
+        output->Armor = output->Armor * typeslotmod;
 
         // depending on quality, add multiplier to armor piece
         float qmulti = ((int32(quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
-        armor = armor * qmulti;
+        output->Armor = output->Armor * qmulti;
 
         // add a random 10% increase or decrease of stats
         float randmulti = (urand(90, 110, seed) / 100.0f);
-        armor = armor * randmulti;
+        output->Armor = output->Armor * randmulti;
+    }
+
+    // Apply block rating to shields
+    if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+    {
+        output->Block = uint32(0.93f*float(ilevel));
     }
 
     // clear old stats
@@ -833,7 +838,6 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     output->Quality = quality;
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked
     output->ItemLevel = ilevel;
-    output->Armor = armor;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
 }
 
