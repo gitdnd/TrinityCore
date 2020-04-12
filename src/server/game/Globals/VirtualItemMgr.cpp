@@ -528,7 +528,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     temp->ItemId = entry;
     std::stringstream d1;
     d1 << "Looking for " << temp->Quality << " " << temp->Class << " " << temp->SubClass << " " << temp->InventoryType;
-    sWorld->SendWorldText(d1.str().c_str());
+    sWorld->SendGlobalText(d1.str().c_str()),nullptr;
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
     std::stringstream ss;
     ss << "Generated item with display " << display;
