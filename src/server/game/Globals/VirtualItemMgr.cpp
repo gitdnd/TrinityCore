@@ -602,6 +602,10 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         statscount = 0;
     ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
 
+    // add up to two extra stats per item
+    uint32 statCountMod = urand(0, 2, seed);
+    statscount = statscount + statCountMod;
+
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
     // if ilevel is not set, use the players average item level +/- 5 item levels.
