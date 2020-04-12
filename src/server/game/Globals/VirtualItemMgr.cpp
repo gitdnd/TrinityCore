@@ -610,8 +610,15 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         ilevel = modifier.ilevel;
     else
     {
-        uint32 lvlMod = urand(-5, 5, seed);
-        ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5) + lvlMod;
+        uint32 lvlMod = urand(0, 5, seed);
+        ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5);
+
+        // there's gotta be a better way to do this..
+        uint32 addSub = urand(0, 1, seed);
+        if (addSub == 0)
+            ilevel = ilevel - lvlMod;
+        else
+            ilevel = ilevel + lvlMod;
     }
 
     output->ItemLevel = ilevel;
