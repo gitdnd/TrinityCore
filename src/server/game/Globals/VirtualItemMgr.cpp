@@ -530,7 +530,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     uint32 entry = generator->GenerateEntry(store);
     temp->seed = modifier.seed;
     temp->ItemId = entry;
-    sWorld->SendGlobalText("Generated item with display ");
+    sWorld->SendGlobalText("Generated item with display ",nullptr);
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
     std::stringstream ss;
     ss << "Generated item with display " << display;
