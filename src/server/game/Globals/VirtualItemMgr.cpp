@@ -428,6 +428,10 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(uint32 quality, uint
     std::list<uint32> displays;
     for (auto displaysitr : availableDisplays)
     {
+        std::stringstream beep;
+        beep << "Looking at " << displaysitr.quality << " " << displaysitr.iInventoryType << " " << displaysitr.iClass << " " << displaysitr.isubClass << " " << displaysitr.displayId;
+        sWorld->SendGlobalText(beep.str().c_str(), nullptr);
+
         if (quality != displaysitr.quality)
             continue;
 
