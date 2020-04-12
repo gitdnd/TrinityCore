@@ -431,16 +431,16 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(displayInfo* info) c
     std::list<uint32> displays;
     for (auto displaysitr : availableDisplays)
     {
-        if (info->quality == displaysitr.quality)
+        if (info->quality != displaysitr.quality)
             continue;
 
-        if (info->iInventoryType == displaysitr.iInventoryType)
+        if (info->iInventoryType != displaysitr.iInventoryType)
             continue;
 
-        if (info->iClass == displaysitr.iClass)
+        if (info->iClass != displaysitr.iClass)
             continue;
 
-        if (info->isubClass == displaysitr.isubClass)
+        if (info->isubClass != displaysitr.isubClass)
             continue;
 
         displays.push_back(displaysitr.displayId);
@@ -455,7 +455,10 @@ uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32
     displayLists = GetDisplaysForDisplayInfo(&dInfo);
 
     if (displayLists.empty())
+    {
+        sWorld->SendGlobalText("Help i found no displays", nullptr);
         return 0;
+    }
     auto display = std::begin(displayLists);
     std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, seed));
     return *display;
@@ -527,7 +530,11 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     uint32 entry = generator->GenerateEntry(store);
     temp->seed = modifier.seed;
     temp->ItemId = entry;
+    sWorld->SendGlobalText("Generated item with display ");
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
+    std::stringstream ss;
+    ss << "Generated item with display " << display;
+    sWorld->SendGlobalText(ss.str().c_str(), nullptr);
     if (display == 0)
         temp->UpdateDisplay();
     else
