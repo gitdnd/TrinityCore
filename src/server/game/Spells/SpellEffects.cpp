@@ -322,6 +322,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
     if (unitTarget && unitTarget->IsAlive())
     {
+        // Try to scale base damage effect based on ilevel
+        if (unitCaster && unitCaster->ToPlayer())
+        {
+            float iLevel = unitCaster->ToPlayer()->GetAverageItemLevel();
+            if (int(iLevel) < 100)
+            {
+                damage = damage * (iLevel / 100);
+            }
+        }
+
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
         {
