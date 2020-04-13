@@ -5003,6 +5003,7 @@ void Player::RepopAtGraveyard()
     }
 
     WorldSafeLocsEntry const* ClosestGrave;
+    bool overrideRepopLoc = false;
 
     // Special handle for battleground maps
     if (Battleground* bg = GetBattleground())
@@ -5013,8 +5014,8 @@ void Player::RepopAtGraveyard()
             ClosestGrave = bf->GetClosestGraveyard(this);
         else
         {
-            // Hardcode respawn point to The Hub
-            ClosestGrave = { 560, 435.3f, 371.6f, 14.9f };
+            ClosestGrave = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
+            overrideRepopLoc = true;
         }
     }
 
@@ -5023,7 +5024,7 @@ void Player::RepopAtGraveyard()
 
     // if no grave found, stay at the current location
     // and don't show spirit healer location
-    if (ClosestGrave)
+    if (ClosestGrave && !overrideRepopLoc)
     {
         TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
@@ -5031,6 +5032,18 @@ void Player::RepopAtGraveyard()
             WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);  // show spirit healer position on minimap
             data << ClosestGrave->map_id;
             data << TaggedPosition<Position::XYZ>(ClosestGrave->x, ClosestGrave->y, ClosestGrave->z);
+            SendDirectMessage(&data);
+        }
+    }
+    // Override repop location to The Hub
+    else if (ClosestGrave)
+    {
+        TeleportTo(550, 435.3f, 371.6f, 14.9f, 2.227985f, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+        if (isDead())                                        // not send if alive, because it used in TeleportTo()
+        {
+            WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4);  // show spirit healer position on minimap
+            data << 550;
+            data << TaggedPosition<Position::XYZ>(435.3f, 371.6f, 14.9f);
             SendDirectMessage(&data);
         }
     }
