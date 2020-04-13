@@ -295,10 +295,7 @@ VirtualItemMgr::~VirtualItemMgr()
 
 char* VirtualItemMgr::ConvertSeed(uint32 seed) const
 {
-    char cseed[11] = "";
-    sprintf(cseed, "%u", seed);
-
-    return cseed;
+    return const_cast<char*>(std::to_string(seed).c_str());
 }
 
 void VirtualItemMgr::LoadNamesFromDB()
