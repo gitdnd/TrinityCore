@@ -329,6 +329,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             if (int(iLevel) < 100)
             {
                 damage = damage * (iLevel / 100);
+                if (damage == 0)
+                {
+                    damage = 1;
+                }
             }
         }
 
