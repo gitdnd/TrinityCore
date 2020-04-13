@@ -160,10 +160,11 @@ public:
 	struct NameInfo
 	{
 		NameInfo() {}
-		NameInfo(int32 type, int32 sub, int32 arrid) : itemType(type), subclass(sub), array_id(arrid) {}
-		NameInfo(int32 type, int32 sub, int32 arrid, std::string n) : itemType(type), subclass(sub), array_id(arrid), name(n) {}
+		NameInfo(int32 type, int32 sub, int32 iType, int32 arrid) : itemType(type), subclass(sub), inventoryType(iType), array_id(arrid) {}
+		NameInfo(int32 type, int32 sub, int32 iType, int32 arrid, std::string n) : itemType(type), subclass(sub), inventoryType(iType), array_id(arrid), name(n) {}
 		int32 itemType;
 		int32 subclass;
+        int32 inventoryType;
 		int32 array_id;
 		std::string name;
 	};
@@ -211,7 +212,7 @@ public:
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, char* seed) const;
+    std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, uint32 inventoryType, char* seed) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
