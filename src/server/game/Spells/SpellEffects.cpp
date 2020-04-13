@@ -323,12 +323,20 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
     if (unitTarget && unitTarget->IsAlive())
     {
         // Try to scale base damage effect based on ilevel
-        if (unitCaster && unitCaster->ToPlayer())
+        if (unitCaster && (unitCaster->ToPlayer() || (unitCaster->ToCreature() && unitTarget->ToPlayer())))
         {
-            float iLevel = unitCaster->ToPlayer()->GetAverageItemLevel();
+            float iLevel;
+            // Scale players damage based on ilevel
+            if (unitCaster->ToPlayer())
+                iLevel = unitCaster->ToPlayer()->GetAverageItemLevel();
+            // Scale npc damage to player based on players ilevel
+            else
+                iLevel = unitTarget->ToPlayer()->GetAverageItemLevel();
+            // Only scale below ilevel 100
             if (int(iLevel) < 100)
             {
                 damage = damage * (iLevel / 100);
+                // Make sure at least 1 damage is done (if player is naked)
                 if (damage == 0)
                 {
                     damage = 1;
