@@ -519,15 +519,15 @@ void VirtualItemMgr::LoadSpellsFromDB()
         Field* fields = result->Fetch();
         uint32 spellId = fields[0].GetUInt32();
         uint32 quality = fields[1].GetUInt32();
-        int32 itemClass = fields[1].GetInt32();
-        int32 subClass = fields[2].GetInt32();
-        int32 inventoryType = fields[3].GetInt32();
-        uint32 SpellTrigger = fields[4].GetUInt32();
-        int32  SpellCharges = fields[5].GetInt32();
-        float  SpellPPMRate = fields[6].GetFloat();
-        int32  SpellCooldown = fields[7].GetInt32();
-        uint32 SpellCategory = fields[8].GetUInt32();
-        int32  SpellCategoryCooldown = fields[9].GetInt32();
+        int32 itemClass = fields[2].GetInt32();
+        int32 subClass = fields[3].GetInt32();
+        int32 inventoryType = fields[4].GetInt32();
+        uint32 SpellTrigger = fields[5].GetUInt32();
+        int32  SpellCharges = fields[6].GetInt32();
+        float  SpellPPMRate = fields[7].GetFloat();
+        int32  SpellCooldown = fields[8].GetInt32();
+        uint32 SpellCategory = fields[9].GetUInt32();
+        int32  SpellCategoryCooldown = fields[10].GetInt32();
 
         availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
         ++count;
