@@ -117,6 +117,24 @@ struct VirtualModifier
     static float GetStatRate(ItemModType stat);
 };
 
+struct itemSpellInfo
+{
+    itemSpellInfo() { spellId = 0; }
+    itemSpellInfo(uint32 sId, uint32 qual, int32 iClass, int32 sub, uint32 iType, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), quality(qual),
+        itemClass(iClass), subClass(sub), inventoryType(iType), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
+    uint32 spellId;
+    uint32 quality;
+    int32 itemClass;
+    int32 subClass;
+    int32 inventoryType;
+    uint32 SpellTrigger;
+    int32  SpellCharges;
+    float  SpellPPMRate;
+    int32  SpellCooldown;
+    uint32 SpellCategory;
+    int32  SpellCategoryCooldown;
+};
+
 class VirtualItemMgr
 {
     friend class ObjectMgr;
@@ -187,27 +205,24 @@ public:
         uint32 displayId;
     };
 
-    struct SpellInfo
-    {
-        SpellInfo(uint32 sId, uint32 qual, int32 iClass, int32 sub, uint32 iType, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), quality(qual),
-            itemClass(iClass), subClass(sub), inventoryType(iType), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
-        uint32 spellId;
-        uint32 quality;
-        int32 itemClass;
-        int32 subClass;
-        int32 inventoryType;
-        uint32 SpellTrigger;
-        int32  SpellCharges;
-        float  SpellPPMRate;
-        int32  SpellCooldown;
-        uint32 SpellCategory;
-        int32  SpellCategoryCooldown;
-    };
+    /**
+      * Not thread safe.
+      * Loads all possible spells from the generator table into memory.
+      */
+
+    void LoadSpellsFromDB();
+
+
 
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
     uint32 GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const;
+
+    /**
+      * Returns a randomly generated item spell depending on item type, subclass and quality
+      */
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, char* seed);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
@@ -223,6 +238,11 @@ public:
      * Return a vector of available displays for the specified requirements.
      */
     std::list<uint32> GetDisplaysForDisplayInfo(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
+
+    /**
+     * Return a vector of available spells for the specified requirements.
+     */
+    std::list<itemSpellInfo> GetSpells(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
 
     /**
      * Creates all used generators and sets their entry ranges in addition to constructing the object itself.
@@ -302,7 +322,7 @@ private:
 
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
-    std::vector<SpellInfo> availableSpells;
+    std::vector<itemSpellInfo> availableSpells;
 
     /**
      * Not thread safe.

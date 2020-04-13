@@ -2094,6 +2094,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Virtual Item Displays...");
     sVirtualItemMgr.LoadDisplaysFromDB();
 
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Spells...");
+    sVirtualItemMgr.LoadSpellsFromDB();
+
     TC_LOG_INFO("server.loading", "Loading Petitions...");
     sPetitionMgr->LoadPetitions();
 

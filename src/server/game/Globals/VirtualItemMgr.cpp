@@ -500,6 +500,64 @@ void VirtualItemMgr::LoadDisplaysFromDB()
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item displays in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
+void VirtualItemMgr::LoadSpellsFromDB()
+{
+    WriteGuard guard(lock);
+
+    uint32 count = 0;
+    uint32 beginTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_spells`");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item spells, table item_generator_spells is empty.");
+        return;
+    }
+
+    do {
+        Field* fields = result->Fetch();
+        uint32 spellId = fields[0].GetUInt32();
+        uint32 quality = fields[1].GetUInt32();
+        int32 itemClass = fields[1].GetInt32();
+        int32 subClass = fields[2].GetInt32();
+        int32 inventoryType = fields[3].GetInt32();
+        uint32 SpellTrigger = fields[4].GetUInt32();
+        int32  SpellCharges = fields[5].GetInt32();
+        float  SpellPPMRate = fields[6].GetFloat();
+        int32  SpellCooldown = fields[7].GetInt32();
+        uint32 SpellCategory = fields[8].GetUInt32();
+        int32  SpellCategoryCooldown = fields[9].GetInt32();
+
+        availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+}
+
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, char* seed)
+{
+#define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
+        std::list<itemSpellInfo> spells;
+        for (auto someSpells : availableSpells)
+        {
+            if (item->Quality != someSpells.quality)
+                continue;
+
+            IFSKIP(someSpells.itemClass, item->Class);
+            IFSKIP(someSpells.subClass, item->SubClass);
+            IFSKIP(someSpells.inventoryType, item->InventoryType);
+            spells.push_back(someSpells);
+        }
+        if (spells.empty())
+            return itemSpellInfo();
+        auto selectedSpell = std::begin(spells);
+        std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, seed));
+#undef IFSKIP
+        return *selectedSpell;
+}
+
 VirtualItemTemplate const* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 {
     if (entry < minEntry || entry >= maxEntry)
@@ -545,6 +603,25 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         temp->UpdateDisplay();
     else
         temp->DisplayInfoID = display;
+
+    //@todo: Foereaper add the randomness you want here.
+    uint8 numSpellsToGenerate = 1;
+
+    //Prevent crash incase something goes dumb.
+    if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
+        numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
+
+    for (uint8 i = 0; i < numSpellsToGenerate; ++i)
+    {
+        itemSpellInfo spell = GenerateSpell(temp, seed);
+        temp->Spells[i].SpellId = spell.spellId;
+        temp->Spells[i].SpellTrigger = spell.SpellTrigger;
+        temp->Spells[i].SpellCharges = spell.SpellCharges;
+        temp->Spells[i].SpellPPMRate = spell.SpellPPMRate;
+        temp->Spells[i].SpellCooldown = spell.SpellCooldown;
+        temp->Spells[i].SpellCategory = spell.SpellCategory;
+        temp->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+    }
 
     delete store[entry];
     store[entry] = temp;
