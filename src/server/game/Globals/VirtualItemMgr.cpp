@@ -378,7 +378,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
         // Retrieve all the string lists
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
-        for (size_t i = 1; i <= 7; ++i)
+        for (size_t i = 1; i <= 6; ++i)
         {
             NameInfo nameInfo(type, subclass, 0, i);
             auto list = GetNamesForNameInfo(&nameInfo);
@@ -392,6 +392,14 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
 
         std::stringstream ss;
         // Concat the correct full item name for the item quality
+
+        // List 1: Unique names, like Malice, Mangler, Mercy etc.
+        // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
+        // List 3: Material names, like Bone, Copper, Diamond etc.
+        // List 4: Basic type name, like Blade, Razor, Maul etc.
+        // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
+        // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
+
         switch (quality)
         {
             case ITEM_QUALITY_NORMAL:
@@ -416,7 +424,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[7][urand(0, nameLists[7].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
                 break;
             }
             default:
