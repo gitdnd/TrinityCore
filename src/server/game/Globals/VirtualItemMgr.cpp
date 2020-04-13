@@ -614,6 +614,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
         itemSpellInfo spell = GenerateSpell(temp, seed);
+        if (spell.spellId == 0)
+            continue;
         temp->Spells[i].SpellId = spell.spellId;
         temp->Spells[i].SpellTrigger = spell.SpellTrigger;
         temp->Spells[i].SpellCharges = spell.SpellCharges;
