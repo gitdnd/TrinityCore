@@ -320,10 +320,11 @@ void VirtualItemMgr::LoadNamesFromDB()
 		Field* fields = result->Fetch();
 		int32 itemType = fields[0].GetInt32();
 		int32 subclass = fields[1].GetInt32();
-		int32 array_id = fields[2].GetInt32();
-		std::string name = fields[3].GetString();
+        int32 inventoryType = fields[2].GetInt32();
+		int32 array_id = fields[3].GetInt32();
+		std::string name = fields[4].GetString();
 
-		availableNames.push_back(NameInfo(itemType, subclass, array_id, name));
+		availableNames.push_back(NameInfo(itemType, subclass, inventoryType, array_id, name));
 		++count;
 	} while (result->NextRow());
 
@@ -347,12 +348,15 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
 		if (info->subclass != name.subclass && name.subclass != -1)
 			continue;
 
+        if (info->inventoryType != name.inventoryType && name.inventoryType != -1)
+            continue;
+
 		names.push_back(name.name);
 	}
 	return names;
 }
 
-std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint32 quality, char* seed) const
+std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint32 inventoryType, uint32 quality, char* seed) const
 {
     std::string fullName = "";
 
@@ -372,10 +376,11 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
             subclass = ITEM_SUBCLASS_WEAPON_BOW;
 
         // Retrieve all the string lists
+        // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
         for (size_t i = 1; i <= 7; ++i)
         {
-            NameInfo nameInfo(type, subclass, i);
+            NameInfo nameInfo(type, subclass, 0, i);
             auto list = GetNamesForNameInfo(&nameInfo);
 
             // Make sure the current list is not empty. If it is, fall back to template item name.
@@ -772,7 +777,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     }
 
     // Generate random item name
-    std::string name = GenerateItemName(output->Class, output->SubClass, quality, seed);
+    std::string name = GenerateItemName(output->Class, output->SubClass, output->InventoryType, quality, seed);
     if (!name.empty())
         output->Name1 = name;
 
