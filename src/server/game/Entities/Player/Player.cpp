@@ -5012,7 +5012,10 @@ void Player::RepopAtGraveyard()
         if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
             ClosestGrave = bf->GetClosestGraveyard(this);
         else
-            ClosestGrave = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
+        {
+            // Hardcode respawn point to The Hub
+            ClosestGrave = { 560, 435.3f, 371.6f, 14.9f };
+        }
     }
 
     // stop countdown until repop
