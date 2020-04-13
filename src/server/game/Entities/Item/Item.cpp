@@ -427,6 +427,8 @@ void Item::SaveToDB(SQLTransaction& trans)
                     for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
                         stmt->setInt8(i++, itemTemplate->Socket[j].Color);
 
+                    stmt->setUInt32(i++, itemTemplate->DisenchantID);
+
                     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
                     {
                         stmt->setUInt32(i++, itemTemplate->Spells[j].SpellId);
