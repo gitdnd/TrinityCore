@@ -2076,13 +2076,12 @@ void Group::SetDungeonLevel(int dungeonLevel) {
     m_dungeonLevel = dungeonLevel;
     if (!isBGGroup() && !isBFGroup())
     {
-        // FIXME(Harry)
-        /*PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_DIFFICULTY);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_DUNGEON_LEVEL);
 
-        stmt->setUInt8(0, uint8(m_dungeonDifficulty));
+        stmt->setUInt32(0, dungeonLevel);
         stmt->setUInt32(1, m_dbStoreId);
 
-        CharacterDatabase.Execute(stmt);*/
+        CharacterDatabase.Execute(stmt);
     }
 
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())

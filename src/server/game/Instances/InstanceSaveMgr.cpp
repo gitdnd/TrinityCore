@@ -215,6 +215,7 @@ void InstanceSave::SaveToDB()
     stmt->setUInt8(3, uint8(GetDifficulty()));
     stmt->setUInt32(4, completedEncounters);
     stmt->setString(5, data);
+    stmt->setInt32(6, GetDungeonLevel());
     CharacterDatabase.Execute(stmt);
 }
 
