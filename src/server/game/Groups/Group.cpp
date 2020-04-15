@@ -2455,6 +2455,22 @@ ItemQualities Group::GetLootThreshold() const
     return m_lootThreshold;
 }
 
+float Group::GetAvgItemLevel() const
+{
+    float avg = 0.0f;
+    int count = 0;
+    for (const GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* player = itr->GetSource();
+        if (player && player->GetSession())
+        {
+            avg += player->GetAverageItemLevel();
+            ++count;
+        }
+    }
+    return count > 0 ? avg / count : 0;
+}
+
 bool Group::IsMember(ObjectGuid guid) const
 {
     return _getMemberCSlot(guid) != m_memberSlots.end();

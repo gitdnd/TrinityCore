@@ -221,6 +221,7 @@ class TC_GAME_API Group
         ObjectGuid GetLooterGuid() const;
         ObjectGuid GetMasterLooterGuid() const;
         ItemQualities GetLootThreshold() const;
+        float GetAvgItemLevel() const;
 
         uint32 GetDbStoreId() const { return m_dbStoreId; }
 
