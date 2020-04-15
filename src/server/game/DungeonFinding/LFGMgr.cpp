@@ -940,8 +940,8 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
     LFGDungeonData const* dungeon = GetLFGDungeon(proposal.dungeonId);
     ASSERT(dungeon);
 
-    float averageLevel;
-    int plrCount;
+    float averageLevel = 0.0f;
+    int plrCount = 0;
     Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group.GetCounter()) : nullptr;
     for (GuidList::const_iterator it = players.begin(); it != players.end(); ++it)
     {
