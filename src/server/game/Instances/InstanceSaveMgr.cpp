@@ -73,7 +73,7 @@ void InstanceSaveManager::Unload()
 - adding instance into manager
 - called from InstanceMap::Add, _LoadBoundInstances, LoadGroups
 */
-InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load)
+InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, time_t resetTime, bool canReset, bool load)
 {
     if (InstanceSave* old_save = GetInstanceSave(instanceId))
         return old_save;
@@ -113,7 +113,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
 
     TC_LOG_DEBUG("maps", "InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d", mapId, instanceId);
 
-    InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, canReset);
+    InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, dungeonLevel, resetTime, canReset);
     if (!load)
         save->SaveToDB();
 
@@ -178,9 +178,9 @@ void InstanceSaveManager::UnloadInstanceSave(uint32 InstanceId)
     }
 }
 
-InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset)
+InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, time_t resetTime, bool canReset)
 : m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
-  m_difficulty(difficulty), m_canReset(canReset), m_toDelete(false) { }
+  m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_canReset(canReset), m_toDelete(false) { }
 
 InstanceSave::~InstanceSave()
 {

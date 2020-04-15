@@ -18911,7 +18911,7 @@ void Player::_LoadBoundInstances(PreparedQueryResult result)
             }
 
             // since non permanent binds are always solo bind, they can always be reset
-            if (InstanceSave* save = sInstanceSaveMgr->AddInstanceSave(mapId, instanceId, Difficulty(difficulty), resetTime, !perm, true))
+            if (InstanceSave* save = sInstanceSaveMgr->AddInstanceSave(mapId, instanceId, Difficulty(difficulty), m_dungeonLevel, resetTime, !perm, true))
                BindToInstance(save, perm, extendState, true);
         }
         while (result->NextRow());

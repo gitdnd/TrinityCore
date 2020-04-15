@@ -3770,7 +3770,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             if (!mapSave)
             {
                 TC_LOG_DEBUG("maps", "InstanceMap::Add: creating instance save for map %d spawnmode %d with instance id %d", GetId(), GetSpawnMode(), GetInstanceId());
-                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), 0, true);
+                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), GetDungeonLevel(), 0, true);
             }
 
             ASSERT(mapSave);
