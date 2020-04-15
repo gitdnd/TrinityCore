@@ -1575,6 +1575,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Difficulty GetRaidDifficulty() const { return m_raidDifficulty; }
         Difficulty GetStoredRaidDifficulty() const { return m_raidMapDifficulty; } // only for use in difficulty packet after exiting to raid map
         void SetDungeonDifficulty(Difficulty dungeon_difficulty) { m_dungeonDifficulty = dungeon_difficulty; }
+        void SetDungeonLevel(int dungeonLevel) { m_dungeonLevel = dungeonLevel; }
         void SetRaidDifficulty(Difficulty raid_difficulty) { m_raidDifficulty = raid_difficulty; }
         void StoreRaidMapDifficulty();
 
@@ -2292,6 +2293,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Difficulty m_dungeonDifficulty;
         Difficulty m_raidDifficulty;
         Difficulty m_raidMapDifficulty;
+        int m_dungeonLevel;
 
         uint32 m_atLoginFlags;
 

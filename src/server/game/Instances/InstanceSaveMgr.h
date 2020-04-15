@@ -118,6 +118,7 @@ class TC_GAME_API InstanceSave
         /* currently it is possible to omit this information from this structure
            but that would depend on a lot of things that can easily change in future */
         Difficulty GetDifficulty() const { return m_difficulty; }
+        int GetDungeonLevel() const { return m_dungeonLevel; }
 
         typedef std::list<Player*> PlayerListType;
         typedef std::list<Group*> GroupListType;
@@ -138,6 +139,7 @@ class TC_GAME_API InstanceSave
         uint32 m_instanceid;
         uint32 m_mapid;
         Difficulty m_difficulty;
+        int m_dungeonLevel;
         bool m_canReset;
         bool m_toDelete;
 

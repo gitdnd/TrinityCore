@@ -268,6 +268,8 @@ class TC_GAME_API Group
         Difficulty GetRaidDifficulty() const;
         void SetDungeonDifficulty(Difficulty difficulty);
         void SetRaidDifficulty(Difficulty difficulty);
+        void SetDungeonLevel(int dungeonLevel);
+        int GetDungeonLevel() { return m_dungeonLevel };
         uint16 InInstance();
         bool InCombatToInstance(uint32 instanceId);
         void ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo);
@@ -356,6 +358,7 @@ class TC_GAME_API Group
         GroupType           m_groupType;
         Difficulty          m_dungeonDifficulty;
         Difficulty          m_raidDifficulty;
+        int                 m_dungeonLevel;
         Battleground*       m_bgGroup;
         Battlefield*        m_bfGroup;
         ObjectGuid          m_targetIcons[TARGETICONCOUNT];

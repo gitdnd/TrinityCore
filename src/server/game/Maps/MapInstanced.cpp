@@ -28,7 +28,7 @@
 #include "VMapFactory.h"
 #include "World.h"
 
-MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
+MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, 0)
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_GRIDS*sizeof(uint16));
@@ -155,7 +155,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             {
                 map = FindInstanceMap(loginInstanceId);
                 if (!map && pSave && pSave->GetInstanceId() == loginInstanceId)
-                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty());
+                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel());
                 return map;
             }
 
@@ -180,7 +180,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             map = FindInstanceMap(newInstanceId);
             // it is possible that the save exists but the map doesn't
             if (!map)
-                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty());
+                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel());
         }
         else
         {
@@ -189,18 +189,19 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             newInstanceId = sMapMgr->GenerateInstanceId();
 
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
+            int dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : player->GetAverageItemLevel();
             //Seems it is now possible, but I do not know if it should be allowed
             //ASSERT(!FindInstanceMap(NewInstanceId));
             map = FindInstanceMap(newInstanceId);
             if (!map)
-                map = CreateInstance(newInstanceId, nullptr, diff);
+                map = CreateInstance(newInstanceId, nullptr, diff, dungeonLevel);
         }
     }
 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel)
 {
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
@@ -224,7 +225,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 
     TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
 
-    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, this);
+    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, this);
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();

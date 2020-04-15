@@ -940,6 +940,8 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
     LFGDungeonData const* dungeon = GetLFGDungeon(proposal.dungeonId);
     ASSERT(dungeon);
 
+    float averageLevel;
+    int plrCount;
     Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group.GetCounter()) : nullptr;
     for (GuidList::const_iterator it = players.begin(); it != players.end(); ++it)
     {
@@ -947,6 +949,9 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
         Player* player = ObjectAccessor::FindConnectedPlayer(pguid);
         if (!player)
             continue;
+
+        averageLevel += player->GetAverageItemLevel();
+        ++plrCount;
 
         Group* group = player->GetGroup();
         if (group && group != grp)
@@ -976,9 +981,11 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
                 player->CastSpell(player, LFG_SPELL_DUNGEON_COOLDOWN, false);
         }
     }
+    averageLevel /= plrCount;
 
     ASSERT(grp);
     grp->SetDungeonDifficulty(Difficulty(dungeon->difficulty));
+    grp->SetDungeonLevel(int(averageLevel));
     ObjectGuid gguid = grp->GetGUID();
     SetDungeon(gguid, dungeon->Entry());
     SetState(gguid, LFG_STATE_DUNGEON);

@@ -2072,6 +2072,29 @@ void Group::SetDungeonDifficulty(Difficulty difficulty)
     }
 }
 
+void Group::SetDungeonLevel(int dungeonLevel) {
+    m_dungeonLevel = dungeonLevel;
+    if (!isBGGroup() && !isBFGroup())
+    {
+        // FIXME(Harry)
+        /*PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_DIFFICULTY);
+
+        stmt->setUInt8(0, uint8(m_dungeonDifficulty));
+        stmt->setUInt32(1, m_dbStoreId);
+
+        CharacterDatabase.Execute(stmt);*/
+    }
+
+    for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        Player* player = itr->GetSource();
+        if (!player->GetSession())
+            continue;
+
+        player->SetDungeonLevel(dungeonLevel);
+    }
+}
+
 void Group::SetRaidDifficulty(Difficulty difficulty)
 {
     m_raidDifficulty = difficulty;

@@ -321,7 +321,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     public:
-        Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
+        Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, Map* _parent = nullptr);
         virtual ~Map();
 
         MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -448,6 +448,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         Difficulty GetDifficulty() const { return Difficulty(GetSpawnMode()); }
         bool IsRegularDifficulty() const;
         MapDifficulty const* GetMapDifficulty() const;
+        int GetDungeonLevel() const { return i_dungeonLevel; }
 
         bool Instanceable() const;
         bool IsDungeon() const;
@@ -706,6 +707,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         MapEntry const* i_mapEntry;
         uint8 i_spawnMode;
+        int i_dungeonLevel;
         uint32 i_InstanceId;
         uint32 m_unloadTimer;
         float m_VisibleDistance;
@@ -911,7 +913,7 @@ enum InstanceResetMethod
 class TC_GAME_API InstanceMap : public Map
 {
     public:
-        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, Map* _parent);
+        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, Map* _parent);
         ~InstanceMap();
         bool AddPlayerToMap(Player*) override;
         void RemovePlayerFromMap(Player*, bool) override;
