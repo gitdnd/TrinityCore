@@ -400,6 +400,11 @@ namespace LuaGroup
         group->ConvertToLFG();
         return 0;
     }*/
+
+    int GetDungeonLevel(lua_State* /*L*/, Group* group)
+    {
+        return group->GetDungeonLevel();
+    }
 };
 
 #endif

@@ -370,5 +370,10 @@ namespace LuaMap
         lua_settop(L, tbl);
         return 1;
     }
+
+    int GetDungeonLevel(lua_State* /*L*/, Map* map)
+    {
+        return map->GetDungeonLevel();
+    }
 };
 #endif

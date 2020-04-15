@@ -1075,6 +1075,7 @@ ElunaRegister<Group> GroupMethods[] =
     { "SendPacket", &LuaGroup::SendPacket },
     // {"ConvertToLFG", &LuaGroup::ConvertToLFG},                 // :ConvertToLFG() - UNDOCUMENTED - Converts the group to an LFG group
     { "ConvertToRaid", &LuaGroup::ConvertToRaid },
+    { "GetDungeonLevel", &LuaGroup::GetDungeonLevel },
 
     { NULL, NULL }
 };
@@ -1224,6 +1225,7 @@ ElunaRegister<Map> MapMethods[] =
 
     // Other
     { "SaveInstanceData", &LuaMap::SaveInstanceData },
+    { "GetDungeonLevel", &LuaMap::GetDungeonLevel },
 
     { NULL, NULL }
 };
