@@ -401,9 +401,10 @@ namespace LuaGroup
         return 0;
     }*/
 
-    int GetDungeonLevel(lua_State* /*L*/, Group* group)
+    int GetDungeonLevel(lua_State* L, Group* group)
     {
-        return group->GetDungeonLevel();
+        Eluna::Push(L, group->GetDungeonLevel());
+        return 1;
     }
 };
 

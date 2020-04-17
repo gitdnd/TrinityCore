@@ -371,9 +371,10 @@ namespace LuaMap
         return 1;
     }
 
-    int GetDungeonLevel(lua_State* /*L*/, Map* map)
+    int GetDungeonLevel(lua_State* L, Map* map)
     {
-        return map->GetDungeonLevel();
+        Eluna::Push(L, map->GetDungeonLevel());
+        return 1;
     }
 };
 #endif
