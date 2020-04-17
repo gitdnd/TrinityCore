@@ -26528,8 +26528,10 @@ float Player::GetAverageItemLevel() const
             continue;
 
         if (m_items[i] && m_items[i]->GetTemplate())
+        {
             sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality();
-
+        }
+        // Add items with no slot to the count
         ++count;
     }
 

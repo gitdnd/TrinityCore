@@ -1424,7 +1424,6 @@ void Creature::UpdateLevelDependantStats()
         // FIXME(Harry): Come up with a better scaling system
         float dungeonLevelMod = dungeonLevel;
         health = uint32(health * dungeonLevelMod);
-        Say("Scaling health", (Language)0, this);
     }
 
     SetCreateHealth(health);

@@ -347,13 +347,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
             }
         }*/
+        // FIXME(Harry): Come up with a better way to scale creature spell damage to players
         if (unitCaster->ToCreature() && unitTarget->ToPlayer())
         {
             int dungeonLevel = unitCaster->GetMap()->GetDungeonLevel();
             if (dungeonLevel > 0)
             {
                 unitCaster->Say("Scaling damage " + std::to_string(damage) + " by dungeon level: " + std::to_string(dungeonLevel), (Language)0, unitCaster);
-                damage = damage * (dungeonLevel / 100);
+                damage = damage * (dungeonLevel / 100.00f);
+                unitCaster->Say("New damage: " + std::to_string(damage), (Language)0, unitCaster);
             }
         }
 
