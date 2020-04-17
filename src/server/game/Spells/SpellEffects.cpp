@@ -323,7 +323,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
     if (unitTarget && unitTarget->IsAlive())
     {
         // Try to scale base damage effect based on ilevel
-        if (unitCaster && (unitCaster->ToPlayer() || (unitCaster->ToCreature() && unitTarget->ToPlayer())))
+        /*if (unitCaster && (unitCaster->ToPlayer() || (unitCaster->ToCreature() && unitTarget->ToPlayer())))
         {
             float iLevel;
             // Scale players damage based on ilevel
@@ -345,6 +345,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 {
                     damage = 1;
                 }
+            }
+        }*/
+        if (unitCaster->ToCreature() && unitTarget->ToPlayer())
+        {
+            int dungeonLevel = unitCaster->GetMap()->GetDungeonLevel();
+            if (dungeonLevel > 0)
+            {
+                unitCaster->Say("Scaling my spell damage", (Language)0, unitCaster);
+                damage = damage * (dungeonLevel / 100);
             }
         }
 

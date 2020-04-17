@@ -1418,6 +1418,15 @@ void Creature::UpdateLevelDependantStats()
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
 
+    int dungeonLevel = GetMap()->GetDungeonLevel();
+    if (dungeonLevel > 0)
+    {
+        // FIXME(Harry): Come up with a better scaling system
+        float dungeonLevelMod = dungeonLevel / 10;
+        health = uint32(health * dungeonLevelMod);
+        Say("Scaling health", (Language)0, this);
+    }
+
     SetCreateHealth(health);
     SetMaxHealth(health);
     SetHealth(health);
