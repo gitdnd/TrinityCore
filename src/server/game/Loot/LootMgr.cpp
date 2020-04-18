@@ -559,7 +559,7 @@ void LootTemplate::CopyConditions(LootItem* li) const
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId) const
+void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId, VirtualModifier modifier) const
 {
     if (groupId)                                            // Group reference uses own processing of the group
     {
@@ -594,7 +594,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId
                 Referenced->Process(loot, rate, lootMode, item->groupid);
         }
         else                                                    // Plain entries (not a reference, not grouped)
-            loot.AddItem(*item);                                // Chance is already checked, just add
+            loot.AddItem(*item, modifier);                                // Chance is already checked, just add
     }
 
     // Now processing groups

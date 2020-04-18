@@ -142,7 +142,7 @@ void Loot::clear()
 }
 
 // Inserts the item into the loot (called by LootTemplate processors)
-void Loot::AddItem(LootStoreItem const& item)
+void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
 {
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
     if (!proto)
@@ -150,7 +150,7 @@ void Loot::AddItem(LootStoreItem const& item)
 
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(proto))
-        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto))
+        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
             proto = newProto;
 
     uint32 count = urand(item.mincount, item.maxcount);

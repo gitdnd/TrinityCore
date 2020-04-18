@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "VirtualItemMgr.h"
+
 class Item;
 class LootStore;
 class Player;
@@ -245,7 +247,7 @@ struct TC_GAME_API Loot
     bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT);
 
     // Inserts the item into the loot (called by LootTemplate processors)
-    void AddItem(LootStoreItem const & item);
+    void AddItem(LootStoreItem const & item, VirtualModifier modifier = VirtualModifier());
 
     LootItem* LootItemInSlot(uint32 lootslot, Player* player, NotNormalLootItem** qitem = nullptr, NotNormalLootItem** ffaitem = nullptr, NotNormalLootItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(Player* player) const;
