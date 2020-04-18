@@ -217,10 +217,20 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    tab->Process(*this, store.IsRatesAllowed(), lootMode);          // Processing is done there, callback via Loot::AddItem()
-
-                                                                    // Setting access rights for group loot case
+    VirtualModifier modifier = VirtualModifier();
     Group* group = lootOwner->GetGroup();
+    if (!personal && group)
+    {
+        modifier.plrAvgLvl = group->GetAvgItemLevel();
+    }
+    else
+    {
+        modifier.plrAvgLvl = lootOwner->GetAverageItemLevel();
+    }
+
+    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier);          // Processing is done there, callback via Loot::AddItem()
+
+    // Setting access rights for group loot case
     if (!personal && group)
     {
         roundRobinPlayer = lootOwner->GetGUID();
