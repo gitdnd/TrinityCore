@@ -73,7 +73,7 @@ void VirtualItemTemplate::UpdateDisplay()
         DisplayInfoID = dbcitem->DisplayId;
 }
 
-VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0)
+VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0)
 {
 }
 
