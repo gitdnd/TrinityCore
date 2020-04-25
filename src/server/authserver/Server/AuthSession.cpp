@@ -780,10 +780,10 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     ASSERT(gmod.GetNumBytes() <= 32);
 
     // Fill the response packet with the result
-    if (AuthHelper::IsAcceptedClientBuild(_build))
+    //if (AuthHelper::IsAcceptedClientBuild(_build))
         pkt << uint8(WOW_SUCCESS);
-    else
-        pkt << uint8(WOW_FAIL_VERSION_INVALID);
+    //else
+    //    pkt << uint8(WOW_FAIL_VERSION_INVALID);
 
     // B may be calculated < 32B so we force minimal length to 32B
     pkt.append(B.AsByteArray(32).get(), 32);      // 32 bytes
