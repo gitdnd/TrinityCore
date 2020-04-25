@@ -130,6 +130,278 @@ typedef struct XFER_RESUME_S
 
 #pragma pack(pop)
 
+
+Patcher patcher;
+
+// Launch the patch hashing mechanism on object creation
+void Patcher::Initialize()
+{
+    m_dataDir = sConfigMgr->GetStringDefault("DataDir", "./data/") + "/patches/";
+    if (!m_dataDir.empty())
+        if ((m_dataDir.at(m_dataDir.length() - 1) != '/') && (m_dataDir.at(m_dataDir.length() - 1) != '\\'))
+            m_dataDir.push_back('/');
+
+    TC_LOG_INFO("network", "Searching for available patches.");
+    LoadPatchesInfo();
+}
+
+PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool* fallback)
+{
+    PATCH_INFO* patch = NULL;
+    int locale = *((int*)(_locale.c_str()));
+
+    TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
+
+    // Hardcoded for enGB
+    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
+        if (it->build == _build && it->locale == 'BGne')
+        {
+            patch = &(*it);
+            *fallback = true;
+        }
+
+    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
+        if (it->build == _build && it->locale == locale)
+        {
+            patch = &(*it);
+            *fallback = false;
+        }
+
+    return patch;
+}
+
+bool Patcher::PossiblePatching(int _build, std::string _locale)
+{
+    bool temp;
+    return getPatchInfo(_build, _locale, &temp) != NULL;
+}
+
+bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _session)
+{
+    bool fallback;
+    PATCH_INFO* patch = getPatchInfo(_build, _locale, &fallback);
+
+    // one of them nonzero, start patching.
+    if (patch)
+    {
+        ByteBuffer pkt;
+        pkt << uint8(AUTH_LOGON_PROOF);
+        pkt << uint8(LOGIN_DOWNLOAD_FILE);
+        _session->SendPacket(pkt);
+
+        std::stringstream path;
+        if (fallback)
+        {
+            path << PATCH_PATH << _build << "-enGB.mpq";
+        }
+        else
+        {
+            path << PATCH_PATH << _build << "-" << _locale << ".mpq";
+        }
+        _session->pPatch = fopen(path.str().c_str(), "rb");
+        TC_LOG_INFO("network", "Sending Patch: %s", path.str().c_str());
+        XFER_INIT_C packet;
+        packet.cmd = XFER_INITIATE;
+        packet.fileNameLen = 5;
+        packet.fileName[0] = 'P';
+        packet.fileName[1] = 'a';
+        packet.fileName[2] = 't';
+        packet.fileName[3] = 'c';
+        packet.fileName[4] = 'h';
+        packet.file_size = patch->filesize;
+        memcpy(packet.md5, patch->md5, MD5_DIGEST_LENGTH);
+        pkt.resize(sizeof(packet));
+        std::memcpy(pkt.contents(), &packet, sizeof(packet));
+        _session->SendPacket(pkt);
+        return true;
+    }
+    else
+    {
+        TC_LOG_INFO("network", "Client with version %i and locale %s did not get a patch.", _build, _locale.c_str());
+        return false;
+    }
+}
+
+// Preload MD5 hashes of existing patch files on server
+#ifndef _WIN32
+#include <dirent.h>
+#include <errno.h>
+void Patcher::LoadPatchesInfo()
+{
+    DIR* dirp;
+    struct dirent* dp;
+    dirp = opendir(PATCH_PATH);
+
+    if (!dirp)
+        return;
+
+    while (dirp)
+    {
+        errno = 0;
+        if ((dp = readdir(dirp)) != NULL)
+        {
+            int l = strlen(dp->d_name);
+
+            if (l < 8)
+                continue;
+
+            if (!memcmp(&dp->d_name[l - 4], ".mpq", 4))
+            {
+                LoadPatchMD5(PATCH_PATH, dp->d_name);
+            }
+        }
+        else
+        {
+            if (errno != 0)
+            {
+                closedir(dirp);
+                return;
+            }
+            break;
+        }
+    }
+
+    if (dirp)
+        closedir(dirp);
+}
+#else
+void Patcher::LoadPatchesInfo()
+{
+    WIN32_FIND_DATA fil;
+    HANDLE hFil = FindFirstFile(PATCH_PATH "*.mpq", &fil);
+    if (hFil == INVALID_HANDLE_VALUE)
+        return;                                             // no patches were found
+
+    do
+    {
+        LoadPatchMD5(PATCH_PATH, fil.cFileName);
+    } while (FindNextFile(hFil, &fil));
+}
+#endif
+
+// Calculate and store MD5 hash for a given patch file
+void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
+{
+    int build;
+    union
+    {
+        int i;
+        char c[4];
+    } locale;
+
+    if (sscanf(szFileName, "%i-%c%c%c%c.mpq", &build, &locale.c[0], &locale.c[1], &locale.c[2], &locale.c[3]) != 5)
+        return;
+
+    // Try to open the patch file
+    std::string path = szPath;
+    path += szFileName;
+    FILE* pPatch = fopen(path.c_str(), "rb");
+
+    if (!pPatch)
+    {
+        TC_LOG_ERROR("network", "Error loading patch %s\n", path.c_str());
+        return;
+    }
+
+    // Calculate the MD5 hash
+    MD5_CTX ctx;
+    MD5_Init(&ctx);
+    uint8* buf = new uint8[512 * 1024];
+
+    while (!feof(pPatch))
+    {
+        size_t read = fread(buf, 1, 512 * 1024, pPatch);
+        MD5_Update(&ctx, buf, read);
+    }
+
+    delete[] buf;
+    fseek(pPatch, 0, SEEK_END);
+    size_t size = ftell(pPatch);
+    fclose(pPatch);
+
+    // Store the result in the internal patch hash map
+    PATCH_INFO pi;
+    pi.build = build;
+    pi.locale = locale.i;
+    pi.filesize = uint64(size);
+    MD5_Final((uint8*)& pi.md5, &ctx);
+    _patches.push_back(pi);
+    TC_LOG_DEBUG("server.authserver", "Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
+}
+
+// Resume patch transfer
+bool AuthSession::HandleXferResume()
+{
+    TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
+    XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
+
+    // Todo: Send back a packet? I think the client don't get we send data.
+    if (patcher.PossiblePatching(_build, _localizationName))
+    {
+        fseek(pPatch, 0, SEEK_END);
+        size_t size = ftell(pPatch);
+
+        fseek(pPatch, long(challenge->pos), 0);
+
+        if (_patcher)
+        {
+            _patcher->stop();
+            delete _patcher;
+        }
+        _patcher = new PatcherRunnable(this, challenge->pos, size);
+        boost::thread u(&PatcherRunnable::run, _patcher);
+        u.join();
+        return true;
+    }
+    return false;
+}
+
+// Cancel patch transfer
+bool AuthSession::HandleXferCancel()
+{
+    TC_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
+    CloseSocket();
+    return true;
+}
+
+// Accept patch transfer
+bool AuthSession::HandleXferAccept()
+{
+    // Check packet length and patch existence
+    if (!pPatch)
+    {
+        TC_LOG_ERROR("network", "Error while accepting patch transfer (wrong packet)");
+        return false;
+    }
+
+    // Launch a PatcherRunnable thread, starting at the beginning of the patch file
+    fseek(pPatch, 0, SEEK_END);
+    size_t size = ftell(pPatch);
+    fseek(pPatch, 0, 0);
+
+    if (_patcher)
+    {
+        _patcher->stop();
+        delete _patcher;
+    }
+    _patcher = new PatcherRunnable(this, 0, size);
+    boost::thread u(&PatcherRunnable::run, _patcher);
+    return true;
+}
+
+PatcherRunnable::PatcherRunnable(AuthSession* as, uint64 _pos, uint64 _size)
+{
+    mySocket = as;
+    pos = _pos;
+    size = _size;
+    stopped = false;
+}
+
+void PatcherRunnable::stop()
+{
+    stopped = true;
+}
+
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 enum class BufferSizes : uint32
@@ -189,7 +461,7 @@ void AccountInfo::LoadResult(Field* fields)
 }
 
 AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)),
-_status(STATUS_CHALLENGE), _build(0), _expversion(0)
+_status(STATUS_CHALLENGE), _build(0), _expversion(0), _patcher(NULL), pPatch(NULL)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -1016,277 +1288,6 @@ bool AuthSession::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* vers
     version.Finalize();
 
     return memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0;
-}
-
-Patcher patcher;
-
-// Launch the patch hashing mechanism on object creation
-void Patcher::Initialize()
-{
-    m_dataDir = sConfigMgr->GetStringDefault("DataDir", "./data/") + "/patches/";
-    if (!m_dataDir.empty())
-        if ((m_dataDir.at(m_dataDir.length() - 1) != '/') && (m_dataDir.at(m_dataDir.length() - 1) != '\\'))
-            m_dataDir.push_back('/');
-
-    TC_LOG_INFO("network", "Searching for available patches.");
-    LoadPatchesInfo();
-}
-
-PATCH_INFO * Patcher::getPatchInfo(int _build, std::string _locale, bool* fallback)
-{
-    PATCH_INFO * patch = NULL;
-    int locale = *((int*)(_locale.c_str()));
-    
-    TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
-
-    // Hardcoded for enGB
-    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
-        if (it->build == _build && it->locale == 'BGne')
-        {
-            patch = &(*it);
-            *fallback = true;
-        }
-    
-    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
-        if (it->build == _build && it->locale == locale)
-        {
-            patch = &(*it);
-            *fallback = false;
-        }
-    
-    return patch;
-}
-
-bool Patcher::PossiblePatching(int _build, std::string _locale)
-{
-    bool temp;
-    return getPatchInfo(_build, _locale, &temp) != NULL;
-}
-
-bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _session)
-{
-    bool fallback;
-    PATCH_INFO* patch = getPatchInfo(_build, _locale, &fallback);
-
-    // one of them nonzero, start patching.
-    if (patch)
-    {
-        ByteBuffer pkt;
-        pkt << uint8(AUTH_LOGON_PROOF);
-        pkt << uint8(LOGIN_DOWNLOAD_FILE);
-        _session->SendPacket(pkt);
-
-        std::stringstream path;
-        if (fallback)
-        {
-            path << PATCH_PATH << _build << "-enGB.mpq";
-        }
-        else
-        {
-            path << PATCH_PATH << _build << "-" << _locale << ".mpq";
-        }
-        _session->pPatch = fopen(path.str().c_str(), "rb");
-        TC_LOG_INFO("network", "Sending Patch: %s", path.str().c_str());
-        XFER_INIT_C packet;
-        packet.cmd = XFER_INITIATE;
-        packet.fileNameLen = 5;
-        packet.fileName[0] = 'P';
-        packet.fileName[1] = 'a';
-        packet.fileName[2] = 't';
-        packet.fileName[3] = 'c';
-        packet.fileName[4] = 'h';
-        packet.file_size = patch->filesize;
-        memcpy(packet.md5, patch->md5, MD5_DIGEST_LENGTH);
-        pkt.resize(sizeof(packet));
-        std::memcpy(pkt.contents(), &packet, sizeof(packet));
-        _session->SendPacket(pkt);
-        return true;
-    }
-    else
-    {
-        TC_LOG_INFO("network", "Client with version %i and locale %s did not get a patch.", _build, _locale.c_str());
-        return false;
-    }
-}
-
-// Preload MD5 hashes of existing patch files on server
-#ifndef _WIN32
-#include <dirent.h>
-#include <errno.h>
-void Patcher::LoadPatchesInfo()
-{
-    DIR* dirp;
-    struct dirent* dp;
-    dirp = opendir(PATCH_PATH);
-
-    if (!dirp)
-        return;
-
-    while (dirp)
-    {
-        errno = 0;
-        if ((dp = readdir(dirp)) != NULL)
-        {
-            int l = strlen(dp->d_name);
-
-            if (l < 8)
-                continue;
-
-            if (!memcmp(&dp->d_name[l - 4], ".mpq", 4))
-            {
-                LoadPatchMD5(PATCH_PATH, dp->d_name);
-            }
-        }
-        else
-        {
-            if (errno != 0)
-            {
-                closedir(dirp);
-                return;
-            }
-            break;
-        }
-    }
-
-    if (dirp)
-        closedir(dirp);
-}
-#else
-void Patcher::LoadPatchesInfo()
-{
-    WIN32_FIND_DATA fil;
-    HANDLE hFil = FindFirstFile(PATCH_PATH "*.mpq", &fil);
-    if (hFil == INVALID_HANDLE_VALUE)
-        return;                                             // no patches were found
-
-    do
-    {
-        LoadPatchMD5(PATCH_PATH, fil.cFileName);
-    } while (FindNextFile(hFil, &fil));
-}
-#endif
-
-// Calculate and store MD5 hash for a given patch file
-void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
-{
-    int build;
-    union
-    {
-        int i;
-        char c[4];
-    } locale;
-
-    if (sscanf(szFileName, "%i-%c%c%c%c.mpq", &build, &locale.c[0], &locale.c[1], &locale.c[2], &locale.c[3]) != 5)
-        return;
-
-    // Try to open the patch file
-    std::string path = szPath;
-    path += szFileName;
-    FILE* pPatch = fopen(path.c_str(), "rb");
-
-    if (!pPatch)
-    {
-        TC_LOG_ERROR("network", "Error loading patch %s\n", path.c_str());
-        return;
-    }
-
-    // Calculate the MD5 hash
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
-    uint8* buf = new uint8[512 * 1024];
-
-    while (!feof(pPatch))
-    {
-        size_t read = fread(buf, 1, 512 * 1024, pPatch);
-        MD5_Update(&ctx, buf, read);
-    }
-
-    delete[] buf;
-    fseek(pPatch, 0, SEEK_END);
-    size_t size = ftell(pPatch);
-    fclose(pPatch);
-
-    // Store the result in the internal patch hash map
-    PATCH_INFO pi;
-    pi.build = build;
-    pi.locale = locale.i;
-    pi.filesize = uint64(size);
-    MD5_Final((uint8*)& pi.md5, &ctx);
-    _patches.push_back(pi);
-    TC_LOG_DEBUG("server.authserver", "Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
-}
-
-// Resume patch transfer
-bool AuthSession::HandleXferResume()
-{
-    TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
-    XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
-
-    // Todo: Send back a packet? I think the client don't get we send data.
-    if (patcher.PossiblePatching(_build, _localizationName))
-    {
-        fseek(pPatch, 0, SEEK_END);
-        size_t size = ftell(pPatch);
-
-        fseek(pPatch, long(challenge->pos), 0);
-
-        if (_patcher)
-        {
-            _patcher->stop();
-            delete _patcher;
-        }
-        _patcher = new PatcherRunnable(this, challenge->pos, size);
-        boost::thread u(&PatcherRunnable::run, _patcher);
-        u.join();
-        return true;
-    }
-    return false;
-}
-
-// Cancel patch transfer
-bool AuthSession::HandleXferCancel()
-{
-    TC_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
-    CloseSocket();
-    return true;
-}
-
-// Accept patch transfer
-bool AuthSession::HandleXferAccept()
-{
-    // Check packet length and patch existence
-    if (!pPatch)
-    {
-        TC_LOG_ERROR("network", "Error while accepting patch transfer (wrong packet)");
-        return false;
-    }
-
-    // Launch a PatcherRunnable thread, starting at the beginning of the patch file
-    fseek(pPatch, 0, SEEK_END);
-    size_t size = ftell(pPatch);
-    fseek(pPatch, 0, 0);
-
-    if (_patcher)
-    {
-        _patcher->stop();
-        delete _patcher;
-    }
-    _patcher = new PatcherRunnable(this, 0, size);
-    boost::thread u(&PatcherRunnable::run, _patcher);
-    return true;
-}
-
-PatcherRunnable::PatcherRunnable(AuthSession* as, uint64 _pos, uint64 _size)
-{
-    mySocket = as;
-    pos = _pos;
-    size = _size;
-    stopped = false;
-}
-
-void PatcherRunnable::stop()
-{
-    stopped = true;
 }
 
 #if defined(__GNUC__)
