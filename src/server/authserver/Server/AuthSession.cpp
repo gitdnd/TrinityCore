@@ -130,6 +130,22 @@ typedef struct XFER_RESUME_S
 
 #pragma pack(pop)
 
+#if defined(__GNUC__)
+#pragma pack(1)
+#else
+#pragma pack(push,1)
+#endif
+struct TransferDataPacket
+{
+    uint8 cmd;
+    uint16 chunk_size;
+};
+#if defined(__GNUC__)
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
+
 
 Patcher patcher;
 
@@ -1326,19 +1342,3 @@ bool AuthSession::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* vers
 
     return memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0;
 }
-
-#if defined(__GNUC__)
-#pragma pack(1)
-#else
-#pragma pack(push,1)
-#endif
-struct TransferDataPacket
-{
-    uint8 cmd;
-    uint16 chunk_size;
-};
-#if defined(__GNUC__)
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
