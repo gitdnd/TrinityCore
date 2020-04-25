@@ -133,6 +133,43 @@ typedef struct XFER_RESUME_S
 
 Patcher patcher;
 
+// Send content of patch file to the client
+void PatcherRunnable::run()
+{
+    TC_LOG_INFO("network", "PatcherRunnable::run(): %ld -> %ld", pos, size);
+
+    while (pos < size && !stopped)
+    {
+        uint64 left = size - pos;
+        uint16 send = (left > 4096) ? 4096 : left;
+
+        char* bytes = new char[sizeof(TransferDataPacket) + send];
+        TransferDataPacket* hdr = (TransferDataPacket*)bytes;
+        hdr->cmd = uint8(XFER_DATA);
+        hdr->chunk_size = send;
+        fread(bytes + sizeof(TransferDataPacket), 1, send, mySocket->pPatch);
+
+        ByteBuffer pkt(sizeof(TransferDataPacket) + send);
+        pkt.append(bytes, sizeof(TransferDataPacket) + send);
+
+        mySocket->SendPacket(pkt);
+        delete[] bytes;
+
+        pos += send;
+
+        _sleep(sConfigMgr->GetIntDefault("PatchPacketDelay", 100));
+    }
+
+    if (!stopped)
+    {
+        fclose(mySocket->pPatch);
+        mySocket->pPatch = NULL;
+        mySocket->_patcher = NULL;
+    }
+
+    TC_LOG_INFO("network", "patcher done.");
+}
+
 // Launch the patch hashing mechanism on object creation
 void Patcher::Initialize()
 {
