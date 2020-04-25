@@ -1037,7 +1037,7 @@ PATCH_INFO * Patcher::getPatchInfo(int _build, std::string _locale, bool* fallba
     PATCH_INFO * patch = NULL;
     int locale = *((int*)(_locale.c_str()));
     
-    TC_LOG_DEBUG("Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
+    TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
 
     // Hardcoded for enGB
     for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
@@ -1213,7 +1213,7 @@ void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
     pi.filesize = uint64(size);
     MD5_Final((uint8*)& pi.md5, &ctx);
     _patches.push_back(pi);
-    TC_LOG_DEBUG("Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
+    TC_LOG_DEBUG("server.authserver", "Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
 }
 
 // Resume patch transfer
