@@ -190,7 +190,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
 
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
             int dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : player->GetAverageItemLevel();
-            player->Say("Creating dungeonLevel: " + std::to_string(dungeonLevel), (Language)0, player);
+            //player->Say("Creating dungeonLevel: " + std::to_string(dungeonLevel), (Language)0, player);
             //Seems it is now possible, but I do not know if it should be allowed
             //ASSERT(!FindInstanceMap(NewInstanceId));
             map = FindInstanceMap(newInstanceId);
