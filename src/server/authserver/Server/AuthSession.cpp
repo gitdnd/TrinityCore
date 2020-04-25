@@ -421,6 +421,7 @@ bool AuthSession::HandleXferCancel()
 // Accept patch transfer
 bool AuthSession::HandleXferAccept()
 {
+    TC_LOG_DEBUG("server.authserver", "Entering HandleXferAccept");
     // Check packet length and patch existence
     if (!pPatch)
     {
