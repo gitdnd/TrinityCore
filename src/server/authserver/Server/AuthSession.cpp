@@ -937,16 +937,6 @@ bool AuthSession::HandleLogonProof()
 
         if (!VerifyVersion(logonProof->A, sizeof(logonProof->A), logonProof->crc_hash, false))
         {
-            // If the client has no valid version
-            if (_expversion == NO_VALID_EXP_FLAG)
-            {
-                if (patcher.PossiblePatching(_build, _localizationName))
-                {
-                    _status = STATUS_AUTHED; // Will get disconnected on packet 
-                    if (patcher.InitPatching(_build, _localizationName, this))
-                        return true;
-                }
-            }
             ByteBuffer packet;
             packet << uint8(AUTH_LOGON_PROOF);
             packet << uint8(WOW_FAIL_VERSION_INVALID);
@@ -955,6 +945,22 @@ bool AuthSession::HandleLogonProof()
         }
 
         TC_LOG_DEBUG("server.authserver", "'%s:%d' User '%s' successfully authenticated", GetRemoteIpAddress().to_string().c_str(), GetRemotePort(), _accountInfo.Login.c_str());
+
+        // If the client has no valid version
+        if (_expversion == NO_VALID_EXP_FLAG)
+        {
+            if (patcher.PossiblePatching(_build, _localizationName))
+            {
+                _status = STATUS_AUTHED; // Will get disconnected without this
+                if (patcher.InitPatching(_build, _localizationName, this))
+                    return true;
+            }
+            ByteBuffer packet;
+            packet << uint8(AUTH_LOGON_PROOF);
+            packet << uint8(WOW_FAIL_VERSION_INVALID);
+            SendPacket(packet);
+            return true;
+        }
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
