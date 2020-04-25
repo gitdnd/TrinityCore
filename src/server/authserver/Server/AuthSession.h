@@ -31,6 +31,7 @@
 
 using boost::asio::ip::tcp;
 
+class PatcherRunnable;
 class Field;
 struct AuthHandler;
 
