@@ -833,20 +833,6 @@ bool AuthSession::HandleLogonProof()
     // Read the packet
     sAuthLogonProof_C *logonProof = reinterpret_cast<sAuthLogonProof_C*>(GetReadBuffer().GetReadPointer());
 
-    // If the client has no valid version
-    if (_expversion == NO_VALID_EXP_FLAG)
-    {
-        if (patcher.PossiblePatching(_build, _localizationName))
-        {
-            if (patcher.InitPatching(_build, _localizationName, this))
-                return true;
-            else
-                return false;
-        }
-        else
-            return false;
-    }
-
     // Continue the SRP6 calculation based on data received from the client
     BigNumber A;
 
@@ -951,6 +937,16 @@ bool AuthSession::HandleLogonProof()
 
         if (!VerifyVersion(logonProof->A, sizeof(logonProof->A), logonProof->crc_hash, false))
         {
+            // If the client has no valid version
+            if (_expversion == NO_VALID_EXP_FLAG)
+            {
+                if (patcher.PossiblePatching(_build, _localizationName))
+                {
+                    _status = STATUS_AUTHED; // Will get disconnected on packet 
+                    if (patcher.InitPatching(_build, _localizationName, this))
+                        return true;
+                }
+            }
             ByteBuffer packet;
             packet << uint8(AUTH_LOGON_PROOF);
             packet << uint8(WOW_FAIL_VERSION_INVALID);
