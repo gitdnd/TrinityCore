@@ -587,6 +587,7 @@ void AuthSession::ReadHandler()
 
         if (_status != itr->second.status)
         {
+            TC_LOG_DEBUG("network", "Status %d doesn't match status %d, disconnecting", _status, itr->second.status);
             CloseSocket();
             return;
         }
@@ -601,6 +602,7 @@ void AuthSession::ReadHandler()
             size += challenge->size;
             if (size > MAX_ACCEPTED_CHALLENGE_SIZE)
             {
+                TC_LOG_DEBUG("network", "Exceeded MAX_ACCEPTED_CHALLENGE_SIZE, disconnecting");
                 CloseSocket();
                 return;
             }
