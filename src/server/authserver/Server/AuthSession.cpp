@@ -327,6 +327,7 @@ void Patcher::LoadPatchesInfo()
 
     do
     {
+        TC_LOG_DEBUG("server.authserver", "Found patch: %s", fil.cFileName);
         LoadPatchMD5(PATCH_PATH, fil.cFileName);
     } while (FindNextFile(hFil, &fil));
 }
@@ -834,9 +835,15 @@ bool AuthSession::HandleLogonProof()
     // If the client has no valid version
     if (_expversion == NO_VALID_EXP_FLAG)
     {
-        // Check if we have the appropriate patch on the disk
-        TC_LOG_DEBUG("network", "Client with invalid version, patching is not implemented");
-        return false;
+        if (patcher.PossiblePatching(_build, _localizationName))
+        {
+            if (patcher.InitPatching(_build, _localizationName, this))
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
     }
 
     // Continue the SRP6 calculation based on data received from the client
