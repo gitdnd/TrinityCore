@@ -31,7 +31,7 @@
 
 using boost::asio::ip::tcp;
 
-class PatcherRunnable;
+class AuthSession;
 class Field;
 struct AuthHandler;
 
@@ -59,6 +59,39 @@ typedef struct PATCH_INFO
     uint64 filesize;
     uint8 md5[MD5_DIGEST_LENGTH];
 } PATCH_INFO;
+
+class Patcher
+{
+    typedef std::vector<PATCH_INFO> Patches;
+public:
+    void Initialize();
+
+    void LoadPatchMD5(const char*, char*);
+    bool GetHash(char* pat, uint8 mymd5[16]);
+
+    bool InitPatching(int _build, std::string _locale, AuthSession* _session);
+    bool PossiblePatching(int _build, std::string _locale);
+
+private:
+    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool* fallback);
+    void LoadPatchesInfo();
+    Patches _patches;
+    std::string m_dataDir;
+};
+
+// Launch a thread to transfer a patch to the client
+class PatcherRunnable
+{
+public:
+    PatcherRunnable(AuthSession* session, uint64 start, uint64 size);
+    void run();
+    void stop();
+private:
+    AuthSession* mySocket;
+    uint64 pos;
+    uint64 size;
+    bool stopped;
+};
 
 struct AccountInfo
 {
@@ -141,38 +174,5 @@ struct AuthHandler
 };
 
 #pragma pack(pop)
-
-class Patcher
-{
-    typedef std::vector<PATCH_INFO> Patches;
-public:
-    void Initialize();
-
-    void LoadPatchMD5(const char*, char*);
-    bool GetHash(char* pat, uint8 mymd5[16]);
-
-    bool InitPatching(int _build, std::string _locale, AuthSession* _session);
-    bool PossiblePatching(int _build, std::string _locale);
-
-private:
-    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool* fallback);
-    void LoadPatchesInfo();
-    Patches _patches;
-    std::string m_dataDir;
-};
-
-// Launch a thread to transfer a patch to the client
-class PatcherRunnable
-{
-public:
-    PatcherRunnable(AuthSession* session, uint64 start, uint64 size);
-    void run();
-    void stop();
-private:
-    AuthSession* mySocket;
-    uint64 pos;
-    uint64 size;
-    bool stopped;
-};
 
 #endif
