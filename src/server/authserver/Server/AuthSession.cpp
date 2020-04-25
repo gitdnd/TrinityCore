@@ -781,44 +781,42 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
 
     // Fill the response packet with the result
     if (AuthHelper::IsAcceptedClientBuild(_build))
-    {
         pkt << uint8(WOW_SUCCESS);
-
-        // B may be calculated < 32B so we force minimal length to 32B
-        pkt.append(B.AsByteArray(32).get(), 32);      // 32 bytes
-        pkt << uint8(1);
-        pkt.append(g.AsByteArray(1).get(), 1);
-        pkt << uint8(32);
-        pkt.append(N.AsByteArray(32).get(), 32);
-        pkt.append(s.AsByteArray(int32(BufferSizes::SRP_6_S)).get(), size_t(BufferSizes::SRP_6_S));   // 32 bytes
-        pkt.append(VersionChallenge.data(), VersionChallenge.size());
-        pkt << uint8(securityFlags);            // security flags (0x0...0x04)
-
-        if (securityFlags & 0x01)               // PIN input
-        {
-            pkt << uint32(0);
-            pkt << uint64(0) << uint64(0);      // 16 bytes hash?
-        }
-
-        if (securityFlags & 0x02)               // Matrix input
-        {
-            pkt << uint8(0);
-            pkt << uint8(0);
-            pkt << uint8(0);
-            pkt << uint8(0);
-            pkt << uint64(0);
-        }
-
-        if (securityFlags & 0x04)               // Security token input
-            pkt << uint8(1);
-
-        TC_LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s is using '%s' locale (%u)",
-            ipAddress.c_str(), port, _accountInfo.Login.c_str(), _localizationName.c_str(), GetLocaleByName(_localizationName));
-
-        _status = STATUS_LOGON_PROOF;
-    }
     else
         pkt << uint8(WOW_FAIL_VERSION_INVALID);
+
+    // B may be calculated < 32B so we force minimal length to 32B
+    pkt.append(B.AsByteArray(32).get(), 32);      // 32 bytes
+    pkt << uint8(1);
+    pkt.append(g.AsByteArray(1).get(), 1);
+    pkt << uint8(32);
+    pkt.append(N.AsByteArray(32).get(), 32);
+    pkt.append(s.AsByteArray(int32(BufferSizes::SRP_6_S)).get(), size_t(BufferSizes::SRP_6_S));   // 32 bytes
+    pkt.append(VersionChallenge.data(), VersionChallenge.size());
+    pkt << uint8(securityFlags);            // security flags (0x0...0x04)
+
+    if (securityFlags & 0x01)               // PIN input
+    {
+        pkt << uint32(0);
+        pkt << uint64(0) << uint64(0);      // 16 bytes hash?
+    }
+
+    if (securityFlags & 0x02)               // Matrix input
+    {
+        pkt << uint8(0);
+        pkt << uint8(0);
+        pkt << uint8(0);
+        pkt << uint8(0);
+        pkt << uint64(0);
+    }
+
+    if (securityFlags & 0x04)               // Security token input
+        pkt << uint8(1);
+
+    TC_LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s is using '%s' locale (%u)",
+        ipAddress.c_str(), port, _accountInfo.Login.c_str(), _localizationName.c_str(), GetLocaleByName(_localizationName));
+
+    _status = STATUS_LOGON_PROOF;
 
     SendPacket(pkt);
 }
