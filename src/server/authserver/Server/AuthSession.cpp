@@ -387,6 +387,10 @@ void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
 bool AuthSession::HandleXferResume()
 {
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
+
+    // Seems to be crashing the authserver, disable
+    return false;
+
     XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
 
     // Todo: Send back a packet? I think the client don't get we send data.
