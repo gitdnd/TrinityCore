@@ -5038,10 +5038,14 @@ void Player::RepopAtGraveyard()
     // Override repop location to The Hub
     else if (ClosestGrave)
     {
+        // Reset phase to 1 on repop
+        SetPhaseMask(1);
+        // Hub map and coords
         TeleportTo(550, 435.3f, 371.6f, 14.9f, 2.227985f, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
         {
             WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4);  // show spirit healer position on minimap
+            // Hub map and coords
             data << 550;
             data << TaggedPosition<Position::XYZ>(435.3f, 371.6f, 14.9f);
             SendDirectMessage(&data);
