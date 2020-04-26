@@ -1421,8 +1421,8 @@ void Creature::UpdateLevelDependantStats()
     int dungeonLevel = GetMap()->GetDungeonLevel();
     if (dungeonLevel > 0)
     {
-        // FIXME(Harry): Come up with a better scaling system
-        float dungeonLevelMod = dungeonLevel / 10.00f;
+        // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
+        float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
         health = uint32(health * dungeonLevelMod);
     }
 
