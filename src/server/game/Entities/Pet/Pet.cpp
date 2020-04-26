@@ -523,8 +523,8 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
             RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
             // lose happiness when died and not in BG/Arena
-            if (!GetMap()->IsBattlegroundOrArena())
-                ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
+            //if (!GetMap()->IsBattlegroundOrArena())
+            //    ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
             //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         }
@@ -648,7 +648,7 @@ void Pet::LoseHappiness()
     int32 addvalue = 670;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
     if (IsInCombat())                                        //we know in combat happiness fades faster, multiplier guess
         addvalue = int32(addvalue * 1.5f);
-    ModifyPower(POWER_HAPPINESS, -addvalue);
+    ModifyPower(POWER_HAPPINESS, addvalue); // ADD happiness instead of losing, the longer we have the pet the more happy it gets
 }
 
 HappinessState Pet::GetHappinessState()
