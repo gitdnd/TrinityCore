@@ -389,7 +389,7 @@ bool AuthSession::HandleXferResume()
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
 
     // Seems to be crashing the authserver, disable
-    return false;
+    //return false;
 
     XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
 
@@ -398,6 +398,8 @@ bool AuthSession::HandleXferResume()
     {
         fseek(pPatch, 0, SEEK_END);
         size_t size = ftell(pPatch);
+
+        TC_LOG_DEBUG("network", "Seeking to file position: %ld", long(challenge->pos));
 
         fseek(pPatch, long(challenge->pos), 0);
 
@@ -409,6 +411,7 @@ bool AuthSession::HandleXferResume()
         _patcher = new PatcherRunnable(this, challenge->pos, size);
         boost::thread u(&PatcherRunnable::run, _patcher);
         //u.join(); // why are we joining the thread?
+        u.detach();
         return true;
     }
     return false;
