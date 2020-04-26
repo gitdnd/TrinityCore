@@ -388,12 +388,8 @@ bool AuthSession::HandleXferResume()
 {
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
 
-    // Seems to be crashing the authserver, disable
-    //return false;
-
     XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
 
-    // Todo: Send back a packet? I think the client don't get we send data.
     if (patcher.PossiblePatching(_build, _localizationName))
     {
         fseek(pPatch, 0, SEEK_END);
@@ -410,7 +406,8 @@ bool AuthSession::HandleXferResume()
         }
         _patcher = new PatcherRunnable(this, challenge->pos, size);
         boost::thread u(&PatcherRunnable::run, _patcher);
-        //u.join(); // why are we joining the thread?
+        // Potentially open to a DOS attach since we spawn a new thread each time.
+        // Need to implement a thread pool if this ever becomes an issue
         u.detach();
         return true;
     }
