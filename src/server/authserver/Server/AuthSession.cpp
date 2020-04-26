@@ -404,7 +404,7 @@ bool AuthSession::HandleXferResume()
         }
         _patcher = new PatcherRunnable(this, challenge->pos, size);
         boost::thread u(&PatcherRunnable::run, _patcher);
-        u.join();
+        //u.join(); // why are we joining the thread?
         return true;
     }
     return false;
