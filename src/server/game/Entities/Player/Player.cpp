@@ -5039,7 +5039,7 @@ void Player::RepopAtGraveyard()
     else if (ClosestGrave)
     {
         // Reset phase to 1 on repop
-        SetPhaseMask(1);
+        SetPhaseMask(1, true);
         // Hub map and coords
         TeleportTo(550, 435.3f, 371.6f, 14.9f, 2.227985f, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
