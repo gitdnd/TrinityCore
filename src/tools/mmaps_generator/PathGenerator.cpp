@@ -327,5 +327,8 @@ int main(int argc, char** argv)
 
     if (!silent)
         printf("Finished. MMAPS were built in %u ms!\n", GetMSTimeDiffToNow(start));
+    if (debugOutput) {
+        printf("- Debug output was enabled\n");
+    }
     return 0;
 }
