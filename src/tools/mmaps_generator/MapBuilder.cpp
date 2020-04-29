@@ -981,12 +981,12 @@ namespace MMAP
     /**************************************************************************/
     bool MapBuilder::shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY)
     {
-        char fileName[255];
+        /*char fileName[255];
         sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
         FILE* file = fopen(fileName, "rb");
         if (!file) {
             printf("Failed to find mmtile\n");
-            return true;
+            return false;
         }
 
         MmapTileHeader header;
@@ -994,19 +994,18 @@ namespace MMAP
         fclose(file);
         if (count != 1) {
             printf("Tile header count not 1\n");
-            return true;
+            return false;
         }
 
         if (header.mmapMagic != MMAP_MAGIC || header.dtVersion != uint32(DT_NAVMESH_VERSION)) {
             printf("mmapMagic invalid\n");
-            return true;
+            return false;
         }
 
         if (header.mmapVersion != MMAP_VERSION) {
             printf("mmap version wrong\n");
-            return true;
-        }
-
+            return false;
+        }*/
         return false;
     }
 
