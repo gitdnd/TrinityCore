@@ -569,7 +569,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId
         if (!Groups[groupId - 1])
             return;
 
-        Groups[groupId - 1]->Process(loot, lootMode);
+        Groups[groupId - 1]->Process(loot, lootMode, modifier);
         return;
     }
 
