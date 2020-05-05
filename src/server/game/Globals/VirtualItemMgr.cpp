@@ -659,16 +659,16 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     temp->ItemId = entry;
     std::stringstream d1;
     uint32 display = GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
-    std::stringstream ss;
+    /*std::stringstream ss;
     ss << "Generated item with display " << display;
-    sWorld->SendGlobalText(ss.str().c_str(), nullptr);
+    sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
     if (display == 0)
         temp->UpdateDisplay();
     else
         temp->DisplayInfoID = display;
 
     //@todo: Foereaper add the randomness you want here.
-    uint8 numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
+    uint8 numSpellsToGenerate = 0;
 
     //Prevent crash incase something goes dumb.
     if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
