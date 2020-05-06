@@ -668,7 +668,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         temp->DisplayInfoID = display;
 
     //@todo: Foereaper add the randomness you want here.
-    uint8 numSpellsToGenerate = 0;
+    uint8 numSpellsToGenerate = 3;
 
     //Prevent crash incase something goes dumb.
     if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
