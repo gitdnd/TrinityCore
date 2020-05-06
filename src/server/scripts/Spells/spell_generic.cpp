@@ -1985,7 +1985,7 @@ class spell_gen_lifebloom : public SpellScriptLoader
                 // final heal only on duration end or dispel
                 if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE && GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_ENEMY_SPELL)
                     return;
-
+                
                 // final heal
                 GetTarget()->CastSpell(GetTarget(), _spellId, { aurEff, GetCasterGUID() });
             }
@@ -4397,6 +4397,38 @@ class spell_gen_cannon_blast : public SpellScript
     }
 };
 
+class spell_gen_between_cast_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_gen_between_cast_periodic);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (!GetCaster())
+            return;
+        std::list<Player*> targets;
+        Trinity::AnyPlayerInObjectRangeCheck check(GetCaster(), 100.f, false);
+        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(GetCaster(), targets, check);
+        Cell::VisitWorldObjects(GetCaster(), searcher, 100.f);
+        for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+        {
+            Player* player = (*iter);
+            if (player->IsInBetween(GetCaster(), GetTarget(), 2.f))
+                player->CastSpell(player, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+     }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_between_cast_periodic::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4526,4 +4558,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_freezing_circle);
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_gen_cannon_blast);
+    RegisterAuraScript(spell_gen_between_cast_periodic);
+
 }
