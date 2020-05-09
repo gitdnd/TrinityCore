@@ -8460,6 +8460,9 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     return;
                 }
 
+            // Debug messsages
+            Say("Player.cpp filling chest loot", (Language)0, this);
+
             if (lootid)
             {
                 loot->clear();
