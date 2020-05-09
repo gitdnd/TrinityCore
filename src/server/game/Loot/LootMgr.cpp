@@ -591,7 +591,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId
 
             uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
-                Referenced->Process(loot, rate, lootMode, item->groupid);
+                Referenced->Process(loot, rate, lootMode, item->groupid, modifier);
         }
         else                                                    // Plain entries (not a reference, not grouped)
             loot.AddItem(*item, modifier);                                // Chance is already checked, just add
