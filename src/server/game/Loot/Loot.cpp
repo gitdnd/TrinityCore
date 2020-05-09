@@ -227,8 +227,6 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     {
         modifier.plrAvgLvl = lootOwner->GetAverageItemLevel();
     }
-    // Debug messsages
-    lootOwner->Say("Generating loot", (Language)0, lootOwner);
 
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier);          // Processing is done there, callback via Loot::AddItem()
 
