@@ -374,7 +374,10 @@ Transport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType guid 
                 entry = instance->GetGameObjectEntry(0, entry);
 
         if (!entry)
+        {
+            TC_LOG_ERROR("sql.sql", "Unable to find InstanceMap InstanceScript for transport %u", entry);
             return nullptr;
+        }
     }
 
     TransportTemplate const* tInfo = GetTransportTemplate(entry);

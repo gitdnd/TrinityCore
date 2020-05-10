@@ -245,6 +245,7 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "PlayMusic", &LuaWorldObject::PlayMusic },
     { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
     { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
+    {"CreateTransport", &LuaWorldObject::CreateTransport },
 
     { NULL, NULL }
 };

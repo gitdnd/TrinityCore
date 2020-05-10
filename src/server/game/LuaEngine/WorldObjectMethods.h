@@ -4,6 +4,7 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
+#include <Maps\TransportMgr.h>
 #ifndef WORLDOBJECTMETHODS_H
 #define WORLDOBJECTMETHODS_H
 
@@ -1196,6 +1197,13 @@ namespace LuaWorldObject
             obj->PlayDistanceSound(soundId, player);
         else
             obj->PlayDistanceSound(soundId);
+        return 0;
+    }
+
+    int CreateTransport(lua_State* L, WorldObject* obj)
+    {
+        uint32 objectId = Eluna::CHECKVAL<uint32>(L, 2);
+        TransportMgr::instance()->CreateTransport(188511, 0, obj->GetMap());
         return 0;
     }
 };
