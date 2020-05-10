@@ -283,6 +283,10 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
     if (erased || _staticPassengers.erase(passenger)) // static passenger can remove itself in case of grid unload
     {
+        if (passenger->ToPlayer())
+        {
+            passenger->ToPlayer()->Say("Removing passenger", (Language)0, passenger);
+        }
         passenger->SetTransport(nullptr);
         passenger->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         passenger->m_movementInfo.transport.Reset();
