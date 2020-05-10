@@ -461,5 +461,10 @@ namespace LuaObject
         return 1;
     }
 
+    int ToTransport(lua_State* L, Object* obj)
+    {
+        Eluna::Push(L, reinterpret_cast<Transport*>(obj));
+        return 1;
+    }
 };
 #endif

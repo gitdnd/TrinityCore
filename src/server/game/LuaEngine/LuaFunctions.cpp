@@ -185,6 +185,7 @@ ElunaRegister<Object> ObjectMethods[] =
     { "ToCreature", &LuaObject::ToCreature },
     { "ToPlayer", &LuaObject::ToPlayer },
     { "ToCorpse", &LuaObject::ToCorpse },
+    { "ToTransport", &LuaObject::ToTransport },
     { "RemoveFlag", &LuaObject::RemoveFlag },
  
     { NULL, NULL }
