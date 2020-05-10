@@ -16,6 +16,7 @@ namespace LuaTransport
     {
         WorldObject* worldObj = Eluna::CHECKOBJ<WorldObject>(L, 2);
         obj->AddPassenger(worldObj);
+        return 0;
     }
 };
 
