@@ -1284,6 +1284,7 @@ ElunaRegister<Transport> TransportMethods[] =
     { "EnableMovement", &LuaTransport::EnableMovement },
     { "AddPassenger", &LuaTransport::AddPassenger },
     { "GetPassengers", &LuaTransport::GetPassengers },
+    { "SummonPassenger", &LuaTransport::SummonPassenger },
 
     { NULL, NULL }
 };
