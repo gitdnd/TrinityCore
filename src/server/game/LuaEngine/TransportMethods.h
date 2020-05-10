@@ -39,10 +39,10 @@ namespace LuaTransport
     int SummonPassenger(lua_State* L, Transport* obj)
     {
         auto entry = Eluna::CHECKVAL<uint32>(L, 2);
-        auto x = Eluna::CHECKVAL<uint32>(L, 3);
-        auto y = Eluna::CHECKVAL<uint32>(L, 4);
-        auto z = Eluna::CHECKVAL<uint32>(L, 5);
-        auto o = Eluna::CHECKVAL<uint32>(L, 6);
+        auto x = Eluna::CHECKVAL<int32>(L, 3);
+        auto y = Eluna::CHECKVAL<int32>(L, 4);
+        auto z = Eluna::CHECKVAL<int32>(L, 5);
+        auto o = Eluna::CHECKVAL<int32>(L, 6);
         auto summonType = Eluna::CHECKVAL<uint32>(L, 7);
         obj->SummonPassenger(entry, Position(x, y, z, o), (TempSummonType)summonType);
         return 0;
