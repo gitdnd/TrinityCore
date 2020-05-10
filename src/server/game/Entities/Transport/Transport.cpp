@@ -563,7 +563,10 @@ void Transport::UnloadStaticPassengers()
 void Transport::EnableMovement(bool enabled)
 {
     if (!GetGOInfo()->moTransport.canBeStopped)
+    {
+        TC_LOG_ERROR("transport", "Transport %u cannot be stopped, unable to set movement to true", m_goInfo->entry);
         return;
+    }
 
     _pendingStop = !enabled;
 }
