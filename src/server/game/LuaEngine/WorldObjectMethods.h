@@ -1203,7 +1203,11 @@ namespace LuaWorldObject
     int CreateTransport(lua_State* L, WorldObject* obj)
     {
         uint32 objectId = Eluna::CHECKVAL<uint32>(L, 2);
-        TransportMgr::instance()->CreateTransport(188511, 0, obj->GetMap());
+        Transport* transport = TransportMgr::instance()->CreateTransport(188511, 0, obj->GetMap());
+        if (transport && obj->ToPlayer())
+        {
+            obj->ToPlayer()->Say("Successfully created transport", (Language)0, obj->ToPlayer());
+        }
         return 0;
     }
 };

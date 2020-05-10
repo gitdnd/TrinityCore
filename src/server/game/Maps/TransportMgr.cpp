@@ -403,6 +403,7 @@ Transport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType guid 
 
     if (!trans->Create(guidLow, entry, mapId, x, y, z, o, 255))
     {
+        TC_LOG_ERROR("entities.transport", "Transport %u (name %s) failed to create in map", entry, trans->GetName().c_str());
         delete trans;
         return nullptr;
     }
