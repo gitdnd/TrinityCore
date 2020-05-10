@@ -1425,6 +1425,9 @@ void RegisterFunctions(Eluna* E)
     ElunaTemplate<ElunaQuery>::SetMethods(E, QueryMethods);
 
     ElunaTemplate<Transport>::Register(E, "Transport");
+    ElunaTemplate<Transport>::SetMethods(E, ObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, WorldObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, GameObjectMethods);
     ElunaTemplate<Transport>::SetMethods(E, TransportMethods);
 
     ElunaTemplate<long long>::Register(E, "long long", true);

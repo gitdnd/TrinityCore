@@ -1211,10 +1211,6 @@ namespace LuaWorldObject
         {
             transport->EnableMovement(enableMovement);
         }
-        if (obj->ToPlayer())
-        {
-            obj->ToPlayer()->NearTeleportTo(transport->GetPositionX(), transport->GetPositionY(), transport->GetPositionZ() + 8, transport->GetOrientation());
-        }
         Eluna::Push(L, transport);
         return 1;
     }
