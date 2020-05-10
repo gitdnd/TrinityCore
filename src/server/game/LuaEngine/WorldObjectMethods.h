@@ -6,6 +6,7 @@
 
 #include <Maps\TransportMgr.h>
 #include <Transport.h>
+
 #ifndef WORLDOBJECTMETHODS_H
 #define WORLDOBJECTMETHODS_H
 
@@ -1204,15 +1205,18 @@ namespace LuaWorldObject
     int CreateTransport(lua_State* L, WorldObject* obj)
     {
         uint32 objectId = Eluna::CHECKVAL<uint32>(L, 2);
+        bool enableMovement = Eluna::CHECKVAL<bool>(L, 3, false);
         Transport* transport = TransportMgr::instance()->CreateTransport(objectId, 0, obj->GetMap());
-        if (transport && obj->ToPlayer())
+        if (transport)
         {
-            obj->ToPlayer()->Say("Successfully created transport", (Language)0, obj->ToPlayer());
-            transport->EnableMovement(false);
-            obj->ToPlayer()->NearTeleportTo(transport->GetPositionX(), transport->GetPositionY(), transport->GetPositionZ() + 4, transport->GetOrientation());
-            transport->AddPassenger(obj);
+            transport->EnableMovement(enableMovement);
         }
-        return 0;
+        if (obj->ToPlayer())
+        {
+            obj->ToPlayer()->NearTeleportTo(transport->GetPositionX(), transport->GetPositionY(), transport->GetPositionZ() + 8, transport->GetOrientation());
+        }
+        Eluna::Push(L, transport);
+        return 1;
     }
 };
 #endif
