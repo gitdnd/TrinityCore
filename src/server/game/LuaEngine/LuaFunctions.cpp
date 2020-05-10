@@ -1281,6 +1281,7 @@ ElunaRegister<BattleGround> BattleGroundMethods[] =
 ElunaRegister<Transport> TransportMethods[] =
 {
     { "EnableMovement", &LuaTransport::EnableMovement },
+    { "AddPassenger", &LuaTransport::AddPassenger },
 
     { NULL, NULL }
 };

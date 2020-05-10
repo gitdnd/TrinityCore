@@ -11,6 +11,12 @@ namespace LuaTransport
         obj->EnableMovement(state);
         return 0;
     }
+
+    int AddPassenger(lua_State* L, Transport* obj)
+    {
+        WorldObject* worldObj = Eluna::CHECKOBJ<WorldObject>(L, 2);
+        obj->AddPassenger(worldObj);
+    }
 };
 
 #endif
