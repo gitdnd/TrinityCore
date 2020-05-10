@@ -334,6 +334,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
+                // TODO: Harry remove this line
+                plrMover->Say("Removing myself as passenger!", (Language)0, plrMover);
+
                 plrMover->GetTransport()->RemovePassenger(plrMover);
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
                     transport->AddPassenger(plrMover);
@@ -351,6 +354,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
     else if (plrMover && plrMover->GetTransport())                // if we were on a transport, leave
     {
+        // TODO: Harry remove this line
+        plrMover->Say("Removing myself as passenger 2!", (Language)0, plrMover);
+
         plrMover->GetTransport()->RemovePassenger(plrMover);
         movementInfo.transport.Reset();
     }
