@@ -5,6 +5,7 @@
 */
 
 #include <Maps\TransportMgr.h>
+#include <Transport.h>
 #ifndef WORLDOBJECTMETHODS_H
 #define WORLDOBJECTMETHODS_H
 
@@ -1207,6 +1208,9 @@ namespace LuaWorldObject
         if (transport && obj->ToPlayer())
         {
             obj->ToPlayer()->Say("Successfully created transport", (Language)0, obj->ToPlayer());
+            transport->EnableMovement(false);
+            obj->ToPlayer()->NearTeleportTo(transport->GetPositionX(), transport->GetPositionY(), transport->GetPositionZ() + 4, transport->GetOrientation());
+            transport->AddPassenger(obj);
         }
         return 0;
     }
