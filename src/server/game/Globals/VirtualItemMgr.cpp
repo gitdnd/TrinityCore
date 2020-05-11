@@ -525,7 +525,10 @@ uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32
 
     if (displayLists.empty())
     {
-        sWorld->SendGlobalText("Help i found no displays", nullptr);
+        std::ostringstream stream;
+        stream << "ERROR: Found no display id for item quality [" << quality << "] class [";
+        stream << _class << "] subclass [" << subclass << "] inventoryType [" << inventoryType << "]";
+        sWorld->SendGlobalText(stream.str().c_str(), nullptr);
         return 0;
     }
     auto display = std::begin(displayLists);

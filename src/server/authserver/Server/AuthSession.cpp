@@ -154,6 +154,13 @@ void PatcherRunnable::run()
 {
     TC_LOG_INFO("network", "PatcherRunnable::run(): %ld -> %ld", pos, size);
 
+    // Handle socket closed
+    if (!mySocket || !mySocket->IsOpen())
+    {
+        TC_LOG_INFO("network", "PatcherRunnable::run(): Socket is closed, stopping patcher");
+        return;
+    }
+
     while (pos < size && !stopped)
     {
         uint64 left = size - pos;
