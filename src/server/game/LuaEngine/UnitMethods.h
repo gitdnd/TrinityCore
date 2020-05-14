@@ -3078,8 +3078,6 @@ namespace LuaUnit
         case /*ENCOUNTER_FRAME_ENGAGE*/0:
         case /*ENCOUNTER_FRAME_DISENGAGE*/1:
         case /*ENCOUNTER_FRAME_UPDATE_PRIORITY*/2:
-            if (!unit)
-                return;
             data << unit->GetPackGUID();
             data << uint8(param1);
             break;
