@@ -433,6 +433,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "DealHeal", &LuaUnit::DealHeal },
     { "AddThreat", &LuaUnit::AddThreat },
     { "SpawnDynObject", &LuaUnit::SpawnDynObject },
+    { "SendEncounterFrame", &LuaUnit::SendEncounterFrame },
 
     { NULL, NULL }
 };
