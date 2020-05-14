@@ -3068,8 +3068,8 @@ namespace LuaUnit
         uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
         uint8 param1 = Eluna::CHECKVAL<uint8>(L, 3);
         uint8 param2 = Eluna::CHECKVAL<uint8>(L, 4);
-        if(type > 6)
-            return luaL_error(L, "SendEncounterFrame type larger then expected ( > 6)");
+        if(type > 7)
+            return luaL_error(L, "SendEncounterFrame type larger then expected ( > 7)");
         WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
         data << uint32(type);
 
