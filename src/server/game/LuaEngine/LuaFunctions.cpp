@@ -1285,6 +1285,7 @@ ElunaRegister<Transport> TransportMethods[] =
     { "AddPassenger", &LuaTransport::AddPassenger },
     { "GetPassengers", &LuaTransport::GetPassengers },
     { "SummonPassenger", &LuaTransport::SummonPassenger },
+    { "SetVisible", &LuaTransport::SetVisible },
 
     { NULL, NULL }
 };
