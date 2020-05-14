@@ -4,6 +4,9 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
+#include <Maps\TransportMgr.h>
+#include <Transport.h>
+
 #ifndef WORLDOBJECTMETHODS_H
 #define WORLDOBJECTMETHODS_H
 
@@ -1197,6 +1200,19 @@ namespace LuaWorldObject
         else
             obj->PlayDistanceSound(soundId);
         return 0;
+    }
+
+    int CreateTransport(lua_State* L, WorldObject* obj)
+    {
+        uint32 objectId = Eluna::CHECKVAL<uint32>(L, 2);
+        bool enableMovement = Eluna::CHECKVAL<bool>(L, 3, false);
+        Transport* transport = TransportMgr::instance()->CreateTransport(objectId, 0, obj->GetMap());
+        if (transport)
+        {
+            transport->EnableMovement(enableMovement);
+        }
+        Eluna::Push(L, transport);
+        return 1;
     }
 };
 #endif

@@ -36,6 +36,7 @@ extern "C"
 #include "CorpseMethods.h"
 #include "VehicleMethods.h"
 #include "BattleGroundMethods.h"
+#include "TransportMethods.h"
 
 luaL_Reg GlobalMethods[] =
 {
@@ -184,6 +185,7 @@ ElunaRegister<Object> ObjectMethods[] =
     { "ToCreature", &LuaObject::ToCreature },
     { "ToPlayer", &LuaObject::ToPlayer },
     { "ToCorpse", &LuaObject::ToCorpse },
+    { "ToTransport", &LuaObject::ToTransport },
     { "RemoveFlag", &LuaObject::RemoveFlag },
  
     { NULL, NULL }
@@ -245,6 +247,7 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "PlayMusic", &LuaWorldObject::PlayMusic },
     { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
     { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
+    {"CreateTransport", &LuaWorldObject::CreateTransport },
 
     { NULL, NULL }
 };
@@ -1277,6 +1280,17 @@ ElunaRegister<BattleGround> BattleGroundMethods[] =
     { NULL, NULL }
 };
 
+ElunaRegister<Transport> TransportMethods[] =
+{
+    { "EnableMovement", &LuaTransport::EnableMovement },
+    { "AddPassenger", &LuaTransport::AddPassenger },
+    { "GetPassengers", &LuaTransport::GetPassengers },
+    { "SummonPassenger", &LuaTransport::SummonPassenger },
+    { "SetVisible", &LuaTransport::SetVisible },
+
+    { NULL, NULL }
+};
+
 #if (!defined(TBC) && !defined(CLASSIC))
 // fix compile error about accessing vehicle destructor
 template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
@@ -1415,6 +1429,12 @@ void RegisterFunctions(Eluna* E)
 
     ElunaTemplate<ElunaQuery>::Register(E, "ElunaQuery", true);
     ElunaTemplate<ElunaQuery>::SetMethods(E, QueryMethods);
+
+    ElunaTemplate<Transport>::Register(E, "Transport");
+    ElunaTemplate<Transport>::SetMethods(E, ObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, WorldObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, GameObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, TransportMethods);
 
     ElunaTemplate<long long>::Register(E, "long long", true);
 

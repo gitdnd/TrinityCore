@@ -2851,7 +2851,8 @@ enum QuestSort
     QUEST_SORT_JEWELCRAFTING       = 373,
     QUEST_SORT_NOBLEGARDEN         = 374,
     QUEST_SORT_PILGRIMS_BOUNTY     = 375,
-    QUEST_SORT_LOVE_IS_IN_THE_AIR  = 376
+    QUEST_SORT_LOVE_IS_IN_THE_AIR  = 376,
+    QUEST_SORT_TRANSMUTATION       = 377
 };
 
 constexpr uint8 ClassByQuestSort(int32 QuestSort)
@@ -3025,7 +3026,8 @@ enum SkillType
     SKILL_PET_WASP                 = 785,
     SKILL_PET_EXOTIC_RHINO         = 786,
     SKILL_PET_EXOTIC_CORE_HOUND    = 787,
-    SKILL_PET_EXOTIC_SPIRIT_BEAST  = 788
+    SKILL_PET_EXOTIC_SPIRIT_BEAST  = 788,
+    SKILL_TRANSMUTATION            = 789
 };
 
 #define MAX_SKILL_TYPE               789
@@ -3059,6 +3061,7 @@ constexpr uint32 SkillByQuestSort(int32 QuestSort)
         case QUEST_SORT_FIRST_AID:      return SKILL_FIRST_AID;
         case QUEST_SORT_JEWELCRAFTING:  return SKILL_JEWELCRAFTING;
         case QUEST_SORT_INSCRIPTION:    return SKILL_INSCRIPTION;
+        case QUEST_SORT_TRANSMUTATION:  return SKILL_TRANSMUTATION;
     }
     return 0;
 }
