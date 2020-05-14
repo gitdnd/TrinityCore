@@ -3068,29 +3068,30 @@ namespace LuaUnit
         uint32 type = Eluna::CHECKVAL<uint32>(L, 0);
         uint8 param1 = Eluna::CHECKVAL<uint8>(L, 1);
         uint8 param2 = Eluna::CHECKVAL<uint8>(L, 2);
+        if(type > 6)
+            return luaL_error(L, "SendEncounterFrame type larger then expected ( > 6)");
         WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
         data << uint32(type);
 
         switch (type)
         {
-        case ENCOUNTER_FRAME_ENGAGE:
-        case ENCOUNTER_FRAME_DISENGAGE:
-        case ENCOUNTER_FRAME_UPDATE_PRIORITY:
+        case /*ENCOUNTER_FRAME_ENGAGE*/0:
+        case /*ENCOUNTER_FRAME_DISENGAGE*/1:
+        case /*ENCOUNTER_FRAME_UPDATE_PRIORITY*/2:
             if (!unit)
                 return;
             data << unit->GetPackGUID();
             data << uint8(param1);
             break;
-        case ENCOUNTER_FRAME_ADD_TIMER:
-        case ENCOUNTER_FRAME_ENABLE_OBJECTIVE:
-        case ENCOUNTER_FRAME_DISABLE_OBJECTIVE:
+        case /*ENCOUNTER_FRAME_ADD_TIMER*/3:
+        case /*ENCOUNTER_FRAME_ENABLE_OBJECTIVE*/4:
+        case /*ENCOUNTER_FRAME_DISABLE_OBJECTIVE*/6:
             data << uint8(param1);
             break;
-        case ENCOUNTER_FRAME_UPDATE_OBJECTIVE:
+        case /*ENCOUNTER_FRAME_UPDATE_OBJECTIVE*/5:
             data << uint8(param1);
             data << uint8(param2);
             break;
-        case ENCOUNTER_FRAME_UNK7:
         default:
             break;
         }
