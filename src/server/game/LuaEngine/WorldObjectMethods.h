@@ -1214,5 +1214,15 @@ namespace LuaWorldObject
         Eluna::Push(L, transport);
         return 1;
     }
+
+    int SetZoneOverrideLight(lua_State* L, WorldObject* obj)
+    {
+        uint32 zoneId = Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 areaLightId = Eluna::CHECKVAL<uint32>(L, 3);
+        uint32 overrideLightId = Eluna::CHECKVAL<uint32>(L, 4);
+        uint32 transitionTimeInMS = Eluna::CHECKVAL<uint32>(L, 5);
+
+        obj->GetMap()->SetZoneOverrideLight(zoneId, areaLightId, overrideLightId, transitionTimeInMS);
+    }
 };
 #endif

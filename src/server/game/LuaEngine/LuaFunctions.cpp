@@ -248,6 +248,7 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
     { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
     {"CreateTransport", &LuaWorldObject::CreateTransport },
+    {"SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
 
     { NULL, NULL }
 };
