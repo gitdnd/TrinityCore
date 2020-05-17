@@ -3062,5 +3062,40 @@ namespace LuaUnit
           
         return 0;
     }
+
+    int SendEncounterFrame(lua_State* L, Unit* unit)
+    {
+        uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
+        uint8 param1 = Eluna::CHECKVAL<uint8>(L, 3);
+        uint8 param2 = Eluna::CHECKVAL<uint8>(L, 4);
+        if(type > 7)
+            return luaL_error(L, "SendEncounterFrame type larger then expected ( > 7)");
+        WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+        data << uint32(type);
+
+        switch (type)
+        {
+        case /*ENCOUNTER_FRAME_ENGAGE*/0:
+        case /*ENCOUNTER_FRAME_DISENGAGE*/1:
+        case /*ENCOUNTER_FRAME_UPDATE_PRIORITY*/2:
+            data << unit->GetPackGUID();
+            data << uint8(param1);
+            break;
+        case /*ENCOUNTER_FRAME_ADD_TIMER*/3:
+        case /*ENCOUNTER_FRAME_ENABLE_OBJECTIVE*/4:
+        case /*ENCOUNTER_FRAME_DISABLE_OBJECTIVE*/6:
+            data << uint8(param1);
+            break;
+        case /*ENCOUNTER_FRAME_UPDATE_OBJECTIVE*/5:
+            data << uint8(param1);
+            data << uint8(param2);
+            break;
+        default:
+            break;
+        }
+        unit->GetMap()->SendToPlayers(&data);
+        return 0;
+    }
+
 };
 #endif

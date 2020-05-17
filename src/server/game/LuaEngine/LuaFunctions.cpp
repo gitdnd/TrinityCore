@@ -248,6 +248,7 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
     { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
     {"CreateTransport", &LuaWorldObject::CreateTransport },
+    {"SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
 
     { NULL, NULL }
 };
@@ -436,6 +437,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "DealHeal", &LuaUnit::DealHeal },
     { "AddThreat", &LuaUnit::AddThreat },
     { "SpawnDynObject", &LuaUnit::SpawnDynObject },
+    { "SendEncounterFrame", &LuaUnit::SendEncounterFrame },
 
     { NULL, NULL }
 };
@@ -1286,6 +1288,7 @@ ElunaRegister<Transport> TransportMethods[] =
     { "AddPassenger", &LuaTransport::AddPassenger },
     { "GetPassengers", &LuaTransport::GetPassengers },
     { "SummonPassenger", &LuaTransport::SummonPassenger },
+    { "SetVisible", &LuaTransport::SetVisible },
 
     { NULL, NULL }
 };

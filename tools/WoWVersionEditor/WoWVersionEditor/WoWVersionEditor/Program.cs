@@ -13,7 +13,6 @@ namespace WoWVersionEditor
 
         static void Main(string[] args)
         {
-            args = new string[] { "D:\\WoW 3.3.5a\\Wow_customclass.exe", "+" };
             try
             {
                 var path = args[0];
