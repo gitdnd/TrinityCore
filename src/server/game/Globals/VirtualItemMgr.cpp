@@ -522,7 +522,12 @@ uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32
 {
     std::list<uint32> displayLists;
     displayLists = GetDisplaysForDisplayInfo(quality, _class, subclass, inventoryType);
-
+    // Attempt to find display at a quality up if none found
+    if (displayLists.empty())
+    {
+        displayLists = GetDisplaysForDisplayInfo(quality + 1, _class, subclass, inventoryType);
+    }
+    // If still empty, output an error
     if (displayLists.empty())
     {
         std::ostringstream stream;
