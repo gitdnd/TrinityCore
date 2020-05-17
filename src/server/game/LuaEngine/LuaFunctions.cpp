@@ -799,6 +799,7 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SetDefaultMovementType", &LuaCreature::SetDefaultMovementType },
     { "SetRespawnDelay", &LuaCreature::SetRespawnDelay },
     { "SetWanderRadius", &LuaCreature::SetWanderRadius },
+    { "SetRegenerateHealth", &LuaCreature::SetRegenerateHealth },
     { "SetInCombatWithZone", &LuaCreature::SetInCombatWithZone },
     { "SetDisableReputationGain", &LuaCreature::SetDisableReputationGain },
 #if defined(TRINITY) || AZEROTHCORE

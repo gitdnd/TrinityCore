@@ -1079,6 +1079,20 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     }
 
     /**
+     * Sets whether the [Creature] can regenerate health or not
+     *
+     * @param bool disable = true : `true` to enable regenerate health, `false` to disable regenerate health
+     */
+    int SetRegenerateHealth(lua_State* L, Creature* creature)
+    {
+        bool disable = Eluna::CHECKVAL<bool>(L, 2);
+
+        creature->SetRegenerateHealth(disable);
+
+        return 0;
+    }
+
+    /**
      * Sets the time it takes for the [Creature] to respawn when killed.
      *
      * @param uint32 delay : the delay, in seconds
