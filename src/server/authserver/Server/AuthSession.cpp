@@ -154,15 +154,15 @@ void PatcherRunnable::run()
 {
     TC_LOG_INFO("network", "PatcherRunnable::run(): %ld -> %ld", pos, size);
 
-    // Handle socket closed
-    if (!mySocket || !mySocket->IsOpen())
-    {
-        TC_LOG_INFO("network", "PatcherRunnable::run(): Socket is closed, stopping patcher");
-        return;
-    }
-
     while (pos < size && !stopped)
     {
+        // Handle socket closed
+        if (!mySocket || !mySocket->IsOpen())
+        {
+            TC_LOG_INFO("network", "PatcherRunnable::run(): Socket is closed, stopping patcher");
+            break;
+        }
+
         uint64 left = size - pos;
         uint16 send = (left > 4096) ? 4096 : left;
 
@@ -183,7 +183,7 @@ void PatcherRunnable::run()
         _sleep(sConfigMgr->GetIntDefault("PatchPacketDelay", 100));
     }
 
-    if (!stopped)
+    if (!stopped && mySocket)
     {
         fclose(mySocket->pPatch);
         mySocket->pPatch = NULL;
