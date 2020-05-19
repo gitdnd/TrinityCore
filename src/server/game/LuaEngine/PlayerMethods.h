@@ -4153,5 +4153,43 @@ namespace LuaPlayer
         player->AdvanceQuestCredit(id);
         return 0;
     }
+
+    int GetLFGRole(lua_State* L, Player* player)
+    {
+        if (player->GetGroup())
+        {
+            auto slots = player->GetGroup()->GetMemberSlots();
+            for (auto it = slots.begin(); it != slots.end(); ++it)
+            {
+                // I don't know if we can compare guid's directly so lets compare the raw value
+                if (it->guid.GetRawValue() == player->GetGUID().GetRawValue())
+                {
+                    /*
+                        PLAYER_ROLE_TANK                             = 0x02,
+                        PLAYER_ROLE_HEALER                           = 0x04,
+                        PLAYER_ROLE_DAMAGE                           = 0x08
+                    */
+                    auto roles = it->roles;
+                    // Tank
+                    if (roles & 0x02 == 0)
+                    {
+                        Eluna::Push(L, 0);
+                    }
+                    // Healer
+                    else if (roles & 0x04 == 0)
+                    {
+                        Eluna::Push(L, 1);
+                    }
+                    // DPS
+                    else if (roles & 0x08 == 0)
+                    {
+                        Eluna::Push(L, 2);
+                    }
+                    break;
+                }
+            }
+        }
+        return 1;
+    }
 };
 #endif

@@ -755,6 +755,7 @@ ElunaRegister<Player> PlayerMethods[] =
 #endif
     { "GetAvgItemLevel", &LuaPlayer::GetAvgItemLevel },
     { "QuestKillCredit", &LuaPlayer::QuestKillCredit },
+    { "GetLFGRole", &LuaPlayer::GetLFGRole },
 
     { NULL, NULL }
 };
