@@ -4161,8 +4161,7 @@ namespace LuaPlayer
             auto slots = player->GetGroup()->GetMemberSlots();
             for (auto it = slots.begin(); it != slots.end(); ++it)
             {
-                // I don't know if we can compare guid's directly so lets compare the raw value
-                if (it->guid.GetRawValue() == player->GetGUID().GetRawValue())
+                if (it->guid == player->GetGUID())
                 {
                     /*
                         PLAYER_ROLE_TANK                             = 0x02,
