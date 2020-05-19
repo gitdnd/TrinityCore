@@ -4171,17 +4171,17 @@ namespace LuaPlayer
                     */
                     auto roles = it->roles;
                     // Tank
-                    if (roles & 0x02 == 0)
+                    if (roles & 0x02)
                     {
                         Eluna::Push(L, 0);
                     }
                     // Healer
-                    else if (roles & 0x04 == 0)
+                    else if (roles & 0x04)
                     {
                         Eluna::Push(L, 1);
                     }
                     // DPS
-                    else if (roles & 0x08 == 0)
+                    else if (roles & 0x08)
                     {
                         Eluna::Push(L, 2);
                     }
