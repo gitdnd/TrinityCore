@@ -1223,6 +1223,7 @@ namespace LuaWorldObject
         uint32 transitionTimeInMS = Eluna::CHECKVAL<uint32>(L, 5);
 
         obj->GetMap()->SetZoneOverrideLight(zoneId, areaLightId, overrideLightId, transitionTimeInMS);
+        return 0;
     }
 };
 #endif
