@@ -815,6 +815,7 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SetWalk", &LuaCreature::SetWalk },
     { "SetHomePosition", &LuaCreature::SetHomePosition },
     { "SetEquipmentSlots", &LuaCreature::SetEquipmentSlots },
+    { "SetWaypoint", &LuaCreature::SetWaypoint },
 
     // Boolean
     { "IsWorldBoss", &LuaCreature::IsWorldBoss },

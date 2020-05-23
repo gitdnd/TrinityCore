@@ -980,6 +980,25 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     }
 
     /**
+     * Sets the [Creature]s waypoint path
+     *
+     * @param uint32 pathid : entry of a path
+     */
+    int SetWaypoint(lua_State* L, Creature* creature)
+    {
+        uint32 pathid = Eluna::CHECKVAL<uint32>(L, 2);
+        if (creature->GetEntry() == 1)
+            return 1;
+
+        //creature->LoadPath(pathid);
+        //creature->SetDefaultMovementType(WAYPOINT_MOTION_TYPE);
+        creature->GetMotionMaster()->MovePath(pathid, true);
+        //creature->GetMotionMaster()->Initialize();
+
+        return 0;
+    }
+
+    /**
      * Equips given [Item]s to the [Unit]. Using 0 removes the equipped [Item]
      *
      * @param uint32 main_hand : main hand [Item]'s entry
