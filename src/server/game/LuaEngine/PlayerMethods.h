@@ -4190,5 +4190,15 @@ namespace LuaPlayer
         }
         return 1;
     }
+
+    int UpdateAchievementCriteria(lua_State* L, Player* player)
+    {
+        uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
+        uint32 miscValue1 = Eluna::CHECKVAL<uint32>(L, 3, 0);
+        uint32 miscValue2 = Eluna::CHECKVAL<uint32>(L, 4, 0);
+        //WorldObject* ref = Eluna::CHECKOBJ<WorldObject>(L, 5);
+        player->UpdateAchievementCriteria((AchievementCriteriaTypes)type, miscValue1, miscValue2);
+        return 0;
+    }
 };
 #endif
