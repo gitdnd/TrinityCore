@@ -4208,7 +4208,6 @@ namespace LuaPlayer
         auto achievement = AchievementGlobalMgr::instance()->GetAchievement(id);
         if (achievement)
         {
-            player->Say("I'm about to learn a achievement!", (Language)0, player);
             player->CompletedAchievement(achievement);
         }
         return 0;
