@@ -809,7 +809,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     }
 
     // Apply block rating to shields
-    if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
+    if (output->Class == ITEM_CLASS_ARMOR && output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
     {
         output->Block = uint32(0.93f*float(ilevel));
     }
