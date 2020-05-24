@@ -4,6 +4,7 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
+#include <Achievements\AchievementMgr.h>
 #ifndef PLAYERMETHODS_H
 #define PLAYERMETHODS_H
 
@@ -4198,6 +4199,17 @@ namespace LuaPlayer
         uint32 miscValue2 = Eluna::CHECKVAL<uint32>(L, 4, 0);
         //WorldObject* ref = Eluna::CHECKOBJ<WorldObject>(L, 5);
         player->UpdateAchievementCriteria((AchievementCriteriaTypes)type, miscValue1, miscValue2);
+        return 0;
+    }
+
+    int CompleteAchievement(lua_State* L, Player* player)
+    {
+        uint32 id = Eluna::CHECKVAL<uint32>(L, 2);
+        auto achievement = AchievementGlobalMgr::instance()->GetAchievement(id);
+        if (achievement)
+        {
+            player->CompletedAchievement(achievement);
+        }
         return 0;
     }
 };
