@@ -758,6 +758,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetLFGRole", &LuaPlayer::GetLFGRole },
     { "UpdateAchievementCriteria", &LuaPlayer::UpdateAchievementCriteria },
     { "CompleteAchievement", &LuaPlayer::CompleteAchievement },
+    { "FinishDungeon", &LuaPlayer::FinishDungeon },
 
     { NULL, NULL }
 };

@@ -7,6 +7,7 @@
 #ifndef PLAYERMETHODS_H
 #define PLAYERMETHODS_H
 #include <Achievements\AchievementMgr.h>
+#include <DungeonFinding\LFGMgr.h>
 
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
@@ -4209,6 +4210,16 @@ namespace LuaPlayer
         if (achievement)
         {
             player->CompletedAchievement(achievement);
+        }
+        return 0;
+    }
+
+    int FinishDungeon(lua_State* /*L*/, Player* player)
+    {
+        auto group = player->GetGroup();
+        if (group)
+        {
+            sLFGMgr->FinishDungeon(group->GetGUID(), sLFGMgr->GetDungeon(group->GetGUID()), player->GetMap());
         }
         return 0;
     }
