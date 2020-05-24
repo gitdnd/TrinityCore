@@ -361,65 +361,62 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
     // Test armor name generator
     if (type == ITEM_CLASS_ARMOR)
     {
-        if (inventoryType = INVTYPE_CHEST)
+        // Retrieve all the string lists
+        // For Weapons we always use inventoryType 0
+        std::map<uint32, std::vector<std::string>> nameLists;
+        for (size_t i = 1; i <= 7; ++i)
         {
-            // Retrieve all the string lists
-            // For Weapons we always use inventoryType 0
-            std::map<uint32, std::vector<std::string>> nameLists;
-            for (size_t i = 1; i <= 7; ++i)
-            {
-                NameInfo nameInfo(type, subclass, inventoryType, i);
-                auto list = GetNamesForNameInfo(&nameInfo);
+            NameInfo nameInfo(type, subclass, inventoryType, i);
+            auto list = GetNamesForNameInfo(&nameInfo);
 
-                // Make sure the current list is not empty. If it is, fall back to template item name.
-                if (list.empty())
-                    return fullName;
-
-                nameLists.insert(std::make_pair(i, list));
-            }
-
-            std::stringstream ss;
-            // Concat the correct full item name for the item quality
-
-            // List 1: Unique names, like Malice, Mangler, Mercy etc.
-            // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
-            // List 3: Material names, like Bone, Copper, Diamond etc.
-            // List 4: Basic type name, like Blade, Razor, Maul etc.
-            // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
-            // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
-
-            switch (quality)
-            {
-            case ITEM_QUALITY_NORMAL:
-            {
-                ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-                break;
-            }
-            case ITEM_QUALITY_UNCOMMON:
-            {
-                ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-                break;
-            }
-            case ITEM_QUALITY_RARE:
-            {
-                ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
-                break;
-            }
-            case ITEM_QUALITY_EPIC:
-            {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-                break;
-            }
-            case ITEM_QUALITY_LEGENDARY:
-            {
-                ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
-                break;
-            }
-            default:
+            // Make sure the current list is not empty. If it is, fall back to template item name.
+            if (list.empty())
                 return fullName;
-            }
-            fullName = ss.str();
+
+            nameLists.insert(std::make_pair(i, list));
         }
+
+        std::stringstream ss;
+        // Concat the correct full item name for the item quality
+
+        // List 1: Unique names, like Malice, Mangler, Mercy etc.
+        // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
+        // List 3: Material names, like Bone, Copper, Diamond etc.
+        // List 4: Basic type name, like Blade, Razor, Maul etc.
+        // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
+        // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
+
+        switch (quality)
+        {
+        case ITEM_QUALITY_NORMAL:
+        {
+            ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_UNCOMMON:
+        {
+            ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_RARE:
+        {
+            ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_EPIC:
+        {
+            ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+            break;
+        }
+        case ITEM_QUALITY_LEGENDARY:
+        {
+            ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
+            break;
+        }
+        default:
+            return fullName;
+        }
+        fullName = ss.str();
     }
 
     if (type == ITEM_CLASS_WEAPON)
