@@ -4,9 +4,9 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
-#include <Achievements\AchievementMgr.h>
 #ifndef PLAYERMETHODS_H
 #define PLAYERMETHODS_H
+#include <Achievements\AchievementMgr.h>
 
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
@@ -4208,6 +4208,7 @@ namespace LuaPlayer
         auto achievement = AchievementGlobalMgr::instance()->GetAchievement(id);
         if (achievement)
         {
+            player->Say("I'm about to learn a achievement!", (Language)0, player);
             player->CompletedAchievement(achievement);
         }
         return 0;
