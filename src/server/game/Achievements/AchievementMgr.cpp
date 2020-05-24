@@ -1505,16 +1505,10 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // Disable for GameMasters with GM-mode enabled or for players that don't have the related RBAC permission
     if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
-    m_player->Say("I'm completing achievement!", (Language)0, m_player);
-    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER) {
-        m_player->Say("Uh oh! ACHIEVEMENT_FLAG_COUNTER is set so we cannot continue!", (Language)0, m_player);
-    }
-    if (HasAchieved(achievement->ID)) {
-        m_player->Say("Uh oh, I've already completed this achievement!", (Language)0, m_player);
-    }
+
     if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
-    m_player->Say("I'm completing achievement 2!", (Language)0, m_player);
+
     TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement(%u). Player: %s (%u)",
         achievement->ID, m_player->GetName().c_str(), m_player->GetGUID().GetCounter());
 
