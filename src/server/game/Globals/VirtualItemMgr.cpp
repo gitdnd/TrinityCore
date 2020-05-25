@@ -666,9 +666,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     bool isTwinket = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_TRINKET;
     bool isRing = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_FINGER;
     uint32 display = isTwinket || isRing ? 0 : GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
-    std::stringstream ss;
-    ss << "Generated item, isTwinket: " << isTwinket << ", isRing: " << isRing << ", display: " << display;
-    sWorld->SendGlobalText(ss.str().c_str(), nullptr);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
