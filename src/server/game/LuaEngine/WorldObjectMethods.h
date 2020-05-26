@@ -175,6 +175,7 @@ namespace LuaWorldObject
      * @param float range = 533.33333 : optionally set range. Default range is grid size
      * @param uint32 hostile = 0 : 0 both, 1 hostile, 2 friendly
      * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
+     * @param bool includeGM = false : false excludes GMs from the return result, true includes them.
      *
      * @return [Player] nearestPlayer
      */
@@ -183,6 +184,7 @@ namespace LuaWorldObject
         float range = Eluna::CHECKVAL<float>(L, 2, SIZE_OF_GRIDS);
         uint32 hostile = Eluna::CHECKVAL<uint32>(L, 3, 0);
         uint32 dead = Eluna::CHECKVAL<uint32>(L, 4, 1);
+        bool includeGM = Eluna::CHECKVAL<bool>(L, 5, false);
 
         Unit* target = NULL;
         ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_PLAYER, 0, hostile, dead);
@@ -275,6 +277,7 @@ namespace LuaWorldObject
      * @param float range = 533.33333 : optionally set range. Default range is grid size
      * @param uint32 hostile = 0 : 0 both, 1 hostile, 2 friendly
      * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
+     * @param bool includeGM = false : false excludes GMs from the return result, true includes them.
      *
      * @return table playersInRange : table of [Player]s
      */
@@ -283,6 +286,7 @@ namespace LuaWorldObject
         float range = Eluna::CHECKVAL<float>(L, 2, SIZE_OF_GRIDS);
         uint32 hostile = Eluna::CHECKVAL<uint32>(L, 3, 0);
         uint32 dead = Eluna::CHECKVAL<uint32>(L, 4, 1);
+        bool includeGM = Eluna::CHECKVAL<bool>(L, 5, false);
 
         std::list<Player*> list;
         ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_PLAYER, 0, hostile, dead);
@@ -303,8 +307,12 @@ namespace LuaWorldObject
 
         for (std::list<Player*>::const_iterator it = list.begin(); it != list.end(); ++it)
         {
+            if (!includeGM && (*it)->IsGameMaster())
+                continue;
+
             Eluna::Push(L, *it);
             lua_rawseti(L, tbl, ++i);
+            
         }
 
         lua_settop(L, tbl);
