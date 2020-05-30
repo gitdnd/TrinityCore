@@ -810,13 +810,13 @@ int32 Player::getMaxTimer(MirrorTimerType timer) const
     switch (timer)
     {
         case FATIGUE_TIMER:
-            return MINUTE * IN_MILLISECONDS;
+            return 15 * IN_MILLISECONDS;
         case BREATH_TIMER:
         {
             if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                 return DISABLED_MIRROR_TIMER;
 
-            int32 UnderWaterTime = 3 * MINUTE * IN_MILLISECONDS;
+            int32 UnderWaterTime = MINUTE * IN_MILLISECONDS;
             UnderWaterTime *= GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING);
             return UnderWaterTime;
         }
