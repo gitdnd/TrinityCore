@@ -175,7 +175,7 @@ namespace LuaWorldObject
      * @param float range = 533.33333 : optionally set range. Default range is grid size
      * @param uint32 hostile = 0 : 0 both, 1 hostile, 2 friendly
      * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
-     * @param bool includeGM = false : false excludes GMs from the return result, true includes them.
+     * @param bool filterGM = true : true excludes GMs from the return result, false includes them.
      *
      * @return [Player] nearestPlayer
      */
@@ -184,10 +184,10 @@ namespace LuaWorldObject
         float range = Eluna::CHECKVAL<float>(L, 2, SIZE_OF_GRIDS);
         uint32 hostile = Eluna::CHECKVAL<uint32>(L, 3, 0);
         uint32 dead = Eluna::CHECKVAL<uint32>(L, 4, 1);
-        bool includeGM = Eluna::CHECKVAL<bool>(L, 5, false);
+        bool filterGM = Eluna::CHECKVAL<bool>(L, 5, true);
 
         Unit* target = NULL;
-        ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_PLAYER, 0, hostile, dead);
+        ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_PLAYER, 0, hostile, dead, filterGM);
 #ifdef TRINITY
         Trinity::UnitLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, target, checker);
         Cell::VisitAllObjects(obj, searcher, range);
@@ -277,7 +277,7 @@ namespace LuaWorldObject
      * @param float range = 533.33333 : optionally set range. Default range is grid size
      * @param uint32 hostile = 0 : 0 both, 1 hostile, 2 friendly
      * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
-     * @param bool includeGM = false : false excludes GMs from the return result, true includes them.
+     * @param bool filterGM = true : true excludes GMs from the return result, false includes them.
      *
      * @return table playersInRange : table of [Player]s
      */
@@ -286,10 +286,10 @@ namespace LuaWorldObject
         float range = Eluna::CHECKVAL<float>(L, 2, SIZE_OF_GRIDS);
         uint32 hostile = Eluna::CHECKVAL<uint32>(L, 3, 0);
         uint32 dead = Eluna::CHECKVAL<uint32>(L, 4, 1);
-        bool includeGM = Eluna::CHECKVAL<bool>(L, 5, false);
+        bool filterGM = Eluna::CHECKVAL<bool>(L, 5, true);
 
         std::list<Player*> list;
-        ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_PLAYER, 0, hostile, dead);
+        ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_PLAYER, 0, hostile, dead, filterGM);
 #ifdef TRINITY
         Trinity::PlayerListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, list, checker);
         Cell::VisitAllObjects(obj, searcher, range);
@@ -307,12 +307,8 @@ namespace LuaWorldObject
 
         for (std::list<Player*>::const_iterator it = list.begin(); it != list.end(); ++it)
         {
-            if (!includeGM && (*it)->IsGameMaster())
-                continue;
-
             Eluna::Push(L, *it);
             lua_rawseti(L, tbl, ++i);
-            
         }
 
         lua_settop(L, tbl);
@@ -424,10 +420,11 @@ namespace LuaWorldObject
         uint32 entry = Eluna::CHECKVAL<uint32>(L, 4, 0);
         uint32 hostile = Eluna::CHECKVAL<uint32>(L, 5, 0); // 0 none, 1 hostile, 2 friendly
         uint32 dead = Eluna::CHECKVAL<uint32>(L, 6, 1); // 0 both, 1 alive, 2 dead
+        bool filterGM = Eluna::CHECKVAL<bool>(L, 7, true);
 
         float x, y, z;
         obj->GetPosition(x, y, z);
-        ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, type, entry, hostile, dead);
+        ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, type, entry, hostile, dead, filterGM);
 
         WorldObject* target = NULL;
 #ifdef TRINITY

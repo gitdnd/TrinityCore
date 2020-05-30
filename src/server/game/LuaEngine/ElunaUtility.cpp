@@ -47,8 +47,8 @@ bool ElunaUtil::ObjectDistanceOrderPred::operator()(WorldObject const* pLeft, Wo
 }
 
 ElunaUtil::WorldObjectInRangeCheck::WorldObjectInRangeCheck(bool nearest, WorldObject const* obj, float range,
-    uint16 typeMask, uint32 entry, uint32 hostile, uint32 dead) :
-    i_obj(obj), i_obj_unit(nullptr), i_obj_fact(nullptr), i_hostile(hostile), i_entry(entry), i_range(range), i_typeMask(typeMask), i_dead(dead), i_nearest(nearest)
+    uint16 typeMask, uint32 entry, uint32 hostile, uint32 dead, bool filterGM) :
+    i_obj(obj), i_obj_unit(nullptr), i_obj_fact(nullptr), i_hostile(hostile), i_entry(entry), i_range(range), i_typeMask(typeMask), i_dead(dead), i_nearest(nearest), i_filterGM(filterGM)
 {
     i_obj_unit = i_obj->ToUnit();
     if (!i_obj_unit)
@@ -68,6 +68,8 @@ bool ElunaUtil::WorldObjectInRangeCheck::operator()(WorldObject* u)
     if (i_entry && u->GetEntry() != i_entry)
         return false;
     if (i_obj->GET_GUID() == u->GET_GUID())
+        return false;
+    if (i_filterGM && i_obj->ToPlayer() && i_obj->ToPlayer()->IsGameMaster())
         return false;
     if (!i_obj->IsWithinDistInMap(u, i_range))
         return false;
