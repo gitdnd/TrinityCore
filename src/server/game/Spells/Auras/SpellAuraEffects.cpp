@@ -379,6 +379,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandlePreventResurrection,                       //314 SPELL_AURA_PREVENT_RESURRECTION todo
     &AuraEffect::HandleNoImmediateEffect,                         //315 SPELL_AURA_UNDERWATER_WALKING todo
     &AuraEffect::HandleNoImmediateEffect,                         //316 SPELL_AURA_PERIODIC_HASTE implemented in AuraEffect::CalculatePeriodic
+    &AuraEffect::HandleTempLearnSpell,                            //317 SPELL_AURA_TEMP_LEARN_SPELL
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
@@ -5785,6 +5786,38 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 
     TC_LOG_DEBUG("spells.aura.effect", "AuraEffect::HandleRaidProcFromChargeWithValueAuraProc: Triggering spell %u from aura %u proc", triggerSpellId, GetId());
     target->CastSpell(target, triggerSpellId, args);
+}
+
+void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+    Player* pT = target->ToPlayer();
+    uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
+    if (apply)
+    {
+        if (pT->HasSpell(triggerSpellId))
+            return;
+        pT->AddTemporarySpell(triggerSpellId);
+        WorldPacket data(SMSG_LEARNED_SPELL, 6);
+        data << uint32(triggerSpellId);
+        data << uint16(0);
+        pT->SendDirectMessage(&data);
+    }
+    else
+    {
+        if (pT->IsLoading() || pT->GetSession()->isLogingOut())
+            return;
+        pT->RemoveTemporarySpell(triggerSpellId);
+        WorldPacket data(SMSG_REMOVED_SPELL, 4);
+        data << uint32(triggerSpellId);
+        pT->SendDirectMessage(&data);
+    }
 }
 
 template TC_GAME_API void AuraEffect::GetTargetList(std::list<Unit*>&) const;
