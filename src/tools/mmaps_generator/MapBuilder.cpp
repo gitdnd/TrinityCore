@@ -398,13 +398,23 @@ namespace MMAP
                 // unpack tile coords
                 StaticMapTree::unpackTileID((*it), tileX, tileY);
 
-                if (!shouldSkipTile(mapID, tileX, tileY)) {
-                    printf("Building tile: %d, %d\n", tileX, tileY);
-                    buildTile(mapID, tileX, tileY, navMesh);
+                try
+                {
+                    if (!shouldSkipTile(mapID, tileX, tileY))
+                    {
+                        printf("Building tile: %d, %d\n", tileX, tileY);
+                        buildTile(mapID, tileX, tileY, navMesh);
+                    }
+                    else
+                    {
+                        printf("Skipping tile: %d, %d\n", tileX, tileY);
+                    }
                 }
-                else {
-                    printf("Skipping tile: %d, %d\n", tileX, tileY);
+                catch (...)
+                {
+                    printf("----> FAILED TO BUILD MAP TILE: %d: %d, %d\n", mapID, tileX, tileY);
                 }
+
                 ++m_totalTilesProcessed;
             }
 
