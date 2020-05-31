@@ -2076,7 +2076,7 @@ void Group::SetDungeonLevel(int dungeonLevel) {
     m_dungeonLevel = dungeonLevel;
     if (!isBGGroup() && !isBFGroup())
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_DUNGEON_LEVEL);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_DUNGEON_LEVEL);
 
         stmt->setUInt32(0, dungeonLevel);
         stmt->setUInt32(1, m_dbStoreId);
