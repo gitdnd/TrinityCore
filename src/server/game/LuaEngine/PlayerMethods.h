@@ -2915,7 +2915,7 @@ namespace LuaPlayer
         if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER)) // check if Quest Tracker is enabled
         {
             // prepare Quest Tracker datas
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
             stmt->setUInt32(0, quest->GetQuestId());
             stmt->setUInt32(1, player->GetGUID().GetCounter());
 
@@ -3631,7 +3631,11 @@ namespace LuaPlayer
      */
     int KickPlayer(lua_State* /*L*/, Player* player)
     {
+#ifdef TRINITY
+        player->GetSession()->KickPlayer("PlayerMethods::KickPlayer Kick the player");
+#else
         player->GetSession()->KickPlayer();
+#endif
         return 0;
     }
 

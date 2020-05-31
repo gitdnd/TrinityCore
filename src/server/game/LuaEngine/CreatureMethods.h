@@ -423,7 +423,7 @@ namespace LuaCreature
      */
     int GetWanderRadius(lua_State* L, Creature* creature)
     {
-#ifdef TRINITY
+#if defined TRINITY || AZEROTHCORE
         Eluna::Push(L, creature->GetWanderDistance());
 #else
         Eluna::Push(L, creature->GetRespawnRadius());
@@ -1089,7 +1089,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     {
         float dist = Eluna::CHECKVAL<float>(L, 2);
 
-#ifdef TRINITY
+#if defined TRINITY || AZEROTHCORE
         creature->SetWanderDistance(dist);
 #else
         creature->SetRespawnRadius(dist);

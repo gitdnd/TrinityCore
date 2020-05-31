@@ -1926,7 +1926,11 @@ namespace LuaGlobalFunctions
     int Kick(lua_State* L)
     {
         Player* player = Eluna::CHECKOBJ<Player>(L, 1);
+#ifdef TRINITY
+        player->GetSession()->KickPlayer("GlobalMethods::Kick Kick the player");
+#else
         player->GetSession()->KickPlayer();
+#endif
         return 0;
     }
 
@@ -2094,7 +2098,9 @@ namespace LuaGlobalFunctions
             draft.SetMoney(money);
 #endif
 
-#if defined TRINITY || AZEROTHCORE
+#if defined TRINITY
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+#elif defined AZEROTHCORE
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 #endif
         uint8 addedItems = 0;
