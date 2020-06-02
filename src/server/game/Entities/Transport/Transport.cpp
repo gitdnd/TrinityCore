@@ -253,6 +253,11 @@ void Transport::AddPassenger(WorldObject* passenger)
 
     if (_passengers.insert(passenger).second)
     {
+        // If the player already has a transport, remove them from that one before adding to this one
+        if (passenger->GetTransport())
+        {
+            passenger->GetTransport()->RemovePassenger(passenger);
+        }
         passenger->SetTransport(this);
         passenger->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         passenger->m_movementInfo.transport.guid = GetGUID();
