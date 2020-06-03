@@ -248,6 +248,10 @@ void Transport::DelayedUpdate(uint32 /*diff*/)
 
 void Transport::AddPassenger(WorldObject* passenger)
 {
+    if (passenger->ToPlayer())
+    {
+        passenger->ToPlayer()->Say("I am getting on a transport!", (Language)0, passenger);
+    }
     if (!IsInWorld())
         return;
 
@@ -270,6 +274,10 @@ void Transport::AddPassenger(WorldObject* passenger)
 
 void Transport::RemovePassenger(WorldObject* passenger)
 {
+    if (passenger->ToPlayer())
+    {
+        passenger->ToPlayer()->Say("I am leaving a transport!", (Language)0, passenger);
+    }
     bool erased = false;
     if (_passengerTeleportItr != _passengers.end())
     {
