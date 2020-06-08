@@ -920,17 +920,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(statgroupid, seed);
     if (!socketcolors.empty())
     {
-        for (int32 i = 0; i < MAX_ITEM_PROTO_SOCKETS; ++i)
+        for (int32 i = 0; i < socketCount; ++i)
         {
-            if (!output->Socket[i].Color == 0)
-                continue;
-            if (output->Socket[i].Color != SOCKET_COLOR_RED &&
-                output->Socket[i].Color != SOCKET_COLOR_BLUE &&
-                output->Socket[i].Color != SOCKET_COLOR_YELLOW)
-                continue;
-            if (!int32(socketCount) > i+1)
-                continue;
-
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
     }
