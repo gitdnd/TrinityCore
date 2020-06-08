@@ -895,39 +895,63 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     }
     statscount = setStats;
 
+    // set amount of sockets on the items depending on the quality
+    uint32 socketCount = 0;
+    switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            socketCount = urand(2, 3, seed);
+            break;
+        case ITEM_QUALITY_EPIC:
+            socketCount = 2;
+            break;
+        case ITEM_QUALITY_RARE:
+            socketCount = urand(1, 2, seed);
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            socketCount = 1;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            socketCount = 1;
+            break;
+    }
+
+
     // set socket colors
     std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(statgroupid, seed);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < MAX_ITEM_PROTO_SOCKETS; ++i)
         {
-            if (!output->Socket[i].Color)
+            if (!output->Socket[i].Color == 0)
                 continue;
             if (output->Socket[i].Color != SOCKET_COLOR_RED &&
                 output->Socket[i].Color != SOCKET_COLOR_BLUE &&
                 output->Socket[i].Color != SOCKET_COLOR_YELLOW)
                 continue;
+            if (!int32(socketCount) > i+1)
+                continue;
+
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
     }
 
     // Hardcode disenchant ID
     switch (quality) {
-    case ITEM_QUALITY_LEGENDARY:
-        output->DisenchantID = 60004;
-        break;
-    case ITEM_QUALITY_EPIC:
-        output->DisenchantID = 60003;
-        break;
-    case ITEM_QUALITY_RARE:
-        output->DisenchantID = 60002;
-        break;
-    case ITEM_QUALITY_UNCOMMON:
-        output->DisenchantID = 60001;
-        break;
-    case ITEM_QUALITY_NORMAL:
-        output->DisenchantID = 60000;
-        break;
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60004;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60003;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60002;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60001;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60000;
+            break;
     }
 
     // Generate random item name
@@ -1120,7 +1144,6 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_HIT_SPELL_RATING,
         ITEM_MOD_HASTE_SPELL_RATING,
         ITEM_MOD_CRIT_SPELL_RATING,
-        ITEM_MOD_MANA_REGENERATION,
         ITEM_MOD_SPELL_POWER,
         ITEM_MOD_SPELL_PENETRATION
     };
@@ -1181,7 +1204,7 @@ VirtualModifier::StatGroupData::StatGroupData()
     };
 
     stat_group_sockets[STAT_GROUP_STR_DPS] = {
-        SOCKET_COLOR_YELLOW
+        SOCKET_COLOR_RED
     };
 
     stat_group_sockets[STAT_GROUP_STR_TANK] = {
@@ -1193,7 +1216,7 @@ VirtualModifier::StatGroupData::StatGroupData()
     };
 
     stat_group_sockets[STAT_GROUP_AGI_TANK] = {
-        SOCKET_COLOR_RED
+        SOCKET_COLOR_YELLOW
     };
 
     stat_group_sockets[STAT_GROUP_AGI_RANGED] = {
