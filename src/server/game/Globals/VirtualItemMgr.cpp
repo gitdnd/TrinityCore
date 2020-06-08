@@ -922,6 +922,9 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     {
         for (int32 i = 0; i < socketCount; ++i)
         {
+            if (output->Socket[i].Color != 0)
+                continue;
+
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
     }
