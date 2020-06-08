@@ -1988,6 +1988,8 @@ void Player::RegenerateAll()
 
     Regenerate(POWER_ENERGY);
 
+    Regenerate(POWER_FOCUS);
+
     Regenerate(POWER_MANA);
 
     // Runes act as cooldowns, and they don't need to send any data
@@ -2087,6 +2089,9 @@ void Player::Regenerate(Powers power)
         case POWER_ENERGY:                                  // Regenerate energy (rogue)
             addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
             break;
+        case POWER_FOCUS:
+            addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS);
+            break;
         case POWER_RUNIC_POWER:
         {
             if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
@@ -2096,7 +2101,6 @@ void Player::Regenerate(Powers power)
             }
         }   break;
         case POWER_RUNE:
-        case POWER_FOCUS:
         case POWER_HAPPINESS:
             break;
         case POWER_HEALTH:
@@ -2227,6 +2231,7 @@ void Player::ResetAllPowers()
         default:
             break;
     }
+    SetFullPower(POWER_FOCUS);
 }
 
 bool Player::CanInteractWithQuestGiver(Object* questGiver) const
@@ -4598,6 +4603,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restore_percent));
         SetPower(POWER_RAGE, 0);
         SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
+        SetPower(POWER_FOCUS, uint32(GetMaxPower(POWER_FOCUS) * restore_percent));
     }
 
     // trigger update zone for alive state zone updates
@@ -24095,7 +24101,7 @@ void Player::ResurrectUsingRequestDataImpl()
 
     SetPower(POWER_RAGE, 0);
     SetFullPower(POWER_ENERGY);
-
+    SetFullPower(POWER_FOCUS);
     SpawnCorpseBones();
 }
 

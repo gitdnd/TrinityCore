@@ -4233,7 +4233,7 @@ void Spell::EffectSelfResurrect(SpellEffIndex effIndex)
     player->SetPower(POWER_MANA, mana);
     player->SetPower(POWER_RAGE, 0);
     player->SetPower(POWER_ENERGY, player->GetMaxPower(POWER_ENERGY));
-
+    player->SetFullPower(POWER_FOCUS);
     player->SpawnCorpseBones();
 }
 

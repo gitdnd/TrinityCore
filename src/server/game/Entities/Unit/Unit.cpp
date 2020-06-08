@@ -9426,7 +9426,7 @@ uint32 Unit::GetCreatePowerValue(Powers power) const
         case POWER_FOCUS:
             return (GetTypeId() != TYPEID_UNIT || !ToCreature()->IsPet() || ToPet()->getPetType() != HUNTER_PET) ? 0 : 100;
         case POWER_ENERGY:
-            return 100;
+            return (GetTypeId() == TYPEID_PLAYER) ? 1000 : 100;
         case POWER_HAPPINESS:
             return (GetTypeId() != TYPEID_UNIT || !ToCreature()->IsPet() || ToPet()->getPetType() != HUNTER_PET) ? 0 : 1050000;
         case POWER_RUNIC_POWER:
@@ -12859,14 +12859,16 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
     if (attacker)
     {
         addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
-
+        if(GetTypeId() == TYPEID_PLAYER)
+            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
     else
     {
         addRage = damage / rageconversion * 2.5f;
-
+        if (GetTypeId() == TYPEID_PLAYER)
+            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
         // Berserker Rage effect
         if (HasAura(18499))
             addRage *= 2.0f;
@@ -12875,6 +12877,7 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
     ModifyPower(POWER_RAGE, uint32(addRage * 10));
+
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
