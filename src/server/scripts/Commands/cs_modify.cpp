@@ -56,6 +56,8 @@ public:
             { "bit",          rbac::RBAC_PERM_COMMAND_MODIFY_BIT,          false, &HandleModifyBitCommand,           "" },
             { "drunk",        rbac::RBAC_PERM_COMMAND_MODIFY_DRUNK,        false, &HandleModifyDrunkCommand,         "" },
             { "energy",       rbac::RBAC_PERM_COMMAND_MODIFY_ENERGY,       false, &HandleModifyEnergyCommand,        "" },
+            { "power",        rbac::RBAC_PERM_COMMAND_MODIFY_ENERGY,       false, &HandleModifyPowerCommand,        "" },
+            { "displaypower", rbac::RBAC_PERM_COMMAND_MODIFY_ENERGY,       false, &HandleModifyDisplayPowerCommand,        "" },
             { "faction",      rbac::RBAC_PERM_COMMAND_MODIFY_FACTION,      false, &HandleModifyFactionCommand,       "" },
             { "gender",       rbac::RBAC_PERM_COMMAND_MODIFY_GENDER,       false, &HandleModifyGenderCommand,        "" },
             { "honor",        rbac::RBAC_PERM_COMMAND_MODIFY_HONOR,        false, &HandleModifyHonorCommand,         "" },
@@ -201,6 +203,45 @@ public:
         }
         return false;
     }
+
+    static bool HandleModifyPowerCommand(ChatHandler* handler, char const* args)
+    {
+        if (!args)
+            return false;
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+        char const* power = strtok((char*)args, " ");
+        char const* min = strtok(nullptr, " ");
+        char const* max = strtok(nullptr, " ");
+
+        if (!power || !min || !max)
+            return false;
+        int32 powerType = atoi(power);
+        int32 minPower = atoi(min);
+        int32 maxPower = atoi(max);
+        target->SetMaxPower(Powers(powerType), maxPower);
+        target->SetPower(Powers(powerType), minPower);
+        handler->PSendSysMessage("You set powerType %i to %i/%i", powerType, minPower, maxPower);
+        return true;
+    }
+
+    static bool HandleModifyDisplayPowerCommand(ChatHandler* handler, char const* args)
+    {
+        if (!args)
+            return false;
+
+        Player* target = handler->getSelectedPlayerOrSelf();
+        char const* power = strtok((char*)args, " ");
+
+        if (!power)
+            return false;
+
+        int32 powerType = atoi(power);
+        target->SetPowerType(Powers(powerType));
+        handler->PSendSysMessage("You set display powerType to %i", powerType);
+        return true;
+    }
+
 
     //Edit Player Faction
     static bool HandleModifyFactionCommand(ChatHandler* handler, char const* args)
