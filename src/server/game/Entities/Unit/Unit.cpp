@@ -9425,7 +9425,7 @@ uint32 Unit::GetCreatePowerValue(Powers power) const
             return 1000;
         case POWER_FOCUS:
             if (GetTypeId() == TYPEID_PLAYER)
-                return 1000;
+                return 100;
             return (GetTypeId() != TYPEID_UNIT || !ToCreature()->IsPet() || ToPet()->getPetType() != HUNTER_PET) ? 0 : 100;
         case POWER_ENERGY:
             return 100;

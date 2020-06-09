@@ -2090,7 +2090,7 @@ void Player::Regenerate(Powers power)
             addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_FOCUS:
-            addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS);
+            addvalue += (0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS))*0.5f;
             break;
         case POWER_RUNIC_POWER:
         {
