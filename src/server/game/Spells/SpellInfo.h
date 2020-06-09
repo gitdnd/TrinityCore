@@ -400,6 +400,7 @@ class TC_GAME_API SpellInfo
         SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
         uint32 ExplicitTargetMask;
         SpellChainNode const* ChainEntry;
+        char* SpellDescription[16];
 
         SpellInfo(SpellEntry const* spellEntry);
         ~SpellInfo();

@@ -846,6 +846,9 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     for (uint8 i = 0; i < 16; ++i)
         Rank[i] = spellEntry->Rank[i];
 
+    for (uint8 i = 0; i < 16; ++i)
+        SpellDescription[i] = spellEntry->Description[i];
+
     MaxTargetLevel = spellEntry->MaxTargetLevel;
     MaxAffectedTargets = spellEntry->MaxAffectedTargets;
     SpellFamilyName = spellEntry->SpellFamilyName;

@@ -1438,7 +1438,7 @@ struct SpellEntry
     //uint32    SpellNameFlag;                              // 152 not used
     char*     Rank[16];                                     // 153-168  m_nameSubtext_lang
     //uint32    RankFlags;                                  // 169 not used
-    //char*     Description[16];                            // 170-185  m_description_lang not used
+    char*     Description[16];                            // 170-185  m_description_lang not used
     //uint32    DescriptionFlags;                           // 186 not used
     //char*     ToolTip[16];                                // 187-202  m_auraDescription_lang not used
     //uint32    ToolTipFlags;                               // 203 not used

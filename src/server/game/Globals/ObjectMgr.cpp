@@ -2962,12 +2962,26 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.MinMoneyLoot            = fields[135].GetUInt32();
         itemTemplate.MaxMoneyLoot            = fields[136].GetUInt32();
         itemTemplate.FlagsCu                 = fields[137].GetUInt32();
-
+        if (itemTemplate.ItemId >= 70000 && itemTemplate.GemProperties >= 150000)
+        {
+            if (GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(itemTemplate.GemProperties))
+            {
+                if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(gemProperty->spellitemenchantement))
+                {
+                    if(SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(enchant->spellid[0]))
+                    {
+                        std::stringstream ss;
+                        ss << itemTemplate.Description << "\n" << spellEntry->SpellName << "\n" << spellEntry->SpellDescription[LOCALE_enUS];
+                        itemTemplate.Description = ss.str().c_str();
+                    }
+                }
+            }
+        }
         // Checks
 
         ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
 
-        if (dbcitem)
+        /*if (dbcitem)
         {
             if (itemTemplate.Class != dbcitem->Class)
             {
@@ -3009,7 +3023,7 @@ void ObjectMgr::LoadItemTemplates()
 
         }
         else
-            TC_LOG_ERROR("sql.sql", "Item (Entry: %u) does not exist in item.dbc! (not correct id?).", entry);
+            TC_LOG_ERROR("sql.sql", "Item (Entry: %u) does not exist in item.dbc! (not correct id?).", entry);*/
 
         if (itemTemplate.Class >= MAX_ITEM_CLASS)
         {
