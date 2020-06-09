@@ -2971,7 +2971,7 @@ void ObjectMgr::LoadItemTemplates()
                     if(SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(enchant->spellid[0]))
                     {
                         std::stringstream ss;
-                        ss << itemTemplate.Description << "\n" << spellEntry->SpellName << "\n" << spellEntry->SpellDescription[LOCALE_enUS];
+                        ss << itemTemplate.Description << "\n" << spellEntry->SpellName[LOCALE_enUS] << "\n" << spellEntry->SpellDescription[LOCALE_enUS];
                         itemTemplate.Description = ss.str().c_str();
                     }
                 }
