@@ -1015,7 +1015,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
     if(!pCurrChar->GetGuildId())
-        if(Guild * startGuild = sGuildMgr->GetGuildByName("Testing Guild"))
+        if(Guild * startGuild = sGuildMgr->GetGuildById(1))
             startGuild->HandleAcceptMember(this);
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
