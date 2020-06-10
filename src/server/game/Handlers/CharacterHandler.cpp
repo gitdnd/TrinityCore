@@ -1014,9 +1014,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
-    if(!pCurrChar->GetGuildId())
-        if(Guild * startGuild = sGuildMgr->GetGuildById(1))
-            startGuild->HandleAcceptMember(this);
+    if (Guild* startGuild = sGuildMgr->GetGuildById(1))
+        startGuild->AddMember(CharacterDatabaseTransaction(nullptr), pCurrChar->GetGUID());
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
     delete holder;
