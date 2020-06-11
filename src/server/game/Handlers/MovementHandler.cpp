@@ -35,6 +35,7 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
+#include "Chat.h"
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
 {
@@ -289,12 +290,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!movementInfo.pos.IsPositionValid())
     {
+        ChatHandler(this).PSendSysMessage("Desync F detected, report to devs.");
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
     if (!mover->movespline->Finalized())
     {
+        ChatHandler(this).PSendSysMessage("Desync E detected, report to devs.");
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
@@ -305,6 +308,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
+            ChatHandler(this).PSendSysMessage("Desync A detected, report to devs.");
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -313,6 +317,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
         if (fabs(movementInfo.transport.pos.GetPositionX()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionY()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionZ()) > 75.0f)
         {
+            ChatHandler(this).PSendSysMessage("Desync B detected, report to devs.");
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -320,6 +325,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
+            ChatHandler(this).PSendSysMessage("Desync C detected, report to devs.");
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
@@ -374,6 +380,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
     if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
+        ChatHandler(this).PSendSysMessage("Desync D detected, report to devs.");
         TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
         movementInfo.time = GameTime::GetGameTimeMS();
     }
