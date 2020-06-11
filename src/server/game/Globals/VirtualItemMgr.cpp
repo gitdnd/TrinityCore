@@ -925,8 +925,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             if (output->Socket[i].Color != 0)
                 continue;
 
-            uint8 chance = quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.0f;
-            if (urand(1, 100, seed) >= 100-chance)
+            uint8 chance = quality == ITEM_QUALITY_LEGENDARY ? 100-10 : 100-5;
+            if (urand(1, 100, seed) >= chance)
             {
                 output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
                 continue;

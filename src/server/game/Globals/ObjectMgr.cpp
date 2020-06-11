@@ -2973,7 +2973,7 @@ void ObjectMgr::LoadItemTemplates()
                         if (SpellInfo const* actualSpell = sSpellMgr->GetSpellInfo(spellEntry->Effects[EFFECT_0].TriggerSpell))
                         {
                             std::stringstream ss;
-                            ss << itemTemplate.Description << "\n" << actualSpell->SpellName[LOCALE_enUS] << "\n" << actualSpell->SpellDescription[LOCALE_enUS];
+                            ss << itemTemplate.Description << "\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << actualSpell->SpellDescription[LOCALE_enUS];
                             itemTemplate.Description = ss.str().c_str();
                         }
                     }
