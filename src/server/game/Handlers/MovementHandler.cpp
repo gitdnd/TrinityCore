@@ -308,8 +308,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
-            ChatHandler(this).PSendSysMessage("Desync A detected, report to devs.");
+            ChatHandler(this).PSendSysMessage("Desync detected, attempting to fix.");
             recvData.rfinish();                 // prevent warnings spam
+            if (Player* plrMover = mover->ToPlayer())
+            {
+                plrMover->TeleportTo(plrMover->GetWorldLocation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+            }
             return;
         }
 
