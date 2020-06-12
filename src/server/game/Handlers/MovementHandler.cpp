@@ -312,8 +312,16 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             recvData.rfinish();                 // prevent warnings spam
             if (Player* plrMover = mover->ToPlayer())
             {
-                if(plrMover->GetMapId() == 761)
-                    plrMover->TeleportTo(plrMover->GetWorldLocation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                if (plrMover->GetMapId() == 761)
+                {
+                    std::list<GameObject*> list;
+                    plrMover->GetGameObjectListWithEntryInGrid(list, 50010, 1000.f);
+                    if (!list.empty())
+                    {
+                        GameObject* transport = list.front();
+                        plrMover->TeleportTo(plrMover->GetMapId(), transport->GetPositionX() + 6.1f, transport->GetPositionY() -1.1f, transport->GetPositionZ() + 9.5f, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                    }
+                }
             }
             return;
         }
