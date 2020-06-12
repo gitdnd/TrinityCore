@@ -312,7 +312,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             recvData.rfinish();                 // prevent warnings spam
             if (Player* plrMover = mover->ToPlayer())
             {
-                plrMover->TeleportTo(plrMover->GetWorldLocation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                if(plrMover->GetMapId() == 761)
+                    plrMover->TeleportTo(plrMover->GetWorldLocation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
             }
             return;
         }
