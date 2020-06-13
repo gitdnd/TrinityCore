@@ -12333,7 +12333,7 @@ void Player::UpdateCraftSkill()
     UpdateSkillEnchantments(skillId, SkillValue, new_value);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '%s' (%s), SkillID: %u",
-        GetName().c_str(), GetGUID().ToString().c_str(), SkillId);
+        GetName().c_str(), GetGUID().ToString().c_str(), skillId);
 }
 
 void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
