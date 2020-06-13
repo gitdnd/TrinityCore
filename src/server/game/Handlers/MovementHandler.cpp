@@ -314,13 +314,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             {
                 if (plrMover->GetMapId() == 761)
                 {
-                    std::list<GameObject*> list;
+                    plrMover->TeleportTo(761, -1014.48f, 1340.47f, 8.55f, plrMover->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                    /*std::list<GameObject*> list;
                     plrMover->GetGameObjectListWithEntryInGrid(list, 50010, 1000.f);
                     if (!list.empty())
                     {
                         GameObject* transport = list.front();
                         plrMover->TeleportTo(plrMover->GetMapId(), transport->GetPositionX() + 6.1f, transport->GetPositionY() -1.1f, transport->GetPositionZ() + 9.5f, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-                    }
+                    }*/
                 }
             }
             return;
