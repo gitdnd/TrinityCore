@@ -5361,7 +5361,8 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
          0.036587f, // Mage
          0.024211f, // Warlock
          0.0f,      // ??
-         0.056097f  // Druid
+         0.056097f, // Druid
+         0.036640f  // Adventurer
     };
     // Crit/agility to dodge/agility coefficient multipliers; 3.2.0 increased required agility by 15%
     const float crit_to_dodge[MAX_CLASSES] =
@@ -5376,7 +5377,8 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
          1.00f/1.15f,    // Mage
          0.97f/1.15f,    // Warlock (?)
          0.0f,           // ??
-         2.00f/1.15f     // Druid
+         2.00f/1.15f,    // Druid
+         2.00f/1.15f     // Adventurer
     };
 
     uint8 level = GetLevel();
@@ -11881,7 +11883,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
 
     if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass > ITEM_SUBCLASS_ARMOR_MISC && proto->SubClass < ITEM_SUBCLASS_ARMOR_BUCKLER && proto->InventoryType != INVTYPE_CLOAK)
     {
-        if (_class == CLASS_WARRIOR || _class == CLASS_PALADIN || _class == CLASS_DEATH_KNIGHT)
+        if (_class == CLASS_WARRIOR || _class == CLASS_PALADIN || _class == CLASS_DEATH_KNIGHT || _class == CLASS_ADVENTURER)
         {
             if (GetLevel() < 40)
             {
