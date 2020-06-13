@@ -896,7 +896,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     statscount = setStats;
 
     // set amount of sockets on the items depending on the quality
-    uint32 socketCount = 0;
+    int32 socketCount = 0;
     switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
             socketCount = urand(2, 3, seed);
