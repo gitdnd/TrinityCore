@@ -12094,7 +12094,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         {
             pItem->AddToWorld();
             pItem->SendUpdateToPlayer(this);
-            UpdateCraftSkill();
+            UpdateCraftingSkill();
         }
 
         pItem->SetState(ITEM_CHANGED, this);
@@ -12258,7 +12258,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         pItem2->SetState(ITEM_CHANGED, this);
 
         ApplyEquipCooldown(pItem2);
-        UpdateCraftSkill();
+        UpdateCraftingSkill();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem2, bag, slot);
 #endif
@@ -12271,7 +12271,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     // only for full equip instead adding to stack
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
-    UpdateCraftSkill();
+    UpdateCraftingSkill();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, bag, slot);
 #endif
@@ -12300,14 +12300,14 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
 
-        UpdateCraftSkill();
+        UpdateCraftingSkill();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, (pos >> 8), slot);
 #endif
     }
 }
 
-void Player::UpdateCraftSkill()
+void Player::UpdateCraftingSkill()
 {
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
@@ -26641,13 +26641,13 @@ float Player::GetAverageItemLevel() const
 
         if (m_items[i] && m_items[i]->GetTemplate())
         {
-            sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality();
+            sum += m_items[i]->GetTemplate()->GetItemLevel();
         }
         // Add items with no slot to the count
         ++count;
     }
 
-    return ((float)sum) / count;
+    return sum / (float)count;
 }
 
 void Player::_LoadInstanceTimeRestrictions(PreparedQueryResult result)

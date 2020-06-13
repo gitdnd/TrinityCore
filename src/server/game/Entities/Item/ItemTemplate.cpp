@@ -103,6 +103,11 @@ float ItemTemplate::GetItemLevelIncludingQuality() const
     return std::max<float>(0.f, itemLevel);
 }
 
+float ItemTemplate::GetItemLevel() const
+{
+    return float(ItemLevel);
+}
+
 uint32 ItemTemplate::GetSkill() const
 {
     static uint32 const itemWeaponSkills[MAX_ITEM_SUBCLASS_WEAPON] =

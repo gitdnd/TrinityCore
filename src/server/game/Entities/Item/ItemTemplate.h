@@ -708,6 +708,7 @@ struct ItemTemplate
     int32 GetTotalAPBonus() const { return _totalAP; }
 
     float GetItemLevelIncludingQuality() const;
+    float GetItemLevel() const;
 
     uint32 GetSkill() const;
 
