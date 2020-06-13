@@ -12094,6 +12094,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         {
             pItem->AddToWorld();
             pItem->SendUpdateToPlayer(this);
+            UpdateCraftSkill();
         }
 
         pItem->SetState(ITEM_CHANGED, this);
@@ -12323,6 +12324,9 @@ void Player::UpdateCraftSkill()
         return;
 
     uint32 new_value = GetAverageItemLevel();
+    // Going below zero breaks the profession (treats as unlearned client side)
+    if (new_value < 1)
+        new_value = 1;
     if (new_value > MaxValue)
         new_value = MaxValue;
 
