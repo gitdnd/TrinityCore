@@ -12315,7 +12315,7 @@ void Player::UpdateCraftSkill()
 
     uint32 valueIndex = PLAYER_SKILL_VALUE_INDEX(itr->second.pos);
 
-    //uint32 data = GetUInt32Value(valueIndex);
+    uint32 data = GetUInt32Value(valueIndex);
     uint16 SkillValue = SKILL_VALUE(data);
     uint16 MaxValue = SKILL_MAX(data);
 
