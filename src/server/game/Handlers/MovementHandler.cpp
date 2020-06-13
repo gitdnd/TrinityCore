@@ -308,13 +308,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
-            ChatHandler(this).PSendSysMessage("Desync detected, attempting to fix.");
-            recvData.rfinish();                 // prevent warnings spam
+           
+            
             if (Player* plrMover = mover->ToPlayer())
             {
                 if (plrMover->GetMapId() == 761)
                 {
-                    plrMover->TeleportTo(761, -1014.48f, 1340.47f, 8.55f, plrMover->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+                    ChatHandler(this).PSendSysMessage("Desync detected, attempting to fix.");
+                    //plrMover->TeleportTo(761, -1014.48f, 1340.47f, 8.55f, plrMover->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
                     /*std::list<GameObject*> list;
                     plrMover->GetGameObjectListWithEntryInGrid(list, 50010, 1000.f);
                     if (!list.empty())
@@ -323,6 +324,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                         plrMover->TeleportTo(plrMover->GetMapId(), transport->GetPositionX() + 6.1f, transport->GetPositionY() -1.1f, transport->GetPositionZ() + 9.5f, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
                     }*/
                 }
+                else
+                    recvData.rfinish();                 // prevent warnings spam
             }
             return;
         }
