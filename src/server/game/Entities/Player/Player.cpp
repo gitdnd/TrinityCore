@@ -12257,7 +12257,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         pItem2->SetState(ITEM_CHANGED, this);
 
         ApplyEquipCooldown(pItem2);
-
+        UpdateCraftSkill();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem2, bag, slot);
 #endif
@@ -12270,7 +12270,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     // only for full equip instead adding to stack
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
-
+    UpdateCraftSkill();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, bag, slot);
 #endif
@@ -12299,10 +12299,41 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
 
+        UpdateCraftSkill();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, (pos >> 8), slot);
 #endif
     }
+}
+
+void Player::UpdateCraftSkill()
+{
+    const uint32 skillId = 333;
+    SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
+    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
+        return;
+
+    uint32 valueIndex = PLAYER_SKILL_VALUE_INDEX(itr->second.pos);
+
+    //uint32 data = GetUInt32Value(valueIndex);
+    uint16 SkillValue = SKILL_VALUE(data);
+    uint16 MaxValue = SKILL_MAX(data);
+
+    if (!MaxValue || !SkillValue || SkillValue > MaxValue)
+        return;
+
+    uint32 new_value = GetAverageItemLevel();
+    if (new_value > MaxValue)
+        new_value = MaxValue;
+
+    SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, MaxValue));
+    if (itr->second.uState != SKILL_NEW)
+        itr->second.uState = SKILL_CHANGED;
+
+    UpdateSkillEnchantments(skillId, SkillValue, new_value);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
+    TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '%s' (%s), SkillID: %u",
+        GetName().c_str(), GetGUID().ToString().c_str(), SkillId);
 }
 
 void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
