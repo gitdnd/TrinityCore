@@ -323,37 +323,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
     if (unitTarget && unitTarget->IsAlive())
     {
         // Try to scale base damage effect based on ilevel
-        /*if (unitCaster && (unitCaster->ToPlayer() || (unitCaster->ToCreature() && unitTarget->ToPlayer())))
-        {
-            float iLevel;
-            // Scale players damage based on ilevel
-            if (unitCaster->ToPlayer())
-                iLevel = unitCaster->ToPlayer()->GetAverageItemLevel();
-            // Scale npc damage to player based on players ilevel
-            else
-                iLevel = unitTarget->ToPlayer()->GetAverageItemLevel();
-            int intILevel = int(iLevel);
-            // Only scale below ilevel 100
-            if (intILevel < 100)
-            {
-                // Set a lower amount to scale to
-                if (intILevel < 30)
-                    intILevel = 30;
-                damage = damage * (iLevel / 100);
-                // Make sure at least 1 damage is done (if player is naked)
-                if (damage == 0)
-                {
-                    damage = 1;
-                }
-            }
-        }*/
-        // FIXME(Harry): Come up with a better way to scale creature spell damage to players (((dungeonLevel^2)/15000)+0.5)
         if (unitCaster->ToCreature() && unitTarget->ToPlayer())
         {
             int dungeonLevel = unitCaster->GetMap()->GetDungeonLevel();
             if (dungeonLevel > 0)
             {
-                float modifier = (pow(float(dungeonLevel), 2) / 15000.0f) + 0.5f;
+                float modifier = (pow(float(dungeonLevel), 2) / 40000.0f) + 0.5f;
                 damage = damage * modifier;
             }
         }

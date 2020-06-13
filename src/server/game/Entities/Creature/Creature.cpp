@@ -1464,8 +1464,14 @@ void Creature::UpdateLevelDependantStats()
 
     SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
 
-    // damage
     float basedamage = stats->GenerateBaseDamage(cInfo);
+
+    if (dungeonLevel > 0)
+    {
+        // FIXME(Harry): Come up with a better scaling system
+        float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 40000.0f) + 0.5f;
+        basedamage = uint32(basedamage * dungeonLevelMod);
+    }
 
     float weaponBaseMinDamage = basedamage;
     float weaponBaseMaxDamage = basedamage * 1.5f;
