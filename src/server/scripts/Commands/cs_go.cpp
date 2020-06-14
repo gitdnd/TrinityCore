@@ -85,7 +85,7 @@ public:
 
         if (mapId == MAPID_INVALID)
             mapId = player->GetMapId();
-        if (!MapManager::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
+        if (/*!MapManager::IsValidMapCoord(mapId, pos) ||*/ sObjectMgr->IsTransportMap(mapId))
         {
             handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
             handler->SetSentErrorMessage(true);
