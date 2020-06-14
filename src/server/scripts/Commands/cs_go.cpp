@@ -340,12 +340,13 @@ public:
         uint32 mapId = id.get_value_or(player->GetMapId());
         if (z)
         {
-            if (!MapManager::IsValidMapCoord(mapId, x, y, *z))
+            // Screw you trinity, let me go to any map. It's my fault if the client crashes
+            /*if (!MapManager::IsValidMapCoord(mapId, x, y, *z))
             {
                 handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, mapId);
                 handler->SetSentErrorMessage(true);
                 return false;
-            }
+            }*/
         }
         else
         {
