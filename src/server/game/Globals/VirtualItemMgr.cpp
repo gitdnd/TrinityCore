@@ -915,6 +915,35 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             break;
     }
 
+    // reduce max amount of sockets depending on type
+    switch (output->Class)
+    {
+        case ITEM_CLASS_ARMOR:
+            switch (output->InventoryType)
+            {
+                case INVTYPE_LEGS:
+                case INVTYPE_CHEST:
+                    break;
+                case INVTYPE_HEAD:
+                case INVTYPE_SHOULDERS:
+                    if (socketCount > 2)
+                        socketCount = 2;
+                    break;
+                case INVTYPE_WAIST:
+                case INVTYPE_CLOAK:
+                case INVTYPE_FEET:
+                case INVTYPE_WRISTS:
+                case INVTYPE_HANDS:
+                    if (socketCount > 1)
+                        socketCount = 1;
+                    break;
+                default:
+                    socketCount = 0;
+            }
+            break;
+        default:
+            socketCount = 0;
+    }
 
     // set socket colors
     std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(statgroupid, seed);
