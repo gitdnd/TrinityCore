@@ -230,6 +230,8 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
     &Spell::EffectNULL,                                     //163 unused
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
+    &Spell::EffectReRollVirtualItemSockets,                 //165 SPELL_EFFECT_REMOVE_AURA
+    &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_REMOVE_AURA
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)

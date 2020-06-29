@@ -966,7 +966,9 @@ enum SpellEffects
     SPELL_EFFECT_TALENT_SPEC_SELECT                 = 162,
     SPELL_EFFECT_163                                = 163,
     SPELL_EFFECT_REMOVE_AURA                        = 164,
-    TOTAL_SPELL_EFFECTS                             = 165
+    SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS        = 165,
+    SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM           = 166,
+    TOTAL_SPELL_EFFECTS                             = 167
 };
 
 enum SpellCastResult

@@ -380,6 +380,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //315 SPELL_AURA_UNDERWATER_WALKING todo
     &AuraEffect::HandleNoImmediateEffect,                         //316 SPELL_AURA_PERIODIC_HASTE implemented in AuraEffect::CalculatePeriodic
     &AuraEffect::HandleTempLearnSpell,                            //317 SPELL_AURA_TEMP_LEARN_SPELL
+    &AuraEffect::HandleWaterBreathing,                            //318 SPELL_AURA_DISABLE_FATIGUE
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
