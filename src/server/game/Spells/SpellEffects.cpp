@@ -5473,3 +5473,13 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
 
     m_caster->CastSpell(unitTarget, m_spellInfo->Effects[effIndex].TriggerSpell, true);
 }
+
+void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
+{
+    //@todo finish this.
+}
+
+void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
+{
+    //@todo finish this.
+}
