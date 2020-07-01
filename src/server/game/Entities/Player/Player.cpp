@@ -21482,6 +21482,8 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     else
     {
         RemoveAurasByType(SPELL_AURA_MOUNTED);
+        RemoveMovementImpairingAuras(true);
+        RemoveAurasByType(SPELL_AURA_MOD_STUN);
 
         if (IsInDisallowedMountForm())
             RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
