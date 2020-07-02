@@ -117,7 +117,7 @@ public:
             { "unstuck",          rbac::RBAC_PERM_COMMAND_UNSTUCK,           true, &HandleUnstuckCommand,          "" },
             { "wchange",          rbac::RBAC_PERM_COMMAND_WCHANGE,          false, &HandleChangeWeather,           "" },
             { "mailbox",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleMailBoxCommand,          "" },
-            { "mailbox",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleTbsTestCommand,          "" },
+            { "tbtest",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleTbsTestCommand,          "" },
         };
         return commandTable;
     }
