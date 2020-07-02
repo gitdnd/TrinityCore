@@ -789,6 +789,12 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             ilevel = ilevel + lvlMod;
     }
 
+    // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
+    if (modifier.isCrafted && !modifier.ilevel && ilevel >= output->ItemLevel)
+    {
+        ilevel = output->ItemLevel;
+    }
+
     output->ItemLevel = ilevel;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
