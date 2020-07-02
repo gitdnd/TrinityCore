@@ -1091,7 +1091,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         InventoryResult CanUseAmmo(uint32 item) const;
         InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
         Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0, GuidSet const& allowedLooters = GuidSet(), bool isCrafted = false);
-        Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0, bool isCrafted = false, GuidSet const& allowedLooters = GuidSet())
+        Item* StoreNewItem2(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0, bool isCrafted = false, GuidSet const& allowedLooters = GuidSet())
         {
             return StoreNewItem(pos, item, update, randomPropertyId, allowedLooters, isCrafted);
         }
