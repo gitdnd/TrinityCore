@@ -117,6 +117,7 @@ public:
             { "unstuck",          rbac::RBAC_PERM_COMMAND_UNSTUCK,           true, &HandleUnstuckCommand,          "" },
             { "wchange",          rbac::RBAC_PERM_COMMAND_WCHANGE,          false, &HandleChangeWeather,           "" },
             { "mailbox",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleMailBoxCommand,          "" },
+            { "mailbox",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleTbsTestCommand,          "" },
         };
         return commandTable;
     }
@@ -2680,6 +2681,22 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
 
         handler->GetSession()->SendShowMailBox(player->GetGUID());
+        return true;
+    }
+
+    static bool HandleTbsTestCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        char* radius_str = strtok((char*)args, " ");
+        char* step_str = args ? strtok(nullptr, " ") : "8";
+        float radius= atof(radius_str);
+        uint8 step = atoi(radius_str);
+
+        if (Creature* c = player->SummonCreature(82001, player->GetRandomNearPosition(5.0f), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
+        {
+            player->CastSpell(c, 82000, true);
+            c->GetMotionMaster()->MoveCirclePath(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), radius, false, step);
+        }
         return true;
     }
 };
