@@ -795,6 +795,12 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         ilevel = output->ItemLevel;
     }
 
+    // Hard cap of 325 across all items FIXME
+    if (ilevel > 325)
+    {
+        ilevel = 325;
+    }
+
     output->ItemLevel = ilevel;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
