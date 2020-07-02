@@ -2691,11 +2691,14 @@ public:
         char* step_str = args ? strtok(nullptr, " ") : "8";
         float radius= atof(radius_str);
         uint8 step = atoi(radius_str);
-
-        if (Creature* c = player->SummonCreature(82001, player->GetRandomNearPosition(5.0f), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
+        if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
         {
-            player->CastSpell(c, 82000, true);
-            c->GetMotionMaster()->MoveCirclePath(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), radius, false, step);
+            if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
+            {
+
+                master->CastSpell(slave, 82000, true);
+                slave->GetMotionMaster()->MoveCirclePath(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), radius, false, step);
+            }
         }
         return true;
     }
