@@ -395,7 +395,8 @@ enum AuraType : uint32
     SPELL_AURA_UNDERWATER_WALKING                           = 315,
     SPELL_AURA_PERIODIC_HASTE                               = 316,
     SPELL_AURA_TEMP_LEARN_SPELL                             = 317,
-    TOTAL_AURAS                                             = 318
+    SPELL_AURA_DISABLE_FATIGUE                              = 318,
+    TOTAL_AURAS                                             = 319
 };
 
 enum AuraObjectType

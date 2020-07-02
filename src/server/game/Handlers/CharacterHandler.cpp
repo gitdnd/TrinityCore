@@ -51,6 +51,8 @@
 #include "SystemPackets.h"
 #include "QueryHolder.h"
 #include "World.h"
+#include "Spell.h"
+#include "SpellAuras.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1017,7 +1019,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     if (Guild* startGuild = sGuildMgr->GetGuildById(1))
         startGuild->AddMember(CharacterDatabaseTransaction(nullptr), pCurrChar->GetGUID());
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
-
+    if (Aura* aura = pCurrChar->AddAura(54844, pCurrChar))
+        aura->SetDuration(10 * IN_MILLISECONDS);
     delete holder;
 }
 

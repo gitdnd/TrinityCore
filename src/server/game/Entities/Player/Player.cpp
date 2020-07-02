@@ -802,7 +802,12 @@ int32 Player::getMaxTimer(MirrorTimerType timer) const
     switch (timer)
     {
         case FATIGUE_TIMER:
+        {
+            if (HasAuraType(SPELL_AURA_DISABLE_FATIGUE))
+                return DISABLED_MIRROR_TIMER;
+
             return 15 * IN_MILLISECONDS;
+        }
         case BREATH_TIMER:
         {
             if (!IsAlive() || HasAuraType(SPELL_AURA_WATER_BREATHING) || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
@@ -21479,6 +21484,8 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     else
     {
         RemoveAurasByType(SPELL_AURA_MOUNTED);
+        RemoveMovementImpairingAuras(true);
+        RemoveAurasByType(SPELL_AURA_MOD_STUN);
 
         if (IsInDisallowedMountForm())
             RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
