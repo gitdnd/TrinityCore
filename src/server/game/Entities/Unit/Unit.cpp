@@ -909,7 +909,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
 
         if (damagetype != NODAMAGE && damagetype != DOT && damage)
         {
-            if (victim != attacker && (!spellProto || !(spellProto->HasAttribute(SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE) || spellProto->HasAttribute(SPELL_ATTR3_TREAT_AS_PERIODIC))))
+            if (victim != attacker && victim->GetTypeId() == TYPEID_PLAYER && (!spellProto || !(spellProto->HasAttribute(SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE) || spellProto->HasAttribute(SPELL_ATTR3_TREAT_AS_PERIODIC))))
             {
                 if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
                 {
@@ -959,7 +959,7 @@ void Unit::CastStop(uint32 except_spellid)
             InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit)
+void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit, Spell* spell /*= nullptr*/)
 {
     if (damage < 0)
         return;
@@ -1072,7 +1072,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
 
     damageInfo->damage = damage;
     DamageInfo dmgInfo(*damageInfo, SPELL_DIRECT_DAMAGE, BASE_ATTACK, PROC_HIT_NONE);
-    Unit::CalcAbsorbResist(dmgInfo);
+    Unit::CalcAbsorbResist(dmgInfo, spell);
     damageInfo->absorb = dmgInfo.GetAbsorb();
     damageInfo->resist = dmgInfo.GetResist();
 
@@ -1737,13 +1737,12 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
     return victimResistance / (victimResistance + resistanceConstant);
 }
 
-/*static*/ void Unit::CalcAbsorbResist(DamageInfo& damageInfo)
+/*static*/ void Unit::CalcAbsorbResist(DamageInfo& damageInfo, Spell* spell /*= nullptr*/)
 {
     if (!damageInfo.GetVictim() || !damageInfo.GetVictim()->IsAlive() || !damageInfo.GetDamage())
         return;
 
     uint32 resistedDamage = Unit::CalcSpellResistedDamage(damageInfo.GetAttacker(), damageInfo.GetVictim(), damageInfo.GetDamage(), damageInfo.GetSchoolMask(), damageInfo.GetSpellInfo());
-    damageInfo.ResistDamage(resistedDamage);
 
     // Ignore Absorption Auras
     float auraAbsorbMod = 0.f;
@@ -1765,6 +1764,11 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
     RoundToInterval(auraAbsorbMod, 0.0f, 100.0f);
 
     int32 absorbIgnoringDamage = CalculatePct(damageInfo.GetDamage(), auraAbsorbMod);
+
+    if (spell)
+        spell->CallScriptOnResistAbsorbCalculateHandlers(damageInfo, resistedDamage, absorbIgnoringDamage);
+
+    damageInfo.ResistDamage(resistedDamage);
     damageInfo.ModifyDamage(-absorbIgnoringDamage);
 
     // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -6047,7 +6051,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
     {
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            ASSERT(AddGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()),
+            ASSERT_WITH_SIDE_EFFECTS(AddGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()),
                 "Player %s is trying to charm unit %u, but it already has a charmed unit %s", GetName().c_str(), charm->GetEntry(), GetCharmedGUID().ToString().c_str());
             m_charmed = charm;
 
@@ -6061,7 +6065,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
         // PvP, FFAPvP
         charm->SetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG, GetByteValue(UNIT_FIELD_BYTES_2, UNIT_BYTES_2_OFFSET_PVP_FLAG));
 
-        ASSERT(charm->AddGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()),
+        ASSERT_WITH_SIDE_EFFECTS(charm->AddGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()),
             "Unit %u is being charmed, but it already has a charmer %s", charm->GetEntry(), charm->GetCharmerGUID().ToString().c_str());
         charm->m_charmer = this;
 
@@ -6080,12 +6084,12 @@ void Unit::SetCharm(Unit* charm, bool apply)
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
-            ASSERT(RemoveGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()),
+            ASSERT_WITH_SIDE_EFFECTS(RemoveGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()),
                 "Player %s is trying to uncharm unit %u, but it has another charmed unit %s", GetName().c_str(), charm->GetEntry(), GetCharmedGUID().ToString().c_str());
             m_charmed = nullptr;
         }
 
-        ASSERT(charm->RemoveGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()),
+        ASSERT_WITH_SIDE_EFFECTS(charm->RemoveGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()),
             "Unit %u is being uncharmed, but it has another charmer %s", charm->GetEntry(), charm->GetCharmerGUID().ToString().c_str());
         charm->m_charmer = nullptr;
 

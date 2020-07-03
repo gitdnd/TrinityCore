@@ -1584,7 +1584,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
             if (!mapEntry)
                 return SPELL_FAILED_INCORRECT_AREA;
 
-            return zone_id == 4197 || (mapEntry->IsBattleground() && player && player->InBattleground()) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+            return zone_id == AREA_WINTERGRASP || (mapEntry->IsBattleground() && player && player->InBattleground()) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         }
         case 44521:                                         // Preparation
         {
@@ -3624,6 +3624,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_SPELL_HIT_CHANCE:
             case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
             case SPELL_AURA_MOD_RANGED_HASTE:
+            case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
             case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
             case SPELL_AURA_HASTE_SPELLS:
             case SPELL_AURA_MOD_RESISTANCE:
@@ -3644,6 +3645,8 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
             case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
             case SPELL_AURA_MOD_SPEED_SLOW_ALL:
+            case SPELL_AURA_MELEE_SLOW:
+            case SPELL_AURA_MOD_ATTACK_POWER_PCT:
                 if (!_isPositiveTarget(spellInfo, effIndex) || bp < 0)
                     return false;
                 break;
@@ -3660,6 +3663,10 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
                 break;
             case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:   // check targets and basepoints (ex Recklessness)
                 if (!_isPositiveTarget(spellInfo, effIndex) && bp > 0)
+                    return false;
+                break;
+            case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:   // check targets and basepoints (target enemy and negative bp -> negative)
+                if (!_isPositiveTarget(spellInfo, effIndex) && bp < 0)
                     return false;
                 break;
             case SPELL_AURA_ADD_TARGET_TRIGGER:
@@ -3716,6 +3723,8 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE:
             case SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE:
             case SPELL_AURA_DUMMY:
+            case SPELL_AURA_PERIODIC_DUMMY:
+            case SPELL_AURA_MOD_HEALING:
                 // check target for positive and negative spells
                 if (!_isPositiveTarget(spellInfo, effIndex))
                     return false;
