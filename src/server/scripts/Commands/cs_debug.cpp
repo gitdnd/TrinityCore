@@ -122,7 +122,7 @@ public:
             { "asan",          rbac::RBAC_PERM_COMMAND_DEBUG_ASAN,          true,  nullptr,                             "", debugAsanCommandTable },
             { "guidlimits",    rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugGuidLimitsCommand,       "" },
             { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
-            { "spawndynobj",   rbac::RBAC_PERM_COMMAND_DEBUG,              false, &HandleSpawnDynamicObject,           "" }
+            { "spawndynobj",   rbac::RBAC_PERM_COMMAND_DEBUG,              false, &HandleSpawnDynamicObject,           "" },
             { "objectcount",   rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugObjectCountCommand,      "" },
             { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" }
         };
