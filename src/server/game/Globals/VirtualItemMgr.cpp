@@ -807,7 +807,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
     {
         // by default we assume 1 ilevel = 1 armor
-        output->Armor = 1*ilevel;
+        output->Armor = 1 * ilevel;
 
         // retrieve armor slot and type multiplier
         float typeslotmod = VirtualModifier::GetTypeSlotArmorModifier((ItemSubclassArmor)output->SubClass, (InventoryType)output->InventoryType);
@@ -825,7 +825,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     // Apply block rating to shields
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
     {
-        output->Block = uint32(0.93f*float(ilevel));
+        output->Block = uint32(0.93f * float(ilevel));
     }
 
     // clear old stats
@@ -872,8 +872,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         ASSERT(mineachpct <= 1.0f / selectedStats.size() && mineachpct >= 0.0);
 
         // calculate min amount and take that from the randomly distributed pool
-        int16 min_amount = std::floor(pool*mineachpct);
-        int16 workpool = pool - selectedStats.size()*min_amount;
+        int16 min_amount = std::floor(pool * mineachpct);
+        int16 workpool = pool - selectedStats.size() * min_amount;
 
         // pick random positions from the workpool and use them to divide it into N random size parts
         // then add those to distributedPool along with the minimum amounts
@@ -910,51 +910,51 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
     switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            socketCount = urand(2, 3, seed);
-            break;
-        case ITEM_QUALITY_EPIC:
-            socketCount = 2;
-            break;
-        case ITEM_QUALITY_RARE:
-            socketCount = urand(1, 2, seed);
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            socketCount = 1;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            socketCount = 1;
-            break;
+    case ITEM_QUALITY_LEGENDARY:
+        socketCount = urand(2, 3, seed);
+        break;
+    case ITEM_QUALITY_EPIC:
+        socketCount = 2;
+        break;
+    case ITEM_QUALITY_RARE:
+        socketCount = urand(1, 2, seed);
+        break;
+    case ITEM_QUALITY_UNCOMMON:
+        socketCount = 1;
+        break;
+    case ITEM_QUALITY_NORMAL:
+        socketCount = 1;
+        break;
     }
 
     // reduce max amount of sockets depending on type
     switch (output->Class)
     {
-        case ITEM_CLASS_ARMOR:
-            switch (output->InventoryType)
-            {
-                case INVTYPE_LEGS:
-                case INVTYPE_CHEST:
-                    break;
-                case INVTYPE_HEAD:
-                case INVTYPE_SHOULDERS:
-                    if (socketCount > 2)
-                        socketCount = 2;
-                    break;
-                case INVTYPE_WAIST:
-                case INVTYPE_CLOAK:
-                case INVTYPE_FEET:
-                case INVTYPE_WRISTS:
-                case INVTYPE_HANDS:
-                    if (socketCount > 1)
-                        socketCount = 1;
-                    break;
-                default:
-                    socketCount = 0;
-            }
+    case ITEM_CLASS_ARMOR:
+        switch (output->InventoryType)
+        {
+        case INVTYPE_LEGS:
+        case INVTYPE_CHEST:
+            break;
+        case INVTYPE_HEAD:
+        case INVTYPE_SHOULDERS:
+            if (socketCount > 2)
+                socketCount = 2;
+            break;
+        case INVTYPE_WAIST:
+        case INVTYPE_CLOAK:
+        case INVTYPE_FEET:
+        case INVTYPE_WRISTS:
+        case INVTYPE_HANDS:
+            if (socketCount > 1)
+                socketCount = 1;
             break;
         default:
             socketCount = 0;
+        }
+        break;
+    default:
+        socketCount = 0;
     }
 
     // set socket colors
@@ -966,7 +966,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             if (output->Socket[i].Color != 0)
                 continue;
 
-            uint8 chance = quality == ITEM_QUALITY_LEGENDARY ? 100-10 : 100-5;
+            uint8 chance = quality == ITEM_QUALITY_LEGENDARY ? 100 - 10 : 100 - 5;
             if (urand(1, 100, seed) >= chance)
             {
                 output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
@@ -977,23 +977,127 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
         }
     }
 
-    // Hardcode disenchant ID
-    switch (quality) {
+    // Different disenchant loot pools depending on ilevel and quality
+    // Range 60000-60029
+    if (ilevel <= 50)
+    {
+        switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60004;
+            output->DisenchantID = 60000;
             break;
         case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60003;
+            output->DisenchantID = 60001;
             break;
         case ITEM_QUALITY_RARE:
             output->DisenchantID = 60002;
             break;
         case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60001;
+            output->DisenchantID = 60003;
             break;
         case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60000;
+            output->DisenchantID = 60004;
             break;
+        }
+    }
+    else if (ilevel <= 100)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60005;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60006;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60007;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60008;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60009;
+            break;
+        }
+    }
+    else if (ilevel <= 150)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60010;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60011;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60012;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60013;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60014;
+            break;
+        }
+    }
+    else if (ilevel <= 200)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60015;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60016;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60017;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60018;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60019;
+            break;
+        }
+    }
+    else if (ilevel <= 250)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60020;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60021;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60022;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60023;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60024;
+            break;
+        }
+    }
+    else
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60025;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60026;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60027;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60028;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60029;
+            break;
+        }
     }
 
     // Generate random item name
