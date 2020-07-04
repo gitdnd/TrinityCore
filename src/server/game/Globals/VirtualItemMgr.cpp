@@ -999,7 +999,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             break;
         }
     }
-    else if (ilevel <= 100)
+    else if (ilevel > 50 && ilevel <= 100)
     {
         switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
@@ -1019,7 +1019,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             break;
         }
     }
-    else if (ilevel <= 150)
+    else if (ilevel > 100 && ilevel <= 150)
     {
         switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
@@ -1039,7 +1039,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             break;
         }
     }
-    else if (ilevel <= 200)
+    else if (ilevel > 150 && ilevel <= 200)
     {
         switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
@@ -1059,7 +1059,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             break;
         }
     }
-    else if (ilevel <= 250)
+    else if (ilevel > 200 && ilevel <= 250)
     {
         switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
@@ -1079,7 +1079,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
             break;
         }
     }
-    else
+    else if (ilevel > 250)
     {
         switch (quality) {
         case ITEM_QUALITY_LEGENDARY:
