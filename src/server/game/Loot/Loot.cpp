@@ -144,6 +144,10 @@ void Loot::clear()
 // Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
 {
+    std::ostringstream stream;
+    stream << "Adding item to loot: " << item.itemid;
+    sWorld->SendGlobalText(stream.str().c_str(), nullptr);
+
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
     if (!proto)
         return;
@@ -186,7 +190,10 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
         }
 
         if (!canSeeItemInLootWindow)
+        {
+            sWorld->SendGlobalText("Skipping item that cannot be seen", nullptr);
             continue;
+        }
 
         // non-conditional one-player only items are counted here,
         // free for all items are counted in FillFFALoot(),
