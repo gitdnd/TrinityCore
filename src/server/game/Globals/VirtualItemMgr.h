@@ -48,6 +48,8 @@ struct VirtualItemTemplate : ItemTemplate
      * Updates the displayId used by the item from DBC data to match the current item entry's displayid.
      */
     void UpdateDisplay();
+
+    StatGroup statGroup;
 };
 
 struct VirtualModifier
@@ -121,13 +123,14 @@ struct VirtualModifier
 struct itemSpellInfo
 {
     itemSpellInfo() { spellId = 0; }
-    itemSpellInfo(uint32 sId, uint32 qual, int32 iClass, int32 sub, uint32 iType, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), quality(qual),
-        itemClass(iClass), subClass(sub), inventoryType(iType), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
+    itemSpellInfo(uint32 sId, uint32 qual, int32 iClass, int32 sub, uint32 iType, uint8 iGroup, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), quality(qual),
+        itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
     uint32 spellId;
     uint32 quality;
     int32 itemClass;
     int32 subClass;
     int32 inventoryType;
+    uint8 statGroup;
     uint32 SpellTrigger;
     int32  SpellCharges;
     float  SpellPPMRate;
@@ -223,7 +226,7 @@ public:
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(ItemTemplate* const item, char* seed);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, char* seed);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
@@ -270,7 +273,7 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStats(ItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
 
     /**
      * Checks if the passed template is a valid virtual item template.
@@ -278,8 +281,8 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(ItemTemplate* output, VirtualModifier modifier, uint32 seed);
-    void GenerateSpells(ItemTemplate* output, VirtualModifier modifier, char* seed);
+    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
+    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
 
 private:
 

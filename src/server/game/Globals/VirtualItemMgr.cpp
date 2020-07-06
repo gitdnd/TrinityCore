@@ -590,21 +590,22 @@ void VirtualItemMgr::LoadSpellsFromDB()
         int32 itemClass = fields[2].GetInt32();
         int32 subClass = fields[3].GetInt32();
         int32 inventoryType = fields[4].GetInt32();
-        uint32 SpellTrigger = fields[5].GetUInt32();
-        int32  SpellCharges = fields[6].GetInt32();
-        float  SpellPPMRate = fields[7].GetFloat();
-        int32  SpellCooldown = fields[8].GetInt32();
-        uint32 SpellCategory = fields[9].GetUInt32();
-        int32  SpellCategoryCooldown = fields[10].GetInt32();
+        int8 statGroup = fields[5].GetInt8();
+        uint32 SpellTrigger = fields[6].GetUInt32();
+        int32  SpellCharges = fields[7].GetInt32();
+        float  SpellPPMRate = fields[8].GetFloat();
+        int32  SpellCooldown = fields[9].GetInt32();
+        uint32 SpellCategory = fields[10].GetUInt32();
+        int32  SpellCategoryCooldown = fields[11].GetInt32();
 
-        availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
+        availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, statGroup, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
         ++count;
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(ItemTemplate* const item, char* seed)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, char* seed)
 {
 #define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
         std::list<itemSpellInfo> spells;
@@ -616,6 +617,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(ItemTemplate* const item, char* seed
             IFSKIP(someSpells.itemClass, item->Class);
             IFSKIP(someSpells.subClass, item->SubClass);
             IFSKIP(someSpells.inventoryType, item->InventoryType);
+            IFSKIP(someSpells.statGroup, item->statGroup);
             spells.push_back(someSpells);
         }
         if (spells.empty())
@@ -672,10 +674,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     if (display == 0)
         temp->UpdateDisplay();
     else
-        temp->DisplayInfoID = display;
-
-    //@todo: Foereaper add the randomness you want here.
-    
+        temp->DisplayInfoID = display; 
 
     delete store[entry];
     store[entry] = temp;
@@ -686,7 +685,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return temp;
 }
 
-void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifier) const
+void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier) const
 {
     // decide quality
     uint32 quality = output->Quality;
@@ -890,76 +889,6 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     }
     statscount = setStats;
 
-    // set amount of sockets on the items depending on the quality
-    int32 socketCount = 0;
-    switch (quality) {
-    case ITEM_QUALITY_LEGENDARY:
-        socketCount = urand(2, 3, seed);
-        break;
-    case ITEM_QUALITY_EPIC:
-        socketCount = 2;
-        break;
-    case ITEM_QUALITY_RARE:
-        socketCount = urand(1, 2, seed);
-        break;
-    case ITEM_QUALITY_UNCOMMON:
-        socketCount = 1;
-        break;
-    case ITEM_QUALITY_NORMAL:
-        socketCount = 1;
-        break;
-    }
-
-    // reduce max amount of sockets depending on type
-    switch (output->Class)
-    {
-    case ITEM_CLASS_ARMOR:
-        switch (output->InventoryType)
-        {
-        case INVTYPE_LEGS:
-        case INVTYPE_CHEST:
-            break;
-        case INVTYPE_HEAD:
-        case INVTYPE_SHOULDERS:
-            if (socketCount > 2)
-                socketCount = 2;
-            break;
-        case INVTYPE_WAIST:
-        case INVTYPE_CLOAK:
-        case INVTYPE_FEET:
-        case INVTYPE_WRISTS:
-        case INVTYPE_HANDS:
-            if (socketCount > 1)
-                socketCount = 1;
-            break;
-        default:
-            socketCount = 0;
-        }
-        break;
-    default:
-        socketCount = 0;
-    }
-
-    // set socket colors
-    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(statgroupid, seed);
-    if (!socketcolors.empty())
-    {
-        for (int32 i = 0; i < socketCount; ++i)
-        {
-            if (output->Socket[i].Color != 0)
-                continue;
-
-            uint8 chance = quality == ITEM_QUALITY_LEGENDARY ? 100 - 10 : 100 - 5;
-            if (urand(1, 100, seed) >= chance)
-            {
-                output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
-                continue;
-            }
-
-            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
-        }
-    }
-
     // Different disenchant loot pools depending on ilevel and quality
     // Range 60000-60029
     if (ilevel <= 50)
@@ -1156,6 +1085,7 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
+    output->statGroup = statgroupid;
 }
 
 bool VirtualItemMgr::IsVirtualTemplate(ItemTemplate const * base)
@@ -1406,7 +1336,80 @@ std::vector<StatGroup> const & VirtualModifier::StatGroupData::GetArmorSubclassS
     return armor_type_stat_groups[subclass];
 }
 
-void VirtualItemMgr::GenerateSpells(ItemTemplate* output, VirtualModifier modifier, char* seed)
+void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, char* seed)
+{
+    // set amount of sockets on the items depending on the quality
+    int32 socketCount = 0;
+    switch (output->Quality) {
+    case ITEM_QUALITY_LEGENDARY:
+        socketCount = urand(2, 3, seed);
+        break;
+    case ITEM_QUALITY_EPIC:
+        socketCount = 2;
+        break;
+    case ITEM_QUALITY_RARE:
+        socketCount = urand(1, 2, seed);
+        break;
+    case ITEM_QUALITY_UNCOMMON:
+        socketCount = 1;
+        break;
+    case ITEM_QUALITY_NORMAL:
+        socketCount = 1;
+        break;
+    }
+
+    // reduce max amount of sockets depending on type
+    switch (output->Class)
+    {
+    case ITEM_CLASS_ARMOR:
+        switch (output->InventoryType)
+        {
+        case INVTYPE_LEGS:
+        case INVTYPE_CHEST:
+            break;
+        case INVTYPE_HEAD:
+        case INVTYPE_SHOULDERS:
+            if (socketCount > 2)
+                socketCount = 2;
+            break;
+        case INVTYPE_WAIST:
+        case INVTYPE_CLOAK:
+        case INVTYPE_FEET:
+        case INVTYPE_WRISTS:
+        case INVTYPE_HANDS:
+            if (socketCount > 1)
+                socketCount = 1;
+            break;
+        default:
+            socketCount = 0;
+        }
+        break;
+    default:
+        socketCount = 0;
+    }
+
+    // set socket colors
+    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(statgroupid, seed);
+    if (!socketcolors.empty())
+    {
+        for (int32 i = 0; i < socketCount; ++i)
+        {
+            if (output->Socket[i].Color != 0)
+                continue;
+
+            uint8 chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 100 - 10 : 100 - 5;
+            if (urand(1, 100, seed) >= chance)
+            {
+                output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
+                continue;
+            }
+
+            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
+        }
+    }
+}
+
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed)
 {
     //@todo Finalize these numbers, add more then 1 spell to generate.
     uint8 numSpellsToGenerate = 0;
@@ -1417,25 +1420,25 @@ void VirtualItemMgr::GenerateSpells(ItemTemplate* output, VirtualModifier modifi
     case ITEM_QUALITY_UNCOMMON:
         {
             float chance = isTrinket ? 60.f : 10.f;
-            if (roll_chance_f(60.f))
+            if (roll_chance_f(chance))
                 numSpellsToGenerate = 1;
         }break;
     case ITEM_QUALITY_RARE:
     {
         float chance = isTrinket ? 70.f : 15.f;
-        if (roll_chance_f(60.f))
+        if (roll_chance_f(chance))
             numSpellsToGenerate = 1;
     }break;
     case ITEM_QUALITY_EPIC:
     {
         float chance = isTrinket ? 80.f : 20.f;
-        if (roll_chance_f(60.f))
+        if (roll_chance_f(chance))
             numSpellsToGenerate = 1;
     }break;
     case ITEM_QUALITY_LEGENDARY:
     {
         float chance = isTrinket ? 90.f : 25.f;
-        if (roll_chance_f(60.f))
+        if (roll_chance_f(chance))
             numSpellsToGenerate = 1;
     }break;
     default:
