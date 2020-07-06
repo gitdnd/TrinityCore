@@ -604,7 +604,7 @@ void VirtualItemMgr::LoadSpellsFromDB()
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, char* seed)
+itemSpellInfo VirtualItemMgr::GenerateSpell(ItemTemplate* const item, char* seed)
 {
 #define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
         std::list<itemSpellInfo> spells;
@@ -653,7 +653,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
     GenerateStats(temp, modifier);
-
+    GenerateSpells(temp, modifier, seed);
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);
     if (!generator)
@@ -675,25 +675,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         temp->DisplayInfoID = display;
 
     //@todo: Foereaper add the randomness you want here.
-    uint8 numSpellsToGenerate = 3;
-
-    //Prevent crash incase something goes dumb.
-    if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
-        numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
-
-    for (uint8 i = 0; i < numSpellsToGenerate; ++i)
-    {
-        itemSpellInfo spell = GenerateSpell(temp, seed);
-        if (spell.spellId == 0)
-            continue;
-        temp->Spells[i].SpellId = spell.spellId;
-        temp->Spells[i].SpellTrigger = spell.SpellTrigger;
-        temp->Spells[i].SpellCharges = spell.SpellCharges;
-        temp->Spells[i].SpellPPMRate = spell.SpellPPMRate;
-        temp->Spells[i].SpellCooldown = spell.SpellCooldown;
-        temp->Spells[i].SpellCategory = spell.SpellCategory;
-        temp->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
-    }
+    
 
     delete store[entry];
     store[entry] = temp;
@@ -1422,4 +1404,58 @@ std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSoc
 std::vector<StatGroup> const & VirtualModifier::StatGroupData::GetArmorSubclassStatGroups(ItemSubclassArmor subclass) const
 {
     return armor_type_stat_groups[subclass];
+}
+
+void VirtualItemMgr::GenerateSpells(ItemTemplate* output, VirtualModifier modifier, char* seed)
+{
+    //@todo Finalize these numbers, add more then 1 spell to generate.
+    uint8 numSpellsToGenerate = 0;
+
+    bool isTrinket = output->InventoryType == INVTYPE_TRINKET;
+    switch (output->Quality)
+    {
+    case ITEM_QUALITY_UNCOMMON:
+        {
+            float chance = isTrinket ? 60.f : 10.f;
+            if (roll_chance_f(60.f))
+                numSpellsToGenerate = 1;
+        }break;
+    case ITEM_QUALITY_RARE:
+    {
+        float chance = isTrinket ? 70.f : 15.f;
+        if (roll_chance_f(60.f))
+            numSpellsToGenerate = 1;
+    }break;
+    case ITEM_QUALITY_EPIC:
+    {
+        float chance = isTrinket ? 80.f : 20.f;
+        if (roll_chance_f(60.f))
+            numSpellsToGenerate = 1;
+    }break;
+    case ITEM_QUALITY_LEGENDARY:
+    {
+        float chance = isTrinket ? 90.f : 25.f;
+        if (roll_chance_f(60.f))
+            numSpellsToGenerate = 1;
+    }break;
+    default:
+    }
+
+    //Prevent crash incase something goes dumb.
+    if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
+        numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
+
+    for (uint8 i = 0; i < numSpellsToGenerate; ++i)
+    {
+        itemSpellInfo spell = GenerateSpell(output, seed);
+        if (spell.spellId == 0)
+            continue;
+        output->Spells[i].SpellId = spell.spellId;
+        output->Spells[i].SpellTrigger = spell.SpellTrigger;
+        output->Spells[i].SpellCharges = spell.SpellCharges;
+        output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
+        output->Spells[i].SpellCooldown = spell.SpellCooldown;
+        output->Spells[i].SpellCategory = spell.SpellCategory;
+        output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+    }
 }

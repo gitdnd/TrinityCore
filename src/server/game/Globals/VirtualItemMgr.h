@@ -223,7 +223,7 @@ public:
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, char* seed);
+    itemSpellInfo GenerateSpell(ItemTemplate* const item, char* seed);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
@@ -277,6 +277,9 @@ public:
      * Returns true if it is, false if it is not.
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
+
+    void GenerateSockets(ItemTemplate* output, VirtualModifier modifier, uint32 seed);
+    void GenerateSpells(ItemTemplate* output, VirtualModifier modifier, char* seed);
 
 private:
 
