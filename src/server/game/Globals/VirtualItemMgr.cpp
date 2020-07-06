@@ -848,7 +848,8 @@ void VirtualItemMgr::GenerateStats(ItemTemplate* output, VirtualModifier modifie
 
     // select stat group
     StatGroup statgroupid = modifier.statgroup;
-    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
+    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR && output->InventoryType != INVTYPE_CLOAK && output->InventoryType != INVTYPE_RELIC
+        && output->InventoryType != INVTYPE_QUIVER && output->InventoryType != INVTYPE_FINGER)
     {
         std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups((ItemSubclassArmor)output->SubClass);
         if (!statgroups.empty())
