@@ -281,7 +281,7 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
+    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll, char* seed);
     void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 

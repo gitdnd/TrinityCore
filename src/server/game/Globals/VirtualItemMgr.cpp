@@ -659,7 +659,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     if (!name.empty())
         temp->Name1 = name;
     UpdateDisenchantId(temp);
-    GenerateSockets(temp, modifier, seed);
+    GenerateSockets(temp, modifier, false, seed);
     GenerateSpells(temp, modifier, seed);
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);
@@ -1213,7 +1213,7 @@ std::vector<StatGroup> const & VirtualModifier::StatGroupData::GetArmorSubclassS
     return armor_type_stat_groups[subclass];
 }
 
-void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, char* seed)
+void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll, char* seed)
 {
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
@@ -1266,12 +1266,12 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
     // set socket colors
-    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(statgroupid, seed);
+    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(output->statGroup, seed);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
         {
-            if (output->Socket[i].Color != 0)
+            if (output->Socket[i].Color != 0 && !reRoll)
                 continue;
 
             uint8 chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 100 - 10 : 100 - 5;
