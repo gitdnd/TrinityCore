@@ -1319,6 +1319,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
             numSpellsToGenerate = 1;
     }break;
     default:
+        break;
     }
 
     //Prevent crash incase something goes dumb.
