@@ -655,6 +655,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
     GenerateStats(temp, modifier);
+    UpdateDisenchantId(temp);
+    GenerateSockets(temp, modifier, seed);
     GenerateSpells(temp, modifier, seed);
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);
@@ -888,129 +890,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         }
     }
     statscount = setStats;
-
-    // Different disenchant loot pools depending on ilevel and quality
-    // Range 60000-60029
-    if (ilevel <= 50)
-    {
-        switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60000;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60001;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60002;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60003;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60004;
-            break;
-        }
-    }
-    else if (ilevel > 50 && ilevel <= 100)
-    {
-        switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60005;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60006;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60007;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60008;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60009;
-            break;
-        }
-    }
-    else if (ilevel > 100 && ilevel <= 150)
-    {
-        switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60010;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60011;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60012;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60013;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60014;
-            break;
-        }
-    }
-    else if (ilevel > 150 && ilevel <= 200)
-    {
-        switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60015;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60016;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60017;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60018;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60019;
-            break;
-        }
-    }
-    else if (ilevel > 200 && ilevel <= 250)
-    {
-        switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60020;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60021;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60022;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60023;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60024;
-            break;
-        }
-    }
-    else if (ilevel > 250)
-    {
-        switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60025;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60026;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60027;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60028;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60029;
-            break;
-        }
-    }
 
     // Generate random item name
     std::string name = GenerateItemName(output->Class, output->SubClass, output->InventoryType, quality, seed);
@@ -1460,5 +1339,133 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
         output->Spells[i].SpellCooldown = spell.SpellCooldown;
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+    }
+}
+
+void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output)
+{
+    uint32 ilevel = output->ItemLevel;
+    uint32 quality = output->Quality;
+    // Different disenchant loot pools depending on ilevel and quality
+    // Range 60000-60029
+    if (ilevel <= 50)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60000;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60001;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60002;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60003;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60004;
+            break;
+        }
+    }
+    else if (ilevel > 50 && ilevel <= 100)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60005;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60006;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60007;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60008;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60009;
+            break;
+        }
+    }
+    else if (ilevel > 100 && ilevel <= 150)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60010;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60011;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60012;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60013;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60014;
+            break;
+        }
+    }
+    else if (ilevel > 150 && ilevel <= 200)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60015;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60016;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60017;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60018;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60019;
+            break;
+        }
+    }
+    else if (ilevel > 200 && ilevel <= 250)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60020;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60021;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60022;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60023;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60024;
+            break;
+        }
+    }
+    else if (ilevel > 250)
+    {
+        switch (quality) {
+        case ITEM_QUALITY_LEGENDARY:
+            output->DisenchantID = 60025;
+            break;
+        case ITEM_QUALITY_EPIC:
+            output->DisenchantID = 60026;
+            break;
+        case ITEM_QUALITY_RARE:
+            output->DisenchantID = 60027;
+            break;
+        case ITEM_QUALITY_UNCOMMON:
+            output->DisenchantID = 60028;
+            break;
+        case ITEM_QUALITY_NORMAL:
+            output->DisenchantID = 60029;
+            break;
+        }
     }
 }

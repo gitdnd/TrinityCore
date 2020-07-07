@@ -283,6 +283,7 @@ public:
 
     void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
     void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
+    void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:
 
