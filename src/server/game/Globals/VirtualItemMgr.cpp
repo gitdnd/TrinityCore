@@ -655,6 +655,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
     GenerateStats(temp, modifier);
+    std::string name = GenerateItemName(temp->Class, temp->SubClass, temp->InventoryType, temp->Quality, seed);
+    if (!name.empty())
+        temp->Name1 = name;
     UpdateDisenchantId(temp);
     GenerateSockets(temp, modifier, seed);
     GenerateSpells(temp, modifier, seed);
@@ -890,11 +893,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         }
     }
     statscount = setStats;
-
-    // Generate random item name
-    std::string name = GenerateItemName(output->Class, output->SubClass, output->InventoryType, quality, seed);
-    if (!name.empty())
-        output->Name1 = name;
 
     // If item is a weapon, then generate bot and top damage + speed
     if (output->Class == ITEM_CLASS_WEAPON)
