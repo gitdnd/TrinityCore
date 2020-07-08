@@ -1258,24 +1258,40 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         }
     }
   
+    if (!reRoll)
+    {
+        // set socket colors
+        std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(output->statGroup, seed);
+        if (!socketcolors.empty())
+        {
+            for (int32 i = 0; i < socketCount; ++i)
+            {
+                if (output->Socket[i].Color != 0)
+                    continue;
 
-    // set socket colors
-    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(output->statGroup, seed);
-    if (!socketcolors.empty())
+                float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
+                if (roll_chance_f(chance))
+                {
+                    output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
+                    continue;
+                }
+
+                output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
+            }
+        }
+    }
+    else
     {
         for (int32 i = 0; i < socketCount; ++i)
         {
-            if (output->Socket[i].Color != 0 && !reRoll)
-                continue;
-
-            uint8 chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 100 - 10 : 100 - 5;
-            if (urand(1, 100, seed) >= chance)
+            float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
+            if (roll_chance_f(chance))
             {
                 output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
                 continue;
             }
-
-            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
+            uint8 socketColors[3] = { SOCKET_COLOR_RED, SOCKET_COLOR_YELLOW, SOCKET_COLOR_BLUE };
+            output->Socket[i].Color = socketColors[urand(0, std::size(socketColors) - 1)];
         }
     }
 }
