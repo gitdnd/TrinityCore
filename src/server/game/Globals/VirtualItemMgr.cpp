@@ -628,7 +628,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, cha
         return *selectedSpell;
 }
 
-VirtualItemTemplate const* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
+VirtualItemTemplate * VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 {
     if (entry < minEntry || entry >= maxEntry)
         return nullptr;

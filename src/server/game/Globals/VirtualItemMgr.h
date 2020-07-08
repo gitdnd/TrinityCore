@@ -262,7 +262,7 @@ public:
      * Fetches the VirtualItemTemplate assigned for the unique entry.
      * Returns VirtualItemTemplate if found, else returns null.
      */
-    VirtualItemTemplate const* GetVirtualTemplate(uint32 entry);
+    VirtualItemTemplate * GetVirtualTemplate(uint32 entry);
 
     /**
      * Uses passed base and modifier to generate a new VirtualItemTemplate.

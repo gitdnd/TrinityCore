@@ -5492,7 +5492,24 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
 
 void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
 {
-    //@todo finish this.
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    //@todo Put this in target checking
+    if (itemTarget->GetOwnerGUID() != player->GetGUID())
+        return;
+    if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
+    {
+        sVirtualItemMgr.GenerateSockets(vItem, VirtualModifier(), true, sVirtualItemMgr.ConvertSeed(vItem->seed));
+        itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
+    }
 }
 
 void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
