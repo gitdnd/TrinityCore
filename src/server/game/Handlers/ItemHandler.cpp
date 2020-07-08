@@ -990,6 +990,9 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                 return;
         }
 
+        if (itemProto->Socket[i].Color != SOCKET_COLOR_PRISMATIC && !(GemProps[i]->color & itemProto->Socket[i].Color))
+            return;
+
         // tried to put normal gem in meta socket
         if (itemProto->Socket[i].Color == SOCKET_COLOR_META && GemProps[i]->color != SOCKET_COLOR_META)
             return;
