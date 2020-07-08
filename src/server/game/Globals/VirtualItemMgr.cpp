@@ -1227,18 +1227,14 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     case ITEM_QUALITY_RARE:
         socketCount = urand(1, 2, seed);
         break;
-    case ITEM_QUALITY_UNCOMMON:
+    default:
         socketCount = 1;
-        break;
-    case ITEM_QUALITY_NORMAL:
-        socketCount = 1;
-        break;
+        break; 
     }
 
     // reduce max amount of sockets depending on type
-    switch (output->Class)
+    if (output->Class == ITEM_CLASS_ARMOR)
     {
-    case ITEM_CLASS_ARMOR:
         switch (output->InventoryType)
         {
         case INVTYPE_LEGS:
@@ -1260,10 +1256,8 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         default:
             socketCount = 0;
         }
-        break;
-    default:
-        socketCount = 0;
     }
+  
 
     // set socket colors
     std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(output->statGroup, seed);
