@@ -18,6 +18,7 @@
 #include "Spell.h"
 #include "AccountMgr.h"
 #include "Battleground.h"
+#include "Chat.h"
 #include "CellImpl.h"
 #include "Common.h"
 #include "Creature.h"
@@ -5507,6 +5508,7 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
         return;
     if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
     {
+        ChatHandler(player->GetSession()).PSendSysMessage("Rerolling sockets.");
         sVirtualItemMgr.GenerateSockets(vItem, VirtualModifier(), true, sVirtualItemMgr.ConvertSeed(vItem->seed));
         const_cast<ItemTemplate*>(itemTarget->GetTemplate())->InitializeQueryData();
         WorldPacket response = itemTarget->GetTemplate()->BuildQueryData(LOCALE_enUS);

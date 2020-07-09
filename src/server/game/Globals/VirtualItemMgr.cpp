@@ -1291,7 +1291,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
                 continue;
             }
             uint8 socketColors[3] = { SOCKET_COLOR_RED, SOCKET_COLOR_YELLOW, SOCKET_COLOR_BLUE };
-            output->Socket[i].Color = socketColors[urand(0, std::size(socketColors) - 1)];
+            output->Socket[i].Color = socketColors[urand(0, 2)];
         }
     }
 }
