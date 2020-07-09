@@ -982,6 +982,8 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
         // tried to put gem in socket where no socket exists (take care about prismatic sockets)
         if (!itemProto->Socket[i].Color)
         {
+            if (sVirtualItemMgr.GetVirtualTemplate(itemProto->ItemId) && i == 0)
+                continue;
             // no prismatic socket
             if (!itemTarget->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT))
                 return;
@@ -990,7 +992,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                 return;
         }
 
-        if (itemProto->Socket[i].Color != SOCKET_COLOR_PRISMATIC && !(GemProps[i]->color & itemProto->Socket[i].Color))
+        if (itemProto->Socket[i].Color != 0 && !(GemProps[i]->color & itemProto->Socket[i].Color))
             return;
 
         // tried to put normal gem in meta socket
