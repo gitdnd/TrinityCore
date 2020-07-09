@@ -1130,6 +1130,29 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
 
+    stat_group_stats[STAT_GROUP_ALL] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_HIT_SPELL_RATING,
+        ITEM_MOD_HASTE_SPELL_RATING,
+        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_RANGED_RATING,
+        ITEM_MOD_CRIT_RANGED_RATING,
+        ITEM_MOD_HASTE_RANGED_RATING,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_RANGED_ATTACK_POWER,
+        ITEM_MOD_ARMOR_PENETRATION_RATING
+    };
+
     // socket groups
     stat_group_sockets[STAT_GROUP_HEALING] = {
         SOCKET_COLOR_BLUE
@@ -1157,6 +1180,12 @@ VirtualModifier::StatGroupData::StatGroupData()
 
     stat_group_sockets[STAT_GROUP_AGI_RANGED] = {
         SOCKET_COLOR_YELLOW
+    };
+
+    stat_group_sockets[STAT_GROUP_ALL] = {
+        SOCKET_COLOR_YELLOW,
+        SOCKET_COLOR_RED,
+        SOCKET_COLOR_BLUE
     };
 
     // type stat groups
@@ -1258,40 +1287,23 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         }
     }
   
-    if (!reRoll)
-    {
-        // set socket colors
-        std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(output->statGroup, seed);
-        if (!socketcolors.empty())
-        {
-            for (int32 i = 0; i < socketCount; ++i)
-            {
-                if (output->Socket[i].Color != 0)
-                    continue;
-
-                float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
-                if (roll_chance_f(chance))
-                {
-                    output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
-                    continue;
-                }
-
-                output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
-            }
-        }
-    }
-    else
+  // set socket colors
+    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, seed);
+    if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
         {
+            if (output->Socket[i].Color != 0)
+                continue;
+
             float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
             if (roll_chance_f(chance))
             {
                 output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
                 continue;
             }
-            uint8 socketColors[3] = { SOCKET_COLOR_RED, SOCKET_COLOR_YELLOW, SOCKET_COLOR_BLUE };
-            output->Socket[i].Color = socketColors[urand(0, 2)];
+
+            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
     }
 }
