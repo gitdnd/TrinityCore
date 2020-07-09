@@ -5508,6 +5508,9 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
     {
         sVirtualItemMgr.GenerateSockets(vItem, VirtualModifier(), true, sVirtualItemMgr.ConvertSeed(vItem->seed));
+        const_cast<ItemTemplate*>(itemTarget->GetTemplate())->InitializeQueryData();
+        WorldPacket response = itemTarget->GetTemplate()->BuildQueryData(LOCALE_enUS);
+        sWorld->SendGlobalMessage(&response);
         itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
     }
 }
