@@ -1286,14 +1286,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             socketCount = 0;
         }
     }
-    bool genPris = false;
-    float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
-    if (roll_chance_f(chance))
-    {
-        genPris = true;
-        if (socketCount < 3)
-            socketCount += 1;
-    }
+
   // set socket colors
     std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, seed);
     if (!socketcolors.empty())
@@ -1303,13 +1296,12 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             if (output->Socket[i].Color != 0 && !reRoll)
                 continue;
 
-            if (genPris)
+            /*float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
+            if (roll_chance_f(chance))
             {
-                genPris = false;
-                output->Socket[i].Color = 0;
+                output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
                 continue;
-            }
-
+            }*/
 
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
