@@ -232,8 +232,8 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
     &Spell::EffectNULL,                                     //163 unused
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
-    &Spell::EffectReRollVirtualItemSockets,                 //165 SPELL_EFFECT_REMOVE_AURA
-    &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_REMOVE_AURA
+    &Spell::EffectReRollVirtualItemSockets,                 //165 SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS
+    &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -5493,15 +5493,12 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
 
 void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
-
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
-    {
-        //ChatHandler(player->GetSession()).PSendSysMessage("Wrong effectHandleMode.. got %u", uint8(effectHandleMode));
-        return;
-    }
 
     if (!itemTarget)
     {
