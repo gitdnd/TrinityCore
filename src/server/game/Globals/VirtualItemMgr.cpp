@@ -1296,12 +1296,12 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             if (output->Socket[i].Color != 0 && !reRoll)
                 continue;
 
-            float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
+            /*float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
             if (roll_chance_f(chance))
             {
                 output->Socket[i].Color = SOCKET_COLOR_PRISMATIC;
                 continue;
-            }
+            }*/
 
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
         }
