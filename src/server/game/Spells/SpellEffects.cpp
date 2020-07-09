@@ -5496,9 +5496,10 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
+
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("Wrong effectHandleMode..");
+        ChatHandler(player->GetSession()).PSendSysMessage("Wrong effectHandleMode.. got %u", uint8(effectHandleMode));
         return;
     }
 
