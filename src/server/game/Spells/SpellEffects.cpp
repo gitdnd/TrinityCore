@@ -5493,19 +5493,28 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
 
 void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
-        return;
-
-    if (!itemTarget)
-        return;
-
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Wrong effectHandleMode..");
+        return;
+    }
+
+    if (!itemTarget)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("No item target.");
+        return;
+    }
+
 
     //@todo Put this in target checking
     if (itemTarget->GetOwnerGUID() != player->GetGUID())
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Not item owner..");
         return;
+    }
     if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Rerolling sockets.");
@@ -5515,6 +5524,8 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
         sWorld->SendGlobalMessage(&response);
         itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
     }
+    else
+        ChatHandler(player->GetSession()).PSendSysMessage("Not virtual item.");
 }
 
 void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
