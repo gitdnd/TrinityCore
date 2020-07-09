@@ -5521,6 +5521,7 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
         WorldPacket response = itemTarget->GetTemplate()->BuildQueryData(LOCALE_enUS);
         sWorld->SendGlobalMessage(&response);
         itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
+        itemTarget->SaveToDB(CharacterDatabaseTransaction());
     }
     else
         ChatHandler(player->GetSession()).PSendSysMessage("Not virtual item.");
