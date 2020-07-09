@@ -1286,7 +1286,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             socketCount = 0;
         }
     }
-  
+
   // set socket colors
     std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, seed);
     if (!socketcolors.empty())
