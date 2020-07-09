@@ -1293,7 +1293,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     {
         for (int32 i = 0; i < socketCount; ++i)
         {
-            if (output->Socket[i].Color != 0)
+            if (output->Socket[i].Color != 0 && !reRoll)
                 continue;
 
             float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
