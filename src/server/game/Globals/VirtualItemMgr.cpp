@@ -591,14 +591,16 @@ void VirtualItemMgr::LoadSpellsFromDB()
         int32 subClass = fields[3].GetInt32();
         int32 inventoryType = fields[4].GetInt32();
         int8 statGroup = fields[5].GetInt8();
-        uint32 SpellTrigger = fields[6].GetUInt32();
-        int32  SpellCharges = fields[7].GetInt32();
-        float  SpellPPMRate = fields[8].GetFloat();
-        int32  SpellCooldown = fields[9].GetInt32();
-        uint32 SpellCategory = fields[10].GetUInt32();
-        int32  SpellCategoryCooldown = fields[11].GetInt32();
+        int8 minItemLevel = fields[6].GetInt32();
+        int8 maxItemLevel = fields[7].GetInt32();
+        uint32 SpellTrigger = fields[8].GetUInt32();
+        int32  SpellCharges = fields[9].GetInt32();
+        float  SpellPPMRate = fields[10].GetFloat();
+        int32  SpellCooldown = fields[11].GetInt32();
+        uint32 SpellCategory = fields[12].GetUInt32();
+        int32  SpellCategoryCooldown = fields[13].GetInt32();
 
-        availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, statGroup, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
+        availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
         ++count;
     } while (result->NextRow());
 
@@ -618,6 +620,11 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, cha
             IFSKIP(someSpells.subClass, item->SubClass);
             IFSKIP(someSpells.inventoryType, item->InventoryType);
             IFSKIP(someSpells.statGroup, item->statGroup);
+            if (someSpells.maxItemLevel != -1 && item->ItemLevel > someSpells.maxItemLevel)
+                continue;
+            if (someSpells.minItemLevel != -1 && item->ItemLevel < someSpells.minItemLevel)
+                continue;
+
             spells.push_back(someSpells);
         }
         if (spells.empty())
