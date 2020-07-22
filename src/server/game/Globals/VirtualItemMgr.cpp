@@ -1229,7 +1229,7 @@ VirtualModifier::StatGroupData::StatGroupData()
 std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupStats(StatGroup group, char* seed) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, seed));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_stats[group];
