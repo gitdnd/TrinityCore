@@ -471,7 +471,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " of " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
                 break;
             }
             case ITEM_QUALITY_EPIC:
@@ -1229,7 +1229,7 @@ VirtualModifier::StatGroupData::StatGroupData()
 std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupStats(StatGroup group, char* seed) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, seed));
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_stats[group];
