@@ -400,7 +400,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
         }
         case ITEM_QUALITY_RARE:
         {
-            ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
+            ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
             break;
         }
         case ITEM_QUALITY_EPIC:
@@ -471,7 +471,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " of " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
                 break;
             }
             case ITEM_QUALITY_EPIC:
