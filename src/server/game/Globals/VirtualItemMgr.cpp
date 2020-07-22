@@ -849,7 +849,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             statgroupid = statgroups[urand(0, statgroups.size() - 1, seed)];
     }
     if (statgroupid == STAT_GROUP_RANDOM)
-        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
+        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, seed));
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
     std::vector<ItemModType> const& statgroup = modifier.premadeStatGroupData.GetStatGroupStats(statgroupid, seed);
 
