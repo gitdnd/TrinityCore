@@ -54,9 +54,8 @@ uint32 urand(uint32 min, uint32 max)
 uint32 urand(uint32 min, uint32 max, char* seed)
 {
     ASSERT(max >= min);
-    std::default_random_engine generator(seed);
     std::uniform_int_distribution<uint32> uid(min, max);
-    return uid(generator);
+    return uid(engine);
 }
 
 uint32 urandms(uint32 min, uint32 max)
