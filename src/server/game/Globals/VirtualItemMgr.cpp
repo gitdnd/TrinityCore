@@ -1323,38 +1323,47 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
 void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed)
 {
+    bool isTrinket = output->Class = ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     //@todo Finalize these numbers, add more then 1 spell to generate.
-    uint8 numSpellsToGenerate = 0;
-
-    bool isTrinket = output->InventoryType == INVTYPE_TRINKET;
+    uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
     switch (output->Quality)
     {
-    case ITEM_QUALITY_UNCOMMON:
+        case ITEM_QUALITY_UNCOMMON:
         {
             float chance = isTrinket ? 60.f : 10.f;
             if (roll_chance_f(chance))
-                numSpellsToGenerate = 1;
-        }break;
-    case ITEM_QUALITY_RARE:
-    {
-        float chance = isTrinket ? 70.f : 15.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate = 1;
-    }break;
-    case ITEM_QUALITY_EPIC:
-    {
-        float chance = isTrinket ? 80.f : 20.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate = 1;
-    }break;
-    case ITEM_QUALITY_LEGENDARY:
-    {
-        float chance = isTrinket ? 90.f : 25.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate = 1;
-    }break;
-    default:
-        break;
+                numSpellsToGenerate += 1;
+            break;
+        }
+        case ITEM_QUALITY_RARE:
+        {
+            float chance = isTrinket ? 70.f : 15.f;
+            if (roll_chance_f(chance))
+                numSpellsToGenerate += 2;
+            else
+                numSpellsToGenerate += 1;
+            break;
+        }
+        case ITEM_QUALITY_EPIC:
+        {
+            float chance = isTrinket ? 80.f : 20.f;
+            if (roll_chance_f(chance))
+                numSpellsToGenerate += 3;
+            else
+                numSpellsToGenerate += 1;
+            break;
+        }
+        case ITEM_QUALITY_LEGENDARY:
+        {
+            float chance = isTrinket ? 90.f : 25.f;
+            if (roll_chance_f(chance))
+                numSpellsToGenerate += 3;
+            else
+                numSpellsToGenerate += 2;
+            break;
+        }
+        default:
+            break;
     }
 
     //Prevent crash incase something goes dumb.
