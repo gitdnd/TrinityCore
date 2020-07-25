@@ -613,7 +613,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, cha
         std::list<itemSpellInfo> spells;
         for (auto someSpells : availableSpells)
         {
-            if (item->Quality <= someSpells.quality)
+            if (item->Quality != someSpells.quality)
                 continue;
 
             IFSKIP(someSpells.itemClass, item->Class);
@@ -1328,7 +1328,9 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
 
-    switch (output->Quality)
+    // FIXME Temporarily disabled so that twinkets always generate a single spell, and the rest are from stat pool
+    // This will need to be refactored to support other items
+    /*switch (output->Quality)
     {
     case ITEM_QUALITY_UNCOMMON:
         {
@@ -1362,7 +1364,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     }break;
     default:
         break;
-    }
+    }*/
 
     //Prevent crash incase something goes dumb.
     if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
