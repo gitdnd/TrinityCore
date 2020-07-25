@@ -758,6 +758,12 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     uint32 statCountMod = urand(0, 2, seed);
     statscount = statscount + statCountMod;
 
+    // No stats on twinkets
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+    {
+        statscount = 0;
+    }
+
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
     // if ilevel is not set, use the players average item level +/- 5 item levels.
