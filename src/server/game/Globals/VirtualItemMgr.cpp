@@ -613,7 +613,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, cha
         std::list<itemSpellInfo> spells;
         for (auto someSpells : availableSpells)
         {
-            if (item->Quality != someSpells.quality)
+            if (item->Quality >= someSpells.quality)
                 continue;
 
             IFSKIP(someSpells.itemClass, item->Class);
