@@ -619,13 +619,13 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, cha
             IFSKIP(someSpells.itemClass, item->Class);
             IFSKIP(someSpells.subClass, item->SubClass);
             IFSKIP(someSpells.inventoryType, item->InventoryType);
-            //FIXME Disabled stat group check
-            //IFSKIP(someSpells.statGroup, item->statGroup);
+            // Don't check stat group when generating trinkets
+            if (item->InventoryType != INVTYPE_TRINKET)
+                IFSKIP(someSpells.statGroup, item->statGroup);
             if (someSpells.maxItemLevel != -1 && item->ItemLevel > someSpells.maxItemLevel)
                 continue;
             if (someSpells.minItemLevel != -1 && item->ItemLevel < someSpells.minItemLevel)
                 continue;
-
             spells.push_back(someSpells);
         }
         if (spells.empty())
@@ -1368,11 +1368,23 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
         numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
 
+    std::vector<uint32_t> spellsToUse;
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
         itemSpellInfo spell = GenerateSpell(output, seed);
         if (spell.spellId == 0)
             continue;
+        // Skip spell if we have already used this one. Try a few times to fetch a unique spell
+        int tries = 0;
+        while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
+        {
+            spell = GenerateSpell(output, seed);
+            ++tries;
+        }
+        // If still a duplicate, skip
+        if (std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
+            continue;
+        spellsToUse.push_back(spell.spellId);
         output->Spells[i].SpellId = spell.spellId;
         output->Spells[i].SpellTrigger = spell.SpellTrigger;
         output->Spells[i].SpellCharges = spell.SpellCharges;
