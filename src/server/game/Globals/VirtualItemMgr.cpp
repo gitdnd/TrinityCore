@@ -619,7 +619,8 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, cha
             IFSKIP(someSpells.itemClass, item->Class);
             IFSKIP(someSpells.subClass, item->SubClass);
             IFSKIP(someSpells.inventoryType, item->InventoryType);
-            IFSKIP(someSpells.statGroup, item->statGroup);
+            //FIXME Disabled stat group check
+            //IFSKIP(someSpells.statGroup, item->statGroup);
             if (someSpells.maxItemLevel != -1 && item->ItemLevel > someSpells.maxItemLevel)
                 continue;
             if (someSpells.minItemLevel != -1 && item->ItemLevel < someSpells.minItemLevel)
