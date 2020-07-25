@@ -1327,7 +1327,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
 
-    bool isTrinket = output->InventoryType == INVTYPE_TRINKET;
     switch (output->Quality)
     {
     case ITEM_QUALITY_UNCOMMON:
