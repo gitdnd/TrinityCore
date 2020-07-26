@@ -656,62 +656,62 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         return nullptr;
 
     // Generate a new virtual item template based on the base items template
-    VirtualItemTemplate* temp = new VirtualItemTemplate(base);
+    VirtualItemTemplate* output = new VirtualItemTemplate(base);
 
     // If no seed supplied, generate a new seed.
     // If seed supplied, skip and assign seed to template.
     if (modifier.seed == 0)
     {
         SFMTRand sfmt;
-        temp->seed = sfmt.RandomUInt32();
+        output->seed = sfmt.RandomUInt32();
     }
     else
-        temp->seed = modifier.seed;
+        output->seed = modifier.seed;
 
     // Generate base stats for the item
-    GenerateStats(temp, modifier);
+    GenerateStats(output, modifier);
 
     // Generate an item name based on type and quality
-    std::string name = GenerateItemName(temp);
+    std::string name = GenerateItemName(output);
     if (!name.empty())
-        temp->Name1 = name;
+        output->Name1 = name;
 
     // Set the correct disenchant ID based on ilevel and quality
-    UpdateDisenchantId(temp);
+    UpdateDisenchantId(output);
 
     // Generate the items sockets based on type and quality
-    GenerateSockets(temp, modifier, false);
+    GenerateSockets(output, modifier, false);
 
     // Add spells to items like trinkets and legendaries(todo)
-    GenerateSpells(temp);
+    GenerateSpells(output);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
-    EntryGenerator* generator = Generator(temp);
+    EntryGenerator* generator = Generator(output);
     if (!generator)
         return nullptr;
     uint32 entry = generator->GenerateEntry(store);
-    temp->ItemId = entry;
+    output->ItemId = entry;
 
     // Select a display ID for the item based on type, special case for trinkets and rings
-    bool isTrinket = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_TRINKET;
-    bool isRing = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(temp);
+    bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
+    bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
+    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
     if (display == 0)
-        temp->UpdateDisplay();
+        output->UpdateDisplay();
     else
-        temp->DisplayInfoID = display; 
+        output->DisplayInfoID = display;
 
     delete store[entry];
-    store[entry] = temp;
+    store[entry] = output;
 
     if(sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
-        temp->InitializeQueryData();
+        output->InitializeQueryData();
 
-    return temp;
+    return output;
 }
 
 void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier) const
