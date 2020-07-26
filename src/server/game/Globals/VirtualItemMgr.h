@@ -228,17 +228,17 @@ public:
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
-    uint32 GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 seed) const;
+    uint32 GenerateItemDisplay(VirtualItemTemplate* item) const;
 
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, uint32 seed);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, uint32 inventoryType, uint32 seed) const;
+    std::string GenerateItemName(VirtualItemTemplate* item) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -248,12 +248,12 @@ public:
     /**
      * Return a vector of available displays for the specified requirements.
      */
-    std::list<uint32> GetDisplaysForDisplayInfo(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
+    std::list<uint32> GetDisplaysForDisplayInfo(VirtualItemTemplate* item, bool qualityOverride = false) const;
 
     /**
      * Return a vector of available spells for the specified requirements.
      */
-    std::list<itemSpellInfo> GetSpells(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
+    //std::list<itemSpellInfo> GetSpells(VirtualItemTemplate* item) const;
 
     /**
      * Creates all used generators and sets their entry ranges in addition to constructing the object itself.
@@ -289,7 +289,7 @@ public:
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
     void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier);
+    void GenerateSpells(VirtualItemTemplate* output);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:

@@ -349,20 +349,20 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
 	return names;
 }
 
-std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint32 inventoryType, uint32 quality, uint32 seed) const
+std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
 {
     std::string fullName = "";
-
+    uint32 seed = output->seed;
 
     // Test armor name generator
-    if (type == ITEM_CLASS_ARMOR)
+    if (output->Class == ITEM_CLASS_ARMOR)
     {
         // Retrieve all the string lists
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
         for (size_t i = 1; i <= 7; ++i)
         {
-            NameInfo nameInfo(type, subclass, inventoryType, i);
+            NameInfo nameInfo(output->Class, output->SubClass, output->InventoryType, i);
             auto list = GetNamesForNameInfo(&nameInfo);
 
             // Make sure the current list is not empty. If it is, fall back to template item name.
@@ -382,50 +382,52 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
 
-        switch (quality)
+        switch (output->Quality)
         {
-        case ITEM_QUALITY_NORMAL:
-        {
-            ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_UNCOMMON:
-        {
-            ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_RARE:
-        {
-            ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_EPIC:
-        {
-            ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_LEGENDARY:
-        {
-            ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
-            break;
-        }
-        default:
-            return fullName;
+            case ITEM_QUALITY_NORMAL:
+            {
+                ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_UNCOMMON:
+            {
+                ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_RARE:
+            {
+                ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_EPIC:
+            {
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_LEGENDARY:
+            {
+                ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
+                break;
+            }
+            default:
+                return fullName;
         }
         fullName = ss.str();
     }
 
-    if (type == ITEM_CLASS_WEAPON)
+    if (output->Class == ITEM_CLASS_WEAPON)
     {
         // Some subclasses use the same database name lists.
         // No need to have duplicate db entries, so switch item subclass.
-        if (subclass == ITEM_SUBCLASS_WEAPON_SWORD2)
+
+        uint32 subclass = output->SubClass;
+        if (output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2)
             subclass = ITEM_SUBCLASS_WEAPON_SWORD;
-        else if (subclass == ITEM_SUBCLASS_WEAPON_MACE2)
+        else if (output->SubClass == ITEM_SUBCLASS_WEAPON_MACE2)
             subclass = ITEM_SUBCLASS_WEAPON_MACE;
-        else if (subclass == ITEM_SUBCLASS_WEAPON_AXE2)
+        else if (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE2)
             subclass = ITEM_SUBCLASS_WEAPON_AXE;
-        else if (subclass == ITEM_SUBCLASS_WEAPON_CROSSBOW)
+        else if (output->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW)
             subclass = ITEM_SUBCLASS_WEAPON_BOW;
 
         // Retrieve all the string lists
@@ -433,7 +435,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
         std::map<uint32, std::vector<std::string>> nameLists;
         for (size_t i = 1; i <= 6; ++i)
         {
-            NameInfo nameInfo(type, subclass, 0, i);
+            NameInfo nameInfo(output->Class, subclass, 0, i);
             auto list = GetNamesForNameInfo(&nameInfo);
 
             // Make sure the current list is not empty. If it is, fall back to template item name.
@@ -453,7 +455,7 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
 
-        switch (quality)
+        switch (output->Quality)
         {
             case ITEM_QUALITY_NORMAL:
             {
@@ -489,21 +491,26 @@ std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint3
     return fullName;
 }
 
-std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const
+std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate* output, bool qualityOverride) const
 {
     std::list<uint32> displays;
+
+    uint32 quality = output->Quality;
+    if (qualityOverride)
+        quality = output->Quality + 1;
+
     for (auto displaysitr : availableDisplays)
     {
         if (quality != displaysitr.quality)
             continue;
 
-        if (inventoryType != displaysitr.iInventoryType)
+        if (output->InventoryType != displaysitr.iInventoryType)
             continue;
 
-        if (_class != displaysitr.iClass)
+        if (output->Class != displaysitr.iClass)
             continue;
 
-        if (subclass != displaysitr.isubClass)
+        if (output->SubClass != displaysitr.isubClass)
             continue;
 
         displays.push_back(displaysitr.displayId);
@@ -511,26 +518,26 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(uint32 quality, uint
     return displays;
 }
 
-uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 seed) const
+uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output) const
 {
     std::list<uint32> displayLists;
-    displayLists = GetDisplaysForDisplayInfo(quality, _class, subclass, inventoryType);
+    displayLists = GetDisplaysForDisplayInfo(output);
     // Attempt to find display at a quality up if none found
     if (displayLists.empty())
     {
-        displayLists = GetDisplaysForDisplayInfo(quality + 1, _class, subclass, inventoryType);
+        displayLists = GetDisplaysForDisplayInfo(output, true);
     }
     // If still empty, output an error
     if (displayLists.empty())
     {
         std::ostringstream stream;
-        stream << "ERROR: Found no display id for item quality [" << quality << "] class [";
-        stream << _class << "] subclass [" << subclass << "] inventoryType [" << inventoryType << "]";
+        stream << "ERROR: Found no display id for item quality [" << output->Quality << "] class [";
+        stream << output->Class << "] subclass [" << output->SubClass << "] inventoryType [" << output->InventoryType << "]";
         sWorld->SendGlobalText(stream.str().c_str(), nullptr);
         return 0;
     }
     auto display = std::begin(displayLists);
-    std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, seed));
+    std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, output->seed));
     return *display;
 }
 
@@ -603,31 +610,31 @@ void VirtualItemMgr::LoadSpellsFromDB()
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, uint32 seed)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output)
 {
 #define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
         std::list<itemSpellInfo> spells;
         for (auto someSpells : availableSpells)
         {
-            if (item->Quality != someSpells.quality)
+            if (output->Quality != someSpells.quality)
                 continue;
 
-            IFSKIP(someSpells.itemClass, item->Class);
-            IFSKIP(someSpells.subClass, item->SubClass);
-            IFSKIP(someSpells.inventoryType, item->InventoryType);
+            IFSKIP(someSpells.itemClass, output->Class);
+            IFSKIP(someSpells.subClass, output->SubClass);
+            IFSKIP(someSpells.inventoryType, output->InventoryType);
             // Don't check stat group when generating trinkets
-            if (item->InventoryType != INVTYPE_TRINKET)
-                IFSKIP(someSpells.statGroup, item->statGroup);
-            if (someSpells.maxItemLevel != -1 && item->ItemLevel > someSpells.maxItemLevel)
+            if (output->InventoryType != INVTYPE_TRINKET)
+                IFSKIP(someSpells.statGroup, output->statGroup);
+            if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
                 continue;
-            if (someSpells.minItemLevel != -1 && item->ItemLevel < someSpells.minItemLevel)
+            if (someSpells.minItemLevel != -1 && output->ItemLevel < someSpells.minItemLevel)
                 continue;
             spells.push_back(someSpells);
         }
         if (spells.empty())
             return itemSpellInfo();
         auto selectedSpell = std::begin(spells);
-        std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, seed));
+        std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, output->seed));
 #undef IFSKIP
         return *selectedSpell;
 }
@@ -648,33 +655,48 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     if (!base)
         return nullptr;
 
+    // Generate a new virtual item template based on the base items template
+    VirtualItemTemplate* temp = new VirtualItemTemplate(base);
+
     // If no seed supplied, generate a new seed.
+    // If seed supplied, skip and assign seed to template.
     if (modifier.seed == 0)
     {
         SFMTRand sfmt;
-        modifier.seed = sfmt.RandomUInt32();
+        temp->seed = sfmt.RandomUInt32();
     }
+    else
+        temp->seed = modifier.seed;
 
-    VirtualItemTemplate* temp = new VirtualItemTemplate(base);
+    // Generate base stats for the item
     GenerateStats(temp, modifier);
-    std::string name = GenerateItemName(temp->Class, temp->SubClass, temp->InventoryType, temp->Quality, modifier.seed);
+
+    // Generate an item name based on type and quality
+    std::string name = GenerateItemName(temp);
     if (!name.empty())
         temp->Name1 = name;
+
+    // Set the correct disenchant ID based on ilevel and quality
     UpdateDisenchantId(temp);
+
+    // Generate the items sockets based on type and quality
     GenerateSockets(temp, modifier, false);
-    GenerateSpells(temp, modifier);
+
+    // Add spells to items like trinkets and legendaries(todo)
+    GenerateSpells(temp);
+
+    // Generate an entry based on item type
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);
     if (!generator)
         return nullptr;
-
     uint32 entry = generator->GenerateEntry(store);
-    temp->seed = modifier.seed;
     temp->ItemId = entry;
 
+    // Select a display ID for the item based on type, special case for trinkets and rings
     bool isTrinket = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_TRINKET;
     bool isRing = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, modifier.seed);
+    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(temp);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -696,8 +718,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 {
     // decide quality
     uint32 quality = output->Quality;
-
-    uint32 seed = modifier.seed;
+    uint32 seed = output->seed;
 
     if (modifier.quality < MAX_ITEM_QUALITY)
         quality = modifier.quality;
@@ -1293,16 +1314,16 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 {
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
-    uint32 seed = modifier.seed;
+
     switch (output->Quality) {
     case ITEM_QUALITY_LEGENDARY:
-        socketCount = urand(2, 3, seed);
+        socketCount = urand(2, 3, output->seed);
         break;
     case ITEM_QUALITY_EPIC:
         socketCount = 2;
         break;
     case ITEM_QUALITY_RARE:
-        socketCount = urand(1, 2, seed);
+        socketCount = urand(1, 2, output->seed);
         break;
     default:
         socketCount = 1;
@@ -1336,7 +1357,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
   // set socket colors
-    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, seed);
+    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, output->seed);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
@@ -1351,14 +1372,13 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
                 continue;
             }*/
 
-            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, seed)];
+            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, output->seed)];
         }
     }
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output)
 {
-    uint32 seed = modifier.seed;
     //@todo Finalize these numbers, add more then 1 spell to generate.
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
@@ -1408,14 +1428,14 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     std::vector<uint32_t> spellsToUse;
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
-        itemSpellInfo spell = GenerateSpell(output, seed);
+        itemSpellInfo spell = GenerateSpell(output);
         if (spell.spellId == 0)
             continue;
         // Skip spell if we have already used this one. Try a few times to fetch a unique spell
         int tries = 0;
         while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
         {
-            spell = GenerateSpell(output, seed);
+            spell = GenerateSpell(output);
             ++tries;
         }
         // If still a duplicate, skip
