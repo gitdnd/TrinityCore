@@ -101,17 +101,17 @@ float VirtualModifier::GetSlotStatModifier(InventoryType invtype)
         case INVTYPE_TRINKET:
         case INVTYPE_HOLDABLE:
         case INVTYPE_SHIELD:
-            return 9.0f / 16.0f;
+            return 0.56f;
 
         case INVTYPE_WEAPON:
         case INVTYPE_WEAPONMAINHAND:
         case INVTYPE_WEAPONOFFHAND:
-            return 27.0f / 64.0f;
+            return 0.42f;
 
         case INVTYPE_RANGED:
         case INVTYPE_RANGEDRIGHT:
         case INVTYPE_THROWN:
-            return 81.0f / 256.0f;
+            return 0.31f;
 
         default:
             return 1.0f;
@@ -668,7 +668,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     else
         output->seed = modifier.seed;
 
-    // Generate base stats for the item
+    // Generate base stats for the item.
+    // Important that this is the first part to be generated after tempalte creation,
+    // as some of the next function calls require information set in this function ie. quality, ilevel etc.
     GenerateStats(output, modifier);
 
     // Generate an item name based on type and quality
