@@ -27,6 +27,14 @@ enum StatGroup
     STAT_GROUP_RANDOM = STAT_GROUP_COUNT,
 };
 
+enum StatGroupType
+{
+    STAT_GROUP_TYPE_PRIMARY,
+    STAT_GROUP_TYPE_SECONDARY,
+    STAT_GROUP_TYPE_GEMS,
+    STAT_GROUP_TYPE_COUNT
+};
+
 struct VirtualItemTemplate : ItemTemplate
 {
     VirtualItemTemplate(ItemTemplate const* base) : ItemTemplate(*base), base_entry(base->ItemId)
@@ -96,7 +104,9 @@ struct VirtualModifier
          * Returns the stat groups for the given armor subclass.
          */
         std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
+
     private:
+
         std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
         std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
         std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
@@ -180,6 +190,23 @@ public:
      */
     static VirtualItemMgr& instance();
 
+    /**
+     * Not thread safe.
+     * Loads all possible stat group entries from the stat group table into memory.
+     */
+    void LoadStatGroupInfoFromDB();
+
+    struct StatGroupInfo
+    {
+        StatGroupInfo() {}
+        StatGroupInfo(int32 group, int32 type, int32 stat) : statGroup(group), statType(type), statId(stat) {}
+        StatGroupInfo(int32 group, int32 type, int32 stat, std::string n) : statGroup(group), statType(type), statId(stat), comment(n) {}
+        int32 statGroup;
+        int32 statType;
+        int32 statId;
+        std::string comment;
+    };
+
 	/**
 	 * Not thread safe.
 	 * Loads all possible names from the generator table into memory.
@@ -222,8 +249,6 @@ public:
       */
 
     void LoadSpellsFromDB();
-
-
 
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
@@ -335,6 +360,7 @@ private:
     std::unordered_map<ItemSubclassWeapon, EntryGenerator> weaponGenerator;
     std::vector<uint32> freed_entries;
 
+    std::vector<StatGroupInfo> stat_group_info;
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
     std::vector<itemSpellInfo> availableSpells;
