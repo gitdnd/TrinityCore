@@ -77,9 +77,15 @@ struct VirtualModifier
         StatGroupData();
 
         /**
-         * Returns the stats for the given stat group.
+         * Returns the primary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupStats(StatGroup group, char* seed) const;
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, char* seed) const;
+
+        /**
+         * Returns the secondary stats for the given stat group.
+         */
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, char* seed) const;
+
 
         /**
          * Returns the sockets for the given stat group.
@@ -91,7 +97,8 @@ struct VirtualModifier
          */
         std::vector<StatGroup> const& GetArmorSubclassStatGroups(ItemSubclassArmor subclass) const;
     private:
-        std::vector<ItemModType> stat_group_stats[STAT_GROUP_COUNT];
+        std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
+        std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
         std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
         std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
     };

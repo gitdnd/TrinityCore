@@ -98,6 +98,7 @@ float VirtualModifier::GetSlotStatModifier(InventoryType invtype)
         case INVTYPE_NECK:
         case INVTYPE_CLOAK:
         case INVTYPE_FINGER:
+        case INVTYPE_TRINKET:
         case INVTYPE_HOLDABLE:
         case INVTYPE_SHIELD:
             return 9.0f / 16.0f;
@@ -759,10 +760,10 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     uint32 statCountMod = urand(0, 2, seed);
     statscount = statscount + statCountMod;
 
-    // No stats on twinkets
+    // Only a single stat on trinkets
     if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
     {
-        statscount = 0;
+        statscount = 1;
     }
 
     // decide itemlevel
@@ -858,15 +859,23 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     if (statgroupid == STAT_GROUP_RANDOM)
         statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, seed));
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
-    std::vector<ItemModType> const& statgroup = modifier.premadeStatGroupData.GetStatGroupStats(statgroupid, seed);
+    std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, seed);
+    std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, seed);
 
     std::vector<ItemModType> selectedStats;
     std::vector<int16> distributedPool;
-    if (statscount && !statgroup.empty())
+    if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
     {
         // select stats from preselected stat group
         for (uint32 i = 0; i < statscount; ++i)
-            selectedStats.push_back(statgroup[urand(0, statgroup.size() - 1, seed)]);
+        {
+            // make sure primary stats are always selected before secondary stats
+            // trinkets should also only have secondary stats, not primary
+            if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
+                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, seed)]);
+            else
+                selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, seed)]);
+        };
 
         // distribute pool to stats
         const float mineachpct = 0.5f / selectedStats.size();
@@ -1079,27 +1088,44 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 
 VirtualModifier::StatGroupData::StatGroupData()
 {
-    stat_group_stats[STAT_GROUP_HEALING] = {
+    // Healing Data
+    stat_group_primary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_INTELLECT,
-        ITEM_MOD_SPIRIT,
+        ITEM_MOD_SPIRIT
+    };
+    stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_SPELL_RATING,
         ITEM_MOD_CRIT_SPELL_RATING,
         ITEM_MOD_MANA_REGENERATION,
         ITEM_MOD_SPELL_POWER
     };
-    stat_group_stats[STAT_GROUP_INT_DPS] = {
+    stat_group_sockets[STAT_GROUP_HEALING] = {
+        SOCKET_COLOR_BLUE
+    };
+
+    // Int DPS Data
+    stat_group_primary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_INTELLECT,
+        ITEM_MOD_INTELLECT
+    };
+    stat_group_secondary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_HIT_SPELL_RATING,
         ITEM_MOD_HASTE_SPELL_RATING,
         ITEM_MOD_CRIT_SPELL_RATING,
         ITEM_MOD_SPELL_POWER,
         ITEM_MOD_SPELL_PENETRATION
     };
-    stat_group_stats[STAT_GROUP_STR_DPS] = {
+    stat_group_sockets[STAT_GROUP_INT_DPS] = {
+        SOCKET_COLOR_BLUE
+    };
+
+    // Str DPS Data
+    stat_group_primary_stats[STAT_GROUP_STR_DPS] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_STRENGTH,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_STR_DPS] = {
         ITEM_MOD_HIT_MELEE_RATING,
         ITEM_MOD_CRIT_MELEE_RATING,
         ITEM_MOD_HASTE_MELEE_RATING,
@@ -1107,17 +1133,31 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
-    stat_group_stats[STAT_GROUP_STR_TANK] = {
+    stat_group_sockets[STAT_GROUP_STR_DPS] = {
+        SOCKET_COLOR_RED
+    };
+
+    // Str Tank Data
+    stat_group_primary_stats[STAT_GROUP_STR_TANK] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_STRENGTH,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_STR_TANK] = {
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
         ITEM_MOD_HIT_RATING
     };
-    stat_group_stats[STAT_GROUP_AGI_DPS] = {
+    stat_group_sockets[STAT_GROUP_STR_TANK] = {
+        SOCKET_COLOR_RED
+    };
+
+    // Agi Melee DPS Data
+    stat_group_primary_stats[STAT_GROUP_AGI_DPS] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY,
+        ITEM_MOD_AGILITY
+    };
+    stat_group_secondary_stats[STAT_GROUP_AGI_DPS] = {
         ITEM_MOD_HIT_MELEE_RATING,
         ITEM_MOD_CRIT_MELEE_RATING,
         ITEM_MOD_HASTE_MELEE_RATING,
@@ -1125,17 +1165,32 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
-    stat_group_stats[STAT_GROUP_AGI_TANK] = {
+    stat_group_sockets[STAT_GROUP_AGI_DPS] = {
+        SOCKET_COLOR_YELLOW
+    };
+
+    // Agi Tank Data
+    stat_group_primary_stats[STAT_GROUP_AGI_TANK] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY,
+        ITEM_MOD_AGILITY
+    };
+    stat_group_secondary_stats[STAT_GROUP_AGI_TANK] = {
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
         ITEM_MOD_HIT_RATING
     };
-    stat_group_stats[STAT_GROUP_AGI_RANGED] = {
+    stat_group_sockets[STAT_GROUP_AGI_TANK] = {
+        SOCKET_COLOR_YELLOW,
+        SOCKET_COLOR_RED
+    };
+
+    // Agi Ranged DPS Data
+    stat_group_primary_stats[STAT_GROUP_AGI_RANGED] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY,
+        ITEM_MOD_AGILITY
+    };
+    stat_group_secondary_stats[STAT_GROUP_AGI_RANGED] = {
         ITEM_MOD_HIT_RANGED_RATING,
         ITEM_MOD_CRIT_RANGED_RATING,
         ITEM_MOD_HASTE_RANGED_RATING,
@@ -1143,12 +1198,19 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_RANGED_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
+    stat_group_sockets[STAT_GROUP_AGI_RANGED] = {
+        SOCKET_COLOR_YELLOW
+    };
 
-    stat_group_stats[STAT_GROUP_ALL] = {
+    // Stat group for all stats
+    stat_group_primary_stats[STAT_GROUP_ALL] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_AGILITY,
         ITEM_MOD_INTELLECT,
         ITEM_MOD_SPIRIT,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_ALL] = {
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
@@ -1166,36 +1228,6 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_RANGED_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
-
-    // socket groups
-    stat_group_sockets[STAT_GROUP_HEALING] = {
-        SOCKET_COLOR_BLUE
-    };
-
-    stat_group_sockets[STAT_GROUP_INT_DPS] = {
-        SOCKET_COLOR_BLUE
-    };
-
-    stat_group_sockets[STAT_GROUP_STR_DPS] = {
-        SOCKET_COLOR_RED
-    };
-
-    stat_group_sockets[STAT_GROUP_STR_TANK] = {
-        SOCKET_COLOR_RED
-    };
-
-    stat_group_sockets[STAT_GROUP_AGI_DPS] = {
-        SOCKET_COLOR_YELLOW
-    };
-
-    stat_group_sockets[STAT_GROUP_AGI_TANK] = {
-        SOCKET_COLOR_YELLOW
-    };
-
-    stat_group_sockets[STAT_GROUP_AGI_RANGED] = {
-        SOCKET_COLOR_YELLOW
-    };
-
     stat_group_sockets[STAT_GROUP_ALL] = {
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_RED,
@@ -1233,13 +1265,22 @@ VirtualModifier::StatGroupData::StatGroupData()
 
 }
 
-std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupStats(StatGroup group, char* seed) const
+std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, char* seed) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
     ASSERT(group < STAT_GROUP_COUNT);
 
-    return stat_group_stats[group];
+    return stat_group_primary_stats[group];
+}
+
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, char* seed) const
+{
+    if (group == STAT_GROUP_RANDOM)
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
+    ASSERT(group < STAT_GROUP_COUNT);
+
+    return stat_group_secondary_stats[group];
 }
 
 std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, char* seed) const
