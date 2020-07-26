@@ -95,7 +95,7 @@ struct VirtualModifier
         /**
          * Returns the stat groups for the given armor subclass.
          */
-        std::vector<StatGroup> const& GetArmorSubclassStatGroups(ItemSubclassArmor subclass) const;
+        std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
     private:
         std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
         std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
@@ -113,13 +113,13 @@ struct VirtualModifier
      * Fetches the rate (point*rate = stat_amount) for the given item equip type.
      * Returns the stat rate.
      */
-    static float GetSlotStatModifier(InventoryType invtype);
+    static float GetSlotStatModifier(VirtualItemTemplate* item);
 
     /**
      * Fetches the armor modifier for the subclass and inventory type combination.
      * Returns the armor modifier.
      */
-    static float GetTypeSlotArmorModifier(ItemSubclassArmor subclass, InventoryType invtype);
+    static float GetTypeSlotArmorModifier(VirtualItemTemplate* item);
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given stat type.
