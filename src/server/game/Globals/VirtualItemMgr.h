@@ -79,18 +79,18 @@ struct VirtualModifier
         /**
          * Returns the primary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, char* seed) const;
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, uint32 seed) const;
 
         /**
          * Returns the secondary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, char* seed) const;
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, uint32 seed) const;
 
 
         /**
          * Returns the sockets for the given stat group.
          */
-        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, char* seed) const;
+        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, uint32 seed) const;
 
         /**
          * Returns the stat groups for the given armor subclass.
@@ -186,9 +186,6 @@ public:
 	 */
 	void LoadNamesFromDB();
 
-    // Convert seed from uint32 to char* for urand.
-    char* ConvertSeed(uint32 seed) const;
-
 	struct NameInfo
 	{
 		NameInfo() {}
@@ -231,17 +228,17 @@ public:
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
-    uint32 GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const;
+    uint32 GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 seed) const;
 
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, char* seed);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, uint32 seed);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, uint32 inventoryType, char* seed) const;
+    std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, uint32 inventoryType, uint32 seed) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -291,8 +288,8 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll, char* seed);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
+    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll);
+    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:

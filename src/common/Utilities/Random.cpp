@@ -51,11 +51,13 @@ uint32 urand(uint32 min, uint32 max)
     return uid(engine);
 }
 
-uint32 urand(uint32 min, uint32 max, char* seed)
+uint32 urand(uint32 min, uint32 max, uint32 seed)
 {
     ASSERT(max >= min);
-    std::uniform_int_distribution<uint32> uid(min, max);
-    return uid(engine);
+
+    srand(seed);
+
+    return rand() % max + min;
 }
 
 uint32 urandms(uint32 min, uint32 max)

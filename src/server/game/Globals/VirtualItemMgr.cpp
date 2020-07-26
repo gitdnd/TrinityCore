@@ -294,11 +294,6 @@ VirtualItemMgr::~VirtualItemMgr()
     store.clear();
 }
 
-char* VirtualItemMgr::ConvertSeed(uint32 seed) const
-{
-    return const_cast<char*>(std::to_string(seed).c_str());
-}
-
 void VirtualItemMgr::LoadNamesFromDB()
 {
 	WriteGuard guard(lock);
@@ -354,7 +349,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
 	return names;
 }
 
-std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint32 inventoryType, uint32 quality, char* seed) const
+std::string VirtualItemMgr::GenerateItemName(uint32 type, uint32 subclass, uint32 inventoryType, uint32 quality, uint32 seed) const
 {
     std::string fullName = "";
 
@@ -516,7 +511,7 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(uint32 quality, uint
     return displays;
 }
 
-uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const
+uint32 VirtualItemMgr::GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 seed) const
 {
     std::list<uint32> displayLists;
     displayLists = GetDisplaysForDisplayInfo(quality, _class, subclass, inventoryType);
@@ -608,7 +603,7 @@ void VirtualItemMgr::LoadSpellsFromDB()
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, char* seed)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* const item, uint32 seed)
 {
 #define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
         std::list<itemSpellInfo> spells;
@@ -660,16 +655,14 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         modifier.seed = sfmt.RandomUInt32();
     }
 
-    char* seed = ConvertSeed(modifier.seed);
-
     VirtualItemTemplate* temp = new VirtualItemTemplate(base);
     GenerateStats(temp, modifier);
-    std::string name = GenerateItemName(temp->Class, temp->SubClass, temp->InventoryType, temp->Quality, seed);
+    std::string name = GenerateItemName(temp->Class, temp->SubClass, temp->InventoryType, temp->Quality, modifier.seed);
     if (!name.empty())
         temp->Name1 = name;
     UpdateDisenchantId(temp);
-    GenerateSockets(temp, modifier, false, seed);
-    GenerateSpells(temp, modifier, seed);
+    GenerateSockets(temp, modifier, false);
+    GenerateSpells(temp, modifier);
     WriteGuard guard(lock);
     EntryGenerator* generator = Generator(temp);
     if (!generator)
@@ -679,9 +672,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     temp->seed = modifier.seed;
     temp->ItemId = entry;
 
-    bool isTwinket = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_TRINKET;
+    bool isTrinket = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_TRINKET;
     bool isRing = temp->Class == ITEM_CLASS_ARMOR && temp->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTwinket || isRing ? 0 : GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, seed);
+    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(temp->Quality, temp->Class, temp->SubClass, temp->InventoryType, modifier.seed);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -704,7 +697,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     // decide quality
     uint32 quality = output->Quality;
 
-    char* seed = ConvertSeed(modifier.seed);
+    uint32 seed = modifier.seed;
 
     if (modifier.quality < MAX_ITEM_QUALITY)
         quality = modifier.quality;
@@ -849,8 +842,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 
     // select stat group
     StatGroup statgroupid = modifier.statgroup;
-    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR && output->InventoryType != INVTYPE_CLOAK && output->InventoryType != INVTYPE_RELIC
-        && output->InventoryType != INVTYPE_QUIVER && output->InventoryType != INVTYPE_FINGER)
+    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
     {
         std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups((ItemSubclassArmor)output->SubClass);
         if (!statgroups.empty())
@@ -1265,7 +1257,7 @@ VirtualModifier::StatGroupData::StatGroupData()
 
 }
 
-std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, char* seed) const
+std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, uint32 seed) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
@@ -1274,7 +1266,7 @@ std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPri
     return stat_group_primary_stats[group];
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, char* seed) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, uint32 seed) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
@@ -1283,7 +1275,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSeco
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, char* seed) const
+std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, uint32 seed) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
@@ -1297,10 +1289,11 @@ std::vector<StatGroup> const & VirtualModifier::StatGroupData::GetArmorSubclassS
     return armor_type_stat_groups[subclass];
 }
 
-void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll, char* seed)
+void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
 {
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
+    uint32 seed = modifier.seed;
     switch (output->Quality) {
     case ITEM_QUALITY_LEGENDARY:
         socketCount = urand(2, 3, seed);
@@ -1363,8 +1356,9 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier)
 {
+    uint32 seed = modifier.seed;
     //@todo Finalize these numbers, add more then 1 spell to generate.
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
