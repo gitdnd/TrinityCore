@@ -32,6 +32,7 @@
 #include <memory>
 #include <queue>
 #include <unordered_set>
+#include "VirtualItemMgr.h"
 
 struct AccessRequirement;
 struct AchievementEntry;
