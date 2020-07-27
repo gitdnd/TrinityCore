@@ -56,7 +56,7 @@ uint32 urand(uint32 min, uint32 max, uint32 seed)
     assert(max >= min);
     thread_local std::mt19937 generator;
     generator.seed(seed);
-    std::uniform_int_distribution<std::uint32_t> uid(min, max);
+    std::uniform_int_distribution<uint32> uid(min, max);
     return uid(generator);
 }
 
