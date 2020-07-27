@@ -546,7 +546,6 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
     std::string fullName = "";
     uint32 seed = output->seed;
 
-    // Test armor name generator
     if (output->Class == ITEM_CLASS_ARMOR)
     {
         // Retrieve all the string lists
@@ -574,35 +573,73 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
 
-        switch (output->Quality)
+
+        // Shields have their names generated like weapons.
+        if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
         {
-        case ITEM_QUALITY_NORMAL:
-        {
-            ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-            break;
+            switch (output->Quality)
+            {
+            case ITEM_QUALITY_NORMAL:
+            {
+                ss << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_UNCOMMON:
+            {
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_RARE:
+            {
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_EPIC:
+            {
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_LEGENDARY:
+            {
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
+                break;
+            }
+            default:
+                return fullName;
+            }
         }
-        case ITEM_QUALITY_UNCOMMON:
+        else
         {
-            ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_RARE:
-        {
-            ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_EPIC:
-        {
-            ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_LEGENDARY:
-        {
-            ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
-            break;
-        }
-        default:
-            return fullName;
+            switch (output->Quality)
+            {
+                case ITEM_QUALITY_NORMAL:
+                {
+                    ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                    break;
+                }
+                case ITEM_QUALITY_UNCOMMON:
+                {
+                    ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                    break;
+                }
+                case ITEM_QUALITY_RARE:
+                {
+                    ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
+                    break;
+                }
+                case ITEM_QUALITY_EPIC:
+                {
+                    ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                    break;
+                }
+                case ITEM_QUALITY_LEGENDARY:
+                {
+                    ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
+                    break;
+                }
+                default:
+                    return fullName;
+            }
         }
         fullName = ss.str();
     }
@@ -649,33 +686,33 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
 
         switch (output->Quality)
         {
-        case ITEM_QUALITY_NORMAL:
-        {
-            ss << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_UNCOMMON:
-        {
-            ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_RARE:
-        {
-            ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_EPIC:
-        {
-            ss << nameLists[1][urand(0, nameLists[1].size() - 1, seed)];
-            break;
-        }
-        case ITEM_QUALITY_LEGENDARY:
-        {
-            ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
-            break;
-        }
-        default:
-            return fullName;
+            case ITEM_QUALITY_NORMAL:
+            {
+                ss << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_UNCOMMON:
+            {
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_RARE:
+            {
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_EPIC:
+            {
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, seed)];
+                break;
+            }
+            case ITEM_QUALITY_LEGENDARY:
+            {
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
+                break;
+            }
+            default:
+                return fullName;
         }
         fullName = ss.str();
     }
