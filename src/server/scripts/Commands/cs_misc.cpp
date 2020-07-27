@@ -1300,7 +1300,26 @@ public:
             return false;
         }
 
-        Item* item = playerTarget->StoreNewItem(dest, itemId, true, GenerateItemRandomPropertyId(itemId));
+        VirtualModifier modifier;
+
+        //item id, seed, ilevel, quality
+        char const* seedStr = strtok(nullptr, " ");
+        if (seedStr)
+        {
+            modifier.seed = atoi(seedStr);
+            char const* ilevelStr = strtok(nullptr, " ");
+            if (ilevelStr)
+            {
+                modifier.ilevel = atoi(seedStr);
+                char const* qualityStr = strtok(nullptr, " ");
+                if (qualityStr)
+                {
+                    modifier.quality = atoi(qualityStr);
+                }
+            }
+        }
+
+        Item* item = playerTarget->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
 
         // remove binding (let GM give it to another player later)
         if (player == playerTarget)

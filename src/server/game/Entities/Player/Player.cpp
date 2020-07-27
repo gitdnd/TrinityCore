@@ -11984,12 +11984,17 @@ void Player::RemoveAmmo()
 // Return stored item (if stored to stack, it can diff. from pItem). And pItem ca be deleted in this case.
 Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, GuidSet const& allowedLooters, bool isCrafted)
 {
+    VirtualModifier modifier = VirtualModifier();
+    modifier.isCrafted = isCrafted;
+    return StoreNewItem3(dest, item, update, randomPropertyId, allowedLooters, modifier);
+}
+
+Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, GuidSet const& allowedLooters, VirtualModifier modifier)
+{
     uint32 count = 0;
     for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
         count += itr->count;
 
-    VirtualModifier modifier = VirtualModifier();
-    modifier.isCrafted = isCrafted;
     Item* pItem = Item::CreateItem(item, count, this, modifier);
     if (pItem)
     {
