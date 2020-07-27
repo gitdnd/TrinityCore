@@ -646,25 +646,12 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
 
     if (output->Class == ITEM_CLASS_WEAPON)
     {
-        // Some subclasses use the same database name lists.
-        // No need to have duplicate db entries, so switch item subclass.
-
-        uint32 subclass = output->SubClass;
-        if (output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2)
-            subclass = ITEM_SUBCLASS_WEAPON_SWORD;
-        else if (output->SubClass == ITEM_SUBCLASS_WEAPON_MACE2)
-            subclass = ITEM_SUBCLASS_WEAPON_MACE;
-        else if (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE2)
-            subclass = ITEM_SUBCLASS_WEAPON_AXE;
-        else if (output->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW)
-            subclass = ITEM_SUBCLASS_WEAPON_BOW;
-
         // Retrieve all the string lists
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
         for (size_t i = 1; i <= 6; ++i)
         {
-            NameInfo nameInfo(output->Class, subclass, 0, i);
+            NameInfo nameInfo(output->Class, output->SubClass, 0, i);
             auto list = GetNamesForNameInfo(&nameInfo);
 
             // Make sure the current list is not empty. If it is, fall back to template item name.
