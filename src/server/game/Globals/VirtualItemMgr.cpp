@@ -206,6 +206,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     else
         output->seed = modifier.seed;
 
+    // instantiate RNG
+
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
     // as some of the next function calls require information set in this function ie. quality, ilevel etc.
@@ -424,9 +426,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         {
             // make sure primary stats are always selected before secondary stats
             // trinkets should also only have secondary stats, not primary
-            //if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
-            //    selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, seed)]);
-            //else
+            if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
+                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, seed)]);
+            else
                 selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, seed)]);
         };
 
