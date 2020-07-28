@@ -1,11 +1,14 @@
 #include "Define.h" // uint32 etc types
 #include "ItemTemplate.h" // Item enums
 #include "DBCStores.h" // Needed for item DBC lookup
+#include "SFMTRand.h"
 #include <map>
+#include <random>
 #include <set>
 #include <vector>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/tss.hpp>
 
 #ifndef VIRTUAL_ITEM_MGR_H
 #define VIRTUAL_ITEM_MGR_H
@@ -75,6 +78,7 @@ struct VirtualModifier
     uint32 seed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
+    std::mt19937 generator;
 
     class StatGroupData
     {
@@ -87,18 +91,18 @@ struct VirtualModifier
         /**
          * Returns the primary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, uint32 seed) const;
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, VirtualModifier modifier) const;
 
         /**
          * Returns the secondary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, uint32 seed) const;
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, VirtualModifier modifier) const;
 
 
         /**
          * Returns the sockets for the given stat group.
          */
-        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, uint32 seed) const;
+        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, VirtualModifier modifier) const;
 
         /**
          * Returns the stat groups for the given armor subclass.
@@ -253,17 +257,17 @@ public:
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
-    uint32 GenerateItemDisplay(VirtualItemTemplate* item) const;
+    uint32 GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier) const;
 
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* item);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(VirtualItemTemplate* item) const;
+    std::string GenerateItemName(VirtualItemTemplate* item, VirtualModifier modifier) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -314,7 +318,7 @@ public:
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
     void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll);
-    void GenerateSpells(VirtualItemTemplate* output);
+    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:

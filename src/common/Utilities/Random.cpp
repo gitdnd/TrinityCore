@@ -17,8 +17,6 @@
 
 #include "Random.h"
 #include "Errors.h"
-#include "SFMTRand.h"
-#include <boost/thread/tss.hpp>
 #include <random>
 
 static boost::thread_specific_ptr<SFMTRand> sfmtRand;
@@ -51,14 +49,11 @@ uint32 urand(uint32 min, uint32 max)
     return uid(engine);
 }
 
-uint32 urand(uint32 min, uint32 max, uint32 seed)
+uint32 urand(uint32 min, uint32 max, std::mt19937 generator)
 {
     assert(max >= min);
-    //thread_local std::mt19937 generator;
-    //generator.seed(seed);
     std::uniform_int_distribution<uint32> uid(min, max);
-    //return uid(generator);
-    return uid(engine);
+    return uid(generator);
 }
 
 uint32 urandms(uint32 min, uint32 max)

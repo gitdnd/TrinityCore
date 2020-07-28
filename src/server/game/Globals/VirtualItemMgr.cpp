@@ -207,6 +207,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->seed = modifier.seed;
 
     // instantiate RNG
+    modifier.generator.seed(output->seed);
 
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
@@ -214,7 +215,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateStats(output, modifier);
 
     // Generate an item name based on type and quality
-    std::string name = GenerateItemName(output);
+    std::string name = GenerateItemName(output, modifier);
     if (!name.empty())
         output->Name1 = name;
 
@@ -225,7 +226,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateSockets(output, modifier, false);
 
     // Add spells to items like trinkets and legendaries(todo)
-    GenerateSpells(output);
+    GenerateSpells(output, modifier);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
@@ -238,7 +239,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a display ID for the item based on type, special case for trinkets and rings
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output);
+    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -260,7 +261,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 {
     // decide quality
     uint32 quality = output->Quality;
-    uint32 seed = output->seed;
 
     if (modifier.quality < MAX_ITEM_QUALITY)
         quality = modifier.quality;
@@ -286,7 +286,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 
         if (sum >= 1)
         {
-            uint32 rand = urand(1, sum, seed);
+            uint32 rand = urand(1, sum, modifier.generator);
             sum = 0;
             for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
             {
@@ -313,7 +313,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
 
     // add up to two extra stats per item
-    uint32 statCountMod = urand(0, 2, seed);
+    uint32 statCountMod = urand(0, 2, modifier.generator);
     statscount = statscount + statCountMod;
 
     // Only a single stat on trinkets
@@ -335,11 +335,11 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         if (modifier.plrAvgLvl < 20)
             modifier.plrAvgLvl = 20;
 
-        uint32 lvlMod = urand(0, 5, seed);
+        uint32 lvlMod = urand(0, 5, modifier.generator);
         ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5);
 
         // there's gotta be a better way to do this..
-        uint32 addSub = urand(0, 1, seed);
+        uint32 addSub = urand(0, 1, modifier.generator);
         if (addSub == 0)
             ilevel = ilevel - lvlMod;
         else
@@ -375,7 +375,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         output->Armor = output->Armor * qmulti;
 
         // add a random 10% increase or decrease of stats
-        float randmulti = (urand(90, 110, seed) / 100.0f);
+        float randmulti = (urand(90, 110, modifier.generator) / 100.0f);
         output->Armor = output->Armor * randmulti;
     }
 
@@ -409,13 +409,13 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     {
         std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
         if (!statgroups.empty())
-            statgroupid = statgroups[urand(0, statgroups.size() - 1, seed)];
+            statgroupid = statgroups[urand(0, statgroups.size() - 1, modifier.generator)];
     }
     if (statgroupid == STAT_GROUP_RANDOM)
-        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, seed));
+        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, modifier.generator));
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
-    std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, seed);
-    std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, seed);
+    std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, modifier);
+    std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, modifier);
 
     std::vector<ItemModType> selectedStats;
     std::vector<int16> distributedPool;
@@ -427,9 +427,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             // make sure primary stats are always selected before secondary stats
             // trinkets should also only have secondary stats, not primary
             if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
-                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, seed)]);
+                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, modifier.generator)]);
             else
-                selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, seed)]);
+                selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, modifier.generator)]);
         };
 
         // distribute pool to stats
@@ -445,7 +445,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         std::vector<int16> fences;
         fences.push_back(0);
         for (int32 i = 1; i < int32(selectedStats.size()); ++i)
-            fences.push_back(urand(0, workpool, seed));
+            fences.push_back(urand(0, workpool, modifier.generator));
         fences.push_back(workpool);
         std::sort(fences.begin(), fences.end());
         for (int32 i = 1; i < int32(fences.size()); ++i)
@@ -483,7 +483,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             case ITEM_SUBCLASS_WEAPON_POLEARM:
             case ITEM_SUBCLASS_WEAPON_STAFF:
             {
-                output->Delay = (urand(20, 40, seed) * 100);
+                output->Delay = (urand(20, 40, modifier.generator) * 100);
                 output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
@@ -495,7 +495,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             case ITEM_SUBCLASS_WEAPON_FIST:
             case ITEM_SUBCLASS_WEAPON_DAGGER:
             {
-                output->Delay = (urand(13, 30, seed) * 100);
+                output->Delay = (urand(13, 30, modifier.generator) * 100);
                 output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
@@ -505,7 +505,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             case ITEM_SUBCLASS_WEAPON_GUN:
             case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             {
-                output->Delay = (urand(15, 34, seed) * 100);
+                output->Delay = (urand(15, 34, modifier.generator) * 100);
                 output->Damage[0].DamageMin = ((0.93f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((0.93f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
@@ -513,10 +513,10 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             }
             case ITEM_SUBCLASS_WEAPON_WAND:
             {
-                output->Delay = (urand(12, 20, seed) * 100);
+                output->Delay = (urand(12, 20, modifier.generator) * 100);
                 output->Damage[0].DamageMin = ((1.5f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((1.5f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, seed);
+                output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, modifier.generator);
                 break;
             }
             default:
@@ -543,10 +543,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     output->statGroup = statgroupid;
 }
 
-std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
+std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier) const
 {
     std::string fullName = "";
-    uint32 seed = output->seed;
 
     if (output->Class == ITEM_CLASS_ARMOR)
     {
@@ -583,27 +582,27 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
             {
             case ITEM_QUALITY_NORMAL:
             {
-                ss << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[4][urand(0, nameLists[4].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_UNCOMMON:
             {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_EPIC:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, seed)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, modifier.generator)];
                 break;
             }
             default:
@@ -616,27 +615,27 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
             {
                 case ITEM_QUALITY_NORMAL:
                 {
-                    ss << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                    ss << nameLists[5][urand(0, nameLists[5].size() - 1, modifier.generator)];
                     break;
                 }
                 case ITEM_QUALITY_UNCOMMON:
                 {
-                    ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                    ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, modifier.generator)];
                     break;
                 }
                 case ITEM_QUALITY_RARE:
                 {
-                    ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, seed)];
+                    ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, modifier.generator)];
                     break;
                 }
                 case ITEM_QUALITY_EPIC:
                 {
-                    ss << nameLists[3][urand(0, nameLists[3].size() - 1, seed)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, seed)];
+                    ss << nameLists[3][urand(0, nameLists[3].size() - 1, modifier.generator)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, modifier.generator)];
                     break;
                 }
                 case ITEM_QUALITY_LEGENDARY:
                 {
-                    ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, seed)];
+                    ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, modifier.generator)];
                     break;
                 }
                 default:
@@ -677,27 +676,27 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
         {
             case ITEM_QUALITY_NORMAL:
             {
-                ss << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[4][urand(0, nameLists[4].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_UNCOMMON:
             {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, seed)];
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_EPIC:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, seed)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, modifier.generator)];
                 break;
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, seed)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, modifier.generator)];
                 break;
             }
             default:
@@ -709,7 +708,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output) const
     return fullName;
 }
 
-uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output) const
+uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier) const
 {
     std::list<uint32> displayLists;
     displayLists = GetDisplaysForDisplayInfo(output);
@@ -728,11 +727,11 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output) const
         return 0;
     }
     auto display = std::begin(displayLists);
-    std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, output->seed));
+    std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, modifier.generator));
     return *display;
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier)
 {
 #define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
@@ -756,12 +755,12 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output)
     if (spells.empty())
         return itemSpellInfo();
     auto selectedSpell = std::begin(spells);
-    std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, output->seed));
+    std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, modifier.generator));
 #undef IFSKIP
     return *selectedSpell;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     //@todo Finalize these numbers, add more then 1 spell to generate.
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
@@ -812,14 +811,14 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output)
     std::vector<uint32_t> spellsToUse;
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
-        itemSpellInfo spell = GenerateSpell(output);
+        itemSpellInfo spell = GenerateSpell(output, modifier);
         if (spell.spellId == 0)
             continue;
         // Skip spell if we have already used this one. Try a few times to fetch a unique spell
         int tries = 0;
         while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
         {
-            spell = GenerateSpell(output);
+            spell = GenerateSpell(output, modifier);
             ++tries;
         }
         // If still a duplicate, skip
@@ -843,13 +842,13 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
     switch (output->Quality) {
     case ITEM_QUALITY_LEGENDARY:
-        socketCount = urand(2, 3, output->seed);
+        socketCount = urand(2, 3, modifier.generator);
         break;
     case ITEM_QUALITY_EPIC:
         socketCount = 2;
         break;
     case ITEM_QUALITY_RARE:
-        socketCount = urand(1, 2, output->seed);
+        socketCount = urand(1, 2, modifier.generator);
         break;
     default:
         socketCount = 1;
@@ -883,7 +882,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
     // set socket colors
-    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, output->seed);
+    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, modifier);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
@@ -898,7 +897,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
                 continue;
             }*/
 
-            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, output->seed)];
+            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, modifier.generator)];
         }
     }
 }
@@ -1031,28 +1030,28 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     return names;
 }
 
-std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, uint32 seed) const
+std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, VirtualModifier modifier) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, modifier.generator));
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_primary_stats[group];
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, uint32 seed) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, VirtualModifier modifier) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, modifier.generator));
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, uint32 seed) const
+std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, VirtualModifier modifier) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, seed));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, modifier.generator));
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_sockets[group];
