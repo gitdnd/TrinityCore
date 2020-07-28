@@ -207,7 +207,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->seed = modifier.seed;
 
     // instantiate RNG
-    modifier.generator.seed(output->seed);
+    thread_local std::mt19937 generator;
+    generator.seed(output->seed);
+    modifier.generator = generator;
 
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
@@ -230,10 +232,10 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
-    EntryGenerator* generator = Generator(output);
-    if (!generator)
+    EntryGenerator* entryGenerator = Generator(output);
+    if (!entryGenerator)
         return nullptr;
-    uint32 entry = generator->GenerateEntry(store);
+    uint32 entry = entryGenerator->GenerateEntry(store);
     output->ItemId = entry;
 
     // Select a display ID for the item based on type, special case for trinkets and rings
