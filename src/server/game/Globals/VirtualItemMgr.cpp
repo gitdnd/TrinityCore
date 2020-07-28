@@ -402,9 +402,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         pool = modifier.statpool;
     ASSERT(pool >= 0 && pool < 0x7FFF);
 
-    // debug test
-    pool = 300;
-
     // modify stat pool size depending on item quality
     pool = (pool * quality) / 2;
 
