@@ -424,9 +424,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         {
             // make sure primary stats are always selected before secondary stats
             // trinkets should also only have secondary stats, not primary
-            if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
-                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, seed)]);
-            else
+            //if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
+            //    selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, seed)]);
+            //else
                 selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, seed)]);
         };
 
