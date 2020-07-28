@@ -336,11 +336,12 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         if (modifier.plrAvgLvl < 20)
             modifier.plrAvgLvl = 20;
 
-        uint32 lvlMod = urand(0, 5, generator);
+        // Explicitly not using generator here
+        uint32 lvlMod = urand(0, 5);
         ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5);
 
         // there's gotta be a better way to do this..
-        uint32 addSub = urand(0, 1, generator);
+        uint32 addSub = urand(0, 1);
         if (addSub == 0)
             ilevel = ilevel - lvlMod;
         else
