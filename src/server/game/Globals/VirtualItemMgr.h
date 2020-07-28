@@ -303,7 +303,7 @@ public:
      * Uses passed base and modifier to generate a new VirtualItemTemplate.
      * Returns the newly created VirtualItemTemplate.
      */
-    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, std::mt19937& generator, VirtualModifier modifier = VirtualModifier());
+    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier = VirtualModifier());
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.

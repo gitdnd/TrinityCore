@@ -188,7 +188,7 @@ void VirtualItemMgr::LoadSpellsFromDB()
 
 // Generators
 
-VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, std::mt19937& generator, VirtualModifier modifier)
+VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
 {
     if (!base)
         return nullptr;
