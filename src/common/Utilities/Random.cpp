@@ -49,7 +49,7 @@ uint32 urand(uint32 min, uint32 max)
     return uid(engine);
 }
 
-uint32 urand(uint32 min, uint32 max, std::mt19937 generator)
+uint32 urand(uint32 min, uint32 max, std::mt19937 &generator)
 {
     assert(max >= min);
     std::uniform_int_distribution<uint32> uid(min, max);

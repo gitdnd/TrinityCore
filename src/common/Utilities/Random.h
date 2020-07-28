@@ -32,7 +32,7 @@ TC_COMMON_API int32 irand(int32 min, int32 max);
 TC_COMMON_API uint32 urand(uint32 min, uint32 max);
 
 /* Return a random number in the range min..max (inclusive) with the specified seed.*/
-TC_COMMON_API uint32 urand(uint32 min, uint32 max, std::mt19937 generator);
+TC_COMMON_API uint32 urand(uint32 min, uint32 max, std::mt19937 &generator);
 
 /* Return a random millisecond value between min and max seconds. Functionally equivalent to urand(min*IN_MILLISECONDS, max*IN_MILLISECONDS). */
 TC_COMMON_API uint32 urandms(uint32 min, uint32 max);

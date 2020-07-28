@@ -78,7 +78,7 @@ struct VirtualModifier
     uint32 seed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
-    std::mt19937 generator;
+    std::mt19937 &generator;
 
     class StatGroupData
     {
