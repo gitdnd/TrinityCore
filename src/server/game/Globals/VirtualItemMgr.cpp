@@ -588,12 +588,12 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             }
             case ITEM_QUALITY_UNCOMMON:
             {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
                 break;
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
                 break;
             }
             case ITEM_QUALITY_EPIC:
@@ -603,7 +603,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
                 break;
             }
             default:
@@ -621,12 +621,12 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
                 }
                 case ITEM_QUALITY_UNCOMMON:
                 {
-                    ss << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)];
+                    ss << nameLists[4][urand(0, nameLists[4].size() - 1, generator)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)];
                     break;
                 }
                 case ITEM_QUALITY_RARE:
                 {
-                    ss << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, generator)];
+                    ss << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, generator)];
                     break;
                 }
                 case ITEM_QUALITY_EPIC:
@@ -636,7 +636,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
                 }
                 case ITEM_QUALITY_LEGENDARY:
                 {
-                    ss << nameLists[6][urand(0, nameLists[6].size() - 1)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, generator)];
+                    ss << nameLists[6][urand(0, nameLists[6].size() - 1, generator)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, generator)];
                     break;
                 }
                 default:
@@ -682,12 +682,12 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             }
             case ITEM_QUALITY_UNCOMMON:
             {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << nameLists[3][urand(0, nameLists[3].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
                 break;
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << nameLists[2][urand(0, nameLists[2].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
                 break;
             }
             case ITEM_QUALITY_EPIC:
@@ -697,7 +697,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
                 break;
             }
             default:
@@ -986,6 +986,9 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate*
     uint32 quality = output->Quality;
     if (qualityOverride)
         quality = output->Quality + 1;
+
+    if (quality == ITEM_QUALITY_LEGENDARY)
+        quality = quality - 1;
 
     for (auto displaysitr : availableDisplays)
     {
