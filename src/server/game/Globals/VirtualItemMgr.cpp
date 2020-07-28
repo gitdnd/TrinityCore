@@ -210,15 +210,15 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     thread_local std::mt19937 generator;
     generator.seed(output->seed);
 
-    // Generate an item name based on type and quality
-    std::string name = GenerateItemName(output, generator, modifier);
-    if (!name.empty())
-        output->Name1 = name;
-
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
     // as some of the next function calls require information set in this function ie. quality, ilevel etc.
     GenerateStats(output, generator, modifier);
+
+    // Generate an item name based on type and quality
+    std::string name = GenerateItemName(output, generator, modifier);
+    if (!name.empty())
+        output->Name1 = name;
 
     // Set the correct disenchant ID based on ilevel and quality
     UpdateDisenchantId(output);
