@@ -329,7 +329,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     uint32 ilevel = output->ItemLevel;
     if (modifier.ilevel)
         ilevel = modifier.ilevel;
-    /*else
+    else
     {
         // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.
         // To prevent too small of a stat pool on early items.
@@ -346,7 +346,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             ilevel = ilevel - lvlMod;
         else
             ilevel = ilevel + lvlMod;
-    }*/
+    }
 
     // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
     if (modifier.isCrafted && !modifier.ilevel && ilevel >= output->ItemLevel)
