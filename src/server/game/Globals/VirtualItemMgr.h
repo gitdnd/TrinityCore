@@ -78,7 +78,6 @@ struct VirtualModifier
     uint32 seed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
-    std::mt19937 &generator;
 
     class StatGroupData
     {
@@ -91,18 +90,18 @@ struct VirtualModifier
         /**
          * Returns the primary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, VirtualModifier modifier) const;
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
 
         /**
          * Returns the secondary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, VirtualModifier modifier) const;
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
 
 
         /**
          * Returns the sockets for the given stat group.
          */
-        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, VirtualModifier modifier) const;
+        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
 
         /**
          * Returns the stat groups for the given armor subclass.
@@ -257,17 +256,17 @@ public:
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
-    uint32 GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier) const;
+    uint32 GenerateItemDisplay(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
 
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(VirtualItemTemplate* item, VirtualModifier modifier) const;
+    std::string GenerateItemName(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -304,12 +303,12 @@ public:
      * Uses passed base and modifier to generate a new VirtualItemTemplate.
      * Returns the newly created VirtualItemTemplate.
      */
-    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier = VirtualModifier());
+    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, std::mt19937& generator, VirtualModifier modifier = VirtualModifier());
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
 
     /**
      * Checks if the passed template is a valid virtual item template.
@@ -317,8 +316,8 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier);
+    void GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll);
+    void GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:
