@@ -272,6 +272,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (!ValidateHyperlinksAndMaybeKick(msg))
             return;
     }
+
+    if (lang != LANG_ADDON)
+        lang = LANG_UNIVERSAL;
+
     std::stringstream chatSpy;
     switch (type)
     {
