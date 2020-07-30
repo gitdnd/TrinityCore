@@ -2680,6 +2680,34 @@ void World::SendGMText(uint32 string_id, ...)
     va_end(ap);
 }
 
+void World::SendGMText(char const* text)
+{
+    WorldPacket data;
+
+    // need copy to prevent corruption by strtok call in LineFromMessage original string
+    char* buf = strdup(text);
+    char* pos = buf;
+
+    while (char* line = ChatHandler::LineFromMessage(pos))
+    {
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+        {
+            WorldSession* session = itr->second;
+            if (!session || !session->HasPermission(rbac::RBAC_PERM_RECEIVE_GLOBAL_GM_TEXTMESSAGE))
+                continue;
+
+            // Player should be in world
+            Player* player = session->GetPlayer();
+            if (!player || !player->IsInWorld())
+                continue;
+            session->SendPacket(&data);
+        }
+    }
+
+    free(buf);
+}
+
 /// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
 void World::SendGlobalText(char const* text, WorldSession* self)
 {
