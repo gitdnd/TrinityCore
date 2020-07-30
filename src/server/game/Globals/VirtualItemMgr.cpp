@@ -402,6 +402,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         pool = modifier.statpool;
     ASSERT(pool >= 0 && pool < 0x7FFF);
 
+
+
     // modify stat pool size depending on item quality
     pool = (pool * quality) / 2;
 
@@ -562,6 +564,9 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             // Make sure the current list is not empty. If it is, fall back to template item name.
             if (list.empty())
                 return fullName;
+
+            auto name1 = nameLists[1][0];
+            sWorld->SendGlobalText(("Name 1 = " + name1).c_str(), nullptr);
 
             nameLists.insert(std::make_pair(i, list));
         }
