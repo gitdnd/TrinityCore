@@ -32,6 +32,7 @@
 #include <memory>
 #include <queue>
 #include <unordered_set>
+#include "VirtualItemMgr.h"
 
 struct AccessRequirement;
 struct AchievementEntry;
@@ -1095,6 +1096,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         {
             return StoreNewItem(pos, item, update, randomPropertyId, allowedLooters, isCrafted);
         }
+        Item* StoreNewItem3(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0, GuidSet const& allowedLooters = GuidSet(), VirtualModifier modifier = VirtualModifier());
         Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
         Item* EquipNewItem(uint16 pos, uint32 item, bool update);
         Item* EquipItem(uint16 pos, Item* pItem, bool update);

@@ -5516,7 +5516,8 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Rerolling sockets.");
-        sVirtualItemMgr.GenerateSockets(vItem, VirtualModifier(), true, sVirtualItemMgr.ConvertSeed(vItem->seed));
+        //@todo This needs to be seeded correctly using the modifier var
+        sVirtualItemMgr.GenerateSockets(vItem, std::mt19937(), VirtualModifier(), true);
         const_cast<ItemTemplate*>(itemTarget->GetTemplate())->InitializeQueryData();
         WorldPacket response = itemTarget->GetTemplate()->BuildQueryData(LOCALE_enUS);
         sWorld->SendGlobalMessage(&response);

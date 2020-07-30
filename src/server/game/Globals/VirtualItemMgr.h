@@ -1,11 +1,14 @@
 #include "Define.h" // uint32 etc types
 #include "ItemTemplate.h" // Item enums
 #include "DBCStores.h" // Needed for item DBC lookup
+#include "SFMTRand.h"
 #include <map>
+#include <random>
 #include <set>
 #include <vector>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/tss.hpp>
 
 #ifndef VIRTUAL_ITEM_MGR_H
 #define VIRTUAL_ITEM_MGR_H
@@ -25,6 +28,14 @@ enum StatGroup
     STAT_GROUP_ALL,
     STAT_GROUP_COUNT,
     STAT_GROUP_RANDOM = STAT_GROUP_COUNT,
+};
+
+enum StatGroupType
+{
+    STAT_GROUP_TYPE_PRIMARY,
+    STAT_GROUP_TYPE_SECONDARY,
+    STAT_GROUP_TYPE_GEMS,
+    STAT_GROUP_TYPE_COUNT
 };
 
 struct VirtualItemTemplate : ItemTemplate
@@ -77,21 +88,30 @@ struct VirtualModifier
         StatGroupData();
 
         /**
-         * Returns the stats for the given stat group.
+         * Returns the primary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupStats(StatGroup group, char* seed) const;
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
+
+        /**
+         * Returns the secondary stats for the given stat group.
+         */
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
+
 
         /**
          * Returns the sockets for the given stat group.
          */
-        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, char* seed) const;
+        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
 
         /**
          * Returns the stat groups for the given armor subclass.
          */
-        std::vector<StatGroup> const& GetArmorSubclassStatGroups(ItemSubclassArmor subclass) const;
+        std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
+
     private:
-        std::vector<ItemModType> stat_group_stats[STAT_GROUP_COUNT];
+
+        std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
+        std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
         std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
         std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
     };
@@ -106,13 +126,13 @@ struct VirtualModifier
      * Fetches the rate (point*rate = stat_amount) for the given item equip type.
      * Returns the stat rate.
      */
-    static float GetSlotStatModifier(InventoryType invtype);
+    static float GetSlotStatModifier(VirtualItemTemplate* item);
 
     /**
      * Fetches the armor modifier for the subclass and inventory type combination.
      * Returns the armor modifier.
      */
-    static float GetTypeSlotArmorModifier(ItemSubclassArmor subclass, InventoryType invtype);
+    static float GetTypeSlotArmorModifier(VirtualItemTemplate* item);
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given stat type.
@@ -173,14 +193,28 @@ public:
      */
     static VirtualItemMgr& instance();
 
+    /**
+     * Not thread safe.
+     * Loads all possible stat group entries from the stat group table into memory.
+     */
+    void LoadStatGroupInfoFromDB();
+
+    struct StatGroupInfo
+    {
+        StatGroupInfo() {}
+        StatGroupInfo(int32 group, int32 type, int32 stat) : statGroup(group), statType(type), statId(stat) {}
+        StatGroupInfo(int32 group, int32 type, int32 stat, std::string n) : statGroup(group), statType(type), statId(stat), comment(n) {}
+        int32 statGroup;
+        int32 statType;
+        int32 statId;
+        std::string comment;
+    };
+
 	/**
 	 * Not thread safe.
 	 * Loads all possible names from the generator table into memory.
 	 */
 	void LoadNamesFromDB();
-
-    // Convert seed from uint32 to char* for urand.
-    char* ConvertSeed(uint32 seed) const;
 
 	struct NameInfo
 	{
@@ -219,22 +253,20 @@ public:
 
     void LoadSpellsFromDB();
 
-
-
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
-    uint32 GenerateItemDisplay(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType, char* seed) const;
+    uint32 GenerateItemDisplay(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
 
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* const item, char* seed);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier);
 
     /**
      * Returns a randomly generated item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(uint32 type, uint32 subclass, uint32 quality, uint32 inventoryType, char* seed) const;
+    std::string GenerateItemName(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -244,12 +276,12 @@ public:
     /**
      * Return a vector of available displays for the specified requirements.
      */
-    std::list<uint32> GetDisplaysForDisplayInfo(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
+    std::list<uint32> GetDisplaysForDisplayInfo(VirtualItemTemplate* item, bool qualityOverride = false) const;
 
     /**
      * Return a vector of available spells for the specified requirements.
      */
-    std::list<itemSpellInfo> GetSpells(uint32 quality, uint32 _class, uint32 subclass, uint32 inventoryType) const;
+    //std::list<itemSpellInfo> GetSpells(VirtualItemTemplate* item) const;
 
     /**
      * Creates all used generators and sets their entry ranges in addition to constructing the object itself.
@@ -276,7 +308,7 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
 
     /**
      * Checks if the passed template is a valid virtual item template.
@@ -284,8 +316,8 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll, char* seed);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, char* seed);
+    void GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll);
+    void GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:
@@ -331,6 +363,7 @@ private:
     std::unordered_map<ItemSubclassWeapon, EntryGenerator> weaponGenerator;
     std::vector<uint32> freed_entries;
 
+    std::vector<StatGroupInfo> stat_group_info;
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
     std::vector<itemSpellInfo> availableSpells;
