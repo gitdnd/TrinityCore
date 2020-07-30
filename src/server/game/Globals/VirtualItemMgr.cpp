@@ -565,7 +565,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             if (list.empty())
                 return fullName;
 
-            auto name1 = nameLists[1][0];
+            auto name1 = nameLists[6][0];
             sWorld->SendGlobalText(("Name 1 = " + name1).c_str(), nullptr);
 
             nameLists.insert(std::make_pair(i, list));
