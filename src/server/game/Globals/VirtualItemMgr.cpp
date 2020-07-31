@@ -210,6 +210,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     thread_local std::mt19937 generator;
     generator.seed(output->seed);
 
+    GenerateQuality(output, generator, modifier);
+
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
     // as some of the next function calls require information set in this function ie. quality, ilevel etc.
@@ -260,55 +262,11 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
 void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
 {
-    // decide quality
-    uint32 quality = output->Quality;
-
-    if (modifier.quality < MAX_ITEM_QUALITY)
-        quality = modifier.quality;
-    else
-    {
-        quality = output->Quality;
-
-        // these are not percentage chances. They represent areas of a number line made from their sum
-        static const uint32 chances[MAX_ITEM_QUALITY] = {
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_UNCOMMON),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_RARE),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_EPIC),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_LEGENDARY),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_ARTIFACT),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
-        };
-
-        uint32 sum = 0;
-        for (auto u : chances)
-            sum += u;
-
-        if (sum >= 1)
-        {
-            uint32 rand = urand(1, sum, generator);
-            sum = 0;
-            for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
-            {
-                sum += chances[i];
-                if (sum < rand)
-                    continue;
-
-                quality = i;
-                break;
-            }
-        }
-
-        quality = std::max(output->Quality, quality); // dont generate quality below original
-    }
-    ASSERT(quality < MAX_ITEM_QUALITY);
-
     // always bind on pickup
-    output->Bonding = 1;
+    output->Bonding = BIND_WHEN_PICKED_UP;
 
     // decide stat amount
-    uint32 statscount = quality;
+    uint32 statscount = output->Quality;
     if (statscount < 0)
         statscount = 0;
     ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
@@ -338,7 +296,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 
         // Explicitly not using generator here
         uint32 lvlMod = urand(0, 5);
-        ilevel = modifier.plrAvgLvl + ((int32(quality) - int32(output->Quality)) * 5);
+        ilevel = modifier.plrAvgLvl + ((int32(output->Quality) - int32(output->Quality)) * 5);
 
         // there's gotta be a better way to do this..
         uint32 addSub = urand(0, 1);
@@ -373,7 +331,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         output->Armor = output->Armor * typeslotmod;
 
         // depending on quality, add multiplier to armor piece
-        float qmulti = ((int32(quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
+        float qmulti = ((int32(output->Quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
         output->Armor = output->Armor * qmulti;
 
         // add a random 10% increase or decrease of stats
@@ -405,7 +363,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 
 
     // modify stat pool size depending on item quality
-    pool = (pool * quality) / 2;
+    pool = (pool * output->Quality) / 2;
 
     // select stat group
     StatGroup statgroupid = modifier.statgroup;
@@ -540,7 +498,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->Description = "";
 
     // apply other item data
-    output->Quality = quality;
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
@@ -906,6 +863,54 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
     }
 }
 
+void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier())
+{
+    // decide quality
+    uint32 quality = output->Quality;
+
+    if (modifier.quality < MAX_ITEM_QUALITY)
+        quality = modifier.quality;
+    else
+    {
+        quality = output->Quality;
+
+        // these are not percentage chances. They represent areas of a number line made from their sum
+        static const uint32 chances[MAX_ITEM_QUALITY] = {
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_UNCOMMON),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_RARE),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_EPIC),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_LEGENDARY),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_ARTIFACT),
+            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
+        };
+
+        uint32 sum = 0;
+        for (auto u : chances)
+            sum += u;
+
+        if (sum >= 1)
+        {
+            uint32 rand = urand(1, sum, generator);
+            sum = 0;
+            for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
+            {
+                sum += chances[i];
+                if (sum < rand)
+                    continue;
+
+                quality = i;
+                break;
+            }
+        }
+
+        quality = std::max(output->Quality, quality); // dont generate quality below original
+    }
+
+    output->Quality = quality;
+}
+
 uint32 VirtualItemMgr::EntryGenerator::GenerateEntry(VirtualItemMgr::Store const& store)
 {
     uint32 entry = nextEntry;
@@ -1124,7 +1129,7 @@ float VirtualModifier::GetStatRate(ItemModType stat)
     case ITEM_MOD_SPELL_HEALING_DONE:
         return 0.45f;
     case ITEM_MOD_MANA_REGENERATION:
-        return 2.0f;
+        return 2.5f;
     case ITEM_MOD_HEALTH_REGEN:
         return 2.5f;
     case ITEM_MOD_SPELL_PENETRATION:

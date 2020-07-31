@@ -318,6 +318,7 @@ public:
 
     void GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll);
     void GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier);
+    void GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier());
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
 private:
