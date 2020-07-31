@@ -234,6 +234,7 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectRemoveAura,                               //164 SPELL_EFFECT_REMOVE_AURA
     &Spell::EffectReRollVirtualItemSockets,                 //165 SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS
     &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM
+    &Spell::EffectCreateVirtualItem,                        //167 SPELL_EFFECT_CREATE_VIRTUAL_ITEM
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -5531,4 +5532,43 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
 void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
 {
     //@todo finish this.
+}
+
+void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!sVirtualItemMgr.IsVirtualTemplate(sObjectMgr->GetItemTemplate(m_spellInfo->Effects[effIndex].BasePoints)))
+        return;
+
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+    uint32 itemId = m_spellInfo->Effects[effIndex].BasePoints;
+    uint8 count = m_spellInfo->Effects[effIndex].MiscValue;
+    Player* player = unitTarget->ToPlayer();
+
+    // Adding items
+    uint32 noSpaceForCount = 0;
+
+    // check space and find places
+    ItemPosCountVec dest;
+    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, count, &noSpaceForCount);
+    if (msg != EQUIP_ERR_OK)                               // convert to possible store amount
+        count -= noSpaceForCount;
+
+    if (count == 0 || dest.empty())                         // can't add any
+    {
+        return;
+    }
+
+    VirtualModifier modifier;
+    modifier.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValueB);
+    modifier.statpool = m_spellInfo->Effects[effIndex].TriggerSpell;
+    modifier.isCrafted = true;
+    Item* item = player->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
+    item->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
+    player->SendNewItem(item, count, true, true);
+    player->UpdateCraftSkill(m_spellInfo->Id);
+    ExecuteLogEffectCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
 }

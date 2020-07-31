@@ -331,7 +331,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
         if (fabs(movementInfo.transport.pos.GetPositionX()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionY()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionZ()) > 75.0f)
         {
-            ChatHandler(this).PSendSysMessage("Desync B detected, report to devs.");
+            //ChatHandler(this).PSendSysMessage("Desync B detected, report to devs.");
             recvData.rfinish();                 // prevent warnings spam
             return;
         }
