@@ -1135,6 +1135,10 @@ float VirtualModifier::GetStatRate(ItemModType stat)
         return 0.86f;
     case ITEM_MOD_DEFENSE_SKILL_RATING:
         return 1.2f;
+    case ITEM_MOD_INTELLECT:
+        return 1.9f;
+    case ITEM_MOD_SPIRIT:
+        return 1.65f;
     default:
         return 1.0f;
     }
