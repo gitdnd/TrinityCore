@@ -307,6 +307,10 @@ namespace LuaWorldObject
 
         for (std::list<Player*>::const_iterator it = list.begin(); it != list.end(); ++it)
         {
+            auto player = *it;
+            if (filterGM && player->IsGameMaster())
+                continue;
+
             Eluna::Push(L, *it);
             lua_rawseti(L, tbl, ++i);
         }
