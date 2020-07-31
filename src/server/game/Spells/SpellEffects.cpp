@@ -5539,7 +5539,7 @@ void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!sVirtualItemMgr.IsVirtualTemplate(sObjectMgr->GetItemTemplate(m_spellInfo->Effects[effIndex].BasePoints)))
+    if (!sVirtualItemMgr.IsVirtualTemplate(sObjectMgr->GetItemTemplate(m_spellInfo->Effects[effIndex].ItemType)))
         return;
 
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
@@ -5563,8 +5563,8 @@ void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
     }
 
     VirtualModifier modifier;
-    modifier.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValueB);
-    modifier.statpool = m_spellInfo->Effects[effIndex].TriggerSpell;
+    modifier.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
+    modifier.statpool = m_spellInfo->Effects[effIndex].MiscValueB;
     modifier.isCrafted = true;
     Item* item = player->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
     item->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
