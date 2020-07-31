@@ -5544,8 +5544,8 @@ void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
 
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
-    uint32 itemId = m_spellInfo->Effects[effIndex].BasePoints;
-    uint8 count = m_spellInfo->Effects[effIndex].MiscValue;
+    uint32 itemId = m_spellInfo->Effects[effIndex].ItemType;
+    uint8 count = damage;
     Player* player = unitTarget->ToPlayer();
 
     // Adding items
