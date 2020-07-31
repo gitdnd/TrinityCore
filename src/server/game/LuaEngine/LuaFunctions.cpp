@@ -247,8 +247,9 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "PlayMusic", &LuaWorldObject::PlayMusic },
     { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
     { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
-    {"CreateTransport", &LuaWorldObject::CreateTransport },
-    {"SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
+    { "CreateTransport", &LuaWorldObject::CreateTransport },
+    { "SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
+    { "SetVisible", &LuaWorldObject::SetVisible },
 
     { NULL, NULL }
 };
@@ -1293,7 +1294,6 @@ ElunaRegister<Transport> TransportMethods[] =
     { "AddPassenger", &LuaTransport::AddPassenger },
     { "GetPassengers", &LuaTransport::GetPassengers },
     { "SummonPassenger", &LuaTransport::SummonPassenger },
-    { "SetVisible", &LuaTransport::SetVisible },
 
     { NULL, NULL }
 };

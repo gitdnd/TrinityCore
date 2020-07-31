@@ -1234,5 +1234,20 @@ namespace LuaWorldObject
         obj->GetMap()->SetZoneOverrideLight(zoneId, areaLightId, overrideLightId, transitionTimeInMS);
         return 0;
     }
+
+    int SetVisible(lua_State* L, WorldObject* obj)
+    {
+        bool visible = Eluna::CHECKVAL<bool>(L, 2);
+        if (visible)
+        {
+            obj->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+        }
+        else
+        {
+            obj->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_GAMEMASTER);
+        }
+        obj->UpdateObjectVisibility(true);
+        return 0;
+    }
 };
 #endif

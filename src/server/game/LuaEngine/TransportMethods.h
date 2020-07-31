@@ -47,21 +47,6 @@ namespace LuaTransport
         Eluna::Push(L, obj->SummonPassenger(entry, Position(x, y, z, o), (TempSummonType)summonType));
         return 1;
     }
-
-    int SetVisible(lua_State* L, Transport* obj)
-    {
-        bool visible = Eluna::CHECKVAL<bool>(L, 2);
-        if (visible)
-        {
-            obj->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
-        }
-        else
-        {
-            obj->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_GAMEMASTER);
-        }
-        obj->UpdateObjectVisibility(true);
-        return 0;
-    }
 };
 
 #endif
