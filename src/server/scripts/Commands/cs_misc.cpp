@@ -1320,7 +1320,7 @@ public:
         }
 
         Item* item = playerTarget->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
-
+        item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
         // remove binding (let GM give it to another player later)
         if (player == playerTarget)
             for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
@@ -1379,7 +1379,7 @@ public:
             if (msg == EQUIP_ERR_OK)
             {
                 Item* item = playerTarget->StoreNewItem(dest, itemTemplatePair.first, true);
-
+                item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
                 // remove binding (let GM give it to another player later)
                 if (player == playerTarget)
                     item->SetBinding(false);

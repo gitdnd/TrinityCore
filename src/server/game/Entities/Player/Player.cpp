@@ -11854,6 +11854,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
 
     if (!proto)
         return EQUIP_ERR_ITEM_NOT_FOUND;
+
    // Used by group, function NeedBeforeGreed, to know if a prototype can be used by a player
 
     const static uint32 item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
@@ -11871,6 +11872,8 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     if (proto->RequiredSpell != 0 && !HasSpell(proto->RequiredSpell))
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
+    return EQUIP_ERR_OK;
+    /*
     if (proto->RequiredSkill != 0)
     {
         if (!GetSkillValue(proto->RequiredSkill))
@@ -11916,7 +11919,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
                 return EQUIP_ERR_CANT_DO_RIGHT_NOW;
     }
 
-    return EQUIP_ERR_OK;
+    return EQUIP_ERR_OK;*/
 }
 
 InventoryResult Player::CanUseAmmo(uint32 item) const
