@@ -42,6 +42,13 @@ int32 irand(int32 min, int32 max)
     return uid(engine);
 }
 
+int32 irand(int32 min, int32 max, std::mt19937& generator)
+{
+    ASSERT(max >= min);
+    std::uniform_int_distribution<int32> uid(min, max);
+    return uid(generator);
+}
+
 uint32 urand(uint32 min, uint32 max)
 {
     ASSERT(max >= min);

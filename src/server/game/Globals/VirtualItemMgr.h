@@ -233,7 +233,7 @@ public:
      */
 
     void GenerateVirtualLevelLookupArray();
-    int32 GetVirtualLevel(float ilevel);
+    int32 GetVirtualLevel(float ilevel) const;
 
     class VirtualLevelInfo
     {
@@ -329,7 +329,7 @@ public:
     /**
      * Converts a virtual player/group level into a usable item level.
      */
-    float GenerateItemLevel(int32 virtualLevel);
+    float GenerateItemLevel(int32 virtualLevel) const;
 
     /**
      * Checks if the passed template is a valid virtual item template.

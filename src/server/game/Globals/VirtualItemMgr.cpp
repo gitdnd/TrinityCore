@@ -294,16 +294,20 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         if (modifier.plrAvgLvl < 20)
             modifier.plrAvgLvl = 20;
 
-        // Explicitly not using generator here
-        uint32 lvlMod = urand(0, 5);
+        // Get the average ilevels virtual level group
+        int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
+
+        // Mod the virtual item level to allow higher or lower virtual item levels 
+        vLevel = vLevel + irand(-1, 5, generator);
+
+        // Get the new item level based on above modifier virtual level
+        ilevel = round(GenerateItemLevel(vLevel));
+
+        // Modify the returned, newly generated iLevel based on quality
         ilevel = modifier.plrAvgLvl + ((int32(output->Quality) - int32(output->Quality)) * 5);
 
-        // there's gotta be a better way to do this..
-        uint32 addSub = urand(0, 1);
-        if (addSub == 0)
-            ilevel = ilevel - lvlMod;
-        else
-            ilevel = ilevel + lvlMod;
+        // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
+        ilevel = ilevel + irand(-3, 3, generator);
     }
 
     // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
@@ -518,7 +522,7 @@ void VirtualItemMgr::GenerateVirtualLevelLookupArray()
     }
 }
 
-float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel)
+float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
 {
     // We need our x variable to be much lower than a managable number, so divide it
     float x = float(virtualLevel) / 5000.0f;
@@ -1036,7 +1040,7 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 
 // Getters
 
-int32 VirtualItemMgr::GetVirtualLevel(float ilevel)
+int32 VirtualItemMgr::GetVirtualLevel(float ilevel) const
 {
     int32 vLevel = 1;
 
