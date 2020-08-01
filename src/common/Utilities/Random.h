@@ -29,7 +29,7 @@
 TC_COMMON_API int32 irand(int32 min, int32 max);
 
 /* Return a random number in the range min..max (inclusive) with the specified seed.*/
-TC_COMMON_API uint32 irand(int32 min, int32 max, std::mt19937& generator);
+TC_COMMON_API int32 irand(int32 min, int32 max, std::mt19937& generator);
 
 /* Return a random number in the range min..max (inclusive). */
 TC_COMMON_API uint32 urand(uint32 min, uint32 max);
