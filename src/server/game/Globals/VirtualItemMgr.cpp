@@ -504,6 +504,31 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->statGroup = statgroupid;
 }
 
+void VirtualItemMgr::GenerateVirtualLevelLookupArray()
+{
+    WriteGuard guard(lock);
+    int32 i = 1;
+    float iLevel = 0.0f;
+
+    // Generate lookup table for Virtual Levels.
+    for (int i = 0; iLevel < 325.0f; ++i)
+    {
+        iLevel = GenerateItemLevel(i);
+        virtual_level_info.insert(std::make_pair(i, VirtualLevelInfo(iLevel)));
+    }
+}
+
+float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel)
+{
+    // We need our x variable to be much lower than a managable number, so divide it
+    float x = float(virtualLevel) / 5000.0f;
+
+    // Generate a logarithmic value to be used as the correct ilevel for the provided vlevel
+    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + 325.0f;
+
+    return ilevel;
+}
+
 std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
 {
     std::string fullName = "";
@@ -1010,6 +1035,12 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 }
 
 // Getters
+
+int32 VirtualItemMgr::GetVirtualLevel(float ilevel)
+{
+    // Check lookup table for closest matching ilevel, return key as vlevel
+    return 1;
+}
 
 std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate* output, bool qualityOverride) const
 {
