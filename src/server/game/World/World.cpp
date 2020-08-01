@@ -2102,6 +2102,8 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Virtual Item Spells...");
     sVirtualItemMgr.LoadSpellsFromDB();
 
+    sVirtualItemMgr.GenerateVirtualLevelLookupArray();
+
     TC_LOG_INFO("server.loading", "Loading Petitions...");
     sPetitionMgr->LoadPetitions();
 

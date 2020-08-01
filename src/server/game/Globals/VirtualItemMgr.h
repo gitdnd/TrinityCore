@@ -229,6 +229,22 @@ public:
 	};
 
     /**
+     * Generate virtual level lookup array from ilevel 1 to 325.
+     */
+
+    void GenerateVirtualLevelLookupArray();
+    int32 GetVirtualLevel(float ilevel) const;
+
+    class VirtualLevelInfo
+    {
+        friend class VirtualItemMgr;
+
+        VirtualLevelInfo() {}
+        VirtualLevelInfo(float ilevel) : iLevel(ilevel) {}
+        float iLevel;
+    };
+
+    /**
      * Not thread safe.
      * Loads all possible displays from the generator table into memory.
      */
@@ -311,6 +327,11 @@ public:
     void GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
 
     /**
+     * Converts a virtual player/group level into a usable item level.
+     */
+    float GenerateItemLevel(int32 virtualLevel) const;
+
+    /**
      * Checks if the passed template is a valid virtual item template.
      * Returns true if it is, false if it is not.
      */
@@ -365,6 +386,7 @@ private:
     std::unordered_map<ItemSubclassWeapon, EntryGenerator> weaponGenerator;
     std::vector<uint32> freed_entries;
 
+    std::map<uint32, VirtualLevelInfo> virtual_level_info;
     std::vector<StatGroupInfo> stat_group_info;
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;

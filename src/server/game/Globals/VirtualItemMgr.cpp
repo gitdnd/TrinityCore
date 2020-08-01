@@ -294,16 +294,20 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         if (modifier.plrAvgLvl < 20)
             modifier.plrAvgLvl = 20;
 
-        // Explicitly not using generator here
-        uint32 lvlMod = urand(0, 5);
-        ilevel = modifier.plrAvgLvl + ((int32(output->Quality) - int32(output->Quality)) * 5);
+        // Get the average ilevels virtual level group
+        int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
 
-        // there's gotta be a better way to do this..
-        uint32 addSub = urand(0, 1);
-        if (addSub == 0)
-            ilevel = ilevel - lvlMod;
-        else
-            ilevel = ilevel + lvlMod;
+        // Mod the virtual item level to allow higher or lower virtual item levels 
+        vLevel = vLevel + irand(-1, 5, generator);
+
+        // Get the new item level based on above modifier virtual level
+        ilevel = round(GenerateItemLevel(vLevel));
+
+        // Modify the returned, newly generated iLevel based on quality
+        ilevel = ilevel + ((int32(output->Quality) - int32(output->Quality)) * 5);
+
+        // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
+        ilevel = ilevel + irand(-3, 3, generator);
     }
 
     // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
@@ -502,6 +506,31 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
     output->statGroup = statgroupid;
+}
+
+void VirtualItemMgr::GenerateVirtualLevelLookupArray()
+{
+    WriteGuard guard(lock);
+    int32 i = 1;
+    float iLevel = 0.0f;
+
+    // Generate lookup table for Virtual Levels.
+    for (int i = 0; iLevel < 325.0f; ++i)
+    {
+        iLevel = GenerateItemLevel(i);
+        virtual_level_info.insert(std::make_pair(i, VirtualLevelInfo(iLevel)));
+    }
+}
+
+float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
+{
+    // We need our x variable to be much lower than a managable number, so divide it
+    float x = float(virtualLevel) / 5000.0f;
+
+    // Generate a logarithmic value to be used as the correct ilevel for the provided vlevel
+    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + 325.0f;
+
+    return ilevel;
 }
 
 std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
@@ -1010,6 +1039,23 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 }
 
 // Getters
+
+int32 VirtualItemMgr::GetVirtualLevel(float ilevel) const
+{
+    int32 vLevel = 1;
+
+    for (auto i=virtual_level_info.begin(); i!=virtual_level_info.end(); i++)
+    {
+        float diff = ilevel / i->second.iLevel;
+        if (diff < 1.0f)
+        {
+            vLevel = i->first;
+            break;
+        }
+    }
+
+    return vLevel;
+}
 
 std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate* output, bool qualityOverride) const
 {
