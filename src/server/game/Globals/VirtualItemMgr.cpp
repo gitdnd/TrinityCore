@@ -863,7 +863,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
     }
 }
 
-void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier())
+void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier)
 {
     // decide quality
     uint32 quality = output->Quality;
@@ -872,8 +872,6 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& 
         quality = modifier.quality;
     else
     {
-        quality = output->Quality;
-
         // these are not percentage chances. They represent areas of a number line made from their sum
         static const uint32 chances[MAX_ITEM_QUALITY] = {
             sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
@@ -910,6 +908,34 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& 
 
     output->Quality = quality;
 }
+
+void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* output)
+{
+    uint8 stats [21] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_STRENGTH,
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_HIT_SPELL_RATING,
+        ITEM_MOD_HASTE_SPELL_RATING,
+        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_RANGED_RATING,
+        ITEM_MOD_CRIT_RANGED_RATING,
+        ITEM_MOD_HASTE_RANGED_RATING,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_RANGED_ATTACK_POWER,
+        ITEM_MOD_ARMOR_PENETRATION_RATING
+    };
+}
+
 
 uint32 VirtualItemMgr::EntryGenerator::GenerateEntry(VirtualItemMgr::Store const& store)
 {
