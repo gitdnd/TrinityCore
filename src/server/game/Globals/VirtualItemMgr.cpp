@@ -1038,8 +1038,19 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 
 int32 VirtualItemMgr::GetVirtualLevel(float ilevel)
 {
-    // Check lookup table for closest matching ilevel, return key as vlevel
-    return 1;
+    int32 vLevel = 1;
+
+    for (auto i=virtual_level_info.begin(); i!=virtual_level_info.end(); i++)
+    {
+        float diff = ilevel / i->second.iLevel;
+        if (diff < 1.0f)
+        {
+            vLevel = i->first;
+            break;
+        }
+    }
+
+    return vLevel;
 }
 
 std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate* output, bool qualityOverride) const
