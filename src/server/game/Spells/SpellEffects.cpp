@@ -239,7 +239,7 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectUnused,                                   //169 SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE
     &Spell::EffectUnused,                                   //170 SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM
     &Spell::EffectUnused,                                   //171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
-    &Spell::EffectUnused,                                   //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
+    &Spell::EffectReRollVirtualItem,                        //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
