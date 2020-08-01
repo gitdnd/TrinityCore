@@ -704,9 +704,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt
         IFSKIP(someSpells.itemClass, output->Class);
         IFSKIP(someSpells.subClass, output->SubClass);
         IFSKIP(someSpells.inventoryType, output->InventoryType);
-        // Don't check stat group when generating trinkets
-        if (output->InventoryType != INVTYPE_TRINKET)
-            IFSKIP(someSpells.statGroup, output->statGroup);
+         IFSKIP(someSpells.statGroup, output->statGroup);
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
             continue;
         if (someSpells.minItemLevel != -1 && output->ItemLevel < someSpells.minItemLevel)
