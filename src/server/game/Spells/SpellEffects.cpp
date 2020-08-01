@@ -235,6 +235,11 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectReRollVirtualItemSockets,                 //165 SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS
     &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM
     &Spell::EffectCreateVirtualItem,                        //167 SPELL_EFFECT_CREATE_VIRTUAL_ITEM
+    &Spell::EffectVirtualItemQualityUpgrade,                //168 SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE
+    &Spell::EffectUnused,                                   //169 SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE
+    &Spell::EffectUnused,                                   //170 SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM
+    &Spell::EffectUnused,                                   //171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
+    &Spell::EffectUnused,                                   //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -5502,36 +5507,36 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
         return;
 
     if (!itemTarget)
-    {
-        ChatHandler(player->GetSession()).PSendSysMessage("No item target.");
         return;
-    }
 
-
-    //@todo Put this in target checking
-    if (itemTarget->GetOwnerGUID() != player->GetGUID())
-    {
-        ChatHandler(player->GetSession()).PSendSysMessage("Not item owner..");
-        return;
-    }
-    if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
-    {
-        ChatHandler(player->GetSession()).PSendSysMessage("Rerolling sockets.");
-        //@todo This needs to be seeded correctly using the modifier var
-        sVirtualItemMgr.GenerateSockets(vItem, std::mt19937(), VirtualModifier(), true);
-        const_cast<ItemTemplate*>(itemTarget->GetTemplate())->InitializeQueryData();
-        WorldPacket response = itemTarget->GetTemplate()->BuildQueryData(LOCALE_enUS);
-        sWorld->SendGlobalMessage(&response);
-        itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
-        itemTarget->SaveToDB(CharacterDatabaseTransaction());
-    }
-    else
-        ChatHandler(player->GetSession()).PSendSysMessage("Not virtual item.");
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+    auto generator = std::mt19937();
+    generator.seed(rand32());
+    sVirtualItemMgr.GenerateSockets(vItem, generator, true);
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
+    itemTarget->SaveToDB(CharacterDatabaseTransaction());
 }
 
 void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
 {
-    //@todo finish this.
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+
+    sVirtualItemMgr.GenerateAdditonalStat(vItem);
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
+    itemTarget->SaveToDB(CharacterDatabaseTransaction());
 }
 
 void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
@@ -5571,4 +5576,48 @@ void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
     player->SendNewItem(item, count, true, true);
     player->UpdateCraftSkill(m_spellInfo->Id);
     ExecuteLogEffectCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
+}
+
+void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
+{
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+    vItem->Quality = m_spellInfo->Effects[effIndex].MiscValue;
+    auto generator = std::mt19937();
+    generator.seed(vItem->seed);
+    sVirtualItemMgr.GenerateStats(vItem, generator);
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
+    itemTarget->SaveToDB(CharacterDatabaseTransaction());
+}
+
+void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
+{
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+    auto generator = std::mt19937();
+    generator.seed(rand32());
+    VirtualModifier mod = VirtualModifier();
+    mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
+    mod.statpool = m_spellInfo->Effects[effIndex].MiscValue;
+    sVirtualItemMgr.GenerateStats(vItem, generator, mod);
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
+    itemTarget->SaveToDB(CharacterDatabaseTransaction());
 }

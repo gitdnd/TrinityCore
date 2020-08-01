@@ -226,7 +226,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     UpdateDisenchantId(output);
 
     // Generate the items sockets based on type and quality
-    GenerateSockets(output, generator, modifier, false);
+    GenerateSockets(output, generator);
 
     // Add spells to items like trinkets and legendaries(todo)
     GenerateSpells(output, generator, modifier);
@@ -692,7 +692,7 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
     return *display;
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt19937& generator)
 {
 #define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
@@ -719,7 +719,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt
     return *selectedSpell;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator)
 {
     //@todo Finalize these numbers, add more then 1 spell to generate.
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
@@ -770,14 +770,14 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     std::vector<uint32_t> spellsToUse;
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
-        itemSpellInfo spell = GenerateSpell(output, generator, modifier);
+        itemSpellInfo spell = GenerateSpell(output, generator);
         if (spell.spellId == 0)
             continue;
         // Skip spell if we have already used this one. Try a few times to fetch a unique spell
         int tries = 0;
         while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
         {
-            spell = GenerateSpell(output, generator, modifier);
+            spell = GenerateSpell(output, generator);
             ++tries;
         }
         // If still a duplicate, skip
@@ -794,7 +794,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     }
 }
 
-void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator,  bool reRoll)
 {
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
@@ -841,7 +841,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
     }
 
     // set socket colors
-    std::vector<SocketColor> const& socketcolors = modifier.premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator, modifier);
+    std::vector<SocketColor> const& socketcolors = VirtualModifier().premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator, modifier);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)

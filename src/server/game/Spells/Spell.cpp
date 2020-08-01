@@ -7071,6 +7071,39 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                  }
                  break;
             }
+            case SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS:
+            case SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM:
+            case SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE:
+            case SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM:
+            case SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE:
+            case SPELL_EFFECT_REROLL_VIRTUAL_ITEM:
+            {
+                if (!m_targets.GetItemTarget())
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                // prevent disenchanting in trade slot
+                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
+                    return SPELL_FAILED_NOT_WHILE_TRADING;
+
+                if (!sVirtualItemMgr.IsVirtualTemplate(m_targets.GetItemTarget()->GetTemplate()))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+                break;
+            }
+            case SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE:
+            {
+                if (!m_targets.GetItemTarget())
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                // prevent disenchanting in trade slot
+                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
+                    return SPELL_FAILED_NOT_WHILE_TRADING;
+
+                if (!sVirtualItemMgr.IsVirtualTemplate(m_targets.GetItemTarget()->GetTemplate()))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                if(m_targets.GetItemTarget()->GetTemplate()->Quality != m_spellInfo->Effects[i].MiscValue-1)
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+            }
             default:
                 break;
         }
