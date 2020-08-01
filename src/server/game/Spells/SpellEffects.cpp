@@ -5613,7 +5613,7 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     generator.seed(rand32());
     VirtualModifier mod = VirtualModifier();
     mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
-    mod.statpool = m_spellInfo->Effects[effIndex].MiscValue;
+    mod.statpool = m_spellInfo->Effects[effIndex].MiscValueB != 0 ? m_spellInfo->Effects[effIndex].MiscValueB : -1;
     sVirtualItemMgr.GenerateStats(vItem, generator, mod);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
