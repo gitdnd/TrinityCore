@@ -159,7 +159,11 @@ void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
 {
     bool out;
     recvData >> out;
-
+    if (GetPlayer()->IsInCombat())
+    {
+        SendLfgTeleportError(uint8(7));
+        return;
+    }
     TC_LOG_DEBUG("lfg", "CMSG_LFG_TELEPORT %s out: %u",
         GetPlayerInfo().c_str(), out ? 1 : 0);
     sLFGMgr->TeleportPlayer(GetPlayer(), out, true);
