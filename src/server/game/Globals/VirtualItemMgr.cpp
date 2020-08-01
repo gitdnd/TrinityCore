@@ -229,7 +229,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateSockets(output, generator);
 
     // Add spells to items like trinkets and legendaries(todo)
-    GenerateSpells(output, generator, modifier);
+    GenerateSpells(output, generator);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
