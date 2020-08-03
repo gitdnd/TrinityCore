@@ -592,7 +592,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
+                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " of " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
                 break;
             }
             default:
