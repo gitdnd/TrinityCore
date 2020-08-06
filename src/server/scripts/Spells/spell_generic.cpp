@@ -2939,7 +2939,7 @@ class spell_gen_profession_research : public SpellScript
             if (spellId == SPELL_CRAFTING_BRAWN_DISCOVERY || spellId == SPELL_CRAFTING_WISDOM_DISCOVERY || spellId == SPELL_CRAFTING_CUNNING_DISCOVERY)
             {
                 SpellInfo const* discoveredSpellInfo = sSpellMgr->GetSpellInfo(discoveredSpellId);
-                caster->AddItem(discoveredSpellInfo->Effects[EFFECT_1].ItemType, 1);
+                caster->AddItem(discoveredSpellInfo->Effects[EFFECT_0].ItemType, 1);
             }
         }
     }
