@@ -388,10 +388,13 @@ enum ItemSubclassGem
     ITEM_SUBCLASS_GEM_ORANGE                    = 5,
     ITEM_SUBCLASS_GEM_META                      = 6,
     ITEM_SUBCLASS_GEM_SIMPLE                    = 7,
-    ITEM_SUBCLASS_GEM_PRISMATIC                 = 8
+    ITEM_SUBCLASS_GEM_PRISMATIC                 = 8,
+    ITEM_SUBCLASS_GEM_BRAWN                     = 9,
+    ITEM_SUBCLASS_GEM_WISDOM                    = 10,
+    ITEM_SUBCLASS_GEM_CUNNING                   = 11
 };
 
-#define MAX_ITEM_SUBCLASS_GEM                     9
+#define MAX_ITEM_SUBCLASS_GEM                     12
 
 enum ItemSubclassArmor
 {
