@@ -1434,5 +1434,19 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
 #endif
         return 1;
     }
+
+    int MoveCircle(lua_State* L, Creature* creature)
+    {
+        float x = Eluna::CHECKVAL<float>(L, 2);
+        float y = Eluna::CHECKVAL<float>(L, 3);
+        float z = Eluna::CHECKVAL<float>(L, 4);
+        float radius = Eluna::CHECKVAL<float>(L, 5);
+        bool clockwise = Eluna::CHECKVAL<bool>(L, 6, true);
+        uint8 stepCount = Eluna::CHECKVAL<uint8>(L, 7, 8);
+
+        creature->GetMotionMaster()->MoveCirclePath(x, y, z, radius, clockwise, stepCount);
+
+        return 0;
+    }
 };
 #endif
