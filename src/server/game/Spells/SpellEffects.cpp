@@ -5588,13 +5588,19 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
         return;
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
-    vItem->Quality = m_spellInfo->Effects[effIndex].MiscValue;
-    auto generator = std::mt19937();
-    generator.seed(vItem->seed);
-    sVirtualItemMgr.GenerateItemName(vItem, generator, VirtualModifier());
-    sVirtualItemMgr.GenerateItemStats(vItem, generator);
-    vItem->InitializeQueryData();
-    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    ItemTemplate const* baseTemplate = sObjectMgr->GetItemTemplate(vItem->base_entry);
+
+    VirtualModifier modifier;
+    modifier.ilevel = vItem->ItemLevel;
+    modifier.seed = vItem->seed;
+    modifier.quality = m_spellInfo->Effects[effIndex].MiscValue;
+
+    VirtualItemTemplate* newItem = sVirtualItemMgr.GenerateVirtualTemplate(baseTemplate, modifier);
+
+    newItem->ItemId = vItem->ItemId;
+
+    newItem->InitializeQueryData();
+    WorldPacket response = newItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
     itemTarget->SaveToDB(CharacterDatabaseTransaction());
