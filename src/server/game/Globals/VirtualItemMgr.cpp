@@ -433,7 +433,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             // if we are at a free stat slot or we are at a stat slot that has the same stat type
             if (j >= setStats || output->ItemStat[j].ItemStatType == selectedStats[i])
             {
-                uint32 finalStatValue = std::floor((pool * (distributedPool[i] / 100)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
+                uint32 finalStatValue = std::floor((float(pool) * (float(distributedPool[i]) / 100.0f)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
                 output->ItemStat[j].ItemStatType = selectedStats[i];
                 output->ItemStat[j].ItemStatValue += finalStatValue;
                 setStats = std::max(setStats, uint32(j + 1));
