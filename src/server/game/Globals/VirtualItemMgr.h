@@ -280,9 +280,9 @@ public:
     itemSpellInfo GenerateSpell(VirtualItemTemplate* item, std::mt19937& generator);
 
     /**
-     * Returns a randomly generated item name depending on item type, subclass and quality
+     * Generates a randoml item name depending on item type, subclass and quality
      */
-    std::string GenerateItemName(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
+    void GenerateItemName(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -320,6 +320,12 @@ public:
      * Returns the newly created VirtualItemTemplate.
      */
     VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier = VirtualModifier());
+
+
+    /**
+     * Used to regenerate item info of virtual items.
+     */
+    void RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier);
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.

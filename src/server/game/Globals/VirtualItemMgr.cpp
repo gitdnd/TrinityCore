@@ -188,6 +188,21 @@ void VirtualItemMgr::LoadSpellsFromDB()
 
 // Generators
 
+void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
+{
+    // instantiate RNG
+    thread_local std::mt19937 generator;
+    generator.seed(output->seed);
+
+    GenerateQuality(output, generator, modifier);
+    GenerateStats(output, generator, modifier);
+    GenerateItemName(output, generator, modifier);
+    UpdateDisenchantId(output);
+    GenerateSockets(output, generator);
+    GenerateSpells(output, generator);
+    GenerateItemStats(output, generator, modifier);
+}
+
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
 {
     if (!base)
@@ -218,9 +233,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateStats(output, generator, modifier);
 
     // Generate an item name based on type and quality
-    std::string name = GenerateItemName(output, generator, modifier);
-    if (!name.empty())
-        output->Name1 = name;
+    GenerateItemName(output, generator, modifier);
 
     // Set the correct disenchant ID based on ilevel and quality
     UpdateDisenchantId(output);
@@ -552,7 +565,7 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     return ilevel;
 }
 
-std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
+void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
 {
     std::string fullName = "";
 
@@ -569,7 +582,10 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
 
             // Make sure the current list is not empty. If it is, fall back to template item name.
             if (list.empty())
-                return fullName;
+            {
+                fullName = output->Name1;
+                break;
+            }
 
             nameLists.insert(std::make_pair(i, list));
 
@@ -584,47 +600,49 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
 
-        // Concat the correct full item name for the item quality
-        std::stringstream ss;
+        if (fullName != output->Name1)
+        {
+            // Concat the correct full item name for the item quality
+            std::stringstream ss;
 
-        // Shields have their names generated like weapons.
-        if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-        {
-            switch (output->Quality)
+            // Shields have their names generated like weapons.
+            if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
             {
-            case ITEM_QUALITY_NORMAL:
-            {
-                ss << selectedWords[4];
-                break;
+                switch (output->Quality)
+                {
+                case ITEM_QUALITY_NORMAL:
+                {
+                    ss << selectedWords[4];
+                    break;
+                }
+                case ITEM_QUALITY_UNCOMMON:
+                {
+                    ss << selectedWords[3] << " " << selectedWords[4];
+                    break;
+                }
+                case ITEM_QUALITY_RARE:
+                {
+                    ss << selectedWords[2] << " " << selectedWords[4];
+                    break;
+                }
+                case ITEM_QUALITY_EPIC:
+                {
+                    ss << selectedWords[1];
+                    break;
+                }
+                case ITEM_QUALITY_LEGENDARY:
+                {
+                    ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
+                    break;
+                }
+                default:
+                    ss << fullName;
+                }
             }
-            case ITEM_QUALITY_UNCOMMON:
+            else
             {
-                ss << selectedWords[3] << " " << selectedWords[4];
-                break;
-            }
-            case ITEM_QUALITY_RARE:
-            {
-                ss << selectedWords[2] << " " << selectedWords[4];
-                break;
-            }
-            case ITEM_QUALITY_EPIC:
-            {
-                ss << selectedWords[1];
-                break;
-            }
-            case ITEM_QUALITY_LEGENDARY:
-            {
-                ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
-                break;
-            }
-            default:
-                return fullName;
-            }
-        }
-        else
-        {
-            switch (output->Quality)
-            {
+                switch (output->Quality)
+                {
                 case ITEM_QUALITY_NORMAL:
                 {
                     ss << selectedWords[5];
@@ -651,10 +669,11 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
                     break;
                 }
                 default:
-                    return fullName;
+                    ss << fullName;
+                }
             }
+            fullName = ss.str();
         }
-        fullName = ss.str();
     }
 
     if (output->Class == ITEM_CLASS_WEAPON)
@@ -670,7 +689,10 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
 
             // Make sure the current list is not empty. If it is, fall back to template item name.
             if (list.empty())
-                return fullName;
+            {
+                fullName = output->Name1;
+                break;
+            }
 
             nameLists.insert(std::make_pair(i, list));
 
@@ -687,9 +709,10 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
         // List 4: Basic type name, like Blade, Razor, Maul etc.
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
-
-        switch (output->Quality)
+        if (fullName != output->Name1)
         {
+            switch (output->Quality)
+            {
             case ITEM_QUALITY_NORMAL:
             {
                 ss << selectedWords[4];
@@ -716,12 +739,13 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
                 break;
             }
             default:
-                return fullName;
+                ss << fullName;
+            }
+            fullName = ss.str();
         }
-        fullName = ss.str();
     }
 
-    return fullName;
+    output->Name1 = fullName;
 }
 
 uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
