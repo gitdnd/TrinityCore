@@ -375,7 +375,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     // instead, we distribute the pool based on a static pool size, and use that as a percentage value
     // when distributing the actual stat values.
     int16 percentile_pool = 100;
-
+    /*
     // select stat group
     StatGroup statgroupid = modifier.statgroup;
     if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
@@ -393,7 +393,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     std::vector<ItemModType> selectedStats;
     std::vector<int16> distributedPool;
 
-    /*
+    
     if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
     {
         // select stats from preselected stat group
@@ -501,11 +501,11 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
-        if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
+        /*if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
             output->Damage[0].DamageMin = output->Damage[0].DamageMin / 2.0f;
             output->Damage[0].DamageMax = output->Damage[0].DamageMax / 2.0f;
-        }
+        }*/
     }
 
     // TODO: add custom descriptions to legendaries possibly?
@@ -516,7 +516,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
-    output->statGroup = statgroupid;
+    //output->statGroup = statgroupid;
 }
 
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
