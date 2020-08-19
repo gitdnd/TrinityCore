@@ -517,6 +517,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
     //output->statGroup = statgroupid;
+    output->statGroup = STAT_GROUP_HEALING;
 }
 
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
