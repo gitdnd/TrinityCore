@@ -327,6 +327,12 @@ public:
     void GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
 
     /**
+     * Uses passed modifier to generate stats and edits output to have the generated stats.
+     */
+    void GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
+
+
+    /**
      * Converts a virtual player/group level into a usable item level.
      */
     float GenerateItemLevel(int32 virtualLevel) const;

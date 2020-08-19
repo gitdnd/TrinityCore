@@ -231,6 +231,10 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Add spells to items like trinkets and legendaries(todo)
     GenerateSpells(output, generator);
 
+    // Generate primary and secondary stats.
+    // Always do this last, as it has variable rand calls based on quality.
+    GenerateItemStats(output, generator, modifier);
+
     // Generate an entry based on item type
     WriteGuard guard(lock);
     EntryGenerator* entryGenerator = Generator(output);
@@ -264,22 +268,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 {
     // always bind on pickup
     output->Bonding = BIND_WHEN_PICKED_UP;
-
-    // decide stat amount
-    uint32 statscount = output->Quality;
-    if (statscount < 0)
-        statscount = 0;
-    ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
-
-    // add up to two extra stats per item
-    uint32 statCountMod = urand(0, 2, generator);
-    statscount = statscount + statCountMod;
-
-    // Only a single stat on trinkets
-    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
-    {
-        statscount = 1;
-    }
 
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
@@ -349,29 +337,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         output->Block = uint32(0.93f * float(ilevel));
     }
 
-    // clear old stats
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-    {
-        output->ItemStat[i].ItemStatType = 0;
-        output->ItemStat[i].ItemStatValue = 0;
-    }
-
-    // select stat pool
-    int16 pool = 0;
-    if (modifier.statpool == -1)
-        pool = ilevel;
-    else
-        pool = modifier.statpool;
-    ASSERT(pool >= 0 && pool < 0x7FFF);
-
-    // modify stat pool size depending on item quality
-    pool = (pool * output->Quality) / 2;
-
-    // since our stats are based on the ilevel of the item, regenerating with a new ilevel causes problems.
-    // instead, we distribute the pool based on a static pool size, and use that as a percentage value
-    // when distributing the actual stat values.
-    int16 percentile_pool = 100;
-    
     // select stat group if the item is an armor piece or manually set as a modifier
     StatGroup statgroupid = modifier.statgroup;
     if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
@@ -387,65 +352,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
 
-    std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
-    std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
-
-    std::vector<ItemModType> selectedStats;
-    std::vector<int16> distributedPool;
-    
-    if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
-    {
-        // select stats from preselected stat group
-        for (uint32 i = 0; i < statscount; ++i)
-        {
-            // make sure primary stats are always selected before secondary stats
-            // trinkets should also only have secondary stats, not primary
-            if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
-                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, generator)]);
-            else
-                selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, generator)]);
-        };
-
-        // distribute pool to stats
-        const float mineachpct = 0.5f / selectedStats.size();
-        ASSERT(mineachpct <= 1.0f / selectedStats.size() && mineachpct >= 0.0);
-
-        // calculate min amount and take that from the randomly distributed pool
-        int16 min_amount = std::floor(percentile_pool * mineachpct);
-        int16 workpool = percentile_pool - selectedStats.size() * min_amount;
-
-        // pick random positions from the workpool and use them to divide it into N random size parts
-        // then add those to distributedPool along with the minimum amounts
-        std::vector<int16> fences;
-        fences.push_back(0);
-        for (int32 i = 1; i < int32(selectedStats.size()); ++i)
-            fences.push_back(urand(0, workpool, generator));
-        fences.push_back(workpool);
-        std::sort(fences.begin(), fences.end());
-        for (int32 i = 1; i < int32(fences.size()); ++i)
-            distributedPool.push_back(min_amount + fences[i] - fences[i - 1]);
-    }
-
-    // apply new stats
-    distributedPool.resize(selectedStats.size()); // ensure counts match
-    uint32 setStats = 0;
-    for (size_t i = 0; i < std::min(selectedStats.size(), size_t(MAX_ITEM_PROTO_STATS)); ++i)
-    {
-        for (uint32 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
-        {
-            // if we are at a free stat slot or we are at a stat slot that has the same stat type
-            if (j >= setStats || output->ItemStat[j].ItemStatType == selectedStats[i])
-            {
-                uint32 finalStatValue = std::floor((float(pool) * (float(distributedPool[i]) / 100.0f)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
-                output->ItemStat[j].ItemStatType = selectedStats[i];
-                output->ItemStat[j].ItemStatValue += finalStatValue;
-                setStats = std::max(setStats, uint32(j + 1));
-                break;
-            }
-        }
-    }
-    statscount = setStats;
-
+    output->statGroup = statgroupid;
 
     // If item is a weapon, then generate bot and top damage + speed
     if (output->Class == ITEM_CLASS_WEAPON)
@@ -511,10 +418,113 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->Description = "";
 
     // apply other item data
-    output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
-    output->statGroup = statgroupid;
+}
+
+void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
+{
+    // get statgroup id
+    StatGroup statgroupid = output->statGroup;
+
+    // decide stat amount
+    uint32 statscount = output->Quality;
+    if (statscount < 0)
+        statscount = 0;
+    ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
+
+    // add up to two extra stats per item
+    uint32 statCountMod = urand(0, 2, generator);
+    statscount = statscount + statCountMod;
+
+    // Only a single stat on trinkets
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+    {
+        statscount = 1;
+    }
+
+    // clear old stats
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+    {
+        output->ItemStat[i].ItemStatType = 0;
+        output->ItemStat[i].ItemStatValue = 0;
+    }
+
+    // select stat pool
+    int16 pool = 0;
+    if (modifier.statpool == -1)
+        pool = output->ItemLevel;
+    else
+        pool = modifier.statpool;
+    ASSERT(pool >= 0 && pool < 0x7FFF);
+
+    // modify stat pool size depending on item quality
+    pool = (pool * output->Quality) / 2;
+
+    // since our stats are based on the ilevel of the item, regenerating with a new ilevel causes problems.
+    // instead, we distribute the pool based on a static pool size, and use that as a percentage value
+    // when distributing the actual stat values.
+    int16 percentile_pool = 100;
+
+    std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
+    std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
+
+    std::vector<ItemModType> selectedStats;
+    std::vector<int16> distributedPool;
+
+    if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
+    {
+        // select stats from preselected stat group
+        for (uint32 i = 0; i < statscount; ++i)
+        {
+            // make sure primary stats are always selected before secondary stats
+            // trinkets should also only have secondary stats, not primary
+            if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
+                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, generator)]);
+            else
+                selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, generator)]);
+        };
+
+        // distribute pool to stats
+        const float mineachpct = 0.5f / selectedStats.size();
+        ASSERT(mineachpct <= 1.0f / selectedStats.size() && mineachpct >= 0.0);
+
+        // calculate min amount and take that from the randomly distributed pool
+        int16 min_amount = std::floor(percentile_pool * mineachpct);
+        int16 workpool = percentile_pool - selectedStats.size() * min_amount;
+
+        // pick random positions from the workpool and use them to divide it into N random size parts
+        // then add those to distributedPool along with the minimum amounts
+        std::vector<int16> fences;
+        fences.push_back(0);
+        for (int32 i = 1; i < int32(selectedStats.size()); ++i)
+            fences.push_back(urand(0, workpool, generator));
+        fences.push_back(workpool);
+        std::sort(fences.begin(), fences.end());
+        for (int32 i = 1; i < int32(fences.size()); ++i)
+            distributedPool.push_back(min_amount + fences[i] - fences[i - 1]);
+    }
+
+    // apply new stats
+    distributedPool.resize(selectedStats.size()); // ensure counts match
+    uint32 setStats = 0;
+    for (size_t i = 0; i < std::min(selectedStats.size(), size_t(MAX_ITEM_PROTO_STATS)); ++i)
+    {
+        for (uint32 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
+        {
+            // if we are at a free stat slot or we are at a stat slot that has the same stat type
+            if (j >= setStats || output->ItemStat[j].ItemStatType == selectedStats[i])
+            {
+                uint32 finalStatValue = std::floor((float(pool) * (float(distributedPool[i]) / 100.0f)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
+                output->ItemStat[j].ItemStatType = selectedStats[i];
+                output->ItemStat[j].ItemStatValue += finalStatValue;
+                setStats = std::max(setStats, uint32(j + 1));
+                break;
+            }
+        }
+    }
+
+    output->StatsCount = setStats;
 }
 
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
@@ -551,6 +561,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
         // Retrieve all the string lists
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
+        std::map<uint32, std::string> selectedWords;
         for (size_t i = 1; i <= 7; ++i)
         {
             NameInfo nameInfo(output->Class, output->SubClass, output->InventoryType, i);
@@ -561,10 +572,10 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
                 return fullName;
 
             nameLists.insert(std::make_pair(i, list));
-        }
 
-        std::stringstream ss;
-        // Concat the correct full item name for the item quality
+            // Select a word from each list, as they are to be used across quality for regeneration.
+            selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
+        }
 
         // List 1: Unique names, like Malice, Mangler, Mercy etc.
         // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
@@ -573,6 +584,8 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
 
+        // Concat the correct full item name for the item quality
+        std::stringstream ss;
 
         // Shields have their names generated like weapons.
         if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
@@ -581,27 +594,27 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             {
             case ITEM_QUALITY_NORMAL:
             {
-                ss << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_UNCOMMON:
             {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << selectedWords[3] << " " << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << selectedWords[2] << " " << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_EPIC:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)];
+                ss << selectedWords[1];
                 break;
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " of " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
+                ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
                 break;
             }
             default:
@@ -614,27 +627,27 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
             {
                 case ITEM_QUALITY_NORMAL:
                 {
-                    ss << nameLists[5][urand(0, nameLists[5].size() - 1, generator)];
+                    ss << selectedWords[5];
                     break;
                 }
                 case ITEM_QUALITY_UNCOMMON:
                 {
-                    ss << nameLists[4][urand(0, nameLists[4].size() - 1, generator)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)];
+                    ss << selectedWords[4] << " " << selectedWords[5];
                     break;
                 }
                 case ITEM_QUALITY_RARE:
                 {
-                    ss << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " of " << nameLists[2][urand(0, nameLists[2].size() - 1, generator)];
+                    ss << selectedWords[5] << " of " << selectedWords[2];
                     break;
                 }
                 case ITEM_QUALITY_EPIC:
                 {
-                    ss << nameLists[3][urand(0, nameLists[3].size() - 1, generator)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)];
+                    ss << selectedWords[3] << " " << selectedWords[5];
                     break;
                 }
                 case ITEM_QUALITY_LEGENDARY:
                 {
-                    ss << nameLists[6][urand(0, nameLists[6].size() - 1, generator)] << ", " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)] << " " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " of " << nameLists[7][urand(0, nameLists[7].size() - 1, generator)];
+                    ss << selectedWords[6] << ", " << selectedWords[4] << " " << selectedWords[5] << " of " << selectedWords[7];
                     break;
                 }
                 default:
@@ -649,6 +662,7 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
         // Retrieve all the string lists
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
+        std::map<uint32, std::string> selectedWords;
         for (size_t i = 1; i <= 6; ++i)
         {
             NameInfo nameInfo(output->Class, output->SubClass, 0, i);
@@ -659,6 +673,9 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
                 return fullName;
 
             nameLists.insert(std::make_pair(i, list));
+
+            // Select a word from each list, as they are to be used across quality for regeneration.
+            selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
         }
 
         std::stringstream ss;
@@ -675,27 +692,27 @@ std::string VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::m
         {
             case ITEM_QUALITY_NORMAL:
             {
-                ss << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_UNCOMMON:
             {
-                ss << nameLists[3][urand(0, nameLists[3].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << selectedWords[3] << " " << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_RARE:
             {
-                ss << nameLists[2][urand(0, nameLists[2].size() - 1, generator)] << " " << nameLists[4][urand(0, nameLists[4].size() - 1, generator)];
+                ss << selectedWords[2] << " " << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_EPIC:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)];
+                ss << selectedWords[1];
                 break;
             }
             case ITEM_QUALITY_LEGENDARY:
             {
-                ss << nameLists[1][urand(0, nameLists[1].size() - 1, generator)] << ", " << nameLists[5][urand(0, nameLists[5].size() - 1, generator)] << " " << nameLists[6][urand(0, nameLists[6].size() - 1, generator)];
+                ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
                 break;
             }
             default:
