@@ -356,8 +356,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         output->ItemStat[i].ItemStatValue = 0;
     }
 
-    
-
     // select stat pool
     int16 pool = 0;
     if (modifier.statpool == -1)
@@ -366,8 +364,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         pool = modifier.statpool;
     ASSERT(pool >= 0 && pool < 0x7FFF);
 
-
-
     // modify stat pool size depending on item quality
     pool = (pool * output->Quality) / 2;
 
@@ -375,8 +371,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     // instead, we distribute the pool based on a static pool size, and use that as a percentage value
     // when distributing the actual stat values.
     int16 percentile_pool = 100;
-    /*
-    // select stat group
+    
+    // select stat group if the item is an armor piece or manually set as a modifier
     StatGroup statgroupid = modifier.statgroup;
     if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
     {
@@ -384,15 +380,18 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         if (!statgroups.empty())
             statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
     }
+
+    // If the stat group is still random, select a random stat group.
     if (statgroupid == STAT_GROUP_RANDOM)
         statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
+
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
+
     std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
     std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
 
     std::vector<ItemModType> selectedStats;
     std::vector<int16> distributedPool;
-
     
     if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
     {
@@ -447,7 +446,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     }
     statscount = setStats;
 
-    */
 
     // If item is a weapon, then generate bot and top damage + speed
     if (output->Class == ITEM_CLASS_WEAPON)
@@ -501,11 +499,11 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
-        /*if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
+        if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
             output->Damage[0].DamageMin = output->Damage[0].DamageMin / 2.0f;
             output->Damage[0].DamageMax = output->Damage[0].DamageMax / 2.0f;
-        }*/
+        }
     }
 
     // TODO: add custom descriptions to legendaries possibly?
@@ -516,8 +514,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->StatsCount = statscount; // remember to modify in stat generation if two same stats are picked
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
-    //output->statGroup = statgroupid;
-    output->statGroup = STAT_GROUP_HEALING;
+    output->statGroup = statgroupid;
 }
 
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
