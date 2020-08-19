@@ -870,6 +870,7 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SelectVictim", &LuaCreature::SelectVictim },
     { "MoveWaypoint", &LuaCreature::MoveWaypoint },
     { "UpdateEntry", &LuaCreature::UpdateEntry },
+    { "MoveCircle", &LuaCreature::MoveCircle },
 
     { NULL, NULL }
 };

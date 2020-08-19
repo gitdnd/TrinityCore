@@ -12337,6 +12337,12 @@ void Player::UpdateCraftingSkill()
         return;
 
     uint32 new_value = GetAverageItemLevel();
+
+    // If the new value is less than the old value, don't update.
+    // This is done to make sure the players' average level doesn't drop.
+    if (new_value < SkillValue)
+        return;
+
     // Going below zero breaks the profession (treats as unlearned client side)
     if (new_value < 1)
         new_value = 1;
@@ -26661,6 +26667,13 @@ float Player::GetAverageItemLevel() const
         // Add items with no slot to the count
         ++count;
     }
+
+    // Get the players' current crafting skill
+    float currentItemLevel = (float)GetSkillValue(333);
+
+    // If the players' crafting skill is higher than the current average equipped armor, return crafting skill instead
+    if (currentItemLevel > (sum / (float)count))
+        return currentItemLevel;
 
     return sum / (float)count;
 }

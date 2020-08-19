@@ -1310,13 +1310,14 @@ public:
             char const* ilevelStr = strtok(nullptr, " ");
             if (ilevelStr)
             {
-                modifier.ilevel = atoi(seedStr);
+                modifier.ilevel = atoi(ilevelStr);
                 char const* qualityStr = strtok(nullptr, " ");
                 if (qualityStr)
                 {
                     modifier.quality = atoi(qualityStr);
                 }
             }
+            handler->PSendSysMessage("ItemId = %d, seed = %d, ilevel = %d, quality = %d", itemId, modifier.seed, modifier.ilevel, (int)modifier.quality);
         }
 
         Item* item = playerTarget->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);

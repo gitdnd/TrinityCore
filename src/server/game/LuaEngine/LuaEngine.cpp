@@ -103,15 +103,16 @@ void Eluna::Uninitialize()
 
 void Eluna::LoadScriptPaths()
 {
-    std::ostringstream command;
-    command << "cd " << std::filesystem::current_path() << "\\lua_scripts" << " & git pull";
-    system(command.str().c_str());
-    uint32 oldMSTime = ElunaUtil::GetCurrTime();
+    lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
 
+    ELUNA_LOG_INFO("[Eluna]: Pulling git scripts...");
+    std::ostringstream command;
+    command << "cd " << std::filesystem::current_path() << "\\" << lua_folderpath << " & git pull";
+    system(command.str().c_str());
+
+    uint32 oldMSTime = ElunaUtil::GetCurrTime();
     lua_scripts.clear();
     lua_extensions.clear();
-
-    lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
 #ifndef ELUNA_WINDOWS
     if (lua_folderpath[0] == '~')
         if (const char* home = getenv("HOME"))
