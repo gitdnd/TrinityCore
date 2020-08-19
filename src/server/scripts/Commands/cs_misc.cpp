@@ -1310,7 +1310,7 @@ public:
             char const* ilevelStr = strtok(nullptr, " ");
             if (ilevelStr)
             {
-                modifier.ilevel = atoi(seedStr);
+                modifier.ilevel = atoi(ilevelStr);
                 char const* qualityStr = strtok(nullptr, " ");
                 if (qualityStr)
                 {
