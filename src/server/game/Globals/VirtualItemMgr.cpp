@@ -369,6 +369,11 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     // modify stat pool size depending on item quality
     pool = (pool * output->Quality) / 2;
 
+    // since our stats are based on the ilevel of the item, regenerating with a new ilevel causes problems.
+    // instead, we distribute the pool based on a static pool size, and use that as a percentage value
+    // when distributing the actual stat values.
+    uint32 percentile_pool = 100;
+
     // select stat group
     StatGroup statgroupid = modifier.statgroup;
     if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
@@ -403,8 +408,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         ASSERT(mineachpct <= 1.0f / selectedStats.size() && mineachpct >= 0.0);
 
         // calculate min amount and take that from the randomly distributed pool
-        int16 min_amount = std::floor(pool * mineachpct);
-        int16 workpool = pool - selectedStats.size() * min_amount;
+        int16 min_amount = std::floor(percentile_pool * mineachpct);
+        int16 workpool = percentile_pool - selectedStats.size() * min_amount;
 
         // pick random positions from the workpool and use them to divide it into N random size parts
         // then add those to distributedPool along with the minimum amounts
@@ -428,7 +433,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             // if we are at a free stat slot or we are at a stat slot that has the same stat type
             if (j >= setStats || output->ItemStat[j].ItemStatType == selectedStats[i])
             {
-                uint32 finalStatValue = std::floor(distributedPool[i] / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
+                uint32 finalStatValue = std::floor(((distributedPool[i]/100)*pool) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
                 output->ItemStat[j].ItemStatType = selectedStats[i];
                 output->ItemStat[j].ItemStatValue += finalStatValue;
                 setStats = std::max(setStats, uint32(j + 1));
