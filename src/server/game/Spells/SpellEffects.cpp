@@ -5591,7 +5591,8 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     vItem->Quality = m_spellInfo->Effects[effIndex].MiscValue;
     auto generator = std::mt19937();
     generator.seed(vItem->seed);
-    sVirtualItemMgr.GenerateStats(vItem, generator);
+    sVirtualItemMgr.GenerateItemName(vItem, generator, VirtualModifier());
+    sVirtualItemMgr.GenerateItemStats(vItem, generator);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
