@@ -4492,7 +4492,7 @@ class spell_gen_between_cast_periodic : public AuraScript
         for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             Player* player = (*iter);
-            if (player->GetGUID() == GetCasterGUID())
+            if (player->GetGUID() == GetCasterGUID() || player->isDead())
                 continue;
 
             if (player->IsInBetween(GetCaster(), GetTarget(), 2.f))
