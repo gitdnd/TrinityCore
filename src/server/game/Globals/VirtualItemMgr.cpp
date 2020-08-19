@@ -356,6 +356,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         output->ItemStat[i].ItemStatValue = 0;
     }
 
+    
+
     // select stat pool
     int16 pool = 0;
     if (modifier.statpool == -1)
@@ -390,6 +392,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 
     std::vector<ItemModType> selectedStats;
     std::vector<int16> distributedPool;
+
+    /*
     if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
     {
         // select stats from preselected stat group
@@ -442,6 +446,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         }
     }
     statscount = setStats;
+
+    */
 
     // If item is a weapon, then generate bot and top damage + speed
     if (output->Class == ITEM_CLASS_WEAPON)
