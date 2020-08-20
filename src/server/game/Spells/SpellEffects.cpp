@@ -5592,6 +5592,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     vItem->Quality = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.quality = m_spellInfo->Effects[effIndex].MiscValue;
+    modifier.seed = vItem->seed;
 
     sVirtualItemMgr.RegenerateItemInfo(vItem, modifier);
 
