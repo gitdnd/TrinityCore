@@ -665,7 +665,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937&
                 }
                 case ITEM_QUALITY_LEGENDARY:
                 {
-                    ss << selectedWords[6] << ", " << selectedWords[4] << " " << selectedWords[5] << " of " << selectedWords[7];
+                    ss << selectedWords[6] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
                     break;
                 }
                 default:
@@ -877,16 +877,17 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
 {
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
+    uint32 socketMod = urand(0, 1, generator);
 
     switch (output->Quality) {
     case ITEM_QUALITY_LEGENDARY:
-        socketCount = urand(2, 3, generator);
+        socketCount = 2 + socketMod;
         break;
     case ITEM_QUALITY_EPIC:
         socketCount = 2;
         break;
     case ITEM_QUALITY_RARE:
-        socketCount = urand(1, 2, generator);
+        socketCount = 1 + socketMod;
         break;
     default:
         socketCount = 1;
@@ -935,7 +936,13 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
                 continue;
             }*/
 
-            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, generator)];
+            // FIXME - Regeneration:
+            // We should urand the socket color, but with variable amounts of sockets, we have variable amounts of urand calls.
+            // This causes regeneration/upgrading to fail.
+            // Should be fixed with specific mods instead of full item regeneration.
+
+            // output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, generator)];
+            output->Socket[i].Color = socketcolors[0];
         }
     }
 }
@@ -1640,8 +1647,7 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_HIT_RATING
     };
     stat_group_sockets[STAT_GROUP_AGI_TANK] = {
-        SOCKET_COLOR_YELLOW,
-        SOCKET_COLOR_RED
+        SOCKET_COLOR_YELLOW
     };
 
     // Agi Ranged DPS Data
