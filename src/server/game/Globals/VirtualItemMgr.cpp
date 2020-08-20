@@ -286,30 +286,26 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
     // if ilevel is not set, use the players average item level +/- 5 item levels.
     uint32 ilevel = output->ItemLevel;
-    if (modifier.ilevel)
-        ilevel = modifier.ilevel;
-    else
-    {
-        // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.
-        // To prevent too small of a stat pool on early items.
-        if (modifier.plrAvgLvl < 20)
-            modifier.plrAvgLvl = 20;
 
-        // Get the average ilevels virtual level group
-        int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
+    // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.
+    // To prevent too small of a stat pool on early items.
+    if (modifier.plrAvgLvl < 20)
+        modifier.plrAvgLvl = 20;
 
-        // Mod the virtual item level to allow higher or lower virtual item levels 
-        vLevel = vLevel + irand(-1, 5, generator);
+    // Get the average ilevels virtual level group
+    int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
 
-        // Get the new item level based on above modifier virtual level
-        ilevel = round(GenerateItemLevel(vLevel));
+    // Mod the virtual item level to allow higher or lower virtual item levels 
+    vLevel = vLevel + irand(-1, 5, generator);
 
-        // Modify the returned, newly generated iLevel based on quality
-        ilevel = ilevel + ((int32(output->Quality) - int32(output->Quality)) * 5);
+    // Get the new item level based on above modifier virtual level
+    ilevel = round(GenerateItemLevel(vLevel));
 
-        // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
-        ilevel = ilevel + irand(-3, 3, generator);
-    }
+    // Modify the returned, newly generated iLevel based on quality
+    ilevel = ilevel + ((int32(output->Quality) - int32(output->Quality)) * 5);
+
+    // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
+    ilevel = ilevel + irand(-3, 3, generator);
 
     // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
     if (modifier.isCrafted && !modifier.ilevel && ilevel >= output->ItemLevel)
@@ -323,7 +319,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
         ilevel = 325;
     }
 
-    output->ItemLevel = ilevel;
+    // If ilevel modifier is set, override all ilevel generation
+    if (modifier.ilevel)
+        ilevel = modifier.ilevel;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
@@ -444,6 +442,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937
     uint32 statscount = output->Quality;
     if (statscount < 0)
         statscount = 0;
+
     ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
 
     // add up to two extra stats per item
@@ -469,6 +468,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937
         pool = output->ItemLevel;
     else
         pool = modifier.statpool;
+
     ASSERT(pool >= 0 && pool < 0x7FFF);
 
     // modify stat pool size depending on item quality
@@ -945,43 +945,42 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& 
     // decide quality
     uint32 quality = output->Quality;
 
+    // these are not percentage chances. They represent areas of a number line made from their sum
+    static const uint32 chances[MAX_ITEM_QUALITY] = {
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_UNCOMMON),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_RARE),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_EPIC),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_LEGENDARY),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_ARTIFACT),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
+    };
+
+    uint32 sum = 0;
+    for (auto u : chances)
+        sum += u;
+
+    if (sum >= 1)
+    {
+        uint32 rand = urand(1, sum, generator);
+        sum = 0;
+        for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
+        {
+            sum += chances[i];
+            if (sum < rand)
+                continue;
+
+            quality = i;
+            break;
+        }
+    }
+
+    quality = std::max(output->Quality, quality); // dont generate quality below original
+
+    // If the quality modifier is set, discard generated quality and force specific quality
     if (modifier.quality < MAX_ITEM_QUALITY)
         quality = modifier.quality;
-    else
-    {
-        // these are not percentage chances. They represent areas of a number line made from their sum
-        static const uint32 chances[MAX_ITEM_QUALITY] = {
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_UNCOMMON),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_RARE),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_EPIC),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_LEGENDARY),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_ARTIFACT),
-            sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
-        };
-
-        uint32 sum = 0;
-        for (auto u : chances)
-            sum += u;
-
-        if (sum >= 1)
-        {
-            uint32 rand = urand(1, sum, generator);
-            sum = 0;
-            for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
-            {
-                sum += chances[i];
-                if (sum < rand)
-                    continue;
-
-                quality = i;
-                break;
-            }
-        }
-
-        quality = std::max(output->Quality, quality); // dont generate quality below original
-    }
 
     output->Quality = quality;
 }
