@@ -192,7 +192,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
 {
     // instantiate RNG
     thread_local std::mt19937 generator;
-    generator.seed(output->seed);
+    generator.seed(modifier.seed);
 
     GenerateQuality(output, generator, modifier);
     GenerateStats(output, generator, modifier);
