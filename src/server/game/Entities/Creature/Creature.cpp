@@ -1435,7 +1435,7 @@ void Creature::UpdateLevelDependantStats()
     uint32 health = uint32(basehp * healthmod);
 
     int dungeonLevel = GetMap()->GetDungeonLevel();
-    if (dungeonLevel > 0)
+    if (dungeonLevel > 0 && dungeonLevel <= 10000)
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
         float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
@@ -1466,7 +1466,7 @@ void Creature::UpdateLevelDependantStats()
 
     float basedamage = stats->GenerateBaseDamage(cInfo);
 
-    if (dungeonLevel > 0)
+    if (dungeonLevel > 0 && dungeonLevel < 10000)
     {
         // FIXME(Harry): Come up with a better scaling system
         float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 40000.0f) + 0.5f;
