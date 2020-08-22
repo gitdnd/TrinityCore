@@ -643,7 +643,7 @@ public:
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), TimeFormat::ShortText);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), TimeFormat::ShortText);
 
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, faction, npcflags, displayid, nativeid);
+        handler->PSendSysMessage("---------------------");
         if (target->GetCreatureData() && target->GetCreatureData()->spawnGroupData->groupId)
         {
             SpawnGroupTemplateData const* const groupData = target->GetCreatureData()->spawnGroupData;
@@ -684,6 +684,9 @@ public:
         for (Mechanics m : EnumUtils::Iterate<Mechanics>())
             if (m && (mechanicImmuneMask & (1 << (m-1))))
                 handler->PSendSysMessage("* %s (0x%X)", EnumUtils::ToTitle(m), m);
+
+        // Name, spawn, guid, entry, faction, display should be last, this is the most important info to read
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, faction, npcflags, displayid, nativeid);
 
         return true;
     }
