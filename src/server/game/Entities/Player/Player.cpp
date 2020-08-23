@@ -25487,10 +25487,10 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                             if (HasSpell(tmpTalent->RankID[rank]))
                                 spentPoints += (rank + 1);
 
-    if (talentInfo->Row > 0)
-        for (uint32 i = talentInfo->Row - 1; i < talentInfo->Row; i++)          // Loop through all talents.
-            if (TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i))                                  // the way talents are tracked
-                if (tmpTalent->TalentTab == tTab)
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); i++)          // Loop through all talents.
+        if (TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i))                                  // the way talents are tracked
+            if (tmpTalent->TalentTab == tTab)
+                if(tmpTalent->Row == talentInfo->Row)
                     for (uint8 rank = 0; rank < MAX_TALENT_RANK; rank++)
                         if (tmpTalent->RankID[rank] != 0)
                             if (HasSpell(tmpTalent->RankID[rank]))
