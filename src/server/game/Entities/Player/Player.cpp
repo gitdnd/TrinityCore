@@ -25475,6 +25475,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
     // Find out how many points we have in this field
     uint32 spentPoints = 0;
+    uint32 spentPointsInRow = 0;
 
     uint32 tTab = talentInfo->TalentTab;
     if (talentInfo->Row > 0)
@@ -25486,6 +25487,15 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                             if (HasSpell(tmpTalent->RankID[rank]))
                                 spentPoints += (rank + 1);
 
+    if (talentInfo->Row > 0)
+        for (uint32 i = talentInfo->Row - 1; i < talentInfo->Row; i++)          // Loop through all talents.
+            if (TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i))                                  // the way talents are tracked
+                if (tmpTalent->TalentTab == tTab)
+                    for (uint8 rank = 0; rank < MAX_TALENT_RANK; rank++)
+                        if (tmpTalent->RankID[rank] != 0)
+                            if (HasSpell(tmpTalent->RankID[rank]))
+                                spentPointsInRow += (rank + 1);
+
     // not have required min points spent in talent tree
     if (GetClass() != CLASS_ADVENTURER)
     {
@@ -25494,11 +25504,10 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     }
     else
     {
-        // Do not allow a player to spend more than one talent per tier
-        if (talentInfo->Row != (spentPoints+CurTalentPoints)-1)
+        // Do not allow spending more than 1 point per row as an adventurer.
+        if (spentPointsInRow > 0)
             return;
     }
-    
 
     // spell not set in talent.dbc
     uint32 spellid = talentInfo->RankID[talentRank];
