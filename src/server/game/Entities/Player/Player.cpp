@@ -12349,6 +12349,9 @@ void Player::UpdateCraftingSkill()
     if (new_value > MaxValue)
         new_value = MaxValue;
 
+    // Update players' talents whenever crafting skill changes
+    InitTalentForLevel();
+
     SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, MaxValue));
     if (itr->second.uState != SKILL_NEW)
         itr->second.uState = SKILL_CHANGED;
@@ -25077,8 +25080,21 @@ uint32 Player::CalculateTalentsPoints() const
 
     if (GetClass() == CLASS_ADVENTURER)
     {
-        // Test to see if this works before adding ilevel calculation
-        return 5;
+        uint32 advTalents = 0;
+        uint32 avgLevel = uint32(GetAverageItemLevel());
+
+        if (avgLevel >= 25)
+            advTalents = 1;
+        else if (avgLevel >= 75)
+            advTalents = 2;
+        else if (avgLevel >= 125)
+            advTalents = 3;
+        else if (avgLevel >= 175)
+            advTalents = 4;
+        else if (avgLevel >= 225)
+            advTalents = 5;
+
+        return advTalents;
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
