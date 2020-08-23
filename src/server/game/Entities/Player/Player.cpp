@@ -25075,7 +25075,7 @@ uint32 Player::CalculateTalentsPoints() const
 {
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel()-9;
 
-    if (GetClass() != CLASS_DEATH_KNIGHT || GetClass() != CLASS_ADVENTURER || GetMapId() != 609)
+    if ((GetClass() != CLASS_DEATH_KNIGHT && GetClass() != CLASS_ADVENTURER) || GetMapId() != 609)
         return uint32(base_talent * sWorld->getRate(RATE_TALENT));
 
     if (GetClass() == CLASS_ADVENTURER)
