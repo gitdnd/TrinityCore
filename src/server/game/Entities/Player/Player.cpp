@@ -25507,6 +25507,10 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         // Do not allow spending more than 1 point per row as an adventurer.
         if (spentPointsInRow > 0)
             return;
+
+        // Do not allow spending points in tiers higher than the amount of spent points.
+        if (spentPoints < talentInfo->Row)
+            return;
     }
 
     // spell not set in talent.dbc
