@@ -25505,6 +25505,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     else
     {
         // Do not allow spending more than 1 point per row as an adventurer.
+        ELUNA_LOG_INFO("Points spent: %u, Row: %u", spentPointsInRow, talentInfo->Row);
         if (spentPointsInRow > 0)
             return;
     }
