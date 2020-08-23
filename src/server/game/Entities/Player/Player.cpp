@@ -25487,9 +25487,18 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                                 spentPoints += (rank + 1);
 
     // not have required min points spent in talent tree
-    if(GetClass() != CLASS_ADVENTURER)
+    if (GetClass() != CLASS_ADVENTURER)
+    {
         if (spentPoints < (talentInfo->Row * MAX_TALENT_RANK))
             return;
+    }
+    else
+    {
+        // Do not allow a player to spend more than one talent per tier
+        if (talentInfo->Row != (spentPoints+CurTalentPoints)-1)
+            return;
+    }
+    
 
     // spell not set in talent.dbc
     uint32 spellid = talentInfo->RankID[talentRank];
