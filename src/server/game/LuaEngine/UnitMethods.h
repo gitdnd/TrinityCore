@@ -1238,6 +1238,25 @@ namespace LuaUnit
         return 1;
     }
 
+#if defined TRINITY || AZEROTHCORE
+    /**
+     * Returns the stack of [Aura]s of the given spell entry on the [Unit] or nil.
+     *
+     * @param uint32 spellID : entry of the aura spell
+     * @return uint8 number : Stack of spells or nil
+     */
+    int GetSpellStackAmount(lua_State* L, Unit* unit)
+    {
+        uint32 spellID = Eluna::CHECKVAL<uint32>(L, 2);
+        Aura const* spell = unit->GetAura(spellID);
+
+        Eluna::Push(L, spell->GetStackAmount());
+
+        return 1;
+    }
+
+#endif
+
     /**
      * Returns a table containing friendly [Unit]'s within given range of the [Unit].
      *
