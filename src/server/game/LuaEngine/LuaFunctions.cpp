@@ -275,6 +275,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "GetRaceAsString", &LuaUnit::GetRaceAsString },
     { "GetClassAsString", &LuaUnit::GetClassAsString },
     { "GetAura", &LuaUnit::GetAura },
+    { "GetSpellStackAmount", &LuaUnit::GetSpellStackAmount },
     { "GetFaction", &LuaUnit::GetFaction },
     { "GetCurrentSpell", &LuaUnit::GetCurrentSpell },
     { "GetCreatureType", &LuaUnit::GetCreatureType },
