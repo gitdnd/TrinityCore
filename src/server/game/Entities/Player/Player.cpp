@@ -25075,14 +25075,14 @@ uint32 Player::CalculateTalentsPoints() const
 {
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel()-9;
 
-    if ((GetClass() != CLASS_DEATH_KNIGHT && GetClass() != CLASS_ADVENTURER) || GetMapId() != 609)
-        return uint32(base_talent * sWorld->getRate(RATE_TALENT));
-
     if (GetClass() == CLASS_ADVENTURER)
     {
         // Test to see if this works before adding ilevel calculation
         return 5;
     }
+
+    if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
+        return uint32(base_talent * sWorld->getRate(RATE_TALENT));
 
     uint32 talentPointsForLevel = GetLevel() < 56 ? 0 : GetLevel() - 55;
     talentPointsForLevel += m_questRewardTalentCount;
