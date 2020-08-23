@@ -1250,6 +1250,9 @@ namespace LuaUnit
         uint32 spellID = Eluna::CHECKVAL<uint32>(L, 2);
         Aura const* spell = unit->GetAura(spellID);
 
+        if (!spell)
+            return 1;
+
         Eluna::Push(L, spell->GetStackAmount());
 
         return 1;
