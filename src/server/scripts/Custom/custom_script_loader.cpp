@@ -19,6 +19,7 @@
 
 void AddSC_GOMove_commandscript();
 void AddSC_FallOfDalaran();
+void AddSC_DragonIsles();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
