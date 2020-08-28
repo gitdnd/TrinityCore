@@ -29,6 +29,10 @@ public:
             // Summon Vrykul Flag
             if (auto caster = GetCaster())
             {
+                if (caster->IsCreature() && caster->IsAlive())
+                {
+                    return;
+                }
                 // Only summon if not next to drop point, and not directly on another flag
                 if (!caster->FindNearestCreature(52024, 5.0f) && !caster->FindNearestCreature(52022, 2.0f))
                 {
