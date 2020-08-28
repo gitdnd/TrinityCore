@@ -26,4 +26,5 @@ void AddCustomScripts()
 {
     AddSC_GOMove_commandscript();
     AddSC_FallOfDalaran();
+    AddSC_DragonIsles();
 }
