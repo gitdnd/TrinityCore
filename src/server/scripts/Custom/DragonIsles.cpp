@@ -31,8 +31,6 @@ public:
             {
                 if (caster->IsCreature() && caster->IsAlive())
                 {
-                    // Reapply aura
-                    caster->CastSpell(caster, 90112);
                     return;
                 }
                 // Only summon if not next to drop point, and not directly on another flag
