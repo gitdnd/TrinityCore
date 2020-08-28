@@ -29,8 +29,8 @@ public:
             // Summon Vrykul Flag
             if (auto caster = GetCaster())
             {
-                // Only summon if not next to drop point
-                if (!caster->FindNearestCreature(52024, 8.0f))
+                // Only summon if not next to drop point, and not directly on another flag
+                if (!caster->FindNearestCreature(52024, 5.0f) && !caster->FindNearestCreature(52022, 2.0f))
                 {
                     caster->SummonCreature(52022, GetCaster()->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 0);
                 }
