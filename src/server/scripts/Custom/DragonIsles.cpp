@@ -29,8 +29,7 @@ public:
             // Summon Vrykul Flag
             if (auto caster = GetCaster())
             {
-                GetCaster()->Yell("Oops, I dropped the flag!", Language(0), GetCaster());
-                GetCaster()->SummonCreature(52022, GetCaster()->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 0);
+                caster->SummonCreature(52022, GetCaster()->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 0);
             }
         }
 
