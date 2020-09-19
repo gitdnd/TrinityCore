@@ -297,7 +297,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!mover->movespline->Finalized())
     {
-        ChatHandler(this).PSendSysMessage("Desync E detected, report to devs.");
+        //ChatHandler(this).PSendSysMessage("Desync E detected, report to devs.");
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
