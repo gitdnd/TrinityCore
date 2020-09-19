@@ -85,8 +85,9 @@ namespace LuaVehicle
         Unit* passenger = Eluna::CHECKOBJ<Unit>(L, 2);
         int8 seatId = Eluna::CHECKVAL<int8>(L, 3);
 #if defined TRINITY || AZEROTHCORE
-        passenger->EnterVehicle(reinterpret_cast<Unit*>(vehicle), seatId);
-        //vehicle->AddPassenger(passenger, seatId);
+        //passenger->EnterVehicle(reinterpret_cast<Unit*>(vehicle), seatId);
+        // This method seems safer
+        vehicle->AddPassenger(passenger, seatId);
 #else
         if (vehicle->CanBoard(passenger))
             vehicle->Board(passenger, seatId);
