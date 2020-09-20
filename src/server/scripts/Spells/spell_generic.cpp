@@ -4507,7 +4507,8 @@ class spell_gen_between_cast_periodic : public AuraScript
             if (player->GetGUID() == GetCasterGUID() || player->isDead())
                 continue;
 
-            if (player->IsInBetween(GetCaster(), GetTarget(), 2.f))
+            // Check of player is between the caster and the target, and check player Z is within range of the caster and target Z
+            if (player->IsInBetween(GetCaster(), GetTarget(), 2.f) && abs(GetCaster()->GetPositionZ() - player->GetPositionZ()) <= 3)
                 player->CastSpell(player, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
      }
