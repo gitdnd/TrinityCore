@@ -1249,5 +1249,20 @@ namespace LuaWorldObject
         obj->UpdateObjectVisibility(true);
         return 0;
     }
+    /**
+     * Sets the [WorldObject] to be active or not
+     *
+     * Loads the worldobject on the grid even though
+     * it may not be on a grid where a player is.
+     *
+     *
+     * @param bool active 
+     */
+    int SetActive(lua_State* L, WorldObject* obj)
+    {
+        bool active = Eluna::CHECKVAL<bool>(L, 2);
+        obj->setActive(active);
+        return 0;
+    }
 };
 #endif

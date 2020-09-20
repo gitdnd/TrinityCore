@@ -250,6 +250,7 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "CreateTransport", &LuaWorldObject::CreateTransport },
     { "SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
     { "SetVisible", &LuaWorldObject::SetVisible },
+    { "SetActive", &LuaWorldObject::SetActive },
 
     { NULL, NULL }
 };
