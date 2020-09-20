@@ -2183,6 +2183,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         std::string GetDebugInfo() const override;
 
+        //Custom:
+        uint8 GetEquippedItemsOfArmorType(uint8 type);
+        void UpdateArmorPassives();
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

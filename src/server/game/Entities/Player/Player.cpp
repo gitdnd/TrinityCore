@@ -12288,6 +12288,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, bag, slot);
 #endif
+    UpdateArmorPassives();
     return pItem;
 }
 
@@ -27130,4 +27131,62 @@ std::string Player::GetDebugInfo() const
     std::stringstream sstr;
     sstr << Unit::GetDebugInfo();
     return sstr.str();
+}
+
+uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
+{
+    uint8 count = 0;
+    for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (item->GetTemplate()->Class == ITEM_CLASS_ARMOR && item->GetTemplate()->SubClass == type)
+                count += 1;
+        }
+    }
+    return count;
+}
+
+void Player::UpdateArmorPassives()
+{
+    if (HasTalent(180000, GetActiveSpec()))
+    {
+        uint8 count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
+        if (count > 0)
+        {
+            if (auto aura = GetAura(181000))
+                aura->SetStackAmount(count);
+            else
+            {
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(181000))
+                {
+                    AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
+                    createInfo.SetCaster(this);
+
+                    auto aura = Aura::TryRefreshStackOrCreate(createInfo);
+                    aura->SetStackAmount(count);
+                }
+            }
+        }
+    }
+    else if (HasTalent(181003, GetActiveSpec()))
+    {
+        uint8 count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
+        if (count > 0)
+        {
+            if (auto aura = GetAura(181003))
+                aura->SetStackAmount(count);
+            else
+            {
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(181003))
+                {
+                    AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
+                    createInfo.SetCaster(this);
+
+                    auto aura = Aura::TryRefreshStackOrCreate(createInfo);
+                    aura->SetStackAmount(count);
+                }
+            }
+        }
+    }
 }
