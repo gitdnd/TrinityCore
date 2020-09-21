@@ -25543,6 +25543,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 #ifdef ELUNA
     sEluna->OnLearnTalents(this, talentId, talentRank, spellid);
 #endif
+    UpdateArmorPassives();
 }
 
 void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank)
@@ -27154,53 +27155,42 @@ uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
 
 void Player::UpdateArmorPassives()
 {
+    uint8 count = 0;
+    uint32 spell = 0;
     if (HasTalent(180000, GetActiveSpec()))
     {
-        uint8 count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
-        if (count > 0)
-        {
-            ChatHandler(GetSession()).PSendSysMessage("Got count %u", count);
-            if (auto aura = GetAura(181000))
-            {
-                ChatHandler(GetSession()).PSendSysMessage("Found aura setting stack");
-                aura->SetStackAmount(count);
-            }
-            else
-            {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(181000))
-                {
-                    ChatHandler(GetSession()).PSendSysMessage("Couldn't find aura, creating one", count);
-                    AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
-                    createInfo.SetCaster(this);
-
-                    auto aura = Aura::TryRefreshStackOrCreate(createInfo);
-                    aura->SetStackAmount(count);
-                }
-            }
-        }
-        else
-            ChatHandler(GetSession()).PSendSysMessage("We got no count.");
+        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
+        spell = 181000;
     }
     else if (HasTalent(181003, GetActiveSpec()))
     {
-        uint8 count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
-        if (count > 0)
+        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
+        spell = 181003;
+    }
+    if (count > 0 && spell != 0)
+    {
+        ChatHandler(GetSession()).PSendSysMessage("Got count %u", count);
+        if (auto aura = GetAura(181000))
         {
-            if (auto aura = GetAura(181003))
-                aura->SetStackAmount(count);
-            else
+            ChatHandler(GetSession()).PSendSysMessage("Found aura setting stack");
+            aura->SetStackAmount(count);
+        }
+        else
+        {
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
             {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(181003))
-                {
-                    AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
-                    createInfo.SetCaster(this);
+                ChatHandler(GetSession()).PSendSysMessage("Couldn't find aura, creating one");
+                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
+                createInfo.SetCaster(this);
 
-                    auto aura = Aura::TryRefreshStackOrCreate(createInfo);
-                    aura->SetStackAmount(count);
-                }
+                auto aura = Aura::TryRefreshStackOrCreate(createInfo);
+                aura->SetStackAmount(count);
             }
         }
     }
     else
-        ChatHandler(GetSession()).PSendSysMessage("No talent found.");
+    {
+        RemoveAura(spell);
+        ChatHandler(GetSession()).PSendSysMessage("We got no count.");
+    }
 }
