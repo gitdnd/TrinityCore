@@ -3966,6 +3966,8 @@ bool Player::ResetTalents(bool no_cost)
     }
     */
 
+    RemoveArmorPassives();
+
     return true;
 }
 
@@ -27217,4 +27219,9 @@ void Player::UpdateArmorPassives()
         RemoveAura(spell);
         //ChatHandler(GetSession()).PSendSysMessage("We got no count.");
     }
+}
+
+void Player::RemoveArmorPassives()
+{
+    uint32 spells[] = { 181000, 181001, 181002, 181003, 181004 }; for (uint8 i : spells) RemoveAura(spells[i]);
 }

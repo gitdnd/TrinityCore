@@ -2186,6 +2186,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         //Custom:
         uint8 GetEquippedItemsOfArmorType(uint8 type);
         void UpdateArmorPassives();
+        void RemoveArmorPassives();
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
