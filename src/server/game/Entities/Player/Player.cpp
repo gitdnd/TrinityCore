@@ -12275,6 +12275,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem2, bag, slot);
 #endif
+        UpdateArmorPassives();
         return pItem2;
     }
 
