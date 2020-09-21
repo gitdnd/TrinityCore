@@ -12120,6 +12120,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem, true);
 
+        UpdateArmorPassives();
+
         return pItem;
     }
     else
@@ -12158,6 +12160,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem2, true);
+
+        UpdateArmorPassives();
 
         return pItem2;
     }
