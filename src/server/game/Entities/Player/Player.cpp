@@ -27155,12 +27155,17 @@ void Player::UpdateArmorPassives()
         uint8 count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
         if (count > 0)
         {
+            ChatHandler(GetSession()).PSendSysMessage("Got count %u", count);
             if (auto aura = GetAura(181000))
+            {
+                ChatHandler(GetSession()).PSendSysMessage("Found aura setting stack");
                 aura->SetStackAmount(count);
+            }
             else
             {
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(181000))
                 {
+                    ChatHandler(GetSession()).PSendSysMessage("Couldn't find aura, creating one", count);
                     AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
                     createInfo.SetCaster(this);
 
@@ -27169,6 +27174,8 @@ void Player::UpdateArmorPassives()
                 }
             }
         }
+        else
+            ChatHandler(GetSession()).PSendSysMessage("We got no count.");
     }
     else if (HasTalent(181003, GetActiveSpec()))
     {
@@ -27190,4 +27197,6 @@ void Player::UpdateArmorPassives()
             }
         }
     }
+    else
+        ChatHandler(GetSession()).PSendSysMessage("No talent found.");
 }
