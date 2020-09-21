@@ -27157,29 +27157,53 @@ void Player::UpdateArmorPassives()
 {
     uint8 count = 0;
     uint32 spell = 0;
+
     if (HasTalent(180000, GetActiveSpec()))
     {
         count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
         spell = 181000;
     }
-    else if (HasTalent(181003, GetActiveSpec()))
+    else if (HasTalent(180001, GetActiveSpec()))
+    {
+        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_CLOTH) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER);
+        spell = 181001;
+    }
+    else if (HasTalent(180002, GetActiveSpec()))
+    {
+        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_CLOTH) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER);
+        spell = 181002;
+    }
+    else if (HasTalent(180003, GetActiveSpec()))
     {
         count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
         spell = 181003;
     }
+    else if (HasTalent(180004, GetActiveSpec()))
+    {
+        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL);
+        spell = 181004;
+    }
+
     if (count > 0 && spell != 0)
     {
-        ChatHandler(GetSession()).PSendSysMessage("Got count %u", count);
-        if (auto aura = GetAura(181000))
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
         {
-            ChatHandler(GetSession()).PSendSysMessage("Found aura setting stack");
-            aura->SetStackAmount(count);
-        }
-        else
-        {
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+            if (count > uint8(spellInfo->StackAmount))
             {
-                ChatHandler(GetSession()).PSendSysMessage("Couldn't find aura, creating one");
+                count = uint8(spellInfo->StackAmount);
+            }
+
+            auto aura = GetAura(spell);
+
+            //ChatHandler(GetSession()).PSendSysMessage("Got count %u", count);
+            if (aura)
+            {
+                //ChatHandler(GetSession()).PSendSysMessage("Found aura setting stack");
+                aura->SetStackAmount(count);
+            }
+            else
+            {
+                //ChatHandler(GetSession()).PSendSysMessage("Couldn't find aura, creating one");
                 AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
                 createInfo.SetCaster(this);
 
@@ -27191,6 +27215,6 @@ void Player::UpdateArmorPassives()
     else
     {
         RemoveAura(spell);
-        ChatHandler(GetSession()).PSendSysMessage("We got no count.");
+        //ChatHandler(GetSession()).PSendSysMessage("We got no count.");
     }
 }
