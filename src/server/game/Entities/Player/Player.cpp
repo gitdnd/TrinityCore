@@ -26285,6 +26285,8 @@ void Player::ActivateSpec(uint8 spec)
     if (spec > GetSpecsCount())
         return;
 
+    RemoveArmorPassives();
+
     if (IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
 
