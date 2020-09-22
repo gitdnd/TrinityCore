@@ -27157,71 +27157,51 @@ uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
 
 void Player::UpdateArmorPassives()
 {
+#define CHECK_TALENT(a,b,c,d) if (HasTalent(a, GetActiveSpec())) \
+    count = GetEquippedItemsOfArmorType(b) + GetEquippedItemsOfArmorType(c); \
+    spell = d
     uint8 count = 0;
     uint32 spell = 0;
 
-    if (HasTalent(180000, GetActiveSpec()))
-    {
-        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
-        spell = 181000;
-    }
-    else if (HasTalent(180001, GetActiveSpec()))
-    {
-        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_CLOTH) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER);
-        spell = 181001;
-    }
-    else if (HasTalent(180002, GetActiveSpec()))
-    {
-        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_CLOTH) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER);
-        spell = 181002;
-    }
-    else if (HasTalent(180003, GetActiveSpec()))
-    {
-        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_PLATE);
-        spell = 181003;
-    }
-    else if (HasTalent(180004, GetActiveSpec()))
-    {
-        count = GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_LEATHER) + GetEquippedItemsOfArmorType(ITEM_SUBCLASS_ARMOR_MAIL);
-        spell = 181004;
-    }
-
-    if (count > 0 && spell != 0)
+    CHECK_TALENT(180000, ITEM_SUBCLASS_ARMOR_MAIL, ITEM_SUBCLASS_ARMOR_PLATE, 181000);
+    CHECK_TALENT(180001, ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER, 181001);
+    CHECK_TALENT(180002, ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER, 181002);
+    CHECK_TALENT(180003, ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_PLATE, 181000);
+    CHECK_TALENT(180004, ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_MAIL, 181004);
+    
+    if (count > 0)
     {
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
         {
             if (count > uint8(spellInfo->StackAmount))
-            {
                 count = uint8(spellInfo->StackAmount);
-            }
-
-            auto aura = GetAura(spell);
-
-            //ChatHandler(GetSession()).PSendSysMessage("Got count %u", count);
-            if (aura)
-            {
-                //ChatHandler(GetSession()).PSendSysMessage("Found aura setting stack");
+          
+            if (auto aura = GetAura(spell))
                 aura->SetStackAmount(count);
-            }
             else
             {
-                //ChatHandler(GetSession()).PSendSysMessage("Couldn't find aura, creating one");
-                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
+                 AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
                 createInfo.SetCaster(this);
 
-                auto aura = Aura::TryRefreshStackOrCreate(createInfo);
-                aura->SetStackAmount(count);
+                if (auto applyAura = Aura::TryRefreshStackOrCreate(createInfo))
+                    applyAura->SetStackAmount(count);
+                else
+                    TC_LOG_ERROR("spells", "Error applying armor passive, broken spell %u?", spell);
             }
         }
     }
     else
     {
-        RemoveAura(spell);
-        //ChatHandler(GetSession()).PSendSysMessage("We got no count.");
+        if(spell != 0)
+            RemoveAura(spell);
     }
+#undef CHECK_TALENT
 }
 
 void Player::RemoveArmorPassives()
 {
-    uint32 spells[] = { 181000, 181001, 181002, 181003, 181004 }; for (uint8 i : spells) RemoveAura(spells[i]);
+    uint32 spells[] = { 181000, 181001, 181002, 181003, 181004 };
+
+    for (uint8 i : spells)
+        RemoveAura(spells[i]);
 }
