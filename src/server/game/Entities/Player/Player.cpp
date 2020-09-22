@@ -26447,6 +26447,7 @@ void Player::ActivateSpec(uint8 spec)
         aurEff->HandleShapeshiftBoosts(this, false);
         aurEff->HandleShapeshiftBoosts(this, true);
     }
+    UpdateArmorPassives();
 }
 
 void Player::LoadActions(PreparedQueryResult result)
