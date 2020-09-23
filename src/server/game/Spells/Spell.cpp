@@ -3599,8 +3599,8 @@ void Spell::handle_immediate()
     TakeCastItem();
 
     // handle ammo consumption for Hunter's volley spell
-    if (m_spellInfo->IsRangedWeaponSpell() && m_spellInfo->IsChanneled())
-        TakeAmmo();
+    //if (m_spellInfo->IsRangedWeaponSpell() && m_spellInfo->IsChanneled())
+    //    TakeAmmo();
 
     if (m_spellState != SPELL_STATE_CASTING)
         finish(true);                                       // successfully finish spell cast (not last in case autorepeat or channel spell)
@@ -6995,7 +6995,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (!item || item->IsBroken())
                     return SPELL_FAILED_EQUIPPED_ITEM;
 
-                switch (item->GetTemplate()->SubClass)
+                /*switch (item->GetTemplate()->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_THROWN:
                     {
@@ -7052,7 +7052,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                         break;
                     default:
                         break;
-                }
+                }*/
                 break;
             }
             case SPELL_EFFECT_CREATE_MANA_GEM:
@@ -7608,8 +7608,9 @@ void Spell::HandleLaunchPhase()
         if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->IsTargetingArea())
             usesAmmo = false;
 
-        if (usesAmmo)
-            TakeAmmo();
+        //Disable taking ammo from the player - we dont use ammo
+        //if (usesAmmo)
+        //    TakeAmmo();
     }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
