@@ -4389,8 +4389,16 @@ void Spell::UpdateSpellCastDataAmmo(WorldPackets::Spells::SpellAmmo& ammo)
                 }
                 else if (m_caster->ToPlayer()->HasAura(46699))      // Requires No Ammo
                 {
-                    ammoDisplayID = 5996;                   // normal arrow
-                    ammoInventoryType = INVTYPE_AMMO;
+                    if (pItem->GetTemplate()->Class == ITEM_SUBCLASS_WEAPON_BOW || pItem->GetTemplate()->Class == ITEM_SUBCLASS_WEAPON_CROSSBOW)
+                    {
+                        ammoDisplayID = 5996;                   // normal arrow
+                        ammoInventoryType = INVTYPE_AMMO;
+                    }
+                    else if(pItem->GetTemplate()->Class == ITEM_SUBCLASS_WEAPON_GUN)
+                    {
+                        ammoDisplayID = 5998;                   // normal arrow
+                        ammoInventoryType = INVTYPE_AMMO;
+                    }
                 }
             }
         }
@@ -6995,7 +7003,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (!item || item->IsBroken())
                     return SPELL_FAILED_EQUIPPED_ITEM;
 
-                /*switch (item->GetTemplate()->SubClass)
+                switch (item->GetTemplate()->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_THROWN:
                     {
@@ -7052,7 +7060,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                         break;
                     default:
                         break;
-                }*/
+                }
                 break;
             }
             case SPELL_EFFECT_CREATE_MANA_GEM:
@@ -7608,9 +7616,8 @@ void Spell::HandleLaunchPhase()
         if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->IsTargetingArea())
             usesAmmo = false;
 
-        //Disable taking ammo from the player - we dont use ammo
-        //if (usesAmmo)
-        //    TakeAmmo();
+        if (usesAmmo)
+            TakeAmmo();
     }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
