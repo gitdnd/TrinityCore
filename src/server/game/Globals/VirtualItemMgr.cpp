@@ -665,7 +665,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937&
                 }
                 case ITEM_QUALITY_LEGENDARY:
                 {
-                    ss << selectedWords[6] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
+                    ss << selectedWords[1] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
                     break;
                 }
                 default:
