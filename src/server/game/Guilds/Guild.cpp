@@ -540,7 +540,7 @@ Guild::Member::Member(ObjectGuid::LowType guildId, ObjectGuid guid, uint8 rankId
 void Guild::Member::SetStats(Player* player)
 {
     m_name      = player->GetName();
-    m_level     = player->GetLevel();
+    m_level     = floor(player->GetAverageItemLevel());
     m_class     = player->GetClass();
     m_gender    = player->GetNativeGender();
     m_zoneId    = player->GetZoneId();
@@ -624,6 +624,7 @@ bool Guild::Member::LoadFromDB(Field* fields)
     for (uint8 i = 0; i <= GUILD_BANK_MAX_TABS; ++i)
         m_bankWithdraw[i] = fields[5 + i].GetUInt32();
 
+    // FIXME(HARRY): Offline guild members will show level 80
     SetStats(fields[12].GetString(),
              fields[13].GetUInt8(),                         // characters.level
              fields[14].GetUInt8(),                         // characters.class
