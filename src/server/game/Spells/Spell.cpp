@@ -3599,8 +3599,8 @@ void Spell::handle_immediate()
     TakeCastItem();
 
     // handle ammo consumption for Hunter's volley spell
-    if (m_spellInfo->IsRangedWeaponSpell() && m_spellInfo->IsChanneled())
-        TakeAmmo();
+    //if (m_spellInfo->IsRangedWeaponSpell() && m_spellInfo->IsChanneled())
+    //    TakeAmmo();
 
     if (m_spellState != SPELL_STATE_CASTING)
         finish(true);                                       // successfully finish spell cast (not last in case autorepeat or channel spell)
@@ -4389,8 +4389,16 @@ void Spell::UpdateSpellCastDataAmmo(WorldPackets::Spells::SpellAmmo& ammo)
                 }
                 else if (m_caster->ToPlayer()->HasAura(46699))      // Requires No Ammo
                 {
-                    ammoDisplayID = 5996;                   // normal arrow
-                    ammoInventoryType = INVTYPE_AMMO;
+                    if (pItem->GetTemplate()->Class == ITEM_SUBCLASS_WEAPON_BOW || pItem->GetTemplate()->Class == ITEM_SUBCLASS_WEAPON_CROSSBOW)
+                    {
+                        ammoDisplayID = 5996;                   // normal arrow
+                        ammoInventoryType = INVTYPE_AMMO;
+                    }
+                    else if(pItem->GetTemplate()->Class == ITEM_SUBCLASS_WEAPON_GUN)
+                    {
+                        ammoDisplayID = 5998;                   // normal arrow
+                        ammoInventoryType = INVTYPE_AMMO;
+                    }
                 }
             }
         }

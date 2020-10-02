@@ -2019,7 +2019,7 @@ class spell_dk_raise_dead : public SpellScriptLoader
             SpellCastResult CheckReagents()
             {
                 /// @workaround: there is no access to castresult of other spells, check it manually
-                SpellInfo const* reagentSpell = sSpellMgr->GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT);
+                /*SpellInfo const* reagentSpell = sSpellMgr->GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT);
                 Player* player = GetCaster()->ToPlayer();
                 if (!player->CanNoReagentCast(reagentSpell))
                 {
@@ -2034,7 +2034,7 @@ class spell_dk_raise_dead : public SpellScriptLoader
                             return SPELL_FAILED_DONT_REPORT;
                         }
                     }
-                }
+                }*/
                 return SPELL_CAST_OK;
             }
 
@@ -2063,12 +2063,12 @@ class spell_dk_raise_dead : public SpellScriptLoader
                     target = nullptr;
             }
 
-            void ConsumeReagents()
-            {
+            //void ConsumeReagents()
+            /*{
                 // No corpse found, take reagents
                 if (!_corpse)
                     GetCaster()->CastSpell(GetCaster(), SPELL_DK_RAISE_DEAD_USE_REAGENT, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
-            }
+            }*/
 
             uint32 GetGhoulSpellId()
             {
@@ -2100,7 +2100,7 @@ class spell_dk_raise_dead : public SpellScriptLoader
                 OnCheckCast += SpellCheckCastFn(spell_dk_raise_dead_SpellScript::CheckCast);
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dk_raise_dead_SpellScript::CheckTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
                 OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_dk_raise_dead_SpellScript::CheckTarget, EFFECT_2, TARGET_UNIT_CASTER);
-                OnCast += SpellCastFn(spell_dk_raise_dead_SpellScript::ConsumeReagents);
+                //OnCast += SpellCastFn(spell_dk_raise_dead_SpellScript::ConsumeReagents);
                 OnEffectHitTarget += SpellEffectFn(spell_dk_raise_dead_SpellScript::HandleRaiseDead, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
                 OnEffectHitTarget += SpellEffectFn(spell_dk_raise_dead_SpellScript::HandleRaiseDead, EFFECT_2, SPELL_EFFECT_DUMMY);
                 AfterCast += SpellCastFn(spell_dk_raise_dead_SpellScript::OverrideCooldown);

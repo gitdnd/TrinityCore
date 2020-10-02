@@ -399,16 +399,16 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             {
                 output->Delay = (urand(15, 34, generator) * 100);
-                output->Damage[0].DamageMin = ((0.93f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((0.93f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
                 break;
             }
             case ITEM_SUBCLASS_WEAPON_WAND:
             {
                 output->Delay = (urand(12, 20, generator) * 100);
-                output->Damage[0].DamageMin = ((1.5f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.5f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, generator);
                 break;
             }
@@ -431,6 +431,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     // apply other item data
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
+    output->MaxDurability = 0; // Disable any form of durability for now
 }
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
@@ -665,7 +666,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937&
                 }
                 case ITEM_QUALITY_LEGENDARY:
                 {
-                    ss << selectedWords[6] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
+                    ss << selectedWords[1] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
                     break;
                 }
                 default:
