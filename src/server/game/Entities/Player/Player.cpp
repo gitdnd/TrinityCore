@@ -27207,6 +27207,6 @@ void Player::RemoveArmorPassives()
 {
     uint32 spells[5] = { 181000, 181001, 181002, 181003, 181004 };
 
-    for (uint8 i = 0; i < 6; ++i)
+    for (uint8 i = 0; i < 4; ++i)
         RemoveAura(spells[i]);
 }
