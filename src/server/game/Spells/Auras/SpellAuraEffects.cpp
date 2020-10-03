@@ -5813,6 +5813,7 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
     else
     {
         pT->RemoveTemporarySpell(triggerSpellId);
+        pT->RemoveAura(triggerSpellId);
         if (pT->IsLoading() || pT->GetSession()->isLogingOut())
             return;
         WorldPacket data(SMSG_REMOVED_SPELL, 4);

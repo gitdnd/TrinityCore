@@ -23997,7 +23997,7 @@ uint32 Player::GetResurrectionSpellId()
     }
 
     // Reincarnation (passive spell)  // prio: 1                  // Glyph of Renewed Life
-    if (prio < 1 && HasSpell(20608) && !GetSpellHistory()->HasCooldown(21169) && (HasAura(58059) || HasItemCount(17030)))
+    if (prio < 1 && HasSpell(20608) && !GetSpellHistory()->HasCooldown(21169))
         spell_id = 21169;
 
     return spell_id;
@@ -27207,6 +27207,6 @@ void Player::RemoveArmorPassives()
 {
     uint32 spells[5] = { 181000, 181001, 181002, 181003, 181004 };
 
-    for (uint8 i = 0; i < 6; ++i)
+    for (uint8 i = 0; i < 4; ++i)
         RemoveAura(spells[i]);
 }
