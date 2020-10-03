@@ -54,7 +54,14 @@ void WhoListStorageMgr::Update()
 
         wstrToLower(wideGuildName);
 
-        _whoListStorage.emplace_back(itr->second->GetGUID(), itr->second->GetTeam(), itr->second->GetSession()->GetSecurity(), floor(itr->second->GetAverageItemLevel()),
+        // Level is sent as a uint8 in the WHO frame
+        uint32 avgLvl = floor(itr->second->GetAverageItemLevel());
+        if (avgLvl > 255)
+        {
+            avgLvl = 255;
+        }
+
+        _whoListStorage.emplace_back(itr->second->GetGUID(), itr->second->GetTeam(), itr->second->GetSession()->GetSecurity(), avgLvl,
             itr->second->GetClass(), itr->second->GetRace(), itr->second->GetZoneId(), itr->second->GetNativeGender(), itr->second->IsVisible(),
             widePlayerName, wideGuildName, playerName, guildName);
     }
