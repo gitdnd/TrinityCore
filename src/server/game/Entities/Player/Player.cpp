@@ -12330,6 +12330,9 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
 void Player::UpdateCraftingSkill()
 {
+    if (Group* group = GetGroup())
+        group->UpdateDungeonLevel();
+
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)

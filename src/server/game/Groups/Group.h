@@ -270,6 +270,7 @@ class TC_GAME_API Group
         void SetRaidDifficulty(Difficulty difficulty);
         void SetDungeonLevel(int dungeonLevel);
         int GetDungeonLevel() { return m_dungeonLevel; }
+        void UpdateDungeonLevel();
         uint16 InInstance();
         bool InCombatToInstance(uint32 instanceId);
         void ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo);

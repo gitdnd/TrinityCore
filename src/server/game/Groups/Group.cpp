@@ -535,7 +535,7 @@ bool Group::AddMember(Player* player)
 
     if (m_maxEnchantingLevel < player->GetSkillValue(SKILL_ENCHANTING))
         m_maxEnchantingLevel = player->GetSkillValue(SKILL_ENCHANTING);
-
+    UpdateDungeonLevel();
     return true;
 }
 
@@ -674,7 +674,7 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
 
         if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup()) ? 1u : 2u))
             Disband();
-
+        UpdateDungeonLevel();
         return true;
     }
     // If group size before player removal <= 2 then disband it
@@ -2719,4 +2719,22 @@ void Group::StartLeaderOfflineTimer()
 void Group::StopLeaderOfflineTimer()
 {
     m_isLeaderOffline = false;
+}
+
+void Group::UpdateDungeonLevel()
+{
+    float averageLevel = 0.0f;
+    uint8 memcount = 0;
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+    {
+        Player* player = ObjectAccessor::FindConnectedPlayer(citr->guid);
+        if (!player)
+            continue;
+
+        averageLevel += player->GetAverageItemLevel();
+        memcount += 1;
+    }
+    averageLevel /= memcount;
+
+    SetDungeonLevel(averageLevel);
 }
