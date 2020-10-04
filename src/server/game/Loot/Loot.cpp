@@ -221,7 +221,16 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     Group* group = lootOwner->GetGroup();
     if (!personal && group)
     {
-        modifier.plrAvgLvl = group->GetAvgItemLevel();
+        uint32 ilevelModifier = group->GetAvgItemLevel();
+        if (lootOwner->GetMap()->IsDungeon())
+        {
+            ilevelModifier += 20;
+        }
+        else if (lootOwner->GetMap()->IsRaid())
+        {
+            ilevelModifier += 40;
+        }
+        modifier.plrAvgLvl = ilevelModifier;
     }
     else
     {
