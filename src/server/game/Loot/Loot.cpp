@@ -225,11 +225,11 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         uint32 ilevelModifier = group->GetAvgItemLevel();
         if (lootOwner->GetMap()->IsDungeon())
         {
-            ilevelModifier += 20;
+            ilevelModifier += 10;
         }
         else if (lootOwner->GetMap()->IsRaid())
         {
-            ilevelModifier += 40;
+            ilevelModifier += 20;
         }
         modifier.plrAvgLvl = ilevelModifier;
     }
