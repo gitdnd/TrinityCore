@@ -1250,7 +1250,7 @@ float VirtualModifier::GetStatRate(ItemModType stat)
     case ITEM_MOD_RANGED_ATTACK_POWER:
         return 0.4f;
     case ITEM_MOD_ARMOR_PENETRATION_RATING:
-        return 0.14f;
+        return 0.3f;
     case ITEM_MOD_ATTACK_POWER:
         return 0.5f;
     case ITEM_MOD_SPELL_HEALING_DONE:
