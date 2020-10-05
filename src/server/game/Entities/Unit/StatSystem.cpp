@@ -381,6 +381,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     {
         switch (GetClass())
         {
+            case CLASS_ADVENTURER:
+                val2 = level * 2.0f + (GetStat(STAT_STRENGTH) * 2.0f) + GetStat(STAT_AGILITY) - 20.0f;
+                break;
             case CLASS_WARRIOR:
                 val2 = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
                 break;
@@ -390,7 +393,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             case CLASS_DEATH_KNIGHT:
                 val2 = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
                 break;
-            case CLASS_ADVENTURER:
             case CLASS_ROGUE:
                 val2 = level * 2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f;
                 break;
