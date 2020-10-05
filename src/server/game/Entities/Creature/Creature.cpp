@@ -1469,7 +1469,7 @@ void Creature::UpdateLevelDependantStats()
     if (dungeonLevel > 0 && dungeonLevel < 10000)
     {
         // FIXME(Harry): Come up with a better scaling system
-        float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 40000.0f) + 0.5f;
+        float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 15000.0f) + 0.5f;
         basedamage = uint32(basedamage * dungeonLevelMod);
     }
 
