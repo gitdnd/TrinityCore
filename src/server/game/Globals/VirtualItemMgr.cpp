@@ -373,10 +373,24 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             case ITEM_SUBCLASS_WEAPON_SWORD2:
             case ITEM_SUBCLASS_WEAPON_AXE2:
             case ITEM_SUBCLASS_WEAPON_MACE2:
+            {
+                output->Delay = (urand(33, 37, generator) * 100);
+                output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageType = 0;
+                break;
+            }
             case ITEM_SUBCLASS_WEAPON_POLEARM:
+            {
+                output->Delay = (urand(31, 36, generator) * 100);
+                output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageType = 0;
+                break;
+            }
             case ITEM_SUBCLASS_WEAPON_STAFF:
             {
-                output->Delay = (urand(20, 40, generator) * 100);
+                output->Delay = (urand(20, 31, generator) * 100);
                 output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
@@ -386,9 +400,16 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             case ITEM_SUBCLASS_WEAPON_MACE:
             case ITEM_SUBCLASS_WEAPON_SWORD:
             case ITEM_SUBCLASS_WEAPON_FIST:
+            {
+                output->Delay = (urand(15, 27, generator) * 100);
+                output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageType = 0;
+                break;
+            }
             case ITEM_SUBCLASS_WEAPON_DAGGER:
             {
-                output->Delay = (urand(13, 30, generator) * 100);
+                output->Delay = (urand(14, 19, generator) * 100);
                 output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
@@ -398,7 +419,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             case ITEM_SUBCLASS_WEAPON_GUN:
             case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             {
-                output->Delay = (urand(15, 34, generator) * 100);
+                output->Delay = (urand(27, 30, generator) * 100);
                 output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
@@ -406,7 +427,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
             }
             case ITEM_SUBCLASS_WEAPON_WAND:
             {
-                output->Delay = (urand(12, 20, generator) * 100);
+                output->Delay = (urand(18, 22, generator) * 100);
                 output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, generator);
