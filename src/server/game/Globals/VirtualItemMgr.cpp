@@ -1288,6 +1288,8 @@ float VirtualModifier::GetStatRate(ItemModType stat)
         return 0.86f;
     case ITEM_MOD_DEFENSE_SKILL_RATING:
         return 1.2f;
+    case ITEM_MOD_BLOCK_RATING:
+        return 1.2f;
     case ITEM_MOD_INTELLECT:
         return 1.9f;
     case ITEM_MOD_SPIRIT:
@@ -1634,7 +1636,9 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
-        ITEM_MOD_HIT_RATING
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE
     };
     stat_group_sockets[STAT_GROUP_STR_TANK] = {
         SOCKET_COLOR_RED
@@ -1666,7 +1670,9 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
-        ITEM_MOD_HIT_RATING
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE
     };
     stat_group_sockets[STAT_GROUP_AGI_TANK] = {
         SOCKET_COLOR_YELLOW
