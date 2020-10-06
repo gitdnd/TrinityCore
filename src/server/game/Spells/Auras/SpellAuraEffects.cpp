@@ -5814,13 +5814,12 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
     {
         //pT->AddToRemoveLoop(triggerSpellId)
         pT->RemoveTemporarySpell(triggerSpellId);
-        pT->RemoveAura(triggerSpellId, pT->GetGUID());
+        pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
         if (pT->IsLoading() || pT->GetSession()->isLogingOut())
             return;
-
-        /*WorldPacket data(SMSG_REMOVED_SPELL, 4);
+        WorldPacket data(SMSG_REMOVED_SPELL, 4);
         data << uint32(triggerSpellId);
-        pT->SendDirectMessage(&data);*/
+        pT->SendDirectMessage(&data);
     }
 }
 
