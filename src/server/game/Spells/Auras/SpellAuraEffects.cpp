@@ -46,6 +46,7 @@
 #endif
 #include "WorldPacket.h"
 #include <numeric>
+#include "Chat.h"
 
 //
 // EFFECT HANDLER NOTES
@@ -5800,27 +5801,47 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         return;
     Player* pT = target->ToPlayer();
     uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
+    auto spell = sSpellMgr->GetSpellInfo(triggerSpellId);
     if (apply)
     {
         if (pT->HasSpell(triggerSpellId))
             return;
         pT->AddTemporarySpell(triggerSpellId);
-        WorldPacket data(SMSG_LEARNED_SPELL, 6);
-        data << uint32(triggerSpellId);
-        data << uint16(0);
-        pT->SendDirectMessage(&data);
+        if (!pT->HasGemSpell(triggerSpellId))
+        {
+            WorldPacket data(SMSG_LEARNED_SPELL, 6);
+            data << uint32(triggerSpellId);
+            data << uint16(0);
+            pT->SendDirectMessage(&data);
+            pT->AddGemSpell(triggerSpellId);
+        }
+        else
+        {
+            if (pT->GetSpellHistory()->HasCooldown(sSpellMgr->GetSpellInfo(triggerSpellId)))
+                return; // Don't clear the cooldown
+            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
+            data << uint32(triggerSpellId);
+            data << uint64(pT->GetGUID());
+            pT->SendDirectMessage(&data);
+        }
+
     }
     else
     {
-        //pT->AddToRemoveLoop(triggerSpellId)
+        ChatHandler(pT->GetSession()).PSendSysMessage("Unlearned: %s", spell->SpellName[LOCALE_enUS]);
         pT->RemoveTemporarySpell(triggerSpellId);
-        pT->RemoveAura(triggerSpellId, pT->GetGUID());
-        if (pT->IsLoading() || pT->GetSession()->isLogingOut())
-            return;
-
-        /*WorldPacket data(SMSG_REMOVED_SPELL, 4);
+        pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
+        WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
+        data << uint64(pT->GetGUID());
+        data << uint8(0);
         data << uint32(triggerSpellId);
-        pT->SendDirectMessage(&data);*/
+        data << uint32(DAY*IN_MILLISECONDS);
+        pT->SendDirectMessage(&data);
+        //if (pT->IsLoading() || pT->GetSession()->isLogingOut())
+            //return;
+        //WorldPacket data(SMSG_REMOVED_SPELL, 4);
+        //data << uint32(triggerSpellId);
+        //pT->SendDirectMessage(&data);
     }
 }
 

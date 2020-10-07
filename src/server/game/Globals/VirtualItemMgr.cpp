@@ -829,7 +829,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
 
-    // FIXME Temporarily disabled so that twinkets always generate a single spell, and the rest are from stat pool
+    // FIXME twinkets should always generate a single spell, and the rest are from stat pool
     // This will need to be refactored to support other items
     /*switch (output->Quality)
     {
