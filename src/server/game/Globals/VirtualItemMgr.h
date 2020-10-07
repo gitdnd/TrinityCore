@@ -78,6 +78,7 @@ struct VirtualModifier
     uint32 seed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
+    uint32 vLvlMod;
 
     class StatGroupData
     {

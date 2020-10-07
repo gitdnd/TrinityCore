@@ -222,16 +222,16 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     Group* group = lootOwner->GetGroup();
     if (!personal && group)
     {
-        uint32 ilevelModifier = group->GetAvgItemLevel();
+        // Only modify the vlevel, this causes better scaling than directly editing the ilevel
         if (lootOwner->GetMap()->IsDungeon())
         {
-            ilevelModifier += 10;
+            modifier.vLvlMod += 1;
         }
         else if (lootOwner->GetMap()->IsRaid())
         {
-            ilevelModifier += 20;
+            modifier.vLvlMod += 2;
         }
-        modifier.plrAvgLvl = ilevelModifier;
+        modifier.plrAvgLvl = group->GetAvgItemLevel();
     }
     else
     {

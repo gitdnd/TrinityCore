@@ -9,7 +9,7 @@
 #include "Log.h"
 #include "SFMTRand.h"
 
-VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0)
+VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0)
 {
 }
 
@@ -297,6 +297,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 
     // Mod the virtual item level to allow higher or lower virtual item levels 
     vLevel = vLevel + irand(-1, 5, generator);
+
+    // Add all vLvl mods before generating a new ilevel
+    vLevel = vLevel + modifier.vLvlMod;
 
     // Get the new item level based on above modifier virtual level
     ilevel = round(GenerateItemLevel(vLevel));
