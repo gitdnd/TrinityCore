@@ -5805,21 +5805,41 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         if (pT->HasSpell(triggerSpellId))
             return;
         pT->AddTemporarySpell(triggerSpellId);
-        WorldPacket data(SMSG_LEARNED_SPELL, 6);
-        data << uint32(triggerSpellId);
-        data << uint16(0);
-        pT->SendDirectMessage(&data);
+        if (!pT->HasGemSpell(triggerSpellId))
+        {
+            WorldPacket data(SMSG_LEARNED_SPELL, 6);
+            data << uint32(triggerSpellId);
+            data << uint16(0);
+            pT->SendDirectMessage(&data);
+            pT->AddGemSpell(triggerSpellId);
+        }
+        else
+        {
+            if (pT->GetSpellHistory()->HasCooldown(sSpellMgr->GetSpellInfo(triggerSpellId)))
+                return; // Don't clear the cooldown
+            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
+            data << uint32(triggerSpellId);
+            data << uint64(pT->GetGUID());
+            pT->SendDirectMessage(&data);
+        }
+
     }
     else
     {
         //pT->AddToRemoveLoop(triggerSpellId)
         pT->RemoveTemporarySpell(triggerSpellId);
         pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
-        if (pT->IsLoading() || pT->GetSession()->isLogingOut())
-            return;
-        WorldPacket data(SMSG_REMOVED_SPELL, 4);
+        WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
+        data << uint64(pT->GetGUID());
+        data << uint8(0);
         data << uint32(triggerSpellId);
+        data << uint32(std::numeric_limits<uint32>().max);
         pT->SendDirectMessage(&data);
+        //if (pT->IsLoading() || pT->GetSession()->isLogingOut())
+            //return;
+        //WorldPacket data(SMSG_REMOVED_SPELL, 4);
+        //data << uint32(triggerSpellId);
+        //pT->SendDirectMessage(&data);
     }
 }
 
