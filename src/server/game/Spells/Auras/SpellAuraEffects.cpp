@@ -46,6 +46,7 @@
 #endif
 #include "WorldPacket.h"
 #include <numeric>
+#include "Chat.h"
 
 //
 // EFFECT HANDLER NOTES
@@ -5800,6 +5801,7 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         return;
     Player* pT = target->ToPlayer();
     uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
+    auto spell = sSpellMgr->GetSpellInfo(triggerSpellId);
     if (apply)
     {
         if (pT->HasSpell(triggerSpellId))
@@ -5826,7 +5828,7 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
     }
     else
     {
-        //pT->AddToRemoveLoop(triggerSpellId)
+        ChatHandler(pT->GetSession()).PSendSysMessage("Unlearned: %s", spell->SpellName[LOCALE_enUS]);
         pT->RemoveTemporarySpell(triggerSpellId);
         pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
         WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
