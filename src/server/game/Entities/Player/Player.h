@@ -2443,6 +2443,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         TimeTrackerSmall m_groupUpdateTimer;
 
+        std::vector<uint32> m_GemSpells;
+        bool HasGemSpell(uint32 spell);
+        void AddGemSpell(uint32 spell) { m_GemSpells.push_back(spell); }
     private:
         // internal common parts for CanStore/StoreItem functions
         InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;

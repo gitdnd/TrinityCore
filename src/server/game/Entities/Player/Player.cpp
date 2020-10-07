@@ -27210,6 +27210,12 @@ void Player::RemoveArmorPassives()
 {
     uint32 spells[5] = { 181000, 181001, 181002, 181003, 181004 };
 
-    for (uint8 i = 0; i < 4; ++i)
+    for (uint8 i = 0; i < 5; ++i)
         RemoveAura(spells[i]);
+}
+
+bool Player::HasGemSpell(uint32 spell)
+{
+    auto i = std::find(m_GemSpells.begin(), m_GemSpells.end(), spell);
+    return i != m_GemSpells.end();
 }
