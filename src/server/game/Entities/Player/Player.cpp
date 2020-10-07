@@ -4860,6 +4860,9 @@ void Player::DurabilityPointsLoss(Item* item, int32 points)
     if (HasAuraType(SPELL_AURA_PREVENT_DURABILITY_LOSS))
         return;
 
+    // Hack to disable durability loss, ez
+    points = 0;
+
     int32 pMaxDurability = item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
     int32 pOldDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
     int32 pNewDurability = pOldDurability - points;

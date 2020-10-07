@@ -3864,8 +3864,8 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         17364, // Stormstrike
-        48278, // Paralyze
-        53651  // Light's Beacon
+        48278 // Paralyze
+        //53651  // Light's Beacon
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
