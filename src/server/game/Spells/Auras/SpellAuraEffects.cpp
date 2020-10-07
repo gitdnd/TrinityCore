@@ -5833,7 +5833,7 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         data << uint64(pT->GetGUID());
         data << uint8(0);
         data << uint32(triggerSpellId);
-        data << uint32(std::numeric_limits<uint32>().max);
+        data << uint32(DAY*IN_MILLISECONDS);
         pT->SendDirectMessage(&data);
         //if (pT->IsLoading() || pT->GetSession()->isLogingOut())
             //return;
