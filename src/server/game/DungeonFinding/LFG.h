@@ -27,11 +27,25 @@
 namespace lfg
 {
 
-enum LFGEnum
+enum LFGDungeonEnum
 {
-    LFG_TANKS_NEEDED                             = 1,
-    LFG_HEALERS_NEEDED                           = 1,
-    LFG_DPS_NEEDED                               = 3
+    LFG_TANKS_NEEDED = 1,
+    LFG_HEALERS_NEEDED = 1,
+    LFG_DPS_NEEDED = 3
+};
+
+enum LFGRaidEnum
+{
+    LFR_TANKS_NEEDED = 2,
+    LFR_HEALERS_NEEDED = 3,
+    LFR_DPS_NEEDED = 6
+};
+
+enum LfgGroupType
+{
+    GROUP_3_MAN = 0,
+    GROUP_5_MAN = 1,
+    GROUP_10_MAN = 2
 };
 
 enum LfgRoles

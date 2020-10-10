@@ -42,7 +42,6 @@
 
 namespace lfg
 {
-
 LFGDungeonData::LFGDungeonData() : id(0), name(), map(0), type(0), expansion(0), group(0), minlevel(0),
     maxlevel(0), difficulty(REGULAR_DIFFICULTY), seasonal(false), x(0.0f), y(0.0f), z(0.0f), o(0.0f)
 {
@@ -394,7 +393,7 @@ void LFGMgr::Update(uint32 diff)
    @param[in]     dungeons Dungeons the player/group is applying for
    @param[in]     comment Player selected comment
 */
-void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment)
+void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment, LfgGroupType groupType)
 {
     if (!player || !player->GetSession() || dungeons.empty())
         return;
@@ -444,7 +443,8 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         joinData.result = LFG_JOIN_NOT_MEET_REQS;
     else if (grp)
     {
-        if (grp->GetMembersCount() > MAXGROUPSIZE)
+        if ((groupType == GROUP_5_MAN && grp->GetMembersCount() > MAXGROUPSIZE) ||
+            (groupType == GROUP_10_MAN && grp->GetMembersCount() > MAXLFGRAIDGROUPSIZE))
             joinData.result = LFG_JOIN_TOO_MUCH_MEMBERS;
         else
         {

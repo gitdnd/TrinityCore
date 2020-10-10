@@ -48,9 +48,9 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, lfg::LfgLockPartyMap const& l
 
 void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 {
+    Group* group = GetPlayer()->GetGroup();
     if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER) ||
-        (GetPlayer()->GetGroup() && GetPlayer()->GetGroup()->GetLeaderGUID() != GetPlayer()->GetGUID() &&
-        (GetPlayer()->GetGroup()->GetMembersCount() == MAXGROUPSIZE || !GetPlayer()->GetGroup()->isLFGGroup())))
+        (group && group->GetLeaderGUID() != GetPlayer()->GetGUID() && !group->isLFGGroup()))
     {
         recvData.rfinish();
         return;
@@ -79,6 +79,28 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
             newDungeons.insert(dungeon);
     }
 
+    // Determine type
+    // FIXME(Harry): Hardcode LFG Raid Id
+    lfg::LfgGroupType groupType = lfg::LfgGroupType::GROUP_5_MAN;;
+    if (newDungeons.find(DRAGONISLESRAID) != newDungeons.end())
+    {
+        groupType = lfg::LfgGroupType::GROUP_10_MAN;
+    }
+
+    // Validations on group size
+    if (groupType == lfg::LfgGroupType::GROUP_10_MAN && newDungeons.size() > 1 || (group && group->GetMembersCount() == MAXLFGRAIDGROUPSIZE))
+    {
+        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s If queueing for a raid, can only select a single raid and group size must be <= %d", GetPlayerInfo().c_str(), MAXLFGRAIDGROUPSIZE);
+        recvData.rfinish();
+        return;
+    }
+    else if (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() == MAXGROUPSIZE))
+    {
+        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Group size is bigger than max group size", GetPlayerInfo().c_str());
+        recvData.rfinish();
+        return;
+    }
+
     recvData.read_skip<uint32>();                          // for 0..uint8 (always 3) { uint8 (always 0) }
 
     std::string comment;
@@ -86,7 +108,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
 
-    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment);
+    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment, groupType);
 }
 
 void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)

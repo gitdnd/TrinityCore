@@ -44,6 +44,9 @@ struct MapEntry;
 #define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
 #define TARGETICONCOUNT 8
 
+#define MAXLFGRAIDGROUPSIZE 10
+#define DRAGONISLESRAID 306
+
 enum RollVote
 {
     PASS              = 0,

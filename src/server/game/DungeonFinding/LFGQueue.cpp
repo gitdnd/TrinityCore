@@ -81,8 +81,11 @@ char const* GetCompatibleString(LfgCompatibility compatibles)
     }
 }
 
-LfgQueueData::LfgQueueData() : joinTime(GameTime::GetGameTime()), tanks(LFG_TANKS_NEEDED),
-healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
+// We require a default constructor, default constructor will use 5man data for now
+LfgQueueData::LfgQueueData() : joinTime(GameTime::GetGameTime()),
+    tanks(LFG_TANKS_NEEDED),
+    healers(LFG_HEALERS_NEEDED),
+    dps(LFG_DPS_NEEDED)
 { }
 
 std::string LFGQueue::GetDetailedMatchRoles(GuidList const& check) const
@@ -191,7 +194,12 @@ void LFGQueue::RemoveFromCurrentQueue(ObjectGuid guid)
 
 void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
 {
-    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap);
+    bool isRaid = dungeons.find(DRAGONISLESRAID) != dungeons.end();
+    int tanksNeeded = isRaid ? LFR_TANKS_NEEDED : LFG_TANKS_NEEDED;
+    int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
+    int dpsNeeded = isRaid ? LFR_DPS_NEEDED : LFG_DPS_NEEDED;
+
+    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded);
     AddToQueue(guid);
 }
 
@@ -369,8 +377,18 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     LfgGroupsMap proposalGroups;
     LfgRolesMap proposalRoles;
 
+    int maxGroupSize = MAXGROUPSIZE;
+
+    ObjectGuid gguid = *check.begin();
+    LfgQueueData const& queue = QueueDataStore[gguid];
+    if (queue.dungeons.find(DRAGONISLESRAID) != queue.dungeons.end())
+    {
+        TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Detected queueing for 10 MAN RAID");
+        maxGroupSize = MAXLFGRAIDGROUPSIZE;
+    }
+
     // Check for correct size
-    if (check.size() > MAXGROUPSIZE || check.empty())
+    if (check.size() > maxGroupSize || check.empty())
     {
         TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Guids: (%s): Size wrong - Not compatibles", GetDetailedMatchRoles(check).c_str());
         return LFG_INCOMPATIBLES_WRONG_GROUP_SIZE;
@@ -396,7 +414,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     // Check if more than one LFG group and number of players joining
     uint8 numPlayers = 0;
     uint8 numLfgGroups = 0;
-    for (GuidList::const_iterator it = check.begin(); it != check.end() && numLfgGroups < 2 && numPlayers <= MAXGROUPSIZE; ++it)
+    for (GuidList::const_iterator it = check.begin(); it != check.end() && numLfgGroups < 2 && numPlayers <= maxGroupSize; ++it)
     {
         ObjectGuid guid = *it;
         LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
@@ -422,7 +440,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     }
 
     // Group with less that MAXGROUPSIZE members always compatible
-    if (check.size() == 1 && numPlayers != MAXGROUPSIZE)
+    if (check.size() == 1 && numPlayers != maxGroupSize)
     {
         TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Guids: (%s) single group. Compatibles", GetDetailedMatchRoles(check).c_str());
         LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(check.front());
@@ -443,7 +461,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
         return LFG_INCOMPATIBLES_MULTIPLE_LFG_GROUPS;
     }
 
-    if (numPlayers > MAXGROUPSIZE)
+    if (numPlayers > maxGroupSize)
     {
         TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Guids: (%s) Too many players (%u)", GetDetailedMatchRoles(check).c_str(), numPlayers);
         SetCompatibles(strGuids, LFG_INCOMPATIBLES_TOO_MUCH_PLAYERS);
@@ -520,7 +538,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     }
 
     // Enough players?
-    if (numPlayers != MAXGROUPSIZE)
+    if (numPlayers != maxGroupSize)
     {
         TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Guids: (%s) Compatibles but not enough players(%u)", GetDetailedMatchRoles(check).c_str(), numPlayers);
         LfgCompatibilityData data(LFG_COMPATIBLES_WITH_LESS_PLAYERS);
@@ -533,7 +551,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
         return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
     }
 
-    ObjectGuid gguid = *check.begin();
+    /*ObjectGuid*/ gguid = *check.begin();
     proposal.queues = check;
     proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(gguid) != LFG_STATE_DUNGEON;
 

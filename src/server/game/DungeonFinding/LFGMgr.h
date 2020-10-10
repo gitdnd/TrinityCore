@@ -392,7 +392,7 @@ class TC_GAME_API LFGMgr
         /// Sets player lfr comment
         void SetComment(ObjectGuid guid, std::string const& comment);
         /// Join Lfg with selected roles, dungeons and comment
-        void JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, std::string const& comment);
+        void JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, std::string const& comment, LfgGroupType groupType);
         /// Leaves lfg
         void LeaveLfg(ObjectGuid guid, bool disconnected = false);
 

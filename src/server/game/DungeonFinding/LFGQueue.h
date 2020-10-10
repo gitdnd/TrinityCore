@@ -53,9 +53,12 @@ struct LfgQueueData
 {
     LfgQueueData();
 
-    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles):
-        joinTime(_joinTime), tanks(LFG_TANKS_NEEDED), healers(LFG_HEALERS_NEEDED),
-        dps(LFG_DPS_NEEDED), dungeons(_dungeons), roles(_roles)
+    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded):
+        joinTime(_joinTime),
+        tanks(tanksNeeded),
+        healers(healersNeeded),
+        dps(dpsNeeded),
+        dungeons(_dungeons), roles(_roles)
         { }
 
     time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
