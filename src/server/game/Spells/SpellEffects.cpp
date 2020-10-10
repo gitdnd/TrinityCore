@@ -334,6 +334,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
     if (unitTarget && unitTarget->IsAlive())
     {
+        // FIXME(Harry): This should be configurable
         // Try to scale base damage effect based on ilevel
         if (unitCaster->ToCreature() && unitTarget->ToPlayer())
         {
