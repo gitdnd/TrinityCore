@@ -26738,8 +26738,8 @@ float Player::GetAverageItemLevel() const
     if (currentItemLevel > (sum / (float)count))
         return currentItemLevel;
 
-    float result = sum / (float)count
-    return result < 1f ? 1f : result;
+    float result = sum / (float)count;
+    return result < 1.0 ? 1.0 : result;
 }
 
 void Player::_LoadInstanceTimeRestrictions(PreparedQueryResult result)
