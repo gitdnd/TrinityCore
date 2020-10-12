@@ -742,8 +742,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
         sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
-    // Allow item dummy effect
-    if (itemTarget || (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT))
+    else if (itemTarget)
         sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
 #endif
 }
