@@ -3497,6 +3497,13 @@ void ObjectMgr::LoadVirtualItemTemplates()
             itemTemplate->Spells[j].SpellCategoryCooldown = fields[i++].GetInt32();
         }
         itemTemplate->seed = uint32(fields[i++].GetUInt32());
+        itemTemplate->socketSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->qualitySeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->statSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->nameSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->displaySeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->spellSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->statValueSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statGroup = StatGroup(uint8(fields[i++].GetUInt8()));
 
         //itemTemplate->UpdateDisplay();

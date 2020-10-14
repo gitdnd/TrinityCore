@@ -440,6 +440,13 @@ void Item::SaveToDB(CharacterDatabaseTransaction& trans)
                         stmt->setInt32(i++, itemTemplate->Spells[j].SpellCategoryCooldown);
                     }
                     stmt->setUInt32(i++, itemTemplate->seed);
+                    stmt->setUInt32(i++, itemTemplate->socketSeed);
+                    stmt->setUInt32(i++, itemTemplate->qualitySeed);
+                    stmt->setUInt32(i++, itemTemplate->statSeed);
+                    stmt->setUInt32(i++, itemTemplate->nameSeed);
+                    stmt->setUInt32(i++, itemTemplate->displaySeed);
+                    stmt->setUInt32(i++, itemTemplate->spellSeed);
+                    stmt->setUInt32(i++, itemTemplate->statValueSeed);
                     stmt->setUInt8(i++, itemTemplate->statGroup);
                     trans->Append(stmt);
                 }

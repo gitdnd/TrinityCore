@@ -62,6 +62,15 @@ struct VirtualItemTemplate : ItemTemplate
     void UpdateDisplay();
 
     StatGroup statGroup;
+
+    // Seeds for various regeneration from item mods.
+    uint32 socketSeed;
+    uint32 qualitySeed;
+    uint32 statSeed;
+    uint32 nameSeed;
+    uint32 displaySeed;
+    uint32 spellSeed;
+    uint32 statValueSeed;
 };
 
 struct VirtualModifier

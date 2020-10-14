@@ -297,7 +297,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
 
     // Mod the virtual item level to allow higher or lower virtual item levels 
     vLevel = vLevel + irand(-1, 5, generator);
-
     // Add all vLvl mods before generating a new ilevel
     vLevel = vLevel + modifier.vLvlMod;
 
@@ -456,6 +455,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
     output->MaxDurability = 0; // Disable any form of durability for now
+    output->statSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
@@ -563,6 +563,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937
     }
 
     output->StatsCount = setStats;
+    output->statValueSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
@@ -771,6 +772,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937&
     }
 
     output->Name1 = fullName;
+    output->nameSeed = generator._Idx;
 }
 
 uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
@@ -793,6 +795,7 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
     }
     auto display = std::begin(displayLists);
     std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, generator));
+    output->displaySeed = generator._Idx;
     return *display;
 }
 
@@ -896,6 +899,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
     }
+    output->spellSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator,  bool reRoll)
@@ -970,6 +974,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
             output->Socket[i].Color = socketcolors[0];
         }
     }
+    output->socketSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier)
@@ -1015,6 +1020,7 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& 
         quality = modifier.quality;
 
     output->Quality = quality;
+    output->qualitySeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* output)
