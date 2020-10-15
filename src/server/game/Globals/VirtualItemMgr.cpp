@@ -904,6 +904,9 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
 
 void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator,  bool reRoll)
 {
+    if (!reRoll && output->socketSeed != 0 && output->socketSeed != generator._Idx)
+        generator.seed(output->socketSeed);
+
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
     uint32 socketMod = urand(0, 1, generator);
@@ -971,7 +974,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
             // Should be fixed with specific mods instead of full item regeneration.
 
             // output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, generator)];
-            output->Socket[i].Color = socketcolors[0];
+            output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, generator)];
         }
     }
     output->socketSeed = generator._Idx;
