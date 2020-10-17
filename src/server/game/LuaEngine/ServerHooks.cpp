@@ -371,3 +371,10 @@ void Eluna::OnRemove(Creature* creature)
     Push(creature);
     CallAllFunctions(ServerEventBindings, key);
 }
+
+void Eluna::OnFreeInstanceId(uint32 instanceId)
+{
+    START_HOOK(ON_FREE_INSTANCE);
+    Push(instanceId);
+    CallAllFunctions(ServerEventBindings, key);
+}

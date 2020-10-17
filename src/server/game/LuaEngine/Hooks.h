@@ -155,6 +155,8 @@ namespace Hooks
         GAME_EVENT_START                        =     34,       // (event, gameeventid)
         GAME_EVENT_STOP                         =     35,       // (event, gameeventid)
 
+        ON_FREE_INSTANCE                        =     36,       // (instanceId)
+
         SERVER_EVENT_COUNT
     };
 
