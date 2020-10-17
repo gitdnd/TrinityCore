@@ -292,7 +292,7 @@ public:
     /**
      * Generates a randoml item name depending on item type, subclass and quality
      */
-    void GenerateItemName(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier) const;
+    void GenerateItemName(VirtualItemTemplate* item, std::mt19937& generator, VirtualModifier modifier, bool reRoll = false) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -340,12 +340,12 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
 
 
     /**
@@ -360,8 +360,8 @@ public:
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
     void GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator, bool reRoll = false);
-    void GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator);
-    void GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier());
+    void GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator, bool reRoll = false);
+    void GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
     void UpdateDisenchantId(VirtualItemTemplate* output);
 
