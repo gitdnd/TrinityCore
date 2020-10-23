@@ -53,12 +53,14 @@ struct LfgQueueData
 {
     LfgQueueData();
 
-    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded):
+    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded, bool _isSolo) :
         joinTime(_joinTime),
         tanks(tanksNeeded),
         healers(healersNeeded),
         dps(dpsNeeded),
-        dungeons(_dungeons), roles(_roles)
+        dungeons(_dungeons),
+        roles(_roles),
+        isSolo(_isSolo)
         { }
 
     time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
@@ -68,6 +70,7 @@ struct LfgQueueData
     LfgDungeonSet dungeons;                                ///< Selected Player/Group Dungeon/s
     LfgRolesMap roles;                                     ///< Selected Player Role/s
     std::string bestCompatible;                            ///< Best compatible combination of people queued
+    bool isSolo;
 };
 
 struct LfgWaitTime

@@ -194,12 +194,13 @@ void LFGQueue::RemoveFromCurrentQueue(ObjectGuid guid)
 
 void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
 {
+    bool isSolo = dungeons.find(STORMWINDVAULT) != dungeons.end();
     bool isRaid = dungeons.find(DRAGONISLESRAID) != dungeons.end();
     int tanksNeeded = isRaid ? LFR_TANKS_NEEDED : LFG_TANKS_NEEDED;
     int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
     int dpsNeeded = isRaid ? LFR_DPS_NEEDED : LFG_DPS_NEEDED;
 
-    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded);
+    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo);
     AddToQueue(guid);
 }
 
@@ -385,6 +386,10 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     {
         TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Detected queueing for 10 MAN RAID");
         maxGroupSize = MAXLFGRAIDGROUPSIZE;
+    }
+    else if (queue.dungeons.find(STORMWINDVAULT) != queue.dungeons.end()) {
+        TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Detected queueing for SOLO CONTENT");
+        maxGroupSize = SOLOCONTENTGROUPSIZE;
     }
 
     // Check for correct size

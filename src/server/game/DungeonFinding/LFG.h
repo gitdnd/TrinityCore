@@ -43,9 +43,10 @@ enum LFGRaidEnum
 
 enum LfgGroupType
 {
-    GROUP_3_MAN = 0,
-    GROUP_5_MAN = 1,
-    GROUP_10_MAN = 2
+    GROUP_SOLO = 0,
+    GROUP_3_MAN = 1,
+    GROUP_5_MAN = 2,
+    GROUP_10_MAN = 3
 };
 
 enum LfgRoles
