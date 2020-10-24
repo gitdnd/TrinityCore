@@ -867,6 +867,8 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 
 void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
 {
+    sWorld->SendGlobalText("TRIGGER MISSILE 1", nullptr);
+
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET
         && effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
@@ -878,6 +880,8 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
         return;
     }
 
+    sWorld->SendGlobalText("TRIGGER MISSILE 2", nullptr);
+
     // normal case
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
     if (!spellInfo)
@@ -886,15 +890,19 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
         return;
     }
 
+    sWorld->SendGlobalText("TRIGGER MISSILE 3", nullptr);
+
     SpellCastTargets targets;
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
         if (!spellInfo->NeedsToBeTriggeredByCaster(m_spellInfo))
             return;
         targets.SetUnitTarget(unitTarget);
+        sWorld->SendGlobalText("TRIGGER MISSILE 4", nullptr);
     }
     else //if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT)
     {
+        sWorld->SendGlobalText("TRIGGER MISSILE 5", nullptr);
         if (spellInfo->NeedsToBeTriggeredByCaster(m_spellInfo) && (m_spellInfo->Effects[effIndex].GetProvidedTargetMask() & TARGET_FLAG_UNIT_MASK))
             return;
 
@@ -912,6 +920,8 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE)
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             args.AddSpellMod(SpellValueMod(SPELLVALUE_BASE_POINT0 + i), damage);
+
+    sWorld->SendGlobalText("TRIGGER MISSILE 6", nullptr);
 
     // original caster guid only for GO cast
     m_caster->CastSpell(targets, spellInfo->Id, args);
@@ -2047,6 +2057,7 @@ void Spell::EffectProficiency(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectSummonType(SpellEffIndex effIndex)
 {
+    sWorld->SendGlobalText("SUMMON EFFECT 1", nullptr);
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
@@ -2060,6 +2071,8 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         TC_LOG_ERROR("spells", "EffectSummonType: Unhandled summon type %u.", m_spellInfo->Effects[effIndex].MiscValueB);
         return;
     }
+
+    sWorld->SendGlobalText("SUMMON EFFECT 2", nullptr);
 
     WorldObject* caster = m_caster;
     if (m_originalCaster)
@@ -2101,6 +2114,8 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             numSummons = 1;
             break;
     }
+
+    sWorld->SendGlobalText("SUMMON EFFECT 3", nullptr);
 
     switch (properties->Category)
     {
@@ -2250,6 +2265,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
     if (summon)
     {
+        sWorld->SendGlobalText("SUMMON EFFECT 4", nullptr);
         summon->SetCreatorGUID(caster->GetGUID());
         ExecuteLogEffectSummonObject(effIndex, summon);
     }
