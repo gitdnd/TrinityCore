@@ -8662,10 +8662,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     if (uint32 lootid = creature->GetCreatureTemplate()->pickpocketLootId)
                         loot->FillLoot(lootid, LootTemplates_Pickpocketing, this, true);
 
+                    // Override pickpocket money to be zero
                     // Generate extra money for pick pocket loot
-                    const uint32 a = urand(0, creature->GetLevel() / 2);
+                    /*const uint32 a = urand(0, creature->GetLevel() / 2);
                     const uint32 b = urand(0, GetLevel() / 2);
-                    loot->gold = uint32(10 * (a + b) * sWorld->getRate(RATE_DROP_MONEY));
+                    loot->gold = uint32(10 * (a + b) * sWorld->getRate(RATE_DROP_MONEY));*/
+                    loot->gold = 0;
                     permission = OWNER_PERMISSION;
                 }
                 else
