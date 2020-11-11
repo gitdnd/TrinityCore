@@ -5510,6 +5510,9 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
+    if (itemTarget->GetState() == ITEM_NEW)
+        itemTarget->SaveToDB(CharacterDatabaseTransaction());
+
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
     auto generator = std::mt19937();
     generator.seed(rand32());
@@ -5529,6 +5532,10 @@ void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
 
     if (!itemTarget)
         return;
+
+    if (itemTarget->GetState() == ITEM_NEW)
+        itemTarget->SaveToDB(CharacterDatabaseTransaction());
+
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
@@ -5588,6 +5595,10 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
+    if (itemTarget->GetState() == ITEM_NEW)
+        itemTarget->SaveToDB(CharacterDatabaseTransaction());
+
+
     VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
@@ -5612,6 +5623,10 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
 
     if (!itemTarget)
         return;
+
+    if (itemTarget->GetState() == ITEM_NEW)
+        itemTarget->SaveToDB(CharacterDatabaseTransaction());
+
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
     auto generator = std::mt19937();
