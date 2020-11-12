@@ -5510,8 +5510,6 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
-    if (itemTarget->GetState() == ITEM_NEW)
-        itemTarget->SaveToDB(CharacterDatabaseTransaction());
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
     auto generator = std::mt19937();
