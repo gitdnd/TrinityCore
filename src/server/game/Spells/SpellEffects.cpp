@@ -5587,10 +5587,6 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
-    if (itemTarget->GetState() == ITEM_NEW)
-        itemTarget->SaveToDB(CharacterDatabaseTransaction());
-
-
     VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
