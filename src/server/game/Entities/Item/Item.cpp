@@ -390,66 +390,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction& trans)
             // VirtualItem
             if (uState == ITEM_NEW)
             {
-                if (VirtualItemTemplate const* itemTemplate = sVirtualItemMgr.GetVirtualTemplate(GetEntry()))
-                {
-                    uint8 i = 0;
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_VIRTUAL_TEMPLATE);
-                    stmt->setUInt32(i++, itemTemplate->ItemId);
-                    stmt->setUInt32(i++, itemTemplate->base_entry);
-                    stmt->setUInt32(i++, GetGUID().GetCounter());
-                    stmt->setString(i++, itemTemplate->Name1);
-                    stmt->setUInt8(i++, itemTemplate->Quality);
-                    stmt->setUInt32(i++, itemTemplate->DisplayInfoID);
-                    stmt->setUInt16(i++, itemTemplate->ItemLevel);
-                    stmt->setUInt8(i++, itemTemplate->StatsCount);
-                    for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
-                    {
-                        if (j < itemTemplate->StatsCount)
-                        {
-                            stmt->setUInt8(i++, itemTemplate->ItemStat[j].ItemStatType);
-                            stmt->setInt16(i++, itemTemplate->ItemStat[j].ItemStatValue);
-                        }
-                        else
-                        {
-                            stmt->setUInt8(i++, 0);
-                            stmt->setInt16(i++, 0);
-                        }
-                    }
-                    stmt->setFloat(i++, itemTemplate->Damage[0].DamageMin);
-                    stmt->setFloat(i++, itemTemplate->Damage[0].DamageMax);
-                    stmt->setUInt8(i++, itemTemplate->Damage[0].DamageType);
-                    stmt->setUInt16(i++, itemTemplate->Delay);
-                    stmt->setUInt16(i++, itemTemplate->Armor);
-                    stmt->setUInt32(i++, itemTemplate->Bonding);
-                    stmt->setString(i++, itemTemplate->Description);
-                    stmt->setUInt32(i++, itemTemplate->Block);
-                    stmt->setUInt32(i++, itemTemplate->ItemSet);
-                    for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
-                        stmt->setInt8(i++, itemTemplate->Socket[j].Color);
-
-                    stmt->setUInt32(i++, itemTemplate->DisenchantID);
-
-                    for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
-                    {
-                        stmt->setUInt32(i++, itemTemplate->Spells[j].SpellId);
-                        stmt->setUInt32(i++, itemTemplate->Spells[j].SpellTrigger);
-                        stmt->setInt32(i++, itemTemplate->Spells[j].SpellCharges);
-                        stmt->setFloat(i++, itemTemplate->Spells[j].SpellPPMRate);
-                        stmt->setInt32(i++, itemTemplate->Spells[j].SpellCooldown);
-                        stmt->setUInt32(i++, itemTemplate->Spells[j].SpellCategory);
-                        stmt->setInt32(i++, itemTemplate->Spells[j].SpellCategoryCooldown);
-                    }
-                    stmt->setUInt32(i++, itemTemplate->seed);
-                    stmt->setUInt32(i++, itemTemplate->socketSeed);
-                    stmt->setUInt32(i++, itemTemplate->qualitySeed);
-                    stmt->setUInt32(i++, itemTemplate->statSeed);
-                    stmt->setUInt32(i++, itemTemplate->nameSeed);
-                    stmt->setUInt32(i++, itemTemplate->displaySeed);
-                    stmt->setUInt32(i++, itemTemplate->spellSeed);
-                    stmt->setUInt32(i++, itemTemplate->statValueSeed);
-                    stmt->setUInt8(i++, itemTemplate->statGroup);
-                    trans->Append(stmt);
-                }
+                SaveVirtualItemInfo();
             }
             break;
         }
@@ -1290,4 +1231,70 @@ std::string Item::GetDebugInfo() const
         << "Owner: " << GetOwnerGUID().ToString() << " Count: " << GetCount()
         << " BagSlot: " << std::to_string(GetBagSlot()) << " Slot: " << std::to_string(GetSlot()) << " Equipped: " << IsEquipped();
     return sstr.str();
+}
+
+void Item::SaveVirtualItemInfo()
+{
+    if (VirtualItemTemplate const* itemTemplate = sVirtualItemMgr.GetVirtualTemplate(GetEntry()))
+    {
+        auto trans = CharacterDatabase.BeginTransaction();
+        uint8 i = 0;
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_VIRTUAL_TEMPLATE);
+        stmt->setUInt32(i++, itemTemplate->ItemId);
+        stmt->setUInt32(i++, itemTemplate->base_entry);
+        stmt->setUInt32(i++, GetGUID().GetCounter());
+        stmt->setString(i++, itemTemplate->Name1);
+        stmt->setUInt8(i++, itemTemplate->Quality);
+        stmt->setUInt32(i++, itemTemplate->DisplayInfoID);
+        stmt->setUInt16(i++, itemTemplate->ItemLevel);
+        stmt->setUInt8(i++, itemTemplate->StatsCount);
+        for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
+        {
+            if (j < itemTemplate->StatsCount)
+            {
+                stmt->setUInt8(i++, itemTemplate->ItemStat[j].ItemStatType);
+                stmt->setInt16(i++, itemTemplate->ItemStat[j].ItemStatValue);
+            }
+            else
+            {
+                stmt->setUInt8(i++, 0);
+                stmt->setInt16(i++, 0);
+            }
+        }
+        stmt->setFloat(i++, itemTemplate->Damage[0].DamageMin);
+        stmt->setFloat(i++, itemTemplate->Damage[0].DamageMax);
+        stmt->setUInt8(i++, itemTemplate->Damage[0].DamageType);
+        stmt->setUInt16(i++, itemTemplate->Delay);
+        stmt->setUInt16(i++, itemTemplate->Armor);
+        stmt->setUInt32(i++, itemTemplate->Bonding);
+        stmt->setString(i++, itemTemplate->Description);
+        stmt->setUInt32(i++, itemTemplate->Block);
+        stmt->setUInt32(i++, itemTemplate->ItemSet);
+        for (uint8 j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
+            stmt->setInt8(i++, itemTemplate->Socket[j].Color);
+
+        stmt->setUInt32(i++, itemTemplate->DisenchantID);
+
+        for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+        {
+            stmt->setUInt32(i++, itemTemplate->Spells[j].SpellId);
+            stmt->setUInt32(i++, itemTemplate->Spells[j].SpellTrigger);
+            stmt->setInt32(i++, itemTemplate->Spells[j].SpellCharges);
+            stmt->setFloat(i++, itemTemplate->Spells[j].SpellPPMRate);
+            stmt->setInt32(i++, itemTemplate->Spells[j].SpellCooldown);
+            stmt->setUInt32(i++, itemTemplate->Spells[j].SpellCategory);
+            stmt->setInt32(i++, itemTemplate->Spells[j].SpellCategoryCooldown);
+        }
+        stmt->setUInt32(i++, itemTemplate->seed);
+        stmt->setUInt32(i++, itemTemplate->socketSeed);
+        stmt->setUInt32(i++, itemTemplate->qualitySeed);
+        stmt->setUInt32(i++, itemTemplate->statSeed);
+        stmt->setUInt32(i++, itemTemplate->nameSeed);
+        stmt->setUInt32(i++, itemTemplate->displaySeed);
+        stmt->setUInt32(i++, itemTemplate->spellSeed);
+        stmt->setUInt32(i++, itemTemplate->statValueSeed);
+        stmt->setUInt8(i++, itemTemplate->statGroup);
+        trans->Append(stmt);
+        CharacterDatabase.CommitTransaction(trans);
+    }
 }

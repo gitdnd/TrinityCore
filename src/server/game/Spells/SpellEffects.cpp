@@ -5520,8 +5520,7 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
-    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
-    itemTarget->SaveToDB(CharacterDatabaseTransaction());
+    itemTarget->SaveVirtualItemInfo();
 }
 
 void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
@@ -5543,8 +5542,7 @@ void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
-    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
-    itemTarget->SaveToDB(CharacterDatabaseTransaction());
+    itemTarget->SaveVirtualItemInfo();
 }
 
 void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
@@ -5611,8 +5609,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
-    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
-    itemTarget->SaveToDB(CharacterDatabaseTransaction());
+    itemTarget->SaveVirtualItemInfo();
 }
 
 void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
@@ -5624,10 +5621,6 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
-    if (itemTarget->GetState() == ITEM_NEW)
-        itemTarget->SaveToDB(CharacterDatabaseTransaction());
-
-
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
     auto generator = std::mt19937();
     generator.seed(rand32());
@@ -5638,6 +5631,5 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
-    itemTarget->SetState(ITEM_NEW); //Should really be ITEM_CHANGED but it doesn't support virtual items and i'm not rewriting it.
-    itemTarget->SaveToDB(CharacterDatabaseTransaction());
+    itemTarget->SaveVirtualItemInfo();
 }

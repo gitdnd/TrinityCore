@@ -209,6 +209,8 @@ class TC_GAME_API Item : public Object
         uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
 
         std::string GetDebugInfo() const override;
+
+        void SaveVirtualItemInfo();
     private:
         std::string m_text;
         uint8 m_slot;
