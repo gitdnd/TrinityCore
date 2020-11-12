@@ -5530,10 +5530,6 @@ void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
-    if (itemTarget->GetState() == ITEM_NEW)
-        itemTarget->SaveToDB(CharacterDatabaseTransaction());
-
-
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
     sVirtualItemMgr.GenerateAdditonalStat(vItem);
