@@ -844,6 +844,8 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
 
+    std::ostringstream debugText;
+    debugText << "Called spell generation, numSpells to generate: " << numSpellsToGenerate << ". ";
     // FIXME twinkets should always generate a single spell, and the rest are from stat pool
     // This will need to be refactored to support other items
     /*switch (output->Quality)
@@ -890,7 +892,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
         itemSpellInfo spell = GenerateSpell(output, generator);
-        std::ostringstream debugText;
         debugText << "Generated spell id: " << spell.spellId;
         if (spell.spellId == 0)
             continue;
@@ -913,8 +914,8 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
         output->Spells[i].SpellCooldown = spell.SpellCooldown;
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
-        sWorld->SendGlobalText(debugText.str().c_str(), nullptr);
     }
+    sWorld->SendGlobalText(debugText.str().c_str(), nullptr);
     output->spellSeed = generator._Idx;
 }
 
