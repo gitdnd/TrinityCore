@@ -810,23 +810,33 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
 
 itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt19937& generator)
 {
-#define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
+#define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
+    std::ostringstream str;
+    str << "Gen: ";
     for (auto const someSpells : availableSpells)
     {
+        str << "1";
         if (output->Quality != someSpells.quality)
             continue;
-
+        str << "2";
         IFSKIP(someSpells.itemClass, output->Class);
+        str << "3";
         IFSKIP(someSpells.subClass, output->SubClass);
+        str << "4";
         IFSKIP(someSpells.inventoryType, output->InventoryType);
-         IFSKIP(someSpells.statGroup, output->statGroup);
+        str << "5";
+        IFSKIP(someSpells.statGroup, output->statGroup);
+        str << "6";
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
             continue;
+        str << "7";
         if (someSpells.minItemLevel != -1 && output->ItemLevel < someSpells.minItemLevel)
             continue;
+        str << "8";
         spells.push_back(someSpells);
     }
+    sWorld->SendGlobalText(str.str().c_str(), nullptr);
     if (spells.empty())
         return itemSpellInfo();
     auto selectedSpell = std::begin(spells);
@@ -845,7 +855,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
 
     std::ostringstream debugText;
-    debugText << "Called spell generation, numSpells to generate: " << numSpellsToGenerate << ". ";
+    debugText << "Called spell generation, numSpells to generate: " << std::to_string(numSpellsToGenerate) << ". ";
     // FIXME twinkets should always generate a single spell, and the rest are from stat pool
     // This will need to be refactored to support other items
     /*switch (output->Quality)
