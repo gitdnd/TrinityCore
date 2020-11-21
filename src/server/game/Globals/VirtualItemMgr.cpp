@@ -826,6 +826,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt
         str << "4";
         IFSKIP(someSpells.inventoryType, output->InventoryType);
         str << "5";
+        str << " " << std::to_string(someSpells.statGroup) << " != " << std::to_string(output->statGroup) << " ";
         IFSKIP(someSpells.statGroup, output->statGroup);
         str << "6";
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
