@@ -890,6 +890,8 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
         itemSpellInfo spell = GenerateSpell(output, generator);
+        std::ostringstream debugText;
+        debugText << "Generated spell id: " << spell.spellId;
         if (spell.spellId == 0)
             continue;
         // Skip spell if we have already used this one. Try a few times to fetch a unique spell
@@ -902,6 +904,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
         // If still a duplicate, skip
         if (std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
             continue;
+        debugText << " and keeping. Pushing.";
         spellsToUse.push_back(spell.spellId);
         output->Spells[i].SpellId = spell.spellId;
         output->Spells[i].SpellTrigger = spell.SpellTrigger;
@@ -910,6 +913,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
         output->Spells[i].SpellCooldown = spell.SpellCooldown;
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+        sWorld->SendGlobalText(debugText.str().c_str(), nullptr);
     }
     output->spellSeed = generator._Idx;
 }
