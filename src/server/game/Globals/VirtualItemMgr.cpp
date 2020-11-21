@@ -799,6 +799,7 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
         std::ostringstream stream;
         stream << "ERROR: Found no display id for item quality [" << output->Quality << "] class [";
         stream << output->Class << "] subclass [" << output->SubClass << "] inventoryType [" << output->InventoryType << "]";
+        stream << ". Please report this to developers.";
         sWorld->SendGlobalText(stream.str().c_str(), nullptr);
         return 0;
     }
@@ -812,33 +813,20 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt
 {
 #define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
-    std::ostringstream str;
-    str << "Gen: ";
     for (auto const someSpells : availableSpells)
     {
-        str << "1";
         if (output->Quality != someSpells.quality)
             continue;
-        str << "2";
         IFSKIP(someSpells.itemClass, output->Class);
-        str << "3";
         IFSKIP(someSpells.subClass, output->SubClass);
-        str << "4";
         IFSKIP(someSpells.inventoryType, output->InventoryType);
-        str << "5";
-        // 255 != 6
-        str << " " << std::to_string(someSpells.statGroup) << " != " << std::to_string(output->statGroup) << " ";
         IFSKIP(someSpells.statGroup, output->statGroup);
-        str << "6";
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
             continue;
-        str << "7";
         if (someSpells.minItemLevel != -1 && output->ItemLevel < someSpells.minItemLevel)
             continue;
-        str << "8";
         spells.push_back(someSpells);
     }
-    sWorld->SendGlobalText(str.str().c_str(), nullptr);
     if (spells.empty())
         return itemSpellInfo();
     auto selectedSpell = std::begin(spells);
@@ -856,8 +844,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
 
-    std::ostringstream debugText;
-    debugText << "Called spell generation, numSpells to generate: " << std::to_string(numSpellsToGenerate) << ". ";
     // FIXME twinkets should always generate a single spell, and the rest are from stat pool
     // This will need to be refactored to support other items
     /*switch (output->Quality)
@@ -904,7 +890,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
         itemSpellInfo spell = GenerateSpell(output, generator);
-        debugText << "Generated spell id: " << spell.spellId;
         if (spell.spellId == 0)
             continue;
         // Skip spell if we have already used this one. Try a few times to fetch a unique spell
@@ -917,7 +902,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
         // If still a duplicate, skip
         if (std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
             continue;
-        debugText << " and keeping. Pushing.";
         spellsToUse.push_back(spell.spellId);
         output->Spells[i].SpellId = spell.spellId;
         output->Spells[i].SpellTrigger = spell.SpellTrigger;
@@ -927,7 +911,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
     }
-    sWorld->SendGlobalText(debugText.str().c_str(), nullptr);
     output->spellSeed = generator._Idx;
 }
 
