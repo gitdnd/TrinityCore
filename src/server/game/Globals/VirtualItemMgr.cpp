@@ -9,7 +9,8 @@
 #include "Log.h"
 #include "SFMTRand.h"
 
-VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0)
+VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
+socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0)
 {
 }
 
