@@ -5512,9 +5512,9 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
 
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
-    auto generator = std::mt19937();
-    generator.seed(rand32());
-    sVirtualItemMgr.GenerateSockets(vItem, generator, true);
+    VirtualModifier mod;
+    mod.socketSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    sVirtualItemMgr.GenerateSockets(vItem, mod, true);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
@@ -5593,6 +5593,13 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     vItem->Quality = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.quality = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.seed = vItem->seed;
+    modifier.displaySeed = vItem->displaySeed;
+    modifier.nameSeed = vItem->nameSeed;
+    modifier.qualitySeed = vItem->qualitySeed;
+    modifier.socketSeed = vItem->socketSeed;
+    modifier.spellSeed = vItem->spellSeed;
+    modifier.statSeed = vItem->statSeed;
+    modifier.statValueSeed = vItem->statValueSeed;
     modifier.ilevel = vItem->ItemLevel;
 
     sVirtualItemMgr.RegenerateItemInfo(vItem, modifier);
@@ -5613,12 +5620,11 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
         return;
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
-    auto generator = std::mt19937();
-    generator.seed(rand32());
-    VirtualModifier mod = VirtualModifier();
+    VirtualModifier mod;
+    mod.statSeed = vItem->statSeed;
     mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
     mod.statpool = m_spellInfo->Effects[effIndex].MiscValueB != 0 ? m_spellInfo->Effects[effIndex].MiscValueB : -1;
-    sVirtualItemMgr.GenerateStats(vItem, generator, mod);
+    sVirtualItemMgr.GenerateStats(vItem, mod);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
