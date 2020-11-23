@@ -85,6 +85,13 @@ struct VirtualModifier
     int16 statpool;
     StatGroup statgroup;
     uint32 seed;
+    uint32 socketSeed;
+    uint32 qualitySeed;
+    uint32 statSeed;
+    uint32 nameSeed;
+    uint32 displaySeed;
+    uint32 spellSeed;
+    uint32 statValueSeed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
     uint32 vLvlMod;
