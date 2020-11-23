@@ -799,6 +799,7 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
         std::ostringstream stream;
         stream << "ERROR: Found no display id for item quality [" << output->Quality << "] class [";
         stream << output->Class << "] subclass [" << output->SubClass << "] inventoryType [" << output->InventoryType << "]";
+        stream << ". Please report this to developers.";
         sWorld->SendGlobalText(stream.str().c_str(), nullptr);
         return 0;
     }
@@ -810,17 +811,16 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
 
 itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt19937& generator)
 {
-#define IFSKIP(spellinfo, requirement) if(spellinfo != -1 && spellinfo != requirement) continue
+#define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
     for (auto const someSpells : availableSpells)
     {
         if (output->Quality != someSpells.quality)
             continue;
-
         IFSKIP(someSpells.itemClass, output->Class);
         IFSKIP(someSpells.subClass, output->SubClass);
         IFSKIP(someSpells.inventoryType, output->InventoryType);
-         IFSKIP(someSpells.statGroup, output->statGroup);
+        IFSKIP(someSpells.statGroup, output->statGroup);
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
             continue;
         if (someSpells.minItemLevel != -1 && output->ItemLevel < someSpells.minItemLevel)
