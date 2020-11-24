@@ -28,6 +28,7 @@
 #include <memory>
 #include <boost/asio/ip/tcp.hpp>
 #include <openssl/md5.h>
+#include <boost/thread.hpp>
 
 using boost::asio::ip::tcp;
 
