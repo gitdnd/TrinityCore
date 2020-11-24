@@ -164,7 +164,7 @@ void PatcherRunnable::run()
         }
 
         uint64 left = size - pos;
-        uint16 send = (left > 4096) ? 4096 : left;
+        uint16 send = (left > 32768) ? 32768 : left;
 
         char* bytes = new char[sizeof(TransferDataPacket) + send];
         TransferDataPacket* hdr = (TransferDataPacket*)bytes;
@@ -416,6 +416,7 @@ bool AuthSession::HandleXferResume()
         // Potentially open to a DOS attach since we spawn a new thread each time.
         // Need to implement a thread pool if this ever becomes an issue
         u.detach();
+        _patcher->patchThread = boost::shared_ptr<boost::thread>(&u);
         return true;
     }
     return false;
@@ -425,6 +426,15 @@ bool AuthSession::HandleXferResume()
 bool AuthSession::HandleXferCancel()
 {
     TC_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
+    if (_patcher)
+    {
+        _patcher->stop();
+        if (_patcher->patchThread) {
+            boost::thread&& thread = *_patcher->patchThread.get();
+            thread.join();
+        }
+        delete _patcher;
+    }
     CloseSocket();
     return true;
 }
@@ -452,6 +462,7 @@ bool AuthSession::HandleXferAccept()
     }
     _patcher = new PatcherRunnable(this, 0, size);
     boost::thread u(&PatcherRunnable::run, _patcher);
+    _patcher->patchThread = boost::shared_ptr<boost::thread>(&u);
     return true;
 }
 

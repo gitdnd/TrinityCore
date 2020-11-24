@@ -86,6 +86,7 @@ public:
     PatcherRunnable(AuthSession* session, uint64 start, uint64 size);
     void run();
     void stop();
+    boost::shared_ptr<boost::thread> patchThread;
 private:
     AuthSession* mySocket;
     uint64 pos;
