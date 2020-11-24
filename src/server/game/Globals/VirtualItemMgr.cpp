@@ -9,7 +9,8 @@
 #include "Log.h"
 #include "SFMTRand.h"
 
-VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0)
+VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
+socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0)
 {
 }
 
@@ -191,16 +192,13 @@ void VirtualItemMgr::LoadSpellsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     // instantiate RNG
-    thread_local std::mt19937 generator;
-    generator.seed(modifier.seed);
-
-    GenerateQuality(output, generator, modifier);
-    GenerateStats(output, generator, modifier);
-    GenerateItemName(output, generator, modifier);
+    GenerateQuality(output, modifier);
+    GenerateStats(output, modifier);
+    GenerateItemName(output, modifier);
     UpdateDisenchantId(output);
-    GenerateSockets(output, generator);
-    GenerateSpells(output, generator);
-    GenerateItemStats(output, generator, modifier);
+    GenerateSockets(output, modifier);
+    GenerateSpells(output, modifier);
+    GenerateItemStats(output, modifier);
 }
 
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
@@ -222,31 +220,52 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->seed = modifier.seed;
 
     // instantiate RNG
-    thread_local std::mt19937 generator;
+    std::mt19937 generator;
     generator.seed(output->seed);
 
-    GenerateQuality(output, generator, modifier);
+    if (modifier.socketSeed == 0)
+        modifier.socketSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    if (modifier.qualitySeed == 0)
+        modifier.qualitySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    if (modifier.statSeed == 0)
+        modifier.statSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    if (modifier.nameSeed == 0)
+        modifier.nameSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    if (modifier.displaySeed == 0)
+        modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    if (modifier.spellSeed == 0)
+        modifier.spellSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    if (modifier.statValueSeed == 0)
+        modifier.statValueSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+
+    GenerateQuality(output, modifier);
 
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
     // as some of the next function calls require information set in this function ie. quality, ilevel etc.
-    GenerateStats(output, generator, modifier);
+    GenerateStats(output, modifier);
 
     // Generate an item name based on type and quality
-    GenerateItemName(output, generator, modifier);
+    GenerateItemName(output, modifier);
 
     // Set the correct disenchant ID based on ilevel and quality
     UpdateDisenchantId(output);
 
     // Generate the items sockets based on type and quality
-    GenerateSockets(output, generator);
+    GenerateSockets(output, modifier);
 
     // Add spells to items like trinkets and legendaries(todo)
-    GenerateSpells(output, generator);
+    GenerateSpells(output, modifier);
 
     // Generate primary and secondary stats.
     // Always do this last, as it has variable rand calls based on quality.
-    GenerateItemStats(output, generator, modifier);
+    GenerateItemStats(output, modifier);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
@@ -259,7 +278,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a display ID for the item based on type, special case for trinkets and rings
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, generator, modifier);
+    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -277,10 +296,10 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return output;
 }
 
-void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
 {
-    if (!reRoll && output->statSeed != 0 && output->statSeed != generator._Idx)
-        generator.seed(output->statSeed);
+    std::mt19937 generator;
+    generator.seed(modifier.statSeed);
 
     // always bind on pickup
     output->Bonding = BIND_WHEN_PICKED_UP;
@@ -461,10 +480,10 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, std::mt19937& ge
     output->statSeed = generator._Idx;
 }
 
-void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
 {
-    if (!reRoll && output->statValueSeed != 0 && output->statValueSeed != generator._Idx)
-        generator.seed(output->statValueSeed);
+    std::mt19937 generator;
+    generator.seed(modifier.statValueSeed);
 
     // get statgroup id
     StatGroup statgroupid = output->statGroup;
@@ -597,10 +616,10 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     return ilevel;
 }
 
-void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
 {
-    if (!reRoll && output->nameSeed != 0 && output->nameSeed != generator._Idx)
-        generator.seed(output->nameSeed);
+    std::mt19937 generator;
+    generator.seed(modifier.nameSeed);
 
     std::string fullName = "";
 
@@ -784,8 +803,10 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, std::mt19937&
     output->nameSeed = generator._Idx;
 }
 
-uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier) const
+uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier) const
 {
+    std::mt19937 generator;
+    generator.seed(modifier.displaySeed);
     std::list<uint32> displayLists;
     displayLists = GetDisplaysForDisplayInfo(output);
     // Attempt to find display at a quality up if none found
@@ -809,11 +830,14 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, std::mt1
     return *display;
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt19937& generator)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier)
 {
+    std::mt19937 generator;
+    generator.seed(modifier.spellSeed);
+
 #define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
-    for (auto const someSpells : availableSpells)
+    for (auto const &someSpells : availableSpells)
     {
         if (output->Quality != someSpells.quality)
             continue;
@@ -835,10 +859,10 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, std::mt
     return *selectedSpell;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& generator, bool reRoll)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
 {
-    if (!reRoll && output->spellSeed != 0 && output->spellSeed != generator._Idx)
-        generator.seed(output->spellSeed);
+    std::mt19937 generator;
+    generator.seed(modifier.spellSeed);
 
     //@todo Finalize these numbers, add more then 1 spell to generate.
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
@@ -889,14 +913,14 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     std::vector<uint32_t> spellsToUse;
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
-        itemSpellInfo spell = GenerateSpell(output, generator);
+        itemSpellInfo spell = GenerateSpell(output, modifier);
         if (spell.spellId == 0)
             continue;
         // Skip spell if we have already used this one. Try a few times to fetch a unique spell
         int tries = 0;
         while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
         {
-            spell = GenerateSpell(output, generator);
+            spell = GenerateSpell(output, modifier);
             ++tries;
         }
         // If still a duplicate, skip
@@ -914,10 +938,10 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, std::mt19937& g
     output->spellSeed = generator._Idx;
 }
 
-void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& generator,  bool reRoll)
+void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
 {
-    if (!reRoll && output->socketSeed != 0 && output->socketSeed != generator._Idx)
-        generator.seed(output->socketSeed);
+    std::mt19937 generator;
+    generator.seed(modifier.socketSeed);
 
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
@@ -992,10 +1016,10 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, std::mt19937& 
     output->socketSeed = generator._Idx;
 }
 
-void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, std::mt19937& generator, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
 {
-    if (!reRoll && output->qualitySeed != 0 && output->qualitySeed != generator._Idx)
-        generator.seed(output->qualitySeed);
+    std::mt19937 generator;
+    generator.seed(modifier.qualitySeed);
 
     // decide quality
     uint32 quality = output->Quality;
