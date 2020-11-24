@@ -164,7 +164,7 @@ void PatcherRunnable::run()
         }
 
         uint64 left = size - pos;
-        uint16 send = (left > 32768) ? 32768 : left;
+        uint16 send = (left > 4096) ? 4096 : left;
 
         char* bytes = new char[sizeof(TransferDataPacket) + send];
         TransferDataPacket* hdr = (TransferDataPacket*)bytes;
