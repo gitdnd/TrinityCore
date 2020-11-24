@@ -416,7 +416,7 @@ bool AuthSession::HandleXferResume()
         // Potentially open to a DOS attach since we spawn a new thread each time.
         // Need to implement a thread pool if this ever becomes an issue
         u.detach();
-        _patcher->patchThread = boost::shared_ptr<boost::thread>(&u);
+        _patcher->patchThread = &u;
         return true;
     }
     return false;
@@ -430,8 +430,8 @@ bool AuthSession::HandleXferCancel()
     {
         _patcher->stop();
         if (_patcher->patchThread) {
-            boost::thread&& thread = *_patcher->patchThread.get();
-            thread.join();
+            boost::thread* thread = _patcher->patchThread;
+            thread->join();
         }
         delete _patcher;
     }
@@ -462,7 +462,7 @@ bool AuthSession::HandleXferAccept()
     }
     _patcher = new PatcherRunnable(this, 0, size);
     boost::thread u(&PatcherRunnable::run, _patcher);
-    _patcher->patchThread = boost::shared_ptr<boost::thread>(&u);
+    _patcher->patchThread = &u;
     return true;
 }
 
