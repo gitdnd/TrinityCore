@@ -121,7 +121,7 @@ public:
 
         _isRunning = true;
         _thread = new boost::thread(&PatcherService::Run, this);
-        _thread.detach();
+        _thread->detach();
     }
     void Stop()
     {
