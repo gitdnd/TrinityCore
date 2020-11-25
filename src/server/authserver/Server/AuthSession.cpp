@@ -467,7 +467,7 @@ bool AuthSession::HandleXferResume()
     std::mutex& mutex = patcherService.GetMutex();
     mutex.lock();
     {
-        uint32 index = patcherService.fnv1a_32(_accountInfo.Login, _accountInfo.Login.length());
+        uint32 index = patcherService.fnv1a_32(_accountInfo.Login.c_str(), _accountInfo.Login.length());
         std::unordered_map<uint32, PatchSession>& patchSessions = patcherService.GetPatchSessions();
 
         PatchSession& patchSession = patchSessions[index];
@@ -495,7 +495,7 @@ bool AuthSession::HandleXferCancel()
     std::mutex& mutex = patcherService.GetMutex();
     mutex.lock();
     {
-        uint32 index = patcherService.fnv1a_32(_accountInfo.Login, _accountInfo.Login.length());
+        uint32 index = patcherService.fnv1a_32(_accountInfo.Login.c_str(), _accountInfo.Login.length());
         std::unordered_map<uint32, PatchSession>& patchSessions = patcherService.GetPatchSessions();
 
         patchSessions.erase(index);
@@ -521,7 +521,7 @@ bool AuthSession::HandleXferAccept()
     std::mutex& mutex = patcherService.GetMutex();
     mutex.lock();
     {
-        uint32 index = patcherService.fnv1a_32(_accountInfo.Login, _accountInfo.Login.length());
+        uint32 index = patcherService.fnv1a_32(_accountInfo.Login.c_str(), _accountInfo.Login.length());
         std::unordered_map<uint32, PatchSession>& patchSessions = patcherService.GetPatchSessions();
 
         PatchSession& patchSession = patchSessions[index];
