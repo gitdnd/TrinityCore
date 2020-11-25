@@ -168,27 +168,23 @@ void PatcherService::Run()
 
             _mutex.lock();
             {
-                for (auto& pair : _patchSessions)
+                for(auto itr = begin(_patchSessions); itr != end(_patchSessions);)
                 {
-                    PatchSession& patchSession = pair.second;
-                    
+                    PatchSession& patchSession = itr->second;
+
                     // Do Patching
                     PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
-                    const ByteBuffer* patchBuffer = patchInfo.GetBuffer(patchSession.bufferIndex);
+                    const ByteBuffer* patchBuffer = patchInfo.GetBuffer(patchSession.bufferIndex++);
 
                     patchSession.session->SendPacket(*patchBuffer);
-                    patchSession.bufferIndex++;
-                }
 
-                // Remove all sessions that have finished patching
-                _patchSessions.erase(std::remove_if(_patchSessions.begin(), _patchSessions.end(), [](std::pair<const uint32, PatchSession>& pair) 
-                {
-                    PatchSession& patchSession = pair.second;
-                    PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
+                    // Remove all session if it has finished patching
                     size_t numBuffers = patchInfo.GetBuffers().size();
-
-                    return patchSession.bufferIndex == numBuffers; 
-                }), _patchSessions.end());
+                    if (patchSession.bufferIndex == numBuffers)
+                    {
+                        itr = _patchSessions.erase(numBuffers);
+                    }
+                }
             }
             _mutex.unlock();
         }
