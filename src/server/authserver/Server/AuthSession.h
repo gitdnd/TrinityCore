@@ -133,7 +133,7 @@ public:
     void Run();
 
     // FNV-1a 32bit hashing algorithm.
-    u32 fnv1a_32(const char* s, std::size_t count)
+    uint32 fnv1a_32(const char* s, std::size_t count)
     {
         return ((count ? fnv1a_32(s, count - 1) : 2166136261u) ^ s[count]) * 16777619u;
     }

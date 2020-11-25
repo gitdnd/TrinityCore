@@ -151,7 +151,7 @@ struct TransferDataPacket
 Patcher patcher;
 PatcherService patcherService;
 
-void PatcherService::run()
+void PatcherService::Run()
 {
     TC_LOG_INFO("network", "Patch Service Starting.");
 
@@ -181,8 +181,8 @@ void PatcherService::run()
                 // Remove all sessions that have finished patching
                 _patchSessions.erase(std::remove_if(_patchSessions.begin(), _patchSessions.end(), [](PatchSession& patchSession) 
                 {
-                    const PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex)
-                    size_t numBuffers = patchInfo.GetBuffers.size();
+                    const PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
+                    size_t numBuffers = patchInfo.GetBuffers().size();
 
                     return patchSession.bufferIndex == numBuffers; 
                 }), _patchSessions.end());
