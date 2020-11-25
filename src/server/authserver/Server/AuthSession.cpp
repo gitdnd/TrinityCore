@@ -182,8 +182,12 @@ void PatcherService::Run()
                     size_t numBuffers = patchInfo.GetBuffers().size();
                     if (patchSession.bufferIndex == numBuffers)
                     {
-                        itr = _patchSessions.erase(numBuffers);
+                        itr = _patchSessions.erase(itr);
                     }
+                    else
+                    {
+                        itr++
+                    };
                 }
             }
             _mutex.unlock();
