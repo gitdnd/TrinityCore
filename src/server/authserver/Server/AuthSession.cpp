@@ -181,8 +181,9 @@ void PatcherService::Run()
                 }
 
                 // Remove all sessions that have finished patching
-                _patchSessions.erase(std::remove_if(_patchSessions.begin(), _patchSessions.end(), [](PatchSession& patchSession) 
+                _patchSessions.erase(std::remove_if(_patchSessions.begin(), _patchSessions.end(), [](std::pair<const uint32, PatchSession>& pair) 
                 {
+                    PatchSession& patchSession = pair.second;
                     PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
                     size_t numBuffers = patchInfo.GetBuffers().size();
 
