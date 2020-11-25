@@ -266,7 +266,8 @@ PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool& fallbac
 bool Patcher::PossiblePatching(int _build, std::string _locale)
 {
     bool temp;
-    return getPatchInfo(_build, _locale, temp) != NULL;
+    uint16 index;
+    return getPatchInfo(_build, _locale, temp, index) != NULL;
 }
 
 bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _session)
