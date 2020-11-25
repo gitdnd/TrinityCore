@@ -168,8 +168,10 @@ void PatcherService::Run()
 
             _mutex.lock();
             {
-                for (PatchSession& patchSession : _patchSessions)
+                for (auto pair : _patchSessions)
                 {
+                    PatchSession& patchSession = pair.second;
+                    
                     // Do Patching
                     const PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
                     const ByteBuffer* patchBuffer = patchInfo.GetBuffer(patchSession.bufferIndex);
@@ -219,7 +221,7 @@ void Patcher::Initialize()
     LoadPatchesInfo();
 }
 
-PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool* fallback, uint16& patchInfoIndex)
+PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool& fallback, uint16& patchInfoIndex)
 {
     PATCH_INFO* patch = NULL;
     int locale = *((int*)(_locale.c_str()));
@@ -227,21 +229,36 @@ PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool* fallbac
     TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
 
     // Hardcoded for enGB
-    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
-        if (it->build == _build && it->locale == 'BGne')
+    for (uint32 i = 0; i < _patches.size(); i++)
+    {
+        PATCH_INFO& patchInfo = _patches[i];
+        if (patchInfo.build == _build)
         {
-            patch = &(*it);
-            patchInfoIndex = it->first;
-            *fallback = true;
+            if (!patch && patchInfo.locale == 'BGne')
+            {
+                patch = &patchInfo;
+                patchInfoIndex = i;
+                fallback = true;
+            }
+            else if (patchInfo.locale == locale)
+            {
+                patch = &patchInfo;
+                patchInfoIndex = i;
+                fallback = false;
+            }
         }
+    }
 
-    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
-        if (it->build == _build && it->locale == locale)
+    for (uint32 i = 0; i < _patches.size(); i++)
+    {
+        PATCH_INFO& patchInfo = _patches[i];
+        if (patchInfo.build == _build && patchInfo.locale == locale)
         {
-            patch = &(*it);
-            patchInfoIndex = it->first;
-            *fallback = false;
+            patch = &patchInfo;
+            patchInfoIndex = i;
+            fallback = false;
         }
+    }
 
     return patch;
 }
@@ -413,19 +430,19 @@ void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
     {
         ByteBuffer*& buffer = patchBuffers[i];
 
-        size_t blockSize = PATCH_BUFFER_MAX_SIZE;
-        if (i == numBlocks - 1 && lastBlockSize > 0)
-            blockSize = lastBlockSize;
+        size_t bufferSize = PATCH_BUFFER_MAX_SIZE;
+        if (i == numBuffers - 1 && lastBufferSize > 0)
+            bufferSize = lastBufferSize;
 
         buffer = new ByteBuffer();
-        buffer->resize(sizeof(TransferDataPacket) + blockSize);
+        buffer->resize(sizeof(TransferDataPacket) + bufferSize);
 
         TransferDataPacket* transferDataPacket = (TransferDataPacket*)buffer->contents();
         transferDataPacket->cmd = uint8(XFER_DATA);
-        transferDataPacket->chunk_size = blockSize;
+        transferDataPacket->chunk_size = bufferSize;
         
         // Read data into the buffer after the header
-        fread(buffer->contents() + sizeof(TransferDataPacket), 1, blockSize, patchFile);
+        fread(buffer->contents() + sizeof(TransferDataPacket), 1, bufferSize, patchFile);
     }
     
     // Reset File Pointer so we can generate the MD5 Hash
@@ -592,7 +609,7 @@ void AccountInfo::LoadResult(Field* fields)
 }
 
 AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)),
-_status(STATUS_CHALLENGE), _build(0), _expversion(0), _patcherService(nullptr)
+_status(STATUS_CHALLENGE), _build(0), _expversion(0)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);

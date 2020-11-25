@@ -66,7 +66,8 @@ public:
     uint8 md5[MD5_DIGEST_LENGTH];
 
     std::vector<ByteBuffer*>& GetBuffers() { return _buffers; }
-    const ByteBuffer* GetBuffer(uint16 index)
+    const std::vector<ByteBuffer*>& GetBuffers() { return _buffers; } const
+    const ByteBuffer* GetBuffer(uint16 index) const
     {
         assert(index < _buffers.size());
         return _buffers[index];
