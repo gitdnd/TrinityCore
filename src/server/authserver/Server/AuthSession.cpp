@@ -186,7 +186,7 @@ void PatcherService::Run()
                     }
                     else
                     {
-                        itr++
+                        itr++;
                     };
                 }
             }
