@@ -168,7 +168,7 @@ void PatcherService::Run()
 
             _mutex.lock();
             {
-                for (auto pair : _patchSessions)
+                for (auto& pair : _patchSessions)
                 {
                     PatchSession& patchSession = pair.second;
                     
