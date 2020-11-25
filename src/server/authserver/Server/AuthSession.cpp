@@ -456,7 +456,7 @@ bool AuthSession::HandleXferResume()
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
 
     // Check if the client indeed had a patch being transfered
-    if (_patchInfoIndex == std::numeric_limit<uint16>().max())
+    if (_patchInfoIndex == std::numeric_limits<uint16>().max())
     {
         TC_LOG_ERROR("network", "Error while canceling patch transfer (wrong packet)");
         return false;
@@ -486,7 +486,7 @@ bool AuthSession::HandleXferCancel()
     TC_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
 
     // Check if the client indeed had a patch being transfered
-    if (_patchInfoIndex == std::numeric_limit<uint16>().max())
+    if (_patchInfoIndex == std::numeric_limits<uint16>().max())
     {
         TC_LOG_ERROR("network", "Error while canceling patch transfer (wrong packet)");
         return false;
@@ -512,7 +512,7 @@ bool AuthSession::HandleXferAccept()
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferAccept");
 
     // Check packet length and patch existence
-    if (_patchInfoIndex == std::numeric_limit<uint16>().max())
+    if (_patchInfoIndex == std::numeric_limits<uint16>().max())
     {
         TC_LOG_ERROR("network", "Error while accepting patch transfer (wrong packet)");
         return false;

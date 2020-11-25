@@ -106,9 +106,9 @@ private:
 struct PatchSession
 {
     AuthSession* session = nullptr;
-    uint16 patchIndex = std::numeric_limit<uint16>().max();  // This is the index into our patch info array.
-    uint16 bufferIndex = std::numeric_limit<uint16>().max(); // This is the index into our prebuilt array of buffers for the patch info we are sending.
-}
+    uint16 patchIndex =  std::numeric_limits<uint16>().max();  // This is the index into our patch info array.
+    uint16 bufferIndex = std::numeric_limits<uint16>().max(); // This is the index into our prebuilt array of buffers for the patch info we are sending.
+};
 
 class PatcherService
 {
@@ -215,7 +215,7 @@ private:
     std::string _os;
     std::string _ipCountry;
     uint16 _build;
-    uint16 _patchInfoIndex = std::numeric_limit<uint16>().max();
+    uint16 _patchInfoIndex = std::numeric_limits<uint16>().max();
     uint8 _expversion;
 
     QueryCallbackProcessor _queryProcessor;
