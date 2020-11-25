@@ -89,14 +89,14 @@ public:
     bool InitPatching(int _build, std::string _locale, AuthSession* _session);
     bool PossiblePatching(int _build, std::string _locale);
 
-    const PATCH_INFO& GetPatchInfo(uint16 index)
+    PATCH_INFO& GetPatchInfo(uint16 index)
     {
         assert(index < _patches.size());
         return _patches[index];
     }
 
 private:
-    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool* fallback, uint16& patchInfoIndex);
+    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool& fallback, uint16& patchInfoIndex);
     void LoadPatchesInfo();
     Patches _patches;
     std::string m_dataDir;

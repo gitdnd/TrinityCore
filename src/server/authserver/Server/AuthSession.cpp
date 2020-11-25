@@ -173,7 +173,7 @@ void PatcherService::Run()
                     PatchSession& patchSession = pair.second;
                     
                     // Do Patching
-                    const PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
+                    PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
                     const ByteBuffer* patchBuffer = patchInfo.GetBuffer(patchSession.bufferIndex);
 
                     patchSession.session->SendPacket(*patchBuffer);
@@ -223,7 +223,7 @@ void Patcher::Initialize()
 
 PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool& fallback, uint16& patchInfoIndex)
 {
-    PATCH_INFO* patch = NULL;
+    PATCH_INFO* patch = nullptr;
     int locale = *((int*)(_locale.c_str()));
 
     TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
@@ -266,14 +266,14 @@ PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool& fallbac
 bool Patcher::PossiblePatching(int _build, std::string _locale)
 {
     bool temp;
-    return getPatchInfo(_build, _locale, &temp) != NULL;
+    return getPatchInfo(_build, _locale, temp) != NULL;
 }
 
 bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _session)
 {
     bool fallback;
     uint16 patchIndex;
-    PATCH_INFO* patch = getPatchInfo(_build, _locale, &fallback, patchIndex);
+    PATCH_INFO* patch = getPatchInfo(_build, _locale, fallback, patchIndex);
 
     if (patch)
     {
