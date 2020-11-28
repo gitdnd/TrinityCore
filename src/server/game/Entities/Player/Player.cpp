@@ -17281,12 +17281,11 @@ void Player::_LoadEquipmentSets(PreparedQueryResult result)
 void Player::_LoadHighestSlotItemLevels(PreparedQueryResult result)
 {
     //PrepareStatement(CHAR_SEL_ITEM_LEVEL_SLOTS, "SELECT head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged WHERE guid = ?", CONNECTION_ASYNC);
-    if (!result)
-        return;
+
     // Edge case for if character already existed, or new character
     // Too lazy to handle these so we hack it by defaulting to zero
     // This will be persisted in save and updated when equipment is updated
-    if (result->GetRowCount() == 0)
+    if (!result || result->GetRowCount() == 0)
     {
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HEAD, 0));
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_NECK, 0));

@@ -218,7 +218,7 @@ bool LoginQueryHolder::Initialize()
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_LEVEL_SLOTS);
-    stmt->setUInt64(0, lowGuid);
+    stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS, stmt);
 
     return res;
