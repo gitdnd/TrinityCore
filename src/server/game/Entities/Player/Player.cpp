@@ -26791,14 +26791,17 @@ float Player::GetAverageItemLevel() const
     uint32 count = 0;
 
     bool isCacheEmpty = _itemSlotToMaxLevel.size() == 0;
+    // Instead of reverting to old system, return 1. This will flag any bugs in the system rather than hiding them
+    if (isCacheEmpty)
+        return 1.0f;
+
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         // don't check tabard, ranged, offhand or shirt
         if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
             continue;
 
-        // FIXME(Harry): Figured out why cache is empty initially on login
-        if (isCacheEmpty)
+        /*if (isCacheEmpty)
         {
             if (m_items[i] && m_items[i]->GetTemplate())
             {
@@ -26806,9 +26809,9 @@ float Player::GetAverageItemLevel() const
             }
         }
         else
-        {
+        {*/
             sum += float(_itemSlotToMaxLevel.at(i));
-        }
+        //}
         
         // Add items with no slot to the count
         ++count;
@@ -26870,15 +26873,16 @@ void Player::_SaveSlotHighestLevel(CharacterDatabaseTransaction& trans)
     stmt->setUInt32(6, ItemLevelForSlot(EQUIPMENT_SLOT_WAIST));
     stmt->setUInt32(7, ItemLevelForSlot(EQUIPMENT_SLOT_LEGS));
     stmt->setUInt32(8, ItemLevelForSlot(EQUIPMENT_SLOT_FEET));
-    stmt->setUInt32(9, ItemLevelForSlot(EQUIPMENT_SLOT_HANDS));
-    stmt->setUInt32(10, ItemLevelForSlot(EQUIPMENT_SLOT_FINGER1));
-    stmt->setUInt32(11, ItemLevelForSlot(EQUIPMENT_SLOT_FINGER2));
-    stmt->setUInt32(12, ItemLevelForSlot(EQUIPMENT_SLOT_TRINKET1));
-    stmt->setUInt32(13, ItemLevelForSlot(EQUIPMENT_SLOT_TRINKET2));
-    stmt->setUInt32(14, ItemLevelForSlot(EQUIPMENT_SLOT_BACK));
-    stmt->setUInt32(15, ItemLevelForSlot(EQUIPMENT_SLOT_MAINHAND));
-    stmt->setUInt32(16, ItemLevelForSlot(EQUIPMENT_SLOT_OFFHAND));
-    stmt->setUInt32(17, ItemLevelForSlot(EQUIPMENT_SLOT_RANGED));
+    stmt->setUInt32(9, ItemLevelForSlot(EQUIPMENT_SLOT_WRISTS));
+    stmt->setUInt32(10, ItemLevelForSlot(EQUIPMENT_SLOT_HANDS));
+    stmt->setUInt32(11, ItemLevelForSlot(EQUIPMENT_SLOT_FINGER1));
+    stmt->setUInt32(12, ItemLevelForSlot(EQUIPMENT_SLOT_FINGER2));
+    stmt->setUInt32(13, ItemLevelForSlot(EQUIPMENT_SLOT_TRINKET1));
+    stmt->setUInt32(14, ItemLevelForSlot(EQUIPMENT_SLOT_TRINKET2));
+    stmt->setUInt32(15, ItemLevelForSlot(EQUIPMENT_SLOT_BACK));
+    stmt->setUInt32(16, ItemLevelForSlot(EQUIPMENT_SLOT_MAINHAND));
+    stmt->setUInt32(17, ItemLevelForSlot(EQUIPMENT_SLOT_OFFHAND));
+    stmt->setUInt32(18, ItemLevelForSlot(EQUIPMENT_SLOT_RANGED));
     trans->Append(stmt);
 }
 
