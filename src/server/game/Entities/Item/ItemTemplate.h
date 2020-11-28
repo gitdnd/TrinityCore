@@ -712,6 +712,7 @@ struct ItemTemplate
 
     float GetItemLevelIncludingQuality() const;
     float GetItemLevel() const;
+    uint32 GetRealItemLevel() const;
 
     uint32 GetSkill() const;
 

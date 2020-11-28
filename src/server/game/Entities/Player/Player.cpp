@@ -4423,6 +4423,10 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_LEVEL_SLOTS);
+            stmt->setUInt32(0, guid);
+            trans->Append(stmt);
+
             Corpse::DeleteFromDB(playerguid, trans);
             break;
         }
@@ -12114,7 +12118,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         {
             pItem->AddToWorld();
             pItem->SendUpdateToPlayer(this);
-            UpdateCraftingSkill();
+            UpdateCraftingSkill(pItem, slot);
         }
 
         pItem->SetState(ITEM_CHANGED, this);
@@ -12282,7 +12286,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         pItem2->SetState(ITEM_CHANGED, this);
 
         ApplyEquipCooldown(pItem2);
-        UpdateCraftingSkill();
+        UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem2, bag, slot);
 #endif
@@ -12296,7 +12300,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     // only for full equip instead adding to stack
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
-    UpdateCraftingSkill();
+    UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, bag, slot);
 #endif
@@ -12326,14 +12330,14 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
 
-        UpdateCraftingSkill();
+        UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem, (pos >> 8), slot);
 #endif
     }
 }
 
-void Player::UpdateCraftingSkill()
+void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 {
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
@@ -12349,9 +12353,20 @@ void Player::UpdateCraftingSkill()
     uint16 SkillValue = SKILL_VALUE(data);
     uint16 MaxValue = SKILL_MAX(data);
 
-    if (!MaxValue || !SkillValue || SkillValue > MaxValue)
+    if (!MaxValue || !SkillValue || SkillValue > MaxValue || !item->GetTemplate())
         return;
 
+    // First check the new item is a slot we care about
+    if (_itemSlotToMaxLevel.find(slot) == _itemSlotToMaxLevel.end())
+        return;
+
+    // Check if new slot item level is higher than the old one
+    uint32 existingLevel = _itemSlotToMaxLevel[slot];
+    uint32 newItemLevel = item->GetTemplate()->GetRealItemLevel();
+    if (newItemLevel > existingLevel)
+        _itemSlotToMaxLevel[slot] = newItemLevel;
+
+    // Now calculate new skill level based on cached item levels
     uint32 new_value = GetAverageItemLevel();
 
     // If the new value is less than the old value, don't update.
@@ -17263,6 +17278,57 @@ void Player::_LoadEquipmentSets(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
+void Player::_LoadHighestSlotItemLevels(PreparedQueryResult result)
+{
+    //PrepareStatement(CHAR_SEL_ITEM_LEVEL_SLOTS, "SELECT head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged WHERE guid = ?", CONNECTION_ASYNC);
+    if (!result)
+        return;
+    // Edge case for if character already existed, or new character
+    // Too lazy to handle these so we hack it by defaulting to zero
+    // This will be persisted in save and updated when equipment is updated
+    if (result->GetRowCount() == 0)
+    {
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HEAD, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_NECK, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_SHOULDERS, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_BODY, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_CHEST, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_WAIST, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_LEGS, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FEET, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HANDS, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER1, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER2, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET1, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET2, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_BACK, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_MAINHAND, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_OFFHAND, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_RANGED, 0));
+        return;
+    }
+    // Expecting only one row
+    Field* fields = result->Fetch();
+
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HEAD,      fields[0].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_NECK,      fields[1].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_SHOULDERS, fields[2].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_BODY,      fields[3].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_CHEST,     fields[4].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_WAIST,     fields[5].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_LEGS,      fields[6].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FEET,      fields[7].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HANDS,     fields[8].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER1,   fields[9].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER2,   fields[10].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET1,  fields[11].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET2,  fields[12].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_BACK,      fields[13].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_MAINHAND,  fields[14].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_OFFHAND,   fields[15].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_RANGED,    fields[16].GetUInt32()));
+}
+
 void Player::_LoadBGData(PreparedQueryResult result)
 {
     if (!result)
@@ -18083,6 +18149,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     m_achievementMgr->CheckAllAchievementCriteria();
 
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
+
+    _LoadHighestSlotItemLevels(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS));
 
     return true;
 }
@@ -19809,6 +19877,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
     GetSession()->SaveTutorialsData(trans);                 // changed only while character in game
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
+    _SaveSlotHighestLevel(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -26719,16 +26788,18 @@ float Player::GetAverageItemLevel() const
     float sum = 0;
     uint32 count = 0;
 
-    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         // don't check tabard, ranged, offhand or shirt
         if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
             continue;
 
-        if (m_items[i] && m_items[i]->GetTemplate())
+        /*if (m_items[i] && m_items[i]->GetTemplate())
         {
             sum += m_items[i]->GetTemplate()->GetItemLevel();
-        }
+        }*/
+        sum += float(_itemSlotToMaxLevel.at(i));
+
         // Add items with no slot to the count
         ++count;
     }
@@ -26773,6 +26844,41 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction& trans)
         stmt->setUInt64(2, itr->second);
         trans->Append(stmt);
     }
+}
+
+void Player::_SaveSlotHighestLevel(CharacterDatabaseTransaction& trans)
+{
+    if (_itemSlotToMaxLevel.size() == 0)
+        return;
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_LEVEL_SLOTS);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(1, ItemLevelForSlot(EQUIPMENT_SLOT_HEAD));
+    stmt->setUInt32(2, ItemLevelForSlot(EQUIPMENT_SLOT_NECK));
+    stmt->setUInt32(3, ItemLevelForSlot(EQUIPMENT_SLOT_SHOULDERS));
+    stmt->setUInt32(4, ItemLevelForSlot(EQUIPMENT_SLOT_BODY));
+    stmt->setUInt32(5, ItemLevelForSlot(EQUIPMENT_SLOT_CHEST));
+    stmt->setUInt32(6, ItemLevelForSlot(EQUIPMENT_SLOT_WAIST));
+    stmt->setUInt32(7, ItemLevelForSlot(EQUIPMENT_SLOT_LEGS));
+    stmt->setUInt32(8, ItemLevelForSlot(EQUIPMENT_SLOT_FEET));
+    stmt->setUInt32(9, ItemLevelForSlot(EQUIPMENT_SLOT_HANDS));
+    stmt->setUInt32(10, ItemLevelForSlot(EQUIPMENT_SLOT_FINGER1));
+    stmt->setUInt32(11, ItemLevelForSlot(EQUIPMENT_SLOT_FINGER2));
+    stmt->setUInt32(12, ItemLevelForSlot(EQUIPMENT_SLOT_TRINKET1));
+    stmt->setUInt32(13, ItemLevelForSlot(EQUIPMENT_SLOT_TRINKET2));
+    stmt->setUInt32(14, ItemLevelForSlot(EQUIPMENT_SLOT_BACK));
+    stmt->setUInt32(15, ItemLevelForSlot(EQUIPMENT_SLOT_MAINHAND));
+    stmt->setUInt32(16, ItemLevelForSlot(EQUIPMENT_SLOT_OFFHAND));
+    stmt->setUInt32(17, ItemLevelForSlot(EQUIPMENT_SLOT_RANGED));
+    trans->Append(stmt);
+}
+
+uint32 Player::ItemLevelForSlot(uint8 slot)
+{
+    if (m_items[slot] && m_items[slot]->GetTemplate())
+    {
+        return m_items[slot]->GetTemplate()->GetRealItemLevel();
+    }
+    return 0;
 }
 
 bool Player::IsInWhisperWhiteList(ObjectGuid guid)

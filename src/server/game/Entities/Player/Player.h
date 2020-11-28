@@ -734,6 +734,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 33,
+    PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS     = 34,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1100,7 +1101,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
         Item* EquipNewItem(uint16 pos, uint32 item, bool update);
         Item* EquipItem(uint16 pos, Item* pItem, bool update);
-        void UpdateCraftingSkill();
+        void UpdateCraftingSkill(Item* item, uint8 slot);
         void AutoUnequipOffhandIfNeed(bool force = false);
         bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
         void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false, bool createdByPlayer = false);
@@ -2189,6 +2190,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void RemoveArmorPassives();
         bool HasGemSpell(uint32 spell);
         void AddGemSpell(uint32 spell) { m_GemSpells.push_back(spell); }
+        uint32 ItemLevelForSlot(uint8 slot);
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -2262,6 +2264,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _LoadGlyphs(PreparedQueryResult result);
         void _LoadTalents(PreparedQueryResult result);
         void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
+        void _LoadHighestSlotItemLevels(PreparedQueryResult result);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -2284,6 +2287,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _SaveTalents(CharacterDatabaseTransaction& trans);
         void _SaveStats(CharacterDatabaseTransaction& trans) const;
         void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction& trans);
+        void _SaveSlotHighestLevel(CharacterDatabaseTransaction& trans);
 
         /*********************************************************/
         /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -2517,6 +2521,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 manaBeforeDuel;
 
         WorldLocation _corpseLocation;
+
+        std::unordered_map<uint8, uint32> _itemSlotToMaxLevel;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

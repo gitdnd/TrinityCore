@@ -108,6 +108,11 @@ float ItemTemplate::GetItemLevel() const
     return float(ItemLevel);
 }
 
+uint32 ItemTemplate::GetRealItemLevel() const
+{
+    return ItemLevel;
+}
+
 uint32 ItemTemplate::GetSkill() const
 {
     static uint32 const itemWeaponSkills[MAX_ITEM_SUBCLASS_WEAPON] =
