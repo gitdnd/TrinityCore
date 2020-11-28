@@ -17508,6 +17508,9 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     // load achievements before anything else to prevent multiple gains for the same achievement/criteria on every loading (as loading does call UpdateAchievementCriteria)
     m_achievementMgr->LoadFromDB(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS));
 
+    // Load highest slot data very early so that it is available when OnEquip methods are called
+    _LoadHighestSlotItemLevels(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS));
+
     uint32 money = fields[8].GetUInt32();
     if (money > MAX_MONEY_AMOUNT)
         money = MAX_MONEY_AMOUNT;
@@ -18149,8 +18152,6 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     m_achievementMgr->CheckAllAchievementCriteria();
 
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
-
-    _LoadHighestSlotItemLevels(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS));
 
     return true;
 }
