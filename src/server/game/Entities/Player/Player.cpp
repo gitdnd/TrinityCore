@@ -17295,6 +17295,7 @@ void Player::_LoadHighestSlotItemLevels(PreparedQueryResult result)
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_WAIST, 0));
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_LEGS, 0));
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FEET, 0));
+        _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_WRISTS, 0));
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HANDS, 0));
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER1, 0));
         _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER2, 0));
@@ -17317,15 +17318,16 @@ void Player::_LoadHighestSlotItemLevels(PreparedQueryResult result)
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_WAIST,     fields[5].GetUInt32()));
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_LEGS,      fields[6].GetUInt32()));
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FEET,      fields[7].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HANDS,     fields[8].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER1,   fields[9].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER2,   fields[10].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET1,  fields[11].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET2,  fields[12].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_BACK,      fields[13].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_MAINHAND,  fields[14].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_OFFHAND,   fields[15].GetUInt32()));
-    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_RANGED,    fields[16].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_WRISTS,    fields[8].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_HANDS,     fields[9].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER1,   fields[10].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_FINGER2,   fields[11].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET1,  fields[12].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_TRINKET2,  fields[13].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_BACK,      fields[14].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_MAINHAND,  fields[15].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_OFFHAND,   fields[16].GetUInt32()));
+    _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_RANGED,    fields[17].GetUInt32()));
 }
 
 void Player::_LoadBGData(PreparedQueryResult result)
