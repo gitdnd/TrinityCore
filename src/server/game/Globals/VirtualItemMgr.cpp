@@ -248,10 +248,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     if (modifier.statValueSeed == 0)
         modifier.statValueSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
 
-    std::ostringstream str;
-    str << "Generate Seed = " << modifier.seed << ", " << "statSeed = " << modifier.statSeed << ", " << "statValueSeed = " << modifier.statValueSeed << "nameSeed = " << modifier.nameSeed;
-    sWorld->SendGlobalText(str.str().c_str(), nullptr);
-
     GenerateQuality(output, modifier);
 
     // Generate base stats for the item.
@@ -485,7 +481,6 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     output->ItemLevel = ilevel;
     output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
     output->MaxDurability = 0; // Disable any form of durability for now
-    //output->statSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
@@ -596,7 +591,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     }
 
     output->StatsCount = setStats;
-    //output->statValueSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
@@ -808,7 +802,6 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
     }
 
     output->Name1 = fullName;
-    //output->nameSeed = generator._Idx;
 }
 
 uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier) const
@@ -834,7 +827,6 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualM
     }
     auto display = std::begin(displayLists);
     std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, generator));
-    //output->displaySeed = generator._Idx;
     return *display;
 }
 
@@ -943,7 +935,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
     }
-    //output->spellSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
@@ -1021,7 +1012,6 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             output->Socket[i].Color = socketcolors[urand(0, socketcolors.size() - 1, generator)];
         }
     }
-    //output->socketSeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
@@ -1070,7 +1060,6 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
         quality = modifier.quality;
 
     output->Quality = quality;
-    //output->qualitySeed = generator._Idx;
 }
 
 void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* output)
