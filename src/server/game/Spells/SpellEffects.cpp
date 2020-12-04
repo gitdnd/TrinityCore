@@ -5606,7 +5606,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     std::ostringstream str;
     str << "Seed = " << modifier.seed << ", " << "qualitySeed = " << modifier.qualitySeed << ", " << "nameSeed = " << modifier.nameSeed;
-    sWorld->SendGlobalText("", nullptr);
+    sWorld->SendGlobalText(str.str().c_str(), nullptr);
 
     sVirtualItemMgr.RegenerateItemInfo(vItem, modifier);
 
