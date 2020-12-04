@@ -203,6 +203,18 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateSockets(output, modifier);
     GenerateSpells(output, modifier);
     GenerateItemStats(output, modifier);
+
+    if (modifier.displaySeed == 0)
+    {
+        modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+        bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
+        bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
+        uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
+        if (display == 0)
+            output->UpdateDisplay();
+        else
+            output->DisplayInfoID = display;
+    }
 }
 
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
