@@ -248,6 +248,10 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     if (modifier.statValueSeed == 0)
         modifier.statValueSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
 
+    std::ostringstream str;
+    str << "Generate Seed = " << modifier.seed << ", " << "statSeed = " << modifier.statSeed << ", " << "statValueSeed = " << modifier.statValueSeed << "nameSeed = " << modifier.nameSeed;
+    sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
     GenerateQuality(output, modifier);
 
     // Generate base stats for the item.
