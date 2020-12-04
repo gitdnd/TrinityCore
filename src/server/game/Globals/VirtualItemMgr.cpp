@@ -192,6 +192,10 @@ void VirtualItemMgr::LoadSpellsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     // instantiate RNG
+    std::mt19937 generator;
+    generator.seed(output->seed);
+
+    // instantiate RNG
     GenerateQuality(output, modifier);
     GenerateStats(output, modifier);
     GenerateItemName(output, modifier);
