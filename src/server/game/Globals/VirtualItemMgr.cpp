@@ -207,6 +207,12 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
         output->DisplayInfoID = display;
 }
 
+void initSeed(uint32& val, std::mt19937 generator)
+{
+    if(!val)
+        val = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+}
+
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
 {
     if (!base)
@@ -228,27 +234,13 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // instantiate RNG
     std::mt19937 generator;
     generator.seed(output->seed);
-
-    if (modifier.socketSeed == 0)
-        modifier.socketSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
-
-    if (modifier.qualitySeed == 0)
-        modifier.qualitySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
-
-    if (modifier.statSeed == 0)
-        modifier.statSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
-
-    if (modifier.nameSeed == 0)
-        modifier.nameSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
-
-    if (modifier.displaySeed == 0)
-        modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
-
-    if (modifier.spellSeed == 0)
-        modifier.spellSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
-
-    if (modifier.statValueSeed == 0)
-        modifier.statValueSeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+    initSeed(modifier.socketSeed, generator);
+    initSeed(modifier.qualitySeed, generator);
+    initSeed(modifier.statSeed, generator);
+    initSeed(modifier.nameSeed, generator);
+    initSeed(modifier.displaySeed, generator);
+    initSeed(modifier.spellSeed, generator);
+    initSeed(modifier.statValueSeed, generator);
 
     GenerateQuality(output, modifier);
 
