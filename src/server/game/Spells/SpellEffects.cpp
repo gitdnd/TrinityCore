@@ -5590,11 +5590,9 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
-    vItem->Quality = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.quality = m_spellInfo->Effects[effIndex].MiscValue;
-    modifier.quality = vItem->Quality;
     modifier.seed = vItem->seed;
-    modifier.displaySeed = 0;
+    modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
     modifier.nameSeed = vItem->nameSeed;
     modifier.qualitySeed = vItem->qualitySeed;
     modifier.socketSeed = vItem->socketSeed;
