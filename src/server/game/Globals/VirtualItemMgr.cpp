@@ -324,7 +324,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     ilevel = round(GenerateItemLevel(vLevel));
 
     // Modify the returned, newly generated iLevel based on quality
-    ilevel = ilevel + ((int32(output->Quality) - int32(output->Quality)) * 5);
+    ilevel = ilevel + (int32(output->Quality) * 5);
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
     ilevel = ilevel + irand(-3, 3, generator);
