@@ -26,8 +26,6 @@
 #include "Socket.h"
 #include "QueryResult.h"
 #include <memory>
-#include <mutex>
-#include <limits>
 #include <boost/asio/ip/tcp.hpp>
 #include <openssl/md5.h>
 #include <boost/thread.hpp>
@@ -50,36 +48,22 @@ enum AuthStatus
 
 // TODO: Add as config variable.
 #ifndef _WIN32
-    #define PATCH_PATH "../var/patches/"
+ #define PATCH_PATH "../var/patches/"
 #else
-    #define PATCH_PATH "./patches/"
+ #define PATCH_PATH "./patches/"
 #endif
-
-constexpr size_t PATCH_BUFFER_MAX_SIZE = 4096;
 
 typedef struct PATCH_INFO
 {
-public:
     int build;
     int locale;
     uint64 filesize;
     uint8 md5[MD5_DIGEST_LENGTH];
-
-    std::vector<ByteBuffer*>& GetBuffers() { return _buffers; }
-    const ByteBuffer* GetBuffer(uint16 index)
-    {
-        assert(index < _buffers.size());
-        return _buffers[index];
-    }
-
-private:
-    std::vector<ByteBuffer*> _buffers;
 } PATCH_INFO;
 
 class Patcher
 {
     typedef std::vector<PATCH_INFO> Patches;
-
 public:
     void Initialize();
 
@@ -89,66 +73,26 @@ public:
     bool InitPatching(int _build, std::string _locale, AuthSession* _session);
     bool PossiblePatching(int _build, std::string _locale);
 
-    PATCH_INFO& GetPatchInfo(uint16 index)
-    {
-        assert(index < _patches.size());
-        return _patches[index];
-    }
-
 private:
-    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool& fallback, uint16& patchInfoIndex);
+    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool* fallback);
     void LoadPatchesInfo();
     Patches _patches;
     std::string m_dataDir;
 };
 
-// A PatchSession is a single instance of a session between the Patcher and a client. This session will transfer the patch data from the patcher to the client
-struct PatchSession
-{
-    AuthSession* session = nullptr;
-    uint16 patchIndex =  std::numeric_limits<uint16>().max();  // This is the index into our patch info array.
-    uint16 bufferIndex = std::numeric_limits<uint16>().max(); // This is the index into our prebuilt array of buffers for the patch info we are sending.
-};
-
-class PatcherService
+// Launch a thread to transfer a patch to the client
+class PatcherRunnable
 {
 public:
-    PatcherService() {}
-
-    void Start()
-    {
-        assert(_isRunning == false);
-
-        _isRunning = true;
-        _thread = new boost::thread(&PatcherService::Run, this);
-        _thread->detach();
-    }
-    void Stop()
-    {
-        assert(_isRunning == true);
-        _isRunning = false;
-
-        delete _thread;
-    }
-    void Run();
-
-    // FNV-1a 32bit hashing algorithm.
-    uint32 fnv1a_32(const char* s, std::size_t count)
-    {
-        return ((count ? fnv1a_32(s, count - 1) : 2166136261u) ^ s[count]) * 16777619u;
-    }
-
-    std::unordered_map<uint32, PatchSession>& GetPatchSessions() { return _patchSessions; }
-    std::mutex& GetMutex() { return _mutex; }
-    boost::thread*& GetThread() { return _thread; }
-    bool IsRunning() { return _isRunning; }
-
+    PatcherRunnable(AuthSession* session, uint64 start, uint64 size);
+    void run();
+    void stop();
+    boost::thread* patchThread;
 private:
-    std::unordered_map<uint32, PatchSession> _patchSessions;
-
-    std::mutex _mutex;
-    boost::thread* _thread;
-    bool _isRunning = false;
+    AuthSession* mySocket;
+    uint64 pos;
+    uint64 size;
+    bool stopped;
 };
 
 struct AccountInfo
@@ -178,8 +122,10 @@ public:
     void Start() override;
     bool Update() override;
 
-    void SendPacket(const ByteBuffer& packet);
-    void SetPatchInfoIndex(const uint16 patchInfoIndex) { _patchInfoIndex = patchInfoIndex;}
+    void SendPacket(ByteBuffer& packet);
+
+    FILE* pPatch;
+    PatcherRunnable* _patcher;
 
 protected:
     void ReadHandler() override;
@@ -201,7 +147,7 @@ private:
 
     void SetVSFields(const std::string& rI);
 
-    bool VerifyVersion(const uint8* a, int32 aLength, const uint8* versionProof, bool isReconnect);
+    bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
 
     BigNumber N, s, g, v;
     BigNumber b, B;
@@ -215,7 +161,6 @@ private:
     std::string _os;
     std::string _ipCountry;
     uint16 _build;
-    uint16 _patchInfoIndex = std::numeric_limits<uint16>().max();
     uint8 _expversion;
 
     QueryCallbackProcessor _queryProcessor;

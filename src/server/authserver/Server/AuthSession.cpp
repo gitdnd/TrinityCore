@@ -29,10 +29,8 @@
 #include "SHA1.h"
 #include "TOTP.h"
 #include "Util.h"
-#include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <openssl/crypto.h>
-#include <boost/chrono.hpp>
 #include <boost/thread.hpp>
 
 using boost::asio::ip::tcp;
@@ -148,66 +146,51 @@ struct TransferDataPacket
 #pragma pack(pop)
 #endif
 
+
 Patcher patcher;
-PatcherService patcherService;
 
-void PatcherService::Run()
+// Send content of patch file to the client
+void PatcherRunnable::run()
 {
-    TC_LOG_INFO("network", "Patch Service Starting.");
+    TC_LOG_INFO("network", "PatcherRunnable::run(): %ld -> %ld", pos, size);
 
-    static uint32 attemptsToPatch = 0;
-    while (_isRunning)
+    while (pos < size && !stopped)
     {
-        if (_patchSessions.size() == 0)
+        // Handle socket closed
+        if (!mySocket || !mySocket->IsOpen())
         {
-            attemptsToPatch++;
-        }
-        else
-        {
-            attemptsToPatch = 0;
-
-            _mutex.lock();
-            {
-                for(auto itr = begin(_patchSessions); itr != end(_patchSessions);)
-                {
-                    PatchSession& patchSession = itr->second;
-
-                    // Do Patching
-                    PATCH_INFO& patchInfo = patcher.GetPatchInfo(patchSession.patchIndex);
-                    const ByteBuffer* patchBuffer = patchInfo.GetBuffer(patchSession.bufferIndex++);
-
-                    patchSession.session->SendPacket(*patchBuffer);
-
-                    // Remove all session if it has finished patching
-                    size_t numBuffers = patchInfo.GetBuffers().size();
-                    if (patchSession.bufferIndex == numBuffers)
-                    {
-                        itr = _patchSessions.erase(itr);
-                    }
-                    else
-                    {
-                        itr++;
-                    };
-                }
-            }
-            _mutex.unlock();
+            TC_LOG_INFO("network", "PatcherRunnable::run(): Socket is closed, stopping patcher");
+            break;
         }
 
-        if (attemptsToPatch < 10)
-        {
-            boost::this_thread::yield();
-        }
-        else if (attemptsToPatch < 100)
-        {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
-        }
-        else
-        {
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
-        }
+        uint64 left = size - pos;
+        uint16 send = (left > 4096) ? 4096 : left;
+
+        char* bytes = new char[sizeof(TransferDataPacket) + send];
+        TransferDataPacket* hdr = (TransferDataPacket*)bytes;
+        hdr->cmd = uint8(XFER_DATA);
+        hdr->chunk_size = send;
+        fread(bytes + sizeof(TransferDataPacket), 1, send, mySocket->pPatch);
+
+        ByteBuffer pkt(sizeof(TransferDataPacket) + send);
+        pkt.append(bytes, sizeof(TransferDataPacket) + send);
+
+        mySocket->SendPacket(pkt);
+        delete[] bytes;
+
+        pos += send;
+
+        _sleep(sConfigMgr->GetIntDefault("PatchPacketDelay", 100));
     }
-    
-    TC_LOG_INFO("network", "Patch Service Stopping.");
+
+    if (!stopped && mySocket)
+    {
+        fclose(mySocket->pPatch);
+        mySocket->pPatch = NULL;
+        mySocket->_patcher = NULL;
+    }
+
+    TC_LOG_INFO("network", "patcher done.");
 }
 
 // Launch the patch hashing mechanism on object creation
@@ -222,44 +205,27 @@ void Patcher::Initialize()
     LoadPatchesInfo();
 }
 
-PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool& fallback, uint16& patchInfoIndex)
+PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool* fallback)
 {
-    PATCH_INFO* patch = nullptr;
+    PATCH_INFO* patch = NULL;
     int locale = *((int*)(_locale.c_str()));
 
     TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
 
     // Hardcoded for enGB
-    for (uint32 i = 0; i < _patches.size(); i++)
-    {
-        PATCH_INFO& patchInfo = _patches[i];
-        if (patchInfo.build == _build)
+    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
+        if (it->build == _build && it->locale == 'BGne')
         {
-            if (!patch && patchInfo.locale == 'BGne')
-            {
-                patch = &patchInfo;
-                patchInfoIndex = i;
-                fallback = true;
-            }
-            else if (patchInfo.locale == locale)
-            {
-                patch = &patchInfo;
-                patchInfoIndex = i;
-                fallback = false;
-            }
+            patch = &(*it);
+            *fallback = true;
         }
-    }
 
-    for (uint32 i = 0; i < _patches.size(); i++)
-    {
-        PATCH_INFO& patchInfo = _patches[i];
-        if (patchInfo.build == _build && patchInfo.locale == locale)
+    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
+        if (it->build == _build && it->locale == locale)
         {
-            patch = &patchInfo;
-            patchInfoIndex = i;
-            fallback = false;
+            patch = &(*it);
+            *fallback = false;
         }
-    }
 
     return patch;
 }
@@ -267,16 +233,15 @@ PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool& fallbac
 bool Patcher::PossiblePatching(int _build, std::string _locale)
 {
     bool temp;
-    uint16 index;
-    return getPatchInfo(_build, _locale, temp, index) != NULL;
+    return getPatchInfo(_build, _locale, &temp) != NULL;
 }
 
 bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _session)
 {
     bool fallback;
-    uint16 patchIndex;
-    PATCH_INFO* patch = getPatchInfo(_build, _locale, fallback, patchIndex);
+    PATCH_INFO* patch = getPatchInfo(_build, _locale, &fallback);
 
+    // one of them nonzero, start patching.
     if (patch)
     {
         ByteBuffer pkt;
@@ -293,27 +258,21 @@ bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _sessio
         {
             path << PATCH_PATH << _build << "-" << _locale << ".mpq";
         }
-
-        _session->SetPatchInfoIndex(patchIndex);
+        _session->pPatch = fopen(path.str().c_str(), "rb");
         TC_LOG_INFO("network", "Sending Patch: %s", path.str().c_str());
-
         XFER_INIT_C packet;
-        {
-            packet.cmd = XFER_INITIATE;
-            packet.fileNameLen = 5;
-            packet.fileName[0] = 'P';
-            packet.fileName[1] = 'a';
-            packet.fileName[2] = 't';
-            packet.fileName[3] = 'c';
-            packet.fileName[4] = 'h';
-            packet.file_size = patch->filesize;
-            std::memcpy(packet.md5, patch->md5, MD5_DIGEST_LENGTH);
-            
-            pkt.resize(sizeof(packet));
-            std::memcpy(pkt.contents(), &packet, sizeof(packet));
-        }
+        packet.cmd = XFER_INITIATE;
+        packet.fileNameLen = 5;
+        packet.fileName[0] = 'P';
+        packet.fileName[1] = 'a';
+        packet.fileName[2] = 't';
+        packet.fileName[3] = 'c';
+        packet.fileName[4] = 'h';
+        packet.file_size = patch->filesize;
+        memcpy(packet.md5, patch->md5, MD5_DIGEST_LENGTH);
+        pkt.resize(sizeof(packet));
+        std::memcpy(pkt.contents(), &packet, sizeof(packet));
         _session->SendPacket(pkt);
-
         return true;
     }
     else
@@ -373,8 +332,6 @@ void Patcher::LoadPatchesInfo()
     if (hFil == INVALID_HANDLE_VALUE)
         return;                                             // no patches were found
 
-    // TODO: Clear previously loaded patches if we later invoke LoadPatchesInfo from outside of Patcher::Initialize
-
     do
     {
         TC_LOG_DEBUG("server.authserver", "Found patch: %s", fil.cFileName);
@@ -399,9 +356,9 @@ void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
     // Try to open the patch file
     std::string path = szPath;
     path += szFileName;
-    FILE* patchFile = fopen(path.c_str(), "rb");
+    FILE* pPatch = fopen(path.c_str(), "rb");
 
-    if (!patchFile)
+    if (!pPatch)
     {
         TC_LOG_ERROR("network", "Error loading patch %s\n", path.c_str());
         return;
@@ -410,62 +367,26 @@ void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
     // Calculate the MD5 hash
     MD5_CTX ctx;
     MD5_Init(&ctx);
+    uint8* buf = new uint8[512 * 1024];
 
-    fseek(patchFile, 0, SEEK_END);
-    size_t fileSize = ftell(patchFile);
-    fseek(patchFile, 0, SEEK_SET);
+    while (!feof(pPatch))
+    {
+        size_t read = fread(buf, 1, 512 * 1024, pPatch);
+        MD5_Update(&ctx, buf, read);
+    }
 
-    PATCH_INFO& patchInfo = _patches.emplace_back();
-    
+    delete[] buf;
+    fseek(pPatch, 0, SEEK_END);
+    size_t size = ftell(pPatch);
+    fclose(pPatch);
+
     // Store the result in the internal patch hash map
-    patchInfo.build = build;
-    patchInfo.locale = locale.i;
-    patchInfo.filesize = static_cast<uint64>(fileSize);
-
-    size_t numBuffers = (fileSize + PATCH_BUFFER_MAX_SIZE - 1) / PATCH_BUFFER_MAX_SIZE;
-    size_t lastBufferSize = fileSize % PATCH_BUFFER_MAX_SIZE;
-
-    std::vector<ByteBuffer*>& patchBuffers = patchInfo.GetBuffers();
-    patchBuffers.resize(numBuffers);
-
-    for (size_t i = 0; i < numBuffers; i++)
-    {
-        ByteBuffer*& buffer = patchBuffers[i];
-
-        size_t bufferSize = PATCH_BUFFER_MAX_SIZE;
-        if (i == numBuffers - 1 && lastBufferSize > 0)
-            bufferSize = lastBufferSize;
-
-        buffer = new ByteBuffer();
-        buffer->resize(sizeof(TransferDataPacket) + bufferSize);
-
-        TransferDataPacket* transferDataPacket = (TransferDataPacket*)buffer->contents();
-        transferDataPacket->cmd = uint8(XFER_DATA);
-        transferDataPacket->chunk_size = bufferSize;
-        
-        // Read data into the buffer after the header
-        fread(buffer->contents() + sizeof(TransferDataPacket), 1, bufferSize, patchFile);
-    }
-    
-    // Reset File Pointer so we can generate the MD5 Hash
-    fseek(patchFile, 0, SEEK_SET);
-
-    constexpr size_t FILE_BUFFER_SIZE = 512 * 1024;
-    uint8* fileBuffer = new uint8[FILE_BUFFER_SIZE];
-    {
-        while (!feof(patchFile))
-        {
-            size_t read = fread(fileBuffer, 1, FILE_BUFFER_SIZE, patchFile);
-            MD5_Update(&ctx, fileBuffer, read);
-        }
-
-        MD5_Final((uint8*)&patchInfo.md5, &ctx);
-
-        delete[] fileBuffer;
-    }
-    
-    fclose(patchFile);
-
+    PATCH_INFO pi;
+    pi.build = build;
+    pi.locale = locale.i;
+    pi.filesize = uint64(size);
+    MD5_Final((uint8*)& pi.md5, &ctx);
+    _patches.push_back(pi);
     TC_LOG_DEBUG("server.authserver", "Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
 }
 
@@ -474,28 +395,30 @@ bool AuthSession::HandleXferResume()
 {
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
 
-    // Check if the client indeed had a patch being transfered
-    if (_patchInfoIndex == std::numeric_limits<uint16>().max())
-    {
-        TC_LOG_ERROR("network", "Error while canceling patch transfer (wrong packet)");
-        return false;
-    }
-
     XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
-    
-    std::mutex& mutex = patcherService.GetMutex();
-    mutex.lock();
-    {
-        uint32 index = patcherService.fnv1a_32(_accountInfo.Login.c_str(), _accountInfo.Login.length());
-        std::unordered_map<uint32, PatchSession>& patchSessions = patcherService.GetPatchSessions();
 
-        PatchSession& patchSession = patchSessions[index];
-        patchSession.session = this;
-        patchSession.patchIndex = _patchInfoIndex;
-        patchSession.bufferIndex = challenge->pos / PATCH_BUFFER_MAX_SIZE;
+    if (patcher.PossiblePatching(_build, _localizationName))
+    {
+        fseek(pPatch, 0, SEEK_END);
+        size_t size = ftell(pPatch);
+
+        TC_LOG_DEBUG("network", "Seeking to file position: %ld", long(challenge->pos));
+
+        fseek(pPatch, long(challenge->pos), 0);
+
+        if (_patcher)
+        {
+            _patcher->stop();
+            delete _patcher;
+        }
+        _patcher = new PatcherRunnable(this, challenge->pos, size);
+        boost::thread u(&PatcherRunnable::run, _patcher);
+        // Potentially open to a DOS attach since we spawn a new thread each time.
+        // Need to implement a thread pool if this ever becomes an issue
+        u.detach();
+        _patcher->patchThread = &u;
+        return true;
     }
-    mutex.unlock();
-    
     return false;
 }
 
@@ -503,24 +426,15 @@ bool AuthSession::HandleXferResume()
 bool AuthSession::HandleXferCancel()
 {
     TC_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
-
-    // Check if the client indeed had a patch being transfered
-    if (_patchInfoIndex == std::numeric_limits<uint16>().max())
+    if (_patcher)
     {
-        TC_LOG_ERROR("network", "Error while canceling patch transfer (wrong packet)");
-        return false;
+        _patcher->stop();
+        if (_patcher->patchThread) {
+            boost::thread* thread = _patcher->patchThread;
+            thread->join();
+        }
+        delete _patcher;
     }
-
-    std::mutex& mutex = patcherService.GetMutex();
-    mutex.lock();
-    {
-        uint32 index = patcherService.fnv1a_32(_accountInfo.Login.c_str(), _accountInfo.Login.length());
-        std::unordered_map<uint32, PatchSession>& patchSessions = patcherService.GetPatchSessions();
-
-        patchSessions.erase(index);
-    }
-    mutex.unlock();
-
     CloseSocket();
     return true;
 }
@@ -529,29 +443,42 @@ bool AuthSession::HandleXferCancel()
 bool AuthSession::HandleXferAccept()
 {
     TC_LOG_DEBUG("server.authserver", "Entering HandleXferAccept");
-
     // Check packet length and patch existence
-    if (_patchInfoIndex == std::numeric_limits<uint16>().max())
+    if (!pPatch)
     {
         TC_LOG_ERROR("network", "Error while accepting patch transfer (wrong packet)");
         return false;
     }
 
-    std::mutex& mutex = patcherService.GetMutex();
-    mutex.lock();
+    // Launch a PatcherRunnable thread, starting at the beginning of the patch file
+    fseek(pPatch, 0, SEEK_END);
+    size_t size = ftell(pPatch);
+    fseek(pPatch, 0, 0);
+
+    if (_patcher)
     {
-        uint32 index = patcherService.fnv1a_32(_accountInfo.Login.c_str(), _accountInfo.Login.length());
-        std::unordered_map<uint32, PatchSession>& patchSessions = patcherService.GetPatchSessions();
-
-        PatchSession& patchSession = patchSessions[index];
-        patchSession.session = this;
-        patchSession.patchIndex = _patchInfoIndex;
-        patchSession.bufferIndex = 0;
+        _patcher->stop();
+        delete _patcher;
     }
-    mutex.unlock();
-
+    _patcher = new PatcherRunnable(this, 0, size);
+    boost::thread u(&PatcherRunnable::run, _patcher);
+    _patcher->patchThread = &u;
     return true;
 }
+
+PatcherRunnable::PatcherRunnable(AuthSession* as, uint64 _pos, uint64 _size)
+{
+    mySocket = as;
+    pos = _pos;
+    size = _size;
+    stopped = false;
+}
+
+void PatcherRunnable::stop()
+{
+    stopped = true;
+}
+
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 enum class BufferSizes : uint32
@@ -611,7 +538,7 @@ void AccountInfo::LoadResult(Field* fields)
 }
 
 AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)),
-_status(STATUS_CHALLENGE), _build(0), _expversion(0)
+_status(STATUS_CHALLENGE), _build(0), _expversion(0), _patcher(NULL), pPatch(NULL)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -718,7 +645,7 @@ void AuthSession::ReadHandler()
     AsyncRead();
 }
 
-void AuthSession::SendPacket(const ByteBuffer& packet)
+void AuthSession::SendPacket(ByteBuffer& packet)
 {
     if (!IsOpen())
         return;

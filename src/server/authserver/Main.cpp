@@ -39,7 +39,6 @@
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "Util.h"
-#include <boost/thread.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -80,7 +79,6 @@ void BanExpiryHandler(std::weak_ptr<Trinity::Asio::DeadlineTimer> banExpiryCheck
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, std::string& configService);
 
 extern Patcher patcher;
-extern PatcherService patcherService;
 
 int main(int argc, char** argv)
 {
@@ -146,7 +144,6 @@ int main(int argc, char** argv)
         return 1;
 
     patcher.Initialize();
-    patcherService.Start();
 
     sSecretMgr->Initialize();
 
@@ -222,8 +219,6 @@ int main(int argc, char** argv)
 
     // Start the io service worker loop
     ioContext->run();
-
-    patcherService.Stop();
 
     banExpiryCheckTimer->cancel();
     dbPingTimer->cancel();
