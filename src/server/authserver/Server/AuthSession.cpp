@@ -1231,12 +1231,11 @@ void AuthSession::RealmListCallback(PreparedQueryResult result)
         Realm const& realm = i.second;
         // don't work with realms which not compatible with the client
         bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && realm.Build == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(realm.Build));
-        bool okDevRealm = _accountInfo.SecurityLevel < 2 && realm.Name.compare("Development") == 0;
 
         // No SQL injection. id of realm is controlled by the database.
         uint32 flag = realm.Flags;
         RealmBuildInfo const* buildInfo = sRealmList->GetBuildInfo(realm.Build);
-        if (!okBuild || !okDevRealm)
+        if (!okBuild)
         {
             if (!buildInfo)
                 continue;
