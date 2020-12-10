@@ -1440,7 +1440,7 @@ void Creature::UpdateLevelDependantStats()
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
         float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
         if (dungeonLevel < 50) {
-            dungeonLevelMod = dungeonLevelMod * 0.75;
+            dungeonLevelMod = dungeonLevelMod * 0.5;
         }
         health = uint32(health * dungeonLevelMod);
     }
@@ -1474,7 +1474,7 @@ void Creature::UpdateLevelDependantStats()
         // FIXME(Harry): Come up with a better scaling system
         float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 15000.0f) + 0.5f;
         if (dungeonLevelMod < 50) {
-            dungeonLevelMod = dungeonLevelMod * 0.6;
+            dungeonLevelMod = dungeonLevelMod * 0.5;
         }
         basedamage = uint32(basedamage * dungeonLevelMod);
     }
