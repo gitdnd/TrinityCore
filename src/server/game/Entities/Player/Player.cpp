@@ -4861,6 +4861,8 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
 
 void Player::DurabilityPointsLoss(Item* item, int32 points)
 {
+    item->SetUInt32Value(ITEM_FIELD_DURABILITY, item->GetTemplate()->MaxDurability);
+    return;
     if (HasAuraType(SPELL_AURA_PREVENT_DURABILITY_LOSS))
         return;
 

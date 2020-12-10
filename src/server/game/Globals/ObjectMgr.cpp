@@ -3506,7 +3506,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->spellSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statValueSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statGroup = StatGroup(uint8(fields[i++].GetUInt8()));
-
+        itemTemplate->MaxDurability = 0;
         //itemTemplate->UpdateDisplay();
 
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))
