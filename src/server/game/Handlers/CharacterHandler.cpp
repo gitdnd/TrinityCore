@@ -292,12 +292,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
              >> createInfo->FacialHair
              >> createInfo->OutfitId;
 
-    if (createInfo->Class == CLASS_ADVENTURER && !GetSecurity())
-    {
-        SendCharCreate(CHAR_CREATE_EXPANSION_CLASS);
-        return;
-    }
-
     if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_TEAMMASK))
     {
         if (uint32 mask = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_DISABLED))
