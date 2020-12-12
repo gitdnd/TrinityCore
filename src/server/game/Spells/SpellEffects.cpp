@@ -345,6 +345,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (dungeonLevel < 50) {
                     modifier = modifier * 0.33;
                 }
+                else if (dungeonLevel < 60) {
+                    modifier = modifier * 0.5;
+                }
+                else if (dungeonLevel < 75) {
+                    modifier = modifier * 0.75;
+                }
                 damage = damage * modifier;
             }
         }

@@ -1442,6 +1442,12 @@ void Creature::UpdateLevelDependantStats()
         if (dungeonLevel < 50) {
             dungeonLevelMod = dungeonLevelMod * 0.5;
         }
+        else if (dungeonLevel < 60) {
+            dungeonLevelMod = dungeonLevelMod * 0.65;
+        }
+        else if (dungeonLevel < 75) {
+            dungeonLevelMod = dungeonLevelMod * 0.8;
+        }
         health = uint32(health * dungeonLevelMod);
     }
 
