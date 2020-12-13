@@ -2727,6 +2727,8 @@ void Group::UpdateDungeonLevel()
     uint8 memcount = 0;
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
+        if (!citr->guid)
+            continue;
         Player* player = ObjectAccessor::FindConnectedPlayer(citr->guid);
         if (!player)
             continue;
