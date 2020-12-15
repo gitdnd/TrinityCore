@@ -674,7 +674,8 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
 
         if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup()) ? 1u : 2u))
             Disband();
-        UpdateDungeonLevel();
+        else
+            UpdateDungeonLevel();
         return true;
     }
     // If group size before player removal <= 2 then disband it
@@ -2727,7 +2728,7 @@ void Group::UpdateDungeonLevel()
     uint8 memcount = 0;
     for (auto citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        if (!citr || !citr->guid)
+        if (!citr->guid)
             continue;
         Player* player = ObjectAccessor::FindConnectedPlayer(citr->guid);
         if (!player)
