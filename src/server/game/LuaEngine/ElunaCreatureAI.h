@@ -76,6 +76,19 @@ struct ElunaCreatureAI : ScriptedAI
     // Called at creature aggro either by MoveInLOS or Attack Start
     void JustEngagedWith(Unit* target) override
     {
+        if (me->GetCreatureTemplate()->rank == 3)
+        {
+            auto map = me->GetMap();
+            Map::PlayerList const& players = map->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                auto player = itr->GetSource();
+                if (player->GetSession())
+                {
+                    player->CastSpell(player, 90191); // Dungeon Death
+                }
+            }
+        }
         if (!sEluna->EnterCombat(me, target))
             ScriptedAI::JustEngagedWith(target);
     }
@@ -109,6 +122,19 @@ struct ElunaCreatureAI : ScriptedAI
     //Called at creature death
     void JustDied(Unit* killer) override
     {
+        if (me->GetCreatureTemplate()->rank == 3)
+        {
+            auto map = me->GetMap();
+            Map::PlayerList const& players = map->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                auto player = itr->GetSource();
+                if (player->GetSession())
+                {
+                    player->RemoveAurasDueToSpell(90191); // Dungeon Death
+                }
+            }
+        }
         if (!sEluna->JustDied(me, killer))
             ScriptedAI::JustDied(killer);
     }
@@ -153,6 +179,19 @@ struct ElunaCreatureAI : ScriptedAI
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        if (me->GetCreatureTemplate()->rank == 3)
+        {
+            auto map = me->GetMap();
+            Map::PlayerList const& players = map->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                auto player = itr->GetSource();
+                if (player->GetSession())
+                {
+                    player->RemoveAurasDueToSpell(90191); // Dungeon Death
+                }
+            }
+        }
         if (!sEluna->EnterEvadeMode(me))
             ScriptedAI::EnterEvadeMode();
     }
