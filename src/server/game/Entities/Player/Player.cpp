@@ -26792,9 +26792,8 @@ float Player::GetAverageItemLevel() const
     float sum = 0;
     uint32 count = 0;
 
-    bool isCacheEmpty = _itemSlotToMaxLevel.size() == 0;
     // Instead of reverting to old system, return 1. This will flag any bugs in the system rather than hiding them
-    if (isCacheEmpty)
+    if (_itemSlotToMaxLevel.size() == 0)
         return 1.0f;
 
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
@@ -26821,12 +26820,11 @@ float Player::GetAverageItemLevel() const
 
     // Get the players' current crafting skill
     float currentItemLevel = (float)GetSkillValue(333);
+    float result = sum / (float)count;
 
     // If the players' crafting skill is higher than the current average equipped armor, return crafting skill instead
-    if (currentItemLevel > (sum / (float)count))
+    if (currentItemLevel > result)
         return currentItemLevel;
-
-    float result = sum / (float)count;
     return result < 1.0 ? 1.0 : result;
 }
 
