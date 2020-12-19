@@ -324,7 +324,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     ilevel = round(GenerateItemLevel(vLevel));
 
     // Modify the returned, newly generated iLevel based on quality
-    ilevel = ilevel + (int32(output->Quality) * 5);
+    ilevel = ilevel + (int32(output->Quality) * 3);
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
     ilevel = ilevel + irand(-3, 3, generator);
@@ -335,15 +335,15 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         ilevel = output->ItemLevel;
     }
 
+    // If ilevel modifier is set, override all ilevel generation
+    if (modifier.ilevel)
+        ilevel = modifier.ilevel;
+
     // Hard cap of 325 across all items FIXME
     if (ilevel > 325)
     {
         ilevel = 325;
     }
-
-    // If ilevel modifier is set, override all ilevel generation
-    if (modifier.ilevel)
-        ilevel = modifier.ilevel;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
@@ -372,7 +372,10 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 
     // select stat group if the item is an armor piece or manually set as a modifier
     StatGroup statgroupid = modifier.statgroup;
-    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR)
+    bool isCloak = output->Class == ITEM_CLASS_ARMOR &&
+        output->SubClass == ITEM_SUBCLASS_ARMOR_CLOTH &&
+        output->InventoryType == INVTYPE_CLOAK;
+    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR && !isCloak)
     {
         std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
         if (!statgroups.empty())
