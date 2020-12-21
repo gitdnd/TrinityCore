@@ -1020,8 +1020,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
-    if (Guild* startGuild = sGuildMgr->GetGuildById(1))
-        startGuild->AddMember(CharacterDatabaseTransaction(nullptr), pCurrChar->GetGUID());
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     if (Aura* aura = pCurrChar->AddAura(54844, pCurrChar))
         aura->SetDuration(10 * IN_MILLISECONDS);
