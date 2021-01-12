@@ -2257,41 +2257,42 @@ bool Player::CanInteractWithQuestGiver(Object* questGiver) const
 
 Creature* Player::GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflagmask) const
 {
+    sWorld->SendGlobalText("Checking guid", nullptr);
     // unit checks
     if (!guid)
         return nullptr;
-
+    sWorld->SendGlobalText("Checking in world", nullptr);
     if (!IsInWorld())
         return nullptr;
 
     if (IsInFlight())
         return nullptr;
-
+    sWorld->SendGlobalText("Checking pet or vehicle", nullptr);
     // exist (we need look pets also for some interaction (quest/etc)
     Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, guid);
     if (!creature)
         return nullptr;
-
+    sWorld->SendGlobalText("Checking death", nullptr);
     // Deathstate checks
     if (!IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_GHOST_VISIBLE))
         return nullptr;
-
+    sWorld->SendGlobalText("Checking interact while dead", nullptr);
     // alive or spirit healer
     if (!creature->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_INTERACT_WHILE_DEAD))
         return nullptr;
-
+    sWorld->SendGlobalText("Checking npc", nullptr);
     // appropriate npc type
     if (npcflagmask && !creature->HasFlag(UNIT_NPC_FLAGS, npcflagmask))
         return nullptr;
-
+    sWorld->SendGlobalText("Checking charmer", nullptr);
     // not allow interaction under control, but allow with own pets
     if (creature->GetCharmerGUID())
         return nullptr;
-
+    sWorld->SendGlobalText("Checking friendly", nullptr);
     // not unfriendly/hostile
     if (creature->GetReactionTo(this) <= REP_UNFRIENDLY)
         return nullptr;
-
+    sWorld->SendGlobalText("Checking distance", nullptr);
     // not too far, taken from CGGameUI::SetInteractTarget
     if (!creature->IsWithinDistInMap(this, creature->GetCombatReach() + 4.0f))
         return nullptr;
