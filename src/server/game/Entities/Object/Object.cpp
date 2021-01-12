@@ -1226,14 +1226,6 @@ bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool 
 
 bool WorldObject::IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D /*= true*/, bool incOwnRadius /*= true*/, bool incTargetRadius /*= true*/) const
 {
-    if (obj) {
-        if (!InSamePhase(obj)) {
-            std::ostringstream str;
-            str << "obj phase = " << obj->GetPhaseMask() << "\n";
-            str << "this phase = " << GetPhaseMask();
-            sWorld->SendGlobalText(str.str().c_str(), nullptr);
-        }
-    }
     return obj &&
         IsInMap(obj) &&
         InSamePhase(obj) &&
