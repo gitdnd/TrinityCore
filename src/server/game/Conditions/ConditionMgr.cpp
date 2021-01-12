@@ -417,7 +417,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo) const
             {
                 // if the target phase is 1 then allow to see
                 // otherwise phases must match
-                return ConditionValue1 == 1 || myMask == ConditionValue1;
+                return ConditionValue1 == 1 || myMask == ConditionValue1 || myMask == uint32(-1);
             }
             // Otherwise both our phases are 1-63, use the normal behaviour
             condMeets = (myMask & ConditionValue1) != 0;
