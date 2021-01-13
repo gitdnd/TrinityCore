@@ -2020,11 +2020,6 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempS
         if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime, this, spellId, 0, dungeonLevel))
         {
             summon->SetTempSummonType(despawnType);
-
-            std::ostringstream str; // DEBUG
-            str << "My dungeon level is: " << dungeonLevel << " | " << summon->GetDungeonLevel();
-            summon->Say(str.str().c_str(), Language(0)); // DEBUG
-
             return summon;
         }
     }

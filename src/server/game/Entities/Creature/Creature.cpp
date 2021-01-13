@@ -1436,9 +1436,6 @@ void Creature::UpdateLevelDependantStats()
     uint32 health = uint32(basehp * healthmod);
 
     int dungeonLevel = GetDungeonLevel();
-    std::ostringstream str; // DEBUG
-    str << "My dungeon level is: " << dungeonLevel;
-    Say(str.str().c_str(), Language(0)); // DEBUG
     if (dungeonLevel > 0 && dungeonLevel <= 10000)
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
