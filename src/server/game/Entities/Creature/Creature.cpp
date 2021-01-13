@@ -1027,7 +1027,7 @@ void Creature::Motion_Initialize()
     GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic = false, int dungeonLevel = 0)
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic, int dungeonLevel)
 {
     ASSERT(map);
     SetMap(map);

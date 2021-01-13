@@ -361,7 +361,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         std::string GetDebugInfo() const override;
 
         int GetDungeonLevel() const {
-            return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
+            return _dungeonLevelOverride > 0 && _dungeonLevelOverride <= 10000 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
         }
 
     protected:
@@ -446,7 +446,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
 
-        int _dungeonLevelOverride = 0;
+        int _dungeonLevelOverride;
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

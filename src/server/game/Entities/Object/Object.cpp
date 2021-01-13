@@ -1876,7 +1876,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, int dungeonLevel = 0)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, int dungeonLevel)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2013,11 +2013,11 @@ void WorldObject::ClearZoneScript()
     m_zoneScript = nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despawnTime /*= 0*/, uint32 /*vehId = 0*/, uint32 spellId /*= 0*/, int dungeonLevel)
+TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despawnTime /*= 0*/, uint32 /*vehId = 0*/, uint32 spellId /*= 0*/, int dungeonLevel /*= 0*/)
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime, this, spellId))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime, this, spellId, dungeonLevel))
         {
             summon->SetTempSummonType(despawnType);
             return summon;
@@ -2027,13 +2027,13 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempS
     return nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despawnTime /*= 0*/)
+TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despawnTime /*= 0*/, int dungeonLevel /*= 0*/)
 {
     if (!x && !y && !z)
         GetClosePoint(x, y, z, GetCombatReach());
     if (!o)
         o = GetOrientation();
-    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime);
+    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, dungeonLevel);
 }
 
 GameObject* WorldObject::SummonGameObject(uint32 entry, Position const& pos, QuaternionData const& rot, uint32 respawnTime, GOSummonType summonType)
