@@ -773,6 +773,7 @@ namespace LuaWorldObject
         float o = Eluna::CHECKVAL<float>(L, 6);
         uint32 spawnType = Eluna::CHECKVAL<uint32>(L, 7, 8);
         uint32 despawnTimer = Eluna::CHECKVAL<uint32>(L, 8, 0);
+        int dungeonLevel = Eluna::CHECKVAL<int>(L, 9, 0);
 
         TempSummonType type;
         switch (spawnType)
@@ -816,7 +817,7 @@ namespace LuaWorldObject
             default:
                 return luaL_argerror(L, 7, "valid SpawnType expected");
         }
-        Eluna::Push(L, obj->SummonCreature(entry, x, y, z, o, type, despawnTimer));
+        Eluna::Push(L, obj->SummonCreature(entry, x, y, z, o, type, despawnTimer, dungeonLevel));
         return 1;
     }
 

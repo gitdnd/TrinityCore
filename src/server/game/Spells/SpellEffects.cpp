@@ -338,7 +338,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         // Try to scale base damage effect based on ilevel
         if (unitCaster->ToCreature() && unitTarget->ToPlayer())
         {
-            int dungeonLevel = unitCaster->GetMap()->GetDungeonLevel();
+            int dungeonLevel = unitCaster->ToCreature()->GetDungeonLevel();
             if (dungeonLevel > 0)
             {
                 float modifier = (pow(float(dungeonLevel), 2) / 40000.0f) + 0.5f;

@@ -1027,11 +1027,12 @@ void Creature::Motion_Initialize()
     GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic)
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic = false, int dungeonLevel = 0)
 {
     ASSERT(map);
     SetMap(map);
     SetPhaseMask(phaseMask, false);
+    _dungeonLevelOverride = dungeonLevel;
 
     // Set if this creature can handle dynamic spawns
     if (!dynamic)
@@ -1434,7 +1435,7 @@ void Creature::UpdateLevelDependantStats()
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
 
-    int dungeonLevel = GetMap()->GetDungeonLevel();
+    int dungeonLevel = GetDungeonLevel();
     if (dungeonLevel > 0 && dungeonLevel <= 10000)
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
