@@ -1952,6 +1952,10 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             break;
     }
 
+    std::ostringstream str;
+    str << "3 Spawning creature with dungeon level: " << dungeonLevel;
+    sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
     if (!summon->Create(GenerateLowGuid<HighGuid::Unit>(), this, phase, entry, pos, nullptr, vehId, true, dungeonLevel))
     {
         delete summon;
@@ -2037,6 +2041,11 @@ TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, fl
         GetClosePoint(x, y, z, GetCombatReach());
     if (!o)
         o = GetOrientation();
+
+    std::ostringstream str;
+    str << "2 Spawning creature with dungeon level: " << dungeonLevel;
+    sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
     return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, dungeonLevel);
 }
 

@@ -817,6 +817,11 @@ namespace LuaWorldObject
             default:
                 return luaL_argerror(L, 7, "valid SpawnType expected");
         }
+
+        std::ostringstream str;
+        str << "1 Spawning creature with dungeon level: " << dungeonLevel;
+        sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
         Eluna::Push(L, obj->SummonCreature(entry, x, y, z, o, type, despawnTimer, dungeonLevel));
         return 1;
     }
