@@ -1878,6 +1878,10 @@ void WorldObject::AddObjectToRemoveList()
 
 TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, int dungeonLevel)
 {
+    std::ostringstream str;
+    str << "4 Spawning creature with dungeon level: " << dungeonLevel;
+    sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
     {
@@ -1952,10 +1956,6 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             break;
     }
 
-    std::ostringstream str;
-    str << "3 Spawning creature with dungeon level: " << dungeonLevel;
-    sWorld->SendGlobalText(str.str().c_str(), nullptr);
-
     if (!summon->Create(GenerateLowGuid<HighGuid::Unit>(), this, phase, entry, pos, nullptr, vehId, true, dungeonLevel))
     {
         delete summon;
@@ -2021,6 +2021,9 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempS
 {
     if (Map* map = FindMap())
     {
+        std::ostringstream str;
+        str << "3 Spawning creature with dungeon level: " << dungeonLevel;
+        sWorld->SendGlobalText(str.str().c_str(), nullptr);
         if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime, this, spellId, dungeonLevel))
         {
             summon->SetTempSummonType(despawnType);
