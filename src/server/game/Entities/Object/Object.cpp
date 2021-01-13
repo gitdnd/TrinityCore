@@ -2049,7 +2049,7 @@ TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, fl
     str << "2 Spawning creature with dungeon level: " << dungeonLevel;
     sWorld->SendGlobalText(str.str().c_str(), nullptr);
 
-    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, dungeonLevel);
+    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, 0, 0, dungeonLevel);
 }
 
 GameObject* WorldObject::SummonGameObject(uint32 entry, Position const& pos, QuaternionData const& rot, uint32 respawnTime, GOSummonType summonType)
