@@ -28,12 +28,14 @@
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject, int dungeonLevel /*= 0*/) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
-m_timer(0), m_lifetime(0), m_canFollowOwner(true), _dungeonLevelOverride(dungeonLevel)
+m_timer(0), m_lifetime(0), m_canFollowOwner(true)
 {
     if (owner)
         m_summonerGUID = owner->GetGUID();
 
     m_unitTypeMask |= UNIT_MASK_SUMMON;
+
+    _dungeonLevelOverride = dungeonLevel;
 }
 
 WorldObject* TempSummon::GetSummoner() const
