@@ -26,9 +26,9 @@
 #include "Pet.h"
 #include "Player.h"
 
-TempSummon::TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject) :
+TempSummon::TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject, int dungeonLevel /*= 0*/) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
-m_timer(0), m_lifetime(0), m_canFollowOwner(true)
+m_timer(0), m_lifetime(0), m_canFollowOwner(true), _dungeonLevelOverride(dungeonLevel)
 {
     if (owner)
         m_summonerGUID = owner->GetGUID();

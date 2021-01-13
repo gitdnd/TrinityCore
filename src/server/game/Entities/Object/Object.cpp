@@ -1936,7 +1936,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     switch (mask)
     {
         case UNIT_MASK_SUMMON:
-            summon = new TempSummon(properties, summoner, false);
+            summon = new TempSummon(properties, summoner, false, dungeonLevel);
             break;
         case UNIT_MASK_GUARDIAN:
             summon = new Guardian(properties, summonerUnit, false);
