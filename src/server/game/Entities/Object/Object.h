@@ -327,8 +327,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
             {
                 // if the target phase is 1 then allow to see
                 // otherwise phases must match
-                return phasemask == 1 ||
-                    (myMask == 1 && ToCreature()) ||
+                return (phasemask == 1 && CanSeePhaseOne()) ||
+                    (myMask == 1 && ToCreature() && CanSeePhaseOne) ||
                     myMask == phasemask ||
                     myMask == uint32(-1) ||
                     phasemask == uint32(-1);
@@ -550,6 +550,9 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
         float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
+        bool CanSeePhaseOne() const { return m_canSeePhaseOne; }
+        void SetCanSeePhaseOne(bool canSee) { m_canSeePhaseOne = canSee; }
+
 #ifdef ELUNA
         ElunaEventProcessor* elunaEvents;
 #endif
@@ -593,6 +596,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         uint32 m_InstanceId;                              // in map copy with instance id
         uint32 m_phaseMask;                               // in area phase state
+        bool m_canSeePhaseOne = true;
 
         uint16 m_notifyflags;
         virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius = true, bool incTargetRadius = true) const;
