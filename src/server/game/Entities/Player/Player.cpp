@@ -16729,6 +16729,42 @@ void Player::AdvanceQuestCredit(uint32 entry, ObjectGuid guid)
     }
 }
 
+void Player::AdvanceQuestObjective(uint32 targetQuest, uint32 objectiveId, ObjectGuid guid)
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (!questid)
+            continue;
+
+        if (questid != targetQuest)
+            continue;
+
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
+        if (!qInfo || qInfo->GetQuestId() != targetQuest)
+            continue;
+
+        QuestStatusData& q_status = m_QuestStatus[questid];
+
+        if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+        {
+            uint32 reqCastCount = qInfo->RequiredNpcOrGoCount[objectiveId];
+            uint16 curCastCount = q_status.CreatureOrGOCount[objectiveId];
+            if (curCastCount < reqCastCount)
+            {
+                q_status.CreatureOrGOCount[objectiveId] = curCastCount + 1;
+
+                m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
+
+                SendQuestUpdateAddCreatureOrGo(qInfo, guid, objectiveId, curCastCount, 1);
+            }
+
+            if (CanCompleteQuest(questid))
+                CompleteQuest(questid);
+        }
+    }
+}
+
 void Player::KillCreditGO(uint32 entry, ObjectGuid guid)
 {
     uint16 addCastCount = 1;

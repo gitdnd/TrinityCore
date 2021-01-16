@@ -4227,5 +4227,21 @@ namespace LuaPlayer
         }
         return 0;
     }
+
+    int AdvanceQuestObjective(lua_State* L, Player* player)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(L, 2);
+        uint32 objective = Eluna::CHECKVAL<uint32>(L, 3);
+        player->AdvanceQuestObjective(entry, objective);
+        return 0;
+    }
+
+    int GetRequiredQuestObjectiveCount(lua_State* L, Player* player)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(L, 2);
+        uint32 npcId = Eluna::CHECKVAL<uint32>(L, 3);
+        Eluna::Push(L, player->GetReqKillOrCastCurrentCount(entry, npcId));
+        return 1;
+    }
 };
 #endif

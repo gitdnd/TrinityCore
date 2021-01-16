@@ -762,6 +762,8 @@ ElunaRegister<Player> PlayerMethods[] =
     { "UpdateAchievementCriteria", &LuaPlayer::UpdateAchievementCriteria },
     { "CompleteAchievement", &LuaPlayer::CompleteAchievement },
     { "FinishDungeon", &LuaPlayer::FinishDungeon },
+    { "AdvanceQuestObjective", &LuaPlayer::AdvanceQuestObjective },
+    { "GetRequiredQuestObjectiveCount", &LuaPlayer::GetRequiredQuestObjectiveCount },
 
     { NULL, NULL }
 };
