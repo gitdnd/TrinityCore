@@ -328,7 +328,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
                 // if the target phase is 1 then allow to see
                 // otherwise phases must match
                 return (phasemask == 1 && CanSeePhaseOne()) ||
-                    (myMask == 1 && ToCreature() && CanSeePhaseOne) ||
+                    (myMask == 1 && ToCreature() && CanSeePhaseOne()) ||
                     myMask == phasemask ||
                     myMask == uint32(-1) ||
                     phasemask == uint32(-1);
