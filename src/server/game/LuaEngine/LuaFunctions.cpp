@@ -765,7 +765,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "AdvanceQuestObjective", &LuaPlayer::AdvanceQuestObjective },
     { "GetRequiredQuestObjectiveCount", &LuaPlayer::GetRequiredQuestObjectiveCount },
     { "SetCanSeePhaseOne", &LuaPlayer::SetCanSeePhaseOne },
-    { "GetCanSeePhaseOne", &LuaPlayer::GetCanSeePhaseOne }
+    { "GetCanSeePhaseOne", &LuaPlayer::GetCanSeePhaseOne },
 
     { NULL, NULL }
 };
