@@ -443,6 +443,8 @@ ElunaRegister<Unit> UnitMethods[] =
     { "SendEncounterFrame", &LuaUnit::SendEncounterFrame },
     { "SetCanSeePhaseOne", &LuaUnit::SetCanSeePhaseOne },
     { "GetCanSeePhaseOne", &LuaUnit::GetCanSeePhaseOne },
+    { "SetCanSeeUniquePhase", &LuaUnit::SetCanSeeUniquePhase },
+    { "GetCanSeeUniquePhase", &LuaUnit::GetCanSeeUniquePhase },
 
     { NULL, NULL }
 };

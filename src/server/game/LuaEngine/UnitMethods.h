@@ -3131,5 +3131,18 @@ namespace LuaUnit
         Eluna::Push(L, unit->CanSeePhaseOne());
         return 1;
     }
+
+    int SetCanSeeUniquePhase(lua_State* L, Unit* unit)
+    {
+        bool canSee = Eluna::CHECKVAL<bool>(L, 2);
+        unit->SetCanSeeUniquePhase(canSee);
+        return 0;
+    }
+
+    int GetCanSeeUniquePhase(lua_State* L, Unit* unit)
+    {
+        Eluna::Push(L, unit->CanSeeUniquePhase());
+        return 1;
+    }
 };
 #endif
