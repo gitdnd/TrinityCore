@@ -441,6 +441,8 @@ ElunaRegister<Unit> UnitMethods[] =
     { "AddThreat", &LuaUnit::AddThreat },
     { "SpawnDynObject", &LuaUnit::SpawnDynObject },
     { "SendEncounterFrame", &LuaUnit::SendEncounterFrame },
+    { "SetCanSeePhaseOne", &LuaUnit::SetCanSeePhaseOne },
+    { "GetCanSeePhaseOne", &LuaUnit::GetCanSeePhaseOne },
 
     { NULL, NULL }
 };
@@ -764,8 +766,6 @@ ElunaRegister<Player> PlayerMethods[] =
     { "FinishDungeon", &LuaPlayer::FinishDungeon },
     { "AdvanceQuestObjective", &LuaPlayer::AdvanceQuestObjective },
     { "GetRequiredQuestObjectiveCount", &LuaPlayer::GetRequiredQuestObjectiveCount },
-    { "SetCanSeePhaseOne", &LuaPlayer::SetCanSeePhaseOne },
-    { "GetCanSeePhaseOne", &LuaPlayer::GetCanSeePhaseOne },
 
     { NULL, NULL }
 };

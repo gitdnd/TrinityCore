@@ -4243,18 +4243,5 @@ namespace LuaPlayer
         Eluna::Push(L, player->GetReqKillOrCastCurrentCount(entry, npcId));
         return 1;
     }
-
-    int SetCanSeePhaseOne(lua_State* L, Player* player)
-    {
-        bool canSee = Eluna::CHECKVAL<bool>(L, 2);
-        player->SetCanSeePhaseOne(canSee);
-        return 0;
-    }
-
-    int GetCanSeePhaseOne(lua_State* L, Player* player)
-    {
-        Eluna::Push(L, player->CanSeePhaseOne());
-        return 1;
-    }
 };
 #endif
