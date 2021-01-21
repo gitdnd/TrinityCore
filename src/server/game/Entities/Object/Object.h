@@ -337,8 +337,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
                     otherMask == uint32(-1) ||
                     // If target is in phase 1 and I can see phase 1
                     (otherMask == 1 && CanSeePhaseOne()) ||
-                    // If I am in phase 1 or they are in phase 1, I am must be a creature and I can see unique phases
-                    ((myMask == 1 || otherMask == 1) && (ToCreature() && CanSeeUniquePhase()));
+                    // If I am in phase 1, I am must be a creature and I can see unique phases
+                    (myMask == 1 && (ToCreature() && CanSeeUniquePhase()));
                     // Unimplemented logic:
                     // - If I am in phase 64+, I am a creature, and can I see phase
                     // - If I am in phase 64+, I am a player, I can see phase 1
@@ -348,7 +348,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
             return (myMask & otherMask) != 0;
         }
         bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
-        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
+        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && b && b->InSamePhase(a); }
 
         uint32 GetZoneId() const { return m_zoneId; }
         uint32 GetAreaId() const { return m_areaId; }
