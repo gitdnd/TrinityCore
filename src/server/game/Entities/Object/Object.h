@@ -319,22 +319,33 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
-        bool InSamePhase(uint32 phasemask) const
+        bool InSamePhase(uint32 otherMask) const
         {
             uint32 myMask = GetPhaseMask();
             // If either object is in phase >= 64 then use the new behaviour
-            if (myMask >= 64 || phasemask >= 64)
+            if (myMask >= 64 || otherMask >= 64)
             {
                 // if the target phase is 1 then allow to see
                 // otherwise phases must match
-                return (phasemask == 1 && CanSeePhaseOne()) ||
-                    (myMask == 1 && ToCreature() && CanSeePhaseOne()) ||
-                    myMask == phasemask ||
+
+                return
+                    // If I am in the same phase as them
+                    myMask == otherMask ||
+                    // If I am in phase -1 (all)
                     myMask == uint32(-1) ||
-                    phasemask == uint32(-1);
+                    // If target is in phase -1 (all)
+                    otherMask == uint32(-1) ||
+                    // If target is in phase 1 and I can see phase 1
+                    (otherMask == 1 && CanSeePhaseOne()) ||
+                    // If I am in phase 1, I am a creature, and I can see unique phases
+                    (myMask == 1 && ToCreature() && CanSeeUniquePhase());
+                    // Unimplemented logic:
+                    // - If I am in phase 64+, I am a creature, and can I see phase
+                    // - If I am in phase 64+, I am a player, I can see phase 1
+                    // ...
             }
             // Otherwise both our phases are 1-63, use the normal behaviour
-            return (myMask & phasemask) != 0;
+            return (myMask & otherMask) != 0;
         }
         bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
         static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
@@ -552,6 +563,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         bool CanSeePhaseOne() const { return m_canSeePhaseOne; }
         void SetCanSeePhaseOne(bool canSee) { m_canSeePhaseOne = canSee; }
+        bool CanSeeUniquePhase() const { return m_canSeeUniquePhase; }
+        void SetCanSeeUniquePhase(bool canSee) { m_canSeeUniquePhase = canSee; }
 
 #ifdef ELUNA
         ElunaEventProcessor* elunaEvents;
@@ -597,6 +610,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         uint32 m_InstanceId;                              // in map copy with instance id
         uint32 m_phaseMask;                               // in area phase state
         bool m_canSeePhaseOne = true;
+        bool m_canSeeUniquePhase = true;
 
         uint16 m_notifyflags;
         virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius = true, bool incTargetRadius = true) const;
