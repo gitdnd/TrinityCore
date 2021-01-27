@@ -1457,24 +1457,30 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
 
     int AnimateAndSetFlyMode(lua_State* L, Creature* creature)
     {
-        float x = Eluna::CHECKVAL<float>(L, 2);
-        float y = Eluna::CHECKVAL<float>(L, 3);
-        float z = Eluna::CHECKVAL<float>(L, 4);
-        float o = Eluna::CHECKVAL<float>(L, 5);
+        float zOffset = Eluna::CHECKVAL<float>(L, 2, 17.0f);
 
         creature->SetCanFly(true);
         creature->SetDisableGravity(true);
         creature->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
         creature->SetFacingTo(creature->GetOrientation() + float(M_PI));
-        creature->GetMotionMaster()->MoveTakeoff(11, Position(x, y, z, o));
+        creature->AttackStop();
+        Position pos;
+        pos.Relocate(creature);
+        pos.m_positionZ += zOffset;
+        creature->GetMotionMaster()->MoveTakeoff(0, pos);
         return 0;
     }
 
     int AnimateAndSetLandMode(lua_State* L, Creature* creature)
     {
+        float x = Eluna::CHECKVAL<float>(L, 2);
+        float y = Eluna::CHECKVAL<float>(L, 3);
+        float z = Eluna::CHECKVAL<float>(L, 4);
+
         creature->SetCanFly(false);
         creature->SetDisableGravity(false);
         creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+        creature->GetMotionMaster()->MoveLand(0, Position(x, y, z, 0));
         return 0;
     }
 };
