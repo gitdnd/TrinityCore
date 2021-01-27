@@ -1454,5 +1454,28 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
         creature->loot.clear();
         return 0;
     }
+
+    int AnimateAndSetFlyMode(lua_State* L, Creature* creature)
+    {
+        float x = Eluna::CHECKVAL<float>(L, 2);
+        float y = Eluna::CHECKVAL<float>(L, 3);
+        float z = Eluna::CHECKVAL<float>(L, 4);
+        float o = Eluna::CHECKVAL<float>(L, 5);
+
+        creature->SetCanFly(true);
+        creature->SetDisableGravity(true);
+        creature->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+        creature->SetFacingTo(creature->GetOrientation() + float(M_PI));
+        creature->GetMotionMaster()->MoveTakeoff(11, Position(x, y, z, o));
+        return 0;
+    }
+
+    int AnimateAndSetLandMode(lua_State* L, Creature* creature)
+    {
+        creature->SetCanFly(false);
+        creature->SetDisableGravity(false);
+        creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+        return 0;
+    }
 };
 #endif

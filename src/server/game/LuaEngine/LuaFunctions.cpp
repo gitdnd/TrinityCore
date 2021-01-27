@@ -880,6 +880,8 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "UpdateEntry", &LuaCreature::UpdateEntry },
     { "MoveCircle", &LuaCreature::MoveCircle },
     { "ClearLoot", &LuaCreature::ClearLoot },
+    { "AnimateAndSetFlyMode", &LuaCreature::AnimateAndSetFlyMode },
+    { "AnimateAndSetLandMode", &LuaCreature::AnimateAndSetLandMode },
 
     { NULL, NULL }
 };
