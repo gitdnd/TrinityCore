@@ -26954,9 +26954,16 @@ void Player::_SaveSlotHighestLevel(CharacterDatabaseTransaction& trans)
 
 uint32 Player::ItemLevelForSlot(uint8 slot)
 {
-    if (m_items[slot] && m_items[slot]->GetTemplate())
+    if (_itemSlotToMaxLevel.find(slot) == _itemSlotToMaxLevel.end())
     {
-        return m_items[slot]->GetTemplate()->GetRealItemLevel();
+        if (m_items[slot] && m_items[slot]->GetTemplate())
+        {
+            return m_items[slot]->GetTemplate()->GetRealItemLevel();
+        }
+    }
+    else
+    {
+        return _itemSlotToMaxLevel[slot];
     }
     return 0;
 }
