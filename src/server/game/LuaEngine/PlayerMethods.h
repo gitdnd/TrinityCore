@@ -4243,5 +4243,16 @@ namespace LuaPlayer
         Eluna::Push(L, player->GetReqKillOrCastCurrentCount(entry, npcId));
         return 1;
     }
+
+    int GetItemLevelPayload(lua_State* L, Player* player)
+    {
+        auto payload = player->GetItemLevelPayload();
+        for (auto &it : payload)
+        {
+            Eluna::Push(L, it.first);
+            Eluna::Push(L, it.second);
+        }
+        return payload.size() * 2;
+    }
 };
 #endif

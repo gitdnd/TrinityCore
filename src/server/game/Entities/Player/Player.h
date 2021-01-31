@@ -2165,6 +2165,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Spell* m_spellModTakingSpell;
 
         float GetAverageItemLevel() const;
+        std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const;
         bool isDebugAreaTriggers;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }

@@ -768,6 +768,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "FinishDungeon", &LuaPlayer::FinishDungeon },
     { "AdvanceQuestObjective", &LuaPlayer::AdvanceQuestObjective },
     { "GetRequiredQuestObjectiveCount", &LuaPlayer::GetRequiredQuestObjectiveCount },
+    { "GetItemLevelPayload", &LuaPlayer::GetItemLevelPayload },
 
     { NULL, NULL }
 };
