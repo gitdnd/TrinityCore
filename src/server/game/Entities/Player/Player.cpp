@@ -12341,6 +12341,9 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
 void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 {
+    if (!item->IsEquipped())
+        return;
+
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
 
@@ -26835,7 +26838,7 @@ float Player::GetAverageItemLevel() const
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         // don't check tabard, ranged, offhand or shirt
-        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
+        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY || !m_items[i]->IsEquipped())
             continue;
 
         /*if (isCacheEmpty)

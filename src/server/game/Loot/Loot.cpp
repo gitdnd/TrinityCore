@@ -231,11 +231,12 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         {
             modifier.vLvlMod += 2;
         }
-        modifier.plrAvgLvl = group->GetAvgItemLevel();
+
+        modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetDungeonLevel() : group->GetAvgItemLevel();
     }
     else
     {
-        modifier.plrAvgLvl = lootOwner->GetAverageItemLevel();
+        modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetDungeonLevel() : lootOwner->GetAverageItemLevel();
     }
 
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier);          // Processing is done there, callback via Loot::AddItem()
