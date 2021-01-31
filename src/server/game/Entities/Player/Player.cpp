@@ -26838,8 +26838,15 @@ float Player::GetAverageItemLevel() const
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         // don't check tabard, ranged, offhand or shirt
-        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY || !m_items[i]->IsEquipped())
+        if (i == EQUIPMENT_SLOT_TABARD ||
+            i == EQUIPMENT_SLOT_RANGED ||
+            i == EQUIPMENT_SLOT_OFFHAND ||
+            i == EQUIPMENT_SLOT_BODY ||
+            // If item in slot and is not equipped
+            (m_items[i] && !m_items[i]->IsEquipped()))
+        {
             continue;
+        }
 
         /*if (isCacheEmpty)
         {
