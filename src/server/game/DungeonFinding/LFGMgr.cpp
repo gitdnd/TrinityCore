@@ -1367,6 +1367,9 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
         error = LFG_TELEPORTERROR_INVALID_LOCATION;
     else if (player->IsInCombat())
         error = LFG_TELEPORTERROR_CANT_DO_THAT_RIGHT_NOW;
+    // Manually handle StormwindVault map 35, cannot enter if group size > 1
+    else if (dungeon->map == 35 && player->GetGroup() && player->GetGroup()->GetMembersCount() > 1)
+        error = LFG_TELEPORTERROR_CANT_DO_THAT_RIGHT_NOW;
     else if (player->GetMapId() != uint32(dungeon->map))  // Do not teleport players in dungeon to the entrance
     {
         uint32 mapid = dungeon->map;
