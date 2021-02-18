@@ -493,6 +493,13 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         return;
     }
 
+    if (authSession->Build != realm.Build)
+    {
+        SendAuthResponseError(AUTH_VERSION_MISMATCH);
+        DelayedCloseSocket();
+        return;
+    }
+
     // Must be done before WorldSession is created
     bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
     if (wardenActive && account.OS != "Win" && account.OS != "OSX")
