@@ -1438,8 +1438,6 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ITEMGEN_QUALITY_ARTIFACT]     = sConfigMgr->GetIntDefault("ItemGenerator.Artifact", 0);
     m_int_configs[CONFIG_ITEMGEN_QUALITY_HEIRLOOM]     = sConfigMgr->GetIntDefault("ItemGenerator.Heirloom", 0);
 
-    m_int_configs[CONFIG_REALM_VERSION] = sConfigMgr->GetIntDefault("RealmVersion", 12340);
-
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 
