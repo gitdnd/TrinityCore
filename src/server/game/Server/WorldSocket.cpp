@@ -496,6 +496,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (authSession->Build != realm.Build)
     {
         SendAuthResponseError(AUTH_VERSION_MISMATCH);
+        TC_LOG_ERROR("sql.sql", "Wrong build number got %u wanted %u", authSession->Build, realm.Build);
         DelayedCloseSocket();
         return;
     }
