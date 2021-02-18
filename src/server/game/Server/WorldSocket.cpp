@@ -428,6 +428,14 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Read the content of the packet
     recvPacket >> authSession->Build;
+
+    if (authSession->Build != sWorld->getIntConfig(CONFIG_REALM_VERSION))
+    {
+        recvPacket.rfinish();
+        SendAuthResponseError(AUTH_VERSION_MISMATCH);
+        return;
+    }
+
     recvPacket >> authSession->LoginServerID;
     recvPacket >> authSession->Account;
     recvPacket >> authSession->LoginServerType;
