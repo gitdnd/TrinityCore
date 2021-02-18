@@ -336,7 +336,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
     {
         // FIXME(Harry): This should be configurable
         // Try to scale base damage effect based on ilevel
-        if (unitCaster->ToCreature() && unitTarget->ToPlayer())
+        if (unitCaster->ToCreature())
         {
             int dungeonLevel = unitCaster->ToCreature()->GetDungeonLevel();
             if (dungeonLevel > 0)

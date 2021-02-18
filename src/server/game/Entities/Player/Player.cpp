@@ -26838,8 +26838,15 @@ float Player::GetAverageItemLevel() const
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         // don't check tabard, ranged, offhand or shirt
-        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY || !m_items[i]->IsEquipped())
+        if (i == EQUIPMENT_SLOT_TABARD ||
+            i == EQUIPMENT_SLOT_RANGED ||
+            i == EQUIPMENT_SLOT_OFFHAND ||
+            i == EQUIPMENT_SLOT_BODY ||
+            // If item in slot and is not equipped
+            (m_items[i] && !m_items[i]->IsEquipped()))
+        {
             continue;
+        }
 
         /*if (isCacheEmpty)
         {
@@ -26865,6 +26872,26 @@ float Player::GetAverageItemLevel() const
     if (currentItemLevel > result)
         return currentItemLevel;
     return result < 1.0 ? 1.0 : result;
+}
+
+std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const
+{
+    std::vector<std::pair<uint8, uint32>> itemLevels;
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        // don't check tabard, ranged, offhand or shirt
+        if (i == EQUIPMENT_SLOT_TABARD ||
+            i == EQUIPMENT_SLOT_RANGED ||
+            i == EQUIPMENT_SLOT_OFFHAND ||
+            i == EQUIPMENT_SLOT_BODY ||
+            // If item in slot and is not equipped
+            (m_items[i] && !m_items[i]->IsEquipped()))
+        {
+            continue;
+        }
+        itemLevels.push_back(std::pair(i, _itemSlotToMaxLevel.at(i)));
+    }
+    return itemLevels;
 }
 
 void Player::_LoadInstanceTimeRestrictions(PreparedQueryResult result)
@@ -26927,9 +26954,16 @@ void Player::_SaveSlotHighestLevel(CharacterDatabaseTransaction& trans)
 
 uint32 Player::ItemLevelForSlot(uint8 slot)
 {
-    if (m_items[slot] && m_items[slot]->GetTemplate())
+    if (_itemSlotToMaxLevel.find(slot) == _itemSlotToMaxLevel.end())
     {
-        return m_items[slot]->GetTemplate()->GetRealItemLevel();
+        if (m_items[slot] && m_items[slot]->GetTemplate())
+        {
+            return m_items[slot]->GetTemplate()->GetRealItemLevel();
+        }
+    }
+    else
+    {
+        return _itemSlotToMaxLevel[slot];
     }
     return 0;
 }

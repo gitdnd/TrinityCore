@@ -92,13 +92,13 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     }
 
     // Validations on group size
-    if (groupType == lfg::LfgGroupType::GROUP_10_MAN && newDungeons.size() > 1 || (group && group->GetMembersCount() == MAXLFGRAIDGROUPSIZE))
+    if (groupType == lfg::LfgGroupType::GROUP_10_MAN && (newDungeons.size() > 1 || (group && group->GetMembersCount() > MAXLFGRAIDGROUPSIZE)))
     {
         TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s If queueing for a raid, can only select a single raid and group size must be <= %d", GetPlayerInfo().c_str(), MAXLFGRAIDGROUPSIZE);
         recvData.rfinish();
         return;
     }
-    else if (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() == MAXGROUPSIZE))
+    else if (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() > MAXGROUPSIZE))
     {
         TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Group size is bigger than max group size", GetPlayerInfo().c_str());
         recvData.rfinish();
@@ -107,6 +107,12 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     else if (groupType == lfg::LfgGroupType::GROUP_SOLO && group)
     {
         TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Cannot be in a group if queueing for solo content", GetPlayerInfo().c_str());
+        recvData.rfinish();
+        return;
+    }
+    else if (groupType == lfg::LfgGroupType::GROUP_SOLO && newDungeons.size() > 1)
+    {
+        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Cannot queue for mixed group size dungeons", GetPlayerInfo().c_str());
         recvData.rfinish();
         return;
     }
