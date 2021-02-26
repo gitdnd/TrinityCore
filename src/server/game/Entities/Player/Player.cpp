@@ -5492,11 +5492,8 @@ float Player::OCTRegenHPPerSpirit() const
 
 float Player::OCTRegenMPPerSpirit() const
 {
-    uint8 level = uint8(GetAverageItemLevel());
+    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
-
-    if (level > 80)
-        level = 80;
 
 //    GtOCTRegenMPEntry     const* baseRatio = sGtOCTRegenMPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
     GtRegenMPPerSptEntry  const* moreRatio = sGtRegenMPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
