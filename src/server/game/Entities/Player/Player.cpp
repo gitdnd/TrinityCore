@@ -5345,11 +5345,8 @@ uint32 Player::GetShieldBlockValue() const
 
 float Player::GetMeleeCritFromAgility() const
 {
-    uint8 level = GetLevel();
+    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
-
-    if (level > GT_MAX_LEVEL)
-        level = GT_MAX_LEVEL;
 
     GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass-1);
     GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
@@ -5395,11 +5392,8 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
          2.00f/1.15f     // Adventurer
     };
 
-    uint8 level = GetLevel();
+    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
-
-    if (level > GT_MAX_LEVEL)
-        level = GT_MAX_LEVEL;
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
     GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
@@ -5417,11 +5411,8 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
 
 float Player::GetSpellCritFromIntellect() const
 {
-    uint8 level = GetLevel();
+    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
-
-    if (level > GT_MAX_LEVEL)
-        level = GT_MAX_LEVEL;
 
     GtChanceToSpellCritBaseEntry const* critBase  = sGtChanceToSpellCritBaseStore.LookupEntry(pclass-1);
     GtChanceToSpellCritEntry     const* critRatio = sGtChanceToSpellCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
@@ -5434,10 +5425,7 @@ float Player::GetSpellCritFromIntellect() const
 
 float Player::GetRatingMultiplier(CombatRating cr) const
 {
-    uint8 level = GetLevel();
-
-    if (level > GT_MAX_LEVEL)
-        level = GT_MAX_LEVEL;
+    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
 
     GtCombatRatingsEntry const* Rating = sGtCombatRatingsStore.LookupEntry(cr*GT_MAX_LEVEL+level-1);
     // gtOCTClassCombatRatingScalarStore.dbc starts with 1, CombatRating with zero, so cr+1
@@ -5469,11 +5457,8 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
 
 float Player::OCTRegenHPPerSpirit() const
 {
-    uint8 level = GetLevel();
+    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
-
-    if (level > GT_MAX_LEVEL)
-        level = GT_MAX_LEVEL;
 
     GtOCTRegenHPEntry     const* baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
     GtRegenHPPerSptEntry  const* moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
