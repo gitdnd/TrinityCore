@@ -5492,7 +5492,7 @@ float Player::OCTRegenHPPerSpirit() const
 
 float Player::OCTRegenMPPerSpirit() const
 {
-    uint8 level = GetAverageItemLevel();
+    uint8 level = uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
 
     if (level > 80)
