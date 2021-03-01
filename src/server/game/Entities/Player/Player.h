@@ -2164,8 +2164,17 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
         Spell* m_spellModTakingSpell;
 
-        float GetAverageItemLevel() const;
+        float Player::GetAverageItemLevel() const { return _averageItemLevel; }
+        float UpdateCachedItemLevel();
+
+        void AddItemLevelToSlotCache(uint8 slot, uint32 ilevel)
+        {
+            _itemSlotToMaxLevel[slot] = ilevel;
+            UpdateCachedItemLevel();
+        }
+
         std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const;
+
         bool isDebugAreaTriggers;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }
@@ -2525,6 +2534,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         WorldLocation _corpseLocation;
 
         std::unordered_map<uint8, uint32> _itemSlotToMaxLevel;
+        float _averageItemLevel;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

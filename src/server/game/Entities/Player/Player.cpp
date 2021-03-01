@@ -12351,7 +12351,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     uint32 existingLevel = _itemSlotToMaxLevel[slot];
     uint32 newItemLevel = item->GetTemplate()->GetRealItemLevel();
     if (newItemLevel > existingLevel)
-        _itemSlotToMaxLevel[slot] = newItemLevel;
+        AddItemLevelToSlotCache(slot, newItemLevel);
 
     // Now calculate new skill level based on cached item levels
     uint32 new_value = GetAverageItemLevel();
@@ -17351,6 +17351,8 @@ void Player::_LoadHighestSlotItemLevels(PreparedQueryResult result)
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_MAINHAND,  fields[15].GetUInt32()));
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_OFFHAND,   fields[16].GetUInt32()));
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_RANGED,    fields[17].GetUInt32()));
+
+    UpdateCachedItemLevel();
 }
 
 void Player::_LoadBGData(PreparedQueryResult result)
@@ -26808,7 +26810,8 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
         m_IsBGRandomWinner = true;
 }
 
-float Player::GetAverageItemLevel() const
+
+float Player::UpdateCachedItemLevel()
 {
     float sum = 0;
     uint32 count = 0;
@@ -26841,7 +26844,7 @@ float Player::GetAverageItemLevel() const
         {*/
             sum += float(_itemSlotToMaxLevel.at(i));
         //}
-        
+
         // Add items with no slot to the count
         ++count;
     }
@@ -26852,8 +26855,15 @@ float Player::GetAverageItemLevel() const
 
     // If the players' crafting skill is higher than the current average equipped armor, return crafting skill instead
     if (currentItemLevel > result)
-        return currentItemLevel;
-    return result < 1.0 ? 1.0 : result;
+    {
+        result = currentItemLevel;
+    }
+    else
+    {
+        result = result < 1.0 ? 1.0 : result;
+    }
+    _averageItemLevel = result;
+    return result;
 }
 
 std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const
