@@ -769,6 +769,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "AdvanceQuestObjective", &LuaPlayer::AdvanceQuestObjective },
     { "GetRequiredQuestObjectiveCount", &LuaPlayer::GetRequiredQuestObjectiveCount },
     { "GetItemLevelPayload", &LuaPlayer::GetItemLevelPayload },
+    { "UpdateArmorPassives", &LuaPlayer::UpdateArmorPassives },
 
     { NULL, NULL }
 };

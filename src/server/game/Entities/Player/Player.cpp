@@ -27354,7 +27354,7 @@ uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
 
 void Player::UpdateArmorPassives()
 {
-#define CHECK_TALENT(a,b,c,d) if (HasTalent(a, GetActiveSpec())) \
+#define CHECK_TALENT(a,b,c,d) if (HasSpell(a)) \
     { \
     count = GetEquippedItemsOfArmorType(b) + GetEquippedItemsOfArmorType(c); \
     spell = d; \

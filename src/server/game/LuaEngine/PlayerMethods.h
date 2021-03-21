@@ -4254,5 +4254,11 @@ namespace LuaPlayer
         }
         return payload.size() * 2;
     }
+
+    int UpdateArmorPassives(lua_State* L, Player* player)
+    {
+        player->UpdateArmorPassives();
+        return 0;
+    }
 };
 #endif
