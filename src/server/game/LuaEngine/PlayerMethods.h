@@ -4255,9 +4255,15 @@ namespace LuaPlayer
         return payload.size() * 2;
     }
 
-    int UpdateArmorPassives(lua_State* L, Player* player)
+    int UpdateTalentPassives(lua_State* L, Player* player)
     {
         player->UpdateArmorPassives();
+        return 0;
+    }
+
+    int RemoveTalentPassives(lua_State* L, Player* player)
+    {
+        player->RemoveArmorPassives();
         return 0;
     }
 };
