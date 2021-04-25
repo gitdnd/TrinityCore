@@ -343,6 +343,10 @@ Unit::Unit(bool isWorldObject) :
         m_auraFlatModifiersGroup[i][TOTAL_VALUE] = 0.0f;
         m_auraPctModifiersGroup[i][BASE_PCT] = 1.0f;
         m_auraPctModifiersGroup[i][TOTAL_PCT] = 1.0f;
+    }
+
+    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+    {
         m_auraPctBonusSchoolDamageGroup[i] = 0.0f;
     }
                                                             // implement 50% base damage from offhand
