@@ -733,7 +733,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (info)
                     {
                         info->SchoolMask = uint32(pow(i, 2));
-                        info->Effects[0].Amplitude = damage * (bonusPct / 100);
+                        info->Effects[0].BasePoints = damage * (bonusPct / 100);
                         Spell* spell = new Spell(unitCaster, info, TriggerCastFlags(0));
                         spell->prepare(m_targets);
                     }
