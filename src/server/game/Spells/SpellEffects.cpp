@@ -722,7 +722,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         }
 
         // Apply bonus school damage effects
-        if (unitCaster)
+        if (unitCaster && m_spellInfo->Id != 11) // FIXME(Harry): Hardcoded check for not hardcoded spell
         {
             for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
             {
