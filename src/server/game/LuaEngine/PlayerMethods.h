@@ -4266,5 +4266,41 @@ namespace LuaPlayer
         player->RemoveArmorPassives();
         return 0;
     }
+
+    int IsStackingSpell(lua_State* L, Player* player)
+    {
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 2);
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+        {
+            Eluna::Push(L, spellInfo->StackAmount > 0);
+        }
+        return 1;
+    }
+
+    int IncreaseSpellAuraStack(lua_State* L, Player* player)
+    {
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 2);
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+        {
+            if (auto aura = player->GetAura(spell))
+            {
+                aura->SetStackAmount(aura->GetStackAmount() + 1);
+            }
+            else
+            {
+                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, player);
+                createInfo.SetCaster(player);
+                if (auto applyAura = Aura::TryRefreshStackOrCreate(createInfo))
+                {
+                    applyAura->SetStackAmount(1);
+                }
+                else
+                {
+                    TC_LOG_ERROR("spells", "Error applying armor passive, broken spell %u?", spell);
+                }
+            }
+        }
+        return 0;
+    }
 };
 #endif

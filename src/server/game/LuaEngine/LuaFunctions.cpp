@@ -771,6 +771,8 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetItemLevelPayload", &LuaPlayer::GetItemLevelPayload },
     { "UpdateTalentPassives", &LuaPlayer::UpdateTalentPassives },
     { "RemoveTalentPassives", &LuaPlayer::RemoveTalentPassives },
+    { "IsStackingSpell", &LuaPlayer::IsStackingSpell },
+    { "IncreaseSpellAuraStack", &LuaPlayer::IncreaseSpellAuraStack },
 
     { NULL, NULL }
 };

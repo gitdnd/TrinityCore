@@ -27379,7 +27379,7 @@ void Player::UpdateArmorPassives()
                 aura->SetStackAmount(count);
             else
             {
-                 AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
+                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
                 createInfo.SetCaster(this);
 
                 if (auto applyAura = Aura::TryRefreshStackOrCreate(createInfo))
