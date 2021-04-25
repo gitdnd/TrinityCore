@@ -382,6 +382,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //316 SPELL_AURA_PERIODIC_HASTE implemented in AuraEffect::CalculatePeriodic
     &AuraEffect::HandleTempLearnSpell,                            //317 SPELL_AURA_TEMP_LEARN_SPELL
     &AuraEffect::HandleWaterBreathing,                            //318 SPELL_AURA_DISABLE_FATIGUE
+    &AuraEffect::HandleDamageSchoolBonus,                         //319 SPELL_AURA_DAMAGE_SCHOOL_BONUS
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
@@ -5843,6 +5844,26 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         //data << uint32(triggerSpellId);
         //pT->SendDirectMessage(&data);
     }
+}
+
+void AuraEffect::HandleDamageSchoolBonus(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    uint32 school = GetMiscValue();
+    if (school < 0 || school >= MAX_SPELL_SCHOOL)
+        return;
+
+    float amount = target->GetBonusSchoolModifierPct(SpellSchools(school));
+    amount = apply ? amount + GetAmount() : amount - GetAmount();
+
+    target->SetBonusSchoolModifierPct(SpellSchools(school), amount);
 }
 
 template TC_GAME_API void AuraEffect::GetTargetList(std::list<Unit*>&) const;

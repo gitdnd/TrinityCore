@@ -343,6 +343,7 @@ Unit::Unit(bool isWorldObject) :
         m_auraFlatModifiersGroup[i][TOTAL_VALUE] = 0.0f;
         m_auraPctModifiersGroup[i][BASE_PCT] = 1.0f;
         m_auraPctModifiersGroup[i][TOTAL_PCT] = 1.0f;
+        m_auraPctBonusSchoolDamageGroup[i] = 0.0f;
     }
                                                             // implement 50% base damage from offhand
     m_auraPctModifiersGroup[UNIT_MOD_DAMAGE_OFFHAND][TOTAL_PCT] = 0.5f;
@@ -9038,6 +9039,22 @@ float Unit::GetPctModifierValue(UnitMods unitMod, UnitModifierPctType modifierTy
     }
 
     return m_auraPctModifiersGroup[unitMod][modifierType];
+}
+
+void Unit::SetBonusSchoolModifierPct(SpellSchools school, float val)
+{
+    m_auraPctBonusSchoolDamageGroup[school] = val;
+}
+
+float Unit::GetBonusSchoolModifierPct(SpellSchools school) const
+{
+    if (school >= MAX_SPELL_SCHOOL)
+    {
+        TC_LOG_ERROR("entities.unit", "attempt to access non-existing modifier value from UnitMods!");
+        return 0.0f;
+    }
+
+    return m_auraPctBonusSchoolDamageGroup[school];
 }
 
 void Unit::UpdateUnitMod(UnitMods unitMod)

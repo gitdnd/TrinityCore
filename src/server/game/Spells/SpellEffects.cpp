@@ -721,6 +721,23 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             damage = unitTarget->SpellDamageBonusTaken(unitCaster, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
         }
 
+        // Apply bonus school damage effects
+        for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            float bonusPct = unitCaster->GetBonusSchoolModifierPct(SpellSchools(i));
+            if (bonusPct > 0)
+            {
+                SpellInfo* info = new SpellInfo(*sSpellMgr->GetSpellInfo(11)); // FIXME(Harry): Hardcoded (Debug Damage)
+                if (info)
+                {
+                    info->SchoolMask = uint32(pow(i, 2));
+                    info->Effects[0].Amplitude = damage * (bonusPct / 100);
+                    Spell* spell = new Spell(unitCaster, info, TriggerCastFlags(0));
+                    spell->prepare(m_targets);
+                }
+            }
+        }
+
         m_damage += damage;
     }
 }

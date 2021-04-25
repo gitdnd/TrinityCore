@@ -1400,9 +1400,12 @@ class TC_GAME_API Unit : public WorldObject
 
         void SetStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float val);
         void SetStatPctModifier(UnitMods unitMod, UnitModifierPctType modifierType, float val);
+        void SetBonusSchoolModifierPct(SpellSchools unitMod, float val);
 
         float GetFlatModifierValue(UnitMods unitMod, UnitModifierFlatType modifierType) const;
         float GetPctModifierValue(UnitMods unitMod, UnitModifierPctType modifierType) const;
+        float GetBonusSchoolModifierPct(SpellSchools unitMod) const;
+
 
         void UpdateUnitMod(UnitMods unitMod);
 
@@ -1737,6 +1740,7 @@ class TC_GAME_API Unit : public WorldObject
 
         float m_auraFlatModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_FLAT_END];
         float m_auraPctModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_PCT_END];
+        float m_auraPctBonusSchoolDamageGroup[MAX_SPELL_SCHOOL];
         float m_weaponDamage[MAX_ATTACK][2][2];
         bool m_canModifyStats;
         VisibleAuraMap m_visibleAuras;
