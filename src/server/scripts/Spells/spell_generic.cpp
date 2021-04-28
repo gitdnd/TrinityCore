@@ -41,6 +41,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include <World\World.h>
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4530,6 +4531,7 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
+            sWorld->SendGlobalText("spell_dmg_proc_aura: Spell Proc Occurred", nullptr);
             /*
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
                 if (spellInfo->Id >= 1 && spellInfo->Id <= 5)
@@ -4539,8 +4541,10 @@ public:
         }
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
+            sWorld->SendGlobalText("spell_dmg_proc_aura: HandleProc", nullptr);
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
+                sWorld->SendGlobalText("spell_dmg_proc_aura: SpellInfo valid", nullptr);
                 uint32 school = spellInfo->Effects[0].MiscValue;
                 SpellSchools eschool = SpellSchools(school);
                 uint32 spell;
@@ -4551,7 +4555,6 @@ public:
                     spell = 11;
                 }
                 PreventDefaultAction();
-
                 uint32 proc_dmg = eventInfo.GetDamageInfo()->GetDamage() * (
                     (spellInfo->Effects[0].BasePoints + spellInfo->Effects[0].DieSides) / 100);
                 CastSpellExtraArgs args(aurEff);
