@@ -4530,6 +4530,14 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
+                // Aura spells and triggers cannot proc this
+                if (spellInfo->Id >= 180037 && spellInfo->Id <= 180039)
+                {
+                    return false;
+                }
+            }
             return true;
         }
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
