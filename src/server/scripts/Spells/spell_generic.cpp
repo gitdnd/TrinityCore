@@ -4519,6 +4519,46 @@ class spell_gen_between_cast_periodic : public AuraScript
     }
 };
 
+class spell_dmg_proc_aura : public SpellScriptLoader
+{
+public:
+    spell_dmg_proc_aura() : SpellScriptLoader("spell_dmg_proc_aura") { }
+
+    class spell_dmg_proc_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dmg_proc_aura_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+                if (spellInfo->Id >= 1 && spellInfo->Id <= 5)
+                    return false;
+
+            return true;
+        }
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            uint32 proc_dmg = eventInfo.GetDamageInfo()->GetDamage() * eventInfo.GetActor()->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_DUMMY, eventInfo.GetSchoolMask());
+            CastSpellExtraArgs args(aurEff);
+            args.OriginalCaster = GetCasterGUID();
+            args.AddSpellBP0(proc_dmg);
+            GetTarget()->CastSpell(GetTarget(), 9505050505050, args);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_dmg_proc_aura_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_dmg_proc_aura_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_dmg_proc_aura_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4652,5 +4692,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_gen_cannon_blast);
     RegisterAuraScript(spell_gen_between_cast_periodic);
+    new spell_dmg_proc_aura();
 
 }
