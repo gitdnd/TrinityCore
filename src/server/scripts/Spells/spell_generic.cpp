@@ -4546,8 +4546,7 @@ public:
             {
                 PreventDefaultAction();
                 uint32 spell = spellInfo->Effects[0].TriggerSpell;
-                uint32 proc_dmg = eventInfo.GetDamageInfo()->GetDamage() * (
-                    (spellInfo->Effects[0].BasePoints + spellInfo->Effects[0].DieSides) / 100);
+                uint32 proc_dmg = (float(eventInfo.GetDamageInfo()->GetDamage()) * (float(aurEff->GetAmount()) / 100.0));
                 CastSpellExtraArgs args(aurEff);
                 args.OriginalCaster = GetCasterGUID();
                 args.AddSpellBP0(proc_dmg);
