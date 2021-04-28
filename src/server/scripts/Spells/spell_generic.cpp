@@ -4530,20 +4530,35 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
+            /*
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
                 if (spellInfo->Id >= 1 && spellInfo->Id <= 5)
                     return false;
-
+            */
             return true;
         }
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
-            PreventDefaultAction();
-            uint32 proc_dmg = eventInfo.GetDamageInfo()->GetDamage() * eventInfo.GetActor()->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_DUMMY, eventInfo.GetSchoolMask());
-            CastSpellExtraArgs args(aurEff);
-            args.OriginalCaster = GetCasterGUID();
-            args.AddSpellBP0(proc_dmg);
-            GetTarget()->CastSpell(GetTarget(), 9505050505050, args);
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
+                uint32 school = spellInfo->Effects[0].MiscValue;
+                SpellSchools eschool = SpellSchools(school);
+                uint32 spell;
+                switch (eschool) {
+                case SPELL_SCHOOL_FIRE:
+                    spell = 180039;
+                default:
+                    spell = 11;
+                }
+                PreventDefaultAction();
+
+                uint32 proc_dmg = eventInfo.GetDamageInfo()->GetDamage() * (
+                    (spellInfo->Effects[0].BasePoints + spellInfo->Effects[0].DieSides) / 100);
+                CastSpellExtraArgs args(aurEff);
+                args.OriginalCaster = GetCasterGUID();
+                args.AddSpellBP0(proc_dmg);
+                GetTarget()->CastSpell(GetTarget(), spell, args);
+            }
         }
 
         void Register() override
