@@ -4532,11 +4532,11 @@ public:
         bool CheckProc(ProcEventInfo& eventInfo)
         {
             sWorld->SendGlobalText("spell_dmg_proc_aura: Spell Proc Occurred", nullptr);
-            /*
+            
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
                 if (spellInfo->Id >= 1 && spellInfo->Id <= 5)
                     return false;
-            */
+            
             return true;
         }
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -4704,6 +4704,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_gen_cannon_blast);
     RegisterAuraScript(spell_gen_between_cast_periodic);
-    //new spell_dmg_proc_aura();
-    RegisterAuraScript(spell_dmg_proc_aura);
+    new spell_dmg_proc_aura();
 }
