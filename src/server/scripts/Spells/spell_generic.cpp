@@ -4547,13 +4547,7 @@ public:
                 sWorld->SendGlobalText("spell_dmg_proc_aura: SpellInfo valid", nullptr);
                 uint32 school = spellInfo->Effects[0].MiscValue;
                 SpellSchools eschool = SpellSchools(school);
-                uint32 spell;
-                switch (eschool) {
-                case SPELL_SCHOOL_FIRE:
-                    spell = 180039;
-                default:
-                    spell = 11;
-                }
+                uint32 spell = spellInfo->Effects[0].TriggerSpell;
                 PreventDefaultAction();
                 uint32 proc_dmg = eventInfo.GetDamageInfo()->GetDamage() * (
                     (spellInfo->Effects[0].BasePoints + spellInfo->Effects[0].DieSides) / 100);
@@ -4710,6 +4704,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_gen_cannon_blast);
     RegisterAuraScript(spell_gen_between_cast_periodic);
-    new spell_dmg_proc_aura();
-
+    //new spell_dmg_proc_aura();
+    RegisterAuraScript(spell_dmg_proc_aura);
 }
