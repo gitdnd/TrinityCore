@@ -13579,39 +13579,24 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
 {
     if (GetTypeId() != TYPEID_PLAYER)
         return;
-    //Prefered implementation
-    /*for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+
+    if (spellProto)
+    {
+        if (spellProto->Id >= 180040 && spellProto->Id <= 180046)
+            return;
+    }
+
+    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
     {
         float bonusdmgpct = GetBonusSchoolModifierPct(SpellSchools(i));
         if (bonusdmgpct >= 0.01)
         {
-            uint32 damage = dmg * bonusdmgpct;
+            uint32 damage = (float(dmg) * float(bonusdmgpct / 100.0));
             CastSpellExtraArgs args;
             args.OriginalCaster = GetGUID();
             args.AddSpellBP0(damage);
             args.SetTriggerFlags(TRIGGERED_FULL_MASK);
-            CastSpell(victim, 180037 + i, args);
-        }
-    }*/
-
-    if (HasAura(180038))
-    {
-        bool noInfiniteLoops = true;
-        if (spellProto)
-        {
-            if (spellProto->Id >= 180037 && spellProto->Id <= 180039)
-                noInfiniteLoops = false;
-        }
-        if (noInfiniteLoops)
-        {
-            //const SpellInfo* sp = sSpellMgr->GetSpellInfo(180039);
-            //uint32 damage = dmg * sp->Effects[0].DamageMultiplier;
-            uint32 damage = dmg * 0.1;
-            CastSpellExtraArgs args;
-            args.OriginalCaster = GetGUID();
-            args.AddSpellBP0(damage);
-            args.SetTriggerFlags(TRIGGERED_FULL_MASK);
-            CastSpell(victim, 180039, args);
+            CastSpell(victim, 180040 + i, args);
         }
     }
 }
