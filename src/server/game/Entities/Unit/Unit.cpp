@@ -13579,6 +13579,20 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
 {
     if (GetTypeId() != TYPEID_PLAYER)
         return;
+    //Prefered implementation
+    /*for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        float bonusdmgpct = GetBonusSchoolModifierPct(SpellSchools(i));
+        if (bonusdmgpct >= 0.01)
+        {
+            uint32 damage = dmg * bonusdmgpct;
+            CastSpellExtraArgs args;
+            args.OriginalCaster = GetGUID();
+            args.AddSpellBP0(damage);
+            args.SetTriggerFlags(TRIGGERED_FULL_MASK);
+            CastSpell(victim, 180037 + i, args);
+        }
+    }*/
 
     if (HasAura(180038))
     {
