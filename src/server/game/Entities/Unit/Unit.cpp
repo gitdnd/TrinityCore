@@ -13596,6 +13596,7 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
             CastSpellExtraArgs args;
             args.OriginalCaster = GetGUID();
             args.AddSpellBP0(damage);
+            args.SetTriggerFlags(TRIGGERED_FULL_MASK);
             CastSpell(victim, 180039, args);
         }
     }
