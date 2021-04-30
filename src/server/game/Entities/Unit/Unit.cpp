@@ -13593,7 +13593,7 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
         float bonusdmgpct = GetBonusSchoolModifierPct(SpellSchools(i));
         if (bonusdmgpct >= 0.01)
         {
-            uint32 damage = (float(dmg) * float(bonusdmgpct / 100.0));
+            uint32 damage = floor((float(dmg) * float(bonusdmgpct / 100.0)));
             CastSpellExtraArgs args;
             args.OriginalCaster = GetGUID();
             args.AddSpellBP0(damage);
