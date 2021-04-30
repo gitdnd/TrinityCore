@@ -4700,5 +4700,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_gen_cannon_blast);
     RegisterAuraScript(spell_gen_between_cast_periodic);
-    new spell_dmg_proc_aura();
+    //new spell_dmg_proc_aura();
 }

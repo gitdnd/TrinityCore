@@ -700,6 +700,8 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
+    attacker->OnDamageDealMakeThisAnAuraHookSometimeLater(victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto);
+
     if (victim->GetTypeId() == TYPEID_PLAYER)
     {
         // Signal to pets that their owner was attacked - except when DOT.
@@ -13571,4 +13573,30 @@ std::string Unit::GetDebugInfo() const
         << " Class: " << std::to_string(GetClass()) << "\n"
         << " " << (movespline ? movespline->ToString() : "Movespline: <none>");
     return sstr.str();
+}
+
+void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto)
+{
+    if (GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if (HasAura(180038))
+    {
+        bool noInfiniteLoops = true;
+        if (spellProto)
+        {
+            if (!(spellProto->Id >= 180037 && spellProto->Id <= 180039))
+                noInfiniteLoops = false;
+        }
+        if (noInfiniteLoops)
+        {
+            //const SpellInfo* sp = sSpellMgr->GetSpellInfo(180039);
+            //uint32 damage = dmg * sp->Effects[0].DamageMultiplier;
+            uint32 damage = dmg * 0.1;
+            CastSpellExtraArgs args;
+            args.OriginalCaster = GetGUID();
+            args.AddSpellBP0(damage);
+            CastSpell(victim, 180039, args);
+        }
+    }
 }

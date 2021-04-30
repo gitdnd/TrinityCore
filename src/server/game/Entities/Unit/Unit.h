@@ -1691,6 +1691,9 @@ class TC_GAME_API Unit : public WorldObject
         float GetCollisionHeight() const override;
 
         std::string GetDebugInfo() const override;
+
+        void OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto);
+
     protected:
         explicit Unit (bool isWorldObject);
 
