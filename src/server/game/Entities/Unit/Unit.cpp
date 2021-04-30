@@ -6154,6 +6154,8 @@ void Unit::SetCharm(Unit* charm, bool apply)
     // Hook for OnHeal Event
     sScriptMgr->OnHeal(healer, victim, (uint32&)gain);
 
+    healer->OnHealDealMakeThisAnAuraHookSometimeLater(victim, (uint32&)gain, healInfo.GetSpellInfo());
+
     Unit* unit = healer;
     if (healer && healer->GetTypeId() == TYPEID_UNIT && healer->IsTotem())
         unit = healer->GetOwner();
@@ -13582,7 +13584,7 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
 
     if (spellProto)
     {
-        if (spellProto->Id >= 180040 && spellProto->Id <= 180046)
+        if (spellProto->Id >= 180040 && spellProto->Id <= 180053)
             return;
     }
 
@@ -13597,6 +13599,32 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
             args.AddSpellBP0(damage);
             args.SetTriggerFlags(TRIGGERED_FULL_MASK);
             CastSpell(victim, 180040 + i, args);
+        }
+    }
+}
+
+void Unit::OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain, SpellInfo const* spellProto)
+{
+    if (GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if (spellProto)
+    {
+        if (spellProto->Id >= 180040 && spellProto->Id <= 180053)
+            return;
+    }
+
+    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        float bonusdmgpct = GetBonusSchoolModifierPct(SpellSchools(i));
+        if (bonusdmgpct >= 0.01)
+        {
+            uint32 damage = (float(gain) * float(bonusdmgpct / 100.0));
+            CastSpellExtraArgs args;
+            args.OriginalCaster = GetGUID();
+            args.AddSpellBP0(damage);
+            args.SetTriggerFlags(TRIGGERED_FULL_MASK);
+            CastSpell(victim, 180047 + i, args);
         }
     }
 }
