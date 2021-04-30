@@ -13585,7 +13585,7 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
         bool noInfiniteLoops = true;
         if (spellProto)
         {
-            if (!(spellProto->Id >= 180037 && spellProto->Id <= 180039))
+            if (spellProto->Id >= 180037 && spellProto->Id <= 180039)
                 noInfiniteLoops = false;
         }
         if (noInfiniteLoops)
