@@ -25192,21 +25192,8 @@ uint32 Player::CalculateTalentsPoints() const
 
     if (GetClass() == CLASS_ADVENTURER)
     {
-        uint32 advTalents = 0;
-        uint32 avgLevel = uint32(GetAverageItemLevel());
-
-        if (avgLevel >= 25)
-            advTalents = 1;
-        else if (avgLevel >= 75)
-            advTalents = 2;
-        else if (avgLevel >= 125)
-            advTalents = 3;
-        else if (avgLevel >= 175)
-            advTalents = 4;
-        else if (avgLevel >= 225)
-            advTalents = 5;
-
-        return advTalents;
+        // Give a talent every 5 item levels
+        return floor(GetAverageItemLevel() / 5.0);
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)

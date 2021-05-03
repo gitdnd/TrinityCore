@@ -4567,6 +4567,57 @@ public:
     }
 };
 
+
+class spell_respiratory_pause : public SpellScriptLoader
+{
+public:
+    spell_respiratory_pause() : SpellScriptLoader("spell_respiratory_pause") { }
+
+    class spell_respiratory_pause_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_respiratory_pause_AuraScript);
+
+        void HandlePeriodic(AuraEffect const* aurEff)
+        {
+            PreventDefaultAction();
+            if (aurEff->GetAmount() <= 0)
+            {
+                Unit* target = GetTarget();
+                target->CastSpell(target, 180097, aurEff);
+                if (Player* playerTarget = GetUnitOwner()->ToPlayer())
+                {
+                    int32 baseAmount = aurEff->GetBaseAmount();
+                    int32 amount = playerTarget->CalculateSpellDamage(GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount);
+                    GetEffect(EFFECT_0)->SetAmount(amount);
+                }
+            }
+        }
+
+        void HandleUpdatePeriodic(AuraEffect* aurEff)
+        {
+            if (Player* playerTarget = GetUnitOwner()->ToPlayer())
+            {
+                int32 baseAmount = aurEff->GetBaseAmount();
+                int32 amount = playerTarget->isMoving() ?
+                    playerTarget->CalculateSpellDamage(GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount) :
+                    aurEff->GetAmount() - 1;
+                aurEff->SetAmount(amount);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_respiratory_pause_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_respiratory_pause_AuraScript::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_respiratory_pause_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4701,4 +4752,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_cannon_blast);
     RegisterAuraScript(spell_gen_between_cast_periodic);
     //new spell_dmg_proc_aura();
+    new spell_respiratory_pause();
 }
