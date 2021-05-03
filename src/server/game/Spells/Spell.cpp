@@ -1040,6 +1040,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
         case TARGET_CHECK_PARTY:
         case TARGET_CHECK_RAID:
         case TARGET_CHECK_RAID_CLASS:
+        case TARGET_CHECK_OWN_SUMMON
             range = m_spellInfo->GetMaxRange(true, m_caster, this);
             break;
         case TARGET_CHECK_ENTRY:
@@ -8278,6 +8279,11 @@ bool WorldObjectSpellTargetCheck::operator()(WorldObject* target) const
                 if (!refUnit->IsInRaidWith(unitTarget))
                     return false;
                 break;
+            case TARGET_CHECK_OWN_SUMMON:
+                if (!refUnit)
+                    return false;
+                if (refUnit->GetOwnerGUID() != _caster->GetGUID())
+                    return false;
             default:
                 break;
         }
