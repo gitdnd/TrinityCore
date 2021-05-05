@@ -4618,37 +4618,27 @@ public:
     }
 };
 
-class spell_second_wind_health_aura : public SpellScriptLoader
+
+class spell_second_wind_health_aura : public AuraScript
 {
-public:
-    spell_second_wind_health_aura() : SpellScriptLoader("spell_second_wind_health_aura") { }
+    PrepareAuraScript(spell_second_wind_health_aura);
 
-    class spell_second_wind_health_aura_AuraScript : public AuraScript
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        PrepareAuraScript(spell_second_wind_health_aura_AuraScript);
-
-        bool CheckProc(ProcEventInfo& eventInfo)
+        if (auto target = eventInfo.GetProcTarget())
         {
-            if (auto target = eventInfo.GetProcTarget())
+            if (auto spell = eventInfo.GetSpellInfo())
             {
-                if (auto spell = eventInfo.GetSpellInfo())
-                {
-                    uint32 threshold = spell->Effects[0].BasePoints + spell->Effects[0].DieSides;
-                    return target->GetHealthPct() <= threshold;
-                }
+                uint32 threshold = spell->Effects[0].BasePoints + spell->Effects[0].DieSides;
+                return uint32(std::floor(target->GetHealthPct())) <= threshold;
             }
-            return false;
         }
+        return false;
+    }
 
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_second_wind_health_aura_AuraScript::CheckProc);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_second_wind_health_aura_AuraScript();
+        DoCheckProc += AuraCheckProcFn(spell_second_wind_health_aura::CheckProc);
     }
 };
 
@@ -4787,5 +4777,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_gen_between_cast_periodic);
     //new spell_dmg_proc_aura();
     new spell_respiratory_pause();
-    new spell_second_wind_health_aura();
+    RegisterAuraScript(spell_second_wind_health_aura);
 }
