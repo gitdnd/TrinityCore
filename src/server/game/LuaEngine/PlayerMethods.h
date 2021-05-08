@@ -4149,7 +4149,10 @@ namespace LuaPlayer
      */
     int GetAvgItemLevel(lua_State* L, Player* player)
     {
-        Eluna::Push(L, player->GetAverageItemLevel());
+        uint32 level = std::floor(player->GetAverageItemLevel());
+        level = level < 1 ? 1 : level;
+        level = level > 300 ? 300 : level;
+        Eluna::Push(L, level);
         return 1;
     }
 
