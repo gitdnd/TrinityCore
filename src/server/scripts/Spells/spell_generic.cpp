@@ -41,7 +41,6 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include <World\World.h>
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4626,16 +4625,9 @@ class spell_second_wind_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (auto spell = eventInfo.GetSpellInfo())
-        {
-            uint32 threshold = spell->Effects[0].BasePoints + spell->Effects[0].DieSides;
-            uint32 healthPct = uint32(std::floor(GetTarget()->GetHealthPct()));
-            std::ostringstream stream;
-            stream << "threshold <= healthPct: " << threshold << " <= " << healthPct;
-            sWorld->SendGlobalText(stream.str().c_str(), nullptr);
-            return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
-        }
-        return false;
+        // The event info spell is the spell that hit the player rather than the proc spell
+        // Hardcode the threshold because of this
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
     }
 
     void Register() override
