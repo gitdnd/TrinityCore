@@ -41,6 +41,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include <World\World.h>
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4625,13 +4626,16 @@ class spell_second_wind_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (auto target = eventInfo.GetProcTarget())
+        sWorld->SendGlobalText("second wind proc check", nullptr);
+        if (auto spell = eventInfo.GetSpellInfo())
         {
-            if (auto spell = eventInfo.GetSpellInfo())
+            sWorld->SendGlobalText("Checking can proc", nullptr);
+            uint32 threshold = spell->Effects[0].BasePoints + spell->Effects[0].DieSides;
+            if (uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold)
             {
-                uint32 threshold = spell->Effects[0].BasePoints + spell->Effects[0].DieSides;
-                return uint32(std::floor(target->GetHealthPct())) <= threshold;
+                sWorld->SendGlobalText("proc true", nullptr);
             }
+            return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
         }
         return false;
     }
