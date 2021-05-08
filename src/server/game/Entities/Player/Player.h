@@ -2534,7 +2534,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         WorldLocation _corpseLocation;
 
         std::unordered_map<uint8, uint32> _itemSlotToMaxLevel;
-        float _averageItemLevel;
+        float _averageItemLevel = 1;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

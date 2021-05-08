@@ -4618,6 +4618,41 @@ public:
     }
 };
 
+
+class spell_second_wind_health_aura : public AuraScript
+{
+    PrepareAuraScript(spell_second_wind_health_aura);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // The event info spell is the spell that hit the player rather than the proc spell
+        // Hardcode the threshold because of this
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_second_wind_health_aura::CheckProc);
+    }
+};
+
+class spell_perseverance_health_aura : public AuraScript
+{
+    PrepareAuraScript(spell_perseverance_health_aura);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // The event info spell is the spell that hit the player rather than the proc spell
+        // Hardcode the threshold because of this
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 20;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_perseverance_health_aura::CheckProc);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4753,4 +4788,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_gen_between_cast_periodic);
     //new spell_dmg_proc_aura();
     new spell_respiratory_pause();
+    RegisterAuraScript(spell_second_wind_health_aura);
+    RegisterAuraScript(spell_perseverance_health_aura);
 }
