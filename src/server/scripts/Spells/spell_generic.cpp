@@ -4626,15 +4626,13 @@ class spell_second_wind_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        sWorld->SendGlobalText("second wind proc check", nullptr);
         if (auto spell = eventInfo.GetSpellInfo())
         {
-            sWorld->SendGlobalText("Checking can proc", nullptr);
             uint32 threshold = spell->Effects[0].BasePoints + spell->Effects[0].DieSides;
-            if (uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold)
-            {
-                sWorld->SendGlobalText("proc true", nullptr);
-            }
+            uint32 healthPct = uint32(std::floor(GetTarget()->GetHealthPct()));
+            std::ostringstream stream;
+            stream << "threshold <= healthPct: " << threshold << " <= " << healthPct;
+            sWorld->SendGlobalText(stream.str().c_str(), nullptr);
             return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
         }
         return false;
