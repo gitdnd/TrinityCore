@@ -4625,9 +4625,9 @@ class spell_second_wind_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // The event info spell is the spell that hit the player rather than the proc spell
-        // Hardcode the threshold because of this
-        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
+        auto effect = eventInfo.GetProcSpell()->m_spellInfo->Effects[0];
+        uint32 threshold = effect.BasePoints + effect.DieSides;
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
     }
 
     void Register() override
@@ -4642,9 +4642,9 @@ class spell_perseverance_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // The event info spell is the spell that hit the player rather than the proc spell
-        // Hardcode the threshold because of this
-        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 20;
+        auto effect = eventInfo.GetProcSpell()->m_spellInfo->Effects[0];
+        uint32 threshold = effect.BasePoints + effect.DieSides;
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
     }
 
     void Register() override
