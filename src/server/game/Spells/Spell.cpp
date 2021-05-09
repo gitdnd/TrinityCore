@@ -7181,6 +7181,10 @@ void Spell::Delayed() // only called in DealDamage()
     if (IsDelayableNoMore())                                 // Spells may only be delayed twice
         return;
 
+    // Talent Zealous: 15% chance to avoid interruption while casting
+    if (playerCaster->HasSpell(180132) && roll_chance_i(15))
+        return;
+
     //check pushback reduce
     int32 delaytime = 500;                                  // spellcasting delay is normally 500ms
 
