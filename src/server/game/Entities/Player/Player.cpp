@@ -13623,6 +13623,14 @@ bool Player::IsUsingStaff() const
         mainItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_STAFF;
 }
 
+bool Player::IsUsingShield() const
+{
+    Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    return offItem &&
+        offItem->GetTemplate()->InventoryType == INVTYPE_SHIELD &&
+        offItem->GetTemplate()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD;
+}
+
 bool Player::IsUsingTwoHandedWeaponInOneHand() const
 {
     Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
