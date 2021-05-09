@@ -2594,7 +2594,7 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
         // 180127 - Standard Bearer: Chance to reflect spell damage
         if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180127) && victim->ToPlayer()->IsUsingStaff())
         {
-            reflectchance = 100;
+            reflectchance += 5;
         }
 
         if (reflectchance > 0 && roll_chance_i(reflectchance))
