@@ -4649,6 +4649,36 @@ class spell_perseverance_health_aura : public AuraScript
     }
 };
 
+class spell_verdant_dreamer_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_verdant_dreamer_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+
+        int32 reduction = (player->GetStat(STAT_SPIRIT) * 0.05) * -1;
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(reduction);
+        player->CastSpell(player, 180136, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_verdant_dreamer_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4786,4 +4816,5 @@ void AddSC_generic_spell_scripts()
     new spell_respiratory_pause();
     RegisterAuraScript(spell_second_wind_health_aura);
     RegisterAuraScript(spell_perseverance_health_aura);
+    RegisterAuraScript(spell_verdant_dreamer_periodic_aura);
 }
