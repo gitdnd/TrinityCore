@@ -2604,7 +2604,7 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
     // 180128 - Attentive: Chance to block spell damage
     if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180128) && victim->ToPlayer()->IsUsingShield())
     {
-        //if (roll_chance_i(5))
+        if (roll_chance_i(5))
             return SPELL_MISS_BLOCK;
     }
 
