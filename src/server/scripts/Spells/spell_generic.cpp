@@ -4625,9 +4625,7 @@ class spell_second_wind_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        auto effect = eventInfo.GetProcSpell()->m_spellInfo->Effects[0];
-        uint32 threshold = effect.BasePoints + effect.DieSides;
-        return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
     }
 
     void Register() override
@@ -4642,9 +4640,7 @@ class spell_perseverance_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        auto effect = eventInfo.GetProcSpell()->m_spellInfo->Effects[0];
-        uint32 threshold = effect.BasePoints + effect.DieSides;
-        return uint32(std::floor(GetTarget()->GetHealthPct())) <= threshold;
+        return uint32(std::floor(GetTarget()->GetHealthPct())) <= 20;
     }
 
     void Register() override

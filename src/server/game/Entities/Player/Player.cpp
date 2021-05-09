@@ -13615,6 +13615,14 @@ bool Player::IsTwoHandUsed() const
     return mainItem && mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
 }
 
+bool Player::IsUsingStaff() const
+{
+    Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    return mainItem &&
+        mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON &&
+        mainItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_STAFF;
+}
+
 bool Player::IsUsingTwoHandedWeaponInOneHand() const
 {
     Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);

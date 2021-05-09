@@ -2591,6 +2591,12 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
         int32 reflectchance = victim->GetTotalAuraModifier(SPELL_AURA_REFLECT_SPELLS);
         reflectchance += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_REFLECT_SPELLS_SCHOOL, spellInfo->GetSchoolMask());
 
+        // 180127 - Standard Bearer: Chance to reflect spell damage
+        if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180127) && victim->ToPlayer()->IsUsingStaff())
+        {
+            reflectchance = 100;
+        }
+
         if (reflectchance > 0 && roll_chance_i(reflectchance))
             return SPELL_MISS_REFLECT;
     }
