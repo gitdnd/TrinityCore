@@ -4665,7 +4665,7 @@ class spell_verdant_dreamer_periodic_aura : public AuraScript
         if (!player)
             return;
 
-        int32 reduction = (player->GetStat(STAT_SPIRIT) * 0.05) * -1;
+        int32 reduction = (player->GetStat(STAT_SPIRIT) * 0.05f) * -1;
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
@@ -4678,6 +4678,36 @@ class spell_verdant_dreamer_periodic_aura : public AuraScript
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_verdant_dreamer_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
+
+class spell_saving_grace : public SpellScriptLoader
+{
+public:
+    spell_saving_grace() : SpellScriptLoader("spell_saving_grace") { }
+
+    class spell_saving_grace_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_saving_grace_AuraScript);
+
+        void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+        {
+            if (GetTarget()->GetHealthPct() <= 50)
+            {
+                AddPct(amount, 10);
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_saving_grace_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_saving_grace_AuraScript();
+    }
+};
+
 
 void AddSC_generic_spell_scripts()
 {
@@ -4817,4 +4847,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_second_wind_health_aura);
     RegisterAuraScript(spell_perseverance_health_aura);
     RegisterAuraScript(spell_verdant_dreamer_periodic_aura);
+    new spell_saving_grace();
 }
