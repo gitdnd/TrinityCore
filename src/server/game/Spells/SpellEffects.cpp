@@ -1295,7 +1295,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
     int32 addhealth = damage;
 
     // Talent: Saving Grace: Heal 10% extra on targets below 50% health
-    if (m_spellInfo->Id == 180139 && unitTarget->GetHealthPct() <= 50)
+    if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
     {
         AddPct(addhealth, 10);
     }
