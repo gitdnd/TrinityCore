@@ -359,7 +359,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             // Talent: Calculated: Increase magic damage done by 25% when above 70% mana
             if (unitCaster->HasSpell(180140))
             {
-                int32 manaPct = (unitCaster->GetPower(POWER_MANA) / unitCaster->GetMaxPower(POWER_MANA)) * 100;
+                int32 manaPct = std::floor((float(unitCaster->GetPower(POWER_MANA)) / float(unitCaster->GetMaxPower(POWER_MANA))) * 100.0f);
                 if (manaPct >= 70)
                 {
                     AddPct(damage, 25);
