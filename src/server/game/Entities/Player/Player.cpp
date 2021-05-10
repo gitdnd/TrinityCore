@@ -2105,6 +2105,12 @@ void Player::Regenerate(Powers power)
             break;
         case POWER_FOCUS:
             addvalue += (0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS))*0.5f;
+
+            // Talent: Nesingwary's Track: Increases Focus Regeneration by 10%
+            if (HasSpell(180094))
+            {
+                addvalue = addvalue * 1.1f;
+            }
             break;
         case POWER_RUNIC_POWER:
         {
