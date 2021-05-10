@@ -1294,9 +1294,14 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
     int32 addhealth = damage;
 
+    // Talent: Saving Grace: Heal 10% extra on targets below 50% health
+    if (m_spellInfo->Id == 180139 && unitTarget->GetHealthPct() <= 50)
+    {
+        AddPct(addhealth, 10);
+    }
     // Vessel of the Naaru (Vial of the Sunwell trinket)
     ///@todo: move this to scripts
-    if (m_spellInfo->Id == 45064)
+    else if (m_spellInfo->Id == 45064)
     {
         // Amount of heal - depends from stacked Holy Energy
         int32 damageAmount = 0;
