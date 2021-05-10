@@ -354,6 +354,18 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 damage = damage * modifier;
             }
         }
+        else if (unitCaster->ToPlayer())
+        {
+            // Talent: Calculated: Increase magic damage done by 25% when above 70% mana
+            if (unitCaster->HasSpell(180140))
+            {
+                int32 manaPct = (unitCaster->GetPower(POWER_MANA) / unitCaster->GetMaxPower(POWER_MANA)) * 100;
+                if (manaPct >= 70)
+                {
+                    AddPct(damage, 25);
+                }
+            }
+        }
 
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
