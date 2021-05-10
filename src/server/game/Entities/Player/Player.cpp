@@ -2077,7 +2077,7 @@ void Player::Regenerate(Powers power)
             // Talent: Eureka: Increases mana regeneration by 25% when below 30% mana
             if (HasSpell(180141))
             {
-                int32 percent = (curValue / maxValue) * 100;
+                int32 percent = std::floor((float(curValue) / float(maxValue)) * 100.0f);
                 if (percent < 30)
                 {
                     bonusRate = 1.25f;
