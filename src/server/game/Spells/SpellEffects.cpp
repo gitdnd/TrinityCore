@@ -3373,6 +3373,12 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
     if (!unitTarget->CanHaveThreatList())
         return;
 
+    // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 5%
+    if (unitCaster->HasSpell(180088))
+    {
+        AddPct(damage, 5);
+    }
+
     unitTarget->GetThreatManager().AddThreat(unitCaster, float(damage), m_spellInfo, true);
 }
 
