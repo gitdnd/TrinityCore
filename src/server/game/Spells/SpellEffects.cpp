@@ -354,7 +354,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 damage = damage * modifier;
             }
         }
-        else if (unitCaster->ToPlayer())
+        else if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
         {
             // Talent: Calculated: Increase magic damage done by 25% when above 70% mana
             if (unitCaster->HasSpell(180140))
@@ -364,6 +364,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 {
                     AddPct(damage, 25);
                 }
+            }
+            // Talent: Ascent of the Archmage: Increases your spell damage by 5%
+            if (unitCaster->HasSpell(180148))
+            {
+                AddPct(damage, 5);
             }
         }
 
