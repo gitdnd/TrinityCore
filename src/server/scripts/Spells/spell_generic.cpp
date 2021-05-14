@@ -4695,7 +4695,7 @@ class spell_warlords_charge_periodic_aura : public AuraScript
         if (!player)
             return;
 
-        int32 bonus = (player->GetStat(STAT_STAMINA) * 0.33f);
+        int32 bonus = (player->GetStat(STAT_STAMINA) * 0.1f);
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
