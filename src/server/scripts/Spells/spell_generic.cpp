@@ -4731,8 +4731,8 @@ class spell_point_blank_periodic_aura : public AuraScript
 
         float distance = caster->GetDistance(target);
         int32 amount = ((20.0f - distance) * 0.5f);
-        amount = std::min(-10, amount);
-        amount = std::max(10, amount);
+        amount = std::max(-10, amount);
+        amount = std::min(10, amount);
 
         std::ostringstream stream;
         stream << "Modifying ranged % damage by: " << amount;
