@@ -41,7 +41,6 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include <World\World.h>
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4734,10 +4733,6 @@ class spell_point_blank_periodic_aura : public AuraScript
         amount = std::max(-10, amount);
         amount = std::min(10, amount);
 
-        std::ostringstream stream;
-        stream << "Modifying ranged % damage by: " << amount;
-        sWorld->SendGlobalText(stream.str().c_str(), nullptr);
-
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
         args.AddSpellBP0(amount);
@@ -4747,6 +4742,42 @@ class spell_point_blank_periodic_aura : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_point_blank_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_dead_eye_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dead_eye_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* caster = GetTarget()->ToPlayer();
+        Unit* target = caster->GetSelectedUnit();
+        if (!target)
+            return;
+        if (target == caster)
+            return;
+
+        float distance = caster->GetDistance(target);
+        int32 amount = ((20.0f - distance) * 0.5f) * -1;
+        amount = std::max(-10, amount);
+        amount = std::min(10, amount);
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(amount);
+        caster->CastSpell(caster, 180158, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dead_eye_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -4890,4 +4921,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_verdant_dreamer_periodic_aura);
     RegisterAuraScript(spell_warlords_charge_periodic_aura);
     RegisterAuraScript(spell_point_blank_periodic_aura);
+    RegisterAuraScript(spell_dead_eye_periodic_aura);
 }
