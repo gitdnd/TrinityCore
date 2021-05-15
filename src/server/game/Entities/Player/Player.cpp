@@ -18096,6 +18096,16 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     _LoadRandomBGStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG));
 
     // after spell and quest load
+    // Override free talents with new system
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NUM_TALENTS_FREE);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        m_usedTalentCount = fields[0].GetUInt32();
+    }
+
     InitTalentForLevel();
     LearnDefaultSkills();
     LearnCustomSpells();
@@ -26546,16 +26556,6 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     m_usedTalentCount = spentTalents;
-
-    // Override free talents with new system
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NUM_TALENTS_FREE);
-    stmt->setUInt32(0, GetGUID().GetCounter());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-    if (result)
-    {
-        Field* fields = result->Fetch();
-        m_usedTalentCount = fields[0].GetUInt32();
-    }
 
     InitTalentForLevel();
 
