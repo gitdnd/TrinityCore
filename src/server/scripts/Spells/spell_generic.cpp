@@ -4721,26 +4721,22 @@ class spell_point_blank_periodic_aura : public AuraScript
     void PeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        Player* player = GetTarget()->ToPlayer();
-        if (!player)
+        Player* caster = GetTarget()->ToPlayer();
+        Unit* target = caster->GetSelectedUnit();
+        if (!target)
             return;
-        Unit* caster = aurEff->GetCaster();
-        if (!caster)
+        if (target == caster)
             return;
 
-        int32 amount = 0;
-        if (player != caster)
-        {
-            float distance = caster->GetDistance(player);
-            amount = ((20.0f - distance) * 0.5f);
-            amount = std::min(-10, amount);
-            amount = std::max(10, amount);
-        }
+        float distance = caster->GetDistance(target);
+        int32 amount = ((20.0f - distance) * 0.5f);
+        amount = std::min(-10, amount);
+        amount = std::max(10, amount);
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
         args.AddSpellBP0(amount);
-        player->CastSpell(player, 180156, args);
+        caster->CastSpell(caster, 180156, args);
     }
 
     void Register() override
