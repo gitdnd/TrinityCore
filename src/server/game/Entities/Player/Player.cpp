@@ -18097,9 +18097,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     // after spell and quest load
     // Override free talents with new system
-    CharacterDatabasePreparedStatement* freeTalentStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NUM_TALENTS_FREE);
-    freeTalentStmt->setUInt32(0, GetGUID().GetCounter());
-    PreparedQueryResult usedTalentResult = CharacterDatabase.Query(freeTalentStmt);
+    PreparedQueryResult usedTalentResult = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
     if (usedTalentResult)
     {
         m_usedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
