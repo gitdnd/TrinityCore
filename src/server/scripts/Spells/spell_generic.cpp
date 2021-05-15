@@ -41,6 +41,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include <World\World.h>
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4732,6 +4733,10 @@ class spell_point_blank_periodic_aura : public AuraScript
         int32 amount = ((20.0f - distance) * 0.5f);
         amount = std::min(-10, amount);
         amount = std::max(10, amount);
+
+        std::ostringstream stream;
+        stream << "Modifying ranged % damage by: " << amount;
+        sWorld->SendGlobalText(stream.str().c_str(), nullptr);
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
