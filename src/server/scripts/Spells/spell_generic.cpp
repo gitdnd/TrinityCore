@@ -4709,6 +4709,46 @@ class spell_warlords_charge_periodic_aura : public AuraScript
     }
 };
 
+class spell_point_blank_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_point_blank_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+        Unit* caster = aurEff->GetCaster();
+        if (!caster)
+            return;
+
+        int32 amount = 0;
+        if (player != caster)
+        {
+            float distance = caster->GetDistance(player);
+            amount = ((20.0f - distance) * 0.5f);
+            amount = std::min(-10, amount);
+            amount = std::max(10, amount);
+        }
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(amount);
+        player->CastSpell(player, 180156, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_point_blank_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4848,4 +4888,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_perseverance_health_aura);
     RegisterAuraScript(spell_verdant_dreamer_periodic_aura);
     RegisterAuraScript(spell_warlords_charge_periodic_aura);
+    RegisterAuraScript(spell_point_blank_periodic_aura);
 }
