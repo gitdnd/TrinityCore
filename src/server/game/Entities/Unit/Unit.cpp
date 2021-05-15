@@ -1761,7 +1761,8 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
             if (!(aurEff->GetMiscValue() & damageInfo.GetSchoolMask()))
                 return false;
 
-            if (!aurEff->IsAffectedOnSpell(damageInfo.GetSpellInfo()))
+            // Talent: Lightbringer's Oath: Increase absorbtion by 10%
+            if (!aurEff->IsAffectedOnSpell(damageInfo.GetSpellInfo()) && (damageInfo.GetSpellInfo()->Id != 180088))
                 return false;
 
             return true;
