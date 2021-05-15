@@ -5357,6 +5357,12 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 uint32 Player::GetShieldBlockValue() const
 {
     float value = std::max(0.f, (m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
+    // Talent: Primed: Allows you to block with a two-handed melee weapon
+    if (HasSpell(180160) && IsTwoHandUsed())
+    {
+        float blockValue = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->GetItemLevel() * 0.93f;
+        value = std::max(0.f, value * blockValue);
+    }
     return uint32(value);
 }
 

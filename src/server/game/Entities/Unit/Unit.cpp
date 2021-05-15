@@ -2669,6 +2669,7 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
                 skillBonus = 0.04f * skillDiff;
             }
+            // Talent: Primed: Allows you to block with a two-handed melee weapon
             else if (playerVictim->HasSpell(180160) && playerVictim->IsTwoHandUsed())
             {
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
