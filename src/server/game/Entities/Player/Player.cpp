@@ -26546,6 +26546,17 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     m_usedTalentCount = spentTalents;
+
+    // Override free talents with new system
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NUM_TALENTS_FREE);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        m_usedTalentCount = fields[0].GetUInt32();
+    }
+
     InitTalentForLevel();
 
     // load them asynchronously

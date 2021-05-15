@@ -626,6 +626,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_ITEM_LEVEL_SLOTS, "SELECT head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged FROM character_slot_max_level WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_ITEM_LEVEL_SLOTS, "REPLACE INTO character_slot_max_level (guid, head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_ITEM_LEVEL_SLOTS, "DELETE FROM character_slot_max_level WHERE guid = ?", CONNECTION_ASYNC);
+
+    PrepareStatement(CHAR_SEL_NUM_TALENTS_FREE, "SELECT COUNT(*) FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
