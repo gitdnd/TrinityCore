@@ -2202,6 +2202,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool HasGemSpell(uint32 spell);
         void AddGemSpell(uint32 spell) { m_GemSpells.push_back(spell); }
         uint32 ItemLevelForSlot(uint8 slot);
+
+        void ClearInactiveGemSpells();
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
