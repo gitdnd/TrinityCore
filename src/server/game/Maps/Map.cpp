@@ -606,6 +606,7 @@ bool Map::AddPlayerToMap(Player* player)
         ConvertCorpseToBones(player->GetGUID());
 
     sScriptMgr->OnPlayerEnterMap(this, player);
+    player->ClearInactiveGemSpells();
     return true;
 }
 
