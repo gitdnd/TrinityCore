@@ -27453,6 +27453,7 @@ void Player::IncreaseUsedTalentCount()
 
 void Player::ClearInactiveGemSpells()
 {
+    /*
     std::vector<uint32> toRemove;
     for (std::vector<uint32>::size_type i = 0; i != m_GemSpells.size(); i++)
     {
@@ -27472,5 +27473,5 @@ void Player::ClearInactiveGemSpells()
     {
         m_GemSpells.erase(m_GemSpells.begin() + itr);
     }
-    toRemove.clear();
+    toRemove.clear();*/
 }
