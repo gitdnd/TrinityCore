@@ -26266,6 +26266,7 @@ void Player::SetMap(Map* map)
 {
     Unit::SetMap(map);
     m_mapRef.link(map, this);
+    ClearInactiveGemSpells();
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)
@@ -27444,8 +27445,33 @@ bool Player::HasGemSpell(uint32 spell)
     return i != m_GemSpells.end();
 }
 
+
 void Player::IncreaseUsedTalentCount()
 {
     ++m_usedTalentCount;
     InitTalentForLevel();
+}
+
+void Player::ClearInactiveGemSpells()
+{
+    std::vector<uint32> toRemove;
+    for (std::vector<uint32>::size_type i = 0; i != m_GemSpells.size(); i++)
+    {
+        if (HasAura(m_GemSpells[i]))
+            continue;
+
+        toRemove.push_back(i);
+    }
+
+    for (auto & itr : m_GemSpells)
+    {
+        if (HasAura(itr))
+            continue;
+        toRemove.push_back(itr);
+    }
+    for (auto& itr : toRemove)
+    {
+        m_GemSpells.erase(m_GemSpells.begin() + itr);
+    }
+    toRemove.clear();
 }
