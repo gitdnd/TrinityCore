@@ -12294,7 +12294,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         ApplyEquipCooldown(pItem2);
         UpdateCraftingSkill(pItem, slot);
-        CalculateTalentsPoints();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem2, bag, slot);
 #endif
@@ -27443,4 +27442,10 @@ bool Player::HasGemSpell(uint32 spell)
 {
     auto i = std::find(m_GemSpells.begin(), m_GemSpells.end(), spell);
     return i != m_GemSpells.end();
+}
+
+void Player::IncreaseUsedTalentCount()
+{
+    ++m_usedTalentCount;
+    InitTalentForLevel();
 }

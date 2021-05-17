@@ -4305,5 +4305,11 @@ namespace LuaPlayer
         }
         return 0;
     }
+
+    int IncreaseUsedTalentCount(lua_State* L, Player* player)
+    {
+        player->IncreaseUsedTalentCount();
+        return 0;
+    }
 };
 #endif

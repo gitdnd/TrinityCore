@@ -773,6 +773,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "RemoveTalentPassives", &LuaPlayer::RemoveTalentPassives },
     { "IsStackingSpell", &LuaPlayer::IsStackingSpell },
     { "IncreaseSpellAuraStack", &LuaPlayer::IncreaseSpellAuraStack },
+    { "IncreaseUsedTalentCount", &LuaPlayer::IncreaseUsedTalentCount },
 
     { NULL, NULL }
 };
