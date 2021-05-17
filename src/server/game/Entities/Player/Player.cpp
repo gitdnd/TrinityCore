@@ -12294,6 +12294,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         ApplyEquipCooldown(pItem2);
         UpdateCraftingSkill(pItem, slot);
+        CalculateTalentsPoints();
 #ifdef ELUNA
         sEluna->OnEquip(this, pItem2, bag, slot);
 #endif
@@ -25238,7 +25239,7 @@ uint32 Player::CalculateTalentsPoints() const
     if (GetClass() == CLASS_ADVENTURER)
     {
         // Give a talent every 5 item levels
-        return floor(GetAverageItemLevel() / 5.0);
+        return std::floor(GetAverageItemLevel() / 5.0f);
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
