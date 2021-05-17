@@ -2591,8 +2591,21 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
         int32 reflectchance = victim->GetTotalAuraModifier(SPELL_AURA_REFLECT_SPELLS);
         reflectchance += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_REFLECT_SPELLS_SCHOOL, spellInfo->GetSchoolMask());
 
+        // 180127 - Standard Bearer: Chance to reflect spell damage
+        if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180127) && victim->ToPlayer()->IsUsingStaff())
+        {
+            reflectchance += 5;
+        }
+
         if (reflectchance > 0 && roll_chance_i(reflectchance))
             return SPELL_MISS_REFLECT;
+    }
+
+    // 180128 - Attentive: Chance to block spell damage
+    if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180128) && victim->ToPlayer()->IsUsingShield())
+    {
+        if (roll_chance_i(5))
+            return SPELL_MISS_BLOCK;
     }
 
     if (spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))

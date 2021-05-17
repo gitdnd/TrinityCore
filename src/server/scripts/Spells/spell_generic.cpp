@@ -4625,8 +4625,6 @@ class spell_second_wind_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // The event info spell is the spell that hit the player rather than the proc spell
-        // Hardcode the threshold because of this
         return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
     }
 
@@ -4642,14 +4640,144 @@ class spell_perseverance_health_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // The event info spell is the spell that hit the player rather than the proc spell
-        // Hardcode the threshold because of this
         return uint32(std::floor(GetTarget()->GetHealthPct())) <= 20;
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_perseverance_health_aura::CheckProc);
+    }
+};
+
+class spell_verdant_dreamer_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_verdant_dreamer_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+
+        int32 reduction = (player->GetStat(STAT_SPIRIT) * 0.05f) * -1;
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(reduction);
+        player->CastSpell(player, 180136, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_verdant_dreamer_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_warlords_charge_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_warlords_charge_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+
+        int32 bonus = (player->GetStat(STAT_STAMINA) * 0.1f);
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(bonus);
+        player->CastSpell(player, 180150, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_warlords_charge_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_point_blank_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_point_blank_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* caster = GetTarget()->ToPlayer();
+        Unit* target = caster->GetSelectedUnit();
+        if (!target)
+            return;
+        if (target == caster)
+            return;
+
+        float distance = caster->GetDistance(target);
+        int32 amount = ((20.0f - distance) * 0.5f);
+        amount = std::max(-10, amount);
+        amount = std::min(10, amount);
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(amount);
+        caster->CastSpell(caster, 180156, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_point_blank_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_dead_eye_periodic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dead_eye_periodic_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        Player* caster = GetTarget()->ToPlayer();
+        Unit* target = caster->GetSelectedUnit();
+        if (!target)
+            return;
+        if (target == caster)
+            return;
+
+        float distance = caster->GetDistance(target);
+        int32 amount = ((20.0f - distance) * 0.5f) * -1;
+        amount = std::max(-10, amount);
+        amount = std::min(10, amount);
+
+        CastSpellExtraArgs args(aurEff);
+        args.OriginalCaster = GetCasterGUID();
+        args.AddSpellBP0(amount);
+        caster->CastSpell(caster, 180158, args);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dead_eye_periodic_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -4790,4 +4918,8 @@ void AddSC_generic_spell_scripts()
     new spell_respiratory_pause();
     RegisterAuraScript(spell_second_wind_health_aura);
     RegisterAuraScript(spell_perseverance_health_aura);
+    RegisterAuraScript(spell_verdant_dreamer_periodic_aura);
+    RegisterAuraScript(spell_warlords_charge_periodic_aura);
+    RegisterAuraScript(spell_point_blank_periodic_aura);
+    RegisterAuraScript(spell_dead_eye_periodic_aura);
 }

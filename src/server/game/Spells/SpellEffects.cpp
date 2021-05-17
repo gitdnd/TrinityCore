@@ -354,6 +354,23 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 damage = damage * modifier;
             }
         }
+        else if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+        {
+            // Talent: Calculated: Increase magic damage done by 25% when above 70% mana
+            if (unitCaster->HasSpell(180140))
+            {
+                int32 manaPct = std::floor((float(unitCaster->GetPower(POWER_MANA)) / float(unitCaster->GetMaxPower(POWER_MANA))) * 100.0f);
+                if (manaPct >= 70)
+                {
+                    AddPct(damage, 25);
+                }
+            }
+            // Talent: Ascent of the Archmage: Increases your spell damage by 5%
+            if (unitCaster->HasSpell(180148))
+            {
+                AddPct(damage, 5);
+            }
+        }
 
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
@@ -1294,9 +1311,14 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
     int32 addhealth = damage;
 
+    // Talent: Saving Grace: Heal 10% extra on targets below 50% health
+    if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
+    {
+        AddPct(addhealth, 10);
+    }
     // Vessel of the Naaru (Vial of the Sunwell trinket)
     ///@todo: move this to scripts
-    if (m_spellInfo->Id == 45064)
+    else if (m_spellInfo->Id == 45064)
     {
         // Amount of heal - depends from stacked Holy Energy
         int32 damageAmount = 0;
@@ -3350,6 +3372,12 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
 
     if (!unitTarget->CanHaveThreatList())
         return;
+
+    // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 5%
+    if (unitCaster->HasSpell(180088))
+    {
+        AddPct(damage, 5);
+    }
 
     unitTarget->GetThreatManager().AddThreat(unitCaster, float(damage), m_spellInfo, true);
 }

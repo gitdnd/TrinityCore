@@ -1761,7 +1761,8 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
             if (!(aurEff->GetMiscValue() & damageInfo.GetSchoolMask()))
                 return false;
 
-            if (!aurEff->IsAffectedOnSpell(damageInfo.GetSpellInfo()))
+            // Talent: Lightbringer's Oath: Increase absorbtion by 10%
+            if (!aurEff->IsAffectedOnSpell(damageInfo.GetSpellInfo()) && (damageInfo.GetSpellInfo()->Id != 180088))
                 return false;
 
             return true;
@@ -2665,6 +2666,12 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
         {
             Item* tmpitem = playerVictim->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
             if (tmpitem && !tmpitem->IsBroken() && tmpitem->GetTemplate()->Block)
+            {
+                chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
+                skillBonus = 0.04f * skillDiff;
+            }
+            // Talent: Primed: Allows you to block with a two-handed melee weapon
+            else if (playerVictim->HasSpell(180160) && playerVictim->IsTwoHandUsed())
             {
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
                 skillBonus = 0.04f * skillDiff;

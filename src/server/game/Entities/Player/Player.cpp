@@ -2072,14 +2072,25 @@ void Player::Regenerate(Powers power)
         {
             bool recentCast = IsUnderLastManaUseEffect();
             float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
+            float bonusRate = 1.0f;
+
+            // Talent: Eureka: Increases mana regeneration by 25% when below 30% mana
+            if (HasSpell(180141))
+            {
+                int32 percent = std::floor((float(curValue) / float(maxValue)) * 100.0f);
+                if (percent < 30)
+                {
+                    bonusRate = 1.25f;
+                }
+            }
 
             if (GetLevel() < 15)
                 ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (GetLevel() * 0.066f));
 
             if (recentCast) // Trinity Updates Mana in intervals of 2s, which is correct
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * 0.001f * m_regenTimer;
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * 0.001f * m_regenTimer * bonusRate;
             else
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 0.001f * m_regenTimer;
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 0.001f * m_regenTimer * bonusRate;
         }   break;
         case POWER_RAGE:                                    // Regenerate rage
         {
@@ -2094,6 +2105,12 @@ void Player::Regenerate(Powers power)
             break;
         case POWER_FOCUS:
             addvalue += (0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS))*0.5f;
+
+            // Talent: Nesingwary's Track: Increases Focus Regeneration by 10%
+            if (HasSpell(180094))
+            {
+                addvalue = addvalue * 1.1f;
+            }
             break;
         case POWER_RUNIC_POWER:
         {
@@ -5340,6 +5357,12 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 uint32 Player::GetShieldBlockValue() const
 {
     float value = std::max(0.f, (m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
+    // Talent: Primed: Allows you to block with a two-handed melee weapon
+    if (HasSpell(180160) && IsTwoHandUsed())
+    {
+        float blockValue = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->GetItemLevel() * 0.93f;
+        value = std::max(0.f, value * blockValue);
+    }
     return uint32(value);
 }
 
@@ -13615,6 +13638,22 @@ bool Player::IsTwoHandUsed() const
     return mainItem && mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
 }
 
+bool Player::IsUsingStaff() const
+{
+    Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    return mainItem &&
+        mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON &&
+        mainItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_STAFF;
+}
+
+bool Player::IsUsingShield() const
+{
+    Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    return offItem &&
+        offItem->GetTemplate()->InventoryType == INVTYPE_SHIELD &&
+        offItem->GetTemplate()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD;
+}
+
 bool Player::IsUsingTwoHandedWeaponInOneHand() const
 {
     Item* offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
@@ -18057,6 +18096,12 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     _LoadRandomBGStatus(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG));
 
     // after spell and quest load
+    // Override free talents with new system
+    PreparedQueryResult usedTalentResult = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
+    if (usedTalentResult)
+    {
+        m_usedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
+    }
     InitTalentForLevel();
     LearnDefaultSkills();
     LearnCustomSpells();
@@ -26508,6 +26553,7 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     m_usedTalentCount = spentTalents;
+
     InitTalentForLevel();
 
     // load them asynchronously

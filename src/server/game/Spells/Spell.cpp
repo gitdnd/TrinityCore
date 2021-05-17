@@ -2370,6 +2370,20 @@ void Spell::TargetInfo::PreprocessTarget(Spell* spell)
             spell->m_damage = 0;
             spell->m_healing = 0;
             _spellHitTarget = nullptr;
+
+            // Concentrate Talent implementation: On spell miss, proc
+            if (spell->m_caster->ToPlayer() && spell->m_caster->ToPlayer()->HasSpell(180118))
+            {
+                spell->m_caster->CastSpell(spell->m_caster, 180119);
+            }
+        }
+    }
+    else
+    {
+        // Concentrate Talent implementation: On spell miss, proc
+        if (spell->m_caster->ToPlayer() && spell->m_caster->ToPlayer()->HasSpell(180118))
+        {
+            spell->m_caster->CastSpell(spell->m_caster, 180119);
         }
     }
 
@@ -7165,6 +7179,10 @@ void Spell::Delayed() // only called in DealDamage()
         return;
 
     if (IsDelayableNoMore())                                 // Spells may only be delayed twice
+        return;
+
+    // Talent Zealous: 15% chance to avoid interruption while casting
+    if (playerCaster->HasSpell(180132) && roll_chance_i(15))
         return;
 
     //check pushback reduce
