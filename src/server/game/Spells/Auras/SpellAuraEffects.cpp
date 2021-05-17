@@ -5120,6 +5120,12 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
     sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
 
+    // Talent: Perpetuity: Increase the damage dealt by your damage over time effects by 5%
+    if (caster && caster->HasSpell(180131))
+    {
+        AddPct(damage, 5);
+    }
+
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
         // leave only target depending bonuses, rest is handled in calculate amount
