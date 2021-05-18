@@ -8587,7 +8587,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 {
                     loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true);
                     // Gems
-                    uint32 gemCount = item->GetGemCountWithLimitCategory(2);
+                    uint32 gemCount = item->GetGemCountWithLimitCategory(0);
                     if (gemCount > 0)
                     {
                         for (int i = 0; i < gemCount; ++i)
