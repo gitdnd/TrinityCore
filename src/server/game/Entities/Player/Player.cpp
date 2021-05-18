@@ -8585,6 +8585,16 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             {
                 case LOOT_DISENCHANTING:
                     loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true);
+                    // Gems
+                    uint32 gemCount = item->GetGemCountWithLimitCategory(2);
+                    if (gemCount > 0)
+                    {
+                        for (int i = 0; i < gemCount; ++i)
+                        {
+                            LootStoreItem item(59991, 0, 100, 0, 0, 0, 2, 5);
+                            loot->AddItem(item);
+                        }
+                    }
                     break;
                 case LOOT_PROSPECTING:
                     loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this, true);
