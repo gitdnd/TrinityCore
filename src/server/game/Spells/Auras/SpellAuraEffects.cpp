@@ -5820,7 +5820,7 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
             data << uint32(triggerSpellId);
             data << uint16(0);
             pT->SendDirectMessage(&data);
-            pT->AddGemSpell(triggerSpellId);
+            pT->AddGemSpell(GetSpellInfo()->Id);
         }
         else
         {
