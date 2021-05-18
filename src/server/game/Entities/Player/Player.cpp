@@ -8584,6 +8584,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             switch (loot_type)
             {
                 case LOOT_DISENCHANTING:
+                {
                     loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true);
                     // Gems
                     uint32 gemCount = item->GetGemCountWithLimitCategory(2);
@@ -8596,6 +8597,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                         }
                     }
                     break;
+                }
                 case LOOT_PROSPECTING:
                     loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this, true);
                     break;
