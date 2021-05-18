@@ -8586,15 +8586,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 case LOOT_DISENCHANTING:
                 {
                     loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true);
-                    // Gems
+                    // Reward shards when the item being disenchanted contains gems
                     uint32 gemCount = item->GetGemCountWithLimitCategory(0);
-                    if (gemCount > 0)
+                    for (int i = 0; i < gemCount; ++i)
                     {
-                        for (int i = 0; i < gemCount; ++i)
-                        {
-                            LootStoreItem item(59991, 0, 100, 0, 0, 0, 2, 5);
-                            loot->AddItem(item);
-                        }
+                        LootStoreItem item(59991, 0, 100, 0, 0, 0, 2, 5);
+                        loot->AddItem(item);
                     }
                     break;
                 }
