@@ -27466,3 +27466,36 @@ void Player::ClearInactiveGemSpells()
 
     toRemove.clear();
 }
+
+void Player::SendFakeCooldown(uint32 spell, uint32 duration)
+{
+    WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
+    data << uint64(GetGUID());
+    data << uint8(0);
+    data << uint32(spell);
+    data << uint32(duration);
+    SendDirectMessage(&data);
+}
+
+void Player::SendSpellRemoval(uint32 spell)
+{
+    WorldPacket data(SMSG_REMOVED_SPELL, 4);
+    data << uint32(spell);
+    SendDirectMessage(&data);
+}
+
+void Player::SendCooldownClear(uint32 spell)
+{
+    WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
+    data << uint32(spell);
+    data << uint64(GetGUID());
+    SendDirectMessage(&data);
+}
+
+void Player::SendSpellLearn(uint32 spell)
+{
+    WorldPacket data(SMSG_LEARNED_SPELL, 6);
+    data << uint32(spell);
+    data << uint16(0);
+    SendDirectMessage(&data);
+}

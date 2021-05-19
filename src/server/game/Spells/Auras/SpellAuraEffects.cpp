@@ -5813,23 +5813,19 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
     {
         if (pT->HasSpell(triggerSpellId))
             return;
+
         pT->AddTemporarySpell(triggerSpellId);
         if (!pT->HasGemSpell(triggerSpellId))
         {
-            WorldPacket data(SMSG_LEARNED_SPELL, 6);
-            data << uint32(triggerSpellId);
-            data << uint16(0);
-            pT->SendDirectMessage(&data);
+            pT->SendSpellLearn(triggerSpellId);
             pT->AddGemSpell(triggerSpellId, GetSpellInfo()->Id);
         }
         else
         {
-            if (pT->GetSpellHistory()->HasCooldown(sSpellMgr->GetSpellInfo(triggerSpellId)))
+            if (pT->GetSpellHistory()->HasCooldown(spell))
                 return; // Don't clear the cooldown
-            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
-            data << uint32(triggerSpellId);
-            data << uint64(pT->GetGUID());
-            pT->SendDirectMessage(&data);
+
+            pT->SendCooldownClear(triggerSpellId);
         }
 
     }
@@ -5838,25 +5834,13 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         ChatHandler(pT->GetSession()).PSendSysMessage("Unlearned: %s", spell->SpellName[LOCALE_enUS]);
         pT->RemoveTemporarySpell(triggerSpellId);
         pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
-        if (const SpellInfo* gemSpell = sSpellMgr->GetSpellInfo(triggerSpellId))
+        if (spell->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
         {
-            if (gemSpell->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
-            {
-                pT->RemoveGemSpell(triggerSpellId);
-                WorldPacket data(SMSG_REMOVED_SPELL, 4);
-                data << uint32(triggerSpellId);
-                pT->SendDirectMessage(&data);
-            }
-            else
-            {
-                WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
-                data << uint64(pT->GetGUID());
-                data << uint8(0);
-                data << uint32(triggerSpellId);
-                data << uint32(DAY * IN_MILLISECONDS);
-                pT->SendDirectMessage(&data);
-            }
+            pT->RemoveGemSpell(triggerSpellId);
+            pT->SendSpellRemoval(triggerSpellId);
         }
+        else
+            pT->SendFakeCooldown(triggerSpellId, DAY * IN_MILLISECONDS);
     }
 }
 

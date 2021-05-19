@@ -2207,6 +2207,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void RemoveGemSpell(uint32 spell) { m_GemSpells.erase(spell); }
         uint32 ItemLevelForSlot(uint8 slot);
         void IncreaseUsedTalentCount();
+        void SendFakeCooldown(uint32 spell, uint32 duration);
+        void SendSpellRemoval(uint32 spell);
+        void SendCooldownClear(uint32 spell);
+        void SendSpellLearn(uint32 spell);
 
         void ClearInactiveGemSpells();
     protected:
