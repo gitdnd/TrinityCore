@@ -2204,6 +2204,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void RemoveArmorPassives();
         bool Player::HasGemSpell(uint32 spell) { return m_GemSpells.find(spell) != m_GemSpells.end(); }
         void AddGemSpell(uint32 spell, uint32 aura) { m_GemSpells.insert(std::make_pair(spell, aura)); }
+        void RemoveGemSpell(uint32 spell) { m_GemSpells.erase(spell); }
         uint32 ItemLevelForSlot(uint8 slot);
         void IncreaseUsedTalentCount();
 

@@ -5838,17 +5838,25 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         ChatHandler(pT->GetSession()).PSendSysMessage("Unlearned: %s", spell->SpellName[LOCALE_enUS]);
         pT->RemoveTemporarySpell(triggerSpellId);
         pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
-        WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
-        data << uint64(pT->GetGUID());
-        data << uint8(0);
-        data << uint32(triggerSpellId);
-        data << uint32(DAY*IN_MILLISECONDS);
-        pT->SendDirectMessage(&data);
-        //if (pT->IsLoading() || pT->GetSession()->isLogingOut())
-            //return;
-        //WorldPacket data(SMSG_REMOVED_SPELL, 4);
-        //data << uint32(triggerSpellId);
-        //pT->SendDirectMessage(&data);
+        if (const SpellInfo* gemSpell = sSpellMgr->GetSpellInfo(triggerSpellId))
+        {
+            if (gemSpell->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
+            {
+                pT->RemoveGemSpell(triggerSpellId);
+                WorldPacket data(SMSG_REMOVED_SPELL, 4);
+                data << uint32(triggerSpellId);
+                pT->SendDirectMessage(&data);
+            }
+            else
+            {
+                WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4);
+                data << uint64(pT->GetGUID());
+                data << uint8(0);
+                data << uint32(triggerSpellId);
+                data << uint32(DAY * IN_MILLISECONDS);
+                pT->SendDirectMessage(&data);
+            }
+        }
     }
 }
 
