@@ -27438,13 +27438,6 @@ void Player::RemoveArmorPassives()
         RemoveAura(spells[i]);
 }
 
-bool Player::HasGemSpell(uint32 spell)
-{
-    auto i = std::find(m_GemSpells.begin(), m_GemSpells.end(), spell);
-    return i != m_GemSpells.end();
-}
-
-
 void Player::IncreaseUsedTalentCount()
 {
     ++m_usedTalentCount;
@@ -27453,25 +27446,14 @@ void Player::IncreaseUsedTalentCount()
 
 void Player::ClearInactiveGemSpells()
 {
-    /*
-    std::vector<uint32> toRemove;
-    for (std::vector<uint32>::size_type i = 0; i != m_GemSpells.size(); i++)
+    std::list<uint32> toRemove;
+    for (auto iter = m_GemSpells.begin(); iter != m_GemSpells.end(); ++iter)
     {
-        if (HasAura(m_GemSpells[i]))
-            continue;
+        if (!HasAura(iter->second))
+            toRemove.push_back(iter->first);
+    }
+    for (auto itertwo = toRemove.begin(); itertwo != toRemove.end(); ++itertwo)
+        m_GemSpells.erase(*itertwo);
 
-        toRemove.push_back(i);
-    }
-
-    for (auto & itr : m_GemSpells)
-    {
-        if (HasAura(itr))
-            continue;
-        toRemove.push_back(itr);
-    }
-    for (auto& itr : toRemove)
-    {
-        m_GemSpells.erase(m_GemSpells.begin() + itr);
-    }
-    toRemove.clear();*/
+    toRemove.clear();
 }

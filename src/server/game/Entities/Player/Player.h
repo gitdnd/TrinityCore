@@ -2202,8 +2202,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetEquippedItemsOfArmorType(uint8 type);
         void UpdateArmorPassives();
         void RemoveArmorPassives();
-        bool HasGemSpell(uint32 spell);
-        void AddGemSpell(uint32 spell) { m_GemSpells.push_back(spell); }
+        bool Player::HasGemSpell(uint32 spell) { return m_GemSpells.find(spell) != m_GemSpells.end(); }
+        void AddGemSpell(uint32 spell, uint32 aura) { m_GemSpells.insert(std::make_pair(spell, aura)); }
         uint32 ItemLevelForSlot(uint8 slot);
         void IncreaseUsedTalentCount();
 
@@ -2466,7 +2466,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         TimeTrackerSmall m_groupUpdateTimer;
 
-        std::vector<uint32> m_GemSpells;
+        std::unordered_map<uint32,uint32> m_GemSpells;
     private:
         // internal common parts for CanStore/StoreItem functions
         InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;

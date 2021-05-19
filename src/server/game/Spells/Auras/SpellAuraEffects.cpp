@@ -5814,13 +5814,13 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         if (pT->HasSpell(triggerSpellId))
             return;
         pT->AddTemporarySpell(triggerSpellId);
-        if (!pT->HasGemSpell(GetSpellInfo()->Id))
+        if (!pT->HasGemSpell(triggerSpellId))
         {
             WorldPacket data(SMSG_LEARNED_SPELL, 6);
             data << uint32(triggerSpellId);
             data << uint16(0);
             pT->SendDirectMessage(&data);
-            pT->AddGemSpell(GetSpellInfo()->Id);
+            pT->AddGemSpell(triggerSpellId, GetSpellInfo()->Id);
         }
         else
         {
