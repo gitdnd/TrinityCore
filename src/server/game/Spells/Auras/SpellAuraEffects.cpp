@@ -5854,14 +5854,14 @@ void AuraEffect::HandleDamageSchoolBonus(AuraApplication const* aurApp, uint8 mo
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    uint32 school = GetMiscValue();
+    SpellSchools school = SpellSchools(GetMiscValue());
     if (school < 0 || school >= MAX_SPELL_SCHOOL)
         return;
 
-    float amount = target->GetBonusSchoolModifierPct(SpellSchools(school));
+    float amount = target->GetBonusSchoolModifierPct(school);
     amount = apply ? amount + GetAmount() : amount - GetAmount();
 
-    target->SetBonusSchoolModifierPct(SpellSchools(school), amount);
+    target->SetBonusSchoolModifierPct(school, amount);
 }
 
 template TC_GAME_API void AuraEffect::GetTargetList(std::list<Unit*>&) const;
