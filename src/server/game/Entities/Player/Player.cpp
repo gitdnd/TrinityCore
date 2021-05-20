@@ -25247,7 +25247,8 @@ uint32 Player::CalculateTalentsPoints() const
     if (GetClass() == CLASS_ADVENTURER)
     {
         // Give a talent every 5 item levels
-        return std::floor(GetAverageItemLevel() / 5.0f);
+        float ilevel = std::min(300.0f, GetAverageItemLevel());
+        return std::floor(ilevel / 5.0f);
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
