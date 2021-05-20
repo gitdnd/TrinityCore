@@ -700,7 +700,8 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
-    attacker->OnDamageDealMakeThisAnAuraHookSometimeLater(victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto);
+    if (attacker)
+        attacker->OnDamageDealMakeThisAnAuraHookSometimeLater(victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto);
 
     if (victim->GetTypeId() == TYPEID_PLAYER)
     {
@@ -6161,7 +6162,8 @@ void Unit::SetCharm(Unit* charm, bool apply)
     // Hook for OnHeal Event
     sScriptMgr->OnHeal(healer, victim, (uint32&)gain);
 
-    healer->OnHealDealMakeThisAnAuraHookSometimeLater(victim, (uint32&)gain, healInfo.GetSpellInfo());
+    if (healer)
+        healer->OnHealDealMakeThisAnAuraHookSometimeLater(victim, (uint32&)gain, healInfo.GetSpellInfo());
 
     Unit* unit = healer;
     if (healer && healer->GetTypeId() == TYPEID_UNIT && healer->IsTotem())
