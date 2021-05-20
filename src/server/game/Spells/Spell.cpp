@@ -7112,7 +7112,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < m_targets.GetItemTarget()->GetTemplate()->ItemLevel)
-                    return SPELL_FAILED_LEVEL_REQUIREMENT;
+                    return SPELL_FAILED_NO_VALID_TARGETS;
 
                 break;
             }
