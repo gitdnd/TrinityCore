@@ -3657,8 +3657,8 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
             RemovePetAura(petSpell);
 
     // free talent points
-    /*uint32 talentCosts = GetTalentSpellCost(spell_id);
-    if (talentCosts > 0 && giveTalentPoints)
+    uint32 talentCosts = GetTalentSpellCost(spell_id);
+    /*if (talentCosts > 0 && giveTalentPoints)
     {
         if (talentCosts < m_usedTalentCount)
             m_usedTalentCount -= talentCosts;
