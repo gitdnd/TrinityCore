@@ -2728,7 +2728,14 @@ void Player::InitTalentForLevel()
         }
         // else update amount of free points
         else
+        {
+            std::ostringstream str;
+            str << "Talent points for level - used talent count: " << talentPointsForLevel << ", " << m_usedTalentCount << "\n";
+            str << "Result: " << (talentPointsForLevel - m_usedTalentCount);
+            sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
             SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
+        }
     }
 
     if (!GetSession()->PlayerLoading())
@@ -25248,7 +25255,7 @@ uint32 Player::CalculateTalentsPoints() const
     {
         // Give a talent every 5 item levels
         float ilevel = std::min(300.0f, GetAverageItemLevel());
-        return std::floor(ilevel / 5.0f);
+        return uint32(std::floor(ilevel / 5.0f));
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
@@ -26561,7 +26568,7 @@ void Player::ActivateSpec(uint8 spec)
         SetGlyph(slot, glyph);
     }
 
-    m_usedTalentCount = spentTalents;
+    //m_usedTalentCount = spentTalents;
 
     InitTalentForLevel();
 
