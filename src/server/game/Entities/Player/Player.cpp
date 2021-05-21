@@ -2728,7 +2728,14 @@ void Player::InitTalentForLevel()
         }
         // else update amount of free points
         else
+        {
+            std::ostringstream str;
+            str << "Talent points for level - used talent count: " << talentPointsForLevel << ", " << m_usedTalentCount << "\n";
+            str << "Result: " << (talentPointsForLevel - m_usedTalentCount);
+            sWorld->SendGlobalText(str.str().c_str(), nullptr);
+
             SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
+        }
     }
 
     if (!GetSession()->PlayerLoading())
@@ -3415,7 +3422,7 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
     }
 
     // update used talent points count
-    m_usedTalentCount += talentCost;
+    //m_usedTalentCount += talentCost;
 
     // update free primary prof.points (if any, can be none in case GM .learn prof. learning)
     if (uint32 freeProfs = GetFreePrimaryProfessionPoints())
@@ -3651,13 +3658,13 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
 
     // free talent points
     uint32 talentCosts = GetTalentSpellCost(spell_id);
-    if (talentCosts > 0 && giveTalentPoints)
+    /*if (talentCosts > 0 && giveTalentPoints)
     {
         if (talentCosts < m_usedTalentCount)
             m_usedTalentCount -= talentCosts;
         else
             m_usedTalentCount = 0;
-    }
+    }*/
 
     // update free primary prof.points (if not overflow setting, can be in case GM use before .learn prof. learning)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
@@ -12388,6 +12395,9 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     // Now calculate new skill level based on cached item levels
     uint32 new_value = GetAverageItemLevel();
 
+    // Update players' talents whenever crafting skill changes
+    InitTalentForLevel();
+
     // If the new value is less than the old value, don't update.
     // This is done to make sure the players' average level doesn't drop.
     if (new_value < SkillValue)
@@ -12398,9 +12408,6 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
         new_value = 1;
     if (new_value > MaxValue)
         new_value = MaxValue;
-
-    // Update players' talents whenever crafting skill changes
-    InitTalentForLevel();
 
     SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, MaxValue));
     if (itr->second.uState != SKILL_NEW)
@@ -25248,7 +25255,7 @@ uint32 Player::CalculateTalentsPoints() const
     {
         // Give a talent every 5 item levels
         float ilevel = std::min(300.0f, GetAverageItemLevel());
-        return std::floor(ilevel / 5.0f);
+        return uint32(std::floor(ilevel / 5.0f));
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
@@ -26561,7 +26568,7 @@ void Player::ActivateSpec(uint8 spec)
         SetGlyph(slot, glyph);
     }
 
-    m_usedTalentCount = spentTalents;
+    //m_usedTalentCount = spentTalents;
 
     InitTalentForLevel();
 
