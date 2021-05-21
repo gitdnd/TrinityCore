@@ -13591,10 +13591,10 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
     if (GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (!victim || victim->isDead())
+    if (!victim || victim->isDead() || victim->GetGUID() == GetGUID())
         return;
 
-    if (victim->GetGUID() == GetGUID())
+    if (damagetype == SELF_DAMAGE)
         return;
 
     if (spellProto)
