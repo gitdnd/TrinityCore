@@ -13588,7 +13588,13 @@ std::string Unit::GetDebugInfo() const
 
 void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto)
 {
-    if (GetTypeId() && GetTypeId() != TYPEID_PLAYER)
+    if (GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if (!victim || victim->isDead())
+        return;
+
+    if (victim->GetGUID() == GetGUID())
         return;
 
     if (spellProto)
@@ -13614,7 +13620,10 @@ void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg
 
 void Unit::OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain, SpellInfo const* spellProto)
 {
-    if (GetTypeId() && GetTypeId() != TYPEID_PLAYER)
+    if (GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if (!victim)
         return;
 
     if (spellProto)
