@@ -12368,6 +12368,9 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
 
+    // Update players' talents whenever crafting skill changes
+    InitTalentForLevel();
+
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
@@ -12405,9 +12408,6 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
         new_value = 1;
     if (new_value > MaxValue)
         new_value = MaxValue;
-
-    // Update players' talents whenever crafting skill changes
-    InitTalentForLevel();
 
     SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, MaxValue));
     if (itr->second.uState != SKILL_NEW)
