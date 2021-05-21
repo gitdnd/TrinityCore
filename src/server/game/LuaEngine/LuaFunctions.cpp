@@ -889,6 +889,9 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "AnimateAndSetFlyMode", &LuaCreature::AnimateAndSetFlyMode },
     { "AnimateAndSetLandMode", &LuaCreature::AnimateAndSetLandMode },
 
+    { "RemoveQuest", &LuaCreature::RemoveQuest },
+    { "AddQuest", &LuaCreature::AddQuest },
+
     { NULL, NULL }
 };
 
