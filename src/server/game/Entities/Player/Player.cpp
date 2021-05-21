@@ -12368,9 +12368,6 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
 
-    // Update players' talents whenever crafting skill changes
-    InitTalentForLevel();
-
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
@@ -12397,6 +12394,9 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 
     // Now calculate new skill level based on cached item levels
     uint32 new_value = GetAverageItemLevel();
+
+    // Update players' talents whenever crafting skill changes
+    InitTalentForLevel();
 
     // If the new value is less than the old value, don't update.
     // This is done to make sure the players' average level doesn't drop.
