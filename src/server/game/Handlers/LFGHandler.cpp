@@ -92,7 +92,8 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     }
 
     // Validations on group size
-    if (groupType == lfg::LfgGroupType::GROUP_10_MAN && (newDungeons.size() > 1 || (group && group->GetMembersCount() > MAXLFGRAIDGROUPSIZE)))
+    // FIXME(Harry): Disable queueing for raid from LFG temporarily
+    if (groupType == lfg::LfgGroupType::GROUP_10_MAN /*&& (newDungeons.size() > 1 || (group && group->GetMembersCount() > MAXLFGRAIDGROUPSIZE))*/)
     {
         TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s If queueing for a raid, can only select a single raid and group size must be <= %d", GetPlayerInfo().c_str(), MAXLFGRAIDGROUPSIZE);
         recvData.rfinish();
