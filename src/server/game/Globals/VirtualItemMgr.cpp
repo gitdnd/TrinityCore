@@ -1726,7 +1726,8 @@ VirtualModifier::StatGroupData::StatGroupData()
     // Agi Ranged DPS Data
     stat_group_primary_stats[STAT_GROUP_AGI_RANGED] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT
     };
     stat_group_secondary_stats[STAT_GROUP_AGI_RANGED] = {
         ITEM_MOD_HIT_RANGED_RATING,
