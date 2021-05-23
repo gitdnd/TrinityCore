@@ -2729,10 +2729,10 @@ void Player::InitTalentForLevel()
         // else update amount of free points
         else
         {
-            std::ostringstream str;
+            /*std::ostringstream str;
             str << "Talent points for level - used talent count: " << talentPointsForLevel << ", " << m_usedTalentCount << "\n";
             str << "Result: " << (talentPointsForLevel - m_usedTalentCount);
-            sWorld->SendGlobalText(str.str().c_str(), nullptr);
+            sWorld->SendGlobalText(str.str().c_str(), nullptr);*/
 
             SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
         }
