@@ -1487,7 +1487,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
     int32 level = fields[10].GetInt32();
     level = std::min(255, level);
-    level = std::max(1, level);
+    //level = std::max(1, level);
 
     *data << uint8(level);                                   // level
     *data << uint32(fields[11].GetUInt16());                 // zone
