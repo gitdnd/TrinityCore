@@ -43,7 +43,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
                      "subject, deliver_time, expire_time, money, has_items FROM mail WHERE receiver = ? ", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_MAIL_LIST_ITEMS, "SELECT itemEntry,count FROM item_instance WHERE guid = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_ENUM, "SELECT c.guid, c.name, c.race, c.class, c.gender, c.skin, c.face, c.hairStyle, c.hairColor, c.facialStyle, "
-                     "FLOOR((slotdata.head + slotdata.neck + slotdata.shoulders + slotdata.chest + slotdata.waist + slotdata.legs + slotdata.feet + slotdata.wrists + slotdata.hands + slotdata.finger1 + slotdata.finger2 + slotdata.trinket1 + slotdata.trinket2 + slotdata.back + slotdata.mainhand) / 15), "
+                     "IFNULL(FLOOR((slotdata.head + slotdata.neck + slotdata.shoulders + slotdata.chest + slotdata.waist + slotdata.legs + slotdata.feet + slotdata.wrists + slotdata.hands + slotdata.finger1 + slotdata.finger2 + slotdata.trinket1 + slotdata.trinket2 + slotdata.back + slotdata.mainhand) / 15), 1) AS `level`, "
                      "c.zone, c.map, c.position_x, c.position_y, c.position_z, "
                      "gm.guildid, c.playerFlags, c.at_login, cp.entry, cp.modelid, cp.level, c.equipmentCache, cb.guid "
                      "FROM characters AS c "
