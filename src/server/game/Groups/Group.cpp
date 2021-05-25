@@ -2738,6 +2738,6 @@ void Group::UpdateDungeonLevel()
         memcount += 1;
     }
     averageLevel /= memcount;
-
+    ASSERT(!(averageLevel > 20));
     SetDungeonLevel(averageLevel);
 }
