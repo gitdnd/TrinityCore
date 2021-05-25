@@ -295,6 +295,7 @@ i_scriptLock(false), _respawnCheckTimer(0)
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     sScriptMgr->OnCreateMap(this);
+    ASSERT(!(i_dungeonLevel < 20));
 }
 
 void Map::InitVisibilityDistance()
