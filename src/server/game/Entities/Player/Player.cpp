@@ -1485,7 +1485,12 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     *data << uint8(hairColor);
     *data << uint8(facialStyle);
 
-    *data << uint8(fields[10].GetUInt8());                   // level
+    uint32 level = fields[10].GetUInt32();
+    level = level > 255 ? 255 : level;
+    //level = std::min(255, level);
+    //level = std::max(1, level);
+
+    *data << uint8(level);                                   // level
     *data << uint32(fields[11].GetUInt16());                 // zone
     *data << uint32(fields[12].GetUInt16());                 // map
 
