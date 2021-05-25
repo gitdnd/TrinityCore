@@ -6554,7 +6554,7 @@ void Player::CheckAreaExploreAndOutdoor()
 
 uint32 Player::TeamForRace(uint8 race)
 {
-    if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
+    if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(/*race*/ 1))
     {
         switch (rEntry->TeamID)
         {
@@ -6573,7 +6573,7 @@ void Player::SetFactionForRace(uint8 race)
 {
     m_team = TeamForRace(race);
 
-    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
+    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(/*race*/ 1);
     SetFaction(rEntry ? rEntry->FactionID : 0);
 }
 
