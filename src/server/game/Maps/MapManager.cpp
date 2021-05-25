@@ -78,7 +78,7 @@ MapManager* MapManager::instance()
     return &instance;
 }
 
-Map* MapManager::CreateBaseMap(uint32 id)
+Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel)
 {
     Map* map = FindBaseMap(id);
 
@@ -93,7 +93,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
             map = new MapInstanced(id, i_gridCleanUpDelay);
         else
         {
-            map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, 0);
+            map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, dungeonLevel);
             map->LoadRespawnTimes();
             map->LoadCorpseData();
         }
@@ -115,7 +115,7 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 
 Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
 {
-    Map* m = CreateBaseMap(id);
+    Map* m = CreateBaseMap(id, player->GetGroupOrPlayerItemLevel());
 
     if (m && m->Instanceable())
         m = ((MapInstanced*)m)->CreateInstanceForPlayer(id, player, loginInstanceId);

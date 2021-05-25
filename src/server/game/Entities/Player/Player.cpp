@@ -27515,3 +27515,10 @@ void Player::SendSpellLearn(uint32 spell)
     data << uint16(0);
     SendDirectMessage(&data);
 }
+
+uint32 Player::GetGroupOrPlayerItemLevel()
+{
+    if (GetGroup())
+        return GetGroup()->GetAvgItemLevel();
+    return GetAverageItemLevel();
+}

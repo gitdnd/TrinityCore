@@ -167,7 +167,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
             if (corpseMapEntry->IsDungeon() && corpseMapEntry->entrance_map >= 0)
             {
                 // if corpse map have entrance
-                if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->entrance_map))
+                if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->entrance_map, _player->GetGroupOrPlayerItemLevel()))
                 {
                     mapID = corpseMapEntry->entrance_map;
                     x = corpseMapEntry->entrance_x;
