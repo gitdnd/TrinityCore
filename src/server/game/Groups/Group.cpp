@@ -2726,6 +2726,9 @@ void Group::UpdateDungeonLevel()
 {
     float averageLevel = 0.0f;
     uint8 memcount = 0;
+    std::stringstream ss;
+    ss << "Debug: ";
+
     for (auto citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!citr->guid)
@@ -2733,11 +2736,12 @@ void Group::UpdateDungeonLevel()
         Player* player = ObjectAccessor::FindConnectedPlayer(citr->guid);
         if (!player)
             continue;
-
         averageLevel += player->GetAverageItemLevel();
+        ss << "averageLevel: " << averageLevel << " memcount " << memcount;
         memcount += 1;
     }
     averageLevel /= memcount;
-    ASSERT(!(averageLevel > 20));
+    ss << " average " << averageLevel;
+    sWorld->SendGMText(6613, ss.str().c_str());
     SetDungeonLevel(averageLevel);
 }
