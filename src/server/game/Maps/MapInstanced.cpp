@@ -28,7 +28,7 @@
 #include "VMapFactory.h"
 #include "World.h"
 
-MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, 0)
+MapInstanced::MapInstanced(uint32 id, time_t expiry, uint32 dLevel) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dLevel)
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_GRIDS*sizeof(uint16));

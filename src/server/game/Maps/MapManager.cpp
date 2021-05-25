@@ -90,7 +90,7 @@ Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel)
         ASSERT(entry);
 
         if (entry->Instanceable())
-            map = new MapInstanced(id, i_gridCleanUpDelay);
+            map = new MapInstanced(id, i_gridCleanUpDelay, dungeonLevel);
         else
         {
             map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, dungeonLevel);
