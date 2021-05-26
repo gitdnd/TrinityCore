@@ -2740,8 +2740,11 @@ void Group::UpdateDungeonLevel()
         ss << "averageLevel " << averageLevel << " memcount " << memcount;
         memcount += 1;
     }
-    averageLevel /= memcount;
+    if(memcount > 0)
+        averageLevel /= memcount;
     ss << " average " << averageLevel;
     sWorld->SendGMText(ss.str().c_str());
+    if (averageLevel < 20)
+        averageLevel = 20;
     SetDungeonLevel(averageLevel);
 }
