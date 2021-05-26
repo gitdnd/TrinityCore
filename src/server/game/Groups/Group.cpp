@@ -2737,12 +2737,13 @@ void Group::UpdateDungeonLevel()
         if (!player)
             continue;
         averageLevel += player->GetAverageItemLevel();
-        ss << "averageLevel " << averageLevel << " memcount " << memcount;
         memcount += 1;
+        ss << "averageLevel " << averageLevel << " memcount " << memcount;
     }
     if(memcount > 0)
         averageLevel /= memcount;
-    ss << " average " << averageLevel;
+    ss << " average " << averageLevel << " \n";
+    printf(ss.str().c_str());
     sWorld->SendGMText(ss.str().c_str());
     if (averageLevel < 20)
         averageLevel = 20;
