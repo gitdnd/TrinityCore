@@ -18247,8 +18247,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     m_achievementMgr->CheckAllAchievementCriteria();
 
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
-    if (GetGroup())
-        GetGroup()->UpdateDungeonLevel();
+
     return true;
 }
 
