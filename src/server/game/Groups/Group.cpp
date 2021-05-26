@@ -2737,7 +2737,7 @@ void Group::UpdateDungeonLevel()
         if (!player)
             continue;
         averageLevel += player->GetAverageItemLevel();
-        ss << "averageLevel: " << averageLevel << " memcount " << memcount;
+        ss << "averageLevel " << averageLevel << " memcount " << memcount;
         memcount += 1;
     }
     averageLevel /= memcount;
