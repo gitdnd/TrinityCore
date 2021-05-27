@@ -1287,15 +1287,18 @@ float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
     case INVTYPE_WRISTS:
     case INVTYPE_NECK:
     case INVTYPE_CLOAK:
-    case INVTYPE_FINGER:
-    case INVTYPE_TRINKET:
     case INVTYPE_HOLDABLE:
     case INVTYPE_SHIELD:
         return 0.56f;
 
+    // Trinkets are extremely nerfed since they roll a single stat with a special effect
+    case INVTYPE_TRINKET:
+        return 0.2f;
+
     case INVTYPE_WEAPON:
     case INVTYPE_WEAPONMAINHAND:
     case INVTYPE_WEAPONOFFHAND:
+    case INVTYPE_FINGER:
         return 0.42f;
 
     case INVTYPE_RANGED:
