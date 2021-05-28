@@ -4058,6 +4058,16 @@ namespace LuaPlayer
     }
 #endif
 
+    int SendUpdateWorldState(lua_State* L, Player* player)
+    {
+        uint32 StateId = Eluna::CHECKVAL<uint32>(L, 2);
+        uint32 Value = Eluna::CHECKVAL<uint32>(L, 3);
+
+        player->SendUpdateWorldState(StateId, Value);
+
+        return 0;
+    }
+
     /*int BindToInstance(lua_State* L, Player* player)
     {
     player->BindToInstance();

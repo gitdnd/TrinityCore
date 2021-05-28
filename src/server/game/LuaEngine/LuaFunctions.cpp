@@ -577,6 +577,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SetFFA", &LuaPlayer::SetFFA },
 #endif
 
+
     // Boolean
     { "IsInGroup", &LuaPlayer::IsInGroup },
     { "IsInGuild", &LuaPlayer::IsInGuild },
@@ -755,6 +756,7 @@ ElunaRegister<Player> PlayerMethods[] =
 #if !defined(CLASSIC) && !defined(TBC)
     { "SendMovieStart", &LuaPlayer::SendMovieStart },
 #endif
+    { "SendUpdateWorldState", &LuaPlayer::SendUpdateWorldState },
 #ifdef CLASSIC
     { "UpdateHonor", &LuaPlayer::UpdateHonor },
     { "ResetHonor", &LuaPlayer::ResetHonor },
