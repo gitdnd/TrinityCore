@@ -27464,12 +27464,10 @@ void Player::RemoveArmorPassives()
         RemoveAura(spells[i]);
 }
 
-uint32 Player::IncreaseUsedTalentCount()
+void Player::IncreaseUsedTalentCount()
 {
     ++m_usedTalentCount;
     InitTalentForLevel();
-
-    return m_usedTalentCount;
 }
 
 void Player::ClearInactiveGemSpells()
