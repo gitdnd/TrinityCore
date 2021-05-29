@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatchBuilder", "PatchBuilder\PatchBuilder.csproj", "{A221ACBE-A2CE-44BA-9166-3F2862FF11B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A221ACBE-A2CE-44BA-9166-3F2862FF11B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A221ACBE-A2CE-44BA-9166-3F2862FF11B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A221ACBE-A2CE-44BA-9166-3F2862FF11B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A221ACBE-A2CE-44BA-9166-3F2862FF11B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15DF0BD3-69C8-4750-9A47-AD72E397D469}
+	EndGlobalSection
+EndGlobal
