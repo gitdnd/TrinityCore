@@ -5356,13 +5356,14 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 
 uint32 Player::GetShieldBlockValue() const
 {
-    float value = std::max(0.f, (m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
     // Talent: Primed: Allows you to block with a two-handed melee weapon
+    float blockValue = 0.f; 
     if (HasSpell(180160) && IsTwoHandUsed())
     {
-        float blockValue = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->GetItemLevel() * 0.93f;
-        value = std::max(0.f, value * blockValue);
+        blockValue = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->GetItemLevel() * 0.93f;
     }
+
+    float value = std::max(0.f, (blockValue + m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
     return uint32(value);
 }
 
@@ -27448,10 +27449,12 @@ void Player::RemoveArmorPassives()
         RemoveAura(spells[i]);
 }
 
-void Player::IncreaseUsedTalentCount()
+uint32 Player::IncreaseUsedTalentCount()
 {
     ++m_usedTalentCount;
     InitTalentForLevel();
+
+    return m_usedTalentCount;
 }
 
 void Player::ClearInactiveGemSpells()
