@@ -32,7 +32,7 @@
 template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
-    ShellExecute(NULL, "open", "DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
+    ShellExecute(NULL, "open", "C:\\HoT\\Development\\Server\\DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
 }
 
 typedef QueryResult ElunaQuery;
