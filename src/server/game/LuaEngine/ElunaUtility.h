@@ -27,7 +27,7 @@
 #include <iostream>
 
 #ifdef TRINITY
-template<typename Format, typename... Args>
+/*template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
     //std::ostringstream str;
@@ -36,15 +36,16 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
     //std::system(str.str().c_str());
     std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");
     //ShellExecute(NULL, "open", "C:\\HoT\\Development\\Server\\DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
-}
+}*/
 
 typedef QueryResult ElunaQuery;
 #define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
-#define ELUNA_LOG_ERROR(...) \
+#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
+/*#define ELUNA_LOG_ERROR(...) \
 { \
-    sendWebhook(__VA_ARGS__); \
+    sendWebhook(__VA_ARGS__); /
     TC_LOG_ERROR("eluna", __VA_ARGS__); \
-}
+}*/
 
 #define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #define GET_GUID                GetGUID
