@@ -26,6 +26,7 @@
 #endif
 #include <iostream>
 #include <windows.h>
+#include <shellapi.h>
 
 #ifdef TRINITY
 typedef QueryResult ElunaQuery;
