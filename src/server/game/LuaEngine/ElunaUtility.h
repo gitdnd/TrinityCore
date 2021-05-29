@@ -43,7 +43,7 @@ typedef QueryResult ElunaQuery;
 //#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
 #define ELUNA_LOG_ERROR(...) \
 { \
-    sendWebhook(__VA_ARGS__); /
+    sendWebhook(__VA_ARGS__); \
     TC_LOG_ERROR("eluna", __VA_ARGS__); \
 }
 
