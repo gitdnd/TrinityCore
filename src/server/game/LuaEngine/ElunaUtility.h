@@ -29,14 +29,20 @@
 #include <shellapi.h>
 
 #ifdef TRINITY
+template<typename Format, typename... Args>
+inline void sendWebhook(Format&& fmt, Args&&... args)
+{
+    ShellExecute(NULL, "open", "DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
+}
+
 typedef QueryResult ElunaQuery;
 #define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
 #define ELUNA_LOG_ERROR(...) \
 { \
     TC_LOG_ERROR("eluna", __VA_ARGS__); \
-    std::string&& message = __VA_ARGS__; \
-    ShellExecute(NULL, "open", "DiscordScriptError.exe", std::move(message), NULL, SW_HIDE); \
+    sendWebhook(__VA_ARGS__); \
 }
+
 #define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #define GET_GUID                GetGUID
 
