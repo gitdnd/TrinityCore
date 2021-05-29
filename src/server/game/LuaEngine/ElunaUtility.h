@@ -34,7 +34,8 @@ typedef QueryResult ElunaQuery;
 #define ELUNA_LOG_ERROR(...) \
 { \
     TC_LOG_ERROR("eluna", __VA_ARGS__); \
-    ShellExecute(NULL, "open", "DiscordScriptError.exe", __VA_ARGS__, NULL, SW_HIDE); \
+    std::string&& message = __VA_ARGS__; \
+    ShellExecute(NULL, "open", "DiscordScriptError.exe", std::move(message), NULL, SW_HIDE); \
 }
 #define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #define GET_GUID                GetGUID
