@@ -540,6 +540,7 @@ void Eluna::Report(lua_State* _L)
 {
     const char* msg = lua_tostring(_L, -1);
     ELUNA_LOG_ERROR("%s", msg);
+    sendWebhook(msg, NULL);
     lua_pop(_L, 1);
 }
 
