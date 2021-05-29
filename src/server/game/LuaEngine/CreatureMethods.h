@@ -1310,6 +1310,46 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     }
 
     /**
+     * Adds the given quest to the [Creature].
+     *
+     * @param uint32 entry : The quest ID to add
+     */
+    int AddQuest(lua_State* L, Creature* creature)
+    {
+        uint32 q_entry = Eluna::CHECKVAL<uint32>(L, 2);
+
+        QuestRelations* CreatureQuestMap = sObjectMgr->GetCreatureQuestRelationMapHACK();
+        CreatureQuestMap->insert(QuestRelations::value_type(creature->GetEntry(), q_entry));
+        return 0;
+    }
+
+    /**
+     * Removes the given quest on the [Creature].
+     *
+     * @param uint32 entry : The quest ID to remove
+     */
+    int RemoveQuest(lua_State* L, Creature* creature)
+    {
+        uint32 q_entry = Eluna::CHECKVAL<uint32>(L, 2);
+
+        QuestRelations* CreatureQuestMap = sObjectMgr->GetCreatureQuestRelationMapHACK();
+
+        // Remove the pair(id, quest) from the multimap
+        QuestRelations::iterator qitr = CreatureQuestMap->find(creature->GetEntry());
+        QuestRelations::iterator lastElement = CreatureQuestMap->upper_bound(creature->GetEntry());
+        for (; qitr != lastElement; ++qitr)
+        {
+            if (qitr->second == q_entry)
+            {
+                CreatureQuestMap->erase(qitr);          // iterator is now no more valid
+                break;                                  // but we can exit loop since the element is found
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * Transform the [Creature] into another Creature.
      *
      * @param uint32 entry : the Creature ID to transform into

@@ -1287,15 +1287,18 @@ float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
     case INVTYPE_WRISTS:
     case INVTYPE_NECK:
     case INVTYPE_CLOAK:
-    case INVTYPE_FINGER:
-    case INVTYPE_TRINKET:
     case INVTYPE_HOLDABLE:
     case INVTYPE_SHIELD:
         return 0.56f;
 
+    // Trinkets are extremely nerfed since they roll a single stat with a special effect
+    case INVTYPE_TRINKET:
+        return 0.2f;
+
     case INVTYPE_WEAPON:
     case INVTYPE_WEAPONMAINHAND:
     case INVTYPE_WEAPONOFFHAND:
+    case INVTYPE_FINGER:
         return 0.42f;
 
     case INVTYPE_RANGED:
@@ -1316,7 +1319,7 @@ float VirtualModifier::GetStatRate(ItemModType stat)
     case ITEM_MOD_RANGED_ATTACK_POWER:
         return 0.4f;
     case ITEM_MOD_ARMOR_PENETRATION_RATING:
-        return 0.3f;
+        return 0.4f;
     case ITEM_MOD_ATTACK_POWER:
         return 0.5f;
     case ITEM_MOD_SPELL_HEALING_DONE:
@@ -1726,7 +1729,8 @@ VirtualModifier::StatGroupData::StatGroupData()
     // Agi Ranged DPS Data
     stat_group_primary_stats[STAT_GROUP_AGI_RANGED] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT
     };
     stat_group_secondary_stats[STAT_GROUP_AGI_RANGED] = {
         ITEM_MOD_HIT_RANGED_RATING,

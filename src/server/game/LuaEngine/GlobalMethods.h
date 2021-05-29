@@ -1847,6 +1847,8 @@ namespace LuaGlobalFunctions
         int maxcount = Eluna::CHECKVAL<int>(L, 3);
         uint32 incrtime = Eluna::CHECKVAL<uint32>(L, 4);
         uint32 extendedcost = Eluna::CHECKVAL<uint32>(L, 5);
+        bool persist = Eluna::CHECKVAL<bool>(L, 6, true);
+
 
 #if defined TRINITY || AZEROTHCORE
 #ifdef CATA
@@ -1856,7 +1858,7 @@ namespace LuaGlobalFunctions
 #else
         if (!eObjectMgr->IsVendorItemValid(entry, item, maxcount, incrtime, extendedcost))
             return 0;
-        eObjectMgr->AddVendorItem(entry, item, maxcount, incrtime, extendedcost);
+        eObjectMgr->AddVendorItem(entry, item, maxcount, incrtime, extendedcost, persist);
 #endif
 #else
         if (!eObjectMgr->IsVendorItemValid(false, "npc_vendor", entry, item, maxcount, incrtime, extendedcost, 0))
@@ -1880,13 +1882,15 @@ namespace LuaGlobalFunctions
     {
         uint32 entry = Eluna::CHECKVAL<uint32>(L, 1);
         uint32 item = Eluna::CHECKVAL<uint32>(L, 2);
+        bool persist = Eluna::CHECKVAL<bool>(L, 3, true);
+
         if (!eObjectMgr->GetCreatureTemplate(entry))
             return luaL_argerror(L, 1, "valid CreatureEntry expected");
 
 #if defined(CATA) || defined(MISTS)
         eObjectMgr->RemoveVendorItem(entry, item, 1);
 #else
-        eObjectMgr->RemoveVendorItem(entry, item);
+        eObjectMgr->RemoveVendorItem(entry, item, persist);
 #endif
         return 0;
     }

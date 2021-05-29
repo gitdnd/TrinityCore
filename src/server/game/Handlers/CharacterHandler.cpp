@@ -1027,6 +1027,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     if (Aura* aura = pCurrChar->AddAura(54844, pCurrChar))
         aura->SetDuration(10 * IN_MILLISECONDS);
+
+    if (pCurrChar->GetGroup())
+        pCurrChar->GetGroup()->UpdateDungeonLevel();
+
     delete holder;
 }
 

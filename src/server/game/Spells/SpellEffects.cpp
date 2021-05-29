@@ -3376,7 +3376,7 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
     // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 5%
     if (unitCaster->HasSpell(180088))
     {
-        AddPct(damage, 5);
+        AddPct(damage, 15);
     }
 
     unitTarget->GetThreatManager().AddThreat(unitCaster, float(damage), m_spellInfo, true);
@@ -5658,8 +5658,9 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     modifier.statValueSeed = vItem->statValueSeed;
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
-
-    sVirtualItemMgr.RegenerateItemInfo(vItem, modifier);
+    sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateStats(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStats(vItem, modifier);
 
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
@@ -5682,6 +5683,7 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
     mod.statpool = m_spellInfo->Effects[effIndex].MiscValueB != 0 ? m_spellInfo->Effects[effIndex].MiscValueB : -1;
     sVirtualItemMgr.GenerateStats(vItem, mod);
+    sVirtualItemMgr.GenerateItemStats(vItem, mod);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
