@@ -27520,6 +27520,6 @@ void Player::SendSpellLearn(uint32 spell)
 uint32 Player::GetGroupOrPlayerItemLevel()
 {
     if (GetGroup())
-        return GetGroup()->GetAvgItemLevel();
+        return GetGroup()->GetDungeonLevel();
     return GetAverageItemLevel();
 }

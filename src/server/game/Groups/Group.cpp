@@ -2074,7 +2074,8 @@ void Group::SetDungeonDifficulty(Difficulty difficulty)
     }
 }
 
-void Group::SetDungeonLevel(int dungeonLevel) {
+void Group::SetDungeonLevel(int dungeonLevel)
+{
     m_dungeonLevel = dungeonLevel;
     if (!isBGGroup() && !isBFGroup())
     {
