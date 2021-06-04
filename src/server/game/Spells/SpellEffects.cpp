@@ -341,17 +341,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             int dungeonLevel = unitCaster->ToCreature()->GetDungeonLevel();
             if (dungeonLevel > 0)
             {
-                float modifier = (pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
+                float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
                 if (dungeonLevel < 50)
                     modifier = modifier * 0.33;
                 else if (dungeonLevel < 60)
                     modifier = modifier * 0.5;
                 else if (dungeonLevel < 75)
                     modifier = modifier * 0.75;
-                else if (dungeonLevel > 270 && dungeonLevel < 300)
-                    modifier = modifier * 1.25;
-                else if (dungeonLevel >= 300)
-                    modifier = modifier * 1.5;
+                else if (dungeonLevel > 250)
+                    modifier = modifier * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
 
                 damage = damage * modifier;
             }
