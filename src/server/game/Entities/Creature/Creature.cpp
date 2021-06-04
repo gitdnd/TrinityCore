@@ -1440,15 +1440,17 @@ void Creature::UpdateLevelDependantStats()
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
         float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
-        if (dungeonLevel < 50) {
+        if (dungeonLevel < 50)
             dungeonLevelMod = dungeonLevelMod * 0.5;
-        }
-        else if (dungeonLevel < 60) {
+        else if (dungeonLevel < 60)
             dungeonLevelMod = dungeonLevelMod * 0.65;
-        }
-        else if (dungeonLevel < 75) {
+        else if (dungeonLevel < 75)
             dungeonLevelMod = dungeonLevelMod * 0.8;
-        }
+        else if (dungeonLevel > 270 && dungeonLevel < 300)
+            dungeonLevelMod = dungeonLevelMod * 1.25;
+        else if (dungeonLevel >= 300)
+            dungeonLevelMod = dungeonLevelMod * 1.5;
+
         health = uint32(health * dungeonLevelMod);
     }
 
@@ -1479,10 +1481,14 @@ void Creature::UpdateLevelDependantStats()
     if (dungeonLevel > 0 && dungeonLevel < 10000)
     {
         // FIXME(Harry): Come up with a better scaling system
-        float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 15000.0f) + 0.5f;
-        if (dungeonLevelMod < 50) {
+        float dungeonLevelMod = (pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
+        if (dungeonLevel < 50)
             dungeonLevelMod = dungeonLevelMod * 0.5;
-        }
+        else if (dungeonLevel > 270 && dungeonLevel < 300)
+            dungeonLevelMod = dungeonLevelMod * 1.25;
+        else if (dungeonLevel >= 300)
+            dungeonLevelMod = dungeonLevelMod * 1.5;
+
         basedamage = uint32(basedamage * dungeonLevelMod);
     }
 
