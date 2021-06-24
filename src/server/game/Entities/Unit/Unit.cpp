@@ -9660,6 +9660,8 @@ void Unit::UpdateCharmAI()
             // HARRY: Hardcoded charm AI override disable in DungeonMode
             if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
             {
+                if (GetAI())
+                    return;
                 RestoreDisabledAI();
                 // Hack: this is required because we want to call OnCharmed(true) on the restored AI
                 RefreshAI();
@@ -9667,6 +9669,10 @@ void Unit::UpdateCharmAI()
                 {
                     ai->OnCharmed(true);
                     return;
+                }
+                else
+                {
+                    newAI = nullptr; // breakpoint line
                 }
             }
             ASSERT(GetTypeId() == TYPEID_UNIT);
