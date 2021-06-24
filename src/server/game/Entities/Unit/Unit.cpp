@@ -9659,6 +9659,7 @@ void Unit::UpdateCharmAI()
             if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
             {
                 RestoreDisabledAI();
+                // Only return if we managed to recover the previous AI
                 if (GetAI())
                 {
                     return;
@@ -11600,6 +11601,12 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     if ((GetTypeId() != TYPEID_PLAYER) || (charmer->GetTypeId() != TYPEID_PLAYER))
     {
+        // HARRY Skip AI changing if hardcoded spell 90262 Charm Forever
+        if (aurApp && aurApp->GetBase()->GetSpellInfo() &&
+            aurApp->GetBase()->GetSpellInfo()->Id == 90262)
+        {
+            return true;
+        }
         // AI will schedule its own change if appropriate
         if (UnitAI* ai = GetAI())
             ai->OnCharmed(false);
