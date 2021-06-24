@@ -4321,5 +4321,48 @@ namespace LuaPlayer
         player->IncreaseUsedTalentCount();
         return 0;
     }
+
+    int OverridePetSpells(lua_State* L, Player* player)
+    {
+        Unit* pet = Eluna::CHECKOBJ<Creature>(L, 2, false);
+
+        uint8 cooldownCount = 0;//vehicle->GetSpellHistory()->GetCooldownsSizeForPacket();
+
+        WorldPacket data(SMSG_PET_SPELLS, 8 + 2 + 4 + 4 + 4 * 10 + 1 + 1 + cooldownCount * (4 + 2 + 4 + 4));
+        data << uint64(pet->GetGUID());                         // Guid
+        data << uint16(0);                                      // Pet Family (0 for all vehicles)
+        data << uint32(0);                                      // Duration
+        // The following three segments are read by the client as one uint32
+        data << uint8(0);                                       // React State
+        data << uint8(0);                                       // Command State
+        data << uint16(0);                                      // DisableActions (set for all vehicles)
+
+        for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+        {
+            uint32 spellId = 0;//TODO: Get real spell Ids
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
+            {
+                data << uint16(0) << uint8(0) << uint8(i + 8);
+                continue;
+            }
+
+            if (spellInfo->IsPassive())
+                pet->CastSpell(pet, spellId, true);
+
+            data << uint32(MAKE_UNIT_ACTION_BUTTON(spellId, i + 8));
+        }
+
+        for (uint32 i = MAX_CREATURE_SPELLS; i < MAX_SPELL_CONTROL_BAR; ++i)
+            data << uint32(0);
+
+        data << uint8(0); // Auras?
+
+        // Cooldowns
+        pet->GetSpellHistory()->WritePacket<Pet>(data);
+        player->SendDirectMessage(&data);
+
+        return 0;
+    }
 };
 #endif

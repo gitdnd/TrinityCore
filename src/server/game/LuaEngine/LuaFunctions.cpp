@@ -776,6 +776,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "IsStackingSpell", &LuaPlayer::IsStackingSpell },
     { "IncreaseSpellAuraStack", &LuaPlayer::IncreaseSpellAuraStack },
     { "IncreaseUsedTalentCount", &LuaPlayer::IncreaseUsedTalentCount },
+    { "OverridePetSpells", &LuaPlayer::OverridePetSpells },
 
     { NULL, NULL }
 };
