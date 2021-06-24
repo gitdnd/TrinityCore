@@ -9524,8 +9524,10 @@ void Unit::RefreshAI()
 
 void Unit::ScheduleAIChange()
 {
-    bool const charmed = IsCharmed();
-
+    // HARRY Hardcode for when Druid is being charmed
+    bool const charmed = IsCharmed() && (
+        !ToCreature() ||
+        ToCreature()->GetCreatureTemplate()->Entry != 52051);
     if (charmed)
         PushAI(nullptr);
     else
@@ -9659,9 +9661,11 @@ void Unit::UpdateCharmAI()
             if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
             {
                 RestoreDisabledAI();
-                // Only return if we managed to recover the previous AI
-                if (GetAI())
+                // Hack: this is required because we want to call OnCharmed(true) on the restored AI
+                RefreshAI();
+                if (UnitAI* ai = GetAI())
                 {
+                    ai->OnCharmed(true);
                     return;
                 }
             }
