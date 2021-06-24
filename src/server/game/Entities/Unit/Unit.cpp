@@ -9525,9 +9525,9 @@ void Unit::RefreshAI()
 void Unit::ScheduleAIChange()
 {
     // HARRY Hardcode for when Druid is being charmed
-    bool const charmed = IsCharmed() && (
+    bool const charmed = IsCharmed(); /*&& (
         !ToCreature() ||
-        ToCreature()->GetCreatureTemplate()->Entry != 52051);
+        ToCreature()->GetCreatureTemplate()->Entry != 52051)*/
     if (charmed)
         PushAI(nullptr);
     else
