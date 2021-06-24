@@ -9528,13 +9528,13 @@ void Unit::ScheduleAIChange()
     if (charmed)
     {
         // HARRY Hardcode for when Druid is being charmed
-        if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
+        /*if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
         {
             if (GetAI())
                 return;
             RestoreDisabledAI();
             PushAI(nullptr); //This could actually be PopAI() to get the previous AI but it's required atm to trigger UpdateCharmAI()
-        }
+        }*/
         PushAI(nullptr);
     }
     else
@@ -11723,6 +11723,11 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     if (GetTypeId() != TYPEID_PLAYER || charmer->GetTypeId() == TYPEID_UNIT)
     {
+        // Hardcode don't change AI for Druid
+        if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
+        {
+            return;
+        }
         if (UnitAI* charmedAI = GetAI())
             charmedAI->OnCharmed(false); // AI will potentially schedule a charm ai update
         else
