@@ -11589,7 +11589,9 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     AddUnitState(UNIT_STATE_CHARMED);
 
-    if ((GetTypeId() != TYPEID_PLAYER) || (charmer->GetTypeId() != TYPEID_PLAYER))
+    if ((GetTypeId() != TYPEID_PLAYER) || (charmer->GetTypeId() != TYPEID_PLAYER) &&
+        // HARRY: Hardcode that we don't want this entry to have AI overridden
+        !(ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051))
     {
         // AI will schedule its own change if appropriate
         if (UnitAI* ai = GetAI())
