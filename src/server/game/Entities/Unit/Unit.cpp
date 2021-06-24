@@ -9524,12 +9524,19 @@ void Unit::RefreshAI()
 
 void Unit::ScheduleAIChange()
 {
-    // HARRY Hardcode for when Druid is being charmed
-    bool const charmed = IsCharmed(); /*&& (
-        !ToCreature() ||
-        ToCreature()->GetCreatureTemplate()->Entry != 52051)*/
+    const bool charmed = IsCharmed();
     if (charmed)
+    {
+        // HARRY Hardcode for when Druid is being charmed
+        if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
+        {
+            if (GetAI())
+                return;
+            RestoreDisabledAI();
+            PushAI(nullptr); //This could actually be PopAI() to get the previous AI but it's required atm to trigger UpdateCharmAI()
+        }
         PushAI(nullptr);
+    }
     else
     {
         RestoreDisabledAI();
