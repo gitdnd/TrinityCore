@@ -9670,10 +9670,6 @@ void Unit::UpdateCharmAI()
                     ai->OnCharmed(true);
                     return;
                 }
-                else
-                {
-                    newAI = nullptr; // breakpoint line
-                }
             }
             ASSERT(GetTypeId() == TYPEID_UNIT);
             if (isPossessed() || IsVehicle())
