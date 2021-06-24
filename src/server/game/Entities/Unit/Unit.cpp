@@ -9659,7 +9659,10 @@ void Unit::UpdateCharmAI()
             if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
             {
                 RestoreDisabledAI();
-                return;
+                if (GetAI())
+                {
+                    return;
+                }
             }
             ASSERT(GetTypeId() == TYPEID_UNIT);
             if (isPossessed() || IsVehicle())
