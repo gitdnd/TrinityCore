@@ -4326,7 +4326,7 @@ namespace LuaPlayer
     {
         Unit* pet = Eluna::CHECKOBJ<Creature>(L, 2, false);
 
-        uint8 cooldownCount = 0;//vehicle->GetSpellHistory()->GetCooldownsSizeForPacket();
+        uint8 cooldownCount = pet->GetSpellHistory()->GetCooldownsSizeForPacket();
 
         WorldPacket data(SMSG_PET_SPELLS, 8 + 2 + 4 + 4 + 4 * 10 + 1 + 1 + cooldownCount * (4 + 2 + 4 + 4));
         data << uint64(pet->GetGUID());                         // Guid
@@ -4339,7 +4339,7 @@ namespace LuaPlayer
 
         for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         {
-            uint32 spellId = 0;//TODO: Get real spell Ids
+            uint32 spellId = 11;//TODO: Get real spell Ids
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo)
             {
