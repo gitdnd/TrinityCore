@@ -9655,6 +9655,11 @@ void Unit::UpdateCharmAI()
         }
         else
         {
+            // HARRY: Hardcoded charm AI override disable in DungeonMode
+            if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
+            {
+                return;
+            }
             ASSERT(GetTypeId() == TYPEID_UNIT);
             if (isPossessed() || IsVehicle())
                 newAI = new PossessedAI(ToCreature());
