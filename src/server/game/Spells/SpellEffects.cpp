@@ -1291,6 +1291,27 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
     int32 addhealth = damage;
 
+    // FIXME(Harry): This should be configurable
+    // Try to scale base damage effect based on ilevel
+    if (unitCaster->ToCreature())
+    {
+        int dungeonLevel = unitCaster->ToCreature()->GetDungeonLevel();
+        if (dungeonLevel > 0)
+        {
+            float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
+            if (dungeonLevel < 50)
+                modifier = modifier * 0.33;
+            else if (dungeonLevel < 60)
+                modifier = modifier * 0.5;
+            else if (dungeonLevel < 75)
+                modifier = modifier * 0.75;
+            else if (dungeonLevel > 250)
+                modifier = modifier * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
+
+            addhealth = addhealth * modifier;
+        }
+    }
+
     // Talent: Saving Grace: Heal 10% extra on targets below 50% health
     if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
     {
