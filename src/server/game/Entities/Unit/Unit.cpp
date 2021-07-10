@@ -9527,14 +9527,6 @@ void Unit::ScheduleAIChange()
     const bool charmed = IsCharmed();
     if (charmed)
     {
-        // HARRY Hardcode for when Druid is being charmed
-        /*if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
-        {
-            if (GetAI())
-                return;
-            RestoreDisabledAI();
-            PushAI(nullptr); //This could actually be PopAI() to get the previous AI but it's required atm to trigger UpdateCharmAI()
-        }*/
         PushAI(nullptr);
     }
     else
@@ -9665,7 +9657,9 @@ void Unit::UpdateCharmAI()
         else
         {
             // HARRY: Hardcoded charm AI override disable in DungeonMode
-            if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
+            if (ToCreature() &&
+                (ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
+                 ToCreature()->GetCreatureTemplate()->Entry == 52066))
             {
                 if (GetAI())
                     return;
@@ -11724,7 +11718,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     if (GetTypeId() != TYPEID_PLAYER || charmer->GetTypeId() == TYPEID_UNIT)
     {
         // Hardcode don't change AI for Druid
-        if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051)
+        if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
+            ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52066)
         {
             return;
         }
