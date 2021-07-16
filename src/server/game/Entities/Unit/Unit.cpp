@@ -9712,7 +9712,7 @@ void Unit::DeleteCharmInfo()
 }
 
 CharmInfo::CharmInfo(Unit* unit)
-: _unit(unit), _CommandState(COMMAND_FOLLOW), _petnumber(0), _oldReactState(REACT_PASSIVE),
+: _unit(unit), _CommandState(COMMAND_FOLLOW), _petnumber(0), _oldReactState(REACT_DEFENSIVE),
   _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
   _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
@@ -9722,7 +9722,7 @@ CharmInfo::CharmInfo(Unit* unit)
     if (Creature* creature = _unit->ToCreature())
     {
         _oldReactState = creature->GetReactState();
-        creature->SetReactState(REACT_PASSIVE);
+        creature->SetReactState(REACT_DEFENSIVE);
     }
 }
 
