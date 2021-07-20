@@ -17416,7 +17416,7 @@ void Player::_LoadHighestSlotItemLevels(PreparedQueryResult result)
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_OFFHAND,   fields[16].GetUInt32()));
     _itemSlotToMaxLevel.insert(std::make_pair(EQUIPMENT_SLOT_RANGED,    fields[17].GetUInt32()));
 
-    UpdateCachedItemLevel();
+    UpdateCachedItemLevel(true);
 }
 
 void Player::_LoadBGData(PreparedQueryResult result)
@@ -26870,7 +26870,7 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 }
 
 
-float Player::UpdateCachedItemLevel()
+float Player::UpdateCachedItemLevel(bool isLogin = false)
 {
     float sum = 0;
     uint32 count = 0;
@@ -26920,7 +26920,7 @@ float Player::UpdateCachedItemLevel()
     else
     {
         result = result < 1.0 ? 1.0 : result;
-        if (result > 1.0f)
+        if (!isLogin && result > 1.0f)
         {
             // Level up visual if ilevel has increased
             CastSpell(this, 47292);

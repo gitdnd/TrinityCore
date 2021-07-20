@@ -2168,7 +2168,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Spell* m_spellModTakingSpell;
 
         float Player::GetAverageItemLevel() const { return _averageItemLevel; }
-        float UpdateCachedItemLevel();
+        float UpdateCachedItemLevel(bool isLogin = false);
 
         void AddItemLevelToSlotCache(uint8 slot, uint32 ilevel)
         {
