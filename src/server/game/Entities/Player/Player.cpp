@@ -26920,6 +26920,11 @@ float Player::UpdateCachedItemLevel()
     else
     {
         result = result < 1.0 ? 1.0 : result;
+        if (result > 1.0f)
+        {
+            // Level up visual if ilevel has increased
+            CastSpell(this, 47292);
+        }
     }
     _averageItemLevel = result;
     return result;
