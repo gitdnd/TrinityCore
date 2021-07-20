@@ -26870,7 +26870,7 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 }
 
 
-float Player::UpdateCachedItemLevel(bool isLogin = false)
+float Player::UpdateCachedItemLevel(bool isLogin)
 {
     float sum = 0;
     uint32 count = 0;
