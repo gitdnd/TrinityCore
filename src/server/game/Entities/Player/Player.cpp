@@ -26920,7 +26920,7 @@ float Player::UpdateCachedItemLevel(bool isLogin)
     else
     {
         result = result < 1.0 ? 1.0 : result;
-        if (!isLogin && result > 1.0f)
+        if (!isLogin && result > 1.0f && result > currentItemLevel)
         {
             // Level up visual if ilevel has increased
             CastSpell(this, 47292);
