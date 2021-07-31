@@ -9659,7 +9659,8 @@ void Unit::UpdateCharmAI()
             // HARRY: Hardcoded charm AI override disable in DungeonMode
             if (ToCreature() &&
                 (ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52066))
+                 ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
+                 ToCreature()->GetCreatureTemplate()->Entry == 52090))
             {
                 if (GetAI())
                     return;
@@ -11719,7 +11720,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     {
         // Hardcode don't change AI for Druid
         if (ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
-            ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52066)
+            ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
+            ToCreature() && ToCreature()->GetCreatureTemplate()->Entry == 52090)
         {
             return;
         }
