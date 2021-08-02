@@ -4364,5 +4364,11 @@ namespace LuaPlayer
 
         return 0;
     }
+
+    int ResetInstances(lua_State* L, Player* player)
+    {
+        player->ResetInstances(INSTANCE_RESET_ALL, false);
+        return 0;
+    }
 };
 #endif

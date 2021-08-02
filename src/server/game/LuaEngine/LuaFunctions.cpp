@@ -777,6 +777,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "IncreaseSpellAuraStack", &LuaPlayer::IncreaseSpellAuraStack },
     { "IncreaseUsedTalentCount", &LuaPlayer::IncreaseUsedTalentCount },
     { "OverridePetSpells", &LuaPlayer::OverridePetSpells },
+    { "ResetInstances", &LuaPlayer::ResetInstances },
 
     { NULL, NULL }
 };
