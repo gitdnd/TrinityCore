@@ -27531,5 +27531,5 @@ uint32 Player::GetGroupOrPlayerItemLevel()
 
 bool Player::IsInstanceBound(uint32 mapId)
 {
-    return GetBoundInstance(mapId, REGULAR_DIFFICULTY);
+    return GetBoundInstance(mapId, REGULAR_DIFFICULTY) != nullptr;
 }
