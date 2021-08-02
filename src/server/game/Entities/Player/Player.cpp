@@ -27528,3 +27528,8 @@ uint32 Player::GetGroupOrPlayerItemLevel()
         return GetGroup()->GetDungeonLevel();
     return GetAverageItemLevel();
 }
+
+bool Player::IsInstanceBound(uint32 mapId)
+{
+    return GetBoundInstance(mapId, REGULAR_DIFFICULTY);
+}

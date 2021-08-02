@@ -4370,5 +4370,12 @@ namespace LuaPlayer
         player->ResetInstances(INSTANCE_RESET_ALL, false);
         return 0;
     }
+
+    int HasInstance(lua_State* L, Player* player)
+    {
+        uint32 mapId = Eluna::CHECKVAL<uint32>(L, 2, false);
+
+        return player->IsInstanceBound(mapId);
+    }
 };
 #endif

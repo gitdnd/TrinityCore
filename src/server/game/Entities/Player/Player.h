@@ -2214,6 +2214,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetGroupOrPlayerItemLevel();
         void ClearInactiveGemSpells();
         uint32 GetTalentLevel() { return talent_level; }
+        bool IsInstanceBound(uint32 mapId);
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
