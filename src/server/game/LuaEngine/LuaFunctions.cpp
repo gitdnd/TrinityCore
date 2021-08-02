@@ -778,6 +778,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "IncreaseUsedTalentCount", &LuaPlayer::IncreaseUsedTalentCount },
     { "OverridePetSpells", &LuaPlayer::OverridePetSpells },
     { "ResetInstances", &LuaPlayer::ResetInstances },
+    { "IsInstanceBound", &LuaPlayer::IsInstanceBound },
 
     { NULL, NULL }
 };

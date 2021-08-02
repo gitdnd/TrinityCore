@@ -4371,7 +4371,7 @@ namespace LuaPlayer
         return 0;
     }
 
-    int HasInstance(lua_State* L, Player* player)
+    int IsInstanceBound(lua_State* L, Player* player)
     {
         uint32 mapId = Eluna::CHECKVAL<uint32>(L, 2, false);
 
