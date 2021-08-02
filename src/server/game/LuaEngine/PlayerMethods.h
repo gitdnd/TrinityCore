@@ -4375,7 +4375,9 @@ namespace LuaPlayer
     {
         uint32 mapId = Eluna::CHECKVAL<uint32>(L, 2, false);
 
-        return player->IsInstanceBound(mapId);
+        Eluna::Push(L, player->IsInstanceBound(mapId));
+
+        return 1;
     }
 };
 #endif
