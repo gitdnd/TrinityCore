@@ -2604,7 +2604,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         if (level <= 150)
         {
             ++talent_level;
-            CastSpell(this, 47292); // Level up visual
+            CastSpell(this, 90299); // Talent level up visual
             SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
             InitTalentForLevel(); 
         }
