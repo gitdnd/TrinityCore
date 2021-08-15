@@ -12429,7 +12429,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 
     // If the new value is less than the old value, don't update.
     // This is done to make sure the players' average level doesn't drop.
-    if (new_value < SkillValue)
+    if (new_value <= SkillValue)
         return;
 
     // Going below zero breaks the profession (treats as unlearned client side)
