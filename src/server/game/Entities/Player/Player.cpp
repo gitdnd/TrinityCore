@@ -19959,6 +19959,9 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
+
+        stmt->setUInt32(index++, GetTalentLevel());
+
         // Index
         stmt->setUInt32(index++, GetGUID().GetCounter());
     }
