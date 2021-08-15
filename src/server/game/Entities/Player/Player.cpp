@@ -2569,7 +2569,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     if (victim && victim->GetTypeId() == TYPEID_UNIT && !victim->ToCreature()->hasLootRecipient())
         return;
 
-    uint8 level = GetLevel();
+    uint8 level = GetTalentLevel();
 
     sScriptMgr->OnGivePlayerXP(this, xp, victim);
 
@@ -2594,7 +2594,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 newXP = GetXP() + xp + bonus_xp;
 
-    while (newXP >= nextLvlXP && level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    while (newXP >= nextLvlXP /*&& level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)*/)
     {
         newXP -= nextLvlXP;
 
