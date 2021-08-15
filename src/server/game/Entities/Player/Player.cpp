@@ -25276,7 +25276,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         SendEquipError(msg, nullptr, nullptr, item->itemid);
 }
 
-uint32 Player::CalculateTalentsPoints() const
+uint32 Player::CalculateTalentsPoints()
 {
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel()-9;
 
