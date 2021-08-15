@@ -7929,9 +7929,11 @@ uint32 ObjectMgr::GetBaseXP(uint8 level)
 
 uint32 ObjectMgr::GetXPForLevel(uint8 level) const
 {
-    if (level < _playerXPperLevel.size())
-        return _playerXPperLevel[level];
-    return 0;
+    // FIXME(Harry): Disabled temporarily
+    //if (level < _playerXPperLevel.size())
+    //    return _playerXPperLevel[level];
+    //return 0;
+    return 10000;
 }
 
 void ObjectMgr::LoadPetNames()

@@ -2573,9 +2573,10 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 
     sScriptMgr->OnGivePlayerXP(this, xp, victim);
 
+    // FIXME(Harry): Disabled temporarily
     // XP to money conversion processed in Player::RewardQuest
-    if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        return;
+    //if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    //    return;
 
     uint32 bonus_xp;
     bool recruitAFriend = GetsRecruitAFriendBonus(true);
@@ -2595,8 +2596,9 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     {
         newXP -= nextLvlXP;
 
-        if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-            GiveLevel(level + 1);
+        // FIXME(Harry): Disabled temporarily
+        //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        //    GiveLevel(level + 1);
 
         level = GetLevel();
         nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
