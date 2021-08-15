@@ -12425,7 +12425,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     uint32 new_value = GetAverageItemLevel();
 
     // Update players' talents whenever crafting skill changes
-    InitTalentForLevel();
+    //InitTalentForLevel();
 
     // If the new value is less than the old value, don't update.
     // This is done to make sure the players' average level doesn't drop.
@@ -12441,6 +12441,9 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     SetUInt32Value(valueIndex, MAKE_SKILL_VALUE(new_value, MaxValue));
     if (itr->second.uState != SKILL_NEW)
         itr->second.uState = SKILL_CHANGED;
+
+    // Level up visual
+    CastSpell(this, 47292);
 
     UpdateSkillEnchantments(skillId, SkillValue, new_value);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
@@ -26943,15 +26946,6 @@ float Player::UpdateCachedItemLevel(bool isLogin)
     if (currentItemLevel > result)
     {
         result = currentItemLevel;
-    }
-    else
-    {
-        result = result < 1.0 ? 1.0 : result;
-        if (!isLogin && result > 1.0f && result > currentItemLevel)
-        {
-            // Level up visual if ilevel has increased
-            CastSpell(this, 47292);
-        }
     }
     _averageItemLevel = result;
     return result;
