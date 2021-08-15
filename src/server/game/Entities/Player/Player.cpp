@@ -3929,7 +3929,7 @@ bool Player::ResetTalents(bool no_cost)
     if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
 
-    uint32 talentPointsForLevel = CalculateTalentsPoints();
+    uint32 talentPointsForLevel = GetTalentLevel();
 
     if (m_usedTalentCount == 0)
     {
@@ -17606,6 +17606,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     SetLevel(fields[6].GetUInt8(), false);
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
+    if (talent_level == 0)
+        talent_level = 1;
 
     _LoadIntoDataField(fields[66].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
     _LoadIntoDataField(fields[69].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE * 2);
@@ -25281,8 +25283,9 @@ uint32 Player::CalculateTalentsPoints() const
     if (GetClass() == CLASS_ADVENTURER)
     {
         // Give a talent every 5 item levels
-        float ilevel = std::min(300.0f, GetAverageItemLevel());
-        return uint32(std::floor(ilevel / 5.0f));
+        //float ilevel = std::min(300.0f, GetAverageItemLevel());
+        //return uint32(std::floor(ilevel / 5.0f));
+        return GetTalentLevel();
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
