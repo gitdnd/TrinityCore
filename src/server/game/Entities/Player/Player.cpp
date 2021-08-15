@@ -2569,7 +2569,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     if (victim && victim->GetTypeId() == TYPEID_UNIT && !victim->ToCreature()->hasLootRecipient())
         return;
 
-    uint8 level = GetTalentLevel();
+    uint32 level = GetTalentLevel();
 
     sScriptMgr->OnGivePlayerXP(this, xp, victim);
 
@@ -2605,9 +2605,11 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         {
             ++talent_level;
             CastSpell(this, 47292); // Level up visual
+            SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
+            InitTalentForLevel(); 
         }
 
-        level = GetLevel();
+        //level = GetLevel();
         nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     }
 
