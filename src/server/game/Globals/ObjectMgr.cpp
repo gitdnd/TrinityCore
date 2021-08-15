@@ -7927,13 +7927,13 @@ uint32 ObjectMgr::GetBaseXP(uint8 level)
     return _baseXPTable[level] ? _baseXPTable[level] : 0;
 }
 
-uint32 ObjectMgr::GetXPForLevel(uint8 level) const
+uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
-    // FIXME(Harry): Disabled temporarily
-    //if (level < _playerXPperLevel.size())
-    //    return _playerXPperLevel[level];
-    //return 0;
-    return 10000;
+    // ((ilevel ^ 2) / 2) * 1000
+    return (std::pow(level, 2) / 2) * 1000;
+    /*if (level < _playerXPperLevel.size())
+       return _playerXPperLevel[level];
+    return 0;*/
 }
 
 void ObjectMgr::LoadPetNames()

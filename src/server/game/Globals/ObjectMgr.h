@@ -1241,7 +1241,7 @@ class TC_GAME_API ObjectMgr
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint8 level);
-        uint32 GetXPForLevel(uint8 level) const;
+        uint32 GetXPForLevel(uint32 level) const;
 
         int32 GetFishingBaseSkillLevel(uint32 entry) const
         {

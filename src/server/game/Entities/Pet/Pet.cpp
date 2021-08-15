@@ -712,7 +712,8 @@ void Pet::GivePetLevel(uint8 level)
     if (getPetType() == HUNTER_PET)
     {
         SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(level)*PET_XP_FACTOR));
+        // Harry: Disabled
+        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, /*uint32(sObjectMgr->GetXPForLevel(level)*PET_XP_FACTOR)*/ 0);
     }
 
     InitStatsForLevel(level);
@@ -778,7 +779,8 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     SetPower(POWER_HAPPINESS, 166500);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(GetLevel()+1)*PET_XP_FACTOR));
+    // Harry: Disabled
+    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, /*uint32(sObjectMgr->GetXPForLevel(GetLevel()+1)*PET_XP_FACTOR)*/ 0);
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
@@ -916,7 +918,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
         case HUNTER_PET:
         {
-            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR));
+            // Harry: Disabled
+            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, /*uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR)*/ 0);
             //these formula may not be correct; however, it is designed to be close to what it should be
             //this makes dps 0.5 of pets level
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));

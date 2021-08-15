@@ -2577,6 +2577,8 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     // XP to money conversion processed in Player::RewardQuest
     //if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     //    return;
+    if (level >= 150)
+        return;
 
     uint32 bonus_xp;
     bool recruitAFriend = GetsRecruitAFriendBonus(true);
@@ -2599,6 +2601,11 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
+        if (level <= 150)
+        {
+            ++talent_level;
+            CastSpell(this, 47292); // Level up visual
+        }
 
         level = GetLevel();
         nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
@@ -2707,6 +2714,11 @@ void Player::GiveLevel(uint8 level)
 
 void Player::InitTalentForLevel()
 {
+    uint32 level = GetTalentLevel();
+
+    SetFreeTalentPoints(level - m_usedTalentCount);
+
+    /*
     uint8 level = GetLevel();
     // talents base at level diff (talents = level - 9 but some can be used already)
     if (level < 10)
@@ -2739,15 +2751,18 @@ void Player::InitTalentForLevel()
         // else update amount of free points
         else
         {
-            /*std::ostringstream str;
+        */
+            /*
+            std::ostringstream str;
             str << "Talent points for level - used talent count: " << talentPointsForLevel << ", " << m_usedTalentCount << "\n";
             str << "Result: " << (talentPointsForLevel - m_usedTalentCount);
-            sWorld->SendGlobalText(str.str().c_str(), nullptr);*/
-
+            sWorld->SendGlobalText(str.str().c_str(), nullptr);
+            */
+    /*
             SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
         }
     }
-
+    */
     if (!GetSession()->PlayerLoading())
         SendTalentsInfoData(false);                         // update at client
 }
@@ -2764,7 +2779,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     sObjectMgr->GetPlayerLevelInfo(GetRace(), GetClass(), GetLevel(), &info);
 
     SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)+10);
-    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetLevel()));
+    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetTalentLevel()));
 
     // reset before any aura state sources (health set/aura apply)
     SetUInt32Value(UNIT_FIELD_AURASTATE, 0);
@@ -17590,6 +17605,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     SetLevel(fields[6].GetUInt8(), false);
     SetXP(fields[7].GetUInt32());
+    talent_level = fields[73].GetUInt32();
 
     _LoadIntoDataField(fields[66].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
     _LoadIntoDataField(fields[69].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE * 2);
