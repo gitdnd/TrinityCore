@@ -628,7 +628,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
         std::map<uint32, std::string> selectedWords;
-        for (size_t i = 1; i <= 7; ++i)
+        for (size_t i = 1; i <= 8; ++i)
         {
             NameInfo nameInfo(output->Class, output->SubClass, output->InventoryType, i);
             auto list = GetNamesForNameInfo(&nameInfo);
@@ -665,7 +665,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
                 {
                 case ITEM_QUALITY_NORMAL:
                 {
-                    ss << selectedWords[4];
+                    ss << selectedWords[8] << " " << selectedWords[4];
                     break;
                 }
                 case ITEM_QUALITY_UNCOMMON:
@@ -698,7 +698,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
                 {
                 case ITEM_QUALITY_NORMAL:
                 {
-                    ss << selectedWords[5];
+                    ss << selectedWords[8] << " " << selectedWords[5];
                     break;
                 }
                 case ITEM_QUALITY_UNCOMMON:
@@ -735,7 +735,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
         // For Weapons we always use inventoryType 0
         std::map<uint32, std::vector<std::string>> nameLists;
         std::map<uint32, std::string> selectedWords;
-        for (size_t i = 1; i <= 6; ++i)
+        for (size_t i = 1; i <= 8; ++i)
         {
             NameInfo nameInfo(output->Class, output->SubClass, 0, i);
             auto list = GetNamesForNameInfo(&nameInfo);
@@ -768,7 +768,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
             {
             case ITEM_QUALITY_NORMAL:
             {
-                ss << selectedWords[4];
+                ss << selectedWords[8] << " " << selectedWords[4];
                 break;
             }
             case ITEM_QUALITY_UNCOMMON:
