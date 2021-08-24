@@ -2372,7 +2372,9 @@ void Spell::TargetInfo::PreprocessTarget(Spell* spell)
             _spellHitTarget = nullptr;
 
             // Concentrate Talent implementation: On spell miss, proc
-            if (spell->m_caster->ToPlayer() && spell->m_caster->ToPlayer()->HasSpell(180118))
+            if (spell->GetSpellInfo()->Id != 180118 &&
+                spell->m_caster->ToPlayer() &&
+                spell->m_caster->ToPlayer()->HasSpell(180118))
             {
                 spell->m_caster->CastSpell(spell->m_caster, 180119, CastSpellExtraArgs(true));
             }
@@ -2381,7 +2383,9 @@ void Spell::TargetInfo::PreprocessTarget(Spell* spell)
     else
     {
         // Concentrate Talent implementation: On spell miss, proc
-        if (spell->m_caster->ToPlayer() && spell->m_caster->ToPlayer()->HasSpell(180118))
+        if (spell->GetSpellInfo()->Id != 180118 &&
+            spell->m_caster->ToPlayer() &&
+            spell->m_caster->ToPlayer()->HasSpell(180118))
         {
             spell->m_caster->CastSpell(spell->m_caster, 180119, CastSpellExtraArgs(true));
         }
