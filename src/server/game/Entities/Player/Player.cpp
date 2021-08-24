@@ -2603,7 +2603,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (level <= 150)
+        if (level <= MAX_TALENT_LEVEL)
         {
             ++talent_level;
             CastSpell(this, 90299); // Talent level up visual
@@ -3942,6 +3942,8 @@ bool Player::ResetTalents(bool no_cost)
         SetFreeTalentPoints(talentPointsForLevel);
         return false;
     }
+
+    m_usedTalentCount = 0;
 
     uint32 cost = 0;
 
