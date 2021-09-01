@@ -4592,8 +4592,8 @@ void Player::BuildPlayerRepop()
     data << GetPackGUID();
     SendDirectMessage(&data);
 
-    if (GetRace() == RACE_NIGHTELF)
-        CastSpell(this, 20584, true);
+    //if (GetRace() == RACE_NIGHTELF)
+    //    CastSpell(this, 20584, true);
     CastSpell(this, 8326, true);
 
     // there must be SMSG.FORCE_RUN_SPEED_CHANGE, SMSG.FORCE_SWIM_SPEED_CHANGE, SMSG.MOVE_WATER_WALK
