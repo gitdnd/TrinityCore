@@ -4328,7 +4328,7 @@ class spell_item_unlock_bank_slot : public SpellScript
             ChatHandler(caster->GetSession()).PSendSysMessage("Dummy Effect Bypassed CheckRequirement.");
             return;
         }
-        caster->SetBankBagSlotCount();
+        caster->SetBankBagSlotCount(slots);
     }
 
     void Register() override
