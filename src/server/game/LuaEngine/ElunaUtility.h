@@ -31,7 +31,7 @@ template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
     std::ostringstream str;
-    str << "C:\\HoT\\Development\\Server\\DiscordScriptError.exe";
+    str << "DiscordScriptError.exe";
     str << " \"" << Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...) << "\"";
     std::system(str.str().c_str());
     //std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");

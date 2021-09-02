@@ -686,7 +686,7 @@ public:
                 handler->PSendSysMessage("* %s (0x%X)", EnumUtils::ToTitle(m), m);
 
         // Name, spawn, guid, entry, faction, display should be last, this is the most important info to read
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, faction, npcflags, displayid, nativeid);
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, npcflags, faction, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, displayid, nativeid, target->GetDungeonLevel());
 
         return true;
     }

@@ -40,7 +40,7 @@
 
 size_t const MAX_GUILD_BANK_TAB_TEXT_LEN = 500;
 
-uint32 const EMBLEM_PRICE = 10 * GOLD;
+uint32 const EMBLEM_PRICE = 0;
 
 // only used in logs
 char const* GetGuildEventString(GuildEvents event)
@@ -96,10 +96,11 @@ char const* GetGuildEventString(GuildEvents event)
 inline uint32 GetGuildBankTabPrice(uint8 tabId)
 {
     // these prices are in gold units, not copper
-    static uint32 const tabPrices[GUILD_BANK_MAX_TABS] = { 100, 250, 500, 1000, 2500, 5000 };
-    ASSERT(tabId < GUILD_BANK_MAX_TABS);
-
-    return tabPrices[tabId];
+    //static uint32 const tabPrices[GUILD_BANK_MAX_TABS] = { 100, 250, 500, 1000, 2500, 5000 };
+    //ASSERT(tabId < GUILD_BANK_MAX_TABS);
+    
+    //return tabPrices[tabId];
+    return 0;
 }
 
 void Guild::SendCommandResult(WorldSession* session, GuildCommandType type, GuildCommandError errCode, std::string const& param)
