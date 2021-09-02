@@ -11927,9 +11927,9 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         return EQUIP_ERR_OK;    // not in LFG group
 
     // check if looted object is inside the lfg dungeon
-    Map const* map = lootedObject->GetMap();
-    if (!sLFGMgr->inLfgDungeonMap(GetGroup()->GetGUID(), map->GetId(), map->GetDifficulty()))
-        return EQUIP_ERR_OK;
+    //Map const* map = lootedObject->GetMap();
+    //if (!sLFGMgr->inLfgDungeonMap(GetGroup()->GetGUID(), map->GetId(), map->GetDifficulty()))
+    //    return EQUIP_ERR_OK;
 
     if (!proto)
         return EQUIP_ERR_ITEM_NOT_FOUND;
