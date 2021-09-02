@@ -11950,8 +11950,6 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
 
     if (proto->RequiredSpell != 0 && !HasSpell(proto->RequiredSpell))
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
-
-    return EQUIP_ERR_OK;
     
     if (proto->RequiredSkill != 0)
     {
@@ -11960,6 +11958,8 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         else if (GetSkillValue(proto->RequiredSkill) < proto->RequiredSkillRank)
             return EQUIP_ERR_CANT_EQUIP_SKILL;
     }
+
+    return EQUIP_ERR_OK;
     /*
     uint8 _class = GetClass();
 
