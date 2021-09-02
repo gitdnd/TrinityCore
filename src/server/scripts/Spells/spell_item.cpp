@@ -4329,6 +4329,7 @@ class spell_item_unlock_bank_slot : public SpellScript
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_item_unlock_bank_slot::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_unlock_bank_slot::CheckRequirement);
     }
 };
 
