@@ -1248,7 +1248,16 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                     if (itr->second == PASS)
                         SendLootRoll(newitemGUID, p->GetGUID(), 128, ROLL_PASS, *r);
                     else
+                    {
+                        if (item->RequiredSkill != 0)
+                        {
+                            if (!p->GetSkillValue(item->RequiredSkill))
+                                r->rollVoteMask &= ~ROLL_FLAG_TYPE_NEED;
+                            else if (p->GetSkillValue(item->RequiredSkill) < item->RequiredSkillRank)
+                                r->rollVoteMask &= ~ROLL_FLAG_TYPE_NEED;
+                        }
                         SendLootStartRollToPlayer(60000, lootedObject->GetMapId(), p, p->CanRollForItemInLFG(item, lootedObject) == EQUIP_ERR_OK, *r);
+                    }
                 }
 
                 RollId.push_back(r);
