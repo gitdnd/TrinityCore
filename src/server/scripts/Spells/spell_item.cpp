@@ -39,7 +39,7 @@
 #include "SpellScript.h"
 #include "WorldSession.h"
 #include "BankPackets.h"
-
+#include "Chat.h"
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
 {
@@ -4307,14 +4307,13 @@ class spell_item_unlock_bank_slot : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
         uint32 slot = caster->GetBankBagSlotCount()+1;
 
-        BankBagSlotPricesEntry const* slotEntry = sBankBagSlotPricesStore.LookupEntry(slot);
-
-        if (!slotEntry)
+        if (slot > 7)
         {
             WorldPackets::Bank::BuyBankSlotResult packet;
             packet.Result = ERR_BANKSLOT_FAILED_TOO_MANY;
             caster->GetSession()->SendPacket(packet.Write());
-            return SPELL_FAILED_DONT_REPORT;
+            ChatHandler(caster->GetSession()).PSendSysMessage("You are capped out on bank slots!");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         }
 
         return SPELL_CAST_OK;
@@ -4323,7 +4322,13 @@ class spell_item_unlock_bank_slot : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        caster->SetBankBagSlotCount(caster->GetBankBagSlotCount()+1);
+        uint32 slots = caster->GetBankBagSlotCount() + 1;
+        if (slots > 7)
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("Dummy Effect Bypassed CheckRequirement.");
+            return;
+        }
+        caster->SetBankBagSlotCount();
     }
 
     void Register() override
