@@ -11923,8 +11923,8 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
 InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObject const* lootedObject) const
 {
-    if (!GetGroup() || !GetGroup()->isLFGGroup())
-        return EQUIP_ERR_OK;    // not in LFG group
+    //if (!GetGroup() || !GetGroup()->isLFGGroup())
+    //    return EQUIP_ERR_OK;    // not in LFG group
 
     // check if looted object is inside the lfg dungeon
     //Map const* map = lootedObject->GetMap();
