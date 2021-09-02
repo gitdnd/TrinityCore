@@ -37,6 +37,8 @@
 #include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
+#include "WorldSession.h"
+#include "BankPackets.h"
 
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
@@ -4290,6 +4292,47 @@ class spell_item_eggnog : public SpellScript
     }
 };
 
+class spell_item_unlock_bank_slot : public SpellScript
+{
+    PrepareSpellScript(spell_item_unlock_bank_slot);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        uint32 slot = caster->GetBankBagSlotCount()+1;
+
+        BankBagSlotPricesEntry const* slotEntry = sBankBagSlotPricesStore.LookupEntry(slot);
+
+        if (!slotEntry)
+        {
+            WorldPackets::Bank::BuyBankSlotResult packet;
+            packet.Result = ERR_BANKSLOT_FAILED_TOO_MANY;
+            caster->GetSession()->SendPacket(packet.Write());
+            return SPELL_FAILED_DONT_REPORT;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        caster->SetBankBagSlotCount(caster->GetBankBagSlotCount()+1);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_unlock_bank_slot::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_unlock_bank_slot::CheckRequirement);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4421,4 +4464,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_mad_alchemists_potion);
     RegisterSpellScript(spell_item_crazy_alchemists_potion);
     RegisterSpellScript(spell_item_eggnog);
+    RegisterSpellScript(spell_item_unlock_bank_slot);
 }
