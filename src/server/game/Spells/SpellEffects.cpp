@@ -5666,6 +5666,9 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     sVirtualItemMgr.GenerateStats(vItem, modifier);
     sVirtualItemMgr.GenerateItemStats(vItem, modifier);
     sVirtualItemMgr.GenerateSockets(vItem, modifier);
+    sVirtualItemMgr.GenerateItemName(vItem, modifier);
+    sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
+    sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
 
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
