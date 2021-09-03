@@ -5659,6 +5659,8 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     modifier.statValueSeed = vItem->statValueSeed;
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
+
+    sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
     sVirtualItemMgr.GenerateStats(vItem, modifier);
     sVirtualItemMgr.GenerateItemStats(vItem, modifier);

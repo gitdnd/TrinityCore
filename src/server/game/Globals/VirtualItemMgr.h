@@ -371,6 +371,7 @@ public:
     void GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
     void UpdateDisenchantId(VirtualItemTemplate* output);
+    void InitSeedGen(VirtualModifier modifier = VirtualModifier());
 
 private:
 
