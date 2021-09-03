@@ -541,8 +541,8 @@ void Guild::Member::SetStats(Player* player)
 {
     m_name      = player->GetName();
     uint32 level = floor(player->GetAverageItemLevel());
-    if (level > STRONG_MAX_LEVEL)
-        level = STRONG_MAX_LEVEL;
+    if (level > 300)
+        level = 300;
     m_level     = level;
     m_class     = player->GetClass();
     m_gender    = player->GetNativeGender();
@@ -550,7 +550,7 @@ void Guild::Member::SetStats(Player* player)
     m_accountId = player->GetSession()->GetAccountId();
 }
 
-void Guild::Member::SetStats(std::string const& name, uint8 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId)
+void Guild::Member::SetStats(std::string const& name, uint32 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId)
 {
     m_name      = name;
     m_level     = level;
@@ -1293,7 +1293,7 @@ void Guild::HandleRoster(WorldSession* session)
         memberData.LastSave = float(float(GameTime::GetGameTime() - member->GetLogoutTime()) / DAY);
 
         memberData.Status = member->GetFlags();
-        memberData.Level = member->GetLevel();
+        memberData.Level = member->GetLevel() > STRONG_MAX_LEVEL ? STRONG_MAX_LEVEL : member->GetLevel();
         memberData.ClassID = member->GetClass();
         memberData.Gender = member->GetGender();
 
