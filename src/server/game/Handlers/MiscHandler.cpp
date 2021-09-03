@@ -309,8 +309,8 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     for (WhoListPlayerInfo const& target : whoList)
     {
         // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
-        if (target.GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
-            continue;
+        //if (target.GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+        //    continue;
 
         // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
         if (!HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && target.GetSecurity() > AccountTypes(gmLevelInWhoList))
@@ -388,7 +388,13 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         if ((matchCount++) >= sWorld->getIntConfig(CONFIG_MAX_WHO))
             continue;
 
-        data << target.GetPlayerName();                   // player name
+        std::string name = target.GetPlayerName();
+        if (lvl > 255)
+        {
+            name = name + "|" + std::to_string(lvl - STRONG_MAX_LEVEL);
+        }
+
+        data << name;                                     // player name
         data << target.GetGuildName();                    // guild name
         data << uint32(lvl);                              // player level
         data << uint32(class_);                           // player class
