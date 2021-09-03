@@ -247,6 +247,13 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->seed = modifier.seed;
 
     InitSeedGen(modifier);
+    output->seed = modifier.seed;
+    output->displaySeed = modifier.displaySeed;
+    output->nameSeed = modifier.nameSeed;
+    output->socketSeed = modifier.socketSeed;
+    output->spellSeed = modifier.spellSeed;
+    output->statSeed = modifier.statSeed;
+    output->statValueSeed = modifier.statValueSeed;
 
     GenerateQuality(output, modifier);
 
