@@ -155,6 +155,7 @@ struct InstanceTemplate
     uint32 Parent;
     uint32 ScriptId;
     bool AllowMount;
+    uint32 maxPlayerOverride;
 };
 
 typedef std::unordered_map<uint16, InstanceTemplate> InstanceTemplateContainer;

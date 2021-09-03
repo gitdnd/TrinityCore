@@ -4241,6 +4241,10 @@ bool InstanceMap::HasPermBoundPlayers() const
 
 uint32 InstanceMap::GetMaxPlayers() const
 {
+    if (const auto mapT = sObjectMgr->GetInstanceTemplate(GetId()))
+        if (mapT->maxPlayerOverride > 0)
+            return mapT->maxPlayerOverride;
+
     MapDifficulty const* mapDiff = GetMapDifficulty();
     if (mapDiff && mapDiff->maxPlayers)
         return mapDiff->maxPlayers;
