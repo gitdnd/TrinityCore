@@ -213,7 +213,7 @@ void initSeed(uint32& val, std::mt19937 generator)
         val = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
 }
 
-void VirtualItemMgr::InitSeedGen(VirtualModifier modifier)
+void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
 {
     // instantiate RNG
     std::mt19937 generator;
