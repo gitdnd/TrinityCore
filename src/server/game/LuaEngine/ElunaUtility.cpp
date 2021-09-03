@@ -69,7 +69,7 @@ bool ElunaUtil::WorldObjectInRangeCheck::operator()(WorldObject* u)
         return false;
     if (i_obj->GET_GUID() == u->GET_GUID())
         return false;
-    if (i_filterGM && i_obj->ToPlayer() && i_obj->ToPlayer()->IsGameMaster())
+    if (i_filterGM && u->ToPlayer() && u->ToPlayer()->IsGameMaster())
         return false;
     if (!i_obj->IsWithinDistInMap(u, i_range))
         return false;
