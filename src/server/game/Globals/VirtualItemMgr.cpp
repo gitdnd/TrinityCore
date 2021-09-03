@@ -213,6 +213,20 @@ void initSeed(uint32& val, std::mt19937 generator)
         val = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
 }
 
+void VirtualItemMgr::InitSeedGen(VirtualModifier modifier)
+{
+    // instantiate RNG
+    std::mt19937 generator;
+    generator.seed(modifier.seed);
+    initSeed(modifier.socketSeed, generator);
+    initSeed(modifier.qualitySeed, generator);
+    initSeed(modifier.statSeed, generator);
+    initSeed(modifier.nameSeed, generator);
+    initSeed(modifier.displaySeed, generator);
+    initSeed(modifier.spellSeed, generator);
+    initSeed(modifier.statValueSeed, generator);
+}
+
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
 {
     if (!base)
@@ -227,20 +241,12 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     {
         SFMTRand sfmt;
         output->seed = sfmt.RandomUInt32();
+        modifier.seed = output->seed;
     }
     else
         output->seed = modifier.seed;
 
-    // instantiate RNG
-    std::mt19937 generator;
-    generator.seed(output->seed);
-    initSeed(modifier.socketSeed, generator);
-    initSeed(modifier.qualitySeed, generator);
-    initSeed(modifier.statSeed, generator);
-    initSeed(modifier.nameSeed, generator);
-    initSeed(modifier.displaySeed, generator);
-    initSeed(modifier.spellSeed, generator);
-    initSeed(modifier.statValueSeed, generator);
+    InitSeedGen(modifier);
 
     GenerateQuality(output, modifier);
 
