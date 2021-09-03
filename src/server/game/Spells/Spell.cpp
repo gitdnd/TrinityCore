@@ -7134,6 +7134,20 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < m_targets.GetItemTarget()->GetTemplate()->ItemLevel)
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
+                if (m_targets.GetItemTarget()->HasSocketedGems())
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                bool foundSocket = false;
+
+                for (int32 i = 0; i < MAX_GEM_SOCKETS; ++i)
+                {
+                    if (!foundSocket && m_targets.GetItemTarget()->GetTemplate()->Socket[i].Color != 0)
+                        foundSocket = true;
+                }
+
+                if (!foundSocket)
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
                 break;
             }
             case SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE:
@@ -7149,20 +7163,6 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if(m_targets.GetItemTarget()->GetTemplate()->Quality != m_spellInfo->Effects[i].MiscValue-1)
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                if (m_targets.GetItemTarget()->HasSocketedGems())
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                bool foundSocket = false;
-
-                for (int32 i = 0; i < MAX_GEM_SOCKETS; ++i)
-                {
-                    if (!foundSocket && m_targets.GetItemTarget()->GetTemplate()->Socket[i].Color != 0)
-                        foundSocket = true;
-                }
-
-                if (!foundSocket)
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 break;
