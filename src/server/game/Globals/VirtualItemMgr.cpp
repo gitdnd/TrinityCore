@@ -474,6 +474,11 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
             output->Damage[0].DamageMin = output->Damage[0].DamageMin / 2.0f;
             output->Damage[0].DamageMax = output->Damage[0].DamageMax / 2.0f;
         }
+
+        // Apply a damage bonus based on item quality
+        float damageBonus = (((output->Quality - 1.0f) / 10.0f) / 2.0f) + 1.0f;
+        output->Damage[0].DamageMin = output->Damage[0].DamageMin * damageBonus;
+        output->Damage[0].DamageMax = output->Damage[0].DamageMax * damageBonus;
     }
 
     // TODO: add custom descriptions to legendaries possibly?
