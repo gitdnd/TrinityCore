@@ -12439,6 +12439,8 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 
     // Now calculate new skill level based on cached item levels
     uint32 new_value = GetAverageItemLevel();
+    if (new_value > 300)
+        new_value = 300;
 
     // Update players' talents whenever crafting skill changes
     //InitTalentForLevel();
