@@ -7098,12 +7098,28 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                  }
                  break;
             }
-            case SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS:
             case SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM:
             case SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE:
             case SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM:
             case SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE:
             case SPELL_EFFECT_REROLL_VIRTUAL_ITEM:
+            {
+                if (!m_targets.GetItemTarget())
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                // prevent disenchanting in trade slot
+                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
+                    return SPELL_FAILED_NOT_WHILE_TRADING;
+
+                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < m_targets.GetItemTarget()->GetTemplate()->ItemLevel)
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                break;
+            }
+            case SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS:
             {
                 if (!m_targets.GetItemTarget())
                     return SPELL_FAILED_NO_VALID_TARGETS;
@@ -7134,6 +7150,19 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
 
                 if(m_targets.GetItemTarget()->GetTemplate()->Quality != m_spellInfo->Effects[i].MiscValue-1)
                     return SPELL_FAILED_NO_VALID_TARGETS;
+
+                bool foundSocket = false;
+
+                for (int32 i = 0; i < MAX_GEM_SOCKETS; ++i)
+                {
+                    if (!foundSocket && m_targets.GetItemTarget()->GetTemplate()->Socket[i].Color != 0)
+                        foundSocket = true;
+                }
+
+                if (!foundSocket)
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                break;
             }
             default:
                 break;
