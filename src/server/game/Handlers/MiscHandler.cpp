@@ -322,8 +322,8 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
                 continue;
 
         // check if target's level is in level range
-        uint8 lvl = target.GetLevel();
-        if (lvl < levelMin || lvl > levelMax)
+        uint32 lvl = target.GetLevel();
+        if (lvl < levelMin/* || lvl > levelMax*/)
             continue;
 
         // check if class matches classmask
@@ -389,7 +389,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
             continue;
 
         std::string name = target.GetPlayerName();
-        if (lvl > 255)
+        if (target.GetLevel() > 255)
         {
             name = name + "|" + std::to_string(lvl - STRONG_MAX_LEVEL);
         }
