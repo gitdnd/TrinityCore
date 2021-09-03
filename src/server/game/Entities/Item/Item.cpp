@@ -970,6 +970,15 @@ uint8 Item::GetGemCountWithLimitCategory(uint32 limitCategory) const
     return count;
 }
 
+bool Item::HasSocketedGems()
+{
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    {
+        if (GetEnchantmentId(EnchantmentSlot(enchant_slot)))
+            return true;
+    }
+}
+
 bool Item::IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const
 {
     ItemTemplate const* proto = GetTemplate();
