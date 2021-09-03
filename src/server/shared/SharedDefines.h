@@ -974,8 +974,8 @@ enum SpellEffects
     SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM      = 170,
     SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE = 171,
     SPELL_EFFECT_REROLL_VIRTUAL_ITEM                = 172,
-
-    TOTAL_SPELL_EFFECTS                             = 173
+    SPELL_EFFECT_EXTRACT_GEMS                       = 173,
+    TOTAL_SPELL_EFFECTS                             = 174
 };
 
 enum SpellCastResult

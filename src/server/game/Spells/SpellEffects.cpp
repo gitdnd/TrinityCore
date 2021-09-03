@@ -240,6 +240,7 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectUnused,                                   //170 SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM
     &Spell::EffectUnused,                                   //171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
     &Spell::EffectReRollVirtualItem,                        //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
+    &Spell::EffectExtractGems,                              //173 SPELL_EFFECT_EXTRACT_GEMS
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -5689,4 +5690,15 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
+}
+
+void Spell::EffectExtractGems(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    itemTarget->ExtractGems();
 }

@@ -387,6 +387,7 @@ class TC_GAME_API Spell
         void EffectCreateVirtualItem(SpellEffIndex effIndex);
         void EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex);
         void EffectReRollVirtualItem(SpellEffIndex effIndex);
+        void EffectExtractGems(SpellEffIndex effIndex);
 
         typedef std::unordered_set<Aura*> UsedSpellMods;
 
