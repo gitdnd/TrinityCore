@@ -998,6 +998,7 @@ void Item::ExtractGems()
 
         GetOwner()->AddItem(gemProto->ItemId, 1);
         GetOwner()->ApplyEnchantment(this, EnchantmentSlot(enchant_slot), false);
+        SetEnchantment(EnchantmentSlot(enchant_slot), 0, 0, 0, GetOwner()->GetGUID());
     }
     bool SocketBonusToBeActivated = GemsFitSockets();//current socketbonus state
     if (SocketBonusActivated ^ SocketBonusToBeActivated)     //if there was a change...
@@ -1006,6 +1007,7 @@ void Item::ExtractGems()
         SetEnchantment(BONUS_ENCHANTMENT_SLOT, (SocketBonusToBeActivated ? GetTemplate()->socketBonus : 0), 0, 0, GetOwner()->GetGUID());
         GetOwner()->ApplyEnchantment(this, BONUS_ENCHANTMENT_SLOT, true);
     }
+    SendUpdateSockets();
 }
 
 bool Item::IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const
