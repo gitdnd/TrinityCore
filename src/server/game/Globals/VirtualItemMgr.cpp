@@ -476,7 +476,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         }
 
         // Apply a damage bonus based on item quality
-        float damageBonus = (((output->Quality - 1.0f) / 10.0f) / 2.0f) + 1.0f;
+        float damageBonus = (((output->Quality - 2.0f) / 10.0f) / 2.0f) + 1.0f;
         output->Damage[0].DamageMin = output->Damage[0].DamageMin * damageBonus;
         output->Damage[0].DamageMax = output->Damage[0].DamageMax * damageBonus;
     }
