@@ -388,9 +388,12 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         if ((matchCount++) >= sWorld->getIntConfig(CONFIG_MAX_WHO))
             continue;
 
+        // If player level is more than 255 (uint8) then inject the rest in the player name
         std::string name = target.GetPlayerName();
         if (lvl > STRONG_MAX_LEVEL)
         {
+            if (lvl > 300)
+                lvl = 300;
             name = name + "|" + std::to_string(lvl - STRONG_MAX_LEVEL);
             lvl = STRONG_MAX_LEVEL;
         }
