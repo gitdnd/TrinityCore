@@ -389,9 +389,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
             continue;
 
         std::string name = target.GetPlayerName();
-        if (target.GetLevel() > 255)
+        if (lvl > STRONG_MAX_LEVEL)
         {
             name = name + "|" + std::to_string(lvl - STRONG_MAX_LEVEL);
+            lvl = STRONG_MAX_LEVEL;
         }
 
         data << name;                                     // player name
