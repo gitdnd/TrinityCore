@@ -540,7 +540,10 @@ Guild::Member::Member(ObjectGuid::LowType guildId, ObjectGuid guid, uint8 rankId
 void Guild::Member::SetStats(Player* player)
 {
     m_name      = player->GetName();
-    m_level     = floor(player->GetAverageItemLevel());
+    uint32 level = floor(player->GetAverageItemLevel());
+    if (level > STRONG_MAX_LEVEL)
+        level = STRONG_MAX_LEVEL;
+    m_level     = level;
     m_class     = player->GetClass();
     m_gender    = player->GetNativeGender();
     m_zoneId    = player->GetZoneId();
@@ -1294,7 +1297,13 @@ void Guild::HandleRoster(WorldSession* session)
         memberData.ClassID = member->GetClass();
         memberData.Gender = member->GetGender();
 
-        memberData.Name = member->GetName();
+        // If player level is more than 255 (uint8) then inject the rest in the player name
+        std::string name = member->GetName();
+        if (member->GetLevel() > STRONG_MAX_LEVEL)
+        {
+            name = name + "|" + std::to_string(300 - STRONG_MAX_LEVEL);
+        }
+        memberData.Name = name;
         memberData.Note = member->GetPublicNote();
         if (sendOfficerNote)
             memberData.OfficerNote = member->GetOfficerNote();
