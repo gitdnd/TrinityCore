@@ -979,6 +979,35 @@ bool Item::HasSocketedGems()
     }
 }
 
+void Item::ExtractGems()
+{
+    bool SocketBonusActivated = GemsFitSockets();
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    {
+        uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot));
+        if (!enchant_id)
+            continue;
+
+        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        if (!enchantEntry)
+            continue;
+
+        ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(enchantEntry->GemID);
+        if (!gemProto)
+            continue;
+
+        GetOwner()->AddItem(gemProto->ItemId, 1);
+        GetOwner()->ApplyEnchantment(this, EnchantmentSlot(enchant_slot), false);
+    }
+    bool SocketBonusToBeActivated = GemsFitSockets();//current socketbonus state
+    if (SocketBonusActivated ^ SocketBonusToBeActivated)     //if there was a change...
+    {
+        GetOwner()->ApplyEnchantment(this, BONUS_ENCHANTMENT_SLOT, false);
+        SetEnchantment(BONUS_ENCHANTMENT_SLOT, (SocketBonusToBeActivated ? GetTemplate()->socketBonus : 0), 0, 0, GetOwner()->GetGUID());
+        GetOwner()->ApplyEnchantment(this, BONUS_ENCHANTMENT_SLOT, true);
+    }
+}
+
 bool Item::IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) const
 {
     ItemTemplate const* proto = GetTemplate();

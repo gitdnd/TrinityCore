@@ -124,6 +124,7 @@ class TC_GAME_API Item : public Object
         uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
         InventoryResult CanBeMergedPartlyWith(ItemTemplate const* proto) const;
         bool HasSocketedGems();
+        void ExtractGems();
 
         uint8 GetSlot() const {return m_slot;}
         Bag* GetContainer() { return m_container; }
