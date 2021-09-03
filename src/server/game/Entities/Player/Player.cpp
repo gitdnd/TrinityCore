@@ -8534,6 +8534,12 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
             if (lootid)
             {
+                // Timeways Chest special handle
+                if (go->GetEntry() == 50028)
+                {
+                    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, 1512821, 1);
+                }
+
                 loot->clear();
 
                 Group* group = GetGroup();
