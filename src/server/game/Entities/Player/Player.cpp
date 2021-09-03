@@ -1450,16 +1450,8 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
         return false;
     }
 
-    uint32 level = fields[10].GetUInt32();
-    level = level > 300 ? 300 : level;
-    std::string name = fields[1].GetString();
-    if (level > STRONG_MAX_LEVEL)
-    {
-        name += "|" + std::to_string(level - STRONG_MAX_LEVEL);
-    }
-
     *data << ObjectGuid(HighGuid::Player, guid);
-    *data << name;                                          // name
+    *data << fields[1].GetString();                         // name
     *data << uint8(plrRace);                                // race
     *data << uint8(plrClass);                               // class
     *data << uint8(gender);                                 // gender
@@ -1495,8 +1487,10 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     *data << uint8(hairColor);
     *data << uint8(facialStyle);
 
-    level = level > STRONG_MAX_LEVEL ? STRONG_MAX_LEVEL : level;
-    level < 1 ? 1 : level;
+    uint32 level = fields[10].GetUInt32();
+    level = level > 255 ? 255 : level;
+    //level = std::min(255, level);
+    //level = std::max(1, level);
 
     *data << uint8(level);                                   // level
     *data << uint32(fields[11].GetUInt16());                 // zone
