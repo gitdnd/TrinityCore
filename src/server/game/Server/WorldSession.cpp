@@ -522,6 +522,8 @@ void WorldSession::LogoutPlayer(bool save)
             _player->RepopAtGraveyard();
             _player->SetPendingBind(0, 0);
         }
+        else if (_player->GetMapId() != 765)
+            _player->TeleportTo(_player->GetStartPosition());
 
         //drop a flag if player is carrying it
         if (Battleground* bg = _player->GetBattleground())
