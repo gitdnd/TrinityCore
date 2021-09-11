@@ -454,7 +454,25 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    LootItem& item = slotid >= loot->items.size() ? loot->quest_items[slotid - loot->items.size()] : loot->items[slotid];
+    uint8 actualCount = 0;
+    LootItem& item = LootItem();
+    bool foundItem = false;
+    for (int i = 0; i < loot->items.size(); ++i)
+    {
+        if (loot->items[i].personalLootOwner && loot->items[i].personalLootOwner != _player->GetGUID())
+            continue;
+        if (actualCount == slotid)
+        {
+            item = loot->items[i];
+            foundItem = true;
+            break;
+        }
+        ++actualCount;
+    }
+    if (!foundItem)
+    {
+        item = loot->quest_items[slotid - loot->items.size()];
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);

@@ -473,7 +473,23 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         i_next = i;
         ++i_next;
         if (Player* player = ObjectAccessor::FindPlayer(*i))
-            player->SendNotifyLootItemRemoved(lootIndex);
+        {   
+            uint8 actualCount = 0;
+            bool foundItem = false;
+            for (int i = 0; i < items.size(); ++i)
+            {
+                if (items[i].personalLootOwner && items[i].personalLootOwner != player->GetGUID())
+                    continue;
+                if (actualCount == lootIndex)
+                {
+                    foundItem = true;
+                    break;
+                }
+                ++actualCount;
+            }
+            if (foundItem)
+                player->SendNotifyLootItemRemoved(lootIndex);
+        }
         else
             PlayersLooting.erase(i);
     }
@@ -681,7 +697,7 @@ bool Loot::hasOverThresholdItem() const
 }
 
 ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
-{   
+{
     b << uint32(li.itemid);
     b << uint32(li.count);                                  // nr of items of this type
     b << uint32(ASSERT_NOTNULL(sObjectMgr->GetItemTemplate(li.itemid))->DisplayInfoID);
