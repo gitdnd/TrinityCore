@@ -152,6 +152,9 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
     if (!proto)
         return;
 
+    uint32 count = urand(item.mincount, item.maxcount);
+    uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
+
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
     uint32 limit = item.needs_quest ? MAX_NR_QUEST_ITEMS : MAX_NR_LOOT_ITEMS;
 
@@ -168,8 +171,6 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                 {
                     if (Player* member = itr->GetSource())
                     {
-                        uint32 count = urand(item.mincount, item.maxcount);
-                        uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
                         ItemTemplate const* personalProto;
                         if (VirtualItemMgr::IsVirtualTemplate(proto))
                         {
@@ -182,6 +183,8 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         else
                             personalProto = proto;
 
+                        uint32 actualCount = count;
+
                         // Disabled check, because of the personal item filter the client should never receive more than 16
                         for (uint32 i = 0; i < stacks /*&& lootItems.size() < limit*/; ++i)
                         {
@@ -192,9 +195,9 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
 
                             generatedLoot.personalLootOwner = member->GetGUID();
 
-                            generatedLoot.count = std::min(count, personalProto->GetMaxStackSize());
+                            generatedLoot.count = std::min(actualCount, personalProto->GetMaxStackSize());
                             lootItems.push_back(generatedLoot);
-                            /*count -=*/ personalProto->GetMaxStackSize();
+                            actualCount -= personalProto->GetMaxStackSize();
 
                             // In some cases, a dropped item should be visible/lootable only for some players in group
                             bool canSeeItemInLootWindow = false;
@@ -217,8 +220,6 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
     // Normal path if not in a group
     if (!isGroup)
     {
-        uint32 count = urand(item.mincount, item.maxcount);
-        uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
         // VirtualItem
         if (VirtualItemMgr::IsVirtualTemplate(proto))
             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
