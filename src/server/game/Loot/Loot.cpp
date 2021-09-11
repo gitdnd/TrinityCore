@@ -183,7 +183,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         else
                             personalProto = proto;
 
-                        for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
+                        for (uint32 i = 0; i < stacks /*&& lootItems.size() < limit*/; ++i)
                         {
                             LootItem generatedLoot(item);
 
