@@ -75,6 +75,9 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
     if (pProto->HasFlag(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeam() != ALLIANCE)
         return false;
 
+    if (personalLootOwner && personalLootOwner != player->GetGUID())
+        return false;
+
     // Master looter can see certain items even if the character can't loot them
     if (!isGivenByMasterLooter && player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID())
     {
@@ -160,7 +163,55 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
     uint32 limit = item.needs_quest ? MAX_NR_QUEST_ITEMS : MAX_NR_LOOT_ITEMS;
 
-    for (int j = 0; j < 2; ++j)
+    bool isGroup = false;
+    if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
+    {
+        if (Group* group = player->GetGroup())
+        {
+            isGroup = true;
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* member = itr->GetSource())
+                {
+                    if (VirtualItemMgr::IsVirtualTemplate(proto))
+                    {
+                        modifier.ilevel = std::floor(member->GetAverageItemLevel());
+                        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
+                            proto = newProto;
+                    }
+
+                    for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
+                    {
+                        LootItem generatedLoot(item);
+
+                        if (item.itemid != proto->ItemId)
+                            generatedLoot.itemid = proto->ItemId;
+
+                        generatedLoot.personalLootOwner = member->GetGUID();
+
+                        generatedLoot.count = std::min(count, proto->GetMaxStackSize());
+                        lootItems.push_back(generatedLoot);
+                        count -= proto->GetMaxStackSize();
+
+                        // In some cases, a dropped item should be visible/lootable only for some players in group
+                        bool canSeeItemInLootWindow = false;
+                        if (generatedLoot.AllowedForPlayer(member))
+                            canSeeItemInLootWindow = true;
+                        if (!canSeeItemInLootWindow)
+                            continue;
+
+                        // non-conditional one-player only items are counted here,
+                        // free for all items are counted in FillFFALoot(),
+                        // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
+                        if (!item.needs_quest && item.conditions.empty() && !proto->HasFlag(ITEM_FLAG_MULTI_DROP))
+                            ++unlootedCount;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!isGroup)
     {
         for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
         {
