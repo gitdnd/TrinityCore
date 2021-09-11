@@ -681,7 +681,7 @@ bool Loot::hasOverThresholdItem() const
 }
 
 ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
-{
+{   
     b << uint32(li.itemid);
     b << uint32(li.count);                                  // nr of items of this type
     b << uint32(ASSERT_NOTNULL(sObjectMgr->GetItemTemplate(li.itemid))->DisplayInfoID);
@@ -763,7 +763,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(i) << l.items[i];
+                    b << uint8(itemsShown) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
                 }
@@ -780,7 +780,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(i) << l.items[i];
+                    b << uint8(itemsShown) << l.items[i];
                     b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
                     ++itemsShown;
                 }
@@ -795,7 +795,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    b << uint8(i) << l.items[i];
+                    b << uint8(itemsShown) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
                 }
@@ -815,6 +815,9 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         for (NotNormalLootItemList::const_iterator qi = q_list->begin(); qi != q_list->end(); ++qi)
         {
             LootItem &item = l.quest_items[qi->index];
+            // Skip if not the personal loot owner
+            if (item.personalLootOwner && item.personalLootOwner != lv.viewer->GetGUID())
+                continue;
             if (!qi->is_looted && !item.is_looted)
             {
                 b << uint8(l.items.size() + (qi - q_list->begin()));
@@ -856,6 +859,9 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         for (NotNormalLootItemList::const_iterator fi = ffa_list->begin(); fi != ffa_list->end(); ++fi)
         {
             LootItem &item = l.items[fi->index];
+            // Skip if not the personal loot owner
+            if (item.personalLootOwner && item.personalLootOwner != lv.viewer->GetGUID())
+                continue;
             if (!fi->is_looted && !item.is_looted)
             {
                 b << uint8(fi->index);
