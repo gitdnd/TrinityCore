@@ -152,17 +152,13 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
     if (!proto)
         return;
 
-    // VirtualItem
-    if (VirtualItemMgr::IsVirtualTemplate(proto))
-        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
-            proto = newProto;
-
     uint32 count = urand(item.mincount, item.maxcount);
     uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
 
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
     uint32 limit = item.needs_quest ? MAX_NR_QUEST_ITEMS : MAX_NR_LOOT_ITEMS;
 
+    // Personal loot hack'n slash
     bool isGroup = false;
     if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
     {
@@ -173,25 +169,30 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
             {
                 if (Player* member = itr->GetSource())
                 {
+                    ItemTemplate const* personalProto;
                     if (VirtualItemMgr::IsVirtualTemplate(proto))
                     {
-                        modifier.ilevel = std::floor(member->GetAverageItemLevel());
+                        int dungeonLevel = member->GetMap()->GetDungeonLevel();
+                        int playerLevel = std::floor(member->GetAverageItemLevel());
+                        modifier.ilevel = playerLevel > dungeonLevel ? dungeonLevel : playerLevel;
                         if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
-                            proto = newProto;
+                            personalProto = newProto;
                     }
+                    else
+                        personalProto = proto;
 
                     for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
                     {
                         LootItem generatedLoot(item);
 
-                        if (item.itemid != proto->ItemId)
-                            generatedLoot.itemid = proto->ItemId;
+                        if (item.itemid != personalProto->ItemId)
+                            generatedLoot.itemid = personalProto->ItemId;
 
                         generatedLoot.personalLootOwner = member->GetGUID();
 
-                        generatedLoot.count = std::min(count, proto->GetMaxStackSize());
+                        generatedLoot.count = std::min(count, personalProto->GetMaxStackSize());
                         lootItems.push_back(generatedLoot);
-                        count -= proto->GetMaxStackSize();
+                        count -= personalProto->GetMaxStackSize();
 
                         // In some cases, a dropped item should be visible/lootable only for some players in group
                         bool canSeeItemInLootWindow = false;
@@ -203,7 +204,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
                         // non-conditional one-player only items are counted here,
                         // free for all items are counted in FillFFALoot(),
                         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-                        if (!item.needs_quest && item.conditions.empty() && !proto->HasFlag(ITEM_FLAG_MULTI_DROP))
+                        if (!item.needs_quest && item.conditions.empty() && !personalProto->HasFlag(ITEM_FLAG_MULTI_DROP))
                             ++unlootedCount;
                     }
                 }
@@ -213,6 +214,10 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
 
     if (!isGroup)
     {
+        // VirtualItem
+        if (VirtualItemMgr::IsVirtualTemplate(proto))
+            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
+                proto = newProto;
         for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
         {
             LootItem generatedLoot(item);
