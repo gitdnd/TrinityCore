@@ -977,6 +977,7 @@ bool Item::HasSocketedGems()
         if (GetEnchantmentId(EnchantmentSlot(enchant_slot)))
             return true;
     }
+    return false;
 }
 
 void Item::ExtractGems()

@@ -866,9 +866,9 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         IFSKIP(someSpells.subClass, output->SubClass);
         IFSKIP(someSpells.inventoryType, output->InventoryType);
         IFSKIP(someSpells.statGroup, output->statGroup);
-        if (someSpells.maxItemLevel != -1 && output->ItemLevel > someSpells.maxItemLevel)
+        if (someSpells.maxItemLevel != -1 && output->ItemLevel > uint32(someSpells.maxItemLevel))
             continue;
-        if (someSpells.minItemLevel != -1 && output->ItemLevel < someSpells.minItemLevel)
+        if (someSpells.minItemLevel != -1 && output->ItemLevel < uint32(someSpells.minItemLevel))
             continue;
         spells.push_back(someSpells);
     }
