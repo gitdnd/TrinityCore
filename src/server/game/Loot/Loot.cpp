@@ -152,9 +152,6 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
     if (!proto)
         return;
 
-    uint32 count = urand(item.mincount, item.maxcount);
-    uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
-
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
     uint32 limit = item.needs_quest ? MAX_NR_QUEST_ITEMS : MAX_NR_LOOT_ITEMS;
 
@@ -171,6 +168,8 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                 {
                     if (Player* member = itr->GetSource())
                     {
+                        uint32 count = urand(item.mincount, item.maxcount);
+                        uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
                         ItemTemplate const* personalProto;
                         if (VirtualItemMgr::IsVirtualTemplate(proto))
                         {
@@ -183,6 +182,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         else
                             personalProto = proto;
 
+                        // Disabled check, because of the personal item filter the client should never receive more than 16
                         for (uint32 i = 0; i < stacks /*&& lootItems.size() < limit*/; ++i)
                         {
                             LootItem generatedLoot(item);
@@ -216,6 +216,8 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
     }
     if (!isGroup)
     {
+        uint32 count = urand(item.mincount, item.maxcount);
+        uint32 stacks = count / proto->GetMaxStackSize() + ((count % proto->GetMaxStackSize()) ? 1 : 0);
         // VirtualItem
         if (VirtualItemMgr::IsVirtualTemplate(proto))
             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
