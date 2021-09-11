@@ -8643,7 +8643,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             {
                 case LOOT_DISENCHANTING:
                 {
-                    loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true, 0U, false);
+                    loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true, LOOT_MODE_DEFAULT, false);
                     // Reward shards when the item being disenchanted contains gems
                     uint8 gemCount = item->GetGemCountWithLimitCategory(0);
                     for (uint8 i = 0; i < gemCount; ++i)
@@ -8654,10 +8654,10 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     break;
                 }
                 case LOOT_PROSPECTING:
-                    loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this, true, 0U, false);
+                    loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this, true, LOOT_MODE_DEFAULT, false);
                     break;
                 case LOOT_MILLING:
-                    loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this, true, 0U, false);
+                    loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this, true, LOOT_MODE_DEFAULT, false);
                     break;
                 default:
                     loot->generateMoneyLoot(item->GetTemplate()->MinMoneyLoot, item->GetTemplate()->MaxMoneyLoot);
@@ -8693,11 +8693,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             if (Battleground* bg = GetBattleground())
             {
                 if (bg->GetTypeID(true) == BATTLEGROUND_AV)
-                    loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true, 0U, false);
+                    loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true, LOOT_MODE_DEFAULT, false);
             }
             // For wintergrasp Quests
             else if (GetZoneId() == AREA_WINTERGRASP)
-                loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true, 0U, false);
+                loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true, LOOT_MODE_DEFAULT, false);
 
             // It may need a better formula
             // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
@@ -8738,7 +8738,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     loot->clear();
 
                     if (uint32 lootid = creature->GetCreatureTemplate()->pickpocketLootId)
-                        loot->FillLoot(lootid, LootTemplates_Pickpocketing, this, true, 0U, false);
+                        loot->FillLoot(lootid, LootTemplates_Pickpocketing, this, true, LOOT_MODE_DEFAULT, false);
 
                     // Override pickpocket money to be zero
                     // Generate extra money for pick pocket loot
@@ -8805,7 +8805,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             else if (loot_type == LOOT_SKINNING)
             {
                 loot->clear();
-                loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true, 0U, false);
+                loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true, LOOT_MODE_DEFAULT, false);
                 permission = OWNER_PERMISSION;
 
                 // Set new loot recipient
