@@ -146,7 +146,7 @@ void Loot::clear()
 }
 
 // Inserts the item into the loot (called by LootTemplate processors)
-void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
+void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool canBePersonal)
 {
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
     if (!proto)
@@ -160,58 +160,60 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
 
     // Personal loot hack'n slash
     bool isGroup = false;
-    if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
+    if (canBePersonal)
     {
-        if (Group* group = player->GetGroup())
+        if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
         {
-            isGroup = true;
-            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            if (Group* group = player->GetGroup())
             {
-                if (Player* member = itr->GetSource())
+                isGroup = true;
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
-                    ItemTemplate const* personalProto;
-                    if (VirtualItemMgr::IsVirtualTemplate(proto))
+                    if (Player* member = itr->GetSource())
                     {
-                        int dungeonLevel = member->GetMap()->GetDungeonLevel();
-                        int playerLevel = std::floor(member->GetAverageItemLevel());
-                        modifier.plrAvgLvl = playerLevel > dungeonLevel ? dungeonLevel : playerLevel;
-                        if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
-                            personalProto = newProto;
-                    }
-                    else
-                        personalProto = proto;
+                        ItemTemplate const* personalProto;
+                        if (VirtualItemMgr::IsVirtualTemplate(proto))
+                        {
+                            int dungeonLevel = member->GetMap()->GetDungeonLevel();
+                            int playerLevel = std::floor(member->GetAverageItemLevel());
+                            modifier.plrAvgLvl = playerLevel > dungeonLevel ? dungeonLevel : playerLevel;
+                            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
+                                personalProto = newProto;
+                        }
+                        else
+                            personalProto = proto;
 
-                    for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
-                    {
-                        LootItem generatedLoot(item);
+                        for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
+                        {
+                            LootItem generatedLoot(item);
 
-                        if (item.itemid != personalProto->ItemId)
-                            generatedLoot.itemid = personalProto->ItemId;
+                            if (item.itemid != personalProto->ItemId)
+                                generatedLoot.itemid = personalProto->ItemId;
 
-                        generatedLoot.personalLootOwner = member->GetGUID();
+                            generatedLoot.personalLootOwner = member->GetGUID();
 
-                        generatedLoot.count = std::min(count, personalProto->GetMaxStackSize());
-                        lootItems.push_back(generatedLoot);
-                        count -= personalProto->GetMaxStackSize();
+                            generatedLoot.count = std::min(count, personalProto->GetMaxStackSize());
+                            lootItems.push_back(generatedLoot);
+                            count -= personalProto->GetMaxStackSize();
 
-                        // In some cases, a dropped item should be visible/lootable only for some players in group
-                        bool canSeeItemInLootWindow = false;
-                        if (generatedLoot.AllowedForPlayer(member))
-                            canSeeItemInLootWindow = true;
-                        if (!canSeeItemInLootWindow)
-                            continue;
+                            // In some cases, a dropped item should be visible/lootable only for some players in group
+                            bool canSeeItemInLootWindow = false;
+                            if (generatedLoot.AllowedForPlayer(member))
+                                canSeeItemInLootWindow = true;
+                            if (!canSeeItemInLootWindow)
+                                continue;
 
-                        // non-conditional one-player only items are counted here,
-                        // free for all items are counted in FillFFALoot(),
-                        // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-                        if (!item.needs_quest && item.conditions.empty() && !personalProto->HasFlag(ITEM_FLAG_MULTI_DROP))
-                            ++unlootedCount;
+                            // non-conditional one-player only items are counted here,
+                            // free for all items are counted in FillFFALoot(),
+                            // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
+                            if (!item.needs_quest && item.conditions.empty() && !personalProto->HasFlag(ITEM_FLAG_MULTI_DROP))
+                                ++unlootedCount;
+                        }
                     }
                 }
             }
         }
     }
-
     if (!isGroup)
     {
         // VirtualItem
@@ -257,7 +259,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier)
 }
 
 // Calls processor of corresponding LootTemplate (which handles everything including references)
-bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode /*= LOOT_MODE_DEFAULT*/)
+bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode /*= LOOT_MODE_DEFAULT*/, bool canBePersonal /* = true*/)
 {
     // Must be provided
     if (!lootOwner)
@@ -298,7 +300,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetDungeonLevel() : lootOwner->GetAverageItemLevel();
     }
 
-    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier);          // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
     if (!personal && group)

@@ -8643,7 +8643,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             {
                 case LOOT_DISENCHANTING:
                 {
-                    loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true);
+                    loot->FillLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, this, true, 1U, false);
                     // Reward shards when the item being disenchanted contains gems
                     uint8 gemCount = item->GetGemCountWithLimitCategory(0);
                     for (uint8 i = 0; i < gemCount; ++i)
@@ -8654,14 +8654,14 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                     break;
                 }
                 case LOOT_PROSPECTING:
-                    loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this, true);
+                    loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this, true, 1U, false);
                     break;
                 case LOOT_MILLING:
-                    loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this, true);
+                    loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this, true, 1U, false);
                     break;
                 default:
                     loot->generateMoneyLoot(item->GetTemplate()->MinMoneyLoot, item->GetTemplate()->MaxMoneyLoot);
-                    loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, loot->gold != 0);
+                    loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, loot->gold != 0, false);
 
                     // Force save the loot and money items that were just rolled
                     //  Also saves the container item ID in Loot struct (not to DB)
@@ -8693,11 +8693,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             if (Battleground* bg = GetBattleground())
             {
                 if (bg->GetTypeID(true) == BATTLEGROUND_AV)
-                    loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true);
+                    loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true, 1U, false);
             }
             // For wintergrasp Quests
             else if (GetZoneId() == AREA_WINTERGRASP)
-                loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true);
+                loot->FillLoot(PLAYER_CORPSE_LOOT_ENTRY, LootTemplates_Creature, this, true, 1U, false);
 
             // It may need a better formula
             // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
