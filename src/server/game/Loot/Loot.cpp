@@ -155,8 +155,8 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
     uint32 limit = item.needs_quest ? MAX_NR_QUEST_ITEMS : MAX_NR_LOOT_ITEMS;
 
-    // Personal loot hack'n slash
     bool isGroup = false;
+    // Personal loot hack'n slash
     if (canBePersonal)
     {
         if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
@@ -194,7 +194,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
 
                             generatedLoot.count = std::min(count, personalProto->GetMaxStackSize());
                             lootItems.push_back(generatedLoot);
-                            count -= personalProto->GetMaxStackSize();
+                            /*count -=*/ personalProto->GetMaxStackSize();
 
                             // In some cases, a dropped item should be visible/lootable only for some players in group
                             bool canSeeItemInLootWindow = false;
@@ -214,6 +214,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
             }
         }
     }
+    // Normal path if not in a group
     if (!isGroup)
     {
         uint32 count = urand(item.mincount, item.maxcount);
