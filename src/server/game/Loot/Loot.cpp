@@ -473,23 +473,7 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         i_next = i;
         ++i_next;
         if (Player* player = ObjectAccessor::FindPlayer(*i))
-        {   
-            uint8 actualCount = 0;
-            bool foundItem = false;
-            for (int i = 0; i < items.size(); ++i)
-            {
-                if (items[i].personalLootOwner && items[i].personalLootOwner != player->GetGUID())
-                    continue;
-                if (actualCount == lootIndex)
-                {
-                    foundItem = true;
-                    break;
-                }
-                ++actualCount;
-            }
-            if (foundItem)
-                player->SendNotifyLootItemRemoved(lootIndex);
-        }
+            player->SendNotifyLootItemRemoved(lootIndex);
         else
             PlayersLooting.erase(i);
     }
@@ -779,7 +763,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(itemsShown) << l.items[i];
+                    b << uint8(i) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
                 }
@@ -796,7 +780,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(itemsShown) << l.items[i];
+                    b << uint8(i) << l.items[i];
                     b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
                     ++itemsShown;
                 }
@@ -811,7 +795,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    b << uint8(itemsShown) << l.items[i];
+                    b << uint8(i) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
                 }
@@ -831,9 +815,6 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         for (NotNormalLootItemList::const_iterator qi = q_list->begin(); qi != q_list->end(); ++qi)
         {
             LootItem &item = l.quest_items[qi->index];
-            // Skip if not the personal loot owner
-            if (item.personalLootOwner && item.personalLootOwner != lv.viewer->GetGUID())
-                continue;
             if (!qi->is_looted && !item.is_looted)
             {
                 b << uint8(l.items.size() + (qi - q_list->begin()));
@@ -875,9 +856,6 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         for (NotNormalLootItemList::const_iterator fi = ffa_list->begin(); fi != ffa_list->end(); ++fi)
         {
             LootItem &item = l.items[fi->index];
-            // Skip if not the personal loot owner
-            if (item.personalLootOwner && item.personalLootOwner != lv.viewer->GetGUID())
-                continue;
             if (!fi->is_looted && !item.is_looted)
             {
                 b << uint8(fi->index);
