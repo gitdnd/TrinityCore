@@ -1492,7 +1492,6 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY:     //   0               2.5
         case CMSG_BEGIN_TRADE:                          //   0               2.5
         case CMSG_INITIATE_TRADE:                       //   0               3
-        case CMSG_MESSAGECHAT:                          //   0               3.5
         case CMSG_INSPECT:                              //   0               3.5
         case CMSG_AREA_SPIRIT_HEALER_QUERY:             // not profiled
         case CMSG_STANDSTATECHANGE:                     // not profiled
@@ -1642,7 +1641,11 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
             maxPacketCounterAllowed = 3;
             break;
         }
-
+        case CMSG_MESSAGECHAT:                          //   0               3.5
+        {
+            maxPacketCounterAllowed = 75;
+            break;
+        }
         case CMSG_ITEM_REFUND_INFO:                     // not profiled
         {
             maxPacketCounterAllowed = PLAYER_SLOTS_COUNT;
