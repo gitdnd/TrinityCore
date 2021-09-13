@@ -94,6 +94,13 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
+    lootSlot = loot->lootSlotFromIndex(lootSlot, player);
+    if (lootSlot == -1)
+    {
+        TC_LOG_DEBUG("loot", "lootSlotFromIndex returned -1 for player %s", GetPlayer()->GetName().c_str());
+        return;
+    }
+
     player->StoreLootItem(lootSlot, loot);
 
     // If player is removing the last LootItem, delete the empty container.
@@ -447,6 +454,13 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!loot)
         return;
 
+    slotid = loot->lootSlotFromIndex(slotid, GetPlayer());
+    if (slotid == -1)
+    {
+        TC_LOG_DEBUG("loot", "MasterLootItem: lootSlotFromIndex returned -1 for player %s", GetPlayer()->GetName().c_str());
+        return;
+    }
+
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
         TC_LOG_DEBUG("loot", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)",
@@ -454,25 +468,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    uint8 actualCount = 0;
-    LootItem& item = LootItem();
-    bool foundItem = false;
-    for (int i = 0; i < loot->items.size(); ++i)
-    {
-        if (loot->items[i].personalLootOwner && loot->items[i].personalLootOwner != _player->GetGUID())
-            continue;
-        if (actualCount == slotid)
-        {
-            item = loot->items[i];
-            foundItem = true;
-            break;
-        }
-        ++actualCount;
-    }
-    if (!foundItem)
-    {
-        item = loot->quest_items[slotid - loot->items.size()];
-    }
+    LootItem& item = slotid >= loot->items.size() ? loot->quest_items[slotid - loot->items.size()] : loot->items[slotid];
 
     ItemPosCountVec dest;
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);

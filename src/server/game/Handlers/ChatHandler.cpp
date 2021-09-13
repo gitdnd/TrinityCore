@@ -137,7 +137,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
         }
     }
-    // LANG_ADDON should not be changed nor be affected by flood control
     else
     {
         // send in universal language if player in .gm on mode (ignore spell effects)
@@ -172,18 +171,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
             }
         }
-
-        if (!CanSpeak())
-        {
-            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
-            SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
-            recvData.rfinish(); // Prevent warnings
-            return;
-        }
-
-        if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
-            sender->UpdateSpeakTime();
     }
+
+    // Flood detection
+    if (!CanSpeak())
+    {
+        std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
+        SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+        recvData.rfinish(); // Prevent warnings
+        return;
+    }
+    if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
+        sender->UpdateSpeakTime();
 
     if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
     {
@@ -275,6 +274,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (lang != LANG_ADDON)
         lang = LANG_UNIVERSAL;
+    else
+        ++_addonMessageReceiveCount;
 
     std::stringstream chatSpy;
     switch (type)

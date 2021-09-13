@@ -439,6 +439,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     TC_METRIC_VALUE("processed_packets", processedPackets);
+    TC_METRIC_VALUE("addon_messages", _addonMessageReceiveCount);
+    _addonMessageReceiveCount = 0;
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
 

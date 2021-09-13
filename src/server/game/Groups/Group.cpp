@@ -886,7 +886,8 @@ void Group::SendLootStartRoll(uint32 countDown, uint32 mapid, Roll const& r)
     WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4+1));
     data << uint64(r.itemGUID);                             // guid of rolled item
     data << uint32(mapid);                                  // 3.3.3 mapid
-    data << uint32(r.itemSlot);                             // itemslot
+    size_t slot_pos = data.wpos();
+    data << uint32(0);                                      // item slot placeholder
     data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
     data << uint32(r.itemRandomSuffix);                     // randomSuffix
     data << uint32(r.itemRandomPropId);                     // item random property ID
@@ -900,8 +901,10 @@ void Group::SendLootStartRoll(uint32 countDown, uint32 mapid, Roll const& r)
         if (!p || !p->GetSession())
             continue;
 
-        if (itr->second == NOT_EMITED_YET)
+        if (itr->second == NOT_EMITED_YET) {
+            data.put<uint32>(slot_pos, r.getTarget()->indexFromLootSlot(r.itemSlot, p));
             p->SendDirectMessage(&data);
+        }
     }
 }
 
@@ -911,18 +914,18 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
         return;
 
     WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
-    data << uint64(r.itemGUID);                             // guid of rolled item
-    data << uint32(mapId);                                  // 3.3.3 mapid
-    data << uint32(r.itemSlot);                             // itemslot
-    data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
-    data << uint32(r.itemRandomSuffix);                     // randomSuffix
-    data << uint32(r.itemRandomPropId);                     // item random property ID
-    data << uint32(r.itemCount);                            // items in stack
-    data << uint32(countDown);                              // the countdown time to choose "need" or "greed"
+    data << uint64(r.itemGUID);                                      // guid of rolled item
+    data << uint32(mapId);                                           // 3.3.3 mapid
+    data << uint32(r.getTarget()->indexFromLootSlot(r.itemSlot, p)); // itemslot
+    data << uint32(r.itemid);                                        // the itemEntryId for the item that shall be rolled for
+    data << uint32(r.itemRandomSuffix);                              // randomSuffix
+    data << uint32(r.itemRandomPropId);                              // item random property ID
+    data << uint32(r.itemCount);                                     // items in stack
+    data << uint32(countDown);                                       // the countdown time to choose "need" or "greed"
     uint8 voteMask = r.rollVoteMask;
     if (!canNeed)
         voteMask &= ~ROLL_FLAG_TYPE_NEED;
-    data << uint8(voteMask);                                // roll type mask
+    data << uint8(voteMask);                                         // roll type mask
 
     p->SendDirectMessage(&data);
 }
@@ -931,7 +934,8 @@ void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rol
 {
     WorldPacket data(SMSG_LOOT_ROLL, (8+4+8+4+4+4+1+1+1));
     data << uint64(sourceGuid);                             // guid of the item rolled
-    data << uint32(roll.itemSlot);                          // slot
+    size_t slot_pos = data.wpos();
+    data << uint32(0);                                      // Item loot slot placeholder
     data << uint64(targetGuid);
     data << uint32(roll.itemid);                            // the itemEntryId for the item that shall be rolled for
     data << uint32(roll.itemRandomSuffix);                  // randomSuffix
@@ -946,8 +950,10 @@ void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rol
         if (!p || !p->GetSession())
             continue;
 
-        if (itr->second != NOT_VALID)
+        if (itr->second != NOT_VALID) {
+            data.put<uint32>(slot_pos, roll.getTarget()->indexFromLootSlot(roll.itemSlot, p));
             p->SendDirectMessage(&data);
+        }
     }
 }
 
@@ -955,7 +961,8 @@ void Group::SendLootRollWon(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 
 {
     WorldPacket data(SMSG_LOOT_ROLL_WON, (8+4+4+4+4+8+1+1));
     data << uint64(sourceGuid);                             // guid of the item rolled
-    data << uint32(roll.itemSlot);                          // slot
+    size_t slot_pos = data.wpos();
+    data << uint32(0);                                      // Item loot slot placeholder
     data << uint32(roll.itemid);                            // the itemEntryId for the item that shall be rolled for
     data << uint32(roll.itemRandomSuffix);                  // randomSuffix
     data << uint32(roll.itemRandomPropId);                  // Item random property
@@ -969,8 +976,10 @@ void Group::SendLootRollWon(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 
         if (!p || !p->GetSession())
             continue;
 
-        if (itr->second != NOT_VALID)
+        if (itr->second != NOT_VALID) {
+            data.put<uint32>(slot_pos, roll.getTarget()->indexFromLootSlot(roll.itemSlot, p));
             p->SendDirectMessage(&data);
+        }
     }
 }
 
@@ -978,7 +987,8 @@ void Group::SendLootAllPassed(Roll const& roll)
 {
     WorldPacket data(SMSG_LOOT_ALL_PASSED, (8+4+4+4+4));
     data << uint64(roll.itemGUID);                             // Guid of the item rolled
-    data << uint32(roll.itemSlot);                             // Item loot slot
+    size_t slot_pos = data.wpos();
+    data << uint32(0);                                         // Item loot slot placeholder
     data << uint32(roll.itemid);                               // The itemEntryId for the item that shall be rolled for
     data << uint32(roll.itemRandomPropId);                     // Item random property ID
     data << uint32(roll.itemRandomSuffix);                     // Item random suffix ID
@@ -989,8 +999,10 @@ void Group::SendLootAllPassed(Roll const& roll)
         if (!player || !player->GetSession())
             continue;
 
-        if (itr->second != NOT_VALID)
+        if (itr->second != NOT_VALID) {
+            data.put<uint32>(slot_pos, roll.getTarget()->indexFromLootSlot(roll.itemSlot, player));
             player->SendDirectMessage(&data);
+        }
     }
 }
 
