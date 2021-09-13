@@ -94,6 +94,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
+    lootSlot = loot->lootSlotFromIndex(lootSlot, player);
     player->StoreLootItem(lootSlot, loot);
 
     // If player is removing the last LootItem, delete the empty container.
@@ -446,6 +447,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     if (!loot)
         return;
+
+    slotid = loot->lootSlotFromIndex(slotid, GetPlayer());
 
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {

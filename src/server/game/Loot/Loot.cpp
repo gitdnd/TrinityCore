@@ -75,7 +75,7 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
     if (pProto->HasFlag(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeam() != ALLIANCE)
         return false;
 
-    if (personalLootOwner && personalLootOwner != player->GetGUID())
+    if (!personalLootOwner.IsEmpty() && personalLootOwner != player->GetGUID())
         return false;
 
     // Master looter can see certain items even if the character can't loot them
@@ -194,6 +194,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                                 generatedLoot.itemid = personalProto->ItemId;
 
                             generatedLoot.personalLootOwner = member->GetGUID();
+                            generatedLoot.freeforall = true;
 
                             generatedLoot.count = std::min(actualCount, personalProto->GetMaxStackSize());
                             lootItems.push_back(generatedLoot);
@@ -473,7 +474,7 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         i_next = i;
         ++i_next;
         if (Player* player = ObjectAccessor::FindPlayer(*i))
-            player->SendNotifyLootItemRemoved(lootIndex);
+            player->SendNotifyLootItemRemoved(indexFromLootSlot(lootIndex, player));
         else
             PlayersLooting.erase(i);
     }
@@ -763,7 +764,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(i) << l.items[i];
+                    b << uint8(l.indexFromLootSlot(i, lv.viewer)) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
                 }
@@ -780,7 +781,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                         // item shall not be displayed.
                         continue;
 
-                    b << uint8(i) << l.items[i];
+                    b << uint8(l.indexFromLootSlot(i, lv.viewer)) << l.items[i];
                     b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
                     ++itemsShown;
                 }
@@ -795,7 +796,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    b << uint8(i) << l.items[i];
+                    b << uint8(l.indexFromLootSlot(i, lv.viewer)) << l.items[i];
                     b << uint8(slot_type);
                     ++itemsShown;
                 }
@@ -858,7 +859,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem &item = l.items[fi->index];
             if (!fi->is_looted && !item.is_looted)
             {
-                b << uint8(fi->index);
+                b << uint8(l.indexFromLootSlot(fi->index, lv.viewer));
                 b << item;
                 b << uint8(slotType);
                 ++itemsShown;
@@ -876,7 +877,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             LootItem &item = l.items[ci->index];
             if (!ci->is_looted && !item.is_looted)
             {
-                b << uint8(ci->index);
+                b << uint8(l.indexFromLootSlot(ci->index, lv.viewer));
                 b << item;
                 switch (lv.permission)
                 {
@@ -906,4 +907,31 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     b.put<uint8>(count_pos, itemsShown);
 
     return b;
+}
+
+uint8 Loot::indexFromLootSlot(uint8 lootSlot, Player* player)
+{
+    uint8 index = -1;
+    for (uint8 i = 0; i <= lootSlot; ++i)
+    {
+        if (items[i].personalLootOwner.IsEmpty() || items[i].personalLootOwner == player->GetGUID())
+            ++index;
+    }
+    return index;
+}
+
+uint8 Loot::lootSlotFromIndex(uint8 index, Player* player)
+{
+    uint8 personalIndex = -1;
+    for (uint8 i = 0; i < items.size(); ++i)
+    {
+        if (items[i].personalLootOwner.IsEmpty() || items[i].personalLootOwner == player->GetGUID())
+        {
+            ++personalIndex;
+            if (personalIndex == index)
+                return i;
+        }
+    }
+    // TODO: raise an error
+    return -1;
 }
