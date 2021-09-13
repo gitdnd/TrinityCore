@@ -197,7 +197,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                             generatedLoot.freeforall = true;
 
                             generatedLoot.count = std::min(actualCount, personalProto->GetMaxStackSize());
-                            lootItems.push_back(generatedLoot);
+                            items.push_back(generatedLoot);
                             actualCount -= personalProto->GetMaxStackSize();
 
                             // In some cases, a dropped item should be visible/lootable only for some players in group
@@ -909,6 +909,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     return b;
 }
 
+// TODO: check if quest items still work
 uint8 Loot::indexFromLootSlot(uint8 lootSlot, Player* player)
 {
     uint8 index = -1;
@@ -932,6 +933,6 @@ uint8 Loot::lootSlotFromIndex(uint8 index, Player* player)
                 return i;
         }
     }
-    // TODO: raise an error
+    // TODO: raise an error, probably
     return -1;
 }
