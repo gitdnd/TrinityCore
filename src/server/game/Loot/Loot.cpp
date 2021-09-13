@@ -912,7 +912,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 uint8 Loot::indexFromLootSlot(uint8 lootSlot, Player* player)
 {
     uint8 index = -1;
-    for (uint8 i = 0; i <= lootSlot; ++i)
+    for (uint8 i = 0; i <= std::min(lootSlot, (uint8)(items.size() - 1)); ++i)
     {
         if (items[i].personalLootOwner.IsEmpty() || items[i].personalLootOwner == player->GetGUID())
             ++index;
