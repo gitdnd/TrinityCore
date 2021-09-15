@@ -12095,8 +12095,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
 
-        // Disabled making items tradeable for 2 hours
-        /*if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound())
+        if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && !sVirtualItemMgr.GetVirtualTemplate(item))
         {
             pItem->SetSoulboundTradeable(allowedLooters);
             pItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, GetTotalPlayedTime());
@@ -12113,7 +12112,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
             stmt->setUInt32(0, pItem->GetGUID().GetCounter());
             stmt->setString(1, ss.str());
             CharacterDatabase.Execute(stmt);
-        }*/
+        }
     }
     return pItem;
 }
