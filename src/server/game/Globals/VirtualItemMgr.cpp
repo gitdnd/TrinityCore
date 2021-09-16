@@ -737,7 +737,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
                 }
                 case ITEM_QUALITY_EPIC:
                 {
-                    ss << selectedWords[3] << " " << selectedWords[4] << " " selectedWords[5];
+                    ss << selectedWords[3] << " " << selectedWords[4] << " " << selectedWords[5];
                     break;
                 }
                 case ITEM_QUALITY_LEGENDARY:
