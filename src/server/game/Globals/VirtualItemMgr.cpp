@@ -1016,7 +1016,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             if (output->Socket[i].Color != 0 && !reRoll)
             {
                 //Dummy call to urand to keep consistency.
-                urand(0, socketcolors.size() - 1, generator)
+                urand(0, socketcolors.size() - 1, generator);
                 continue;
             }
             /*float chance = output->Quality == ITEM_QUALITY_LEGENDARY ? 10.f : 5.f;
