@@ -243,7 +243,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         {
             ObjectGuid guid(HighGuid::Player, (*result)[0].GetUInt32());
             TC_LOG_INFO("network", "Loading %s from account %u.", guid.ToString().c_str(), GetAccountId());
-            if (Player::BuildEnumData(result, &data))
+            if (Player::BuildEnumData(result, &data, this))
             {
                 // Do not allow banned characters to log in
                 if (!(*result)[23].GetUInt32())
