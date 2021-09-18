@@ -385,18 +385,20 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 
     // select stat group if the item is an armor piece or manually set as a modifier
     StatGroup statgroupid = modifier.statgroup;
-    bool isCloak = output->Class == ITEM_CLASS_ARMOR &&
-        output->SubClass == ITEM_SUBCLASS_ARMOR_CLOTH &&
-        output->InventoryType == INVTYPE_CLOAK;
     std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
-
-    StatGroup randone = statgroups[urand(0, statgroups.size() - 1, generator)];
-    StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
-    if (output->Class == ITEM_CLASS_ARMOR && !isCloak)
+    if (!statgroups.empty())
     {
-         if (!statgroups.empty() && modifier.statgroup == STAT_GROUP_RANDOM)
-            statgroupid = randone;
+        bool isCloak = output->Class == ITEM_CLASS_ARMOR &&
+            output->SubClass == ITEM_SUBCLASS_ARMOR_CLOTH &&
+            output->InventoryType == INVTYPE_CLOAK;
+        StatGroup randone = statgroups[urand(0, statgroups.size() - 1, generator)];
+        if (output->Class == ITEM_CLASS_ARMOR && !isCloak)
+        {
+            if (!statgroups.empty() && modifier.statgroup == STAT_GROUP_RANDOM)
+                statgroupid = randone;
+        }
     }
+    StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
 
      // If the stat group is still random, select a random stat group.
      if (statgroupid == STAT_GROUP_RANDOM)
