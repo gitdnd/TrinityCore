@@ -388,16 +388,19 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     bool isCloak = output->Class == ITEM_CLASS_ARMOR &&
         output->SubClass == ITEM_SUBCLASS_ARMOR_CLOTH &&
         output->InventoryType == INVTYPE_CLOAK;
-    if (modifier.statgroup == STAT_GROUP_RANDOM && output->Class == ITEM_CLASS_ARMOR && !isCloak)
+    std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
+
+    StatGroup randone = statgroups[urand(0, statgroups.size() - 1, generator)];
+    StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
+    if (output->Class == ITEM_CLASS_ARMOR && !isCloak)
     {
-        std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
-        if (!statgroups.empty())
+         if (!statgroups.empty())
             statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
     }
 
-    // If the stat group is still random, select a random stat group.
-    if (statgroupid == STAT_GROUP_RANDOM)
-        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
+     // If the stat group is still random, select a random stat group.
+     if (statgroupid == STAT_GROUP_RANDOM)
+         statgroupid = randtwo;
 
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
 
