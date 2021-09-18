@@ -394,8 +394,8 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
     if (output->Class == ITEM_CLASS_ARMOR && !isCloak)
     {
-         if (!statgroups.empty())
-            statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
+         if (!statgroups.empty() && )
+            statgroupid = randone;
     }
 
      // If the stat group is still random, select a random stat group.
