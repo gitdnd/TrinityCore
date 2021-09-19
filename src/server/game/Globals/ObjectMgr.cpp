@@ -10479,6 +10479,10 @@ void ObjectMgr::LoadSpellGemDescriptors()
 
 std::string ObjectMgr::GetSpellGemDesc(uint32 id) const
 {
-    return Trinity::Containers::MapGetValuePtr(_spellGemDesc, id);
+    auto desc = _spellGemDesc.find(id);
+    if (desc != _spellGemDesc.end())
+        return desc->second;
+
+    return "";
 }
 

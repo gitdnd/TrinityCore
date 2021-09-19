@@ -1759,6 +1759,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Disables");                         // must be before loading quests and items
     DisableMgr::LoadDisables();
 
+    TC_LOG_INFO("server.loading", "Loading Spell Gem Desc...");
+    sObjectMgr->LoadSpellGemDescriptors();
+
     TC_LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
 
