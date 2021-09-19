@@ -2725,15 +2725,10 @@ void Player::InitTalentForLevel()
     if (newTalentPoints < 0)
     {
         newTalentPoints = 0;
-        TC_LOG_ERROR("entities.player", "Player %s (%u) talents underflowed (Level/Talent Level) %u/%u)", GetName().c_str(), GetGUID().GetCounter(), level, m_usedTalentCount);
-        ChatHandler(GetSession()).SendSysMessage("Your talent points attempted to underflow, please contact a developer explaining what you were doing with this issue occured.");
-    }
-    if (m_usedTalentCount > level)
-    {
         TC_LOG_ERROR("entities.player", "Player %s (%u) has more talent points than their level (Level/Talent Level) %u/%u)", GetName().c_str(), GetGUID().GetCounter(), level, m_usedTalentCount);
         ChatHandler(GetSession()).SendSysMessage("Your talent points is greater than your level please contact a developer explaining what you were doing with this issue occured.");
     }
-    SetFreeTalentPoints(level - m_usedTalentCount);
+    SetFreeTalentPoints(newTalentPoints);
 
     /*
     uint8 level = GetLevel();
