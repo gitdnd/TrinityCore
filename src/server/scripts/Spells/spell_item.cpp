@@ -4339,6 +4339,28 @@ class spell_item_unlock_bank_slot : public SpellScript
     }
 };
 
+class spell_item_temporal_time_crystal : public SpellScript
+{
+    PrepareSpellScript(spell_item_temporal_time_crystal);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        caster->ResetInstances(INSTANCE_RESET_ALL, false);
+        caster->TeleportTo(35, -1.218f, 28.222f, -19.5f, 1.56996f);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_temporal_time_crystal::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4471,4 +4493,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_crazy_alchemists_potion);
     RegisterSpellScript(spell_item_eggnog);
     RegisterSpellScript(spell_item_unlock_bank_slot);
+    RegisterSpellScript(spell_item_temporal_time_crystal);
 }
