@@ -4348,6 +4348,17 @@ class spell_item_temporal_time_crystal : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->GetMapId() == 35)
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You must exit The Vault before using another temporal time crystal.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
@@ -4358,6 +4369,7 @@ class spell_item_temporal_time_crystal : public SpellScript
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_item_temporal_time_crystal::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_temporal_time_crystal::CheckRequirement);
     }
 };
 
