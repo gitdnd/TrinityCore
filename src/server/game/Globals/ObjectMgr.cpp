@@ -2972,9 +2972,10 @@ void ObjectMgr::LoadItemTemplates()
                     {
                         if (SpellInfo const* actualSpell = sSpellMgr->GetSpellInfo(spellEntry->Effects[EFFECT_0].TriggerSpell))
                         {
-                            std::stringstream ss;
+                           /* std::stringstream ss;
                             ss << itemTemplate.Description << "\n\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << actualSpell->SpellDescription[LOCALE_enUS] << "|r";
-                            itemTemplate.Description = ss.str().c_str();
+                            itemTemplate.Description = ss.str().c_str();*/
+                            itemTemplate.Description = GetSpellGemDesc(actualSpell->Id);
                         }
                     }
                 }
@@ -10453,3 +10454,31 @@ ByteBuffer QuestPOIWrapper::BuildQueryData() const
 
     return tempBuffer;
 }
+
+void ObjectMgr::LoadSpellGemDescriptors()
+{
+    _spellGemDesc.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT SpellId, Description FROM item_spell_gem_desc");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 spell gem desc. DB table `item_spell_gem_desc` is empty!");
+        return;
+    }
+    _spellGemDesc.reserve(result->GetRowCount());
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        std::string desc = fields[1].GetString();
+        _spellGemDesc.emplace(id, desc);
+    } while (result->NextRow());
+}
+
+std::string ObjectMgr::GetSpellGemDesc(uint32 id) const
+{
+    return Trinity::Containers::MapGetValuePtr(_spellGemDesc, id);
+}
+

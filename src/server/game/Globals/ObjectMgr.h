@@ -973,6 +973,7 @@ class TC_GAME_API ObjectMgr
 
         typedef std::map<uint32, uint32> CharacterConversionMap;
 
+
         GameObjectTemplate const* GetGameObjectTemplate(uint32 entry) const;
         GameObjectTemplateContainer const& GetGameObjectTemplates() const { return _gameObjectTemplateStore; }
         uint32 LoadReferenceVendor(int32 vendor, int32 item_id, std::set<uint32>* skip_vendors);
@@ -1237,6 +1238,10 @@ class TC_GAME_API ObjectMgr
         void LoadVendors();
         void LoadTrainers();
         void LoadCreatureDefaultTrainers();
+        void LoadSpellGemDescriptors();
+        std::string GetSpellGemDesc(uint32 id) const;
+        typedef std::unordered_map<uint32, const std::string> spellGemDescContainer;
+        spellGemDescContainer _spellGemDesc;
 
         void InitializeQueriesData(QueryDataGroup mask);
 
