@@ -2974,7 +2974,7 @@ void ObjectMgr::LoadItemTemplates()
                         {
                             const std::string newdesc = GetSpellGemDesc(actualSpell->Id);
                             if (newdesc != "")
-                                itemTemplate.Description = GetSpellGemDesc(actualSpell->Id);
+                                itemTemplate.Description = newdesc;
                             else
                             {
                                 std::stringstream ss;
