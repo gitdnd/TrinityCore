@@ -4339,6 +4339,40 @@ class spell_item_unlock_bank_slot : public SpellScript
     }
 };
 
+class spell_item_temporal_time_crystal : public SpellScript
+{
+    PrepareSpellScript(spell_item_temporal_time_crystal);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->GetMapId() == 35)
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You must exit The Vault before using another temporal time crystal.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        caster->ResetInstances(INSTANCE_RESET_ALL, false);
+        caster->TeleportTo(35, -1.218f, 28.222f, -19.5f, 1.56996f);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_temporal_time_crystal::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_temporal_time_crystal::CheckRequirement);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4471,4 +4505,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_crazy_alchemists_potion);
     RegisterSpellScript(spell_item_eggnog);
     RegisterSpellScript(spell_item_unlock_bank_slot);
+    RegisterSpellScript(spell_item_temporal_time_crystal);
 }
