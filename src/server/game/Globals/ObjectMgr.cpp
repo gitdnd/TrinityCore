@@ -2972,10 +2972,15 @@ void ObjectMgr::LoadItemTemplates()
                     {
                         if (SpellInfo const* actualSpell = sSpellMgr->GetSpellInfo(spellEntry->Effects[EFFECT_0].TriggerSpell))
                         {
-                           /* std::stringstream ss;
-                            ss << itemTemplate.Description << "\n\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << actualSpell->SpellDescription[LOCALE_enUS] << "|r";
-                            itemTemplate.Description = ss.str().c_str();*/
-                            itemTemplate.Description = GetSpellGemDesc(actualSpell->Id);
+                            const std::string newdesc = GetSpellGemDesc(actualSpell->Id);
+                            if (newdesc != "")
+                                itemTemplate.Description = GetSpellGemDesc(actualSpell->Id);
+                            else
+                            {
+                                std::stringstream ss;
+                                ss << itemTemplate.Description << "\n\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << actualSpell->SpellDescription[LOCALE_enUS] << "|r";
+                                itemTemplate.Description = ss.str().c_str();
+                            }
                         }
                     }
                 }
