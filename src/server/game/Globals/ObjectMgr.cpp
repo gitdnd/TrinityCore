@@ -2974,7 +2974,11 @@ void ObjectMgr::LoadItemTemplates()
                         {
                             const std::string newdesc = GetSpellGemDesc(actualSpell->Id);
                             if (newdesc != "")
-                                itemTemplate.Description = newdesc;
+                            {
+                                std::stringstream ss;
+                                ss << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << newdesc << "|r";
+                                itemTemplate.Description = ss.str().c_str();
+                            }
                             else
                             {
                                 std::stringstream ss;
