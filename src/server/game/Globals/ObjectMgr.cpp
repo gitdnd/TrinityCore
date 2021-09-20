@@ -2976,7 +2976,7 @@ void ObjectMgr::LoadItemTemplates()
                             if (newdesc != "")
                             {
                                 std::stringstream ss;
-                                ss << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << newdesc << "|r";
+                                ss << "\n" << newdesc << "|r";
                                 itemTemplate.Description = ss.str().c_str();
                             }
                             else
