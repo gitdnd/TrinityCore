@@ -10,8 +10,8 @@ public:
     {
         if (player->GetSession()->GetAccountId() == 638)
         {
-            player->SetNativeDisplayId(24877);
             player->SetDisplayId(24877);
+            player->SetNativeDisplayId(24877);
         }
 
     }
