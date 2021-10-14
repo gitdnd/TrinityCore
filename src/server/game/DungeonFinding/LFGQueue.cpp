@@ -392,6 +392,10 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
         TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Detected queueing for SOLO CONTENT");
         maxGroupSize = SOLOCONTENTGROUPSIZE;
     }
+    else if (queue.dungeons.find(STROMGARDE) != queue.dungeons.end()) {
+        TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Detected queueing for 3 MAN CONTENT");
+        maxGroupSize = THREEMANGROUPSIZE;
+    }
 
     // Check for correct size
     if (check.size() > maxGroupSize || check.empty())
