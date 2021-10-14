@@ -196,9 +196,10 @@ void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet cons
 {
     bool isSolo = dungeons.find(STORMWINDVAULT) != dungeons.end();
     bool isRaid = dungeons.find(DRAGONISLESRAID) != dungeons.end();
-    int tanksNeeded = isRaid ? LFR_TANKS_NEEDED : LFG_TANKS_NEEDED;
-    int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
-    int dpsNeeded = isRaid ? LFR_DPS_NEEDED : LFG_DPS_NEEDED;
+    bool isThreeMan = dungeons.find(STROMGARDE) != dungeons.end();
+    int tanksNeeded = isRaid ? LFR_TANKS_NEEDED : isThreeMan ? LFG_SMALL_TANKS_NEEDED : LFG_TANKS_NEEDED;
+    int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : isThreeMan ? LFG_SMALL_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
+    int dpsNeeded = isRaid ? LFR_DPS_NEEDED : isThreeMan ? LFG_SMALL_DPS_NEEDED : LFG_DPS_NEEDED;
 
     QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo);
     AddToQueue(guid);

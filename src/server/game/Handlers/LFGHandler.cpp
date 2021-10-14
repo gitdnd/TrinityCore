@@ -90,6 +90,10 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     {
         groupType = lfg::LfgGroupType::GROUP_SOLO;
     }
+    else if (newDungeons.find(STROMGARDE) != newDungeons.end())
+    {
+        groupType = lfg::LfgGroupType::GROUP_3_MAN;
+    }
 
     // Validations on group size
     // FIXME(Harry): Disable queueing for raid from LFG temporarily
@@ -99,7 +103,9 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         recvData.rfinish();
         return;
     }
-    else if (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() > MAXGROUPSIZE))
+    else if (
+        (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() > MAXGROUPSIZE)) ||
+        (groupType == lfg::LfgGroupType::GROUP_3_MAN && (group && group->GetMembersCount() > MAXSMALLGROUPSIZE)))
     {
         TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Group size is bigger than max group size", GetPlayerInfo().c_str());
         recvData.rfinish();
@@ -111,7 +117,9 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         recvData.rfinish();
         return;
     }
-    else if (groupType == lfg::LfgGroupType::GROUP_SOLO && newDungeons.size() > 1)
+    else if (
+        (groupType == lfg::LfgGroupType::GROUP_SOLO && newDungeons.size() > 1) ||
+        (groupType == lfg::LfgGroupType::GROUP_3_MAN && newDungeons.size() > 1))
     {
         TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Cannot queue for mixed group size dungeons", GetPlayerInfo().c_str());
         recvData.rfinish();

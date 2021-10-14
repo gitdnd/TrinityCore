@@ -40,6 +40,7 @@ class WorldSession;
 struct MapEntry;
 
 #define MAXGROUPSIZE 5
+#define MAXSMALLGROUPSIZE 3
 #define MAXRAIDSIZE 40
 #define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
 #define TARGETICONCOUNT 8
@@ -48,6 +49,7 @@ struct MapEntry;
 #define MAXLFGRAIDGROUPSIZE 10
 #define DRAGONISLESRAID 306
 #define STORMWINDVAULT 307
+#define STROMGARDE 309
 
 enum RollVote
 {
