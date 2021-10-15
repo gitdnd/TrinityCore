@@ -444,6 +444,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
     else if (grp)
     {
         if ((groupType == GROUP_5_MAN && grp->GetMembersCount() > MAXGROUPSIZE) ||
+            (groupType == GROUP_3_MAN && grp->GetMembersCount() > MAXSMALLGROUPSIZE) ||
             (groupType == GROUP_10_MAN && grp->GetMembersCount() > MAXLFGRAIDGROUPSIZE))
             joinData.result = LFG_JOIN_TOO_MUCH_MEMBERS;
         else
@@ -1367,8 +1368,9 @@ void LFGMgr::TeleportPlayer(Player* player, bool out, bool fromOpcode /*= false*
         error = LFG_TELEPORTERROR_INVALID_LOCATION;
     else if (player->IsInCombat())
         error = LFG_TELEPORTERROR_CANT_DO_THAT_RIGHT_NOW;
-    // Manually handle StormwindVault map 35, cannot enter if group size > 1
-    else if (dungeon->map == 35 && player->GetGroup() && player->GetGroup()->GetMembersCount() > 1)
+    // Manually handle StormwindVault map 35 and Stromgarde map 766
+    else if ((dungeon->map == 35 && player->GetGroup() && player->GetGroup()->GetMembersCount() > 1) ||
+        (dungeon->map == 766 && player->GetGroup() && player->GetGroup()->GetMembersCount() > 3))
         error = LFG_TELEPORTERROR_CANT_DO_THAT_RIGHT_NOW;
     else if (player->GetMapId() != uint32(dungeon->map))  // Do not teleport players in dungeon to the entrance
     {

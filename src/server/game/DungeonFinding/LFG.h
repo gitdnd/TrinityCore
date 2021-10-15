@@ -34,6 +34,13 @@ enum LFGDungeonEnum
     LFG_DPS_NEEDED = 3
 };
 
+enum LFGSmallDungeonEnum
+{
+    LFG_SMALL_TANKS_NEEDED = 1,
+    LFG_SMALL_HEALERS_NEEDED = 1,
+    LFG_SMALL_DPS_NEEDED = 1
+};
+
 enum LFGRaidEnum
 {
     LFR_TANKS_NEEDED = 2,
