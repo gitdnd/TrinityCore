@@ -43,7 +43,7 @@ public:
         return commandTable;
     }
 
-    static bool HandlDiscordForgotPasswordCommand(ChatHandler* handler, std::string discordId)
+    static bool HandlDiscordForgotPasswordCommand(ChatHandler* handler, std::string const& discordId)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -63,7 +63,7 @@ public:
         return true;
     }
 
-    static bool HandlDiscordForgotUsernameCommand(ChatHandler* handler, std::string discordId)
+    static bool HandlDiscordForgotUsernameCommand(ChatHandler* handler, std::string const& discordId)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -80,7 +80,7 @@ public:
         return true;
     }
 
-    static bool HandlDiscordChangePasswordCommand(ChatHandler* handler, std::string discordId, std::string password)
+    static bool HandlDiscordChangePasswordCommand(ChatHandler* handler, std::string const& discordId, std::string const& password)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -103,7 +103,7 @@ public:
         return true;
     }
 
-    static bool HandlDiscordSetup2FACommand(ChatHandler* handler, std::string discordId)
+    static bool HandlDiscordSetup2FACommand(ChatHandler* handler, std::string const& discordId)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -112,7 +112,7 @@ public:
         return true;
     }
 
-    static bool HandlDiscordRegisterAccountCommand(ChatHandler* handler, std::string discordId, std::string username, std::string password)
+    static bool HandlDiscordRegisterAccountCommand(ChatHandler* handler, std::string const& discordId, std::string const& username, std::string const& password)
     {
         if (AccountMgr::GetIdByEmail(discordId))
         {
@@ -143,7 +143,7 @@ public:
         }
     }
 
-    static bool HandlDiscordRegisterAccessKeyCommand(ChatHandler* handler, std::string discordId, std::string key)
+    static bool HandlDiscordRegisterAccessKeyCommand(ChatHandler* handler, std::string const& discordId, std::string const& key)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -152,7 +152,7 @@ public:
         return true;
     }
 
-    static uint32 GetAccountIdByDiscordId(ChatHandler* handler,  std::string discordId)
+    static uint32 GetAccountIdByDiscordId(ChatHandler* handler,  std::string const& discordId)
     {
         uint32 accountId = AccountMgr::GetIdByEmail(discordId);
 
