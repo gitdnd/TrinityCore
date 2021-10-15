@@ -67,6 +67,8 @@ class TC_GAME_API AccountMgr
         static bool CheckEmail(uint32 accountId, std::string newEmail);
 
         static uint32 GetId(std::string const& username);
+        static uint32 GetIdByEmail(std::string const& email);
+        static std::string GetUsernameById(uint32 id);
         static uint32 GetSecurity(uint32 accountId);
         static uint32 GetSecurity(uint32 accountId, int32 realmId);
         static bool GetName(uint32 accountId, std::string& name);

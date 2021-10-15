@@ -283,6 +283,26 @@ uint32 AccountMgr::GetId(std::string const& username)
     return (result) ? (*result)[0].GetUInt32() : 0;
 }
 
+uint32 AccountMgr::GetIdByEmail(std::string const& email)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_EMAIL);
+    stmt->setString(0, email);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    return (result) ? (*result)[0].GetUInt32() : 0;
+}
+
+
+std::string AccountMgr::GetUsernameById(uint32 id)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_USERNAME_BY_ID);
+    stmt->setUInt32(0, id);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    return (result) ? (*result)[0].GetString() : "";
+}
+
+
 uint32 AccountMgr::GetSecurity(uint32 accountId)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ACCESS_GMLEVEL);
