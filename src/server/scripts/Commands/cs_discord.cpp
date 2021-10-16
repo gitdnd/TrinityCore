@@ -103,12 +103,66 @@ public:
         return true;
     }
 
-    static bool HandlDiscordSetup2FACommand(ChatHandler* handler, std::string const& discordId)
+    static bool HandlDiscordSetup2FACommand(ChatHandler* handler, std::string const& discordId, Optional<uint32> token)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
             return true;
 
+        auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
+        if (!masterKey.IsAvailable())
+        {
+            handler->SendSysMessage(LANG_2FA_COMMANDS_NOT_SETUP);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        { // check if 2FA already enabled
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
+            stmt->setUInt32(0, accountId);
+            PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+            if (!result)
+            {
+                TC_LOG_ERROR("misc", "Account %u not found in login database when processing .account 2fa setup command.", accountId);
+                handler->SendSysMessage(LANG_UNKNOWN_ERROR);
+                return true;
+            }
+
+            if (!result->Fetch()->IsNull())
+            {
+                handler->SendSysMessage(LANG_2FA_ALREADY_SETUP);
+                return true;
+            }
+        }
+
+        // store random suggested secrets
+        static std::unordered_map<uint32, Trinity::Crypto::TOTP::Secret> suggestions;
+        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Trinity::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument size_t constructor invokes resize
+        if (pair.second) // no suggestion yet, generate random secret
+            RAND_bytes(pair.first->second.data(), pair.first->second.size());
+
+        if (!pair.second && token) // suggestion already existed and token specified - validate
+        {
+            if (Trinity::Crypto::TOTP::ValidateToken(pair.first->second, *token))
+            {
+                if (masterKey)
+                    Trinity::Crypto::AEEncryptWithRandomIV<Trinity::Crypto::AES>(pair.first->second, *masterKey);
+
+                LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET);
+                stmt->setBinary(0, pair.first->second);
+                stmt->setUInt32(1, accountId);
+                LoginDatabase.Execute(stmt);
+                suggestions.erase(pair.first);
+                handler->SendSysMessage(LANG_2FA_SETUP_COMPLETE);
+                return true;
+            }
+            else
+                handler->SendSysMessage(LANG_2FA_INVALID_TOKEN);
+        }
+
+        // new suggestion, or no token specified, output TOTP parameters
+        handler->PSendSysMessage(LANG_2FA_SECRET_SUGGESTION, Trinity::Encoding::Base32::Encode(pair.first->second));
         return true;
     }
 
