@@ -17,6 +17,7 @@
 #include "WorldSession.h"
 #include <unordered_map>
 #include <openssl/rand.h>
+#include <boost/optional/optional_io.hpp>
 
 using namespace Trinity::ChatCommands;
 
@@ -160,7 +161,7 @@ public:
             else
             {
                 //handler->SendSysMessage(LANG_2FA_INVALID_TOKEN);
-                handler->PSendSysMessage("%u was invalid toke.", token);
+                handler->PSendSysMessage("%u was invalid token.", token);
                 return true;
             }
                 
