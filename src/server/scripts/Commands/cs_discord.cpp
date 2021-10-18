@@ -36,6 +36,7 @@ public:
             { "setup2fa",               rbac::RBAC_PERM_COMMAND_DISCORD_SETUP_2FA,                true,  &HandlDiscordSetup2FACommand,       ""       },
             { "registeraccount",        rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCOUNT,         true,  &HandlDiscordRegisterAccountCommand,       ""       },
             { "registeraccesskey",      rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCESS_KEY,      true,  &HandlDiscordRegisterAccessKeyCommand,       ""       },
+            { "status",                 rbac::RBAC_PERM_COMMAND_DISCORD_ACCOUNT_STATUS,           true,  &HandlDiscordAccountStatusCommand,       ""       },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -209,7 +210,45 @@ public:
         if (!accountId)
             return true;
 
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCESS_KEY_BY_ACCOUNT);
+        stmt->setString(0, key);
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+        if (!result || !result->Fetch()->IsNull())
+        {
+            handler->PSendSysMessage("%s is not a valid alpha key.", key);
+            return true;
+        }
+
+        LoginDatabasePreparedStatement* alphaaccess = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCESS_KEY_BY_ACCOUNT);
+        alphaaccess->setUInt32(0, accountId);
+        alphaaccess->setString(1, key);
+        LoginDatabase.Execute(alphaaccess);
+        sAccountMgr->UpdateAccountAccess(nullptr, accountId, 1, -1);
+        handler->PSendSysMessage("You redeemed %s key.", key);
         return true;
+    }
+
+    static bool HandlDiscordAccountStatusCommand(ChatHandler* handler, std::string const& discordId)
+    {
+        uint32 accountId = AccountMgr::GetIdByEmail(discordId);
+        bool twoFactorEnabled = false;
+        bool alphaAccess = false;
+
+        if (accountId != 0)
+        {
+            LoginDatabasePreparedStatement* twofactor = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
+            twofactor->setUInt32(0, accountId);
+            PreparedQueryResult twofactorresult = LoginDatabase.Query(twofactor);
+            if (twofactorresult && !twofactorresult->Fetch()->IsNull())
+                twoFactorEnabled = true;
+
+            LoginDatabasePreparedStatement* alpha = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCESS_KEY_BY_ACCOUNT);
+            alpha->setUInt32(0, accountId);
+            PreparedQueryResult alpharesult = LoginDatabase.Query(alpha);
+            if (alpharesult && !alpharesult->Fetch()->IsNull())
+                alphaAccess = true;
+        }
+        handler->PSendSysMessage("%s %s %s", accountId != 0 ? "YesACC" : "noACC", twoFactorEnabled ? "Yes2FA" : "No2FA", alphaAccess ? "YesAlpha" : "NoAlpha");
     }
 
     static uint32 GetAccountIdByDiscordId(ChatHandler* handler,  std::string const& discordId)
