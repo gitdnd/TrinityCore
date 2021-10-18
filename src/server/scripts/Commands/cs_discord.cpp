@@ -249,6 +249,7 @@ public:
                 alphaAccess = true;
         }
         handler->PSendSysMessage("%s %s %s", accountId != 0 ? "YesACC" : "noACC", twoFactorEnabled ? "Yes2FA" : "No2FA", alphaAccess ? "YesAlpha" : "NoAlpha");
+        return true;
     }
 
     static uint32 GetAccountIdByDiscordId(ChatHandler* handler,  std::string const& discordId)
