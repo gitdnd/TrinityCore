@@ -127,7 +127,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_GET_ACCOUNT_USERNAME_BY_ID, "SELECT username FROM account WHERE id = ? LIMIT 1", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_ACCOUNT_BY_ACCESS_KEY, "SELECT accountId FROM access_keys WHERE key = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_ACCESS_KEY_BY_ACCOUNT, "SELECT key FROM access_keys WHERE accountId = ?", CONNECTION_SYNCH);
-    PrepareStatement(LOGIN_UPD_ACCESS_KEY_BY_ACCOUNT, "UPDATE access_keys SET accountId = ? WHERE key = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_ACCESS_KEY_BY_ACCOUNT, "UPDATE access_keys SET accountId = ? WHERE `key` = ?", CONNECTION_ASYNC);
 
 }
 
