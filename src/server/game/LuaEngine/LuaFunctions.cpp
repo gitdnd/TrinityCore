@@ -781,6 +781,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "OverridePetSpells", &LuaPlayer::OverridePetSpells },
     { "ResetInstances", &LuaPlayer::ResetInstances },
     { "IsInstanceBound", &LuaPlayer::IsInstanceBound },
+    { "GetTalentLevel", &LuaPlayer::GetTalentLevel },
 
     { NULL, NULL }
 };

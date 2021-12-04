@@ -4383,5 +4383,11 @@ namespace LuaPlayer
 
         return 1;
     }
+
+    int GetTalentLevel(lua_State* L, Player* player)
+    {
+        Eluna::Push(L, player->GetTalentLevel());
+        return 1;
+    }
 };
 #endif
