@@ -2611,6 +2611,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
             InitTalentForLevel();
             ChatHandler(GetSession()).SendSysMessage(("Your talent level has increased to " + std::to_string(talent_level) + ".").c_str());
             ChatHandler(GetSession()).SendSysMessage("You have gained 1 talent point.");
+            sEluna->OnLevelChanged(this, talent_level - 1);
         }
 
         //level = GetLevel();

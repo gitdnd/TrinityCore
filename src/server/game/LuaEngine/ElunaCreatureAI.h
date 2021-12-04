@@ -78,7 +78,15 @@ struct ElunaCreatureAI : ScriptedAI
     {
         if (me->GetCreatureTemplate()->rank == 3)
         {
+
             auto map = me->GetMap();
+
+            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+            data << uint32(0); // ENCOUNTER_FRAME_ENGAGE
+            data << me->GetPackGUID();
+            data << uint8(0);
+            map->SendToPlayers(&data);
+
             Map::PlayerList const& players = map->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
@@ -125,6 +133,13 @@ struct ElunaCreatureAI : ScriptedAI
         if (me->GetCreatureTemplate()->rank == 3)
         {
             auto map = me->GetMap();
+
+            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+            data << uint32(1); // ENCOUNTER_FRAME_DISENGAGE
+            data << me->GetPackGUID();
+            data << uint8(0);
+            map->SendToPlayers(&data);
+
             Map::PlayerList const& players = map->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
@@ -182,6 +197,13 @@ struct ElunaCreatureAI : ScriptedAI
         if (me->GetCreatureTemplate()->rank == 3)
         {
             auto map = me->GetMap();
+
+            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+            data << uint32(1); // ENCOUNTER_FRAME_DISENGAGE
+            data << me->GetPackGUID();
+            data << uint8(0);
+            map->SendToPlayers(&data);
+
             Map::PlayerList const& players = map->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
