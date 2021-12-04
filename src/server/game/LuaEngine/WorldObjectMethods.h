@@ -1266,5 +1266,21 @@ namespace LuaWorldObject
         obj->setActive(active);
         return 0;
     }
+
+    int SetServersideVisibility(lua_State* L, WorldObject* obj)
+    {
+        ServerSideVisibilityType type = (ServerSideVisibilityType)Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 value = Eluna::CHECKVAL<uint32>(L, 3);
+        obj->m_serverSideVisibility.SetValue(type, value);
+        return 0;
+    }
+
+    int SetServersideVisibilityDetection(lua_State* L, WorldObject* obj)
+    {
+        ServerSideVisibilityType type = (ServerSideVisibilityType)Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 value = Eluna::CHECKVAL<uint32>(L, 3);
+        obj->m_serverSideVisibilityDetect.SetValue(type, value);
+        return 0;
+    }
 };
 #endif
