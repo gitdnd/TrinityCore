@@ -251,6 +251,8 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
     { "SetVisible", &LuaWorldObject::SetVisible },
     { "SetActive", &LuaWorldObject::SetActive },
+    { "SetServersideVisibility", &LuaWorldObject::SetServersideVisibility },
+    { "SetServersideVisibilityDetection", &LuaWorldObject::SetServersideVisibilityDetection },
 
     { NULL, NULL }
 };
