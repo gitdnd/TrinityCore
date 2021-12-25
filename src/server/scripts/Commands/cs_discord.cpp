@@ -202,6 +202,7 @@ public:
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED, username);
             return true;
         }
+        return true;
     }
 
     static bool HandlDiscordRegisterAccessKeyCommand(ChatHandler* handler, std::string const& discordId, std::string const& key)
