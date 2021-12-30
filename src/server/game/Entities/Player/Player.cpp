@@ -12092,7 +12092,22 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
         if (modifier.isCrafted)
         {
-            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM, pItem->GetTemplate()->Quality, 1/*, pItem->GetTemplate()->GetItemLevel() */);
+            // /FIXME Hardcoded achievement IDs is easier, need to improve later
+            uint32 quality = pItem->GetTemplate()->Quality;
+            uint32 achievementId = 0;
+            if (quality == ITEM_QUALITY_RARE)
+                achievementId = 50074;
+            else if (quality == ITEM_QUALITY_EPIC)
+                achievementId = 50075;
+            else if (quality == ITEM_QUALITY_LEGENDARY)
+                achievementId = 50076;
+            if (achievementId > 0)
+            {
+                const AchievementEntry* achievement = AchievementGlobalMgr::instance()->GetAchievement(achievementId);
+                if (achievement)
+                    CompletedAchievement(achievement);
+            }
+            //UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM, pItem->GetTemplate()->Quality, 1/*, pItem->GetTemplate()->GetItemLevel() */);
         }
 
         if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && !sVirtualItemMgr.GetVirtualTemplate(item))

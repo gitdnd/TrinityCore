@@ -1765,7 +1765,6 @@ bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaEntry const* achie
         case ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL:
         case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED:
         case ACHIEVEMENT_CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS:
-        case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
             break;
 
         // specialized cases
@@ -1994,6 +1993,10 @@ bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaEntry const* achie
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA:
             if (miscValue1 != achievementCriteria->Asset.MapID)
                 return false;
+            break;
+        case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
+            //if (miscValue1 < achievementCriteria->Type)
+            //  return false;
             break;
         default:
             break;
