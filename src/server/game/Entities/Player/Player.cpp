@@ -12092,6 +12092,9 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
         if (modifier.isCrafted)
         {
+            std::ostringstream stream;
+            stream << "Updating achievemnt criteria craft item with quality " << pItem->GetTemplate()->Quality;
+            sWorld->SendGlobalText(stream.str().c_str(), nullptr);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM, pItem->GetTemplate()->Quality, 1/*, pItem->GetTemplate()->GetItemLevel() */);
         }
 
