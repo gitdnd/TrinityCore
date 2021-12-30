@@ -12101,6 +12101,8 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
                 achievementId = 50075;
             else if (quality == ITEM_QUALITY_LEGENDARY)
                 achievementId = 50076;
+            else if (quality == ITEM_QUALITY_UNCOMMON)
+                achievementId = 50077;
             if (achievementId > 0)
             {
                 const AchievementEntry* achievement = AchievementGlobalMgr::instance()->GetAchievement(achievementId);
