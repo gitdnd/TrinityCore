@@ -12196,6 +12196,10 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
             pItem->AddToWorld();
             pItem->SendUpdateToPlayer(this);
             UpdateCraftingSkill(pItem, slot);
+            std::ostringstream stream;
+            stream << "Updating achievemnt criteria craft item with quality " << pItem->GetTemplate()->Quality;
+            sWorld->SendGlobalText(stream.str().c_str(), nullptr);
+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM, pItem->GetTemplate()->Quality, 1/*, pItem->GetTemplate()->GetItemLevel() */);
         }
 
         pItem->SetState(ITEM_CHANGED, this);
