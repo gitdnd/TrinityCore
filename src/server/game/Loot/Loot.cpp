@@ -548,7 +548,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, NotNormalLootIte
     bool is_looted = true;
     if (lootSlot >= items.size())
     {
-        uint32 questSlot = lootSlot - items.size();
+        uint32 questSlot = /*lootSlot - */items.size() - 1;
         NotNormalLootItemMap::const_iterator itr = PlayerQuestItems.find(player->GetGUID());
         if (itr != PlayerQuestItems.end() && questSlot < itr->second->size())
         {
