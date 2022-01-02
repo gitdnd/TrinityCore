@@ -12943,11 +12943,11 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
     else
     {
         addRage = damage / rageconversion * 2.5f;
-        if (GetTypeId() == TYPEID_PLAYER)
-            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
         // Berserker Rage effect
         if (HasAura(18499))
             addRage *= 2.0f;
+        if (GetTypeId() == TYPEID_PLAYER)
+            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
     }
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
