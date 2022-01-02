@@ -12493,36 +12493,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     const uint32 craftingLevelQuest = 60036;
     if (IsActiveQuest(craftingLevelQuest))
     {
-        for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
-        {
-            uint32 questid = GetQuestSlotQuestId(i);
-            if (!questid)
-                continue;
-
-            if (questid != craftingLevelQuest)
-                continue;
-
-            Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
-            if (!qInfo || qInfo->GetQuestId() != craftingLevelQuest)
-                continue;
-
-            QuestStatusData& q_status = m_QuestStatus[questid];
-
-            if (q_status.Status == QUEST_STATUS_INCOMPLETE)
-            {
-                uint32 reqCastCount = qInfo->RequiredNpcOrGoCount[0];
-                uint16 curCastCount = q_status.CreatureOrGOCount[0];
-                if (curCastCount < reqCastCount)
-                {
-                    uint32 achievedCount = new_value > 10 ? 10 : new_value;
-                    q_status.CreatureOrGOCount[0] = achievedCount;
-
-                    m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
-
-                    SendQuestUpdateAddCreatureOrGo(qInfo, ObjectGuid::Empty, 0, curCastCount, achievedCount - curCastCount);
-                }
-            }
-        }
+        SetQuestObjective(craftingLevelQuest, 0, new_value > 10 ? 10 : new_value);
     }
 
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '%s' (%s), SkillID: %u",
@@ -16907,6 +16878,42 @@ void Player::AdvanceQuestObjective(uint32 targetQuest, uint32 objectiveId, Objec
                 m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
 
                 SendQuestUpdateAddCreatureOrGo(qInfo, guid, objectiveId, curCastCount, 1);
+            }
+
+            if (CanCompleteQuest(questid))
+                CompleteQuest(questid);
+        }
+    }
+}
+
+void Player::SetQuestObjective(uint32 targetQuest, uint32 objectiveId, uint32 newValue, ObjectGuid guid)
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (!questid)
+            continue;
+
+        if (questid != targetQuest)
+            continue;
+
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
+        if (!qInfo || qInfo->GetQuestId() != targetQuest)
+            continue;
+
+        QuestStatusData& q_status = m_QuestStatus[questid];
+
+        if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+        {
+            uint32 reqCastCount = qInfo->RequiredNpcOrGoCount[0];
+            uint16 curCastCount = q_status.CreatureOrGOCount[0];
+            if (curCastCount < reqCastCount)
+            {
+                q_status.CreatureOrGOCount[0] = newValue;
+
+                m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
+
+                SendQuestUpdateAddCreatureOrGo(qInfo, ObjectGuid::Empty, 0, curCastCount, newValue - curCastCount);
             }
 
             if (CanCompleteQuest(questid))
