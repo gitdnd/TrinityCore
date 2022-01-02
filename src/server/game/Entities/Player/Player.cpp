@@ -12488,6 +12488,43 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 
     UpdateSkillEnchantments(skillId, SkillValue, new_value);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
+
+    // Reach Crafting Item Level 10
+    const uint32 craftingLevelQuest = 60036;
+    if (IsActiveQuest(craftingLevelQuest))
+    {
+        for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+        {
+            uint32 questid = GetQuestSlotQuestId(i);
+            if (!questid)
+                continue;
+
+            if (questid != craftingLevelQuest)
+                continue;
+
+            Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
+            if (!qInfo || qInfo->GetQuestId() != craftingLevelQuest)
+                continue;
+
+            QuestStatusData& q_status = m_QuestStatus[questid];
+
+            if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+            {
+                uint32 reqCastCount = qInfo->RequiredNpcOrGoCount[0];
+                uint16 curCastCount = q_status.CreatureOrGOCount[0];
+                if (curCastCount < reqCastCount)
+                {
+                    uint32 achievedCount = new_value > 10 ? 10 : new_value;
+                    q_status.CreatureOrGOCount[0] = achievedCount;
+
+                    m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
+
+                    SendQuestUpdateAddCreatureOrGo(qInfo, ObjectGuid::Empty, 0, curCastCount, achievedCount - curCastCount);
+                }
+            }
+        }
+    }
+
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '%s' (%s), SkillID: %u",
         GetName().c_str(), GetGUID().ToString().c_str(), skillId);
 }
