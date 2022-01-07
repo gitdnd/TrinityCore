@@ -700,7 +700,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
-    if (attacker)
+    if (attacker && spellProto)
         attacker->OnDamageDealMakeThisAnAuraHookSometimeLater(victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto);
 
     if (victim->GetTypeId() == TYPEID_PLAYER)
