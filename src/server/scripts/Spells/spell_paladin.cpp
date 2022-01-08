@@ -2089,7 +2089,7 @@ public:
 
         void Register() override
         {
-            DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_righteousness_AuraScript::CheckProc);
+            DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_command_AuraScript::CheckProc);
         }
     };
 
