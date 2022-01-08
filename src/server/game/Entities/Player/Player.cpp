@@ -7602,6 +7602,12 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
+            case ITEM_MOD_ATTACK_POWER_PCT:
+                if (apply)
+                    ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(val));
+                else
+                    ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, -float(val));
+                break;
             case ITEM_MOD_RANGED_ATTACK_POWER:
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
@@ -14246,6 +14252,13 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(enchant_amount), apply);
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
                             TC_LOG_DEBUG("entities.player.items", "+ %u ATTACK_POWER", enchant_amount);
+                            break;
+                        case ITEM_MOD_ATTACK_POWER_PCT:
+                            if (apply)
+                                ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(enchant_amount));
+                            else
+                                ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, -float(enchant_amount));
+                            TC_LOG_DEBUG("entities.player.items", "+ %u ATTACK_POWER_PCT", enchant_amount);
                             break;
                         case ITEM_MOD_RANGED_ATTACK_POWER:
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
