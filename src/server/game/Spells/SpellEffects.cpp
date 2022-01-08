@@ -328,6 +328,33 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
     }
 }
 
+void Spell::ApplyRangedTalentBonusDamage(Player* player)
+{
+    // Gun Training
+    if (player->HasAura(180146))
+    {
+        auto stacks = player->GetAura(180146)->GetStackAmount();
+        auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+        if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+            item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+        {
+            AddPct(damage, 5 * stacks);
+        }
+    }
+    // Bow Training
+    if (player->HasAura(180147))
+    {
+        auto stacks = player->GetAura(180147)->GetStackAmount();
+        auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+        if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+            (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+        {
+            AddPct(damage, 5 * stacks);
+        }
+    }
+}
+
 void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
@@ -375,30 +402,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         else if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
         {
             // Handle Bow/Gun Damage bonus talents
-            auto plr = unitCaster->ToPlayer();
-            // Gun Training
-            if (plr->HasAura(180146))
-            {
-                auto stacks = plr->GetAura(180146)->GetStackAmount();
-                auto item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-                if (item && item->GetTemplate()->InventoryType == ITEM_CLASS_WEAPON &&
-                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
-                {
-                    AddPct(damage, 5 * stacks);
-                }
-            }
-            // Bow Training
-            if (plr->HasAura(180147))
-            {
-                auto stacks = plr->GetAura(180147)->GetStackAmount();
-                auto item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-                if (item && item->GetTemplate()->InventoryType == ITEM_CLASS_WEAPON &&
-                    (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
-                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
-                {
-                    AddPct(damage, 5 * stacks);
-                }
-            }
+            ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
         }
 
         bool apply_direct_bonus = true;
@@ -3140,6 +3144,38 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     int32 fixed_bonus = 0;
     int32 spell_bonus = 0;                                  // bonus specific for spell
 
+    // Handle Bow/Gun Damage bonus talents
+    if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+    {
+        auto player = unitCaster->ToPlayer();
+        // Handle Bow/Gun Damage bonus talents
+        //totalDamagePercentMod *= ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
+        // Gun Training
+        if (player->HasAura(180146))
+        {
+            auto stacks = player->GetAura(180146)->GetStackAmount();
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+            {
+                totalDamagePercentMod *= (1 + (0.05 * stacks));
+            }
+        }
+        // Bow Training
+        if (player->HasAura(180147))
+        {
+            auto stacks = player->GetAura(180147)->GetStackAmount();
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+            {
+                totalDamagePercentMod *= (1 + (0.05 * stacks));
+            }
+        }
+    }
+
+    /*
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_WARRIOR:
@@ -3317,6 +3353,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             break;
         }
     }
+    */
 
     bool normalized = false;
     float weaponDamagePercentMod = 1.0f;
