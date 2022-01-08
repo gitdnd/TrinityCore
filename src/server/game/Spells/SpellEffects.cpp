@@ -398,7 +398,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 break;
             }
-            case SPELLFAMILY_WARRIOR:
+            /*case SPELLFAMILY_WARRIOR:
             {
                 if (!unitCaster)
                     break;
@@ -730,7 +730,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     }
                 }
                 break;
-            }
+            }*/
         }
 
         if (unitCaster && damage > 0 && apply_direct_bonus)
