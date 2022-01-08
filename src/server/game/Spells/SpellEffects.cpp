@@ -372,6 +372,34 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 AddPct(damage, 5);
             }
         }
+        else if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+        {
+            // Handle Bow/Gun Damage bonus talents
+            auto plr = unitCaster->ToPlayer();
+            // Gun Training
+            if (plr->HasAura(180146))
+            {
+                auto stacks = plr->GetAura(180146)->GetStackAmount();
+                auto item = plr->GetItemByPos(EQUIPMENT_SLOT_RANGED);
+                if (item && item->GetTemplate()->InventoryType == ITEM_CLASS_WEAPON &&
+                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+                {
+                    AddPct(damage, 5 * stacks);
+                }
+            }
+            // Bow Training
+            else if (plr->HasAura(180147))
+            {
+                auto stacks = plr->GetAura(180147)->GetStackAmount();
+                auto item = plr->GetItemByPos(EQUIPMENT_SLOT_RANGED);
+                if (item && item->GetTemplate()->InventoryType == ITEM_CLASS_WEAPON &&
+                    (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+                {
+                    AddPct(damage, 5 * stacks);
+                }
+            }
+        }
 
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
