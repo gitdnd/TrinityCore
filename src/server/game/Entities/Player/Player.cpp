@@ -7603,6 +7603,9 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_ATTACK_POWER_PCT:
+                // If one-handed weapon then apply half as much bonus
+                if (proto->InventoryType != INVTYPE_2HWEAPON)
+                    val *= 0.5;
                 if (apply)
                     ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(val));
                 else
@@ -14254,6 +14257,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             TC_LOG_DEBUG("entities.player.items", "+ %u ATTACK_POWER", enchant_amount);
                             break;
                         case ITEM_MOD_ATTACK_POWER_PCT:
+                            // If one-handed weapon then apply half as much bonus
+                            if (item->GetTemplate()->InventoryType != INVTYPE_2HWEAPON)
+                                enchant_amount *= 0.5;
                             if (apply)
                                 ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(enchant_amount));
                             else
