@@ -380,7 +380,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             if (plr->HasAura(180146))
             {
                 auto stacks = plr->GetAura(180146)->GetStackAmount();
-                auto item = plr->GetItemByPos(EQUIPMENT_SLOT_RANGED);
+                auto item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
                 if (item && item->GetTemplate()->InventoryType == ITEM_CLASS_WEAPON &&
                     item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
                 {
@@ -388,10 +388,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
             }
             // Bow Training
-            else if (plr->HasAura(180147))
+            if (plr->HasAura(180147))
             {
                 auto stacks = plr->GetAura(180147)->GetStackAmount();
-                auto item = plr->GetItemByPos(EQUIPMENT_SLOT_RANGED);
+                auto item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
                 if (item && item->GetTemplate()->InventoryType == ITEM_CLASS_WEAPON &&
                     (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
                     item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
