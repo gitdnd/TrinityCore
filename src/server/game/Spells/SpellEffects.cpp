@@ -2746,16 +2746,24 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     // Rockbiter Weapon apply to both weapon
     if (!itemTarget)
         return;
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[0] & 0x400000)
+    if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[0] & 0x400000)
+        || m_spellInfo->Id == 10399)
     {
         uint32 spell_id = 0;
 
-        // enchanting spell selected by calculated damage-per-sec stored in Effect[1] base value
-        // Note: damage calculated (correctly) with rounding int32(float(v)) but
-        // RW enchantments applied damage int32(float(v)+0.5), this create  0..1 difference sometime
-        switch (damage)
+        // Check for Gem Rockbiter
+        if (m_spellInfo->Id == 10399)
         {
-            // Rank 1
+            spell_id = 36761;
+        }
+        else
+        {
+            // enchanting spell selected by calculated damage-per-sec stored in Effect[1] base value
+            // Note: damage calculated (correctly) with rounding int32(float(v)) but
+            // RW enchantments applied damage int32(float(v)+0.5), this create  0..1 difference sometime
+            switch (damage)
+            {
+                // Rank 1
             case  2: spell_id = 36744; break;               //  0% [ 7% == 2, 14% == 2, 20% == 2]
             // Rank 2
             case  4: spell_id = 36753; break;               //  0% [ 7% == 4, 14% == 4]
@@ -2770,6 +2778,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
             default:
                 TC_LOG_ERROR("spells", "Spell::EffectEnchantItemTmp: Damage %u not handled in S'RW.", damage);
                 return;
+            }
         }
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
