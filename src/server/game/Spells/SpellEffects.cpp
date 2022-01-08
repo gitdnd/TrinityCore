@@ -1301,13 +1301,13 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         {
             float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
             if (dungeonLevel < 50)
-                modifier = modifier * 0.33;
+                modifier *= 0.33;
             else if (dungeonLevel < 60)
-                modifier = modifier * 0.5;
+                modifier *= 0.5;
             else if (dungeonLevel < 75)
-                modifier = modifier * 0.75;
+                modifier *= 0.75;
             else if (dungeonLevel > 250)
-                modifier = modifier * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
+                modifier *= ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
 
             addhealth = addhealth * modifier;
         }
@@ -1316,7 +1316,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
     // Talent: Saving Grace: Heal 10% extra on targets below 50% health
     if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
     {
-        AddPct(addhealth, 10);
+        addhealth *= 1.1;
     }
     // Vessel of the Naaru (Vial of the Sunwell trinket)
     ///@todo: move this to scripts
@@ -3384,7 +3384,7 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
     if (!unitTarget->CanHaveThreatList())
         return;
 
-    // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 5%
+    // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 15%
     if (unitCaster->HasSpell(180088))
     {
         AddPct(damage, 15);
