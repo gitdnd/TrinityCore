@@ -2022,55 +2022,81 @@ class spell_pal_sacred_shield_dummy : public SpellScriptLoader
 // 20154, 21084 - Seal of Righteousness - melee proc dummy (addition ${$MWS*(0.022*$AP+0.044*$SPH)} damage)
 class spell_pal_seal_of_righteousness : public SpellScriptLoader
 {
-    public:
-        spell_pal_seal_of_righteousness() : SpellScriptLoader("spell_pal_seal_of_righteousness") { }
+public:
+    spell_pal_seal_of_righteousness() : SpellScriptLoader("spell_pal_seal_of_righteousness") { }
 
-        class spell_pal_seal_of_righteousness_AuraScript : public AuraScript
+    class spell_pal_seal_of_righteousness_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_seal_of_righteousness_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            PrepareAuraScript(spell_pal_seal_of_righteousness_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/) override
-            {
-                return ValidateSpellInfo({ SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS });
-            }
-
-            bool CheckProc(ProcEventInfo& eventInfo)
-            {
-                return eventInfo.GetProcTarget() != nullptr && eventInfo.GetProcSpell() == nullptr;
-            }
-
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-
-                Unit* victim = eventInfo.GetProcTarget();
-
-                float ap = GetTarget()->GetTotalAttackPowerValue(BASE_ATTACK);
-                ap += victim->GetTotalAuraModifier(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
-
-                int32 sph = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
-                sph += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_HOLY);
-
-                float mws = GetTarget()->GetAttackTime(BASE_ATTACK);
-                mws /= 1000.0f;
-
-                int32 bp = std::lroundf(mws * (0.022f * ap + 0.044f * sph));
-                CastSpellExtraArgs args(aurEff);
-                args.AddSpellBP0(bp);
-                GetTarget()->CastSpell(victim, SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, args);
-            }
-
-            void Register() override
-            {
-                DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_righteousness_AuraScript::CheckProc);
-                OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_righteousness_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_pal_seal_of_righteousness_AuraScript();
+            return ValidateSpellInfo({ SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS });
         }
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetProcTarget() != nullptr && eventInfo.GetProcSpell() == nullptr;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* victim = eventInfo.GetProcTarget();
+
+            float ap = GetTarget()->GetTotalAttackPowerValue(BASE_ATTACK);
+            ap += victim->GetTotalAuraModifier(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
+
+            int32 sph = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
+            sph += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_HOLY);
+
+            float mws = GetTarget()->GetAttackTime(BASE_ATTACK);
+            mws /= 1000.0f;
+
+            int32 bp = std::lroundf(mws * (0.022f * ap + 0.044f * sph));
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(bp);
+            GetTarget()->CastSpell(victim, SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, args);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_righteousness_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_righteousness_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_seal_of_righteousness_AuraScript();
+    }
+};
+
+class spell_pal_seal_of_command : public SpellScriptLoader
+{
+public:
+    spell_pal_seal_of_command() : SpellScriptLoader("spell_pal_seal_of_command") { }
+
+    class spell_pal_seal_of_command_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_seal_of_command_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetProcTarget() != nullptr && eventInfo.GetProcSpell() == nullptr;
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_righteousness_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_seal_of_command_AuraScript();
+    }
 };
 
 // 31801 - Seal of Vengeance
@@ -2466,6 +2492,7 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_sacred_shield_dummy();
     new spell_pal_seal_of_righteousness();
+    new spell_pal_seal_of_command();
     new spell_pal_seal_of_vengeance<SPELL_PALADIN_HOLY_VENGEANCE, SPELL_PALADIN_SEAL_OF_VENGEANCE_DAMAGE>("spell_pal_seal_of_vengeance");
     new spell_pal_seal_of_vengeance<SPELL_PALADIN_BLOOD_CORRUPTION, SPELL_PALADIN_SEAL_OF_CORRUPTION_DAMAGE>("spell_pal_seal_of_corruption");
     new spell_pal_seals();
