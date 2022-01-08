@@ -2036,7 +2036,7 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-                return eventInfo.GetProcTarget() != nullptr;
+                return eventInfo.GetProcTarget() != nullptr && eventInfo.GetProcSpell() == nullptr;
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
