@@ -1284,8 +1284,8 @@ public:
 
             return true;
         }
-        else if (itemTemplate->MaxCount > 0 && count > itemTemplate->MaxCount)
-            count = itemTemplate->MaxCount;
+        else if (itemTemplate->Stackable == 1)
+            count = 1;
  
         // Adding items
         uint32 noSpaceForCount = 0;
