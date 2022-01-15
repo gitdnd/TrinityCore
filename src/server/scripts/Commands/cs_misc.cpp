@@ -26,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "ItemTemplate.h"
 #include "InstanceSaveMgr.h"
 #include "IpAddress.h"
 #include "IPLocation.h"
@@ -1283,7 +1284,9 @@ public:
 
             return true;
         }
-
+        else if (itemTemplate->MaxCount > 0 && count > itemTemplate->MaxCount)
+            count = itemTemplate->MaxCount;
+ 
         // Adding items
         uint32 noSpaceForCount = 0;
 
