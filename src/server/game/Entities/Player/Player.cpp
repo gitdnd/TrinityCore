@@ -2082,7 +2082,7 @@ void Player::Regenerate(Powers power)
         {
             bool recentCast = IsUnderLastManaUseEffect();
             float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
-            float bonusRate = 1.0f;
+            float bonusRate = 1.5f;
 
             // Talent: Eureka: Increases mana regeneration by 25% when below 30% mana
             if (HasSpell(180141))
@@ -2090,7 +2090,7 @@ void Player::Regenerate(Powers power)
                 int32 percent = std::floor((float(curValue) / float(maxValue)) * 100.0f);
                 if (percent < 30)
                 {
-                    bonusRate = 1.25f;
+                    bonusRate = 1.75f;
                 }
             }
 
