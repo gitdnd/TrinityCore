@@ -39,6 +39,10 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     TC_LOG_DEBUG("network", "Player 1 is: %s (%s)", player->GetGUID().ToString().c_str(), player->GetName().c_str());
     TC_LOG_DEBUG("network", "Player 2 is: %s (%s)", target->GetGUID().ToString().c_str(), target->GetName().c_str());
 
+    // Clear combo points for both duel targets
+    player->ClearComboPoints();
+    target->ClearComboPoints();
+
     time_t now = GameTime::GetGameTime();
     player->duel->StartTime = now + 3;
     target->duel->StartTime = now + 3;
