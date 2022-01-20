@@ -4939,5 +4939,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_warlords_charge_periodic_aura);
     RegisterAuraScript(spell_point_blank_periodic_aura);
     RegisterAuraScript(spell_dead_eye_periodic_aura);
-    RegisterSpellScript(spell_generate_combopoint));
+    RegisterSpellScript(spell_generate_combopoint);
 }
