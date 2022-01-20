@@ -4781,6 +4781,23 @@ class spell_dead_eye_periodic_aura : public AuraScript
     }
 };
 
+class spell_generate_combopoint : public SpellScript
+{
+    PrepareSpellScript(spell_generate_combopoint);
+
+    void HitHandler()
+    {
+        Unit* unit = GetHitUnit();
+        if (unit)
+            unit->AddComboPoints(1);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_generate_combopoint::HitHandler);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4922,4 +4939,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_warlords_charge_periodic_aura);
     RegisterAuraScript(spell_point_blank_periodic_aura);
     RegisterAuraScript(spell_dead_eye_periodic_aura);
+    RegisterSpellScript(spell_generate_combopoint));
 }
