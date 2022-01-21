@@ -2082,7 +2082,7 @@ void Player::Regenerate(Powers power)
         {
             bool recentCast = IsUnderLastManaUseEffect();
             float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
-            float bonusRate = 1.0f;
+            float bonusRate = 1.5f;
 
             // Talent: Eureka: Increases mana regeneration by 25% when below 30% mana
             if (HasSpell(180141))
@@ -2090,7 +2090,7 @@ void Player::Regenerate(Powers power)
                 int32 percent = std::floor((float(curValue) / float(maxValue)) * 100.0f);
                 if (percent < 30)
                 {
-                    bonusRate = 1.25f;
+                    bonusRate = 1.75f;
                 }
             }
 
@@ -7602,6 +7602,15 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
+            case ITEM_MOD_ATTACK_POWER_PCT:
+                // If one-handed weapon then apply half as much bonus
+                if (proto->InventoryType != INVTYPE_2HWEAPON)
+                    val *= 0.5;
+                if (apply)
+                    ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(val));
+                else
+                    ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, -float(val));
+                break;
             case ITEM_MOD_RANGED_ATTACK_POWER:
                 HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
@@ -12090,6 +12099,27 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
+        if (modifier.isCrafted)
+        {
+            // /FIXME Hardcoded achievement IDs is easier, need to improve later
+            uint32 quality = pItem->GetTemplate()->Quality;
+            uint32 achievementId = 0;
+            if (quality == ITEM_QUALITY_RARE)
+                achievementId = 50074;
+            else if (quality == ITEM_QUALITY_EPIC)
+                achievementId = 50075;
+            else if (quality == ITEM_QUALITY_LEGENDARY)
+                achievementId = 50076;
+            else if (quality == ITEM_QUALITY_UNCOMMON)
+                achievementId = 50077;
+            if (achievementId > 0)
+            {
+                const AchievementEntry* achievement = AchievementGlobalMgr::instance()->GetAchievement(achievementId);
+                if (achievement)
+                    CompletedAchievement(achievement);
+            }
+            //UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM, pItem->GetTemplate()->Quality, 1/*, pItem->GetTemplate()->GetItemLevel() */);
+        }
 
         if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && !sVirtualItemMgr.GetVirtualTemplate(item))
         {
@@ -12467,6 +12497,14 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
 
     UpdateSkillEnchantments(skillId, SkillValue, new_value);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
+
+    // Reach Crafting Item Level 10
+    const uint32 craftingLevelQuest = 60036;
+    if (IsActiveQuest(craftingLevelQuest))
+    {
+        SetQuestObjective(craftingLevelQuest, 0, new_value > 10 ? 10 : new_value);
+    }
+
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '%s' (%s), SkillID: %u",
         GetName().c_str(), GetGUID().ToString().c_str(), skillId);
 }
@@ -14217,6 +14255,16 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(enchant_amount), apply);
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
                             TC_LOG_DEBUG("entities.player.items", "+ %u ATTACK_POWER", enchant_amount);
+                            break;
+                        case ITEM_MOD_ATTACK_POWER_PCT:
+                            // If one-handed weapon then apply half as much bonus
+                            if (item->GetTemplate()->InventoryType != INVTYPE_2HWEAPON)
+                                enchant_amount *= 0.5;
+                            if (apply)
+                                ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(enchant_amount));
+                            else
+                                ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, -float(enchant_amount));
+                            TC_LOG_DEBUG("entities.player.items", "+ %u ATTACK_POWER_PCT", enchant_amount);
                             break;
                         case ITEM_MOD_RANGED_ATTACK_POWER:
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
@@ -16849,6 +16897,42 @@ void Player::AdvanceQuestObjective(uint32 targetQuest, uint32 objectiveId, Objec
                 m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
 
                 SendQuestUpdateAddCreatureOrGo(qInfo, guid, objectiveId, curCastCount, 1);
+            }
+
+            if (CanCompleteQuest(questid))
+                CompleteQuest(questid);
+        }
+    }
+}
+
+void Player::SetQuestObjective(uint32 targetQuest, uint32 objectiveId, uint32 newValue, ObjectGuid guid)
+{
+    for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (!questid)
+            continue;
+
+        if (questid != targetQuest)
+            continue;
+
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid);
+        if (!qInfo || qInfo->GetQuestId() != targetQuest)
+            continue;
+
+        QuestStatusData& q_status = m_QuestStatus[questid];
+
+        if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+        {
+            uint32 reqCastCount = qInfo->RequiredNpcOrGoCount[0];
+            uint16 curCastCount = q_status.CreatureOrGOCount[0];
+            if (curCastCount < reqCastCount)
+            {
+                q_status.CreatureOrGOCount[0] = newValue;
+
+                m_QuestStatusSave[questid] = QUEST_DEFAULT_SAVE_TYPE;
+
+                SendQuestUpdateAddCreatureOrGo(qInfo, ObjectGuid::Empty, 0, curCastCount, newValue - curCastCount);
             }
 
             if (CanCompleteQuest(questid))

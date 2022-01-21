@@ -700,7 +700,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
-    if (attacker)
+    if (attacker && spellProto)
         attacker->OnDamageDealMakeThisAnAuraHookSometimeLater(victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto);
 
     if (victim->GetTypeId() == TYPEID_PLAYER)
@@ -10112,7 +10112,7 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
             else // For attacker
             {
                 // Overpower on victim dodge
-                if ((hitMask & PROC_HIT_DODGE) && GetTypeId() == TYPEID_PLAYER && GetClass() == CLASS_WARRIOR)
+                if ((hitMask & PROC_HIT_DODGE) && GetTypeId() == TYPEID_PLAYER)
                 {
                     AddComboPoints(procTarget, 1);
                     StartReactiveTimer(REACTIVE_OVERPOWER);
@@ -10532,7 +10532,7 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if (GetClass() == CLASS_WARRIOR && GetTypeId() == TYPEID_PLAYER)
+                    if (GetTypeId() == TYPEID_PLAYER)
                         ClearComboPoints();
                     break;
                 case REACTIVE_WOLVERINE_BITE:
@@ -12943,11 +12943,11 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
     else
     {
         addRage = damage / rageconversion * 2.5f;
-        if (GetTypeId() == TYPEID_PLAYER)
-            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
         // Berserker Rage effect
         if (HasAura(18499))
             addRage *= 2.0f;
+        if (GetTypeId() == TYPEID_PLAYER)
+            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
     }
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);

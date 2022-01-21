@@ -10,7 +10,7 @@
 #include "SFMTRand.h"
 
 VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
-socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0)
+socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), isCrafted(false)
 {
 }
 
@@ -1343,9 +1343,9 @@ float VirtualModifier::GetStatRate(ItemModType stat)
     switch (stat)
     {
     case ITEM_MOD_RANGED_ATTACK_POWER:
-        return 0.4f;
+        return 0.45f;
     case ITEM_MOD_ARMOR_PENETRATION_RATING:
-        return 0.4f;
+        return 0.3f;
     case ITEM_MOD_ATTACK_POWER:
         return 0.5f;
     case ITEM_MOD_SPELL_HEALING_DONE:

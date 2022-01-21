@@ -752,6 +752,9 @@ class TC_GAME_API Spell
         void InitEffectExecuteData(uint8 effIndex);
         void AssertEffectExecuteData() const;
 
+        // custom
+        void ApplyRangedTalentBonusDamage(Player* player);
+
         // Scripting system
         void LoadScripts();
         void CallScriptBeforeCastHandlers();

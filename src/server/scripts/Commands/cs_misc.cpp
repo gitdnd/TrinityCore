@@ -26,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "ItemTemplate.h"
 #include "InstanceSaveMgr.h"
 #include "IpAddress.h"
 #include "IPLocation.h"
@@ -1283,7 +1284,9 @@ public:
 
             return true;
         }
-
+        else if (itemTemplate->Stackable == 1)
+            count = 1;
+ 
         // Adding items
         uint32 noSpaceForCount = 0;
 

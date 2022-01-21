@@ -328,6 +328,33 @@ void Spell::EffectEnvironmentalDMG(SpellEffIndex /*effIndex*/)
     }
 }
 
+void Spell::ApplyRangedTalentBonusDamage(Player* player)
+{
+    // Gun Training
+    if (player->HasAura(180146))
+    {
+        auto stacks = player->GetAura(180146)->GetStackAmount();
+        auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+        if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+            item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+        {
+            AddPct(damage, 5 * stacks);
+        }
+    }
+    // Bow Training
+    if (player->HasAura(180147))
+    {
+        auto stacks = player->GetAura(180147)->GetStackAmount();
+        auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+        if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+            (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+        {
+            AddPct(damage, 5 * stacks);
+        }
+    }
+}
+
 void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
@@ -372,6 +399,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 AddPct(damage, 5);
             }
         }
+        else if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+        {
+            // Handle Bow/Gun Damage bonus talents
+            ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
+        }
 
         bool apply_direct_bonus = true;
         switch (m_spellInfo->SpellFamilyName)
@@ -398,7 +430,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 break;
             }
-            case SPELLFAMILY_WARRIOR:
+            /*case SPELLFAMILY_WARRIOR:
             {
                 if (!unitCaster)
                     break;
@@ -730,7 +762,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     }
                 }
                 break;
-            }
+            }*/
         }
 
         if (unitCaster && damage > 0 && apply_direct_bonus)
@@ -1301,13 +1333,13 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         {
             float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
             if (dungeonLevel < 50)
-                modifier = modifier * 0.33;
+                modifier *= 0.33;
             else if (dungeonLevel < 60)
-                modifier = modifier * 0.5;
+                modifier *= 0.5;
             else if (dungeonLevel < 75)
-                modifier = modifier * 0.75;
+                modifier *= 0.75;
             else if (dungeonLevel > 250)
-                modifier = modifier * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
+                modifier *= ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
 
             addhealth = addhealth * modifier;
         }
@@ -1316,7 +1348,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
     // Talent: Saving Grace: Heal 10% extra on targets below 50% health
     if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
     {
-        AddPct(addhealth, 10);
+        addhealth *= 1.1;
     }
     // Vessel of the Naaru (Vial of the Sunwell trinket)
     ///@todo: move this to scripts
@@ -2746,16 +2778,24 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     // Rockbiter Weapon apply to both weapon
     if (!itemTarget)
         return;
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[0] & 0x400000)
+    if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[0] & 0x400000)
+        || m_spellInfo->Id == 10399)
     {
         uint32 spell_id = 0;
 
-        // enchanting spell selected by calculated damage-per-sec stored in Effect[1] base value
-        // Note: damage calculated (correctly) with rounding int32(float(v)) but
-        // RW enchantments applied damage int32(float(v)+0.5), this create  0..1 difference sometime
-        switch (damage)
+        // Check for Gem Rockbiter
+        if (m_spellInfo->Id == 10399)
         {
-            // Rank 1
+            spell_id = 36761;
+        }
+        else
+        {
+            // enchanting spell selected by calculated damage-per-sec stored in Effect[1] base value
+            // Note: damage calculated (correctly) with rounding int32(float(v)) but
+            // RW enchantments applied damage int32(float(v)+0.5), this create  0..1 difference sometime
+            switch (damage)
+            {
+                // Rank 1
             case  2: spell_id = 36744; break;               //  0% [ 7% == 2, 14% == 2, 20% == 2]
             // Rank 2
             case  4: spell_id = 36753; break;               //  0% [ 7% == 4, 14% == 4]
@@ -2770,6 +2810,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
             default:
                 TC_LOG_ERROR("spells", "Spell::EffectEnchantItemTmp: Damage %u not handled in S'RW.", damage);
                 return;
+            }
         }
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
@@ -3103,6 +3144,38 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     int32 fixed_bonus = 0;
     int32 spell_bonus = 0;                                  // bonus specific for spell
 
+    // Handle Bow/Gun Damage bonus talents
+    if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+    {
+        auto player = unitCaster->ToPlayer();
+        // Handle Bow/Gun Damage bonus talents
+        //totalDamagePercentMod *= ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
+        // Gun Training
+        if (player->HasAura(180146))
+        {
+            auto stacks = player->GetAura(180146)->GetStackAmount();
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+            {
+                totalDamagePercentMod *= (1 + (0.05 * stacks));
+            }
+        }
+        // Bow Training
+        if (player->HasAura(180147))
+        {
+            auto stacks = player->GetAura(180147)->GetStackAmount();
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+            {
+                totalDamagePercentMod *= (1 + (0.05 * stacks));
+            }
+        }
+    }
+
+    /*
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_WARRIOR:
@@ -3280,6 +3353,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             break;
         }
     }
+    */
 
     bool normalized = false;
     float weaponDamagePercentMod = 1.0f;
@@ -3375,7 +3449,7 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
     if (!unitTarget->CanHaveThreatList())
         return;
 
-    // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 5%
+    // Talent: Lightbringer's Oath: Increases threat gen/loss abilities by 15%
     if (unitCaster->HasSpell(180088))
     {
         AddPct(damage, 15);

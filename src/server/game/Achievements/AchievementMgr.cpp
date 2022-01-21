@@ -869,6 +869,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, miscValue1, PROGRESS_HIGHEST);
                 break;
             // std. case: set at 1
+            case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
             case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
             case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
@@ -1204,6 +1205,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
         case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
         case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
         case ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_QUEST_REWARD:
         case ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY:
         case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
@@ -1992,6 +1994,10 @@ bool AchievementMgr::RequirementsSatisfied(AchievementCriteriaEntry const* achie
             if (miscValue1 != achievementCriteria->Asset.MapID)
                 return false;
             break;
+        case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
+            //if (miscValue1 < achievementCriteria->Type)
+            //  return false;
+            break;
         default:
             break;
     }
@@ -2108,6 +2114,8 @@ char const* AchievementGlobalMgr::GetCriteriaTypeString(AchievementCriteriaTypes
             return "GET_KILLING_BLOWS";
         case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
             return "EQUIP_ITEM";
+        case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
+            return "CRAFT_ITEM";
         case ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS:
             return "MONEY_FROM_VENDORS";
         case ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_TALENTS:
@@ -2248,6 +2256,7 @@ inline bool IsAchievementCriteriaTypeStoredByMiscValue(AchievementCriteriaTypes 
         case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
         case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
         case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM:
         case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
         case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
         case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
