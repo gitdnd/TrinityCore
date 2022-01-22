@@ -3184,7 +3184,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
             {
                 // Throw molotov and cancel current cast
-                player->CastSpell(unitTarget, 180168);
+                player->CastSpell(unitTarget, 180168, true);
                 //return;
                 //cancel();
                 totalDamagePercentMod = 0.0f;
