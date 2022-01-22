@@ -144,7 +144,7 @@ public:
         if (pair.second) // no suggestion yet, generate random secret
             RAND_bytes(pair.first->second.data(), pair.first->second.size());
 
-        if (!pair.second && token.get()) // suggestion already existed and token specified - validate
+        if (!pair.second && token) // suggestion already existed and token specified - validate
         {
             if (Trinity::Crypto::TOTP::ValidateToken(pair.first->second, *token))
             {
