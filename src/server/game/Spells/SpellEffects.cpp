@@ -3144,33 +3144,48 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     int32 fixed_bonus = 0;
     int32 spell_bonus = 0;                                  // bonus specific for spell
 
-    // Handle Bow/Gun Damage bonus talents
-    if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+    if (unitCaster->ToPlayer())
     {
         auto player = unitCaster->ToPlayer();
         // Handle Bow/Gun Damage bonus talents
-        //totalDamagePercentMod *= ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
-        // Gun Training
-        if (player->HasAura(180146))
+        if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
         {
-            auto stacks = player->GetAura(180146)->GetStackAmount();
-            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
-                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+            // Handle Bow/Gun Damage bonus talents
+            //totalDamagePercentMod *= ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
+            // Gun Training
+            if (player->HasAura(180146))
             {
-                totalDamagePercentMod *= (1 + (0.05 * stacks));
+                auto stacks = player->GetAura(180146)->GetStackAmount();
+                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+                if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+                {
+                    totalDamagePercentMod *= (1 + (0.05 * stacks));
+                }
+            }
+            // Bow Training
+            if (player->HasAura(180147))
+            {
+                auto stacks = player->GetAura(180147)->GetStackAmount();
+                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+                if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                    (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                        item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+                {
+                    totalDamagePercentMod *= (1 + (0.05 * stacks));
+                }
             }
         }
-        // Bow Training
-        if (player->HasAura(180147))
+        // Handle Bottled Dissent 180170 Talent
+        if (player->HasAura(180170))
         {
-            auto stacks = player->GetAura(180147)->GetStackAmount();
             auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
             if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
-                (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
-                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
             {
-                totalDamagePercentMod *= (1 + (0.05 * stacks));
+                // Throw molotov and cancel current cast
+                player->CastSpell(unitTarget, 180168);
+                cancel();
             }
         }
     }
