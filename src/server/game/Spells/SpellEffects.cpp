@@ -3176,19 +3176,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 }
             }
         }
-        // Handle Bottled Dissent 180170 Talent
-        if (player->HasAura(180170) && m_spellInfo->Id != 180168)
-        {
-            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
-                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
-            {
-                // Throw molotov and cancel current cast
-                player->CastSpell(unitTarget, 180168, true);
-                cancel();
-                return;
-            }
-        }
     }
 
     /*
