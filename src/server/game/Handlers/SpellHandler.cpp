@@ -637,6 +637,13 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     if (!unit)
         return;
 
+    if (Creature* pMirror = unit->ToCreature())
+    {
+        sScriptMgr->OnMirrorImage(pMirror, GetPlayer());
+        if (pMirror->blockMirror)
+            return;
+    }
+        
     if (!unit->HasAuraType(SPELL_AURA_CLONE_CASTER))
         return;
 

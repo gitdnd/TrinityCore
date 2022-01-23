@@ -1523,5 +1523,57 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
         creature->GetMotionMaster()->MoveLand(0, Position(x, y, z, 0));
         return 0;
     }
+
+    int SendMirrorToPlayer(lua_State* L, Creature* creature)
+    {
+        uint64 guid = Eluna::CHECKVAL<uint64>(L, 2);
+        uint32 displayid = Eluna::CHECKVAL<uint32>(L, 3);
+        uint8 race = Eluna::CHECKVAL<uint32>(L, 4);
+        uint8 gender = Eluna::CHECKVAL<uint32>(L, 5);
+        uint8 _class = Eluna::CHECKVAL<uint32>(L, 6);
+        uint8 skin = Eluna::CHECKVAL<uint32>(L, 7);
+        uint8 face = Eluna::CHECKVAL<uint32>(L, 8);
+        uint8 hairstyle = Eluna::CHECKVAL<uint32>(L, 9);
+        uint8 haircolor = Eluna::CHECKVAL<uint32>(L, 10);
+        uint8 facialhair = Eluna::CHECKVAL<uint32>(L, 11);
+        uint32 head = Eluna::CHECKVAL<uint32>(L, 12);
+        uint32 shoulder = Eluna::CHECKVAL<uint32>(L, 13);
+        uint32 body = Eluna::CHECKVAL<uint32>(L, 14);
+        uint32 chest = Eluna::CHECKVAL<uint32>(L, 15);
+        uint32 waist = Eluna::CHECKVAL<uint32>(L, 16);
+        uint32 legs = Eluna::CHECKVAL<uint32>(L, 17);
+        uint32 feet = Eluna::CHECKVAL<uint32>(L, 18);
+        uint32 wrist = Eluna::CHECKVAL<uint32>(L, 19);
+        uint32 hand = Eluna::CHECKVAL<uint32>(L, 20);
+        uint32 back = Eluna::CHECKVAL<uint32>(L, 21);
+        uint32 tabard = Eluna::CHECKVAL<uint32>(L, 22);
+        Player* player = Eluna::CHECKOBJ<Player>(L, 23);
+        creature->blockMirror = true;
+        WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
+        data << uint64(guid);
+        data << uint32(displayid);
+        data << uint8(race);
+        data << uint8(gender);
+        data << uint8(_class);
+        data << uint8(skin);
+        data << uint8(face);
+        data << uint8(hairstyle);
+        data << uint8(haircolor);
+        data << uint8(facialhair);
+        data << uint32(0); // guild id probably will never be used
+        data << uint32(head);
+        data << uint32(shoulder);
+        data << uint32(body);
+        data << uint32(chest);
+        data << uint32(waist);
+        data << uint32(legs);
+        data << uint32(feet);
+        data << uint32(wrist);
+        data << uint32(hand);
+        data << uint32(back);
+        data << uint32(tabard);
+        player->GetSession()->SendPacket(&data);
+        return 0;
+    }
 };
 #endif

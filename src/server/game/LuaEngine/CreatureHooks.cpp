@@ -330,4 +330,12 @@ bool Eluna::OwnerAttacked(Creature* me, Unit* target)
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
+void Eluna::OnMirrorPlayer(Creature* mirror, Player* player)
+{
+    START_HOOK(CREATURE_EVENT_ON_MIRROR_IMAGE, mirror);
+    Push(mirror);
+    Push(player);
+    CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
+}
+
 #endif // TRINITY
