@@ -337,10 +337,6 @@ struct ElunaCreatureAI : ScriptedAI
             ScriptedAI::OwnerAttacked(target);
     }
 
-    void OnMirrorImage(Creature* mirror, Player* player) override
-    {
-        sEluna->OnMirrorPlayer(mirror, player);
-    }
 #endif
 
 #if defined MANGOS || defined CMANGOS

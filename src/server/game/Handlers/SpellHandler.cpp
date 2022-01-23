@@ -639,7 +639,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 
     if (Creature* pMirror = unit->ToCreature())
     {
-        sScriptMgr->OnMirrorImage(pMirror, GetPlayer());
+        sEluna->OnMirrorPlayer(pMirror, GetPlayer());
         if (pMirror->blockMirror)
             return;
     }

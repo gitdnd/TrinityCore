@@ -2395,11 +2395,6 @@ void ScriptMgr::ModifyVehiclePassengerExitPos(Unit* passenger, Vehicle* vehicle,
     FOREACH_SCRIPT(CreatureScript)->ModifyVehiclePassengerExitPos(passenger, vehicle, pos);
 }
 
-void ScriptMgr::OnMirrorImage(Creature* mirror, Player* player)
-{
-    FOREACH_SCRIPT(CreatureScript)->OnMirrorImage(mirror, player);
-}
-
 SpellScriptLoader::SpellScriptLoader(char const* name)
     : ScriptObject(name)
 {
