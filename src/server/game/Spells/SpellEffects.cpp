@@ -3185,8 +3185,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             {
                 // Throw molotov and cancel current cast
                 player->CastSpell(unitTarget, 180168, true);
-                //cancel();
-                //totalDamagePercentMod = 0.0f;
+                cancel();
                 return;
             }
         }
