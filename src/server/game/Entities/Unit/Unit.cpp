@@ -2935,9 +2935,8 @@ void Unit::_UpdateAutoRepeatSpell()
             auto player = ToPlayer();
             if (player)
             {
-                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-                if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
-                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                auto item = player->GetWeaponForAttack(RANGED_ATTACK, true);
+                if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
                 {
                     // Throw molotov and cancel current cast
                     autoRepeatSpellInfo = sSpellMgr->GetSpellInfo(180168);
