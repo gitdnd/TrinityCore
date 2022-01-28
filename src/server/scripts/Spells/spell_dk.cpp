@@ -261,11 +261,17 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         Unit* caster = GetCaster();
         if (!caster)
             return;
+        if (!eventInfo.GetActionTarget())
+            return;
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || spellInfo->Id == 49028)
+            return;
+        
 
         std::list<Unit*> drw;
         for (Unit* controlled : caster->m_Controlled)
         {
-            if (controlled->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON && controlled->GetVictim())
+            if (controlled->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON)
             {
                 drw.push_back(controlled);
                 break;
@@ -275,13 +281,10 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         if (drw.size() == 0)
             return;
 
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
-            return;
 
         for (auto unit : drw)
         {
-            unit->CastSpell(unit->GetVictim(), spellInfo->Id, false);
+            unit->CastSpell(eventInfo.GetActionTarget(), spellInfo->Id, false);
         }
     }
 
@@ -913,8 +916,7 @@ class spell_dk_vampiric_blood_PowerScript : public PowerScript
             return;
         amount *= -1;
         Aura* aura = GetAura();
-        Unit* caster = GetCaster();
-        caster->GetSpellHistory()->ModifyCooldown(55233, -Seconds(redThis->GetEffect(EFFECT_0)->CalculateAmount(caster) * amount * redThis->GetEffect(EFFECT_1)->CalculateAmount(caster)) / 10000);
+        user->GetSpellHistory()->ModifyCooldown(55233, -Seconds(redThis->GetEffect(EFFECT_0)->CalculateAmount(user) * amount * redThis->GetEffect(EFFECT_1)->CalculateAmount(user)) / 100);
     }
     void Register() override
     {
@@ -955,14 +957,17 @@ class spell_dk_bone_shield_AuraScript : public AuraScript
 
     void BoneHit(ProcEventInfo& eventInfo)
     {
-        PreventDefaultAction();
         Unit* owner = GetUnitOwner();
         if (eventInfo.GetActor() == owner)
             return;
         Aura* aura = owner->GetAura(195181);
-        aura->ModStackAmount(-1);
+        if (aura->GetStackAmount() > 1)
+        {
+            aura->ModStackAmount(-1);
+            PreventDefaultAction();
+        }
         if(owner->HasAura(221699))
-            owner->GetSpellHistory()->ModifyCooldown(221699, -Seconds(2));
+            owner->GetSpellHistory()->ModifyCooldown(221699, -Seconds(20));
         if (!aura)
             return;
         if (aura->GetStackAmount() >= 5 && owner->HasAura(219786))
@@ -1008,25 +1013,23 @@ class spell_dk_bone_shield : public SpellScript
         AfterCast += SpellCastFn(spell_dk_bone_shield::CountBones);
     }
 };
-class spell_dk_rime : public SpellScript
+class spell_dk_rime_AuraScript : public AuraScript
 {
-    PrepareSpellScript(spell_dk_rime);
-    void RimePropperRNG(SpellMissInfo missInfo)
+    PrepareAuraScript(spell_dk_rime_AuraScript);
+    bool RimePropperRNG(ProcEventInfo& eventInfo)
     {
-        if (GetTriggeringSpell()->Id != 49020)
+        if (eventInfo.GetProcSpell()->m_spellInfo->Id == 49020)
         {
-            if (GetTriggeringSpell()->Id != 50842)
+            if (urand(1, 100) <= 45)
             {
-                PreventHitAura();
-                return;
+                return true;
             }
         }
-        if (!(urand(1, 100) <= 45))
-            return;
+        return false;
     }
     void Register() override
     {
-        BeforeHit += BeforeSpellHitFn(spell_dk_rime::RimePropperRNG);
+        DoCheckProc += AuraCheckProcFn(spell_dk_rime_AuraScript::RimePropperRNG);
     }
 };
 
@@ -1047,9 +1050,16 @@ class spell_dk_remorseless_winter_PowerScript : public PowerScript
         Unit* caster = GetCaster();
         caster->AddAura(211805, caster);
     }
+    void RemoveRemorseless(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+    {
+        Unit* caster = GetCaster();
+        Aura* aura = caster->GetAura(211805);
+        aura->Remove();
+    }
     void Register() override
     {
         AddPowerChange(spell_dk_remorseless_winter_PowerScript::PowerChanged);
+        OnEffectRemove += AuraEffectRemoveFn(spell_dk_remorseless_winter_PowerScript::RemoveRemorseless, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 
 };
@@ -1074,40 +1084,24 @@ class spell_dk_icy_talons_PowerScript : public PowerScript
 };
 */ 
 
-class spell_dk_icy_talons : public SpellScript
+class spell_dk_icy_talons_AuraScript : public AuraScript
 {
-    PrepareSpellScript(spell_dk_icy_talons);
+    PrepareAuraScript(spell_dk_icy_talons_AuraScript);
 
-    void CheckIfSpender(SpellMissInfo missInfo)
+    bool CheckIfSpender(ProcEventInfo& eventInfo)
     {
-        for (auto power : GetTriggeringSpell()->PowerCosts)
+        for (auto power : eventInfo.GetProcSpell()->m_spellInfo->PowerCosts)
         {
             if (power == NULL)
                 continue;
-            if (power->PowerType == POWER_RUNIC_POWER)
-                return;
+            if (power->PowerType == POWER_RUNIC_POWER && power->ManaCost > 0)
+                return true;
         }
-        PreventHitDefaultEffect(EFFECT_0);
-        PreventHitAura();
+        return false;
     }
     void Register() override
     {
-        BeforeHit += BeforeSpellHitFn(spell_dk_icy_talons::CheckIfSpender);
-    }
-};
-class spell_dk_frozen_pulse_AuraScript : public AuraScript
-{
-    PrepareAuraScript(spell_dk_frozen_pulse_AuraScript);
-
-    void CheckRunes(ProcEventInfo& eventInfo)
-    {
-        Unit* caster = GetCaster();
-        if (!(caster->GetPower(POWER_RUNES) < 3))
-            PreventDefaultAction();
-    }
-    void Register() override
-    {
-        DoPrepareProc += AuraProcFn(spell_dk_frozen_pulse_AuraScript::CheckRunes);
+        DoCheckProc += AuraCheckProcFn(spell_dk_icy_talons_AuraScript::CheckIfSpender);
     }
 };
 class spell_dk_frostscythe : public SpellScript
@@ -1118,7 +1112,21 @@ class spell_dk_frostscythe : public SpellScript
         Unit* caster = GetCaster();
         Aura* killingMachine = caster->GetAura(51124);
         if (killingMachine)
-            killingMachine->CallScriptDispel(&DispelInfo(caster, GetSpellInfo()->Id, 1));
+        {
+            killingMachine->Remove();
+            Aura* murderous = caster->GetAura(207061);
+            if (murderous)
+            {
+                uint32 chance = murderous->GetEffect(EFFECT_0)->CalculateAmount(caster);
+                if (urand(1, 100) <= chance)
+                {
+                    Player* player = caster->ToPlayer();
+                    if (!player)
+                        return;
+                    RefreshRunes(player, 1);
+                }
+            }
+        }
         
         Aura* icecap = caster->GetAura(207126);
         if (icecap)
@@ -1151,13 +1159,33 @@ class spell_dk_chains_of_ice : public SpellScript
         Aura* coldHeart = caster->GetAura(281209);
         if (coldHeart)
         {
-            caster->CastSpell(GetHitUnit(), 281210, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddSpellMod(SPELLVALUE_BASE_POINT0, 0.107 * coldHeart->GetStackAmount()));
+            caster->CastSpell(GetHitUnit(), 281210, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddTriggerDummy(MapDummy::TriggerStacks, std::optional((uint8)coldHeart->GetStackAmount())));
+
             coldHeart->Remove();
         }
     }
     void Register() override
     {
         AfterHit += SpellHitFn(spell_dk_chains_of_ice::HandleScriptEffect);
+    }
+};
+class spell_dk_cold_heart : public SpellScript
+{
+    PrepareSpellScript(spell_dk_cold_heart);
+
+    void Hit(SpellEffIndex effIndex)
+    {
+        auto& triggerDummy = GetSpell()->GetTriggerDummy();
+        std::optional<std::any> optional = triggerDummy[MapDummy::TriggerStacks];
+        if (!optional)
+            return;
+        if(!optional.has_value())
+            return;
+        SetHitDamage(GetHitDamage() * std::any_cast<uint8>(optional.value()));
+    }
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_dk_cold_heart::Hit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 class spell_dk_frost_strike : public SpellScript
@@ -1195,7 +1223,21 @@ class spell_dk_obliterate : public SpellScript
         Unit* caster = GetCaster();
         Aura* killingMachine = caster->GetAura(51124);
         if (killingMachine)
-            killingMachine->CallScriptDispel(&DispelInfo(caster, GetSpellInfo()->Id, 1));
+        {
+            killingMachine->Remove();
+            Aura* murderous = caster->GetAura(207061);
+            if (murderous)
+            {
+                uint32 chance = murderous->GetEffect(EFFECT_0)->CalculateAmount(caster);
+                if (urand(1, 100) <= chance)
+                {
+                    Player* player = caster->ToPlayer();
+                    if (!player)
+                        return;
+                    RefreshRunes(player, 1);
+                }
+            }
+        }
         Aura* icecap = caster->GetAura(207126);
         if (icecap)
         {
@@ -1212,7 +1254,6 @@ class spell_dk_obliterate : public SpellScript
         OnEffectHitTarget += SpellEffectFn(spell_dk_obliterate::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
-
 class spell_dk_breath_of_sindragosa_AuraScript : public AuraScript
 {
     PrepareAuraScript(spell_dk_breath_of_sindragosa_AuraScript);
@@ -1258,31 +1299,62 @@ class spell_dk_inexorable_assault_AuraScript : public AuraScript
             caster->AddAura(253595, caster);
         }
     }
-    void HandleProc(AuraEffect* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        Aura* aure = GetAura();
-        
-    }
-
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_inexorable_assault_AuraScript::HandleScriptEffect, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
+class spell_dk_frozen_pulse_AuraScript : public AuraScript
+{
+    PrepareAuraScript(spell_dk_frozen_pulse_AuraScript);
+
+    bool CheckRunes(ProcEventInfo& eventInfo)
+    {
+        Unit* caster = GetCaster();
+        if (caster->GetPower(POWER_RUNES) >= 3)
+        {
+            return false;
+        }
+        return true;
+    }
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_frozen_pulse_AuraScript::CheckRunes);
+    }
+};
 class spell_dk_inexorable_assault_dummy_AuraScript : public AuraScript
 {
     PrepareAuraScript(spell_dk_inexorable_assault_dummy_AuraScript);
-    void HandleProc(ProcEventInfo& eventInfo)
+    bool procced = false;
+    bool HandleProc(ProcEventInfo& eventInfo)
     {
-        PreventDefaultAction();
-        Aura* aura = GetAura();
-        aura->ModStackAmount(-1);
+        if(eventInfo.GetProcSpell()->m_spellInfo->Id != 49020)
+        {
+            return false;
+        }
+        return true;
     }
 
+    void PreventDefault(ProcEventInfo& eventInfo)
+    {
+        Aura* aura = GetAura();
+        if (aura->GetStackAmount() > 1)
+        {
+            if (procced)
+            {
+                aura->ModStackAmount(-1);
+                procced = false;
+            }
+            else
+                procced = true;
+            PreventDefaultAction();
+            return;
+        }
+    }
     void Register() override
     {
-        DoPrepareProc += AuraProcFn(spell_dk_inexorable_assault_dummy_AuraScript::HandleProc);
+        DoPrepareProc += AuraProcFn(spell_dk_inexorable_assault_dummy_AuraScript::PreventDefault);
+        DoCheckProc += AuraCheckProcFn(spell_dk_inexorable_assault_dummy_AuraScript::HandleProc);
     }
 };
 class spell_dk_blinding_sleet_AuraScript : public AuraScript
@@ -1366,42 +1438,6 @@ class spell_dk_will_of_the_necropolis_AuraScript : public AuraScript
     }
 
 };
-class spell_dk_killing_machine_AuraScript : public AuraScript
-{
-    PrepareAuraScript(spell_dk_killing_machine_AuraScript);
-
-    void Murderous(DispelInfo* dispelInfo)
-    {
-        Unit* caster = GetCaster();
-        Aura* aura = caster->GetAura(207061);
-        if (!aura)
-            return;
-        uint32 spellId = dispelInfo->GetDispellerSpellId();
-        uint32 chance = 0;
-        switch (spellId)
-        {
-        case 49020:
-            chance = aura->GetEffect(EFFECT_0)->CalculateAmount(caster);
-            break;
-        case 207230:
-            chance = aura->GetEffect(EFFECT_0)->CalculateAmount(caster);
-            break;
-        }
-        if (chance && urand(1, 100) < chance)
-        {
-            Player* player = caster->ToPlayer();
-            if (!player)
-                return;
-            RefreshRunes(player, 1);
-        }
-    }
-
-    void Register() override
-    {
-        OnDispel += AuraDispelFn(spell_dk_killing_machine_AuraScript::Murderous);
-    }
-
-};
 //191685 Virulent Eruption
 class spell_dk_virulent_plague_AuraScript : public AuraScript
 {
@@ -1424,24 +1460,25 @@ class spell_dk_permafrost_AuraScript : public AuraScript
 {
     PrepareAuraScript(spell_dk_permafrost_AuraScript);
 
-    void Shield(DispelInfo* dispelInfo)
+    void Shield(ProcEventInfo& eventInfo)
     {
         Unit* caster = GetUnitOwner();
         Aura* aura = caster->GetAura(207203);
         if (!aura)
         {
             caster->AddAura(207203, caster);
-            Aura* aura = caster->GetAura(207203);
+            aura = caster->GetAura(207203);
             if (!aura)
                 return;
         }
         AuraEffect* eff = aura->GetEffect(EFFECT_0);
-        eff->SetAmount(eff->GetAmount() + GetAura()->GetEffect(EFFECT_0)->CalculateAmount(caster));
+        eff->SetAmount(eff->GetAmount() + aura->GetEffect(EFFECT_0)->CalculateAmount(caster));
+        aura->RefreshDuration();
     }
 
     void Register() override
     {
-        OnDispel += AuraDispelFn(spell_dk_permafrost_AuraScript::Shield);
+        DoPrepareProc += AuraProcFn(spell_dk_permafrost_AuraScript::Shield);
     }
 
 };
@@ -1615,8 +1652,11 @@ class spell_dk_bonestorm : public SpellScript
             return;
         int32 duration = power.value() * 10;
         Aura* aura = caster->GetAura(194844);
-        if (aura)
-            aura->SetDuration(duration);
+        if (!aura)
+            return;
+        aura->GetEffect(EFFECT_2)->SetAmount(1);
+        aura->SetDuration(duration);
+        
     }
     void Register() override
     {
@@ -1644,23 +1684,22 @@ class spell_dk_bonestorm_dummy : public SpellScript
 };
 
 
-class spell_dk_hemostasis : public SpellScript
+class spell_dk_hemostasis_AuraScript : public AuraScript
 {
-    PrepareSpellScript(spell_dk_hemostasis);
-    void HemoStasisPropper(SpellMissInfo missInfo)
+    PrepareAuraScript(spell_dk_hemostasis_AuraScript);
+    bool HemoStasisPropper(ProcEventInfo& eventInfo)
     {
-        
-        if (GetTriggeringSpell()->Id != 50842)
+        if (eventInfo.GetProcSpell()->m_spellInfo->Id != 50842)
         {
-            PreventHitAura();
+            return false;
         }
+        return true;
     }
     void Register() override
     {
-        BeforeHit += BeforeSpellHitFn(spell_dk_hemostasis::HemoStasisPropper);
+        DoCheckProc += AuraCheckProcFn(spell_dk_hemostasis_AuraScript::HemoStasisPropper);
     }
 };
-
 
 class spell_dk_sacrificial_pact : public SpellScript
 {
@@ -2009,19 +2048,18 @@ void AddSC_deathknight_spell_scripts()
     RegisterAuraScript(spell_dk_gargoyle_PowerScript);
     RegisterAuraScript(spell_dk_runic_corruption_PowerScript);
     RegisterAuraScript(spell_dk_runic_empowerment_PowerScript);
-    RegisterSpellScript(spell_dk_rime);
+    RegisterAuraScript(spell_dk_rime_AuraScript);
     RegisterSpellScript(spell_dk_heart_strike);
     RegisterAuraScript(spell_dk_remorseless_winter_PowerScript);
-    RegisterSpellScript(spell_dk_icy_talons);
+    RegisterAuraScript(spell_dk_icy_talons_AuraScript);
     RegisterAuraScript(spell_dk_frozen_pulse_AuraScript);
     RegisterSpellScript(spell_dk_frostscythe);
     RegisterSpellScript(spell_dk_frost_strike);
-    RegisterAuraScript(spell_dk_killing_machine_AuraScript);
     RegisterAuraScript(spell_dk_permafrost_AuraScript);
     RegisterAuraScript(spell_dk_virulent_plague_AuraScript);
     RegisterSpellScript(spell_dk_bonestorm);
     RegisterSpellScript(spell_dk_bonestorm_dummy);
-    RegisterSpellScript(spell_dk_hemostasis);
+    RegisterAuraScript(spell_dk_hemostasis_AuraScript);
     RegisterAuraScript(spell_dk_tombstone_AuraScript);
     RegisterSpellScript(spell_dk_blood_tap);
     RegisterSpellScript(spell_dk_epidemic); 
@@ -2032,7 +2070,8 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_chains_of_ice);
     RegisterAuraScript(spell_dk_blinding_sleet_AuraScript); 
     RegisterSpellScript(spell_dk_gorefiends_grasp_initial); 
-    RegisterAuraScript(spell_dk_inexorable_assault_dummy_AuraScript);
+    RegisterAuraScript(spell_dk_inexorable_assault_dummy_AuraScript); 
+        RegisterSpellScript(spell_dk_cold_heart);
     
 
     RegisterSpellScript(spell_dk_ghoul_explode);

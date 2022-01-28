@@ -26,10 +26,6 @@
 #include "SharedDefines.h"
 #include "SpellDefines.h"
 #include <memory>
-#include <optional>
-#include <map>
-#include <any>
-
 namespace WorldPackets
 {
     namespace Spells
@@ -231,13 +227,6 @@ enum SpellEffectHandleMode
     SPELL_EFFECT_HANDLE_LAUNCH_TARGET,
     SPELL_EFFECT_HANDLE_HIT,
     SPELL_EFFECT_HANDLE_HIT_TARGET
-};
-
-enum class MapDummy : uint8
-{
-    TriggeringSpell,
-    Strike,
-    WasInAir,
 };
 
 

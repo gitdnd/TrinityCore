@@ -2652,6 +2652,7 @@ SpellCastResult WorldObject::CastSpell(CastSpellTargetArg const& targets, uint32
         spell->SetSpellValue(pair.first, pair.second);
 
     spell->m_CastItem = args.CastItem;
+    spell->triggerDummy = args.triggerDummy;
     return spell->prepare(*targets.Targets, args.TriggeringAura);
 }
 

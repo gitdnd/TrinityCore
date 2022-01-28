@@ -24,6 +24,10 @@
 #include "Optional.h"
 #include "Position.h"
 #include <vector>
+#include <optional>
+#include <map>
+#include <any>
+
 
 class AuraEffect;
 class Corpse;
@@ -298,6 +302,13 @@ enum SpellCastTargetFlags : uint32
     TARGET_FLAG_CORPSE_MASK = TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY,
     TARGET_FLAG_ITEM_MASK = TARGET_FLAG_TRADE_ITEM | TARGET_FLAG_ITEM | TARGET_FLAG_GAMEOBJECT_ITEM
 };
+enum class MapDummy : uint8
+{
+    TriggeringSpell,
+    Strike,
+    WasInAir,
+    TriggerStacks,
+};
 
 struct TC_GAME_API SpellDestination
 {
@@ -452,7 +463,9 @@ struct TC_GAME_API CastSpellExtraArgs
     CastSpellExtraArgs& SetOriginalCastId(ObjectGuid const& castId) { OriginalCastId = castId; return *this; }
     CastSpellExtraArgs& AddSpellMod(SpellValueMod mod, int32 val) { SpellValueOverrides.AddMod(mod, val); return *this; }
     CastSpellExtraArgs& AddSpellBP0(int32 val) { return AddSpellMod(SPELLVALUE_BASE_POINT0, val); } // because i don't want to type SPELLVALUE_BASE_POINT0 300 times
+    CastSpellExtraArgs& AddTriggerDummy(MapDummy index, std::optional<std::any> value) { triggerDummy[index] = value; return *this; }
 
+    std::map<MapDummy, std::optional<std::any>> triggerDummy = {};
     TriggerCastFlags TriggerFlags = TRIGGERED_NONE;
     Item* CastItem = nullptr;
     AuraEffect const* TriggeringAura = nullptr;
