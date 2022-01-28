@@ -3427,7 +3427,7 @@ struct SpellPowerEntry
     float PowerCostPct;
     float PowerCostMaxPct;
     float PowerPctPerSecond;
-    int8 PowerType;
+    int8 PowerType = -1;
     int32 RequiredAuraSpellID;
     uint32 OptionalCost;                                            // Spell uses [ManaCost, ManaCost+ManaCostAdditional] power - affects tooltip parsing as multiplier on SpellEffectEntry::EffectPointsPerResource
                                                                    //   only SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE, SPELL_EFFECT_WEAPON_DAMAGE, SPELL_EFFECT_NORMALIZED_WEAPON_DMG

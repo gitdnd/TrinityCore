@@ -26390,7 +26390,11 @@ uint32 Player::GetRuneBaseCooldown() const
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = regenAura.begin();i != regenAura.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_RUNES)
-            cooldown *= 1.0f - (*i)->GetAmount() / 100.0f;
+        {
+            if ((*i)->GetAmount() == -100)
+                continue;
+            cooldown *= 100.0f / (100.f + (*i)->GetAmount());
+        }
 
     // Runes cooldown are now affected by player's haste from equipment ...
     float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);

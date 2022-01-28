@@ -26,6 +26,9 @@
 #include "SharedDefines.h"
 #include "SpellDefines.h"
 #include <memory>
+#include <optional>
+#include <map>
+#include <any>
 
 namespace WorldPackets
 {
@@ -229,6 +232,14 @@ enum SpellEffectHandleMode
     SPELL_EFFECT_HANDLE_HIT,
     SPELL_EFFECT_HANDLE_HIT_TARGET
 };
+
+enum class MapDummy : uint8
+{
+    TriggeringSpell,
+    Strike,
+    WasInAir,
+};
+
 
 typedef std::vector<std::pair<uint32, ObjectGuid>> DispelList;
 
@@ -816,7 +827,9 @@ class TC_GAME_API Spell
         // Scripting system
         void LoadScripts();
         void CallScriptOnPrecastHandler();
+        void CallScriptBeforeCastTimeHandlers();
         void CallScriptBeforeCastHandlers();
+        void CallScriptWhileCastHandlers();
         void CallScriptOnCastHandlers();
         void CallScriptAfterCastHandlers();
         SpellCastResult CallScriptCheckCastHandlers();
@@ -877,6 +890,38 @@ class TC_GAME_API Spell
 
         Spell(Spell const& right) = delete;
         Spell& operator=(Spell const& right) = delete;
+
+public:
+    Unit* GetCastTarget()
+    {
+        return unitTarget;
+    }
+    SpellDestination* GetDestTargets(int index)
+    {
+        if (index == 0 || index == 1 || index == 2)
+            return &(m_destTargets[index]);
+        else
+            return nullptr;
+    }
+    void  EffectRoll(SpellEffIndex effIndex);
+
+    int32 GetSpellTimer()
+    {
+        return m_timer;
+    };
+    void ModifySpellTimer(int32 amount)
+    {
+        m_timer += amount;
+    };
+    void SetSpellTimer(int32 amount)
+    {
+        m_timer = amount;
+    };
+    std::map<MapDummy, std::optional<std::any>> triggerDummy = {};
+    std::map<MapDummy, std::optional<std::any>>& GetTriggerDummy()
+    {
+        return triggerDummy;
+    }
 };
 
 namespace Trinity

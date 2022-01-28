@@ -56,7 +56,8 @@ class TC_GAME_API AuraEffect
         int32 GetMiscValue() const { return GetSpellEffectInfo().MiscValue; }
         AuraType GetAuraType() const { return GetSpellEffectInfo().ApplyAuraName; }
         int32 GetAmount() const { return _amount; }
-        void SetAmount(int32 amount) { _amount = amount; m_canBeRecalculated = false; }
+		void SetAmount(int32 amount) { _amount = amount; m_canBeRecalculated = false; }
+        void ModAmount(int32 amount) { _amount += amount; m_canBeRecalculated = false; }
 
         Optional<float> GetEstimatedAmount() const { return _estimatedAmount; }
 

@@ -1516,6 +1516,7 @@ class TC_GAME_API Unit : public WorldObject
         virtual bool IsMovementPreventedByCasting() const;
         bool CanCastSpellWhileMoving(SpellInfo const* spellInfo) const;
 
+        // USE THIS FOR MODIFYING COOLDOWN OK? OK!
         SpellHistory* GetSpellHistory() { return _spellHistory; }
         SpellHistory const* GetSpellHistory() const { return _spellHistory; }
 
@@ -2018,6 +2019,10 @@ class TC_GAME_API Unit : public WorldObject
 
         std::unique_ptr<MovementForces> _movementForces;
         PositionUpdateInfo _positionUpdateInfo;
+    public:
+        std::list<Aura*> powerChangeAuras;
+        void AddPowerChangeHook(Aura* aura) { powerChangeAuras.push_back(aura); };
+        void RemovePowerChangeHook(Aura* aura) { powerChangeAuras.remove(aura); };
 };
 
 namespace Trinity

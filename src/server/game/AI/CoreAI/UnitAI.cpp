@@ -289,6 +289,7 @@ void UnitAI::FillAISpellInfo()
             if (spellEffectInfo.Effect == SPELL_EFFECT_HEAL ||
                 spellEffectInfo.Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
                 spellEffectInfo.Effect == SPELL_EFFECT_HEAL_MECHANICAL ||
+                spellEffectInfo.Effect == SPELL_EFFECT_HEALTH_LEECH ||
                 (spellEffectInfo.Effect == SPELL_EFFECT_APPLY_AURA && spellEffectInfo.ApplyAuraName == 8))
                 AIInfo->Effects |= 1 << (SELECT_EFFECT_HEALING - 1);
 

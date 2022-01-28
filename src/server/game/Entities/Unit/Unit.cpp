@@ -7939,7 +7939,6 @@ int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*
         SetPower(power, maxPower, withPowerUpdate);
         gain = maxPower - curPower;
     }
-
     return gain;
 }
 
@@ -9043,6 +9042,11 @@ void Unit::SetPower(Powers power, int32 val, bool withPowerUpdate /*= true*/)
         if (pet->isControlled())
             pet->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
     }*/
+    int32 change = val - oldPower;
+    for (auto aura : powerChangeAuras)
+    {
+        aura->CallScriptPowerChangeHandlers(this, power, change);
+    }
 }
 
 void Unit::SetMaxPower(Powers power, int32 val)

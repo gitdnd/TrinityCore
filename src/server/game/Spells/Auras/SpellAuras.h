@@ -179,6 +179,7 @@ class TC_GAME_API Aura
         void RefreshTimers(bool resetPeriodicTimer);
         bool IsExpired() const { return !GetDuration() && !m_dropEvent; }
         bool IsPermanent() const { return GetMaxDuration() == -1; }
+        void ModDuration(int32 duration);
 
         uint8 GetCharges() const { return m_procCharges; }
         void SetCharges(uint8 charges);
@@ -289,6 +290,8 @@ class TC_GAME_API Aura
         bool CallScriptEffectProcHandlers(AuraEffect* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
         void CallScriptAfterEffectProcHandlers(AuraEffect* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
 
+        void CallScriptPowerChangeHandlers(Unit* user, Powers power, int32 amount);
+
         UnitAura* ToUnitAura() { if (GetType() == UNIT_AURA_TYPE) return reinterpret_cast<UnitAura*>(this); else return nullptr; }
         UnitAura const* ToUnitAura() const { if (GetType() == UNIT_AURA_TYPE) return reinterpret_cast<UnitAura const*>(this); else return nullptr; }
 
@@ -307,7 +310,7 @@ class TC_GAME_API Aura
 
         virtual std::string GetDebugInfo() const;
 
-    private:
+    protected:
         AuraScript* GetScriptByType(std::type_info const& type) const;
         void _DeleteRemovedApplications();
 
@@ -345,7 +348,7 @@ class TC_GAME_API Aura
         std::chrono::steady_clock::time_point m_lastProcAttemptTime;
         std::chrono::steady_clock::time_point m_lastProcSuccessTime;
 
-    private:
+    protected:
         std::vector<AuraApplication*> _removedApplications;
 
         AuraEffectVector _effects;

@@ -99,7 +99,7 @@ class TC_GAME_API _SpellScript
                 EffectNameCheck(uint16 _effName) { effName = _effName; }
                 bool Check(SpellInfo const* spellInfo, uint8 effIndex) const;
                 std::string ToString() const;
-            private:
+            protected:
                 uint16 effName;
         };
 
@@ -109,7 +109,7 @@ class TC_GAME_API _SpellScript
                 EffectAuraNameCheck(uint16 _effAurName) { effAurName = _effAurName; }
                 bool Check(SpellInfo const* spellInfo, uint8 effIndex) const;
                 std::string ToString() const;
-            private:
+            protected:
                 uint16 effAurName;
         };
 
@@ -117,7 +117,7 @@ class TC_GAME_API _SpellScript
         std::string const* m_scriptName;
         uint32 m_scriptSpellId;
 
-    private:
+    protected:
 
 #ifdef TRINITY_API_USE_DYNAMIC_LINKING
 
@@ -154,7 +154,7 @@ class TC_GAME_API _SpellScript
             return _ValidateSpellInfo(std::cbegin(spellIds), std::cend(spellIds));
         }
 
-    private:
+    protected:
         template <class InputIt>
         static bool _ValidateSpellInfo(InputIt first, InputIt last)
         {
@@ -187,7 +187,9 @@ enum SpellScriptHookType
     SPELL_SCRIPT_HOOK_OBJECT_TARGET_SELECT,
     SPELL_SCRIPT_HOOK_DESTINATION_TARGET_SELECT,
     SPELL_SCRIPT_HOOK_CHECK_CAST,
+    SPELL_SCRIPT_HOOK_BEFORE_CAST_TIME,
     SPELL_SCRIPT_HOOK_BEFORE_CAST,
+    SPELL_SCRIPT_HOOK_WHILE_CAST,
     SPELL_SCRIPT_HOOK_ON_CAST,
     SPELL_SCRIPT_HOOK_ON_RESIST_ABSORB_CALCULATION,
     SPELL_SCRIPT_HOOK_AFTER_CAST,
@@ -363,7 +365,11 @@ class TC_GAME_API SpellScript : public _SpellScript
         // hooks to which you can attach your functions
         //
         // example: BeforeCast += SpellCastFn(class::function);
+		HookList<CastHandler> BeforeCastTime;
+        // example: BeforeCast += SpellCastFn(class::function);
         HookList<CastHandler> BeforeCast;
+        // example: WhileCast += SpellCastFn(class::function);
+        HookList<CastHandler> WhileCast;
         // example: OnCast += SpellCastFn(class::function);
         HookList<CastHandler> OnCast;
         // example: AfterCast += SpellCastFn(class::function);
@@ -581,6 +587,7 @@ enum AuraScriptHookType
     AURA_SCRIPT_HOOK_EFFECT_PROC,
     AURA_SCRIPT_HOOK_EFFECT_AFTER_PROC,
     AURA_SCRIPT_HOOK_AFTER_PROC,
+    AURA_SCRIPT_HOOK_POWER_CHANGE,
     /*AURA_SCRIPT_HOOK_APPLY,
     AURA_SCRIPT_HOOK_REMOVE, */
 };
@@ -611,7 +618,8 @@ class TC_GAME_API AuraScript : public _SpellScript
         typedef bool(CLASSNAME::*AuraCheckEffectProcFnType)(AuraEffect const*, ProcEventInfo&); \
         typedef void(CLASSNAME::*AuraProcFnType)(ProcEventInfo&); \
         typedef void(CLASSNAME::*AuraEffectProcFnType)(AuraEffect*, ProcEventInfo&); \
-        typedef void(CLASSNAME::*AuraEnterLeaveCombatFnType)(bool);
+        typedef void(CLASSNAME::*AuraEnterLeaveCombatFnType)(bool); \
+        typedef void(CLASSNAME::*AuraPowerChangeFnType)(Unit*, Powers, int32);
 
         AURASCRIPT_FUNCTION_TYPE_DEFINES(AuraScript)
 
@@ -620,7 +628,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 CheckAreaTargetHandler(AuraCheckAreaTargetFnType pHandlerScript);
                 bool Call(AuraScript* auraScript, Unit* target);
-            private:
+            protected:
                 AuraCheckAreaTargetFnType pHandlerScript;
         };
         class TC_GAME_API AuraDispelHandler
@@ -628,7 +636,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 AuraDispelHandler(AuraDispelFnType pHandlerScript);
                 void Call(AuraScript* auraScript, DispelInfo* dispelInfo);
-            private:
+            protected:
                 AuraDispelFnType pHandlerScript;
         };
         class TC_GAME_API EffectBase : public  _SpellScript::EffectAuraNameCheck, public _SpellScript::EffectHook
@@ -643,7 +651,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectPeriodicHandler(AuraEffectPeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
                 void Call(AuraScript* auraScript, AuraEffect const* _aurEff);
-            private:
+            protected:
                 AuraEffectPeriodicFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectUpdatePeriodicHandler : public EffectBase
@@ -651,7 +659,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectUpdatePeriodicHandler(AuraEffectUpdatePeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
                 void Call(AuraScript* auraScript, AuraEffect* aurEff);
-            private:
+            protected:
                 AuraEffectUpdatePeriodicFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectCalcAmountHandler : public EffectBase
@@ -659,7 +667,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectCalcAmountHandler(AuraEffectCalcAmountFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
                 void Call(AuraScript* auraScript, AuraEffect const* aurEff, int32 & amount, bool & canBeRecalculated);
-            private:
+            protected:
                 AuraEffectCalcAmountFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectCalcPeriodicHandler : public EffectBase
@@ -667,7 +675,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectCalcPeriodicHandler(AuraEffectCalcPeriodicFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
                 void Call(AuraScript* auraScript, AuraEffect const* aurEff, bool & isPeriodic, int32 & periodicTimer);
-            private:
+            protected:
                 AuraEffectCalcPeriodicFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectCalcSpellModHandler : public EffectBase
@@ -675,7 +683,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectCalcSpellModHandler(AuraEffectCalcSpellModFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
                 void Call(AuraScript* auraScript, AuraEffect const* aurEff, SpellModifier* & spellMod);
-            private:
+            protected:
                 AuraEffectCalcSpellModFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectCalcCritChanceHandler : public EffectBase
@@ -683,7 +691,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectCalcCritChanceHandler(AuraEffectCalcCritChanceFnType effectHandlerScript, uint8 effIndex, uint16 effName);
                 void Call(AuraScript* auraScript, AuraEffect const* aurEff, Unit const* victim, float& critChance) const;
-            private:
+            protected:
                 AuraEffectCalcCritChanceFnType _effectHandlerScript;
         };
         class TC_GAME_API EffectApplyHandler : public EffectBase
@@ -691,7 +699,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectApplyHandler(AuraEffectApplicationModeFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName, AuraEffectHandleModes _mode);
                 void Call(AuraScript* auraScript, AuraEffect const* _aurEff, AuraEffectHandleModes _mode);
-            private:
+            protected:
                 AuraEffectApplicationModeFnType pEffectHandlerScript;
                 AuraEffectHandleModes mode;
         };
@@ -700,7 +708,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectAbsorbHandler(AuraEffectAbsorbFnType _pEffectHandlerScript, uint8 _effIndex, bool overKill);
                 void Call(AuraScript* auraScript, AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount);
-            private:
+            protected:
                 AuraEffectAbsorbFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectManaShieldHandler : public EffectBase
@@ -708,7 +716,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectManaShieldHandler(AuraEffectAbsorbFnType _pEffectHandlerScript, uint8 _effIndex);
                 void Call(AuraScript* auraScript, AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount);
-            private:
+            protected:
                 AuraEffectAbsorbFnType pEffectHandlerScript;
         };
         class TC_GAME_API EffectSplitHandler : public EffectBase
@@ -716,7 +724,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectSplitHandler(AuraEffectSplitFnType _pEffectHandlerScript, uint8 _effIndex);
                 void Call(AuraScript* auraScript, AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & splitAmount);
-            private:
+            protected:
                 AuraEffectSplitFnType pEffectHandlerScript;
         };
         class TC_GAME_API CheckProcHandler
@@ -724,7 +732,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 CheckProcHandler(AuraCheckProcFnType handlerScript);
                 bool Call(AuraScript* auraScript, ProcEventInfo& eventInfo);
-            private:
+            protected:
                 AuraCheckProcFnType _HandlerScript;
         };
         class TC_GAME_API CheckEffectProcHandler : public EffectBase
@@ -732,7 +740,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 CheckEffectProcHandler(AuraCheckEffectProcFnType handlerScript, uint8 effIndex, uint16 effName);
                 bool Call(AuraScript* auraScript, AuraEffect const* aurEff, ProcEventInfo& eventInfo);
-            private:
+            protected:
                 AuraCheckEffectProcFnType _HandlerScript;
         };
         class TC_GAME_API AuraProcHandler
@@ -740,7 +748,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 AuraProcHandler(AuraProcFnType handlerScript);
                 void Call(AuraScript* auraScript, ProcEventInfo& eventInfo);
-            private:
+            protected:
                 AuraProcFnType _HandlerScript;
         };
         class TC_GAME_API EffectProcHandler : public EffectBase
@@ -748,7 +756,7 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EffectProcHandler(AuraEffectProcFnType effectHandlerScript, uint8 effIndex, uint16 effName);
                 void Call(AuraScript* auraScript, AuraEffect* aurEff, ProcEventInfo& eventInfo);
-            private:
+            protected:
                 AuraEffectProcFnType _EffectHandlerScript;
         };
         class TC_GAME_API EnterLeaveCombatHandler
@@ -756,9 +764,19 @@ class TC_GAME_API AuraScript : public _SpellScript
             public:
                 EnterLeaveCombatHandler(AuraEnterLeaveCombatFnType handlerScript);
                 void Call(AuraScript* auraScript, bool isNowInCombat) const;
-            private:
+            protected:
                 AuraEnterLeaveCombatFnType _handlerScript;
         };
+        class TC_GAME_API PowerChangeHandler
+        {
+            public:
+                PowerChangeHandler(AuraPowerChangeFnType EffectHandlerScript);
+                void Call(AuraScript* auraScript, Unit* user, Powers power, int32 amount);
+            protected:
+                AuraPowerChangeFnType _EffectHandlerScript;
+        };
+
+
 
         #define AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME) \
         class CheckAreaTargetFunction : public AuraScript::CheckAreaTargetHandler { public: CheckAreaTargetFunction(AuraCheckAreaTargetFnType _pHandlerScript) : AuraScript::CheckAreaTargetHandler((AuraScript::AuraCheckAreaTargetFnType)_pHandlerScript) { } }; \
@@ -777,11 +795,12 @@ class TC_GAME_API AuraScript : public _SpellScript
         class CheckEffectProcHandlerFunction : public AuraScript::CheckEffectProcHandler { public: CheckEffectProcHandlerFunction(AuraCheckEffectProcFnType handlerScript, uint8 effIndex, uint16 effName) : AuraScript::CheckEffectProcHandler((AuraScript::AuraCheckEffectProcFnType)handlerScript, effIndex, effName) { } }; \
         class AuraProcHandlerFunction : public AuraScript::AuraProcHandler { public: AuraProcHandlerFunction(AuraProcFnType handlerScript) : AuraScript::AuraProcHandler((AuraScript::AuraProcFnType)handlerScript) { } }; \
         class EffectProcHandlerFunction : public AuraScript::EffectProcHandler { public: EffectProcHandlerFunction(AuraEffectProcFnType effectHandlerScript, uint8 effIndex, uint16 effName) : AuraScript::EffectProcHandler((AuraScript::AuraEffectProcFnType)effectHandlerScript, effIndex, effName) { } }; \
-        class EnterLeaveCombatFunction : public AuraScript::EnterLeaveCombatHandler { public: EnterLeaveCombatFunction(AuraEnterLeaveCombatFnType handlerScript) : AuraScript::EnterLeaveCombatHandler((AuraScript::AuraEnterLeaveCombatFnType)handlerScript) { } }
+        class EnterLeaveCombatFunction : public AuraScript::EnterLeaveCombatHandler { public: EnterLeaveCombatFunction(AuraEnterLeaveCombatFnType handlerScript) : AuraScript::EnterLeaveCombatHandler((AuraScript::AuraEnterLeaveCombatFnType)handlerScript) { } }; \
+		
+        #define PrepareAuraScript(CLASSNAME) AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME);
 
-        #define PrepareAuraScript(CLASSNAME) AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME)
-
-    public:
+        
+            public:
         AuraScript() : _SpellScript(), m_aura(nullptr), m_auraApplication(nullptr), m_defaultActionPrevented(false)
         { }
         bool _Validate(SpellInfo const* entry) override;
@@ -789,7 +808,7 @@ class TC_GAME_API AuraScript : public _SpellScript
         void _PrepareScriptCall(AuraScriptHookType hookType, AuraApplication const* aurApp = nullptr);
         void _FinishScriptCall();
         bool _IsDefaultActionPrevented() const;
-    private:
+    protected:
         Aura* m_aura;
         AuraApplication const* m_auraApplication;
         bool m_defaultActionPrevented;
@@ -957,6 +976,11 @@ class TC_GAME_API AuraScript : public _SpellScript
         HookList<EnterLeaveCombatHandler> OnEnterLeaveCombat;
         #define AuraEnterLeaveCombatFn(F) EnterLeaveCombatFunction(&F)
 
+        // executed when power changes
+        // example: OnPowerChange += AuraProcFn(class::function, GetCaster());
+        // where function is: void function (Unit* unit, Powers power, int32 amount);
+        HookList<PowerChangeHandler> OnPowerChange;
+
         // AuraScript interface - hook/effect execution manipulators
 
         // prevents default action of a hook from being executed (works only while called in a hook which default action can be prevented)
@@ -1043,6 +1067,18 @@ class TC_GAME_API AuraScript : public _SpellScript
 
         // returns desired cast difficulty for triggered spells
         Difficulty GetCastDifficulty() const;
+};
+
+class PowerScript : public AuraScript
+{
+public:
+
+        #define AddPowerChange(F) OnPowerChange.AddToContainer(PowerChangeHandler(AuraScript::AuraPowerChangeFnType(&F)));
+
+    PowerScript() : AuraScript() { };
+
+    bool Load() override;
+    void Unload() override;
 };
 
 //

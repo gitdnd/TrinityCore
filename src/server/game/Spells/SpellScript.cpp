@@ -1374,3 +1374,46 @@ Difficulty AuraScript::GetCastDifficulty() const
 {
     return GetAura()->GetCastDifficulty();
 }
+
+AuraScript::PowerChangeHandler::PowerChangeHandler(AuraPowerChangeFnType EffectHandlerScript)
+{
+    _EffectHandlerScript = EffectHandlerScript;
+}
+void AuraScript::PowerChangeHandler::Call(AuraScript* auraScript, Unit* user, Powers power, int32 amount)
+{
+    (auraScript->*_EffectHandlerScript)(user, power, amount);
+}
+
+bool PowerScript::Load()
+{
+    if (OnPowerChange.size() == 0)
+    {
+        Aura* aura = GetAura();
+        if (!aura)
+            return true;
+        if (!aura->GetOwner())
+            return true;
+        Unit* unit = aura->GetUnitOwner();
+        if (unit)
+        {
+            unit->AddPowerChangeHook(GetAura());
+        }
+    }
+    return true;
+}
+
+void PowerScript::Unload()
+{
+    Aura* aura = GetAura();
+    if (!aura)
+        return;
+    if (!aura->GetOwner())
+        return;
+    Unit* owner = aura->GetUnitOwner();
+    if (!owner)
+        return;
+    for (auto hook : OnPowerChange)
+    {
+        owner->RemovePowerChangeHook(GetAura());
+    }
+}

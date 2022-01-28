@@ -2244,6 +2244,11 @@ void ScriptMgr::OnDamage(Unit* attacker, Unit* victim, uint32& damage)
     FOREACH_SCRIPT(UnitScript)->OnDamage(attacker, victim, damage);
 }
 
+void ScriptMgr::OnPowerChange(Unit* user, Powers power, int32& amount)
+{
+	FOREACH_SCRIPT(UnitScript)->OnPowerChange(user, power, amount);
+}
+
 void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage)
 {
     FOREACH_SCRIPT(UnitScript)->ModifyPeriodicDamageAurasTick(target, attacker, damage);

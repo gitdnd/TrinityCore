@@ -375,9 +375,10 @@ class HookList final
     private:
         typedef std::vector<T> ContainerType;
 
-        ContainerType _container;
 
+        ContainerType _container;
     public:
+
         typedef typename ContainerType::const_iterator const_iterator;
         typedef typename ContainerType::iterator iterator;
 
@@ -410,6 +411,10 @@ class HookList final
         const_iterator end() const
         {
             return _container.end();
+        }
+        void AddToContainer(T&& t)
+        {
+            _container.push_back(std::move(t));
         }
 };
 

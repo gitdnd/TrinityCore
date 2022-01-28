@@ -404,6 +404,9 @@ class TC_GAME_API UnitScript : public ScriptObject
         // Called when a unit deals damage to another unit
         virtual void OnDamage(Unit* /*attacker*/, Unit* /*victim*/, uint32& /*damage*/) { }
 
+        // Called when a unit changes a power value
+        virtual void OnPowerChange(Unit* /*user*/, Powers, int32& /*change*/) { }
+
         // Called when DoT's Tick Damage is being Dealt
         virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
@@ -1157,6 +1160,7 @@ class TC_GAME_API ScriptMgr
 
         void OnHeal(Unit* healer, Unit* reciever, uint32& gain);
         void OnDamage(Unit* attacker, Unit* victim, uint32& damage);
+        void OnPowerChange(Unit* user, Powers power, int32& amount);
         void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage);
         void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage);
         void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage, SpellInfo const* spellInfo);

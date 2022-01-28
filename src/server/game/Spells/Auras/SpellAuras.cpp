@@ -886,7 +886,7 @@ void Aura::SetDuration(int32 duration, bool withMods)
         if (Unit* caster = GetCaster())
             if (Player* modOwner = caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(GetSpellInfo(), SpellModOp::Duration, duration);
-
+    
     m_duration = duration;
     SetNeedClientUpdateForTargets();
 }
@@ -989,6 +989,15 @@ bool Aura::ModCharges(int32 num, AuraRemoveMode removeMode)
     return false;
 }
 
+void Aura::ModDuration(int32 duration)
+{
+    Unit* caster = GetCaster();
+    if (caster)
+    {
+        m_duration += duration;
+        SetNeedClientUpdateForTargets();
+    }
+}
 void Aura::ModChargesDelayed(int32 num, AuraRemoveMode removeMode)
 {
     m_dropEvent = nullptr;
@@ -2363,6 +2372,19 @@ void Aura::CallScriptAfterEffectProcHandlers(AuraEffect* aurEff, AuraApplication
         (*scritr)->_FinishScriptCall();
     }
 }
+void Aura::CallScriptPowerChangeHandlers(Unit* user, Powers power, int32 amount)
+{
+    for (std::vector<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_POWER_CHANGE);
+        std::vector<AuraScript::PowerChangeHandler>::iterator hookItrEnd = (*scritr)->OnPowerChange.end(), hookItr = (*scritr)->OnPowerChange.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            hookItr->Call(*scritr, user, power, amount);
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
 
 std::string Aura::GetDebugInfo() const
 {
