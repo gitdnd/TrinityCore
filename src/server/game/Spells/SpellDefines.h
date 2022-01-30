@@ -308,6 +308,7 @@ enum class MapDummy : uint8
     Strike,
     WasInAir,
     TriggerStacks,
+    Scripted,
 };
 
 struct TC_GAME_API SpellDestination

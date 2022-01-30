@@ -3419,7 +3419,7 @@ struct SpellPowerEntry
 {
     uint32 ID;
     uint8 OrderIndex;
-    int32 ManaCost;
+    int32 ManaCost = 0;
     int32 ManaCostPerLevel;
     int32 ManaPerSecond;
     uint32 PowerDisplayID;

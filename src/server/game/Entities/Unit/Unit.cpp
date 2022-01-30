@@ -1942,14 +1942,19 @@ void Unit::HandleEmoteCommand(uint32 emoteId, Player* target /*=nullptr*/, Trini
     bool existExpired = false;
 
     // absorb without mana cost
-    AuraEffectList const& vHealAbsorb = healInfo.GetTarget()->GetAuraEffectsByType(SPELL_AURA_SCHOOL_HEAL_ABSORB);
-    for (AuraEffectList::const_iterator i = vHealAbsorb.begin(); i != vHealAbsorb.end() && healInfo.GetHeal() > 0; ++i)
+    AuraEffectList vHealAbsorb = healInfo.GetTarget()->GetAuraEffectsByType(SPELL_AURA_SCHOOL_HEAL_ABSORB);
+    for (auto i : vHealAbsorb)
     {
-        if (!((*i)->GetMiscValue() & healInfo.GetSpellInfo()->SchoolMask))
+        if (healInfo.GetHeal() <= 0)
+            break;
+        auto info = healInfo.GetSpellInfo();
+        if (!info || !i)
+            continue;
+        if (!(i->GetMiscValue() & info->SchoolMask))
             continue;
 
         // Max Amount can be absorbed by this aura
-        int32 currentAbsorb = (*i)->GetAmount();
+        int32 currentAbsorb = i->GetAmount();
 
         // Found empty aura (impossible but..)
         if (currentAbsorb <= 0)
@@ -1965,10 +1970,13 @@ void Unit::HandleEmoteCommand(uint32 emoteId, Player* target /*=nullptr*/, Trini
         healInfo.AbsorbHeal(currentAbsorb);
 
         // Reduce shield amount
-        (*i)->ChangeAmount((*i)->GetAmount() - currentAbsorb);
-        // Need remove it later
-        if ((*i)->GetAmount() <= 0)
+        int32 newAmount = i->GetAmount() - currentAbsorb;
+        i->ChangeAmount(newAmount);
+        if (newAmount <= 0)
+        {
             existExpired = true;
+            break;
+        }
     }
 
     // Remove all expired absorb auras

@@ -266,6 +266,19 @@ class spell_dk_dancing_rune_weapon : public AuraScript
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo || spellInfo->Id == 49028)
             return;
+        auto dummy = eventInfo.GetProcSpell()->triggerDummy;
+        auto it = dummy.find(MapDummy::Scripted);
+        {
+            if (it != dummy.end())
+            {
+                auto& optional = (*it).second;
+                if (optional.has_value())
+                {
+                    if (std::any_cast<bool>(optional.value()) == true)
+                        return;
+                }
+            }
+        }
         
 
         std::list<Unit*> drw;
@@ -284,7 +297,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
 
         for (auto unit : drw)
         {
-            unit->CastSpell(eventInfo.GetActionTarget(), spellInfo->Id, false);
+            caster->CastSpell(eventInfo.GetActionTarget(), spellInfo->Id, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddTriggerDummy(MapDummy::Scripted, true));
         }
     }
 
@@ -916,7 +929,7 @@ class spell_dk_vampiric_blood_PowerScript : public PowerScript
             return;
         amount *= -1;
         Aura* aura = GetAura();
-        user->GetSpellHistory()->ModifyCooldown(55233, -Seconds(redThis->GetEffect(EFFECT_0)->CalculateAmount(user) * amount * redThis->GetEffect(EFFECT_1)->CalculateAmount(user)) / 100);
+        user->GetSpellHistory()->ModifyCooldown(55233, -Seconds(redThis->GetEffect(EFFECT_0)->CalculateAmount(user) * amount * redThis->GetEffect(EFFECT_1)->CalculateAmount(user)) / 10);
     }
     void Register() override
     {
@@ -933,6 +946,9 @@ class spell_dk_marrowrend : public SpellScript
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
+        Unit* owner = caster->GetOwner();
+        if (owner)
+            caster = owner;
         Aura* aura = caster->GetAura(195181);
         int stacks = GetEffectInfo(EFFECT_2).CalcValue(GetCaster());
         if (!aura)
@@ -967,7 +983,7 @@ class spell_dk_bone_shield_AuraScript : public AuraScript
             PreventDefaultAction();
         }
         if(owner->HasAura(221699))
-            owner->GetSpellHistory()->ModifyCooldown(221699, -Seconds(20));
+            owner->GetSpellHistory()->ModifyCooldown(221699, -Seconds(2000));
         if (!aura)
             return;
         if (aura->GetStackAmount() >= 5 && owner->HasAura(219786))
@@ -979,10 +995,14 @@ class spell_dk_bone_shield_AuraScript : public AuraScript
             owner->RemoveAura(219788);
         }
     }
-    
+    void Removed(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+    {
+        Unit* owner = GetUnitOwner();
+        owner->RemoveAura(219788);
+    }
     void Register() override
     {
-        
+        AfterEffectRemove += AuraEffectRemoveFn(spell_dk_bone_shield_AuraScript::Removed, EFFECT_0, SPELL_AURA_MOD_ARMOR_PCT_FROM_STAT, AURA_EFFECT_HANDLE_REAL);
         DoPrepareProc += AuraProcFn(spell_dk_bone_shield_AuraScript::BoneHit);
     }
 };
@@ -1090,6 +1110,8 @@ class spell_dk_icy_talons_AuraScript : public AuraScript
 
     bool CheckIfSpender(ProcEventInfo& eventInfo)
     {
+        if (!eventInfo.GetProcSpell())
+            return false;
         for (auto power : eventInfo.GetProcSpell()->m_spellInfo->PowerCosts)
         {
             if (power == NULL)
@@ -1159,7 +1181,7 @@ class spell_dk_chains_of_ice : public SpellScript
         Aura* coldHeart = caster->GetAura(281209);
         if (coldHeart)
         {
-            caster->CastSpell(GetHitUnit(), 281210, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddTriggerDummy(MapDummy::TriggerStacks, std::optional((uint8)coldHeart->GetStackAmount())));
+            caster->CastSpell(GetHitUnit(), 281210, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddTriggerDummy(MapDummy::TriggerStacks, (uint8)coldHeart->GetStackAmount()));
 
             coldHeart->Remove();
         }
@@ -1176,9 +1198,10 @@ class spell_dk_cold_heart : public SpellScript
     void Hit(SpellEffIndex effIndex)
     {
         auto& triggerDummy = GetSpell()->GetTriggerDummy();
-        std::optional<std::any> optional = triggerDummy[MapDummy::TriggerStacks];
-        if (!optional)
+        auto it = triggerDummy.find(MapDummy::TriggerStacks);
+        if (it == triggerDummy.end())
             return;
+        auto& optional = (*it).second;
         if(!optional.has_value())
             return;
         SetHitDamage(GetHitDamage() * std::any_cast<uint8>(optional.value()));
@@ -1328,7 +1351,7 @@ class spell_dk_inexorable_assault_dummy_AuraScript : public AuraScript
     bool procced = false;
     bool HandleProc(ProcEventInfo& eventInfo)
     {
-        if(eventInfo.GetProcSpell()->m_spellInfo->Id != 49020)
+        if(eventInfo.GetProcSpell()->m_spellInfo->Id != 49020 && eventInfo.GetProcSpell()->m_spellInfo->Id != 207230)
         {
             return false;
         }
@@ -1391,6 +1414,12 @@ class spell_dk_horn_of_winter : public SpellScript
 class spell_dk_howling_blast : public SpellScript
 {
     PrepareSpellScript(spell_dk_howling_blast);
+    void Hit(SpellEffIndex effIndex)
+    {
+        Unit* caster = GetCaster();
+        if(caster->HasAura(207142) && caster->HasAura(59052))
+            caster->CastSpell(GetHitUnit(), 207150, CastSpellExtraArgs(TRIGGERED_FULL_MASK));
+    }
     void HandleScriptEffect()
     {
         Unit* caster = GetCaster();
@@ -1410,6 +1439,7 @@ class spell_dk_howling_blast : public SpellScript
     }
     void Register() override
     {
+        OnEffectHitTarget += SpellEffectFn(spell_dk_howling_blast::Hit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         AfterHit += SpellHitFn(spell_dk_howling_blast::HandleScriptEffect);
     }
 };
@@ -1449,7 +1479,7 @@ class spell_dk_virulent_plague_AuraScript : public AuraScript
         if (!target->isDead())
             return;
         Unit* caster = GetUnitOwner();
-        caster->CastSpell(target->GetWorldLocation(), 191685, CastSpellExtraArgs(TRIGGERED_FULL_MASK));
+        caster->CastSpell(target, 191685, CastSpellExtraArgs(TRIGGERED_FULL_MASK));
     }
     void Register() override
     {
