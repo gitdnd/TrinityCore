@@ -240,11 +240,13 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     if (!GetPlayer()->IsAlive() || !guid.IsCreatureOrVehicle())
         return;
 
-    GetPlayer()->SendLoot(guid, LOOT_CORPSE);
-
     // interrupt cast
     if (GetPlayer()->IsNonMeleeSpellCast(false))
         GetPlayer()->InterruptNonMeleeSpells(false);
+
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
+
+    GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
 
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
