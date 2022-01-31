@@ -1489,7 +1489,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
         return 0;
     }
 
-    int ClearLoot(lua_State* L, Creature* creature)
+    int ClearLoot(lua_State* /*L*/, Creature* creature)
     {
         creature->loot.clear();
         return 0;

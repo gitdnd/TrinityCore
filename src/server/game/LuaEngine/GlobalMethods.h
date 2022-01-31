@@ -195,7 +195,7 @@ namespace LuaGlobalFunctions
                     if (!player->IsInWorld())
                         continue;
 #if defined TRINITY || AZEROTHCORE
-                    if ((team == TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->IsGameMaster()))
+                    if ((team == TEAM_NEUTRAL || (uint32)player->GetTeamId() == team) && (!onlyGM || player->IsGameMaster()))
 #else
                     if ((team == TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->isGameMaster()))
 #endif

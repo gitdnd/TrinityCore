@@ -4623,7 +4623,7 @@ class spell_second_wind_health_aura : public AuraScript
 {
     PrepareAuraScript(spell_second_wind_health_aura);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
         return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
     }
@@ -4638,7 +4638,7 @@ class spell_perseverance_health_aura : public AuraScript
 {
     PrepareAuraScript(spell_perseverance_health_aura);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
         return uint32(std::floor(GetTarget()->GetHealthPct())) <= 20;
     }

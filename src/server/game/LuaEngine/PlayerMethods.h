@@ -4272,19 +4272,19 @@ namespace LuaPlayer
         return payload.size() * 2;
     }
 
-    int UpdateTalentPassives(lua_State* L, Player* player)
+    int UpdateTalentPassives(lua_State* /*L*/, Player* player)
     {
         player->UpdateArmorPassives();
         return 0;
     }
 
-    int RemoveTalentPassives(lua_State* L, Player* player)
+    int RemoveTalentPassives(lua_State* /*L*/, Player* player)
     {
         player->RemoveArmorPassives();
         return 0;
     }
 
-    int IsStackingSpell(lua_State* L, Player* player)
+    int IsStackingSpell(lua_State* L, Player* /*player*/)
     {
         uint32 spell = Eluna::CHECKVAL<uint32>(L, 2);
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
@@ -4320,7 +4320,7 @@ namespace LuaPlayer
         return 0;
     }
 
-    int IncreaseUsedTalentCount(lua_State* L, Player* player)
+    int IncreaseUsedTalentCount(lua_State* /*L*/, Player* player)
     {
         player->IncreaseUsedTalentCount();
         return 0;
@@ -4369,7 +4369,7 @@ namespace LuaPlayer
         return 0;
     }
 
-    int ResetInstances(lua_State* L, Player* player)
+    int ResetInstances(lua_State* /*L*/, Player* player)
     {
         player->ResetInstances(INSTANCE_RESET_ALL, false);
         return 0;

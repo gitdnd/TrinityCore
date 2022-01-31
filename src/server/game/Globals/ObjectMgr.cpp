@@ -2842,7 +2842,7 @@ void ObjectMgr::LoadItemTemplates()
     }
 
     _itemTemplateStore.reserve(result->GetRowCount());
-    bool enforceDBCAttributes = sWorld->getBoolConfig(CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES);
+    //bool enforceDBCAttributes = sWorld->getBoolConfig(CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES);
 
     do
     {
@@ -2990,7 +2990,7 @@ void ObjectMgr::LoadItemTemplates()
         }
         // Checks
 
-        ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
+        //ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
 
         /*if (dbcitem)
         {

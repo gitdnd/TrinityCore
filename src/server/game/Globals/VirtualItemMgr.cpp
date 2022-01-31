@@ -307,7 +307,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return output;
 }
 
-void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statSeed);
@@ -509,7 +509,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     output->MaxDurability = 0; // Disable any form of durability for now
 }
 
-void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statValueSeed);
@@ -605,10 +605,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         for (uint32 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
         {
             // if we are at a free stat slot or we are at a stat slot that has the same stat type
-            if (j >= setStats || output->ItemStat[j].ItemStatType == selectedStats[i])
+            if (j >= setStats || output->ItemStat[j].ItemStatType == (uint32)selectedStats[i])
             {
                 uint32 finalStatValue = std::floor((float(pool) * (float(distributedPool[i]) / 100.0f)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
-                output->ItemStat[j].ItemStatType = selectedStats[i];
+                output->ItemStat[j].ItemStatType = (uint32)selectedStats[i];
                 output->ItemStat[j].ItemStatValue += finalStatValue;
                 setStats = std::max(setStats, uint32(j + 1));
                 break;
@@ -622,7 +622,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
 {
     WriteGuard guard(lock);
-    int32 i = 1;
     float iLevel = 0.0f;
 
     // Generate lookup table for Virtual Levels.
@@ -644,7 +643,7 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     return ilevel;
 }
 
-void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.nameSeed);
@@ -867,9 +866,9 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     {
         if (output->Quality != someSpells.quality)
             continue;
-        IFSKIP(someSpells.itemClass, output->Class);
-        IFSKIP(someSpells.subClass, output->SubClass);
-        IFSKIP(someSpells.inventoryType, output->InventoryType);
+        IFSKIP(someSpells.itemClass, (int32)output->Class);
+        IFSKIP(someSpells.subClass, (int32)output->SubClass);
+        IFSKIP(someSpells.inventoryType, (int32)output->InventoryType);
         IFSKIP(someSpells.statGroup, output->statGroup);
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > uint32(someSpells.maxItemLevel))
             continue;
@@ -885,7 +884,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     return *selectedSpell;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
     std::mt19937 generator;
     generator.seed(modifier.spellSeed);
@@ -1043,7 +1042,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 }
 
-void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
     std::mt19937 generator;
     generator.seed(modifier.qualitySeed);
@@ -1091,7 +1090,7 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     output->Quality = quality;
 }
 
-void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* output)
+void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
 {
     uint8 stats [21] = {
         ITEM_MOD_STAMINA,
@@ -1267,7 +1266,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     return names;
 }
 
-std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const
+std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1276,7 +1275,7 @@ std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPri
     return stat_group_primary_stats[group];
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1285,7 +1284,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSeco
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const
+std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1641,7 +1640,7 @@ bool VirtualItemMgr::IsVirtualTemplate(ItemTemplate const* base)
     if (base->Class == ITEM_CLASS_WEAPON)
     {
         for (auto subclass : weaponSubclasses)
-            if (base->SubClass == subclass)
+            if (base->SubClass == (uint32)subclass)
                 return true;
     }
     return false;

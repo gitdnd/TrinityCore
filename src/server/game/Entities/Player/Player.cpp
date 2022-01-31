@@ -3665,7 +3665,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (itr == m_spells.end())
         return;                                             // already unleared
 
-    bool giveTalentPoints = disabled || !itr->second->disabled;
+    //bool giveTalentPoints = disabled || !itr->second->disabled;
 
     bool cur_active    = itr->second->active;
     bool cur_dependent = itr->second->dependent;
@@ -11932,7 +11932,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObject const* lootedObject) const
+InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObject const* /*lootedObject*/) const
 {
     //if (!GetGroup() || !GetGroup()->isLFGGroup())
     //    return EQUIP_ERR_OK;    // not in LFG group
@@ -27004,7 +27004,7 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 }
 
 
-float Player::UpdateCachedItemLevel(bool isLogin)
+float Player::UpdateCachedItemLevel(bool /*isLogin*/)
 {
     float sum = 0;
     uint32 count = 0;

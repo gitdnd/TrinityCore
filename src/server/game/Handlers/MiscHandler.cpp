@@ -296,7 +296,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     if (levelMax >= MAX_LEVEL)
         levelMax = STRONG_MAX_LEVEL;
 
-    uint32 team = _player->GetTeam();
+    //uint32 team = _player->GetTeam();
 
     uint32 gmLevelInWhoList  = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
     uint32 displayCount = 0;

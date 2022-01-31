@@ -1333,11 +1333,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         {
             float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
             if (dungeonLevel < 50)
-                modifier *= 0.33;
+                modifier *= 0.33f;
             else if (dungeonLevel < 60)
-                modifier *= 0.5;
+                modifier *= 0.5f;
             else if (dungeonLevel < 75)
-                modifier *= 0.75;
+                modifier *= 0.75f;
             else if (dungeonLevel > 250)
                 modifier *= ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
 
@@ -5634,7 +5634,7 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
     m_caster->CastSpell(unitTarget, m_spellInfo->Effects[effIndex].TriggerSpell, true);
 }
 
-void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
+void Spell::EffectReRollVirtualItemSockets(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -5657,7 +5657,7 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     itemTarget->SaveVirtualItemInfo();
 }
 
-void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
+void Spell::EffectAddStatToVirtualItem(SpellEffIndex /*effIndex*/)
 {
     Player* player = m_caster->ToPlayer();
     if (!player)
@@ -5783,7 +5783,7 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     itemTarget->SaveVirtualItemInfo();
 }
 
-void Spell::EffectExtractGems(SpellEffIndex effIndex)
+void Spell::EffectExtractGems(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;

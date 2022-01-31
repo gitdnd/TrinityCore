@@ -364,7 +364,7 @@ namespace LuaMap
 #endif
             if (!player)
                 continue;
-            if (player->GetSession() && (team >= TEAM_NEUTRAL || player->GetTeamId() == team))
+            if (player->GetSession() && (team >= TEAM_NEUTRAL || (uint32)player->GetTeamId() == team))
             {
                 Eluna::Push(L, player);
                 lua_rawseti(L, tbl, ++i);

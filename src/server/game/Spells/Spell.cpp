@@ -7162,7 +7162,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                if(m_targets.GetItemTarget()->GetTemplate()->Quality != m_spellInfo->Effects[i].MiscValue-1)
+                if(m_targets.GetItemTarget()->GetTemplate()->Quality != (uint32)m_spellInfo->Effects[i].MiscValue-1)
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 break;
