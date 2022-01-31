@@ -2713,7 +2713,7 @@ public:
         char* radius_str = strtok((char*)args, " ");
         char* step_str = args ? strtok(nullptr, " ") : "8";
         float radius= atof(radius_str);
-        uint8 step = atoi(radius_str);
+        uint8 step = atoi(step_str);
         if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
         {
             if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
