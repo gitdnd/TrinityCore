@@ -3762,6 +3762,12 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
     if (damage <= 0)
         return;
 
+    // 180173 Dragonborn talent
+    if (unitTarget->ToPlayer() && unitTarget->ToPlayer()->HasAura(180173))
+    {
+        damage += 1;
+    }
+
     AddComboPointGain(unitTarget, damage);
 }
 
