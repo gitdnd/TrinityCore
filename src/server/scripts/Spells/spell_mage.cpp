@@ -1138,11 +1138,12 @@ class spell_mage_living_bomb : public SpellScriptLoader
                         auto player = caster->ToPlayer();
                         auto points = player->GetComboPoints(player->GetComboTargetGUID());
                         if (points > 0)
+                        {
                             args.AddSpellBP0(689 * 0.1 * points);
-                        player->ClearComboPoints();
-                        // Reproc on all targets one time (we use 180177 clone spell to prevent the loop)
-                        // Spell we cast now triggers 180177 on all nearby targets
-                        caster->CastSpell(GetTarget(), 180178);
+                            // Reproc on all targets one time (we use 180177 clone spell to prevent the loop)
+                            // Spell we cast now triggers 180177 on all nearby targets
+                            caster->CastSpell(GetTarget(), 180178);
+                        }
                     }
                     caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), args);
                 }
