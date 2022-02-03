@@ -1107,6 +1107,8 @@ class spell_mage_living_bomb : public SpellScriptLoader
         {
             PrepareAuraScript(spell_mage_living_bomb_AuraScript);
 
+            uint8 m_comboPoints = 0;
+
             bool Validate(SpellInfo const* spell) override
             {
                 return ValidateSpellInfo({ static_cast<uint32>(spell->Effects[EFFECT_1].CalcValue()) });
@@ -1118,7 +1120,9 @@ class spell_mage_living_bomb : public SpellScriptLoader
                 {
                     if (caster->ToPlayer() && caster->HasAura(180171) && GetSpellInfo() && GetSpellInfo()->Id != 180177)
                     {
-                        caster->ToPlayer()->ClearComboPoints();
+                        auto player = caster->ToPlayer();
+                        m_comboPoints = player->GetComboPoints(player->GetComboTargetGUID());
+                        player->ClearComboPoints();
                     }
                 }
             }
@@ -1136,10 +1140,9 @@ class spell_mage_living_bomb : public SpellScriptLoader
                     if (caster->ToPlayer() && caster->HasAura(180171) && GetSpellInfo() && GetSpellInfo()->Id != 180177)
                     {
                         auto player = caster->ToPlayer();
-                        auto points = player->GetComboPoints(player->GetComboTargetGUID());
-                        if (points > 0)
+                        if (m_comboPoints > 0)
                         {
-                            args.AddSpellBP0(689 * 0.1 * points);
+                            args.AddSpellBP0(689 * 0.1 * m_comboPoints);
                             // Reproc on all targets one time (we use 180177 clone spell to prevent the loop)
                             // Spell we cast now triggers 180177 on all nearby targets
                             caster->CastSpell(GetTarget(), 180178);
