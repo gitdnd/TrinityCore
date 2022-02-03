@@ -301,7 +301,7 @@ Unit::Unit(bool isWorldObject) :
     m_removedAurasCount(0), m_unitMovedByMe(nullptr), m_playerMovingMe(nullptr), m_charmer(nullptr), m_charmed(nullptr),
     i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_vehicle(nullptr), m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE), m_Diminishing(), m_combatManager(this), m_threatManager(this),
-    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_spellHistory(new SpellHistory(this))
+    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_lastComboPoints(0), m_spellHistory(new SpellHistory(this))
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -10463,10 +10463,16 @@ void Unit::ClearComboPoints()
     // (NB: this Aura retains the CP while it's active - now that CP have reset, it shouldn't be there anymore)
     RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
 
+    m_lastComboPoints = m_comboPoints;
     m_comboPoints = 0;
     SendComboPoints();
     m_comboTarget->RemoveComboPointHolder(this);
     m_comboTarget = nullptr;
+}
+
+void Unit::ClearLastComboPoints()
+{
+    m_lastComboPoints = 0;
 }
 
 void Unit::SendComboPoints()

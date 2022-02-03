@@ -1575,11 +1575,13 @@ class TC_GAME_API Unit : public WorldObject
         // This unit having CP on other units
         uint8 GetComboPoints(Unit const* who = nullptr) const { return (who && m_comboTarget != who) ? 0 : m_comboPoints; }
         uint8 GetComboPoints(ObjectGuid const& guid) const { return (m_comboTarget && m_comboTarget->GetGUID() == guid) ? m_comboPoints : 0; }
+        uint8 GetLastComboPoints() const { return m_lastComboPoints; }
         Unit* GetComboTarget() const { return m_comboTarget; }
         ObjectGuid GetComboTargetGUID() const { return m_comboTarget ? m_comboTarget->GetGUID() : ObjectGuid::Empty; }
         void AddComboPoints(Unit* target, int8 count);
         void AddComboPoints(int8 count) { AddComboPoints(nullptr, count); }
         void ClearComboPoints();
+        void ClearLastComboPoints();
         void SendComboPoints();
         // Other units having CP on this unit
         void AddComboPointHolder(Unit* unit) { m_ComboPointHolders.insert(unit); }
@@ -1830,6 +1832,7 @@ class TC_GAME_API Unit : public WorldObject
 
         Unit* m_comboTarget;
         int8 m_comboPoints;
+        int8 m_lastComboPoints;
         std::unordered_set<Unit*> m_ComboPointHolders;
 
         bool m_cleanupDone; // lock made to not add stuff after cleanup before delete
