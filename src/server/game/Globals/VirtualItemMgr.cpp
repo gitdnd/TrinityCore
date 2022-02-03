@@ -499,13 +499,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
 
     // apply other item data
     output->ItemLevel = ilevel;
-
-    // temporarily set itemset to static test sets, need to implement set handler.
-    if (output->Class == ITEM_CLASS_ARMOR)
-        output->ItemSet = 1000;
-    else
-        output->ItemSet = 1001;
-
+    output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
     output->MaxDurability = 0; // Disable any form of durability for now
 }
 
