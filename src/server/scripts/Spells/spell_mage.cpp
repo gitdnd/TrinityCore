@@ -1122,19 +1122,16 @@ class spell_mage_living_bomb : public SpellScriptLoader
                 {
                     CastSpellExtraArgs args(aurEff);
                     // Handle 180171 Pyromaniac bonus damage per combo point
-                    if (caster->ToPlayer() && caster->HasAura(180171))
+                    if (caster->ToPlayer() && caster->HasAura(180171) && GetSpellInfo() && GetSpellInfo()->Id != 180177)
                     {
                         auto player = caster->ToPlayer();
                         auto points = player->GetComboPoints(player->GetComboTargetGUID());
                         if (points > 0)
                             args.AddSpellBP0(689 * 0.1 * points);
-                        if (GetTarget())
-                        {
-                            // Living Bomb 55360 Recast on target, but cannot spread again (caster is null so this will not trigger)
-                            CastSpellExtraArgs noSrcArgs(ObjectGuid::Empty);
-                            noSrcArgs.SetTriggerFlags(TRIGGERED_FULL_MASK);
-                            caster->CastSpell(GetTarget(), 55360, noSrcArgs);
-                        }
+                        player->ClearComboPoints();
+                        // Reproc on all targets one time (we use 180177 clone spell to prevent the loop)
+                        // Spell we cast now triggers 180177 on all nearby targets
+                        caster->CastSpell(GetTarget(), 180178);
                     }
                     caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), args);
                 }
