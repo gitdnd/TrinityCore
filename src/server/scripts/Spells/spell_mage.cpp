@@ -1119,7 +1119,25 @@ class spell_mage_living_bomb : public SpellScriptLoader
                     return;
 
                 if (Unit* caster = GetCaster())
-                    caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), aurEff);
+                {
+                    CastSpellExtraArgs args(aurEff);
+                    // Handle 180171 Pyromaniac bonus damage per combo point
+                    if (caster->ToPlayer() && caster->HasAura(180171))
+                    {
+                        auto player = caster->ToPlayer();
+                        auto points = player->GetComboPoints(player->GetComboTargetGUID());
+                        if (points > 0)
+                            args.AddSpellBP0(689 * 0.1 * points);
+                        if (GetTarget())
+                        {
+                            // Living Bomb 55360 Recast on target, but cannot spread again (caster is null so this will not trigger)
+                            CastSpellExtraArgs noSrcArgs(ObjectGuid::Empty);
+                            noSrcArgs.SetTriggerFlags(TRIGGERED_FULL_MASK);
+                            caster->CastSpell(GetTarget(), 55360, noSrcArgs);
+                        }
+                    }
+                    caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), args);
+                }
             }
 
             void Register() override
