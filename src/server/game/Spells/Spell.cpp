@@ -3133,6 +3133,18 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         }
         else
             m_casttime = 0; // Set cast time to 0 if .cheat casttime is enabled.
+
+        // 180171 Pyromaniac Handle talent modify 42891 Pyroblast cast time
+        if (m_comboTarget &&
+            m_spellInfo && m_spellInfo->Id == 42891 &&
+            player->HasAura(180171))
+        {
+            auto points = player->GetComboPoints(m_comboTarget->GetGUID());
+            m_casttime -= points * 5 * 100;
+            if (m_casttime < 0)
+                m_casttime = 0;
+            player->ClearComboPoints();
+        }
     }
     else
         m_casttime = m_spellInfo->CalcCastTime(this);
