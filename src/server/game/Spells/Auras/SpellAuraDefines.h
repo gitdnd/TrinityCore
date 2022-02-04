@@ -397,7 +397,8 @@ enum AuraType : uint32
     SPELL_AURA_TEMP_LEARN_SPELL                             = 317,
     SPELL_AURA_DISABLE_FATIGUE                              = 318,
     SPELL_AURA_DAMAGE_SCHOOL_BONUS                          = 319,
-    TOTAL_AURAS                                             = 320
+    SPELL_AURA_MOD_RATING_PERCENT                           = 320,
+    TOTAL_AURAS                                             = 321
 };
 
 enum AuraObjectType

@@ -5604,6 +5604,14 @@ void Player::UpdateRating(CombatRating cr)
         if (aurEff->GetMiscValue() & (1 << cr))
             amount += int32(CalculatePct(GetStat(Stats(aurEff->GetMiscValueB())), aurEff->GetAmount()));
 
+    float ratingMulti = 1.f;
+    AuraEffectList const& modRatingPercent = GetAuraEffectsByType(SPELL_AURA_MOD_RATING_PERCENT);
+    for (AuraEffect const* aurEff : modRatingPercent)
+        if (aurEff->GetMiscValue() & (1 << cr))
+            ratingMulti += aurEff->GetAmount() / 100.f;
+
+    amount *= ratingMulti;
+
     if (amount < 0)
         amount = 0;
     SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr, uint32(amount));
