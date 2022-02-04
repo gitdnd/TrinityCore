@@ -383,6 +383,8 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleTempLearnSpell,                            //317 SPELL_AURA_TEMP_LEARN_SPELL
     &AuraEffect::HandleWaterBreathing,                            //318 SPELL_AURA_DISABLE_FATIGUE
     &AuraEffect::HandleDamageSchoolBonus,                         //319 SPELL_AURA_DAMAGE_SCHOOL_BONUS
+    &AuraEffect::HandleModRating,                                 //320 SPELL_AURA_MOD_RATING_PERCENT
+
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
