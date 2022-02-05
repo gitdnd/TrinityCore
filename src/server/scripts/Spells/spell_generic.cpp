@@ -4823,6 +4823,31 @@ class spell_talent_combulstibolt_aura : public AuraScript
     }
 };
 
+class spell_talent_burningarmor_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_burningarmor_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        auto damage = eventInfo.GetDamageInfo()->GetDamage();
+        auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
+        damage = damage * ((bonusFire / 100) * 0.5);
+        CastSpellExtraArgs args;
+        args.AddSpellBP0(damage);
+        target->CastSpell(target, 180188, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_burningarmor_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4966,4 +4991,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_dead_eye_periodic_aura);
     RegisterSpellScript(spell_generate_combopoint);
     RegisterAuraScript(spell_talent_combulstibolt_aura);
+    RegisterAuraScript(spell_talent_burningarmor_aura);
 }
