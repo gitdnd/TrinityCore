@@ -4798,6 +4798,30 @@ class spell_generate_combopoint : public SpellScript
     }
 };
 
+class spell_talent_combulstibolt_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_combulstibolt_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        auto target = eventInfo.GetProcTarget();
+        if (!target)
+            return;
+        auto damage = eventInfo.GetDamageInfo()->GetDamage();
+        damage = damage * 0.10;
+        CastSpellExtraArgs args;
+        args.AddSpellBP0(damage);
+        target->CastSpell(target, 180186, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_combulstibolt_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4940,4 +4964,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_point_blank_periodic_aura);
     RegisterAuraScript(spell_dead_eye_periodic_aura);
     RegisterSpellScript(spell_generate_combopoint);
+    RegisterAuraScript(spell_talent_combulstibolt_aura);
 }
