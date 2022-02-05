@@ -4839,7 +4839,7 @@ class spell_talent_burningarmor_aura : public AuraScript
         damage = damage * ((bonusFire / 100) * 0.5);
         CastSpellExtraArgs args;
         args.AddSpellBP0(damage);
-        target->CastSpell(target, 180188, args);
+        caster->CastSpell(target, 180188, args);
     }
 
     void Register() override
