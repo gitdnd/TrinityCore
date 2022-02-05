@@ -1004,6 +1004,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         case INVTYPE_2HWEAPON:
             if (output->Quality > CONFIG_ITEMGEN_QUALITY_RARE && socketCount < 2)
                 socketCount = 2;
+            break;
         default:
             socketCount = 0;
         }
