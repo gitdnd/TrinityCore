@@ -4805,12 +4805,13 @@ class spell_talent_combulstibolt_aura : public AuraScript
     void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-
+        auto caster = GetCaster();
         auto target = eventInfo.GetProcTarget();
-        if (!target)
+        if (!caster || !target)
             return;
         auto damage = eventInfo.GetDamageInfo()->GetDamage();
-        damage = damage * 0.10;
+        auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
+        damage = damage * (bonusFire / 100);
         CastSpellExtraArgs args;
         args.AddSpellBP0(damage);
         target->CastSpell(target, 180186, args);
