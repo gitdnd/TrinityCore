@@ -1001,6 +1001,9 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             if (socketCount > 1)
                 socketCount = 1;
             break;
+        case INVTYPE_2HWEAPON:
+            if (output->Quality > CONFIG_ITEMGEN_QUALITY_RARE && socketCount < 2)
+                socketCount = 2;
         default:
             socketCount = 0;
         }
@@ -1300,8 +1303,11 @@ float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
     case INVTYPE_CHEST:
     case INVTYPE_ROBE:
     case INVTYPE_LEGS:
-    case INVTYPE_2HWEAPON:
         return 1.0f;
+
+    case INVTYPE_2HWEAPON:
+        return 1.1f;
+
 
     case INVTYPE_SHOULDERS:
     case INVTYPE_HANDS:
