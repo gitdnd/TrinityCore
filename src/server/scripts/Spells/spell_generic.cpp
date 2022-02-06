@@ -4901,7 +4901,8 @@ class spell_talent_engulfing_flames_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT | AURA_EFFECT_HANDLE_REAPPLY);
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT);
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAPPLY);
     }
 };
 
