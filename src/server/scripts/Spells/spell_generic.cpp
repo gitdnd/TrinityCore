@@ -4867,11 +4867,8 @@ class spell_talent_engulf_aura : public AuraScript
             auto aura = target->GetAura(180193);
             if (aura->GetStackAmount() == 10)
             {
-                // Chance to spread 180195 Engulfing Flames (triggers 180193 on nearby ally)
-                if (roll_chance_i(10))
-                {
-                    target->CastSpell(target, 180195);
-                }
+                // Spread 180195 Engulfing Flames (triggers 180193 on nearby ally)
+                target->CastSpell(target, 180195);
             }
         }
     }
