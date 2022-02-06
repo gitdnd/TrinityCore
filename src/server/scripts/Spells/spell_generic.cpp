@@ -4891,7 +4891,7 @@ class spell_talent_engulfing_flames_aura : public AuraScript
         // 180193 Engulfing Flames
         if (target->HasAura(180193))
         {
-            if (target->GetAura(180193)->GetStackAmount() == 10)
+            if (target->GetAura(180193)->GetStackAmount() >= 10)
             {
                 // Engulf
                 target->CastSpell(target, 180194);
@@ -4901,7 +4901,7 @@ class spell_talent_engulfing_flames_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT);
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT | AURA_EFFECT_HANDLE_REAPPLY);
     }
 };
 
