@@ -4834,9 +4834,12 @@ class spell_talent_burningarmor_aura : public AuraScript
         auto target = eventInfo.GetProcTarget();
         if (!caster || !target)
             return;
+        /*
         auto damage = eventInfo.GetDamageInfo()->GetDamage();
         auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
         damage = damage * (bonusFire / 100);
+        */
+        int32 damage = caster->GetArmor() * 0.05;
         CastSpellExtraArgs args;
         args.AddSpellBP0(damage);
         caster->CastSpell(target, 180188, args);
