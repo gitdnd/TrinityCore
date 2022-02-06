@@ -4910,7 +4910,7 @@ class spell_talent_fire_ward_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_fire_ward_aura);
 
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
         auto caster = GetCaster();
         if (!caster || !caster->ToPlayer())
@@ -4927,6 +4927,11 @@ class spell_talent_fire_ward_aura : public AuraScript
                 args.AddSpellBP0((player->GetMaxHealth() * 0.01) * points);
                 // Magic Ward any magic school, based on max hp
                 player->CastSpell(player, 180198, args);
+                auto aura = aurEff->GetBase();
+                if (aura)
+                {
+                    aura->Remove();
+                }
             }
         }
     }
