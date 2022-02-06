@@ -4906,6 +4906,37 @@ class spell_talent_engulfing_flames_aura : public AuraScript
     }
 };
 
+class spell_talent_fire_ward_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_fire_ward_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToPlayer())
+            return;
+        // 180172 Heated Temperament
+        if (caster->HasAura(180172))
+        {
+            auto player = caster->ToPlayer();
+            auto points = caster->GetComboPoints(caster->GetComboTargetGUID());
+            if (points > 0)
+            {
+                PreventDefaultAction();
+                CastSpellExtraArgs args;
+                args.AddSpellBP0((player->GetMaxHealth() * 0.01) * points);
+                // Magic Ward any magic school, based on max hp
+                player->CastSpell(player, 180198, args);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_fire_ward_aura::OnApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5052,4 +5083,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_burningarmor_aura);
     RegisterAuraScript(spell_talent_engulf_aura);
     RegisterAuraScript(spell_talent_engulfing_flames_aura);
+    RegisterAuraScript(spell_talent_fire_ward_aura);
 }
