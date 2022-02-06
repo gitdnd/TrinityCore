@@ -403,9 +403,32 @@ class spell_mage_combustion : public SpellScriptLoader
                 return true;
             }
 
+            void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                auto caster = GetCaster();
+                if (!caster || !caster->ToPlayer())
+                    return;
+                // 180172 Heated Temperament
+                if (caster->HasAura(180172))
+                {
+                    auto player = caster->ToPlayer();
+                    auto points = player->GetComboPoints(player->GetComboTargetGUID());
+                    if (points > 0)
+                    {
+                        auto aura = aurEff->GetBase();
+                        if (aura)
+                        {
+                            aura->SetCharges(aura->GetCharges() + points);
+                            player->ClearComboPoints();
+                        }
+                    }
+                }
+            }
+
             void Register() override
             {
                 DoCheckProc += AuraCheckProcFn(spell_mage_combustion_AuraScript::CheckProc);
+                OnEffectApply += AuraEffectApplyFn(spell_mage_combustion_AuraScript::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
