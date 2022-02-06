@@ -4923,6 +4923,7 @@ class spell_talent_fire_ward_aura : public AuraScript
             if (points > 0)
             {
                 PreventDefaultAction();
+                player->ClearComboPoints();
                 CastSpellExtraArgs args;
                 args.AddSpellBP0((player->GetMaxHealth() * 0.01) * points);
                 // Magic Ward any magic school, based on max hp
