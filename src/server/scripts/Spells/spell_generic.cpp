@@ -4851,6 +4851,63 @@ class spell_talent_burningarmor_aura : public AuraScript
     }
 };
 
+class spell_talent_engulf_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_engulf_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        // 180193 Engulfing Flames
+        if (target->HasAura(180193))
+        {
+            auto aura = target->GetAura(180193);
+            if (aura->GetStackAmount() == 10)
+            {
+                // Chance to spread 180195 Engulfing Flames (triggers 180193 on nearby ally)
+                if (roll_chance_i(10))
+                {
+                    target->CastSpell(target, 180195);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_engulf_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_engulfing_flames_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_engulfing_flames_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto target = GetTarget();
+        if (!target)
+            return;
+        // 180193 Engulfing Flames
+        if (target->HasAura(180193))
+        {
+            if (target->GetAura(180193)->GetStackAmount() == 10)
+            {
+                // Engulf
+                target->CastSpell(target, 180194);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectRemoveFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -4995,4 +5052,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_generate_combopoint);
     RegisterAuraScript(spell_talent_combulstibolt_aura);
     RegisterAuraScript(spell_talent_burningarmor_aura);
+    RegisterAuraScript(spell_talent_engulf_aura);
+    RegisterAuraScript(spell_talent_engulfing_flames_aura);
 }
