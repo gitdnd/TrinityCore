@@ -4943,6 +4943,44 @@ class spell_talent_fire_ward_aura : public AuraScript
     }
 };
 
+// 180199 From The Ashes
+class spell_talent_from_the_ashes_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->isDead())
+        {
+            if (target->IsPlayer() && caster->IsFriendlyTo(target))
+            {
+                auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                if (summon)
+                {
+                    summon->ToCreature()->Yell("I am a pile of ash.", Language(0), nullptr);
+                }
+            }
+            else
+            {
+                auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                if (summon)
+                {
+                    summon->ToCreature()->Yell("I am a guardian phoenix.", Language(0), nullptr);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5090,4 +5128,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_engulf_aura);
     RegisterAuraScript(spell_talent_engulfing_flames_aura);
     RegisterAuraScript(spell_talent_fire_ward_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_aura);
 }
