@@ -4954,7 +4954,7 @@ class spell_talent_from_the_ashes_aura : public AuraScript
         auto target = GetTarget();
         if (!target || !caster || target == caster)
             return;
-        if (target->isDead())
+        if (target->getDeathState() == JUST_DIED)
         {
             if (target->IsPlayer() && caster->IsFriendlyTo(target))
             {
