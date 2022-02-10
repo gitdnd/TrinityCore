@@ -180,9 +180,11 @@ void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet cons
     int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : isThreeMan ? LFG_SMALL_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
     int dpsNeeded = isRaid ? LFR_DPS_NEEDED : isThreeMan ? LFG_SMALL_DPS_NEEDED : LFG_DPS_NEEDED;
 
-    // TODO: calculate penalty
+    // TODO: calculate group item level, penalty
+    int itemLevel = 0;
+    int penalty = 0;
 
-    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo);
+    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo, itemLevel, penalty);
     AddToQueue(guid);
 }
 

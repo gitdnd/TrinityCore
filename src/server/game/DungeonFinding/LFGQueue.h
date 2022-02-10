@@ -54,7 +54,7 @@ struct LfgQueueData
 {
     LfgQueueData();
 
-    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded, bool _isSolo) :
+    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded, bool _isSolo, int itemLevel, int penalty) :
         joinTime(_joinTime),
         tanks(tanksNeeded),
         healers(healersNeeded),
