@@ -32,6 +32,7 @@ enum LfgCompatibility
     LFG_INCOMPATIBLES_HAS_IGNORES,
     LFG_INCOMPATIBLES_NO_ROLES,
     LFG_INCOMPATIBLES_NO_DUNGEONS,
+    LFG_INCOMPATIBLES_ITEM_LEVEL,
     LFG_COMPATIBLES_WITH_LESS_PLAYERS,                     // Values under this = not compatible (do not modify order)
     LFG_COMPATIBLES_BAD_STATES,
     LFG_COMPATIBLES_MATCH                                  // Must be the last one
@@ -60,7 +61,11 @@ struct LfgQueueData
         dps(dpsNeeded),
         dungeons(_dungeons),
         roles(_roles),
-        isSolo(_isSolo)
+        isSolo(_isSolo),
+        penalty(0),
+        itemLevel(0),
+        itemLevelRange(0),
+        isQueued(true)
         { }
 
     time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
@@ -70,6 +75,11 @@ struct LfgQueueData
     LfgDungeonSet dungeons;                                ///< Selected Player/Group Dungeon/s
     LfgRolesMap roles;                                     ///< Selected Player Role/s
     std::string bestCompatible;                            ///< Best compatible combination of people queued
+
+    int32 penalty;                                         ///< Penalty for matching. Reduces itemLevelRange and places people in back of queue
+    int32 itemLevel;                                       ///< Average item level of members
+    int32 itemLevelRange;                                  ///< Highest item level difference between queued people
+    bool isQueued;                                         ///< Used to preserve queue spot while a proposal is active
     bool isSolo;
 };
 
@@ -90,6 +100,7 @@ typedef std::map<ObjectGuid, LfgQueueData> LfgQueueDataContainer;
 class TC_GAME_API LFGQueue
 {
     public:
+        LFGQueue();
 
         // Add/Remove from queue
         std::string GetDetailedMatchRoles(GuidList const& check) const;
@@ -118,12 +129,6 @@ class TC_GAME_API LFGQueue
     private:
         void SetQueueUpdateData(std::string const& strGuids, LfgRolesMap const& proposalRoles);
 
-        void AddToNewQueue(ObjectGuid guid);
-        void AddToCurrentQueue(ObjectGuid guid);
-        void AddToFrontCurrentQueue(ObjectGuid guid);
-        void RemoveFromNewQueue(ObjectGuid guid);
-        void RemoveFromCurrentQueue(ObjectGuid guid);
-
         void SetCompatibles(std::string const& key, LfgCompatibility compatibles);
         LfgCompatibility GetCompatibles(std::string const& key);
         void RemoveFromCompatibles(ObjectGuid guid);
@@ -145,7 +150,7 @@ class TC_GAME_API LFGQueue
         LfgWaitTimesContainer waitTimesHealerStore;        ///< Average wait time to find a group queuing as healer
         LfgWaitTimesContainer waitTimesDpsStore;           ///< Average wait time to find a group queuing as dps
         GuidList currentQueueStore;                        ///< Ordered list. Used to find groups
-        GuidList newToQueueStore;                          ///< New groups to add to queue
+        time_t lastUpdate;
 };
 
 } // namespace lfg
