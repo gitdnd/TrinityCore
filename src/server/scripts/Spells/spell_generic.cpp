@@ -4961,7 +4961,7 @@ class spell_talent_from_the_ashes_aura : public AuraScript
                 auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
                 if (summon)
                 {
-                    summon->ToCreature()->Yell("I am a pile of ash.", Language(0), nullptr);
+                    target->CastSpell(summon, 180200);
                 }
             }
             else
@@ -4969,7 +4969,7 @@ class spell_talent_from_the_ashes_aura : public AuraScript
                 auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
                 if (summon)
                 {
-                    summon->ToCreature()->Yell("I am a guardian phoenix.", Language(0), nullptr);
+                    target->CastSpell(summon, 180201);
                 }
             }
         }
