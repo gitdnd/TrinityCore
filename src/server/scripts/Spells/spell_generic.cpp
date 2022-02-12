@@ -5031,7 +5031,8 @@ class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
         {
             if (caster->isDead() && caster->ToPlayer())
             {
-                caster->ToPlayer()->ResurrectPlayer(20);
+                caster->ToPlayer()->ResurrectPlayer(0.2);
+                caster->CastSpell(caster, 24171);
             }
         }
     }
