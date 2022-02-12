@@ -5029,7 +5029,10 @@ class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
             return;
         if (target->getDeathState() == JUST_DIED)
         {
-
+            if (caster->isDead() && caster->ToPlayer())
+            {
+                caster->ToPlayer()->ResurrectPlayer(20);
+            }
         }
     }
 
