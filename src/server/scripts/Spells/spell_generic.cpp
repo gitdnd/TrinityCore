@@ -4956,6 +4956,9 @@ class spell_talent_from_the_ashes_aura : public AuraScript
             return;
         if (target->getDeathState() == JUST_DIED)
         {
+            // Pile of Ash cannot be affected by Solar Flare
+            if (target->ToCreature() && target->ToCreature()->GetEntry() == 52206)
+                return;
             if (target->IsPlayer() && caster->IsFriendlyTo(target))
             {
                 auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
