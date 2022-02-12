@@ -1011,11 +1011,9 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         switch (output->InventoryType)
         {
         case INVTYPE_2HWEAPON:
-            if (output->Quality > CONFIG_ITEMGEN_QUALITY_RARE && socketCount < 2)
+            if (output->Quality > ITEM_QUALITY_RARE && socketCount < 2)
                 socketCount = 2;
             break;
-        default:
-            //Do Nothing
         }
     }
 
