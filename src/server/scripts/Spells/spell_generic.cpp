@@ -4999,12 +4999,14 @@ class spell_talent_from_the_ashes_phoenix_aura : public AuraScript
             return;
         if (target->getDeathState() == JUST_DIED)
         {
-            auto summon = caster->SummonCreature(52207, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+
+            /*auto summon = caster->SummonCreature(52207, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
             if (summon)
             {
-                summon->ToCreature()->SetCharmedBy(caster, CHARM_TYPE_CHARM);
-                summon->ToCreature()->SetCreatorGUID(caster->GetGUID());
-            }
+                
+            }*/
+            // Summon Phoenix
+            caster->CastSpell(target, 180203);
         }
     }
 
