@@ -5029,10 +5029,12 @@ class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
             return;
         if (target->getDeathState() == JUST_DIED)
         {
-            if (caster->isDead() && caster->ToPlayer())
+            // 180204 Solar Flare Immune (5min debuff after ress)
+            if (caster->isDead() && caster->ToPlayer() && !caster->HasAura(180204))
             {
                 caster->ToPlayer()->ResurrectPlayer(0.2);
                 caster->CastSpell(caster, 24171);
+                caster->CastSpell(caster, 180204);
             }
         }
     }
