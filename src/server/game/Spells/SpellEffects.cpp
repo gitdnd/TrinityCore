@@ -5401,7 +5401,13 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
             // randomize position for multiple summons
             pos = unitCaster->GetRandomPoint(*destTarget, radius);
 
-        TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, unitCaster, m_spellInfo->Id);
+        uint32 level = 0;
+        if (unitCaster->ToPlayer())
+            level = unitCaster->ToPlayer()->GetAverageItemLevel();
+        else if (unitCaster->ToCreature())
+            level = unitCaster->ToCreature()->GetDungeonLevel();
+
+        TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, unitCaster, m_spellInfo->Id, 0, level);
         if (!summon)
             return;
 

@@ -4834,9 +4834,12 @@ class spell_talent_burningarmor_aura : public AuraScript
         auto target = eventInfo.GetProcTarget();
         if (!caster || !target)
             return;
+        /*
         auto damage = eventInfo.GetDamageInfo()->GetDamage();
         auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
         damage = damage * (bonusFire / 100);
+        */
+        int32 damage = caster->GetArmor() * 0.03;
         CastSpellExtraArgs args;
         args.AddSpellBP0(damage);
         caster->CastSpell(target, 180188, args);
@@ -4845,6 +4848,200 @@ class spell_talent_burningarmor_aura : public AuraScript
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_talent_burningarmor_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_engulf_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_engulf_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        // 180193 Engulfing Flames
+        if (target->HasAura(180193))
+        {
+            auto aura = target->GetAura(180193);
+            if (aura->GetStackAmount() == 10)
+            {
+                // Spread 180195 Engulfing Flames (triggers 180193 on nearby ally)
+                target->CastSpell(target, 180195);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_engulf_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_engulfing_flames_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_engulfing_flames_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto target = GetTarget();
+        if (!target)
+            return;
+        // 180193 Engulfing Flames
+        if (target->HasAura(180193))
+        {
+            if (target->GetAura(180193)->GetStackAmount() >= 10)
+            {
+                // Engulf
+                target->CastSpell(target, 180194);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT);
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAPPLY);
+    }
+};
+
+class spell_talent_fire_ward_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_fire_ward_aura);
+
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToPlayer())
+            return;
+        // 180172 Heated Temperament
+        if (caster->HasAura(180172))
+        {
+            auto player = caster->ToPlayer();
+            auto points = caster->GetComboPoints(caster->GetComboTargetGUID());
+            if (points > 0)
+            {
+                PreventDefaultAction();
+                player->ClearComboPoints();
+                CastSpellExtraArgs args;
+                args.AddSpellBP0((player->GetMaxHealth() * 0.01) * points);
+                // Magic Ward any magic school, based on max hp
+                player->CastSpell(player, 180198, args);
+                auto aura = aurEff->GetBase();
+                if (aura)
+                {
+                    aura->Remove();
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_fire_ward_aura::OnApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+// 180199 From The Ashes
+class spell_talent_from_the_ashes_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+            // Pile of Ash cannot be affected by Solar Flare
+            if (target->ToCreature() && target->ToCreature()->GetEntry() == 52206)
+                return;
+            // Resurrection
+            if (target->IsPlayer() && caster->IsFriendlyTo(target))
+            {
+                auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                if (summon)
+                {
+                    target->CastSpell(summon, 180200);
+                }
+            }
+            // Phoenix
+            else
+            {
+                auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                if (summon)
+                {
+                    caster->CastSpell(summon, 180201);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180201 From The Ashes (Guardian Phoenix)
+class spell_talent_from_the_ashes_phoenix_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+
+            /*auto summon = caster->SummonCreature(52207, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+            if (summon)
+            {
+                
+            }*/
+            // Summon Phoenix
+            caster->CastSpell(target, 180203);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_phoenix_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180200 From The Ashes (Resurrection)
+class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+            // 180204 Solar Flare Immune (5min debuff after ress)
+            if (caster->isDead() && caster->ToPlayer() && !caster->HasAura(180204))
+            {
+                caster->ToPlayer()->ResurrectPlayer(0.2);
+                caster->CastSpell(caster, 24171);
+                caster->CastSpell(caster, 180204);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_resurrection_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -4992,4 +5189,10 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_generate_combopoint);
     RegisterAuraScript(spell_talent_combulstibolt_aura);
     RegisterAuraScript(spell_talent_burningarmor_aura);
+    RegisterAuraScript(spell_talent_engulf_aura);
+    RegisterAuraScript(spell_talent_engulfing_flames_aura);
+    RegisterAuraScript(spell_talent_fire_ward_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
 }
