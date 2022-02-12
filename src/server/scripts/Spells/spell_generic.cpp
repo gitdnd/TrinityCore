@@ -4981,6 +4981,57 @@ class spell_talent_from_the_ashes_aura : public AuraScript
     }
 };
 
+// 180201 From The Ashes (Guardian Phoenix)
+class spell_talent_from_the_ashes_phoenix_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+            auto summon = caster->SummonCreature(52207, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+            if (summon)
+            {
+                summon->ToCreature()->SetCharmedBy(caster, CHARM_TYPE_CHARM);
+                summon->ToCreature()->SetCreatorGUID(caster->GetGUID());
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_phoenix_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180200 From The Ashes (Resurrection)
+class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_resurrection_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5129,4 +5180,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_engulfing_flames_aura);
     RegisterAuraScript(spell_talent_fire_ward_aura);
     RegisterAuraScript(spell_talent_from_the_ashes_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
 }
