@@ -9677,7 +9677,8 @@ void Unit::UpdateCharmAI()
                  ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
                  ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
                  ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52123))
+                 ToCreature()->GetCreatureTemplate()->Entry == 52123 ||
+                 ToCreature()->GetCreatureTemplate()->Entry == 52207))
             {
                 if (GetAI())
                     return;
@@ -11741,13 +11742,14 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     if (GetTypeId() != TYPEID_PLAYER || charmer->GetTypeId() == TYPEID_UNIT)
     {
-        // Hardcode don't change AI for Druid
+        // Hardcode don't change AI for Eluna scripts
         if (ToCreature() &&
             (ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52123))
+            ToCreature()->GetCreatureTemplate()->Entry == 52123 ||
+            ToCreature()->GetCreatureTemplate()->Entry == 52207))
         {
             return;
         }
