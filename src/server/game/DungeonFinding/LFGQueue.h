@@ -126,6 +126,9 @@ class TC_GAME_API LFGQueue
         std::string DumpQueueInfo() const;
         std::string DumpCompatibleInfo(bool full = false) const;
 
+        uint32 GetItemLevel(ObjectGuid guid);
+        uint32 GetItemLevelRange(ObjectGuid guid);
+
     private:
         void SetQueueUpdateData(std::string const& strGuids, LfgRolesMap const& proposalRoles);
 

@@ -721,6 +721,16 @@ time_t LFGQueue::GetJoinTime(ObjectGuid guid)
     return QueueDataStore[guid].joinTime;
 }
 
+uint32 LFGQueue::GetItemLevel(ObjectGuid guid)
+{
+    return QueueDataStore[guid].itemLevel;
+}
+
+uint32 LFGQueue::GetItemLevelRange(ObjectGuid guid)
+{
+
+}
+
 std::string LFGQueue::DumpQueueInfo() const
 {
     uint32 players = 0;
