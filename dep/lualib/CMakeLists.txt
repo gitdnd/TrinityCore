@@ -1,41 +1,17 @@
-#
-# Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
-# This program is free software licensed under GPL version 3
-# Please see the included DOCS/LICENSE.md for more information
-#
-
-file(GLOB sources *.c)
-list(REMOVE_ITEM sources ${CMAKE_CURRENT_SOURCE_DIR}/lua.c)
-list(REMOVE_ITEM sources ${CMAKE_CURRENT_SOURCE_DIR}/luac.c)
-
-set(lua_STAT_SRCS
-  ${sources}
-)
-
-#LuaSocket
-file(GLOB LuaSocket LuaSocket/*.C)
-    LIST(APPEND lua_STAT_SRCS ${LuaSocket})
-    source_group("LuaSocket" FILES ${LuaSocket})
-
-#LuaSec
-file(GLOB LuaSec LuaSec/*.C)
-    LIST(APPEND lua_STAT_SRCS ${LuaSec})
-    source_group("LuaSec" FILES ${LuaSec})
-
-add_library(lualib STATIC ${lua_STAT_SRCS})
+set(LUA_VERSION "luajit" CACHE STRING "Lua version to use")
+set_property(CACHE LUA_VERSION PROPERTY STRINGS luajit lua51 lua52 lua53 lua54)
+MESSAGE(STATUS "Lua version: ${LUA_VERSION}")
 
 
-target_include_directories(lualib
-  PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/LuaSocket
-    ${CMAKE_CURRENT_SOURCE_DIR}/LuaSec)
+option(LUA_STATIC "link lua statically" ON)
+if (LUA_STATIC)
+  MESSAGE(STATUS "Lua linking: static")
+else()
+  MESSAGE(STATUS "Lua linking: dynamic")
+endif()
 
-target_link_libraries(lualib
-  PRIVATE
-    trinity-dependency-interface
-  PUBLIC
-    openssl)
-
-add_definitions(-DLUASOCKET_DEBUG)
-add_definitions(-DLUA_COMPAT_MODULE)
+if (LUA_VERSION MATCHES "luajit")
+  add_subdirectory(luajit)
+else()
+  add_subdirectory(lua)
+endif()

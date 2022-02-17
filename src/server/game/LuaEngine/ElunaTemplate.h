@@ -16,6 +16,7 @@ extern "C"
 #include "LuaEngine.h"
 #include "ElunaUtility.h"
 #include "SharedDefines.h"
+#include "ElunaCompat.h"
 
 class ElunaGlobal
 {
