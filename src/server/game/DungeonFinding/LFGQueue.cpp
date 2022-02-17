@@ -728,7 +728,7 @@ uint32 LFGQueue::GetItemLevel(ObjectGuid guid)
 
 uint32 LFGQueue::GetItemLevelRange(ObjectGuid guid)
 {
-
+    return QueueDataStore[guid].itemLevelRange;
 }
 
 std::string LFGQueue::DumpQueueInfo() const
