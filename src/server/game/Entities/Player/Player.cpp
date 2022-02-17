@@ -17724,8 +17724,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     SetLevel(fields[6].GetUInt8(), false);
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
-    if (talent_level == 0)
-        talent_level = 1;
+    //if (talent_level == 0)
+    //    talent_level = 1;
 
     _LoadIntoDataField(fields[66].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
     _LoadIntoDataField(fields[69].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE * 2);
