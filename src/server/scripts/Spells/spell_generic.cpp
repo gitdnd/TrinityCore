@@ -5045,6 +5045,41 @@ class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
     }
 };
 
+class spell_talent_icy_veins_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_icy_veins_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToPlayer())
+            return;
+        // 180205 Winter's Mercy
+        if (caster->HasAura(180205))
+        {
+            auto player = caster->ToPlayer();
+            auto points = caster->GetComboPoints(caster->GetComboTargetGUID());
+            if (points > 0)
+            {
+                player->ClearComboPoints();
+                CastSpellExtraArgs args1;
+                args1.AddSpellBP0(20 + (5 * points));
+                // Icy Veins bonus speed bonus
+                player->CastSpell(player, 180207, args1);
+                CastSpellExtraArgs args2;
+                args2.AddSpellBP0(5 * points);
+                // Icy Veins damage taken bonus
+                player->CastSpell(player, 180208, args1);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_icy_veins_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5195,4 +5230,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_from_the_ashes_aura);
     RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
     RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+    RegisterAuraScript(spell_talent_icy_veins_aura);
 }
