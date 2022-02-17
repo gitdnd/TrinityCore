@@ -54,7 +54,7 @@ struct LfgQueueData
 {
     LfgQueueData();
 
-    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded, bool _isSolo, int itemLevel, int penalty) :
+    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded, bool _isSolo, int _itemLevel, int _penalty) :
         joinTime(_joinTime),
         tanks(tanksNeeded),
         healers(healersNeeded),
@@ -62,8 +62,8 @@ struct LfgQueueData
         dungeons(_dungeons),
         roles(_roles),
         isSolo(_isSolo),
-        penalty(0),
-        itemLevel(0),
+        penalty(_penalty),
+        itemLevel(_itemLevel),
         itemLevelRange(0),
         isQueued(true)
         { }
@@ -106,7 +106,7 @@ class TC_GAME_API LFGQueue
         std::string GetDetailedMatchRoles(GuidList const& check) const;
         void AddToQueue(ObjectGuid guid, bool reAdd = false);
         void RemoveFromQueue(ObjectGuid guid);
-        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
+        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel);
         void RemoveQueueData(ObjectGuid guid);
 
         // Update Timers (when proposal success)
