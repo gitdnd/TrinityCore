@@ -5080,6 +5080,28 @@ class spell_talent_icy_veins_aura : public AuraScript
     }
 };
 
+// 180216 Heart of the Glacier
+class spell_talent_heart_glacier_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_heart_glacier_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        // 180217 Frost Chill (up to 4 targets in area)
+        caster->CastSpell(target, 180217);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_heart_glacier_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5231,4 +5253,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
     RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
     RegisterAuraScript(spell_talent_icy_veins_aura);
+    RegisterAuraScript(spell_talent_heart_glacier_aura);
 }
