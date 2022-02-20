@@ -14,7 +14,7 @@ socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSe
 {
 }
 
-VirtualItemMgr & VirtualItemMgr::instance()
+VirtualItemMgr& VirtualItemMgr::instance()
 {
     static VirtualItemMgr obj;
     return obj;
@@ -30,7 +30,7 @@ VirtualItemMgr::VirtualItemMgr()
 
     for (auto InventoryType : armorInventoryType)
     {
-        uint32 min = minEntry + (blockCounter*block);
+        uint32 min = minEntry + (blockCounter * block);
         uint32 max = min + block - 1;
         armorGenerator[InventoryType] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
@@ -39,7 +39,7 @@ VirtualItemMgr::VirtualItemMgr()
 
     for (auto subclass : weaponSubclasses)
     {
-        uint32 min = minEntry + (blockCounter*block);
+        uint32 min = minEntry + (blockCounter * block);
         uint32 max = min + block - 1;
         weaponGenerator[subclass] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
@@ -90,32 +90,32 @@ void VirtualItemMgr::LoadStatGroupInfoFromDB()
 
 void VirtualItemMgr::LoadNamesFromDB()
 {
-	WriteGuard guard(lock);
+    WriteGuard guard(lock);
 
-	uint32 count = 0;
-	uint32 beginTime = getMSTime();
+    uint32 count = 0;
+    uint32 beginTime = getMSTime();
 
-	QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_names`");
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_names`");
 
-	if (!result)
-	{
-		TC_LOG_INFO("server.loading", "Loaded 0 available virtual item names, table item_generator_names is empty.");
-		return;
-	}
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item names, table item_generator_names is empty.");
+        return;
+    }
 
-	do{
-		Field* fields = result->Fetch();
-		int32 itemType = fields[0].GetInt32();
-		int32 subclass = fields[1].GetInt32();
+    do {
+        Field* fields = result->Fetch();
+        int32 itemType = fields[0].GetInt32();
+        int32 subclass = fields[1].GetInt32();
         int32 inventoryType = fields[2].GetInt32();
-		int32 array_id = fields[3].GetInt32();
-		std::string name = fields[4].GetString();
+        int32 array_id = fields[3].GetInt32();
+        std::string name = fields[4].GetString();
 
-		availableNames.push_back(NameInfo(itemType, subclass, inventoryType, array_id, name));
-		++count;
-	} while (result->NextRow());
+        availableNames.push_back(NameInfo(itemType, subclass, inventoryType, array_id, name));
+        ++count;
+    } while (result->NextRow());
 
-	TC_LOG_INFO("server.loading", "Loaded %u available virtual item names in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded %u available virtual item names in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 void VirtualItemMgr::LoadDisplaysFromDB()
@@ -209,7 +209,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
 
 void initSeed(uint32& val, std::mt19937 generator)
 {
-    if(!val)
+    if (!val)
         val = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
 }
 
@@ -289,7 +289,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a display ID for the item based on type, special case for trinkets and rings
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
+    uint32 display = GenerateItemDisplay(output, modifier);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -301,7 +301,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     delete store[entry];
     store[entry] = output;
 
-    if(sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
+    if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
         output->InitializeQueryData();
 
     return output;
@@ -400,9 +400,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     }
     StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
 
-     // If the stat group is still random, select a random stat group.
-     if (statgroupid == STAT_GROUP_RANDOM)
-         statgroupid = randtwo;
+    // If the stat group is still random, select a random stat group.
+    if (statgroupid == STAT_GROUP_RANDOM)
+        statgroupid = randtwo;
 
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
 
@@ -413,71 +413,71 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     {
         switch (output->SubClass)
         {
-            case ITEM_SUBCLASS_WEAPON_SWORD2:
-            case ITEM_SUBCLASS_WEAPON_AXE2:
-            case ITEM_SUBCLASS_WEAPON_MACE2:
-            {
-                output->Delay = (urand(33, 37, generator) * 100);
-                output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = 0;
-                break;
-            }
-            case ITEM_SUBCLASS_WEAPON_POLEARM:
-            {
-                output->Delay = (urand(31, 36, generator) * 100);
-                output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = 0;
-                break;
-            }
-            case ITEM_SUBCLASS_WEAPON_STAFF:
-            {
-                output->Delay = (urand(20, 31, generator) * 100);
-                output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = 0;
-                break;
-            }
-            case ITEM_SUBCLASS_WEAPON_AXE:
-            case ITEM_SUBCLASS_WEAPON_MACE:
-            case ITEM_SUBCLASS_WEAPON_SWORD:
-            case ITEM_SUBCLASS_WEAPON_FIST:
-            {
-                output->Delay = (urand(15, 27, generator) * 100);
-                output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = 0;
-                break;
-            }
-            case ITEM_SUBCLASS_WEAPON_DAGGER:
-            {
-                output->Delay = (urand(14, 19, generator) * 100);
-                output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = 0;
-                break;
-            }
-            case ITEM_SUBCLASS_WEAPON_BOW:
-            case ITEM_SUBCLASS_WEAPON_GUN:
-            case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-            {
-                output->Delay = (urand(27, 30, generator) * 100);
-                output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = 0;
-                break;
-            }
-            case ITEM_SUBCLASS_WEAPON_WAND:
-            {
-                output->Delay = (urand(18, 22, generator) * 100);
-                output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, generator);
-                break;
-            }
-            default:
-                break;
+        case ITEM_SUBCLASS_WEAPON_SWORD2:
+        case ITEM_SUBCLASS_WEAPON_AXE2:
+        case ITEM_SUBCLASS_WEAPON_MACE2:
+        {
+            output->Delay = (urand(33, 37, generator) * 100);
+            output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = 0;
+            break;
+        }
+        case ITEM_SUBCLASS_WEAPON_POLEARM:
+        {
+            output->Delay = (urand(31, 36, generator) * 100);
+            output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = 0;
+            break;
+        }
+        case ITEM_SUBCLASS_WEAPON_STAFF:
+        {
+            output->Delay = (urand(20, 31, generator) * 100);
+            output->Damage[0].DamageMin = ((1.08f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((1.08f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = 0;
+            break;
+        }
+        case ITEM_SUBCLASS_WEAPON_AXE:
+        case ITEM_SUBCLASS_WEAPON_MACE:
+        case ITEM_SUBCLASS_WEAPON_SWORD:
+        case ITEM_SUBCLASS_WEAPON_FIST:
+        {
+            output->Delay = (urand(15, 27, generator) * 100);
+            output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = 0;
+            break;
+        }
+        case ITEM_SUBCLASS_WEAPON_DAGGER:
+        {
+            output->Delay = (urand(14, 19, generator) * 100);
+            output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = 0;
+            break;
+        }
+        case ITEM_SUBCLASS_WEAPON_BOW:
+        case ITEM_SUBCLASS_WEAPON_GUN:
+        case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+        {
+            output->Delay = (urand(27, 30, generator) * 100);
+            output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = 0;
+            break;
+        }
+        case ITEM_SUBCLASS_WEAPON_WAND:
+        {
+            output->Delay = (urand(18, 22, generator) * 100);
+            output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+            output->Damage[0].DamageType = urand(SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE, generator);
+            break;
+        }
+        default:
+            break;
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
@@ -856,7 +856,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
 
 #define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
-    for (auto const &someSpells : availableSpells)
+    for (auto const& someSpells : availableSpells)
     {
         if (output->Quality != someSpells.quality)
             continue;
@@ -1001,12 +1001,19 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             if (socketCount > 1)
                 socketCount = 1;
             break;
-        case INVTYPE_2HWEAPON:
-            if (output->Quality > CONFIG_ITEMGEN_QUALITY_RARE && socketCount < 2)
-                socketCount = 2;
-            break;
         default:
             socketCount = 0;
+        }
+    }
+
+    if (output->Class == ITEM_CLASS_WEAPON)
+    {
+        switch (output->InventoryType)
+        {
+        case INVTYPE_2HWEAPON:
+            if (output->Quality > ITEM_QUALITY_RARE && socketCount < 2)
+                socketCount = 2;
+            break;
         }
     }
 
@@ -1090,7 +1097,7 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
 
 void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
 {
-    uint8 stats [21] = {
+    uint8 stats[21] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_AGILITY,
         ITEM_MOD_INTELLECT,
@@ -1196,7 +1203,7 @@ int32 VirtualItemMgr::GetVirtualLevel(float ilevel) const
 {
     int32 vLevel = 1;
 
-    for (auto i=virtual_level_info.begin(); i!=virtual_level_info.end(); i++)
+    for (auto i = virtual_level_info.begin(); i != virtual_level_info.end(); i++)
     {
         float diff = ilevel / i->second.iLevel;
         if (diff < 1.0f)
@@ -1264,7 +1271,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     return names;
 }
 
-std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1282,7 +1289,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSeco
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
+std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1291,7 +1298,7 @@ std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSoc
     return stat_group_sockets[group];
 }
 
-std::vector<StatGroup> const & VirtualModifier::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
+std::vector<StatGroup> const& VirtualModifier::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
 {
     return armor_type_stat_groups[output->SubClass];
 }
@@ -1323,7 +1330,7 @@ float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
     case INVTYPE_SHIELD:
         return 0.56f;
 
-    // Trinkets are extremely nerfed since they roll a single stat with a special effect
+        // Trinkets are extremely nerfed since they roll a single stat with a special effect
     case INVTYPE_TRINKET:
         return 0.2f;
 

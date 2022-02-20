@@ -4956,20 +4956,25 @@ class spell_talent_from_the_ashes_aura : public AuraScript
             return;
         if (target->getDeathState() == JUST_DIED)
         {
+            // Pile of Ash cannot be affected by Solar Flare
+            if (target->ToCreature() && target->ToCreature()->GetEntry() == 52206)
+                return;
+            // Resurrection
             if (target->IsPlayer() && caster->IsFriendlyTo(target))
             {
                 auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
                 if (summon)
                 {
-                    summon->ToCreature()->Yell("I am a pile of ash.", Language(0), nullptr);
+                    target->CastSpell(summon, 180200);
                 }
             }
+            // Phoenix
             else
             {
                 auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
                 if (summon)
                 {
-                    summon->ToCreature()->Yell("I am a guardian phoenix.", Language(0), nullptr);
+                    caster->CastSpell(summon, 180201);
                 }
             }
         }
@@ -4978,6 +4983,122 @@ class spell_talent_from_the_ashes_aura : public AuraScript
     void Register() override
     {
         AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180201 From The Ashes (Guardian Phoenix)
+class spell_talent_from_the_ashes_phoenix_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+
+            /*auto summon = caster->SummonCreature(52207, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+            if (summon)
+            {
+                
+            }*/
+            // Summon Phoenix
+            caster->CastSpell(target, 180203);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_phoenix_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180200 From The Ashes (Resurrection)
+class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+            // 180204 Solar Flare Immune (5min debuff after ress)
+            if (caster->isDead() && caster->ToPlayer() && !caster->HasAura(180204))
+            {
+                caster->ToPlayer()->ResurrectPlayer(0.2);
+                caster->CastSpell(caster, 24171);
+                caster->CastSpell(caster, 180204);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_resurrection_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_talent_icy_veins_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_icy_veins_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToPlayer())
+            return;
+        // 180205 Winter's Mercy
+        if (caster->HasAura(180205))
+        {
+            auto player = caster->ToPlayer();
+            auto points = caster->GetComboPoints(caster->GetComboTargetGUID());
+            if (points > 0)
+            {
+                player->ClearComboPoints();
+                CastSpellExtraArgs args1;
+                args1.AddSpellBP0(20 + (5 * points));
+                // Icy Veins bonus speed bonus
+                player->CastSpell(player, 180207, args1);
+                CastSpellExtraArgs args2;
+                args2.AddSpellBP0(5 * points);
+                // Icy Veins damage taken bonus
+                player->CastSpell(player, 180208, args1);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_icy_veins_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+// 180216 Heart of the Glacier
+class spell_talent_heart_glacier_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_heart_glacier_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        // 180217 Frost Chill (up to 4 targets in area)
+        caster->CastSpell(target, 180217);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_heart_glacier_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -5129,4 +5250,8 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_engulfing_flames_aura);
     RegisterAuraScript(spell_talent_fire_ward_aura);
     RegisterAuraScript(spell_talent_from_the_ashes_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+    RegisterAuraScript(spell_talent_icy_veins_aura);
+    RegisterAuraScript(spell_talent_heart_glacier_aura);
 }
