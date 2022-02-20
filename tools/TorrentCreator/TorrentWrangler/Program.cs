@@ -21,7 +21,7 @@ namespace TorrentWrangler
             {
                 var creator = new TorrentCreator
                 {
-                    Announce = "http://gw.elunatech.com:3725/announce",
+                    Announce = "http://tracker.houroftwilight.net/announce",
                     PieceLength = 16777216,
                     CreatedBy = "Hour of Twilight"
                 };
