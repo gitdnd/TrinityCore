@@ -587,12 +587,13 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
             SetHealth(previousHealth);
 
         SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
-        SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
+        /*SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_NATURE]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FROST]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_SHADOW]));
-        SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));
+        SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));*/
+        ApplyScaledResistances();
 
         SetCanModifyStats(true);
         UpdateAllStats();
@@ -3383,4 +3384,45 @@ std::string Creature::GetDebugInfo() const
         << "AIName: " << GetAIName() << " ScriptName: " << GetScriptName()
         << " WaypointPath: " << GetWaypointPath() << " SpawnId: " << GetSpawnId();
     return sstr.str();
+}
+
+void Creature::ApplyScaledResistances()
+{
+    auto const cInfo = GetCreatureTemplate();
+    float holy = cInfo->resistance[SPELL_SCHOOL_HOLY];
+    float fire = cInfo->resistance[SPELL_SCHOOL_FIRE];
+    float nature = cInfo->resistance[SPELL_SCHOOL_NATURE];
+    float frost = cInfo->resistance[SPELL_SCHOOL_FROST];
+    float shadow = cInfo->resistance[SPELL_SCHOOL_SHADOW];
+    float arcane = cInfo->resistance[SPELL_SCHOOL_ARCANE];
+    int dungeonLevel = GetDungeonLevel();
+    if (dungeonLevel > 25)
+    {
+        //ToDo: add curve
+        float scaledFlatResistances = (GetDungeonLevel() / 25) * 20;
+        holy += scaledFlatResistances;
+        fire += scaledFlatResistances;
+        nature += scaledFlatResistances;
+        frost += scaledFlatResistances;
+        shadow += scaledFlatResistances;
+        arcane += scaledFlatResistances;
+    }
+    /*
+    {
+        //ToDo: add curve
+        float scaledPercResistances = GetDungeonLevel() / 10000;
+        holy += holy * scaledFlatResistances;
+        fire += fire * scaledFlatResistances;
+        nature += nature * scaledFlatResistances;
+        frost += frost * scaledFlatResistances;
+        shadow += shadow * scaledFlatResistances;
+        arcane += arcane * scaledFlatResistances;
+    }
+    */
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, holy);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, fire);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, nature);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, frost);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, shadow);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, arcane);
 }
