@@ -5137,6 +5137,57 @@ class spell_talent_heart_glacier_aura : public AuraScript
     }
 };
 
+// 180219 Polar Affliction
+class spell_talent_polar_affliction_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_polar_affliction_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target || !caster->ToPlayer())
+            return;
+        // Calculate whether the target has a Frost debuff
+        bool hasFrostDebuff = false;
+        auto &targetAuras = target->GetAppliedAuras();
+        for (auto itr = targetAuras.begin(); itr != targetAuras.end(); itr++)
+        {
+            auto aura = itr->second;
+            auto base = aura->GetBase();
+            if (!aura->IsPositive() && base->GetSpellInfo() && base->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+            {
+                hasFrostDebuff = true;
+                break;
+            }
+        }
+        // Do nothing if no Frost debuff
+        if (!hasFrostDebuff)
+            return;
+        // If immune to Freeze/Stun effects, increase Frost damage taken instead
+        if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), 0, caster) ||
+            ((target->GetMechanicImmunityMask() & MECHANIC_STUN) > 0) ||
+            ((target->GetMechanicImmunityMask() & MECHANIC_FREEZE) > 0))
+        {
+            CastSpellExtraArgs args;
+            // (1000 + spellPower) * 0.25
+            args.AddSpellBP0((1000 + caster->ToPlayer()->GetBaseSpellPowerBonus()) * 0.25);
+            caster->CastSpell(target, 180231, args);
+        }
+        // Freeze (stun) the target and increase Frost crit damage
+        else
+        {
+            caster->CastSpell(target, 180230);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_polar_affliction_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5289,5 +5340,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
     RegisterAuraScript(spell_talent_icy_veins_aura);
     RegisterAuraScript(spell_talent_heart_glacier_aura);
+    RegisterAuraScript(spell_talent_polar_affliction_aura);
     new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
 }
