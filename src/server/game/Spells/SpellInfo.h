@@ -533,7 +533,8 @@ class TC_GAME_API SpellInfo
         bool SpellCancelsAuraEffect(SpellInfo const* auraSpellInfo, uint8 auraEffIndex) const;
 
         uint32 GetAllowedMechanicMask() const;
-
+        bool IsSupportSpell() const;
+        bool IsPhysicalDamageSpell() const;
     private:
         // loading helpers
         void _InitializeExplicitTargetMask();

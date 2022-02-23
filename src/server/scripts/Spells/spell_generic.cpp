@@ -4798,6 +4798,41 @@ class spell_generate_combopoint : public SpellScript
     }
 };
 
+class spell_generate_combopoint_with_aura : public SpellScriptLoader
+{
+public:
+    spell_generate_combopoint_with_aura(char const* name, uint32 _spellId) : SpellScriptLoader(name),
+        spellId(_spellId) { }
+
+    class spell_generate_combopoint_with_aura_spellscript : public SpellScript
+    {
+        PrepareSpellScript(spell_generate_combopoint_with_aura_spellscript);
+
+    public:
+        spell_generate_combopoint_with_aura_spellscript(uint32 _spellId) : SpellScript(),
+            spellId(_spellId) { }
+
+        void HitHandler()
+        {
+            if (!GetCaster()->HasAura(spellId))
+                return;
+
+            Unit* unit = GetHitUnit();
+            if (unit)
+                unit->AddComboPoints(1);
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_generate_combopoint_with_aura_spellscript::HitHandler);
+        }
+    private:
+        uint32 spellId;
+    };
+private:
+    uint32 spellId;
+};
+
 class spell_talent_combulstibolt_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_combulstibolt_aura);
@@ -5254,4 +5289,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
     RegisterAuraScript(spell_talent_icy_veins_aura);
     RegisterAuraScript(spell_talent_heart_glacier_aura);
+    new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
 }
