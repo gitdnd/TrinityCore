@@ -1775,6 +1775,8 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
             {
                 if (GetTarget()->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT, eventInfo.GetActor()->GetGUID()))
                     return false;
+                if (eventInfo.GetSpellInfo()->Effects->CalcRadius() > 0)
+                    return false;
                 return true;
             }
 
