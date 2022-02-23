@@ -5156,7 +5156,7 @@ class spell_talent_polar_affliction_aura : public AuraScript
         {
             auto aura = itr->second;
             auto base = aura->GetBase();
-            if (!aura->IsPositive() && base->GetSpellInfo() && base->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_FROST)
+            if (!aura->IsPositive() && base->GetSpellInfo() && base->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
             {
                 hasFrostDebuff = true;
                 break;
