@@ -27,7 +27,7 @@ namespace ItemDBCGenerator
         ItemGenerator Inventory[16] 8012092 - 8596432
         */
         private static ItemRange[] RANGES = {
-            new ItemRange(new UInt32[] { 1000000, 1584340 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.HEAD),
+            /*new ItemRange(new UInt32[] { 1000000, 1584340 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.HEAD),
             new ItemRange(new UInt32[] { 1584341, 2168681 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.NECK),
             new ItemRange(new UInt32[] { 2168682, 2753022 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.SHOULDER),
             new ItemRange(new UInt32[] { 2753023, 3337363 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.CHEST),
@@ -35,11 +35,11 @@ namespace ItemDBCGenerator
             new ItemRange(new UInt32[] { 3921705, 4506045 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.LEGS),
             new ItemRange(new UInt32[] { 4506046, 5090386 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.FEET),
             new ItemRange(new UInt32[] { 5090387, 5674727 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.WRISTS),
-            new ItemRange(new UInt32[] { 5674728, 6259068 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.HANDS),
+            new ItemRange(new UInt32[] { 5674728, 6259068 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.HANDS),*/
             new ItemRange(new UInt32[] { 6259069, 6843409 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.FINGER),
-            new ItemRange(new UInt32[] { 6843410, 7427750 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.TRINKET),
-            new ItemRange(new UInt32[] { 7427751, 8012091 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.SHIELD),
-            new ItemRange(new UInt32[] { 8012092, 8596432 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.BACK),
+            new ItemRange(new UInt32[] { 6843410, 7427750 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.TRINKET)
+            /*new ItemRange(new UInt32[] { 7427751, 8012091 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.SHIELD),
+            new ItemRange(new UInt32[] { 8012092, 8596432 }, Constants.ItemClass.ARMOR, Constants.ArmorInventoryType.BACK),*/
 /*
         ItemGenerator Weapon[0] 8596433 - 9180773
         ItemGenerator Weapon[1] 9180774 - 9765114
@@ -56,7 +56,7 @@ namespace ItemDBCGenerator
         ItemGenerator Weapon[18] 15608525 - 16192865
         ItemGenerator Weapon[19] 16192866 - 16777206
 */
-            new ItemRange(new UInt32[] { 8596433, 9180773 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.AXE_ONEH),
+            /*new ItemRange(new UInt32[] { 8596433, 9180773 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.AXE_ONEH),
             new ItemRange(new UInt32[] { 9180774, 9765114 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.AXE_TWOH),
             new ItemRange(new UInt32[] { 9765115, 10349455 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.BOW),
             new ItemRange(new UInt32[] { 10349456, 10933796 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.GUN),
@@ -69,7 +69,7 @@ namespace ItemDBCGenerator
             new ItemRange(new UInt32[] { 14439843, 15024183}, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.FIST_WEAPON),
             new ItemRange(new UInt32[] { 15024184, 15608524 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.DAGGER),
             new ItemRange(new UInt32[] { 15608525, 16192865 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.CROSSBOW),
-            new ItemRange(new UInt32[] { 16192866, 16777206 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.WAND)
+            new ItemRange(new UInt32[] { 16192866, 16777206 }, Constants.ItemClass.WEAPON, Constants.WeaponSubclass.WAND)*/
         };
 
         public static void Print(String message, params Object[] arguments)
