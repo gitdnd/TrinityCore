@@ -5147,7 +5147,7 @@ class spell_talent_polar_affliction_aura : public AuraScript
         PreventDefaultAction();
         auto caster = GetCaster();
         auto target = eventInfo.GetProcTarget();
-        if (!caster || !target)
+        if (!caster || !target || !caster->ToPlayer())
             return;
         // Calculate whether the target has a Frost debuff
         bool hasFrostDebuff = false;
@@ -5166,9 +5166,14 @@ class spell_talent_polar_affliction_aura : public AuraScript
         if (!hasFrostDebuff)
             return;
         // If immune to Freeze/Stun effects, increase Frost damage taken instead
-        if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), 0, caster))
+        if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), 0, caster) ||
+            (target->GetMechanicImmunityMask() & MECHANIC_STUN) ||
+            (target->GetMechanicImmunityMask() & MECHANIC_FREEZE))
         {
-            caster->CastSpell(target, 180231);
+            CastSpellExtraArgs args;
+            // (1000 + spellPower) * 0.25
+            args.AddSpellBP0((1000 + caster->ToPlayer()->GetBaseSpellPowerBonus()) * 0.25);
+            caster->CastSpell(target, 180231, args);
         }
         // Freeze (stun) the target and increase Frost crit damage
         else
