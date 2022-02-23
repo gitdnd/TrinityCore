@@ -5152,7 +5152,7 @@ class spell_talent_polar_affliction_aura : public AuraScript
         // Calculate whether the target has a Frost debuff
         bool hasFrostDebuff = false;
         auto &targetAuras = target->GetAppliedAuras();
-        for (auto itr = targetAuras.begin(); itr != targetAuras.end();)
+        for (auto itr = targetAuras.begin(); itr != targetAuras.end(); itr++)
         {
             auto aura = itr->second;
             auto base = aura->GetBase();
