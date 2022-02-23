@@ -5167,8 +5167,8 @@ class spell_talent_polar_affliction_aura : public AuraScript
             return;
         // If immune to Freeze/Stun effects, increase Frost damage taken instead
         if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), 0, caster) ||
-            (target->GetMechanicImmunityMask() & MECHANIC_STUN) ||
-            (target->GetMechanicImmunityMask() & MECHANIC_FREEZE))
+            ((target->GetMechanicImmunityMask() & MECHANIC_STUN) > 0) ||
+            ((target->GetMechanicImmunityMask() & MECHANIC_FREEZE) > 0))
         {
             CastSpellExtraArgs args;
             // (1000 + spellPower) * 0.25
