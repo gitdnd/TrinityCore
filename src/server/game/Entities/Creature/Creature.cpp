@@ -3399,6 +3399,7 @@ void Creature::ApplyScaledResistances()
     if (dungeonLevel > 25)
     {
         //ToDo: add curve
+        // Gives 20 resistances per 25 dungeon level.
         float scaledFlatResistances = (GetDungeonLevel() / 25) * 20;
         holy += scaledFlatResistances;
         fire += scaledFlatResistances;
@@ -3410,6 +3411,7 @@ void Creature::ApplyScaledResistances()
     /*
     {
         //ToDo: add curve
+        //Would add a percent based resistance based on the dungeon level divided by 10 thousand.
         float scaledPercResistances = GetDungeonLevel() / 10000;
         holy += holy * scaledFlatResistances;
         fire += fire * scaledFlatResistances;
