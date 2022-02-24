@@ -5188,6 +5188,31 @@ class spell_talent_polar_affliction_aura : public AuraScript
     }
 };
 
+// 180232 Hammer of the North
+class spell_talent_hammer_of_the_north_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_hammer_of_the_north_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target || !caster->ToPlayer())
+            return;
+        auto player = caster->ToPlayer();
+        if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+            mainItem->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 2500, 5, 0, caster->GetGUID());
+        if (Item* offHand = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+            offHand->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 2500, 5, 0, caster->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_hammer_of_the_north_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5341,5 +5366,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_icy_veins_aura);
     RegisterAuraScript(spell_talent_heart_glacier_aura);
     RegisterAuraScript(spell_talent_polar_affliction_aura);
+    RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
     new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
 }
