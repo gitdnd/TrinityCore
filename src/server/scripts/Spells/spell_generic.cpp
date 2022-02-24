@@ -5202,9 +5202,17 @@ class spell_talent_hammer_of_the_north_aura : public AuraScript
             return;
         auto player = caster->ToPlayer();
         if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+        {
+            player->ApplyEnchantment(mainItem, TEMP_ENCHANTMENT_SLOT, false);
             mainItem->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 2500, 5000, 0, caster->GetGUID());
+            player->ApplyEnchantment(mainItem, TEMP_ENCHANTMENT_SLOT, true);
+        }
         if (Item* offHand = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+        {
+            player->ApplyEnchantment(offHand, TEMP_ENCHANTMENT_SLOT, false);
             offHand->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 2500, 5000, 0, caster->GetGUID());
+            player->ApplyEnchantment(offHand, TEMP_ENCHANTMENT_SLOT, true);
+        }
     }
 
     void Register() override
