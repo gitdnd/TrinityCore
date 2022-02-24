@@ -2877,6 +2877,8 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         duration = 300;                                     // 5 mins
     else if (m_spellInfo->Id == 37360)
         duration = 300;                                     // 5 mins
+    else if (m_spellInfo->Id == 180233)
+        duration = 5;                                       // 5 seconds
     // default case
     else
         duration = 3600;                                    // 1 hour
