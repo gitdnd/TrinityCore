@@ -1504,8 +1504,7 @@ void Creature::UpdateLevelDependantStats()
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
 
-    float armor = (float)stats->GenerateArmor(cInfo); /// @todo Why is this treated as uint32 when it's a float?
-    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
+    ApplyScaledArmor();
 }
 
 float Creature::_GetHealthMod(int32 Rank)
@@ -3427,4 +3426,15 @@ void Creature::ApplyScaledResistances()
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, frost);
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, shadow);
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, arcane);
+}
+
+void Creature::ApplyScaledArmor()
+{
+    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), GetCreatureTemplate()->unit_class);
+    float armor = stats->GenerateArmor(GetCreatureTemplate());
+    int dungeonLevel = GetDungeonLevel();
+    if(dungeonLevel > 1)
+        armor += (GetDungeonLevel() / 1000) * armor;
+
+    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }
