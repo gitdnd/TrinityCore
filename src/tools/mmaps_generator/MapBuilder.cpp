@@ -778,8 +778,7 @@ namespace MMAP
                 //printf("%sNo vertices to build tile!              \n", tileString);
                 break;
             }
-            if (!params.polyCount || !params.polys ||
-                TILES_PER_MAP*TILES_PER_MAP == params.polyCount)
+            if (!params.polyCount || !params.polys)
             {
                 // we have flat tiles with no actual geometry - don't build those, its useless
                 // keep in mind that we do output those into debug info
