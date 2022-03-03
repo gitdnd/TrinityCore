@@ -4833,6 +4833,48 @@ private:
     uint32 spellId;
 };
 
+class spell_generate_combopoint_with_aura_array : public SpellScriptLoader
+{
+public:
+    spell_generate_combopoint_with_aura_array(char const* name, std::vector<uint32> _spellId) : SpellScriptLoader(name),
+        spellId(_spellId) { }
+
+    class spell_generate_combopoint_with_aura_array_spellscript : public SpellScript
+    {
+        PrepareSpellScript(spell_generate_combopoint_with_aura_array_spellscript);
+
+    public:
+        spell_generate_combopoint_with_aura_array_spellscript(std::vector<uint32> _spellId) : SpellScript(),
+            spellId(_spellId) { }
+
+        void HitHandler()
+        {
+            bool hasAura = false;
+            for (auto auras : spellId)
+            {
+                hasAura = GetCaster()->HasAura(auras);
+                if (hasAura)
+                    break;
+            }
+            if (!hasAura)
+                return;
+
+            Unit* unit = GetHitUnit();
+            if (unit)
+                unit->AddComboPoints(1);
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_generate_combopoint_with_aura_array_spellscript::HitHandler);
+        }
+    private:
+        std::vector<uint32> spellId;
+    };
+private:
+    std::vector<uint32> spellId;
+};
+
 class spell_talent_combulstibolt_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_combulstibolt_aura);
@@ -5376,4 +5418,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_polar_affliction_aura);
     RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
     new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
+    /**/
+    new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 1, 2, 3, 4, 5 });
 }
