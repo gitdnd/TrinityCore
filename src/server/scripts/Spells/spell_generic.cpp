@@ -5418,6 +5418,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_polar_affliction_aura);
     RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
     new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
-    /**/
-    new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 1, 2, 3, 4, 5 });
+    /*new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 1, 2, 3, 4, 5 });*/
 }
