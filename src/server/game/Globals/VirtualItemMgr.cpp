@@ -197,7 +197,8 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     UpdateDisenchantId(output);
     GenerateSockets(output, modifier);
     GenerateSpells(output, modifier);
-    GenerateItemStats(output, modifier);
+    //GenerateItemStats(output, modifier);
+    GenerateItemStatsNew(output, modifier);
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
     uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
@@ -276,7 +277,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Generate primary and secondary stats.
     // Always do this last, as it has variable rand calls based on quality.
-    GenerateItemStats(output, modifier);
+    //GenerateItemStats(output, modifier);
+
+    GenerateItemStatsNew(output, modifier);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
@@ -610,6 +613,98 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         }
     }
 
+    output->StatsCount = setStats;
+}
+
+void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualModifier modifier) const
+{
+    std::mt19937 generator;
+    generator.seed(modifier.statValueSeed);
+
+    // get statgroup id
+    StatGroup statgroupid = output->statGroup;
+
+    // create key-value vector for selected stats
+    std::vector<std::pair<ItemModType, float>> selectedStats;
+
+    // get stats for primary and secondary stat groups
+    std::vector<ItemModType> primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
+    std::vector<ItemModType> secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
+
+    // shuffle vectors so we can pick top values without using any rand calls
+    std::shuffle(std::begin(primarystatgroup), std::end(primarystatgroup), generator);
+    std::shuffle(std::begin(secondarystatgroup), std::end(secondarystatgroup), generator);
+
+    // select stat pool
+    float pool = 0;
+    if (modifier.statpool == -1)
+        pool = (float)output->ItemLevel;
+    else
+        pool = (float)modifier.statpool;
+
+    // divide per-stat pool by predefined blizzlike value
+    pool *= 0.4f;
+
+    // generate primary stat values  for all stats in group
+    for (uint32 i = 0; i < primarystatgroup.size(); ++i)
+    {
+        // select random pool size value based on upper and lower bounds
+        float statPoints = (float)urand((uint32)(pool * 0.9f), (uint32)(pool * 1.1f), generator);
+
+        // mod stat points based on stat weight
+        statPoints *= VirtualModifier::GetStatRateNew(primarystatgroup[i]);
+
+        // mod stat points based on item quality
+        statPoints *= VirtualModifier::GetQualityStatModifier(output);
+
+        // mod stat points based on item slot
+        statPoints *= VirtualModifier::GetSlotStatModifier(output);
+
+        // mod stat points based on stat tier
+        statPoints *= 1.0f;
+
+        if (i < VirtualModifier::GetPrimaryStatSlots(output))
+        {
+            selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
+        }
+    }
+
+    // generate secondary stat values
+    for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
+    {
+        // select random pool size value based on upper and lower bounds
+        float statPoints = (float)urand((uint32)(pool * 0.9f), (uint32)(pool * 1.1f), generator);
+
+        // mod stat points based on stat weight
+        statPoints *= VirtualModifier::GetStatRateNew(secondarystatgroup[i]);
+
+        // mod stat points based on item quality
+        statPoints *= VirtualModifier::GetQualityStatModifier(output);
+
+        // mod stat points based on item slot
+        statPoints *= VirtualModifier::GetSlotStatModifier(output);
+
+        // mod stat points based on stat tier
+        statPoints *= 0.8f;
+
+        if (i < VirtualModifier::GetSecondaryStatSlots(output))
+        {
+            selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
+        }
+    }
+
+    // iterate selected stats and apply to item
+    uint32 setStats = 0;
+    for (uint32 i = 0; i < selectedStats.size(); ++i)
+    {
+        uint32 type = (uint32)selectedStats[i].first;
+        float value = selectedStats[i].second;
+
+        output->ItemStat[i].ItemStatType = type;
+        output->ItemStat[i].ItemStatValue = value;
+
+        setStats = std::max(setStats, uint32(i + 1));
+    }
     output->StatsCount = setStats;
 }
 
@@ -1303,6 +1398,76 @@ std::vector<StatGroup> const& VirtualModifier::StatGroupData::GetArmorSubclassSt
     return armor_type_stat_groups[output->SubClass];
 }
 
+uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
+{
+    int slots;
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            slots = 1;
+        case ITEM_QUALITY_UNCOMMON:
+            slots = 2;
+        case ITEM_QUALITY_RARE:
+            slots = 2;
+        case ITEM_QUALITY_EPIC:
+            slots = 2;
+        case ITEM_QUALITY_LEGENDARY:
+            slots = 2;
+        default:
+            return 1;
+    }
+
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+        slots = 0;
+
+    return slots;
+}
+
+uint32 VirtualModifier::GetSecondaryStatSlots(VirtualItemTemplate* output)
+{
+    uint32 slots;
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            slots = 1;
+        case ITEM_QUALITY_UNCOMMON:
+            slots = 1;
+        case ITEM_QUALITY_RARE:
+            slots = 2;
+        case ITEM_QUALITY_EPIC:
+            slots = 3;
+        case ITEM_QUALITY_LEGENDARY:
+            slots = 3;
+        default:
+            return 1;
+    }
+
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+        slots = 1;
+
+    return slots;
+}
+
+float VirtualModifier::GetQualityStatModifier(VirtualItemTemplate* output)
+{
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            return 1.0f;
+        case ITEM_QUALITY_UNCOMMON:
+            return 1.1f;
+        case ITEM_QUALITY_RARE:
+            return 1.2f;
+        case ITEM_QUALITY_EPIC:
+            return 1.3f;
+        case ITEM_QUALITY_LEGENDARY:
+            return 1.4f;
+        default:
+            return 1.0f;
+    }
+    return 1.0f;
+}
+
 float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
 {
     switch (output->InventoryType)
@@ -1381,6 +1546,65 @@ float VirtualModifier::GetStatRate(ItemModType stat)
         return 1.9f;
     case ITEM_MOD_SPIRIT:
         return 1.65f;
+    default:
+        return 1.0f;
+    }
+    return 1.0f;
+}
+
+float VirtualModifier::GetStatRateNew(ItemModType stat)
+{
+    switch (stat)
+    {
+        /* Primary stats */
+        case ITEM_MOD_STAMINA:
+        case ITEM_MOD_AGILITY:
+        case ITEM_MOD_INTELLECT:
+        case ITEM_MOD_STRENGTH:
+            return 1.0f;
+        case ITEM_MOD_SPIRIT:
+            return 0.6f;
+        /* Defensive stats */
+        case ITEM_MOD_DEFENSE_SKILL_RATING:
+            return 0.3f;
+        case ITEM_MOD_DODGE_RATING:
+        case ITEM_MOD_PARRY_RATING:
+            return 0.45f;
+        case ITEM_MOD_BLOCK_RATING:
+        case ITEM_MOD_BLOCK_VALUE:
+            return 1.5f;
+        /* Spell stats */
+        case ITEM_MOD_HIT_SPELL_RATING:
+        case ITEM_MOD_HASTE_SPELL_RATING:
+        case ITEM_MOD_CRIT_SPELL_RATING:
+            return 1.0f;
+        case ITEM_MOD_MANA_REGENERATION:
+            return 0.4f;
+        case ITEM_MOD_SPELL_POWER:
+            return 1.4f;
+        case ITEM_MOD_SPELL_PENETRATION:
+            return 1.25f;
+        /* Ranged stats */
+        case ITEM_MOD_HIT_RANGED_RATING:
+        case ITEM_MOD_CRIT_RANGED_RATING:
+        case ITEM_MOD_HASTE_RANGED_RATING:
+            return 1.0f;
+        case ITEM_MOD_RANGED_ATTACK_POWER:
+            return 1.8f;
+        /* Melee stats */
+        case ITEM_MOD_EXPERTISE_RATING:
+        case ITEM_MOD_HIT_MELEE_RATING:
+        case ITEM_MOD_CRIT_MELEE_RATING:
+        case ITEM_MOD_HASTE_MELEE_RATING:
+        case ITEM_MOD_ARMOR_PENETRATION_RATING:
+            return 1.0f;
+        case ITEM_MOD_ATTACK_POWER:
+            return 2.0f;
+        /* Other / Unused */
+        case ITEM_MOD_HIT_RATING:
+            return 1.0f;
+        case ITEM_MOD_HEALTH_REGEN:
+            return 0.4f;
     default:
         return 1.0f;
     }
