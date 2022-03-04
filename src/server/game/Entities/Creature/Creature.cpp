@@ -3394,32 +3394,32 @@ void Creature::ApplyScaledResistances()
     float frost = cInfo->resistance[SPELL_SCHOOL_FROST];
     float shadow = cInfo->resistance[SPELL_SCHOOL_SHADOW];
     float arcane = cInfo->resistance[SPELL_SCHOOL_ARCANE];
-    int dungeonLevel = GetDungeonLevel();
-    if (dungeonLevel > 25)
+
+    // Set the resistance to 1/3 of the current dungeon level.
+    // This is fine for bosses up to ilevel 300
+    float scaledFlatResistances = (float)GetDungeonLevel() * 0.33f;
+
+    switch (cInfo->rank)
     {
-        //ToDo: add curve
-        // Gives 20 resistances per 25 dungeon level.
-        float scaledFlatResistances = (GetDungeonLevel() / 25) * 20;
-        holy += scaledFlatResistances;
-        fire += scaledFlatResistances;
-        nature += scaledFlatResistances;
-        frost += scaledFlatResistances;
-        shadow += scaledFlatResistances;
-        arcane += scaledFlatResistances;
+        case CREATURE_ELITE_NORMAL:
+            scaledFlatResistances = scaledFlatResistances * 0.66f;
+            break;
+        case CREATURE_ELITE_RAREELITE:
+        case CREATURE_ELITE_RARE:
+        case CREATURE_ELITE_ELITE:
+            scaledFlatResistances = scaledFlatResistances * 0.33f;
+            break;
+        default:
+            break;
     }
-    /*
-    {
-        //ToDo: add curve
-        //Would add a percent based resistance based on the dungeon level divided by 10 thousand.
-        float scaledPercResistances = GetDungeonLevel() / 10000;
-        holy += holy * scaledFlatResistances;
-        fire += fire * scaledFlatResistances;
-        nature += nature * scaledFlatResistances;
-        frost += frost * scaledFlatResistances;
-        shadow += shadow * scaledFlatResistances;
-        arcane += arcane * scaledFlatResistances;
-    }
-    */
+
+    holy += scaledFlatResistances;
+    fire += scaledFlatResistances;
+    nature += scaledFlatResistances;
+    frost += scaledFlatResistances;
+    shadow += scaledFlatResistances;
+    arcane += scaledFlatResistances;
+
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, holy);
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, fire);
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, nature);
