@@ -307,8 +307,8 @@ uint8 LFGQueue::FindGroups()
         }
         else if (itQueue->second.isQueued)
         {
-            // TODO: calculate range
-            itQueue->second.itemLevelRange = 10 + (now - itQueue->second.joinTime);
+            // Calculate item level range (seconds * 0.5)
+            itQueue->second.itemLevelRange = (now - itQueue->second.joinTime) * 0.5;
             if (itQueue->second.penalty >= 50)
                 penalties.push_back(guid);
             else
