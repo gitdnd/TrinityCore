@@ -3399,8 +3399,10 @@ void Creature::ApplyScaledResistances()
     // This is fine for bosses up to ilevel 300
     float scaledFlatResistances = (float)GetDungeonLevel() * 0.33f;
 
-    switch (cInfo->rank)
+    if ((GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB) != 0)
     {
+        switch (cInfo->rank)
+        {
         case CREATURE_ELITE_NORMAL:
             scaledFlatResistances *= 0.66f;
             break;
@@ -3411,6 +3413,7 @@ void Creature::ApplyScaledResistances()
             break;
         default:
             break;
+        }
     }
 
     holy += scaledFlatResistances;
