@@ -3395,30 +3395,37 @@ void Creature::ApplyScaledResistances()
     float shadow = cInfo->resistance[SPELL_SCHOOL_SHADOW];
     float arcane = cInfo->resistance[SPELL_SCHOOL_ARCANE];
 
-    // Set the resistance to 1/3 of the current dungeon level.
-    // This is fine for bosses up to ilevel 300
-    float scaledFlatResistances = (float)GetDungeonLevel() * 0.33f;
-
-    switch (cInfo->rank)
+    if (GetDungeonLevel() > 1 && !IsPet())
     {
-        case CREATURE_ELITE_NORMAL:
-            scaledFlatResistances *= 0.66f;
-            break;
-        case CREATURE_ELITE_RAREELITE:
-        case CREATURE_ELITE_RARE:
-        case CREATURE_ELITE_ELITE:
-            scaledFlatResistances *= 0.33f;
-            break;
-        default:
-            break;
-    }
+        // Set the resistance to 1/3 of the current dungeon level.
+        // This is fine for bosses up to ilevel 300
+        float scaledFlatResistances = (float)GetDungeonLevel() * 0.33f;
 
-    holy += scaledFlatResistances;
-    fire += scaledFlatResistances;
-    nature += scaledFlatResistances;
-    frost += scaledFlatResistances;
-    shadow += scaledFlatResistances;
-    arcane += scaledFlatResistances;
+        if ((GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB) == 0)
+        {
+            switch (cInfo->rank)
+            {
+            case CREATURE_ELITE_NORMAL:
+                scaledFlatResistances *= 0.66f;
+                break;
+            case CREATURE_ELITE_RAREELITE:
+            case CREATURE_ELITE_RARE:
+            case CREATURE_ELITE_ELITE:
+                scaledFlatResistances *= 0.33f;
+                break;
+            default:
+                break;
+            }
+        }
+
+
+        holy += scaledFlatResistances;
+        fire += scaledFlatResistances;
+        nature += scaledFlatResistances;
+        frost += scaledFlatResistances;
+        shadow += scaledFlatResistances;
+        arcane += scaledFlatResistances;
+    }
 
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, holy);
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, fire);
@@ -3433,7 +3440,7 @@ void Creature::ApplyScaledArmor()
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), GetCreatureTemplate()->unit_class);
     float armor = stats->GenerateArmor(GetCreatureTemplate());
     int dungeonLevel = GetDungeonLevel();
-    if(dungeonLevel > 1)
+    if(dungeonLevel > 1 && !IsPet())
         armor += ((float)dungeonLevel / 1000.0f) * armor;
 
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
