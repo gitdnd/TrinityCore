@@ -171,7 +171,7 @@ void LFGQueue::RemoveFromQueue(ObjectGuid guid)
         QueueDataStore.erase(itDelete);
 }
 
-void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
+void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel)
 {
     bool isSolo = dungeons.find(STORMWINDVAULT) != dungeons.end();
     bool isRaid = dungeons.find(DRAGONISLESRAID) != dungeons.end();
@@ -180,8 +180,7 @@ void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet cons
     int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : isThreeMan ? LFG_SMALL_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
     int dpsNeeded = isRaid ? LFR_DPS_NEEDED : isThreeMan ? LFG_SMALL_DPS_NEEDED : LFG_DPS_NEEDED;
 
-    // TODO: calculate group item level, penalty
-    int itemLevel = 0;
+    // TODO: calculate group penalty
     int penalty = 0;
 
     QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo, itemLevel, penalty);
@@ -308,8 +307,8 @@ uint8 LFGQueue::FindGroups()
         }
         else if (itQueue->second.isQueued)
         {
-            // TODO: calculate range
-            itQueue->second.itemLevelRange = 10 + (now - itQueue->second.joinTime);
+            // Calculate item level range (seconds * 0.5)
+            itQueue->second.itemLevelRange = (now - itQueue->second.joinTime) * 0.5;
             if (itQueue->second.penalty >= 50)
                 penalties.push_back(guid);
             else
@@ -720,6 +719,16 @@ void LFGQueue::UpdateQueueTimers(time_t currTime)
 time_t LFGQueue::GetJoinTime(ObjectGuid guid)
 {
     return QueueDataStore[guid].joinTime;
+}
+
+uint32 LFGQueue::GetItemLevel(ObjectGuid guid)
+{
+    return QueueDataStore[guid].itemLevel;
+}
+
+uint32 LFGQueue::GetItemLevelRange(ObjectGuid guid)
+{
+    return QueueDataStore[guid].itemLevelRange;
 }
 
 std::string LFGQueue::DumpQueueInfo() const
