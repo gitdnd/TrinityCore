@@ -3402,12 +3402,12 @@ void Creature::ApplyScaledResistances()
     switch (cInfo->rank)
     {
         case CREATURE_ELITE_NORMAL:
-            scaledFlatResistances = scaledFlatResistances * 0.66f;
+            scaledFlatResistances *= 0.66f;
             break;
         case CREATURE_ELITE_RAREELITE:
         case CREATURE_ELITE_RARE:
         case CREATURE_ELITE_ELITE:
-            scaledFlatResistances = scaledFlatResistances * 0.33f;
+            scaledFlatResistances *= 0.33f;
             break;
         default:
             break;
@@ -3434,7 +3434,7 @@ void Creature::ApplyScaledArmor()
     float armor = stats->GenerateArmor(GetCreatureTemplate());
     int dungeonLevel = GetDungeonLevel();
     if(dungeonLevel > 1)
-        armor += (GetDungeonLevel() / 1000) * armor;
+        armor += ((float)dungeonLevel / 1000.0f) * armor;
 
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }
