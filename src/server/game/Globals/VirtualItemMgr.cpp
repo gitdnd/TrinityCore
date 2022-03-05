@@ -663,6 +663,53 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         // mod stat points based on stat tier
         statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD);
 
+        // hard coded overrides for primary stats
+        if (secondarystatgroup[i] == ITEM_MOD_STAMINA)
+        {
+            switch (statgroupid)
+            {
+                case STAT_GROUP_STR_DPS:
+                    statPoints *= 1.5f;
+                    break;
+                case STAT_GROUP_STR_TANK:
+                    statPoints *= 1.73f;
+                    break;
+                case STAT_GROUP_AGI_DPS:
+                case STAT_GROUP_AGI_TANK:
+                    statPoints *= 1.32f;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (secondarystatgroup[i] == ITEM_MOD_STRENGTH) 
+        {
+            switch (statgroupid)
+            {
+                case STAT_GROUP_STR_DPS:
+                case STAT_GROUP_STR_TANK:
+                    statPoints *= 1.32f;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (secondarystatgroup[i] == ITEM_MOD_AGILITY)
+        {
+            switch (statgroupid)
+            {
+                case STAT_GROUP_AGI_DPS:
+                case STAT_GROUP_AGI_TANK:
+                    statPoints *= 1.32f;
+                    break;
+                case STAT_GROUP_AGI_RANGED:
+                    statPoints *= 1.28f;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (i < VirtualModifier::GetPrimaryStatSlots(output))
         {
             selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
