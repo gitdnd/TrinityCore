@@ -643,13 +643,13 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         pool = (float)modifier.statpool;
 
     // divide per-stat pool by predefined blizzlike value
-    pool *= 0.4f;
+    pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
 
     // generate primary stat values  for all stats in group
     for (uint32 i = 0; i < primarystatgroup.size(); ++i)
     {
         // select random pool size value based on upper and lower bounds
-        float statPoints = (float)urand((uint32)(pool * 0.9f), (uint32)(pool * 1.1f), generator);
+        float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
         // mod stat points based on stat weight
         statPoints *= VirtualModifier::GetStatRateNew(primarystatgroup[i]);
@@ -661,7 +661,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         statPoints *= VirtualModifier::GetSlotStatModifier(output);
 
         // mod stat points based on stat tier
-        statPoints *= 1.0f;
+        statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD);
 
         if (i < VirtualModifier::GetPrimaryStatSlots(output))
         {
@@ -673,7 +673,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
     for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
     {
         // select random pool size value based on upper and lower bounds
-        float statPoints = (float)urand((uint32)(pool * 0.9f), (uint32)(pool * 1.1f), generator);
+        float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
         // mod stat points based on stat weight
         statPoints *= VirtualModifier::GetStatRateNew(secondarystatgroup[i]);
@@ -685,7 +685,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         statPoints *= VirtualModifier::GetSlotStatModifier(output);
 
         // mod stat points based on stat tier
-        statPoints *= 0.8f;
+        statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
 
         if (i < VirtualModifier::GetSecondaryStatSlots(output))
         {
@@ -1406,15 +1406,15 @@ uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
-            return 1;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_COMMON);
         case ITEM_QUALITY_UNCOMMON:
-            return 2;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_UNCOMMON);
         case ITEM_QUALITY_RARE:
-            return 2;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_RARE);
         case ITEM_QUALITY_EPIC:
-            return 2;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_EPIC);
         case ITEM_QUALITY_LEGENDARY:
-            return 2;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_LEGENDARY);
         default:
             return 1;
     }
@@ -1430,15 +1430,15 @@ uint32 VirtualModifier::GetSecondaryStatSlots(VirtualItemTemplate* output)
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
-            return 1;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_COMMON);
         case ITEM_QUALITY_UNCOMMON:
-            return 1;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_UNCOMMON);
         case ITEM_QUALITY_RARE:
-            return 2;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_RARE);
         case ITEM_QUALITY_EPIC:
-            return 3;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_EPIC);
         case ITEM_QUALITY_LEGENDARY:
-            return 3;
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_LEGENDARY);
         default:
             return 1;
     }
@@ -1451,15 +1451,15 @@ float VirtualModifier::GetQualityStatModifier(VirtualItemTemplate* output)
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
-            return 1.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_COMMON);
         case ITEM_QUALITY_UNCOMMON:
-            return 1.1f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_UNCOMMON);
         case ITEM_QUALITY_RARE:
-            return 1.2f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_RARE);
         case ITEM_QUALITY_EPIC:
-            return 1.3f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_EPIC);
         case ITEM_QUALITY_LEGENDARY:
-            return 1.4f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_LEGENDARY);
         default:
             return 1.0f;
     }
@@ -1471,43 +1471,49 @@ float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
     switch (output->InventoryType)
     {
     case INVTYPE_HEAD:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_HEAD);
     case INVTYPE_CHEST:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_CHEST);
     case INVTYPE_ROBE:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_ROBE);
     case INVTYPE_LEGS:
-        return 1.0f;
-
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_LEGS);
     case INVTYPE_2HWEAPON:
-        return 1.1f;
-
-
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_2HWEAPON);
     case INVTYPE_SHOULDERS:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_SHOULDERS);
     case INVTYPE_HANDS:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_HANDS);
     case INVTYPE_WAIST:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WAIST);
     case INVTYPE_FEET:
-        return 0.75f;
-
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_FEET);
     case INVTYPE_WRISTS:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WRISTS);
     case INVTYPE_NECK:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_NECK);
     case INVTYPE_CLOAK:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_CLOAK);
     case INVTYPE_HOLDABLE:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_HOLDABLE);
     case INVTYPE_SHIELD:
-        return 0.56f;
-
-        // Trinkets are extremely nerfed since they roll a single stat with a special effect
-    case INVTYPE_TRINKET:
-        return 0.2f;
-
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_SHIELD);
     case INVTYPE_WEAPON:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WEAPON);
     case INVTYPE_WEAPONMAINHAND:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONMAINHAND);
     case INVTYPE_WEAPONOFFHAND:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONOFFHAND);
     case INVTYPE_FINGER:
-        return 0.42f;
-
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_FINGER);
+    case INVTYPE_TRINKET:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_TRINKET);
     case INVTYPE_RANGED:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_RANGED);
     case INVTYPE_RANGEDRIGHT:
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_RANGEDRIGHT);
     case INVTYPE_THROWN:
-        return 0.31f;
-
+        return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_THROWN);
     default:
         return 1.0f;
     }
@@ -1556,53 +1562,66 @@ float VirtualModifier::GetStatRateNew(ItemModType stat)
     {
         /* Primary stats */
         case ITEM_MOD_STAMINA:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_STAMINA);
         case ITEM_MOD_AGILITY:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_AGILITY);
         case ITEM_MOD_INTELLECT:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_INTELLECT);
         case ITEM_MOD_STRENGTH:
-            return 1.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_STRENGTH);
         case ITEM_MOD_SPIRIT:
-            return 0.6f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPIRIT);
         /* Defensive stats */
         case ITEM_MOD_DEFENSE_SKILL_RATING:
-            return 0.3f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_DEFENSE_SKILL_RATING);
         case ITEM_MOD_DODGE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_DODGE_RATING);
         case ITEM_MOD_PARRY_RATING:
-            return 0.45f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_PARRY_RATING);
         case ITEM_MOD_BLOCK_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_BLOCK_RATING);
         case ITEM_MOD_BLOCK_VALUE:
-            return 1.5f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_BLOCK_VALUE);
         /* Spell stats */
         case ITEM_MOD_HIT_SPELL_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_SPELL_RATING);
         case ITEM_MOD_HASTE_SPELL_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_SPELL_RATING);
         case ITEM_MOD_CRIT_SPELL_RATING:
-            return 1.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_SPELL_RATING);
         case ITEM_MOD_MANA_REGENERATION:
-            return 0.4f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_MANA_REGENERATION);
         case ITEM_MOD_SPELL_POWER:
-            return 1.4f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER);
         case ITEM_MOD_SPELL_PENETRATION:
-            return 1.25f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION);
         /* Ranged stats */
         case ITEM_MOD_HIT_RANGED_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_RANGED_RATING);
         case ITEM_MOD_CRIT_RANGED_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_RANGED_RATING);
         case ITEM_MOD_HASTE_RANGED_RATING:
-            return 1.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_RANGED_RATING);
         case ITEM_MOD_RANGED_ATTACK_POWER:
-            return 1.8f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_RANGED_ATTACK_POWER);
         /* Melee stats */
         case ITEM_MOD_EXPERTISE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING);
         case ITEM_MOD_HIT_MELEE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_MELEE_RATING);
         case ITEM_MOD_CRIT_MELEE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_MELEE_RATING);
         case ITEM_MOD_HASTE_MELEE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_MELEE_RATING);
         case ITEM_MOD_ARMOR_PENETRATION_RATING:
-            return 1.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_ARMOR_PENETRATION_RATING);
         case ITEM_MOD_ATTACK_POWER:
-            return 2.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_ATTACK_POWER);
         /* Other / Unused */
         case ITEM_MOD_HIT_RATING:
-            return 1.0f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_RATING);
         case ITEM_MOD_HEALTH_REGEN:
-            return 0.4f;
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN);
     default:
         return 1.0f;
     }
