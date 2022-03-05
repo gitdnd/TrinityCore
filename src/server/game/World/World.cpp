@@ -1491,9 +1491,9 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONOFFHAND] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.WeaponOffHand", 0.42f);
     m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_FINGER] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Finger", 0.42f);
     m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_TRINKET] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Trinket", 0.42f);
-    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_RANGED] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Ranged", 0.31);
-    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_RANGEDRIGHT] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.RangedRight", 0.31);
-    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_THROWN] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Thrown", 0.31);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_RANGED] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Ranged", 0.31f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_RANGEDRIGHT] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.RangedRight", 0.31f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_THROWN] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Thrown", 0.31f);
 
     m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_COMMON] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Common", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_UNCOMMON] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Uncommon", 1.1f);
