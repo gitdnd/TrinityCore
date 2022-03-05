@@ -664,7 +664,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD);
 
         // hard coded overrides for primary stats
-        if (secondarystatgroup[i] == ITEM_MOD_STAMINA)
+        if (primarystatgroup[i] == ITEM_MOD_STAMINA)
         {
             switch (statgroupid)
             {
@@ -682,7 +682,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                     break;
             }
         }
-        else if (secondarystatgroup[i] == ITEM_MOD_STRENGTH) 
+        else if (primarystatgroup[i] == ITEM_MOD_STRENGTH)
         {
             switch (statgroupid)
             {
@@ -694,7 +694,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                     break;
             }
         }
-        else if (secondarystatgroup[i] == ITEM_MOD_AGILITY)
+        else if (primarystatgroup[i] == ITEM_MOD_AGILITY)
         {
             switch (statgroupid)
             {
