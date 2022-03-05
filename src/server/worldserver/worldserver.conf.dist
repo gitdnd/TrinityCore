@@ -4132,5 +4132,80 @@ ItemGenerator.Legendary = 0
 ItemGenerator.Artifact = 0
 ItemGenerator.Heirloom = 0
 
+ItemGentor.StatPool.Modifi= 0.4
+ItemGentor.StatPool.LowBound = 0.9
+ItemGentor.StatPool.HighBound = 1.1
+ItemGentor.StatPool.PrimaryStatModifi= 1.0
+ItemGentor.StatPool.SecondaryStatModifi= 0.8
+
+ItemGentor.StatWeight.Stamina = 1.0
+ItemGentor.StatWeight.Agility = 1.0
+ItemGentor.StatWeight.Intellect = 1.0
+ItemGentor.StatWeight.Strength = 1.0
+ItemGentor.StatWeight.Spirit = 0.6
+ItemGentor.StatWeight.DefenseSkillRating = 0.83
+ItemGentor.StatWeight.DodgeRating = 1.0
+ItemGentor.StatWeight.ParryRating = 1.0
+ItemGentor.StatWeight.BlockRating = 0.83
+ItemGentor.StatWeight.BlockValue = 0.83
+ItemGentor.StatWeight.SpellHitRating = 1.0
+ItemGentor.StatWeight.SpellHasteRating = 1.0
+ItemGentor.StatWeight.SpellCritRating = 1.0
+ItemGentor.StatWeight.ManaRegen = 0.4
+ItemGentor.StatWeight.SpellPow= 1.35
+ItemGentor.StatWeight.SpellPenetration = 1.1
+ItemGentor.StatWeight.RangedHitRating = 1.0
+ItemGentor.StatWeight.RangedCritRating = 1.0
+ItemGentor.StatWeight.RangedHasteRating = 1.0
+ItemGentor.StatWeight.RangedAttackPow= 2.2
+ItemGentor.StatWeight.ExpiseRating = 1.0
+ItemGentor.StatWeight.MeleeHitRating = 1.0
+ItemGentor.StatWeight.MeleeCritRating = 1.0
+ItemGentor.StatWeight.MeleeHasteRating = 1.0
+ItemGentor.StatWeight.ArmorPenetration = 1.1
+ItemGentor.StatWeight.AttackPow= 2.0
+ItemGentor.StatWeight.HitRating = 1.0
+ItemGentor.StatWeight.HealthRegen = 0.4
+
+ItemGentor.SlotWeight.Head = 1.0
+ItemGentor.SlotWeight.Chest = 1.0
+ItemGentor.SlotWeight.Robe = 1.0
+ItemGentor.SlotWeight.Legs = 1.0
+ItemGentor.SlotWeight.TwoHandWeapons = 1.1
+ItemGentor.SlotWeight.Should = 0.75
+ItemGentor.SlotWeight.Hands = 0.75
+ItemGentor.SlotWeight.Waist = 0.75
+ItemGentor.SlotWeight.Feet = 0.75
+ItemGentor.SlotWeight.Wrists = 0.56
+ItemGentor.SlotWeight.Neck = 0.56
+ItemGentor.SlotWeight.Cloak = 0.56
+ItemGentor.SlotWeight.Holdable = 0.56
+ItemGentor.SlotWeight.Shield = 0.56
+ItemGentor.SlotWeight.Weapon = 0.42
+ItemGentor.SlotWeight.WeaponMainHand = 0.42
+ItemGentor.SlotWeight.WeaponOffHand = 0.42
+ItemGentor.SlotWeight.Fing= 0.42
+ItemGentor.SlotWeight.Trinket = 0.42
+ItemGentor.SlotWeight.Ranged = 0.31
+ItemGentor.SlotWeight.RangedRight = 0.31
+ItemGentor.SlotWeight.Thrown = 0.31
+
+ItemGentor.QualityMod.Common = 1.0
+ItemGentor.QualityMod.Uncommon = 1.1
+ItemGentor.QualityMod.Rare = 1.2
+ItemGentor.QualityMod.Epic = 1.3
+ItemGentor.QualityMod.Legendary = 1.4
+
+ItemGentor.StatSlot.Primary.Common = 1
+ItemGentor.StatSlot.Secondary.Common = 1
+ItemGentor.StatSlot.Primary.Uncommon = 2
+ItemGentor.StatSlot.Secondary.Uncommon = 1
+ItemGentor.StatSlot.Primary.Rare = 2
+ItemGentor.StatSlot.Secondary.Rare = 2
+ItemGentor.StatSlot.Primary.Epic = 2
+ItemGentor.StatSlot.Secondary.Epic = 3
+ItemGentor.StatSlot.Primary.Legendary = 2
+ItemGentor.StatSlot.Secondary.Legendary = 3
+
 #
 ###################################################################################################
