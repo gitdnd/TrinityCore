@@ -1400,52 +1400,50 @@ std::vector<StatGroup> const& VirtualModifier::StatGroupData::GetArmorSubclassSt
 
 uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
 {
-    int slots;
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+        return 0;
+
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
-            slots = 1;
+            return 1;
         case ITEM_QUALITY_UNCOMMON:
-            slots = 2;
+            return 2;
         case ITEM_QUALITY_RARE:
-            slots = 2;
+            return 2;
         case ITEM_QUALITY_EPIC:
-            slots = 2;
+            return 2;
         case ITEM_QUALITY_LEGENDARY:
-            slots = 2;
+            return 2;
         default:
             return 1;
     }
 
-    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
-        slots = 0;
-
-    return slots;
+    return 1;
 }
 
 uint32 VirtualModifier::GetSecondaryStatSlots(VirtualItemTemplate* output)
 {
-    uint32 slots;
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+        return 1;
+
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
-            slots = 1;
+            return 1;
         case ITEM_QUALITY_UNCOMMON:
-            slots = 1;
+            return 1;
         case ITEM_QUALITY_RARE:
-            slots = 2;
+            return 2;
         case ITEM_QUALITY_EPIC:
-            slots = 3;
+            return 3;
         case ITEM_QUALITY_LEGENDARY:
-            slots = 3;
+            return 3;
         default:
             return 1;
     }
 
-    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
-        slots = 1;
-
-    return slots;
+    return 1;
 }
 
 float VirtualModifier::GetQualityStatModifier(VirtualItemTemplate* output)
