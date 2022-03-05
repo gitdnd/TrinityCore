@@ -687,6 +687,20 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         // mod stat points based on stat tier
         statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
 
+        // hard coded behavior for weapons with spell power.
+        if (secondarystatgroup[i] == ITEM_MOD_SPELL_POWER)
+        {
+            switch (output->InventoryType)
+            {
+                case INVTYPE_2HWEAPON:
+                case INVTYPE_WEAPON:
+                    statPoints *= 4.0f;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if (i < VirtualModifier::GetSecondaryStatSlots(output))
         {
             selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
