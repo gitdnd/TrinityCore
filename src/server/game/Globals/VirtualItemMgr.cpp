@@ -741,6 +741,8 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
             {
                 case INVTYPE_2HWEAPON:
                 case INVTYPE_WEAPON:
+                case INVTYPE_WEAPONMAINHAND:
+                case INVTYPE_WEAPONOFFHAND:
                     statPoints *= 4.0f;
                     break;
                 default:
