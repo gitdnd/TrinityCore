@@ -689,7 +689,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
 
         if (i < VirtualModifier::GetSecondaryStatSlots(output))
         {
-            selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
+            selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
         }
     }
 
