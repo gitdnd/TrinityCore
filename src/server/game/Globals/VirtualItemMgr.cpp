@@ -652,22 +652,27 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
     pool *= (float)(primaryStatSlots + secondaryStatSlots);
 
     // randomly select between -1 and +1 additional stat slots
-    std::uniform_int_distribution<int> dist(-1, 1);
-    int primarySlotMod = dist(generator);
-    int secondarySlotMod = dist(generator);
+    // this does not apply to trinkets
+    if (output->Class != ITEM_CLASS_ARMOR && output->InventoryType != INVTYPE_TRINKET)
+    {
+        std::uniform_int_distribution<int> dist(-1, 1);
+        int primarySlotMod = dist(generator);
+        int secondarySlotMod = dist(generator);
 
-    // check whether or not the amount of stats exceeds the size of our stat group
-    if ((primaryStatSlots + primarySlotMod) > primarystatgroup.size())
-        primaryStatSlots = primarystatgroup.size();
-    else if ((primaryStatSlots + primarySlotMod) < 1)
-        primaryStatSlots = 1;
-    else
-        primaryStatSlots += primarySlotMod;
+        // check whether or not the amount of stats exceeds the size of our stat group
+        if ((primaryStatSlots + primarySlotMod) > primarystatgroup.size())
+            primaryStatSlots = primarystatgroup.size();
+        else if ((primaryStatSlots + primarySlotMod) < 1) // never generate 0 primary stats
+            primaryStatSlots = 1;
+        else
+            primaryStatSlots += primarySlotMod;
 
-    if ((secondaryStatSlots + secondarySlotMod) > secondarystatgroup.size())
-        secondaryStatSlots = secondarystatgroup.size();
-    else
-        secondaryStatSlots += secondarySlotMod;
+        if ((secondaryStatSlots + secondarySlotMod) > secondarystatgroup.size())
+            secondaryStatSlots = secondarystatgroup.size();
+        else
+            secondaryStatSlots += secondarySlotMod;
+    }
+
 
     // if we still have any slots to generate stats for, continue
     if (primaryStatSlots + secondaryStatSlots > 0)
