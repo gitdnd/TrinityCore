@@ -662,7 +662,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
     else
         primaryStatSlots += primarySlotMod;
 
-    if ((primaryStatSlots + secondarySlotMod) > primarystatgroup.size())
+    if ((secondaryStatSlots + secondarySlotMod) > primarystatgroup.size())
         secondaryStatSlots = secondarystatgroup.size();
     else
         secondaryStatSlots += secondarySlotMod;
