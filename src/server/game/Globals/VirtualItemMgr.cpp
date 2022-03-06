@@ -659,7 +659,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
     // check whether or not the amount of stats exceeds the size of our stat group
     if ((primaryStatSlots + primarySlotMod) > primarystatgroup.size())
         primaryStatSlots = primarystatgroup.size();
-    if ((primaryStatSlots + primarySlotMod) < 1)
+    else if ((primaryStatSlots + primarySlotMod) < 1)
         primaryStatSlots = 1;
     else
         primaryStatSlots += primarySlotMod;
