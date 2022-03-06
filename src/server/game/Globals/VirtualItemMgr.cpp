@@ -644,32 +644,61 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
     else
         pool = (float)modifier.statpool;
 
-    // divide per-stat pool by predefined blizzlike value
-    pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
+    // get stat pool amount
+    uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
+    uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
 
-    // generate primary stat values  for all stats in group
-    for (uint32 i = 0; i < primarystatgroup.size(); ++i)
+    // multiply the pool size by the base amounts of stat slots
+    pool *= (float)(primaryStatSlots + secondaryStatSlots);
+
+    // randomly select between -1 and +1 additional stat slots
+    std::uniform_int_distribution<int> dist(-1, 1);
+    int primarySlotMod = dist(generator);
+    int secondarySlotMod = dist(generator);
+
+    // check whether or not the amount of stats exceeds the size of our stat group
+    if ((primaryStatSlots + primarySlotMod) > primarystatgroup.size())
+        primaryStatSlots = primarystatgroup.size();
+    else
+        primaryStatSlots += primarySlotMod;
+
+    if ((primaryStatSlots + secondarySlotMod) > primarystatgroup.size())
+        secondaryStatSlots = secondarystatgroup.size();
+    else
+        secondaryStatSlots += secondarySlotMod;
+
+    // if we still have any slots to generate stats for, continue
+    if (primaryStatSlots + secondaryStatSlots > 0)
     {
-        // select random pool size value based on upper and lower bounds
-        float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+        // divide the pool by the modified amount of stat slots
+        pool /= (float)(primaryStatSlots + secondaryStatSlots);
 
-        // mod stat points based on stat weight
-        statPoints *= VirtualModifier::GetStatRateNew(primarystatgroup[i]);
+        // divide per-stat pool by predefined blizzlike value
+        pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
 
-        // mod stat points based on item quality
-        statPoints *= VirtualModifier::GetQualityStatModifier(output);
-
-        // mod stat points based on item slot
-        statPoints *= VirtualModifier::GetSlotStatModifier(output);
-
-        // mod stat points based on stat tier
-        statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD);
-
-        // hard coded overrides for primary stats
-        if (primarystatgroup[i] == ITEM_MOD_STAMINA)
+        // generate primary stat values  for all stats in group
+        for (uint32 i = 0; i < primarystatgroup.size(); ++i)
         {
-            switch (statgroupid)
+            // select random pool size value based on upper and lower bounds
+            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+
+            // mod stat points based on stat weight
+            statPoints *= VirtualModifier::GetStatRateNew(primarystatgroup[i]);
+
+            // mod stat points based on item quality
+            statPoints *= VirtualModifier::GetQualityStatModifier(output);
+
+            // mod stat points based on item slot
+            statPoints *= VirtualModifier::GetSlotStatModifier(output);
+
+            // mod stat points based on stat tier
+            statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD);
+
+            // hard coded overrides for primary stats
+            if (primarystatgroup[i] == ITEM_MOD_STAMINA)
             {
+                switch (statgroupid)
+                {
                 case STAT_GROUP_STR_DPS:
                     statPoints *= 1.5f;
                     break;
@@ -682,24 +711,24 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                     break;
                 default:
                     break;
+                }
             }
-        }
-        else if (primarystatgroup[i] == ITEM_MOD_STRENGTH)
-        {
-            switch (statgroupid)
+            else if (primarystatgroup[i] == ITEM_MOD_STRENGTH)
             {
+                switch (statgroupid)
+                {
                 case STAT_GROUP_STR_DPS:
                 case STAT_GROUP_STR_TANK:
                     statPoints *= 1.32f;
                     break;
                 default:
                     break;
+                }
             }
-        }
-        else if (primarystatgroup[i] == ITEM_MOD_AGILITY)
-        {
-            switch (statgroupid)
+            else if (primarystatgroup[i] == ITEM_MOD_AGILITY)
             {
+                switch (statgroupid)
+                {
                 case STAT_GROUP_AGI_DPS:
                 case STAT_GROUP_AGI_TANK:
                     statPoints *= 1.32f;
@@ -709,38 +738,38 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                     break;
                 default:
                     break;
+                }
+            }
+
+            if (i < primaryStatSlots)
+            {
+                selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
             }
         }
 
-        if (i < VirtualModifier::GetPrimaryStatSlots(output))
+        // generate secondary stat values
+        for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
         {
-            selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
-        }
-    }
+            // select random pool size value based on upper and lower bounds
+            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
-    // generate secondary stat values
-    for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
-    {
-        // select random pool size value based on upper and lower bounds
-        float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+            // mod stat points based on stat weight
+            statPoints *= VirtualModifier::GetStatRateNew(secondarystatgroup[i]);
 
-        // mod stat points based on stat weight
-        statPoints *= VirtualModifier::GetStatRateNew(secondarystatgroup[i]);
+            // mod stat points based on item quality
+            statPoints *= VirtualModifier::GetQualityStatModifier(output);
 
-        // mod stat points based on item quality
-        statPoints *= VirtualModifier::GetQualityStatModifier(output);
+            // mod stat points based on item slot
+            statPoints *= VirtualModifier::GetSlotStatModifier(output);
 
-        // mod stat points based on item slot
-        statPoints *= VirtualModifier::GetSlotStatModifier(output);
+            // mod stat points based on stat tier
+            statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
 
-        // mod stat points based on stat tier
-        statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
-
-        // hard coded behavior for weapons with spell power.
-        if (secondarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-        {
-            switch (output->InventoryType)
+            // hard coded behavior for weapons with spell power.
+            if (secondarystatgroup[i] == ITEM_MOD_SPELL_POWER)
             {
+                switch (output->InventoryType)
+                {
                 case INVTYPE_2HWEAPON:
                 case INVTYPE_WEAPON:
                 case INVTYPE_WEAPONMAINHAND:
@@ -749,12 +778,13 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                     break;
                 default:
                     break;
+                }
             }
-        }
 
-        if (i < VirtualModifier::GetSecondaryStatSlots(output))
-        {
-            selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
+            if (i < secondaryStatSlots)
+            {
+                selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
+            }
         }
     }
 
