@@ -376,7 +376,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         armorValue *= VirtualModifier::GetQualityStatModifier(output);
 
         // add a random 10% increase or decrease of stats
-        armorValue *= (float)urand((uint32)(armorValue *0.9f), (uint32)(armorValue * 1.1f), generator);
+        armorValue = (float)urand((uint32)(armorValue * 0.9f), (uint32)(armorValue * 1.1f), generator);
 
         // apply armor value to template
         output->Armor = (uint32)armorValue;
@@ -741,7 +741,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                 }
             }
 
-            if (i < primaryStatSlots)
+            if (i < primaryStatSlots && primaryStatSlots > 0)
             {
                 selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
             }
@@ -781,7 +781,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
                 }
             }
 
-            if (i < secondaryStatSlots)
+            if (i < secondaryStatSlots && secondaryStatSlots > 0)
             {
                 selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
             }
