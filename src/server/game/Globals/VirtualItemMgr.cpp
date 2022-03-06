@@ -365,19 +365,21 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
     {
         // by default we assume 1 ilevel = 1 armor
-        output->Armor = 1 * ilevel;
+        float armorValue = (float)ilevel;
 
         // retrieve armor slot and type multiplier
-        float typeslotmod = VirtualModifier::GetTypeSlotArmorModifier(output);
-        output->Armor = output->Armor * typeslotmod;
+        armorValue *= VirtualModifier::GetTypeSlotArmorModifier(output);;
 
         // depending on quality, add multiplier to armor piece
-        float qmulti = ((int32(output->Quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
-        output->Armor = output->Armor * qmulti;
+        // we use the same modifier as the stat quality modifier
+        // reconsider this if we ever need to change stat quality modifiers
+        armorValue *= VirtualModifier::GetQualityStatModifier(output);
 
         // add a random 10% increase or decrease of stats
-        float randmulti = (urand(90, 110, generator) / 100.0f);
-        output->Armor = output->Armor * randmulti;
+        armorValue *= (float)urand((uint32)(armorValue *0.9f), (uint32)(armorValue * 1.1f), generator);
+
+        // apply armor value to template
+        output->Armor = (uint32)armorValue;
     }
 
     // Apply block rating to shields
