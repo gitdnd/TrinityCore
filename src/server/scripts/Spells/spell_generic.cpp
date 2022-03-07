@@ -41,7 +41,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-#include "Chat.h"
+
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
     PrepareAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5273,10 +5273,7 @@ class spell_evokers_intellect_aura : public AuraScript
         uint32 spell = eventInfo.GetSpellInfo()->Id;
 
         if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
-        {
-            ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Clearing uniques.");
             uniqueSpells.clear();
-        }
 
         uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
         ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Unique size %u.", uniqueSpells.size());
