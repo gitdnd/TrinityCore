@@ -8335,8 +8335,17 @@ int32 Unit::ModifyHealth(int32 dVal)
     int32 val = dVal + curHealth;
     if (val <= 0)
     {
-        SetHealth(0);
-        return -curHealth;
+        if (HasAura(SPELL_BLOOD_MAGIC))
+        {
+            Kill(this, this, true);
+            return -curHealth;
+        }
+        else
+        {
+            SetHealth(0);
+            return -curHealth;
+        }
+
     }
 
     int32 maxHealth = (int32)GetMaxHealth();
