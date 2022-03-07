@@ -5329,7 +5329,7 @@ class spell_talent_congelation_actual_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_congelation_actual_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void PeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
         if (GetCaster() && GetCaster()->GetHealthPct() > 35)
@@ -5344,7 +5344,7 @@ class spell_talent_congelation_actual_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_talent_congelation_actual_aura::OnProc, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_congelation_actual_aura::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
