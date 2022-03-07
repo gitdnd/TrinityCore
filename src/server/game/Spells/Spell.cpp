@@ -5467,7 +5467,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
 
     if (!(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
-        if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && m_spellInfo->PowerType == POWER_MANA)
+        if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && m_spellInfo->PowerType == POWER_MANA)
         {
             m_customError = SPELL_CUSTOM_ERROR_NOT_ENOUGH_HEALTH;
             return SPELL_FAILED_CUSTOM_ERROR;
