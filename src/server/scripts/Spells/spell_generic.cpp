@@ -5276,7 +5276,7 @@ class spell_evokers_intellect_aura : public AuraScript
             uniqueSpells.clear();
 
         uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
-        ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Unique size %u.", uniqueSpells.size());
+
         if (Aura* evokers = GetCaster()->GetAura(450002))
             evokers->SetStackAmount(uniqueSpells.size());
         else
