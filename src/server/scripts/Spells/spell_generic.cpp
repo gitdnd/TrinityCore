@@ -41,7 +41,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
-
+#include "Chat.h"
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
     PrepareAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5271,11 +5271,16 @@ class spell_evokers_intellect_aura : public AuraScript
     {
         PreventDefaultAction();
         uint32 spell = eventInfo.GetSpellInfo()->Id;
-        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) == uniqueSpells.end())
+
+        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
+        {
+            ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Clearing uniques.");
             uniqueSpells.clear();
+        }
 
         uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
-        if (Aura* evokers = eventInfo.GetActor()->GetAura(450002))
+        ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Unique size %u.", uniqueSpells.size());
+        if (Aura* evokers = GetCaster()->GetAura(450002))
             evokers->SetStackAmount(uniqueSpells.size());
         else
         {
@@ -5284,7 +5289,8 @@ class spell_evokers_intellect_aura : public AuraScript
                 AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetCaster());
                 createInfo.SetCaster(GetCaster());
 
-                Aura::TryRefreshStackOrCreate(createInfo);
+                if (Aura* evoke = Aura::TryRefreshStackOrCreate(createInfo))
+                    evoke->SetStackAmount(uniqueSpells.size());
             }
         }
     }
