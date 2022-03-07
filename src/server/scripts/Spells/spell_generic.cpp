@@ -5271,10 +5271,9 @@ class spell_evokers_intellect_aura : public AuraScript
     {
         PreventDefaultAction();
         uint32 spell = eventInfo.GetSpellInfo()->Id;
-        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
-        {
+        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) == uniqueSpells.end())
             uniqueSpells.clear();
-        }
+
         uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
         if (Aura* evokers = eventInfo.GetActor()->GetAura(450002))
             evokers->SetStackAmount(uniqueSpells.size());
