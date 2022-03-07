@@ -3266,15 +3266,20 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     if (!unitCaster)
         return 0;
 
+    Powers usingPower = PowerType;
+
+    if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && PowerType == POWER_MANA)
+        usingPower = POWER_HEALTH;
+
     // Spell drain all exist power on cast (Only paladin lay of Hands)
     if (HasAttribute(SPELL_ATTR1_DRAIN_ALL_POWER))
     {
         // If power type - health drain all
-        if (PowerType == POWER_HEALTH)
+        if (usingPower == POWER_HEALTH)
             return unitCaster->GetHealth();
         // Else drain all power
-        if (PowerType < MAX_POWERS)
-            return unitCaster->GetPower(PowerType);
+        if (usingPower < MAX_POWERS)
+            return unitCaster->GetPower(usingPower);
         TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
         return 0;
     }
@@ -3284,7 +3289,7 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     // PCT cost from total amount
     if (ManaCostPercentage)
     {
-        switch (PowerType)
+        switch (usingPower)
         {
             // health as power used
             case POWER_HEALTH:

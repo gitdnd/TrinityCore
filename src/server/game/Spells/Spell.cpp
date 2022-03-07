@@ -4213,6 +4213,11 @@ void Spell::SendSpellStart()
     if (!IsNeedSendToClient())
         return;
 
+    Powers powerType = m_spellInfo->PowerType;
+
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
     //TC_LOG_DEBUG("spells", "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_2;
@@ -4234,10 +4239,10 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_AMMO;
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsPet()))
-         && m_spellInfo->PowerType != POWER_HEALTH)
+         && powerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
-    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
+    if (m_spellInfo->RuneCostID && powerType == POWER_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
 
     WorldPackets::Spells::SpellStart packet;
@@ -4257,7 +4262,7 @@ void Spell::SendSpellStart()
     m_targets.Write(castData.Target);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(m_spellInfo->PowerType);
+        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(powerType);
 
     if (castFlags & CAST_FLAG_AMMO)
     {
@@ -4280,6 +4285,10 @@ void Spell::SendSpellGo()
     // not send invisible spell casting
     if (!IsNeedSendToClient())
         return;
+    Powers powerType = m_spellInfo->PowerType;
+
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
@@ -4292,13 +4301,13 @@ void Spell::SendSpellGo()
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsPet()))
-        && m_spellInfo->PowerType != POWER_HEALTH)
+        && powerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->ToPlayer()->GetClass() == CLASS_DEATH_KNIGHT)
         && m_spellInfo->RuneCostID
-        && m_spellInfo->PowerType == POWER_RUNE
+        && powerType == POWER_RUNE
         && !(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
@@ -4333,7 +4342,7 @@ void Spell::SendSpellGo()
     m_targets.Write(castData.Target);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(m_spellInfo->PowerType);
+        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(powerType);
 
     if (castFlags & CAST_FLAG_RUNE_LIST && !m_spellInfo->HasAura(SPELL_AURA_CONVERT_RUNE)) // rune cooldowns list
     {
@@ -6549,6 +6558,11 @@ SpellCastResult Spell::CheckPower() const
     if (!unitCaster)
         return SPELL_CAST_OK;
 
+    Powers powerType = m_spellInfo->PowerType;
+
+    if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
     // item cast not used power
     if (m_CastItem)
         return SPELL_CAST_OK;
@@ -6568,7 +6582,7 @@ SpellCastResult Spell::CheckPower() const
     }
 
     //check rune cost only if a spell has PowerType == POWER_RUNE
-    if (m_spellInfo->PowerType == POWER_RUNE)
+    if (powerType == POWER_RUNE)
     {
         SpellCastResult failReason = CheckRuneCost(m_spellInfo->RuneCostID);
         if (failReason != SPELL_CAST_OK)
@@ -6576,7 +6590,6 @@ SpellCastResult Spell::CheckPower() const
     }
 
     // Check power amount
-    Powers powerType = m_spellInfo->PowerType;
     if (int32(unitCaster->GetPower(powerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else

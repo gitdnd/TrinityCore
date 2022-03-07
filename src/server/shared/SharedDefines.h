@@ -3875,6 +3875,11 @@ enum WorldState : uint32
     WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20009,      // Next daily calendar deletions of old events time
 };
 
+enum CustomSpells : uint32
+{
+    SPELL_BLOOD_MAGIC = 450000,
+};
+
 namespace Trinity
 {
 namespace Impl
