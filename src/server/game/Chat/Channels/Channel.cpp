@@ -161,7 +161,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
         return;
     }
-    if (GetName().c_str() == "ChatSpy")
+    if (GetName() == "ChatSpy")
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Found chatspy");
         if (player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
