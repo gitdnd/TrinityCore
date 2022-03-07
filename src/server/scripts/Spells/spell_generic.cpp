@@ -4850,7 +4850,7 @@ public:
         void HitHandler()
         {
             bool hasAura = false;
-            for (auto auras : spellId)
+            for (uint32 auras : spellId)
             {
                 hasAura = GetCaster()->HasAura(auras);
                 if (hasAura)
@@ -5555,6 +5555,14 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
     RegisterAuraScript(spell_talent_frozenheart_actual_aura);
     //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
-    new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 180054, 180055, 180056, 180057, 180058, 180059 });
+    std::vector<uint32> test;
+    test.emplace_back(180054);
+    test.emplace_back(180055);
+    test.emplace_back(180056);
+    test.emplace_back(180057);
+    test.emplace_back(180058);
+    test.emplace_back(180059);
+
+    new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", test);
     RegisterAuraScript(spell_evokers_intellect_aura);
 }
