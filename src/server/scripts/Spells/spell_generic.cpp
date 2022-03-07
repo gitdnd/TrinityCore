@@ -5504,7 +5504,7 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
     RegisterAuraScript(spell_talent_congelation_trigger_aura);
     RegisterAuraScript(spell_talent_congelation_actual_aura);
-    new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
-    /*new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 1, 2, 3, 4, 5 });*/
+    //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
+    new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 180054, 180055, 180056, 180057, 180058, 180059 });
     RegisterAuraScript(spell_evokers_intellect_aura);
 }
