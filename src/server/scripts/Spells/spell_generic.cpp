@@ -5348,6 +5348,54 @@ class spell_talent_congelation_actual_aura : public AuraScript
     }
 };
 
+class spell_talent_frozenheart_trigger_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_frozenheart_trigger_aura);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        auto caster = GetCaster();
+        if (!caster)
+        {
+            PreventDefaultAction();
+            return;
+        }
+        if (caster->GetHealthPct() <= 75)
+        {
+            PreventDefaultAction();
+        }
+        // Trigger
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_frozenheart_trigger_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_frozenheart_actual_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_frozenheart_actual_aura);
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (GetCaster() && GetCaster()->GetHealthPct() <= 75)
+        {
+            auto base = aurEff->GetBase();
+            if (base)
+            {
+                base->Remove();
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_frozenheart_actual_aura::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5504,6 +5552,8 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
     RegisterAuraScript(spell_talent_congelation_trigger_aura);
     RegisterAuraScript(spell_talent_congelation_actual_aura);
+    RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
+    RegisterAuraScript(spell_talent_frozenheart_actual_aura);
     //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
     new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 180054, 180055, 180056, 180057, 180058, 180059 });
     RegisterAuraScript(spell_evokers_intellect_aura);
