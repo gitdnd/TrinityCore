@@ -4798,6 +4798,23 @@ class spell_generate_combopoint : public SpellScript
     }
 };
 
+class spell_generate_combopoint_all : public SpellScript
+{
+    PrepareSpellScript(spell_generate_combopoint);
+
+    void HitHandler()
+    {
+        if (GetCaster()->HasAura(180054) || GetCaster()->HasAura(180055) || GetCaster()->HasAura(180056) || GetCaster()->HasAura(180057) ||
+            GetCaster()->HasAura(180058) || GetCaster()->HasAura(180059))
+            GetHitUnit()->AddComboPoints(1);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_generate_combopoint_all::HitHandler);
+    }
+};
+
 class spell_generate_combopoint_with_aura : public SpellScriptLoader
 {
 public:
@@ -4831,48 +4848,6 @@ public:
     };
 private:
     uint32 spellId;
-};
-
-class spell_generate_combopoint_with_aura_array : public SpellScriptLoader
-{
-public:
-    spell_generate_combopoint_with_aura_array(char const* name, std::vector<uint32> _spellId) : SpellScriptLoader(name),
-        spellId(_spellId) { }
-
-    class spell_generate_combopoint_with_aura_array_spellscript : public SpellScript
-    {
-        PrepareSpellScript(spell_generate_combopoint_with_aura_array_spellscript);
-
-    public:
-        spell_generate_combopoint_with_aura_array_spellscript(std::vector<uint32> _spellId) : SpellScript(),
-            spellId(_spellId) { }
-
-        void HitHandler()
-        {
-            bool hasAura = false;
-            for (uint32 auras : spellId)
-            {
-                hasAura = GetCaster()->HasAura(auras);
-                if (hasAura)
-                    break;
-            }
-            if (!hasAura)
-                return;
-
-            Unit* unit = GetHitUnit();
-            if (unit)
-                unit->AddComboPoints(1);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_generate_combopoint_with_aura_array_spellscript::HitHandler);
-        }
-    private:
-        std::vector<uint32> spellId;
-    };
-private:
-    std::vector<uint32> spellId;
 };
 
 class spell_talent_combulstibolt_aura : public AuraScript
@@ -5555,14 +5530,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
     RegisterAuraScript(spell_talent_frozenheart_actual_aura);
     //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
-    std::vector<uint32> test;
-    test.emplace_back(180054);
-    test.emplace_back(180055);
-    test.emplace_back(180056);
-    test.emplace_back(180057);
-    test.emplace_back(180058);
-    test.emplace_back(180059);
-
-    new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", test);
     RegisterAuraScript(spell_evokers_intellect_aura);
+    RegisterSpellScript(spell_generate_combopoint_all);
 }
