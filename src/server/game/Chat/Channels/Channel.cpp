@@ -161,19 +161,18 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
         return;
     }
-    if (GetName() == "ChatSpy")
+
+    if (GetName() == "ChatLog")
     {
-        ChatHandler(player->GetSession()).PSendSysMessage("Found chatspy");
         if (player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
         {
-            ChatHandler(player->GetSession()).PSendSysMessage("Declining chatspy join.");
             BannedAppend appender;
             ChannelNameBuilder<BannedAppend> builder(this, appender);
             SendToOne(builder, guid);
             return;
         }
     }
-    ChatHandler(player->GetSession()).PSendSysMessage("Joining %s channel id %u", GetName().c_str(), GetChannelId());
+
     if (IsBanned(guid))
     {
         BannedAppend appender;

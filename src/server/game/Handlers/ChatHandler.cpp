@@ -655,8 +655,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
     if (!chatSpy.str().empty())
     {
-        if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart("ChatSpy", sender))
-            chn->ChatSpySay(_player->GetGUID(), chatSpy.str().c_str(), LANG_UNIVERSAL);
+        if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
+            if (const Channel* chn = cMgr->GetChannel(0, "ChatLog", GetPlayer(), false))
+                chn->ChatSpySay(_player->GetGUID(), chatSpy.str().c_str(), LANG_UNIVERSAL);
             
         //sWorld->SendGMText(chatSpy.str().c_str());
     }
