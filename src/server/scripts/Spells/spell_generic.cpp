@@ -4800,7 +4800,7 @@ class spell_generate_combopoint : public SpellScript
 
 class spell_generate_combopoint_all : public SpellScript
 {
-    PrepareSpellScript(spell_generate_combopoint);
+    PrepareSpellScript(spell_generate_combopoint_all);
 
     void HitHandler()
     {

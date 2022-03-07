@@ -5467,7 +5467,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
 
     if (!(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
-        if (Unit* unitCaster = m_caster->ToUnit())
+        /*if (Unit* unitCaster = m_caster->ToUnit())
         {
             if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && m_spellInfo->PowerType == POWER_MANA)
             {
@@ -5477,7 +5477,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                     return SPELL_FAILED_CUSTOM_ERROR;
                 }
             }
-        }
+        }*/
 
         castResult = CheckPower();
         if (castResult != SPELL_CAST_OK)
@@ -6577,8 +6577,8 @@ SpellCastResult Spell::CheckPower() const
 
     Powers powerType = m_spellInfo->PowerType;
 
-    if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
-        powerType = POWER_HEALTH;
+    /*if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;*/
 
     // item cast not used power
     if (m_CastItem)

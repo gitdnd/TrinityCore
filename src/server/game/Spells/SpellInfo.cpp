@@ -3268,8 +3268,8 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
 
     Powers usingPower = PowerType;
 
-    if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && PowerType == POWER_MANA)
-        usingPower = POWER_HEALTH;
+    //if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && PowerType == POWER_MANA)
+        //usingPower = POWER_HEALTH;
 
     // Spell drain all exist power on cast (Only paladin lay of Hands)
     if (HasAttribute(SPELL_ATTR1_DRAIN_ALL_POWER))
