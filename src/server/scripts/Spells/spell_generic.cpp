@@ -5276,11 +5276,11 @@ class spell_evokers_intellect_aura : public AuraScript
             uniqueSpells.clear();
         }
         uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
-        if (Aura* evokers = eventInfo.GetActor()->GetAura(12345))
+        if (Aura* evokers = eventInfo.GetActor()->GetAura(450002))
             evokers->SetStackAmount(uniqueSpells.size());
         else
         {
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(12345))
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(450002))
             {
                 AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetCaster());
                 createInfo.SetCaster(GetCaster());
