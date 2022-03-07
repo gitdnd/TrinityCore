@@ -715,6 +715,28 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
     SendToAll(builder, !info.IsModerator() ? guid : ObjectGuid::Empty);
 }
 
+void Channel::ChatSpySay(ObjectGuid guid, std::string const& what, uint32 lang) const
+{
+    if (what.empty())
+        return;
+
+    // TODO: Add proper RBAC check
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+        lang = LANG_UNIVERSAL;
+
+    auto builder = [&](WorldPacket& data, LocaleConstant locale)
+    {
+        LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(locale);
+
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), player, player, what, 0, GetName(localeIdx));
+        else
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, GetName(localeIdx));
+    };
+
+    SendToAll(builder, guid);
+}
+
 void Channel::Invite(Player const* player, std::string const& newname)
 {
     ObjectGuid guid = player->GetGUID();

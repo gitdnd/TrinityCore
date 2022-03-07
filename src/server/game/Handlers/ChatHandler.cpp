@@ -654,7 +654,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
     }
     if (!chatSpy.str().empty())
-        sWorld->SendGMText(chatSpy.str().c_str());
+    {
+        if (Channel* chn = ChannelMgr::GetChannelForPlayerByNamePart("ChatSpy", sender))
+            chn->ChatSpySay(_player->GetGUID(), chatSpy.str().c_str(), LANG_UNIVERSAL);
+            
+        //sWorld->SendGMText(chatSpy.str().c_str());
+    }
+        
 }
 
 void WorldSession::HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet)
