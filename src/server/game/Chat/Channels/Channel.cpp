@@ -162,7 +162,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         return;
     }
 
-    if (IsBanned(guid))
+    if (IsBanned(guid) || GetName().c_str() == "ChatSpy" && player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
     {
         BannedAppend appender;
         ChannelNameBuilder<BannedAppend> builder(this, appender);
