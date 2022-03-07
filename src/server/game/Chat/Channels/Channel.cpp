@@ -161,7 +161,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
         return;
     }
-
+    ChatHandler(player->GetSession()).PSendSysMessage("Joining %s channel id %u", GetName().c_str(), GetChannelId());
     if (IsBanned(guid) || GetName().c_str() == "ChatSpy" && player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
     {
         BannedAppend appender;
