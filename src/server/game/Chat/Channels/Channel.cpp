@@ -161,8 +161,20 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
         return;
     }
+    if (GetName().c_str() == "ChatSpy")
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Found chatspy");
+        if (player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("Declining chatspy join.");
+            BannedAppend appender;
+            ChannelNameBuilder<BannedAppend> builder(this, appender);
+            SendToOne(builder, guid);
+            return;
+        }
+    }
     ChatHandler(player->GetSession()).PSendSysMessage("Joining %s channel id %u", GetName().c_str(), GetChannelId());
-    if (IsBanned(guid) || GetName().c_str() == "ChatSpy" && player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+    if (IsBanned(guid))
     {
         BannedAppend appender;
         ChannelNameBuilder<BannedAppend> builder(this, appender);
@@ -727,14 +739,10 @@ void Channel::ChatSpySay(ObjectGuid guid, std::string const& what, uint32 lang) 
     auto builder = [&](WorldPacket& data, LocaleConstant locale)
     {
         LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(locale);
-
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), player, player, what, 0, GetName(localeIdx));
-        else
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, GetName(localeIdx));
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, GetName(localeIdx));
     };
 
-    SendToAll(builder, guid);
+    SendToAll(builder, ObjectGuid::Empty);
 }
 
 void Channel::Invite(Player const* player, std::string const& newname)
