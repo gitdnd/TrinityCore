@@ -4285,6 +4285,7 @@ void Spell::SendSpellGo()
     // not send invisible spell casting
     if (!IsNeedSendToClient())
         return;
+
     Powers powerType = m_spellInfo->PowerType;
 
     if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
@@ -4806,6 +4807,10 @@ void Spell::TakePower()
     }
 
     Powers powerType = Powers(m_spellInfo->PowerType);
+
+    if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
     bool hit = true;
     if (unitCaster->GetTypeId() == TYPEID_PLAYER)
     {
