@@ -5263,6 +5263,41 @@ class spell_talent_hammer_of_the_north_aura : public AuraScript
     }
 };
 
+class spell_evokers_intellect_aura : public AuraScript
+{
+    PrepareAuraScript(spell_evokers_intellect_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 spell = eventInfo.GetSpellInfo()->Id;
+        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
+        {
+            uniqueSpells.clear();
+        }
+        uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
+        if (Aura* evokers = eventInfo.GetActor()->GetAura(12345))
+            evokers->SetStackAmount(uniqueSpells.size());
+        else
+        {
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(12345))
+            {
+                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetCaster());
+                createInfo.SetCaster(GetCaster());
+
+                Aura::TryRefreshStackOrCreate(createInfo);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_evokers_intellect_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+
+    std::vector<uint32> uniqueSpells;
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5419,4 +5454,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
     new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
     /*new spell_generate_combopoint_with_aura_array("spell_gen_generate_combo_point_dummy", { 1, 2, 3, 4, 5 });*/
+    RegisterAuraScript(spell_evokers_intellect_aura);
 }
