@@ -5375,13 +5375,9 @@ class spell_talent_coldtempered_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_coldtempered_aura);
 
-    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-    }
-
-    void AfterProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
         auto base = aurEff->GetBase();
         if (base)
             base->Remove();
@@ -5390,7 +5386,6 @@ class spell_talent_coldtempered_aura : public AuraScript
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_talent_coldtempered_aura::OnProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
-        AfterEffectProc += AuraEffectProcFn(spell_talent_coldtempered_aura::AfterProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
