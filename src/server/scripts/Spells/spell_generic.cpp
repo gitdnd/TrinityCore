@@ -4814,8 +4814,9 @@ class spell_generate_combopoint_all : public SpellScript
             if (hasAura)
             {
                 //Generic Combo Point Add spell
-                CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                GetCaster()->CastSpell(GetHitUnit(), 450003, args);
+                //CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+                //GetCaster()->CastSpell(GetHitUnit(), 450003, args);
+                GetCaster()->AddComboPoints(GetHitUnit(), 1);
                 //GetHitUnit()->AddComboPoints(1);
                 break;
             }
