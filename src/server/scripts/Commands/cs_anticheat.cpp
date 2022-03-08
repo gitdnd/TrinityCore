@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "RBAC.h"
 
 using namespace Trinity::ChatCommands;
 
@@ -30,29 +31,29 @@ class anticheat_commandscript : public CommandScript
 public:
     anticheat_commandscript() : CommandScript("anticheat_commandscript") { }
 
-    ChatCommandTable GetCommands() const override
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommandTable anticheatCommandTable =
+        static std::vector<ChatCommand> anticheatCommandTable =
         {
-            { "global",      HandleAntiCheatGlobalCommand,   rbac::RBAC_ROLE_GAMEMASTER,              Console::Yes },
-            { "player",      HandleAntiCheatPlayerCommand,   rbac::RBAC_ROLE_GAMEMASTER,              Console::Yes },
-            { "delete",      HandleAntiCheatDeleteCommand,   rbac::RBAC_ROLE_ADMINISTRATOR,           Console::Yes },
-            { "handle",      HandleAntiCheatHandleCommand,   rbac::RBAC_ROLE_ADMINISTRATOR,           Console::Yes },
-            { "jail",        HandleAnticheatJailCommand,     rbac::RBAC_ROLE_GAMEMASTER,              Console::Yes },
-            { "warn",        HandleAnticheatWarnCommand,     rbac::RBAC_ROLE_GAMEMASTER,              Console::Yes },
+            { "global",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatGlobalCommand,    "" },
+            { "player",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatPlayerCommand,    "" },
+            { "delete",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatDeleteCommand,    "" },
+            { "handle",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatHandleCommand,    "" },
+            { "jail",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAnticheatJailCommand,    "" },
+            { "warn",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAnticheatWarnCommand,    "" },
         };
 
-        static ChatCommandTable commandTable =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "anticheat", anticheatCommandTable },
+            { "anticheat",          rbac::RBAC_PERM_COMMAND_ANTICHEAT,  false, nullptr,    "", anticheatCommandTable },
         };
 
         return commandTable;
     }
 
-    static bool HandleAnticheatWarnCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
+    static bool HandleAnticheatWarnCommand(ChatHandler* handler/*, Optional<PlayerIdentifier> player*/)
     {
-        if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
+        /*if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
             return false;
 
         if (!player)
@@ -64,12 +65,13 @@ public:
             return false;
         }
 
-        ChatHandler(player->GetConnectedPlayer()->GetSession()).SendSysMessage("The anticheat system has reported several times that you may be cheating. You will be monitored to confirm if this is accurate.");
+        ChatHandler(player->GetConnectedPlayer()->GetSession()).SendSysMessage("The anticheat system has reported several times that you may be cheating. You will be monitored to confirm if this is accurate.");*/
         return true;
     }
 
-    static bool HandleAnticheatJailCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
+    static bool HandleAnticheatJailCommand(ChatHandler* handler/*, Optional<PlayerIdentifier> player*/)
     {
+        /*
         if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
             return false;
 
@@ -88,26 +90,28 @@ public:
         WorldLocation jail {1, 16226.5f, 16403.6f, -64.5f, 3.2f};
         pTarget->TeleportTo(jail);
         handler->GetPlayer()->TeleportTo(jail);
-        pTarget->SetHomebind(jail, 876);
+        pTarget->SetHomebind(jail, 876);*/
 
         return true;
     }
 
-    static bool HandleAntiCheatDeleteCommand(ChatHandler* /*handler*/, Variant<EXACT_SEQUENCE("deleteall"), PlayerIdentifier> command)
+    static bool HandleAntiCheatDeleteCommand(ChatHandler* /*handler*//*, Variant<EXACT_SEQUENCE("deleteall"), PlayerIdentifier> command*/)
     {
+        /*
         if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
             return false;
 
         if (command.holds_alternative<EXACT_SEQUENCE("deleteall")>())
             sAnticheatMgr->AnticheatDeleteCommand(0);
         else
-            sAnticheatMgr->AnticheatDeleteCommand(command.get<PlayerIdentifier>().GetGUID().GetCounter());
+            sAnticheatMgr->AnticheatDeleteCommand(command.get<PlayerIdentifier>().GetGUID().GetCounter());*/
 
         return true;
     }
 
-    static bool HandleAntiCheatPlayerCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
+    static bool HandleAntiCheatPlayerCommand(ChatHandler* handler/*, Optional<PlayerIdentifier> player*/)
     {
+        /*
         if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
             return false;
 
@@ -135,7 +139,7 @@ public:
         handler->PSendSysMessage("Average: %f || Total Reports: %u ",average,total_reports);
         handler->PSendSysMessage("Speed Reports: %u || Fly Reports: %u || Jump Reports: %u ",speed_reports,fly_reports,jump_reports);
         handler->PSendSysMessage("Walk On Water Reports: %u  || Teleport To Plane Reports: %u",waterwalk_reports,teleportplane_reports);
-        handler->PSendSysMessage("Climb Reports: %u", climb_reports);
+        handler->PSendSysMessage("Climb Reports: %u", climb_reports);*/
 
         return true;
     }
