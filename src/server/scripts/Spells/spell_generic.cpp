@@ -4800,21 +4800,22 @@ class spell_generate_combopoint : public SpellScript
     }
 };
 static uint32 comboAuras[6] = { 180054, 180055, 180056, 180057, 180058, 180059 };
+
 class spell_generate_combopoint_all : public SpellScript
 {
     PrepareSpellScript(spell_generate_combopoint_all);
 
     void HitHandler()
     {
-        ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Test.");
         bool hasAura = false;
         for (uint32 checkAura : comboAuras)
         {
             hasAura = GetCaster()->HasAura(checkAura);
-            ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Check aura %u, status %s.", checkAura, hasAura ? "true" : "false");
             if (hasAura)
             {
-                GetHitUnit()->AddComboPoints(1);
+                //Generic Combo Point Add spell
+                GetCaster()->CastSpell(GetHitUnit(), 450003, true);
+                //GetHitUnit()->AddComboPoints(1);
                 break;
             }
         }
