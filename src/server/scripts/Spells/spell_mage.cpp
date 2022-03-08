@@ -428,7 +428,7 @@ class spell_mage_combustion : public SpellScriptLoader
             void Register() override
             {
                 DoCheckProc += AuraCheckProcFn(spell_mage_combustion_AuraScript::CheckProc);
-                OnEffectApply += AuraEffectApplyFn(spell_mage_combustion_AuraScript::OnApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_mage_combustion_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -460,7 +460,7 @@ class spell_mage_combustion_proc : public SpellScriptLoader
 
             void Register() override
             {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
