@@ -41,6 +41,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "Chat.h"
+#include "WorldSession.h"
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4797,16 +4799,25 @@ class spell_generate_combopoint : public SpellScript
         OnHit += SpellHitFn(spell_generate_combopoint::HitHandler);
     }
 };
-
+static uint32 comboAuras[6] = { 180054, 180055, 180056, 180057, 180058, 180059 };
 class spell_generate_combopoint_all : public SpellScript
 {
     PrepareSpellScript(spell_generate_combopoint_all);
 
     void HitHandler()
     {
-        if (GetCaster()->HasAura(180054) || GetCaster()->HasAura(180055) || GetCaster()->HasAura(180056) || GetCaster()->HasAura(180057) ||
-            GetCaster()->HasAura(180058) || GetCaster()->HasAura(180059))
-            GetHitUnit()->AddComboPoints(1);
+        ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Test.");
+        bool hasAura = false;
+        for (uint32 checkAura : comboAuras)
+        {
+            hasAura = GetCaster()->HasAura(checkAura);
+            ChatHandler(GetCaster()->ToPlayer()->GetSession()).PSendSysMessage("Check aura %u, status %s.", checkAura, hasAura ? "true" : "false");
+            if (hasAura)
+            {
+                GetHitUnit()->AddComboPoints(1);
+                break;
+            }
+        }
     }
 
     void Register() override
