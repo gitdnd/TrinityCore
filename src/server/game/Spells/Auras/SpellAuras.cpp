@@ -1157,6 +1157,7 @@ bool Aura::CanBeSaved() const
         case 55849: // Power Spark
         case 73822: // Hellscream's Warsong
         case 73828: // Strength of Wrynn
+        case 450003: //Evoker's Intellect Proc
             return false;
     }
 
