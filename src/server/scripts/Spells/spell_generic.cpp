@@ -5371,6 +5371,29 @@ class spell_talent_frozenheart_actual_aura : public AuraScript
     }
 };
 
+class spell_talent_coldtempered_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_coldtempered_aura);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+    }
+
+    void AfterProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        auto base = aurEff->GetBase();
+        if (base)
+            base->Remove();
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_coldtempered_aura::OnProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+        AfterEffectProc += AuraEffectProcFn(spell_talent_coldtempered_aura::AfterProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5529,6 +5552,7 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_congelation_actual_aura);
     RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
     RegisterAuraScript(spell_talent_frozenheart_actual_aura);
+    RegisterAuraScript(spell_talent_coldtempered_aura);
     //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
     RegisterAuraScript(spell_evokers_intellect_aura);
     RegisterSpellScript(spell_generate_combopoint_all);
