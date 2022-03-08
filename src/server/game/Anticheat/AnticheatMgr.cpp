@@ -47,23 +47,35 @@ void AnticheatMgr::JumpHackDetection(Player* player, MovementInfo /* movementInf
     }
 }
 
-void AnticheatMgr::WalkOnWaterHackDetection(Player* player, MovementInfo /* movementInfo */)
+void AnticheatMgr::WalkOnWaterHackDetection(Player* player, MovementInfo  movementInfo)
 {
     if ((sWorld->getIntConfig(CONFIG_ANTICHEAT_DETECTIONS_ENABLED) & WALK_WATER_HACK_DETECTION) == 0)
         return;
 
-    uint32 key = player->GetGUID().GetCounter();
-    if (!m_Players[key].GetLastMovementInfo().HasMovementFlag(MOVEMENTFLAG_WATERWALKING))
+    // ghost can water walk
+    if (player->HasAuraType(SPELL_AURA_GHOST))
         return;
 
-    // if we are a ghost we can walk on water
-    if (!player->IsAlive())
+    // Prevents the False Positive for water walking when you ressurrect.
+    // Aura 15007 (Resurrection sickness) is given while dead before returning back to life.
+    if (player->HasAuraType(SPELL_AURA_GHOST) && player->HasAura(15007))
         return;
 
-    if (player->HasAuraType(SPELL_AURA_FEATHER_FALL) ||
-        player->HasAuraType(SPELL_AURA_SAFE_FALL) ||
-        player->HasAuraType(SPELL_AURA_WATER_WALK))
+    ObjectGuid key = player->GetGUID();
+    /* Thanks to @LilleCarl */
+    if (m_Players[key].GetLastMovementInfo().HasMovementFlag(MOVEMENTFLAG_WATERWALKING) && movementInfo.HasMovementFlag(MOVEMENTFLAG_WATERWALKING))
+    {
+        if (player->HasAuraType(SPELL_AURA_WATER_WALK) || player->HasAuraType(SPELL_AURA_FEATHER_FALL) ||
+            player->HasAuraType(SPELL_AURA_SAFE_FALL))
+        {
+            return;
+        }
+
+    }
+    else if (!m_Players[key].GetLastMovementInfo().HasMovementFlag(MOVEMENTFLAG_WATERWALKING) && !movementInfo.HasMovementFlag(MOVEMENTFLAG_WATERWALKING))
+    {
         return;
+    }
 
     TC_LOG_DEBUG("entities.player.character", "AnticheatMgr:: Walk on Water - Hack detected player GUID %s",player->GetGUID().ToString().c_str());
     BuildReport(player,WALK_WATER_HACK_REPORT);
