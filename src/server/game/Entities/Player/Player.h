@@ -2216,6 +2216,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ClearInactiveGemSpells();
         uint32 GetTalentLevel() { return talent_level; }
         bool IsInstanceBound(uint32 mapId);
+
+        bool CanTeleport() { return m_canTeleport; }
+        void SetCanTeleport(bool value) { m_canTeleport = value; }
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -2551,6 +2555,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         float _averageItemLevel;
 
         uint32 talent_level;
+        bool m_canTeleport;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

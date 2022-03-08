@@ -34,6 +34,8 @@ enum ReportTypes
     JUMP_HACK_REPORT,
     TELEPORT_PLANE_HACK_REPORT,
     CLIMB_HACK_REPORT,
+    TELEPORT_HACK_REPORT,
+    IGNORE_CONTROL_REPORT,
 
    // MAX_REPORT_TYPES
 };
@@ -45,7 +47,9 @@ enum DetectionTypes
     WALK_WATER_HACK_DETECTION       = 4,
     JUMP_HACK_DETECTION             = 8,
     TELEPORT_PLANE_HACK_DETECTION   = 16,
-    CLIMB_HACK_DETECTION            = 32
+    CLIMB_HACK_DETECTION            = 32,
+    TELEPORT_HACK_DETECTION         = 64,
+    IGNORE_CONTROL_HACK_DETECTION   = 128
 };
 
 // GUIDLow is the key.
@@ -89,6 +93,8 @@ class TC_GAME_API AnticheatMgr
         void JumpHackDetection(Player* player, MovementInfo movementInfo,uint32 opcode);
         void TeleportPlaneHackDetection(Player* player, MovementInfo);
         void ClimbHackDetection(Player* player,MovementInfo movementInfo,uint32 opcode);
+        void TeleportHackDetection(Player* player, MovementInfo movementInfo);
+        void IgnoreControlHackDetection(Player* player, MovementInfo movementInfo);
 
         void BuildReport(Player* player,uint8 reportType);
 

@@ -417,6 +417,7 @@ Player::Player(WorldSession* session): Unit(true)
 
     talent_level = 0;
     _averageItemLevel = 1;
+    m_canTeleport = false;
 }
 
 Player::~Player()
@@ -1735,7 +1736,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         SetSemaphoreTeleportNear(true);
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
         if (!GetSession()->PlayerLogout())
+        {
+            SetCanTeleport(true);
             SendTeleportPacket(m_teleport_dest, (options & TELE_TO_TRANSPORT_TELEPORT) != 0);
+        }
     }
     else
     {
@@ -1836,6 +1840,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             if (!GetSession()->PlayerLogout())
             {
+                SetCanTeleport(true);
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
                 data << uint32(mapid);
                 if (GetTransport())
