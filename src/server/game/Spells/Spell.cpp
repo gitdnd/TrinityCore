@@ -4842,7 +4842,10 @@ void Spell::TakePower()
     // health as power used
     if (powerType == POWER_HEALTH)
     {
-        unitCaster->ModifyHealth(-(int32)m_powerCost);
+        if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && (unitCaster->GetHealth() - m_powerCost) <= 0)
+            unitCaster->Kill(unitCaster, unitCaster, true);
+        else
+            unitCaster->ModifyHealth(-(int32)m_powerCost);
         return;
     }
 
