@@ -1069,11 +1069,11 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         if (someSpells.statGroup != -1 && output->statGroup != someSpells.statGroup)
             continue;
 
-        if (someSpells.maxItemLevel != -1 && output->ItemLevel > (uint32)someSpells.maxItemLevel)
-            continue;
+        //if (someSpells.maxItemLevel != -1 && (int32)output->ItemLevel > someSpells.maxItemLevel)
+        //    continue;
 
-        if (someSpells.minItemLevel != -1 && output->ItemLevel < (uint32)someSpells.minItemLevel)
-            continue;
+        //if (someSpells.minItemLevel != -1 && (int32)output->ItemLevel < someSpells.minItemLevel)
+        //    continue;
 
         spells.push_back(someSpells);
     }
