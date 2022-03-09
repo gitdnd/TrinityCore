@@ -648,6 +648,21 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
     uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
 
+    // if this is a trinket, randomly select which slot to generate a stat for
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+    {
+        // set both primary and secondary stats to none
+        primaryStatSlots = 0;
+        secondaryStatSlots = 0;
+
+        // randomly select primary or secondary stat
+        bool isPrimary = (urand(0, 1, generator) != 0);
+        if (isPrimary)
+            secondaryStatSlots = 1;
+        else
+            secondaryStatSlots = 1;
+    }
+
     // multiply the pool size by the base amounts of stat slots
     pool *= (float)(primaryStatSlots + secondaryStatSlots);
 
@@ -1458,9 +1473,6 @@ std::vector<StatGroup> const& VirtualModifier::StatGroupData::GetArmorSubclassSt
 
 uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
 {
-    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
-        return 0;
-
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
@@ -1482,9 +1494,6 @@ uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
 
 uint32 VirtualModifier::GetSecondaryStatSlots(VirtualItemTemplate* output)
 {
-    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
-        return 1;
-
     switch (output->Quality)
     {
         case ITEM_QUALITY_NORMAL:
