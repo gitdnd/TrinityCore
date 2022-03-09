@@ -852,184 +852,101 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
     generator.seed(modifier.nameSeed);
 
     std::string fullName = "";
+    std::stringstream ss;
 
+    // For Weapons we always use inventoryType 0
+    uint32 inventoryType = 0;
     if (output->Class == ITEM_CLASS_ARMOR)
+        inventoryType = output->InventoryType;
+
+    // Retrieve all the string lists
+    std::map<uint32, std::vector<std::string>> nameLists;
+    std::map<uint32, std::string> selectedWords;
+    for (size_t i = 1; i <= 8; ++i)
     {
-        // Retrieve all the string lists
-        // For Weapons we always use inventoryType 0
-        std::map<uint32, std::vector<std::string>> nameLists;
-        std::map<uint32, std::string> selectedWords;
-        for (size_t i = 1; i <= 8; ++i)
+        NameInfo nameInfo(output->Class, output->SubClass, inventoryType, i);
+        auto list = GetNamesForNameInfo(&nameInfo);
+
+        // Make sure the current list is not empty. If it is, fall back to template item name.
+        if (list.empty())
         {
-            NameInfo nameInfo(output->Class, output->SubClass, output->InventoryType, i);
-            auto list = GetNamesForNameInfo(&nameInfo);
-
-            // Make sure the current list is not empty. If it is, fall back to template item name.
-            if (list.empty())
-            {
-                fullName = output->Name1;
-                break;
-            }
-
-            nameLists.insert(std::make_pair(i, list));
-
-            // Select a word from each list, as they are to be used across quality for regeneration.
-            selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
+            fullName = output->Name1;
+            break;
         }
 
-        // List 1: Unique names, like Malice, Mangler, Mercy etc.
-        // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
-        // List 3: Material names, like Bone, Copper, Diamond etc.
-        // List 4: Basic type name, like Blade, Razor, Maul etc.
-        // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
-        // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
+        nameLists.insert(std::make_pair(i, list));
 
-        if (fullName != output->Name1)
-        {
-            // Concat the correct full item name for the item quality
-            std::stringstream ss;
-
-            // Shields have their names generated like weapons.
-            if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-            {
-                switch (output->Quality)
-                {
-                case ITEM_QUALITY_NORMAL:
-                {
-                    ss << selectedWords[8] << " " << selectedWords[4];
-                    break;
-                }
-                case ITEM_QUALITY_UNCOMMON:
-                {
-                    ss << selectedWords[3] << " " << selectedWords[4];
-                    break;
-                }
-                case ITEM_QUALITY_RARE:
-                {
-                    ss << selectedWords[2] << " " << selectedWords[4];
-                    break;
-                }
-                case ITEM_QUALITY_EPIC:
-                {
-                    ss << selectedWords[1];
-                    break;
-                }
-                case ITEM_QUALITY_LEGENDARY:
-                {
-                    ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
-                    break;
-                }
-                default:
-                    ss << fullName;
-                }
-            }
-            else
-            {
-                switch (output->Quality)
-                {
-                case ITEM_QUALITY_NORMAL:
-                {
-                    ss << selectedWords[8] << " " << selectedWords[5];
-                    break;
-                }
-                case ITEM_QUALITY_UNCOMMON:
-                {
-                    ss << selectedWords[4] << " " << selectedWords[5];
-                    break;
-                }
-                case ITEM_QUALITY_RARE:
-                {
-                    ss << selectedWords[4] << " " << selectedWords[5] << " of " << selectedWords[2];
-                    break;
-                }
-                case ITEM_QUALITY_EPIC:
-                {
-                    ss << selectedWords[3] << " " << selectedWords[4] << " " << selectedWords[5];
-                    break;
-                }
-                case ITEM_QUALITY_LEGENDARY:
-                {
-                    ss << selectedWords[1] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
-                    break;
-                }
-                default:
-                    ss << fullName;
-                }
-            }
-            fullName = ss.str();
-        }
+        // Select a word from each list, as they are to be used across quality for regeneration.
+        selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
     }
 
-    if (output->Class == ITEM_CLASS_WEAPON)
+    // the temporary name is the same as the template name, we can assume lists were missing. skip generating names.
+    if (fullName != output->Name1)
     {
-        // Retrieve all the string lists
-        // For Weapons we always use inventoryType 0
-        std::map<uint32, std::vector<std::string>> nameLists;
-        std::map<uint32, std::string> selectedWords;
-        for (size_t i = 1; i <= 8; ++i)
+        if (output->Class == ITEM_CLASS_ARMOR)
         {
-            NameInfo nameInfo(output->Class, output->SubClass, 0, i);
-            auto list = GetNamesForNameInfo(&nameInfo);
-
-            // Make sure the current list is not empty. If it is, fall back to template item name.
-            if (list.empty())
-            {
-                fullName = output->Name1;
-                break;
-            }
-
-            nameLists.insert(std::make_pair(i, list));
-
-            // Select a word from each list, as they are to be used across quality for regeneration.
-            selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
-        }
-
-        std::stringstream ss;
-        // Concat the correct full item name for the item quality
-
-        // List 1: Unique names, like Malice, Mangler, Mercy etc.
-        // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
-        // List 3: Material names, like Bone, Copper, Diamond etc.
-        // List 4: Basic type name, like Blade, Razor, Maul etc.
-        // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
-        // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
-        if (fullName != output->Name1)
-        {
+            // List 1: Unique names, like Malice, Mangler, Mercy etc.
+            // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
+            // List 3: Material names, like Bone, Copper, Diamond etc.
+            // List 4: Basic type name, like Blade, Razor, Maul etc.
+            // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
+            // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
             switch (output->Quality)
             {
-            case ITEM_QUALITY_NORMAL:
-            {
-                ss << selectedWords[8] << " " << selectedWords[4];
-                break;
+                case ITEM_QUALITY_NORMAL:
+                    ss << selectedWords[8] << " " << selectedWords[5];
+                    break;
+                case ITEM_QUALITY_UNCOMMON:
+                    ss << selectedWords[4] << " " << selectedWords[5];
+                    break;
+                case ITEM_QUALITY_RARE:
+                    ss << selectedWords[4] << " " << selectedWords[5] << " of " << selectedWords[2];
+                    break;
+                case ITEM_QUALITY_EPIC:
+                    ss << selectedWords[3] << " " << selectedWords[4] << " " << selectedWords[5];
+                    break;
+                case ITEM_QUALITY_LEGENDARY:
+                    ss << selectedWords[1] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
+                    break;
+                default:
+                    ss << fullName;
+                    break;
             }
-            case ITEM_QUALITY_UNCOMMON:
-            {
-                ss << selectedWords[3] << " " << selectedWords[4];
-                break;
-            }
-            case ITEM_QUALITY_RARE:
-            {
-                ss << selectedWords[2] << " " << selectedWords[4];
-                break;
-            }
-            case ITEM_QUALITY_EPIC:
-            {
-                ss << selectedWords[1];
-                break;
-            }
-            case ITEM_QUALITY_LEGENDARY:
-            {
-                ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
-                break;
-            }
-            default:
-                ss << fullName;
-            }
-            fullName = ss.str();
         }
-    }
 
-    output->Name1 = fullName;
+        // Shields have their names generated like weapons.
+        if (output->Class == ITEM_CLASS_WEAPON || (output->Class == ITEM_CLASS_ARMOR && output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD))
+        {
+            // List 1: Unique names, like Malice, Mangler, Mercy etc.
+            // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
+            // List 3: Material names, like Bone, Copper, Diamond etc.
+            // List 4: Basic type name, like Blade, Razor, Maul etc.
+            // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
+            // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
+            switch (output->Quality)
+            {
+                case ITEM_QUALITY_NORMAL:
+                    ss << selectedWords[8] << " " << selectedWords[4];
+                    break;
+                case ITEM_QUALITY_UNCOMMON:
+                    ss << selectedWords[3] << " " << selectedWords[4];
+                    break;
+                case ITEM_QUALITY_RARE:
+                    ss << selectedWords[2] << " " << selectedWords[4];
+                    break;
+                case ITEM_QUALITY_EPIC:
+                    ss << selectedWords[1];
+                    break;
+                case ITEM_QUALITY_LEGENDARY:
+                    ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
+                    break;
+                default:
+                    ss << fullName;
+                    break;
+            }
+        }
+        output->Name1 = ss.str();
+    }
 }
 
 uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier) const
