@@ -1132,7 +1132,6 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
         if (spell.spellId == 0)
             continue;
 
-        spellsToUse.push_back(spell.spellId);
         output->Spells[i].SpellId = spell.spellId;
         output->Spells[i].SpellTrigger = spell.SpellTrigger;
         output->Spells[i].SpellCharges = spell.SpellCharges;
