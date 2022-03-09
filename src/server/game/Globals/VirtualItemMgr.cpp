@@ -658,7 +658,7 @@ void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualMo
         // randomly select primary or secondary stat
         bool isPrimary = (urand(0, 1, generator) != 0);
         if (isPrimary)
-            secondaryStatSlots = 1;
+            primaryStatSlots = 1;
         else
             secondaryStatSlots = 1;
     }
