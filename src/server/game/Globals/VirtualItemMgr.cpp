@@ -1053,7 +1053,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
 
 #define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
-    for (auto const& someSpells : availableSpells)
+    for (itemSpellInfo const someSpells : availableSpells)
     {
         if (output->Quality != someSpells.quality)
             continue;
