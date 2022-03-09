@@ -5756,7 +5756,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
-    sVirtualItemMgr.GenerateStats(vItem, modifier);
+    sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
     sVirtualItemMgr.GenerateItemStatsNew(vItem, modifier);
     sVirtualItemMgr.GenerateSockets(vItem, modifier);
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
@@ -5791,7 +5791,7 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     mod.statSeed = vItem->statSeed;
     mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
     mod.statpool = m_spellInfo->Effects[effIndex].MiscValueB != 0 ? m_spellInfo->Effects[effIndex].MiscValueB : -1;
-    sVirtualItemMgr.GenerateStats(vItem, mod);
+    sVirtualItemMgr.GenerateBaseStats(vItem, mod);
     sVirtualItemMgr.GenerateItemStatsNew(vItem, mod);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);

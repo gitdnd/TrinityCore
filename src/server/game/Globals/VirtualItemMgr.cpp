@@ -192,7 +192,7 @@ void VirtualItemMgr::LoadSpellsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     GenerateQuality(output, modifier);
-    GenerateStats(output, modifier);
+    GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output);
     GenerateSockets(output, modifier);
@@ -261,7 +261,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
     // as some of the next function calls require information set in this function ie. quality, ilevel etc.
-    GenerateStats(output, modifier);
+    GenerateBaseStats(output, modifier);
 
     // Generate an item name based on type and quality
     GenerateItemName(output, modifier);
@@ -278,7 +278,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Generate primary and secondary stats.
     // Always do this last, as it has variable rand calls based on quality.
     //GenerateItemStats(output, modifier);
-
     GenerateItemStatsNew(output, modifier);
 
     // Generate an entry based on item type
@@ -289,9 +288,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     uint32 entry = entryGenerator->GenerateEntry(store);
     output->ItemId = entry;
 
-    // Select a display ID for the item based on type, special case for trinkets and rings
-    bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
-    bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
+    // Select a display ID for the item based on type
     uint32 display = GenerateItemDisplay(output, modifier);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
@@ -310,7 +307,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return output;
 }
 
-void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
+void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statSeed);
