@@ -1051,27 +1051,39 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     std::mt19937 generator;
     generator.seed(modifier.spellSeed);
 
-#define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
     for (itemSpellInfo const someSpells : availableSpells)
     {
-        if (output->Quality != someSpells.quality)
+        if (someSpells.quality != -1 && output->Quality != someSpells.quality)
             continue;
-        IFSKIP(someSpells.itemClass, (int32)output->Class);
-        IFSKIP(someSpells.subClass, (int32)output->SubClass);
-        IFSKIP(someSpells.inventoryType, (int32)output->InventoryType);
-        IFSKIP(someSpells.statGroup, output->statGroup);
+
+        if (someSpells.itemClass != -1 && (int32)output->Class != someSpells.itemClass)
+            continue;
+
+        if (someSpells.subClass != -1 && (int32)output->SubClass != someSpells.subClass)
+            continue;
+
+        if (someSpells.inventoryType != -1 && (int32)output->InventoryType != someSpells.inventoryType)
+            continue;
+
+        if (someSpells.statGroup != -1 && output->statGroup != someSpells.statGroup)
+            continue;
+
         if (someSpells.maxItemLevel != -1 && output->ItemLevel > uint32(someSpells.maxItemLevel))
             continue;
+
         if (someSpells.minItemLevel != -1 && output->ItemLevel < uint32(someSpells.minItemLevel))
             continue;
+
         spells.push_back(someSpells);
     }
+
     if (spells.empty())
         return itemSpellInfo();
+
     auto selectedSpell = std::begin(spells);
     std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, generator));
-#undef IFSKIP
+
     return *selectedSpell;
 }
 
