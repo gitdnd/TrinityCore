@@ -2110,12 +2110,6 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         if (target->IsImmunedToSpellEffect(m_spellInfo, effIndex, m_caster))
             effectMask &= ~(1 << effIndex);
 
-    if (Unit* caster = GetCaster()->ToUnit())
-    {
-        if ((target->GetMechanicImmunityMask() & MECHANIC_STUN) != 0 && caster->HasAura(SPELL_EXIGENT_IMPOSITION))
-            caster->CastSpell(target, SPELL_EXIGENT_IMPOSITION_TRIGGER, true);
-    }
-
     ObjectGuid targetGUID = target->GetGUID();
 
     // Lookup target in already in list
