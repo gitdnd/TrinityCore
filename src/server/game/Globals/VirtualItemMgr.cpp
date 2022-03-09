@@ -171,8 +171,8 @@ void VirtualItemMgr::LoadSpellsFromDB()
         int32 subClass = fields[3].GetInt32();
         int32 inventoryType = fields[4].GetInt32();
         int8 statGroup = fields[5].GetInt8();
-        int8 minItemLevel = fields[6].GetInt32();
-        int8 maxItemLevel = fields[7].GetInt32();
+        int32 minItemLevel = fields[6].GetInt32();
+        int32 maxItemLevel = fields[7].GetInt32();
         uint32 SpellTrigger = fields[8].GetUInt32();
         int32  SpellCharges = fields[9].GetInt32();
         float  SpellPPMRate = fields[10].GetFloat();
