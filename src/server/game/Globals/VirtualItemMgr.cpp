@@ -196,7 +196,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output);
     GenerateSockets(output, modifier);
-    GenerateSpells(output, modifier);
+    //GenerateSpells(output, modifier);
     //GenerateItemStats(output, modifier);
     GenerateItemStatsNew(output, modifier);
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
