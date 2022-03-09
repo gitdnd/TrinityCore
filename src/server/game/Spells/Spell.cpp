@@ -2458,6 +2458,14 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
         bool const canEffectTrigger = !spell->m_spellInfo->HasAttribute(SPELL_ATTR3_CANT_TRIGGER_PROC) && spell->unitTarget->CanProc() &&
             (spell->CanExecuteTriggersOnHit(EffectMask) || MissCondition == SPELL_MISS_IMMUNE || MissCondition == SPELL_MISS_IMMUNE2);
 
+        if ((MissCondition == SPELL_MISS_IMMUNE || MissCondition == SPELL_MISS_IMMUNE2) && spell->m_spellInfo->HasAura(SPELL_AURA_MOD_STUN)
+            && !spell->unitTarget->IsFriendlyTo(caster))
+        {
+            //Exigent Imposition
+            if (caster->HasAura(180245))
+                caster->CastSpell(spell->unitTarget, 180246, true);
+        }
+
         // Trigger info was not filled in Spell::prepareDataForTriggerSystem - we do it now
         if (canEffectTrigger && !procAttacker && !procVictim)
         {
