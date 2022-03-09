@@ -1126,22 +1126,12 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
         numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
 
-    std::vector<uint32_t> spellsToUse;
     for (uint8 i = 0; i < numSpellsToGenerate; ++i)
     {
         itemSpellInfo spell = GenerateSpell(output, modifier);
         if (spell.spellId == 0)
             continue;
-        // Skip spell if we have already used this one. Try a few times to fetch a unique spell
-        int tries = 0;
-        while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
-        {
-            spell = GenerateSpell(output, modifier);
-            ++tries;
-        }
-        // If still a duplicate, skip
-        if (std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
-            continue;
+
         spellsToUse.push_back(spell.spellId);
         output->Spells[i].SpellId = spell.spellId;
         output->Spells[i].SpellTrigger = spell.SpellTrigger;
