@@ -1077,9 +1077,6 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
 
 void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
-    if (!(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
-        return;
-
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         if (output->Spells[i].SpellId == 0)
