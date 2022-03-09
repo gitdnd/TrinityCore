@@ -1077,68 +1077,26 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
 
 void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.spellSeed);
+    if (!(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
+        return;
 
-    //@todo Finalize these numbers, add more then 1 spell to generate.
-    bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
-    uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
-
-    // FIXME twinkets should always generate a single spell, and the rest are from stat pool
-    // This will need to be refactored to support other items
-    /*switch (output->Quality)
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-    case ITEM_QUALITY_UNCOMMON:
+        if (output->Spells[i].SpellId == 0)
         {
-            float chance = isTrinket ? 60.f : 10.f;
-            if (roll_chance_f(chance))
-                numSpellsToGenerate += 1;
-        }break;
-    case ITEM_QUALITY_RARE:
-    {
-        float chance = isTrinket ? 70.f : 15.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate += 2;
-        else
-            numSpellsToGenerate += 1;
-    }break;
-    case ITEM_QUALITY_EPIC:
-    {
-        float chance = isTrinket ? 80.f : 20.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate += 3;
-        else
-            numSpellsToGenerate += 2;
-    }break;
-    case ITEM_QUALITY_LEGENDARY:
-    {
-        float chance = isTrinket ? 90.f : 25.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate += 4;
-        else
-            numSpellsToGenerate += 3;
-    }break;
-    default:
-        break;
-    }*/
+            itemSpellInfo spell = GenerateSpell(output, modifier);
+            if (spell.spellId == 0)
+                continue;
 
-    //Prevent crash incase something goes dumb.
-    if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
-        numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
-
-    for (uint8 i = 0; i < numSpellsToGenerate; ++i)
-    {
-        itemSpellInfo spell = GenerateSpell(output, modifier);
-        if (spell.spellId == 0)
-            continue;
-
-        output->Spells[i].SpellId = spell.spellId;
-        output->Spells[i].SpellTrigger = spell.SpellTrigger;
-        output->Spells[i].SpellCharges = spell.SpellCharges;
-        output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
-        output->Spells[i].SpellCooldown = spell.SpellCooldown;
-        output->Spells[i].SpellCategory = spell.SpellCategory;
-        output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+            output->Spells[i].SpellId = spell.spellId;
+            output->Spells[i].SpellTrigger = spell.SpellTrigger;
+            output->Spells[i].SpellCharges = spell.SpellCharges;
+            output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
+            output->Spells[i].SpellCooldown = spell.SpellCooldown;
+            output->Spells[i].SpellCategory = spell.SpellCategory;
+            output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+            break;
+        }
     }
 }
 
