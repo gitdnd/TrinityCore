@@ -2585,7 +2585,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     // XP to money conversion processed in Player::RewardQuest
     //if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     //    return;
-    if (level >= MAX_TALENT_LEVEL)
+    if (level >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         return;
 
     uint32 bonus_xp;
@@ -2609,7 +2609,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (level <= MAX_TALENT_LEVEL)
+        if (level <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
             ++talent_level;
             CastSpell(this, 90299); // Talent level up visual
@@ -15499,7 +15499,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
-    if (GetTalentLevel() < MAX_TALENT_LEVEL)
+    if (GetTalentLevel() < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         GiveXP(XP, nullptr);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
