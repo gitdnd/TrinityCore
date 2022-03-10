@@ -5431,11 +5431,20 @@ public:
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
             if (!damageInfo)
                 return false;
+
             if (eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
                 return false;
+
             Player* player = eventInfo.GetActor()->ToPlayer();
-            if(player->GetWeaponForAttack(BASE_ATTACK) && player->GetWeaponForAttack(BASE_ATTACK)->GetTemplate()->SubClass == IT)
-            return eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER;
+            if (Item* mainHand = player->GetWeaponForAttack(BASE_ATTACK))
+                if (mainHand->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                    return false;
+
+            if (Item* offHand = player->GetWeaponForAttack(OFF_ATTACK))
+                if (offHand->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                    return false;
+
+            return true;
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
