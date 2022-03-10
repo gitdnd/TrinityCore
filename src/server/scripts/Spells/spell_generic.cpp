@@ -5403,6 +5403,55 @@ class spell_talent_coldtempered_aura : public AuraScript
     }
 };
 
+class spell_cold_steel_aura : public SpellScriptLoader
+{
+public:
+    spell_cold_steel_aura() : SpellScriptLoader("spell_cold_steel_aura") { }
+
+    class spell_cold_steel_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_cold_steel_aura_AuraScript);
+
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            return eventInfo.GetActor()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            float damage = 0.f;
+
+            if (eventInfo.GetDamageInfo()->GetAttackType() == OFF_ATTACK)
+                damage = (actor->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + actor->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE)) / 2.f;
+            else
+                damage = (actor->GetFloatValue(UNIT_FIELD_MINDAMAGE) + actor->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2.f;
+
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(damage*0.05);
+            actor->CastSpell(eventInfo.GetProcTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, args);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_cold_steel_aura_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_cold_steel_aura_AuraScript::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_cold_steel_aura_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5565,4 +5614,5 @@ void AddSC_generic_spell_scripts()
     //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
     RegisterAuraScript(spell_evokers_intellect_aura);
     RegisterSpellScript(spell_generate_combopoint_all);
+    new spell_cold_steel_aura();
 }
