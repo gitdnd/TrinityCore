@@ -3772,6 +3772,13 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
         damage += 1;
     }
 
+    if ((m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) != 0 && unitTarget->ToPlayer()
+        && unitTarget->ToPlayer()->HasAura(180247)
+        && roll_chance_i(5))
+    {
+        damage += 1;
+    }
+
     AddComboPointGain(unitTarget, damage);
 }
 
