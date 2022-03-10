@@ -4540,4 +4540,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_eggnog);
     RegisterSpellScript(spell_item_unlock_bank_slot);
     RegisterSpellScript(spell_item_temporal_time_crystal);
+    RegisterSpellScript(spell_item_floating_cult_thesis);
 }
