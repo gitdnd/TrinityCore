@@ -4812,28 +4812,26 @@ class spell_generate_combopoint_all : public SpellScript
         {
             hasAura = GetCaster()->HasAura(checkAura);
             if (hasAura)
-            {
-                uint32 points = 1;
-                if (GetCaster()->HasAura(180173)
-                    && roll_chance_i(5))
-                {
-                    points += 1;
-                }
-
-                if ((GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) != 0 && GetCaster()->HasAura(180247)
-                    && roll_chance_i(5))
-                {
-                    points += 1;
-                }
-                //Generic Combo Point Add spell
-                CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                args.AddSpellBP0(points);
-                GetCaster()->CastSpell(GetHitUnit(), 450003, args);
-                //GetCaster()->AddComboPoints(GetHitUnit(), 1);
-                //GetHitUnit()->AddComboPoints(1);
                 break;
-            }
         }
+        uint32 points = 1;
+        if (GetCaster()->HasAura(180173)
+            && roll_chance_i(5))
+        {
+            points += 1;
+        }
+
+        if ((GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) != 0 && GetCaster()->HasAura(180247)
+            && roll_chance_i(5))
+        {
+            points += 1;
+        }
+        //Generic Combo Point Add spell
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(points);
+        GetCaster()->CastSpell(GetHitUnit(), 450003, args);
+        //GetCaster()->AddComboPoints(GetHitUnit(), 1);
+        //GetHitUnit()->AddComboPoints(1);
     }
 
     void Register() override
