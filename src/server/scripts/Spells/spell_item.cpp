@@ -4373,6 +4373,40 @@ class spell_item_temporal_time_crystal : public SpellScript
     }
 };
 
+class spell_item_floating_cult_thesis : public SpellScript
+{
+    PrepareSpellScript(spell_item_floating_cult_thesis);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->GetMapId() == 768)
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You must exit The Timeways before using the Floating Cult Thesis.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        caster->ResetInstances(INSTANCE_RESET_ALL, false);
+        caster->TeleportTo(768, 12126.85f, 15339.47f, 857.3f, 6.261189f);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_floating_cult_thesis::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_floating_cult_thesis::CheckRequirement);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4506,4 +4540,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_eggnog);
     RegisterSpellScript(spell_item_unlock_bank_slot);
     RegisterSpellScript(spell_item_temporal_time_crystal);
+    RegisterSpellScript(spell_item_floating_cult_thesis);
 }
