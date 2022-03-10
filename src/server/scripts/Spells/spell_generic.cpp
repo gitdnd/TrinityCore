@@ -5436,15 +5436,13 @@ public:
                 return false;
 
             Player* player = eventInfo.GetActor()->ToPlayer();
-            if (Item* mainHand = player->GetWeaponForAttack(BASE_ATTACK))
-                if (mainHand->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+            if (Item* weapon = player->GetWeaponForAttack(eventInfo.GetDamageInfo()->GetAttackType()))
+                if (weapon->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
                     return false;
+                else
+                    return true;
 
-            if (Item* offHand = player->GetWeaponForAttack(OFF_ATTACK))
-                if (offHand->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                    return false;
-
-            return true;
+            return false;
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
