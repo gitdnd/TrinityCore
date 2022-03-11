@@ -975,7 +975,9 @@ enum SpellEffects
     SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE = 171,
     SPELL_EFFECT_REROLL_VIRTUAL_ITEM                = 172,
     SPELL_EFFECT_EXTRACT_GEMS                       = 173,
-    TOTAL_SPELL_EFFECTS                             = 174
+    SPELL_EFFECT_PCT_XP_GAIN                        = 174,
+    SPELL_EFFECT_XP_GAIN                            = 175,
+    TOTAL_SPELL_EFFECTS                             = 176
 };
 
 enum SpellCastResult

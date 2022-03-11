@@ -241,6 +241,8 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectUnused,                                   //171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
     &Spell::EffectReRollVirtualItem,                        //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
     &Spell::EffectExtractGems,                              //173 SPELL_EFFECT_EXTRACT_GEMS
+    &Spell::EffectPctXPGain,                                //174 SPELL_EFFECT_PCT_XP_GAIN
+    &Spell::EffectXPGain,                                   //175 SPELL_EFFECT_XP_GAIN
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -5822,4 +5824,23 @@ void Spell::EffectExtractGems(SpellEffIndex /*effIndex*/)
         return;
 
     itemTarget->ExtractGems();
+}
+
+void Spell::EffectPctXPGain(SpellEffIndex effIndex)
+{
+    if (!unitTarget || !unitTarget->IsPlayer())
+        return;
+
+    Player* plr = unitTarget->ToPlayer();
+    uint32 requiredXp = plr->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+    uint32 xpToGive = CalculatePct(requiredXp, damage);
+    plr->GiveXP(xpToGive, plr);
+}
+
+void Spell::EffectXPGain(SpellEffIndex effIndex)
+{
+    if (!unitTarget || !unitTarget->IsPlayer())
+        return;
+
+    unitTarget->ToPlayer()->GiveXP(damage, unitTarget);
 }
