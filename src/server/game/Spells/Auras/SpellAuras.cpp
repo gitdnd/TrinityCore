@@ -142,6 +142,8 @@ void AuraApplication::_InitFlags(Unit* caster, uint8 effMask)
                 break;
             }
         }
+        if(GetBase()->GetId() == 180250)
+            negativeFound = true;
         _flags |= negativeFound ? AFLAG_NEGATIVE : AFLAG_POSITIVE;
     }
     // aura is cast by friend
@@ -157,6 +159,8 @@ void AuraApplication::_InitFlags(Unit* caster, uint8 effMask)
                 break;
             }
         }
+        if (GetBase()->GetId() == 180250)
+            positiveFound = false;
         _flags |= positiveFound ? AFLAG_POSITIVE : AFLAG_NEGATIVE;
     }
 }
