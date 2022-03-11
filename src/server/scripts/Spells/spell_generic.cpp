@@ -5473,6 +5473,41 @@ public:
     }
 };
 
+class spell_glaciation_aura : public AuraScript
+{
+    PrepareAuraScript(spell_glaciation_aura);
+
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetEffectiveHeal() > 0;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return;
+        // Non stacking.
+        if (eventInfo.GetProcTarget()->HasAura(180252))
+            return;
+
+        int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 20.0f));
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(absorb);
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), 180252, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_glaciation_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_glaciation_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5636,4 +5671,5 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_evokers_intellect_aura);
     RegisterSpellScript(spell_generate_combopoint_all);
     new spell_cold_steel_aura();
+    RegisterAuraScript(spell_glaciation_aura);
 }
