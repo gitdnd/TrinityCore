@@ -5528,7 +5528,7 @@ class spell_frostfire_bolt_combo_spender : public SpellScript
             return;
 
         int32 slowAmount = GetCaster()->GetComboPoints() * 5;
-        uint32 damageAmount = GetHitDamage() * 0.05;
+        uint32 damageAmount = GetHitDamage() * (GetCaster()->GetComboPoints() * 0.05);
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
         args.AddSpellBP0(-slowAmount);
         args.AddSpellBP1(damageAmount);
