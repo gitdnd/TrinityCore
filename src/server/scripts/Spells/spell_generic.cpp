@@ -5518,6 +5518,30 @@ class spell_glaciation_aura : public AuraScript
     }
 };
 
+class spell_frostfire_bolt_combo_spender : public SpellScript
+{
+    PrepareSpellScript(spell_frostfire_bolt_combo_spender);
+
+    void OnHit()
+    {
+        if (!GetCaster()->HasAura(SPELL_ICY_HOT))
+            return;
+
+        int32 amount = GetCaster()->GetComboPoints() * 5;
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(-amount);
+        args.AddSpellBP1(-amount);
+        
+        GetCaster()->CastSpell(GetHitUnit(), 180254, args);
+        GetCaster()->ClearComboPoints();
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_frostfire_bolt_combo_spender::OnHit);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterAuraScript(spell_gen_absorb0_hitlimit1);
@@ -5682,4 +5706,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_generate_combopoint_all);
     new spell_cold_steel_aura();
     RegisterAuraScript(spell_glaciation_aura);
+    RegisterSpellScript(spell_frostfire_bolt_combo_spender);
 }
