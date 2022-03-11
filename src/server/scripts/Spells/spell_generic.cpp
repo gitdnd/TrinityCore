@@ -4814,6 +4814,10 @@ class spell_generate_combopoint_all : public SpellScript
             if (hasAura)
                 break;
         }
+
+        if (!hasAura)
+            return;
+
         uint32 points = 1;
         if (GetCaster()->HasAura(180173)
             && roll_chance_i(5))
@@ -5491,14 +5495,14 @@ class spell_glaciation_aura : public AuraScript
         if (!healInfo || !healInfo->GetHeal())
             return;
         // Non stacking.
-        if (eventInfo.GetProcTarget()->HasAura(180252))
+        if (eventInfo.GetProcTarget()->HasAura(180252, eventInfo.GetActor()->GetGUID()))
             return;
 
         int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 20.0f));
 
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(absorb);
-        GetTarget()->CastSpell(eventInfo.GetProcTarget(), 180252, args);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), 180252, args);
     }
 
     void Register() override
