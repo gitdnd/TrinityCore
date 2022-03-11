@@ -5527,10 +5527,11 @@ class spell_frostfire_bolt_combo_spender : public SpellScript
         if (!GetCaster()->HasAura(SPELL_ICY_HOT))
             return;
 
-        int32 amount = GetCaster()->GetComboPoints() * 5;
+        int32 slowAmount = GetCaster()->GetComboPoints() * 5;
+        uint32 damageAmount = GetHitDamage() * 0.05;
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-        args.AddSpellBP0(-amount);
-        args.AddSpellBP1(-amount);
+        args.AddSpellBP0(-slowAmount);
+        args.AddSpellBP1(damageAmount);
         
         GetCaster()->CastSpell(GetHitUnit(), 180254, args);
         GetCaster()->ClearComboPoints();
