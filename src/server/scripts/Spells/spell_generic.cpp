@@ -4783,22 +4783,6 @@ class spell_dead_eye_periodic_aura : public AuraScript
     }
 };
 
-class spell_generate_combopoint : public SpellScript
-{
-    PrepareSpellScript(spell_generate_combopoint);
-
-    void HitHandler()
-    {
-        Unit* unit = GetHitUnit();
-        if (unit)
-            unit->AddComboPoints(1);
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_generate_combopoint::HitHandler);
-    }
-};
 static uint32 comboAuras[6] = { 180054, 180055, 180056, 180057, 180058, 180059 };
 
 class spell_generate_combopoint_all : public SpellScript
@@ -4848,41 +4832,6 @@ class spell_generate_combopoint_all : public SpellScript
     {
         OnHit += SpellHitFn(spell_generate_combopoint_all::HitHandler);
     }
-};
-
-class spell_generate_combopoint_with_aura : public SpellScriptLoader
-{
-public:
-    spell_generate_combopoint_with_aura(char const* name, uint32 _spellId) : SpellScriptLoader(name),
-        spellId(_spellId) { }
-
-    class spell_generate_combopoint_with_aura_spellscript : public SpellScript
-    {
-        PrepareSpellScript(spell_generate_combopoint_with_aura_spellscript);
-
-    public:
-        spell_generate_combopoint_with_aura_spellscript(uint32 _spellId) : SpellScript(),
-            spellId(_spellId) { }
-
-        void HitHandler()
-        {
-            if (!GetCaster()->HasAura(spellId))
-                return;
-
-            Unit* unit = GetHitUnit();
-            if (unit)
-                unit->AddComboPoints(1);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_generate_combopoint_with_aura_spellscript::HitHandler);
-        }
-    private:
-        uint32 spellId;
-    };
-private:
-    uint32 spellId;
 };
 
 class spell_talent_combulstibolt_aura : public AuraScript
@@ -5526,8 +5475,8 @@ class spell_frostfire_bolt_combo_spender : public SpellScript
     {
         if (!GetCaster()->HasAura(SPELL_ICY_HOT))
             return;
-
-        int32 slowAmount = GetCaster()->GetComboPoints() * 5;
+        
+        int32 slowAmount = GetCaster()->GetComboPoints(GetHitUnit()) * 5;
         uint32 damageAmount = GetHitDamage() * (GetCaster()->GetComboPoints() * 0.05);
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
         args.AddSpellBP0(-slowAmount);
@@ -5684,7 +5633,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_warlords_charge_periodic_aura);
     RegisterAuraScript(spell_point_blank_periodic_aura);
     RegisterAuraScript(spell_dead_eye_periodic_aura);
-    RegisterSpellScript(spell_generate_combopoint);
     RegisterAuraScript(spell_talent_combulstibolt_aura);
     RegisterAuraScript(spell_talent_burningarmor_aura);
     RegisterAuraScript(spell_talent_engulf_aura);
@@ -5702,7 +5650,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
     RegisterAuraScript(spell_talent_frozenheart_actual_aura);
     RegisterAuraScript(spell_talent_coldtempered_aura);
-    //new spell_generate_combopoint_with_aura("spell_gen_generate_combo_point_forst", 180057);
     RegisterAuraScript(spell_evokers_intellect_aura);
     RegisterSpellScript(spell_generate_combopoint_all);
     new spell_cold_steel_aura();
