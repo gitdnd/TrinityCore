@@ -3878,6 +3878,7 @@ enum WorldState : uint32
 enum CustomSpells : uint32
 {
     SPELL_BLOOD_MAGIC = 450000,
+    SPELL_ICY_HOT = 180206,
 };
 
 namespace Trinity

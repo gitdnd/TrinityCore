@@ -869,6 +869,16 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
     {
         modOwner = caster->GetSpellModOwner();
         maxDuration = caster->CalcSpellDuration(spellInfo);
+        //Hack till script hook is made
+        if (Unit* hack = caster->ToUnit())
+        {
+            //Icy Hot: 
+            if (spellInfo->Id == 44572 && hack->HasAura(SPELL_ICY_HOT))
+            {
+                maxDuration = std::round(maxDuration + (hack->GetComboPoints() * 0.5f));
+                hack->ClearComboPoints();
+            }
+        }
     }
     else
         maxDuration = spellInfo->GetDuration();
