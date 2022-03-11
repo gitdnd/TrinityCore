@@ -4830,6 +4830,12 @@ class spell_generate_combopoint_all : public SpellScript
         {
             points += 1;
         }
+
+        if ((GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) != 0 && GetCaster()->HasAura(180253)
+            && roll_chance_i(5))
+        {
+            points += 1;
+        }
         //Generic Combo Point Add spell
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
         args.AddSpellBP0(points);
