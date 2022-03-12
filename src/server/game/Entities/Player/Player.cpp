@@ -2609,7 +2609,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (level <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+        if (talent_level <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
             ++talent_level;
             CastSpell(this, 90299); // Talent level up visual
