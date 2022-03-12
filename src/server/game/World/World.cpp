@@ -873,6 +873,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_MAX_TALENT_LEVEL] = sConfigMgr->GetIntDefault("MaxTalentLevel", 150);
 
+    m_int_configs[CONFIG_MAX_ITEM_LEVEL] = sConfigMgr->GetIntDefault("MaxVirtualItemLevel", 325);
+
     if (m_int_configs[CONFIG_MAX_PLAYER_LEVEL] > MAX_LEVEL)
     {
         TC_LOG_ERROR("server.loading", "MaxPlayerLevel (%i) must be in range 1..%u. Set to %u.", m_int_configs[CONFIG_MAX_PLAYER_LEVEL], MAX_LEVEL, MAX_LEVEL);

@@ -353,9 +353,9 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         ilevel = modifier.ilevel;
 
     // Hard cap of 325 across all items FIXME
-    if (ilevel > 325)
+    if (ilevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
     {
-        ilevel = 325;
+        ilevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
     }
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
@@ -828,7 +828,7 @@ void VirtualItemMgr::GenerateVirtualLevelLookupArray()
     float iLevel = 0.0f;
 
     // Generate lookup table for Virtual Levels.
-    for (int i = 0; iLevel < 325.0f; ++i)
+    for (int i = 0; iLevel < sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL); ++i)
     {
         iLevel = GenerateItemLevel(i);
         virtual_level_info.insert(std::make_pair(i, VirtualLevelInfo(iLevel)));
@@ -841,7 +841,7 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     float x = float(virtualLevel) / 5000.0f;
 
     // Generate a logarithmic value to be used as the correct ilevel for the provided vlevel
-    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + 325.0f;
+    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + float(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL));
 
     return ilevel;
 }
