@@ -2602,14 +2602,14 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 newXP = GetXP() + xp + bonus_xp;
 
-    while (newXP >= nextLvlXP /*&& level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)*/)
+    while (newXP >= nextLvlXP && talent_level < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
     {
         newXP -= nextLvlXP;
 
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (talent_level <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+        if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
             ++talent_level;
             CastSpell(this, 90299); // Talent level up visual
