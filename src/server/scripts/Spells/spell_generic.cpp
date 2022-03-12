@@ -4821,10 +4821,10 @@ class spell_generate_combopoint_all : public SpellScript
             points += 1;
         }
         //Generic Combo Point Add spell
-        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-        args.AddSpellBP0(points);
-        GetCaster()->CastSpell(GetHitUnit(), 450003, args);
-        //GetCaster()->AddComboPoints(GetHitUnit(), 1);
+        //CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        //args.AddSpellBP0(points);
+        //GetCaster()->CastSpell(GetHitUnit(), 450003, args);
+        GetCaster()->AddComboPoints(GetHitUnit(), points);
         //GetHitUnit()->AddComboPoints(1);
     }
 
