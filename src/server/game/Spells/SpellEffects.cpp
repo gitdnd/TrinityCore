@@ -236,7 +236,7 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM
     &Spell::EffectCreateVirtualItem,                        //167 SPELL_EFFECT_CREATE_VIRTUAL_ITEM
     &Spell::EffectVirtualItemQualityUpgrade,                //168 SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE
-    &Spell::EffectUnused,                                   //169 SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE
+    &Spell::EffectItemLevelUpgrade,                         //169 SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE
     &Spell::EffectUnused,                                   //170 SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM
     &Spell::EffectUnused,                                   //171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
     &Spell::EffectReRollVirtualItem,                        //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
@@ -5748,6 +5748,9 @@ void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
 
 void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
@@ -5795,6 +5798,9 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
 void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
@@ -5828,6 +5834,9 @@ void Spell::EffectExtractGems(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectPctXPGain(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     if (!unitTarget || !unitTarget->IsPlayer())
         return;
 
@@ -5839,8 +5848,61 @@ void Spell::EffectPctXPGain(SpellEffIndex effIndex)
 
 void Spell::EffectXPGain(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     if (!unitTarget || !unitTarget->IsPlayer())
         return;
 
     unitTarget->ToPlayer()->GiveXP(damage, unitTarget);
+}
+
+void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    VirtualModifier modifier;
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+
+    modifier.ilevel = m_spellInfo->Effects[effIndex].MiscValue;
+    modifier.seed = vItem->seed;
+    modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    modifier.nameSeed = vItem->nameSeed;
+    modifier.qualitySeed = vItem->qualitySeed;
+    modifier.socketSeed = vItem->socketSeed;
+    modifier.spellSeed = vItem->spellSeed;
+    modifier.statSeed = vItem->statSeed;
+    modifier.statValueSeed = vItem->statValueSeed;
+    modifier.quality = vItem->Quality;
+    modifier.statgroup = vItem->statGroup;
+
+    sVirtualItemMgr.InitSeedGen(modifier);
+    sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStatsNew(vItem, modifier);
+    sVirtualItemMgr.GenerateSockets(vItem, modifier);
+    sVirtualItemMgr.GenerateItemName(vItem, modifier);
+    //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
+    sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
+
+    vItem->seed = modifier.seed;
+    vItem->displaySeed = modifier.displaySeed;
+    vItem->nameSeed = modifier.nameSeed;
+    vItem->socketSeed = modifier.socketSeed;
+    //vItem->spellSeed = modifier.spellSeed;
+    vItem->statSeed = modifier.statSeed;
+    vItem->statValueSeed = modifier.statValueSeed;
+
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SaveVirtualItemInfo();
 }
