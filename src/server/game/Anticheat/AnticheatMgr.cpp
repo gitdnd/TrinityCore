@@ -21,8 +21,9 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "World.h"
+#include "Language.h"
 
-#define CLIMB_ANGLE 1.9f
+#define CLIMB_ANGLE 1.87f
 
 AnticheatMgr::AnticheatMgr()
 {
@@ -462,9 +463,7 @@ void AnticheatMgr::BuildReport(Player* player,uint8 reportType)
         WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
         data << str;
         sWorld->SendGlobalGMMessage(&data);
-        WorldPacket data2(SMSG_SERVER_MESSAGE, (str.size()+1));
-        data2 << str;
-        sWorld->SendGlobalGMMessage(&data2);
+        sWorld->SendGMText(LANG_GM_BROADCAST, str.c_str());
     }
 }
 
