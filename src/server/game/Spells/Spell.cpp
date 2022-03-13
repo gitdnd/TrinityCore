@@ -5975,8 +5975,14 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
             case SPELL_EFFECT_PCT_XP_GAIN:
             case SPELL_EFFECT_XP_GAIN:
             {
-                if (m_targets.GetUnitTarget()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
-                    return SPELL_FAILED_HIGHLEVEL;
+                if (m_targets.GetUnitTarget())
+                {
+                    if (Player* playerTarget = m_targets.GetUnitTarget()->ToPlayer())
+                    {
+                        if (playerTarget->GetTalentLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+                            return SPELL_FAILED_HIGHLEVEL;
+                    }
+                }
                 break;
             }
             default:
