@@ -24,6 +24,7 @@
 #include "LFGQueue.h"
 #include "LFGMgr.h"
 #include "Log.h"
+#include "Metric.h"
 
 namespace lfg
 {
@@ -653,15 +654,22 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
             data.accept = LFG_ANSWER_AGREE;
     }
 
+    int numInQueue = 0;
+    uint32 averageQueueTime = 0;
     // Mark proposal members as not queued (but not remove queue data)
     for (GuidList::const_iterator itQueue = proposal.queues.begin(); itQueue != proposal.queues.end(); ++itQueue)
     {
         QueueDataStore[*itQueue].isQueued = false;
+        auto time = std::time(0) - QueueDataStore[*itQueue].joinTime;
+        averageQueueTime += time;
+        ++numInQueue;
     }
+    averageQueueTime /= numInQueue;
 
     sLFGMgr->AddProposal(proposal);
 
     TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Guids: (%s) MATCH! Group formed", GetDetailedMatchRoles(check).c_str());
+    TC_METRIC_VALUE("lfg_queue_pop_time", averageQueueTime);
     SetCompatibles(strGuids, LFG_COMPATIBLES_MATCH);
     return LFG_COMPATIBLES_MATCH;
 }
