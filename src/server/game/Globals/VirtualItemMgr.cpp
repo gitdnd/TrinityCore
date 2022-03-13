@@ -883,7 +883,8 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
 
-        if (output->Class == ITEM_CLASS_ARMOR)
+        // Shields have their names generated like weapons.
+        if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
         {
             switch (output->Quality)
             {
@@ -1055,24 +1056,25 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     {
         switch (output->InventoryType)
         {
-        case INVTYPE_LEGS:
-        case INVTYPE_CHEST:
-            break;
-        case INVTYPE_HEAD:
-        case INVTYPE_SHOULDERS:
-            if (socketCount > 2)
-                socketCount = 2;
-            break;
-        case INVTYPE_WAIST:
-        case INVTYPE_CLOAK:
-        case INVTYPE_FEET:
-        case INVTYPE_WRISTS:
-        case INVTYPE_HANDS:
-            if (socketCount > 1)
-                socketCount = 1;
-            break;
-        default:
-            socketCount = 0;
+            case INVTYPE_LEGS:
+            case INVTYPE_CHEST:
+                break;
+            case INVTYPE_HEAD:
+            case INVTYPE_SHOULDERS:
+                if (socketCount > 2)
+                    socketCount = 2;
+                break;
+            case INVTYPE_WAIST:
+            case INVTYPE_CLOAK:
+            case INVTYPE_FEET:
+            case INVTYPE_WRISTS:
+            case INVTYPE_HANDS:
+                if (socketCount > 1)
+                    socketCount = 1;
+                break;
+            default:
+                socketCount = 0;
+                break;
         }
     }
 
@@ -1200,8 +1202,10 @@ uint32 VirtualItemMgr::EntryGenerator::GenerateEntry(VirtualItemMgr::Store const
     {
         if (i >= maxEntry)
             i = minEntry;
+
         if (i == nextEntry)
             break;
+
         if (store.find(i) == store.end())
         {
             nextEntry = i;
@@ -1253,6 +1257,7 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 {
     if (!virtualItem)
         return false;
+
     EntryGenerator* generator = Generator(virtualItem);
     if (!generator)
         return false;
@@ -1260,10 +1265,12 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
     uint32 entry = virtualItem->ItemId;
     if (entry < minEntry || entry >= maxEntry || store.find(entry) != store.end())
         return false;
+
     store[entry] = virtualItem;
 
     if (entry == generator->PeekNext())
         generator->GenerateEntry(store);
+
     return true;
 }
 
@@ -1345,6 +1352,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrim
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_primary_stats[group];
@@ -1354,6 +1362,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSeco
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_secondary_stats[group];
@@ -1363,6 +1372,7 @@ std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSock
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_sockets[group];
@@ -1703,10 +1713,13 @@ VirtualItemTemplate* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 {
     if (entry < minEntry || entry >= maxEntry)
         return nullptr;
+
     ReadGuard guard(lock);
+
     auto it = store.find(entry);
     if (it != store.end())
         return it->second;
+
     return nullptr;
 }
 
