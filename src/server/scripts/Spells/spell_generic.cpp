@@ -5504,7 +5504,7 @@ class spell_ice_barrier_combo_spender : public SpellScript
         if (!GetCaster()->HasAura(180205))
             return;
 
-        uint8 comboPoints = GetCaster()->GetComboPoints(GetHitUnit());
+        uint8 comboPoints = GetCaster()->GetComboPoints();
         if (!comboPoints)
             return;
 
