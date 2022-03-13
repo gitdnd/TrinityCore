@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "World.h"
 #include "Language.h"
+#include "GameTime.h"
 
 #define CLIMB_ANGLE 1.87f
 
@@ -457,7 +458,7 @@ void AnticheatMgr::BuildReport(Player* player,uint8 reportType)
 
     if (m_Players[key].GetTotalReports() > sWorld->getIntConfig(CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION))
     {
-        if (m_Players[key].lastAnnounce + 60 * IN_MILLISECONDS < time(nullptr))
+        if (m_Players[key].lastAnnounce + 60 < GameTime::GetGameTime())
         {
             // display warning at the center of the screen, hacky way?
             std::string str = "";
@@ -466,7 +467,7 @@ void AnticheatMgr::BuildReport(Player* player,uint8 reportType)
             data << str;
             sWorld->SendGlobalGMMessage(&data);
             sWorld->SendGMText(LANG_GM_BROADCAST, str.c_str());
-            m_Players[key].lastAnnounce = time(nullptr);
+            m_Players[key].lastAnnounce = GameTime::GetGameTime();
         }
     }
 }
