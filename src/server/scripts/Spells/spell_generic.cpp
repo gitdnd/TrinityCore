@@ -5475,9 +5475,11 @@ class spell_frostfire_bolt_combo_spender : public SpellScript
     {
         if (!GetCaster()->HasAura(SPELL_ICY_HOT))
             return;
-        
-        int32 slowAmount = GetCaster()->GetComboPoints(GetHitUnit()) * 5;
-        uint32 damageAmount = GetHitDamage() * (GetCaster()->GetComboPoints() * 0.05);
+        uint8 comboPoints = GetCaster()->GetComboPoints(GetHitUnit());
+        if (!comboPoints)
+            return;
+        uint32 slowAmount = comboPoints * 5;
+        uint32 damageAmount = GetHitDamage() * (comboPoints * 0.05);
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
         args.AddSpellBP0(-slowAmount);
         args.AddSpellBP1(damageAmount);
@@ -5489,6 +5491,33 @@ class spell_frostfire_bolt_combo_spender : public SpellScript
     void Register() override
     {
         AfterHit += SpellHitFn(spell_frostfire_bolt_combo_spender::OnHit);
+    }
+};
+
+
+class spell_ice_barrier_combo_spender : public SpellScript
+{
+    PrepareSpellScript(spell_ice_barrier_combo_spender);
+
+    void OnHit()
+    {
+        if (!GetCaster()->HasAura(180205))
+            return;
+
+        uint8 comboPoints = GetCaster()->GetComboPoints(GetHitUnit());
+        if (!comboPoints)
+            return;
+
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(comboPoints);
+
+        GetCaster()->CastSpell(GetHitUnit(), 180255, args);
+        GetCaster()->ClearComboPoints();
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_ice_barrier_combo_spender::OnHit);
     }
 };
 
@@ -5655,4 +5684,5 @@ void AddSC_generic_spell_scripts()
     new spell_cold_steel_aura();
     RegisterAuraScript(spell_glaciation_aura);
     RegisterSpellScript(spell_frostfire_bolt_combo_spender);
+    RegisterSpellScript(spell_ice_barrier_combo_spender);
 }
