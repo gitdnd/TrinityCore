@@ -7237,6 +7237,15 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     return SPELL_FAILED_NO_VALID_TARGETS;
                 break;
             }
+            case SPELL_EFFECT_PCT_XP_GAIN:
+            case SPELL_EFFECT_XP_GAIN:
+            {
+                if (!m_targets.GetUnitTarget() || !m_targets.GetUnitTarget()->IsPlayer())
+                    return SPELL_FAILED_TARGET_NOT_PLAYER;
+
+                if(m_targets.GetUnitTarget()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+                    return SPELL_FAILED_HIGHLEVEL;
+            }
             default:
                 break;
         }
