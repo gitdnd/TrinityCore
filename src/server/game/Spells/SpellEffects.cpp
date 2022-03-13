@@ -5763,7 +5763,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     modifier.quality = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.seed = vItem->seed;
-    modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    modifier.displaySeed = vItem->displaySeed;
     modifier.nameSeed = vItem->nameSeed;
     modifier.qualitySeed = vItem->qualitySeed;
     modifier.socketSeed = vItem->socketSeed;
@@ -5874,7 +5874,7 @@ void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
 
     modifier.ilevel = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.seed = vItem->seed;
-    modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    modifier.displaySeed = vItem->displaySeed;
     modifier.nameSeed = vItem->nameSeed;
     modifier.qualitySeed = vItem->qualitySeed;
     modifier.socketSeed = vItem->socketSeed;
