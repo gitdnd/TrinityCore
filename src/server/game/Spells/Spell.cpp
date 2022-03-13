@@ -5972,6 +5972,13 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                         if (bg->GetStatus() == STATUS_IN_PROGRESS)
                             return SPELL_FAILED_NOT_IN_BATTLEGROUND;
                 break;
+            case SPELL_EFFECT_PCT_XP_GAIN:
+            case SPELL_EFFECT_XP_GAIN:
+            {
+                if (m_targets.GetUnitTarget()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+                    return SPELL_FAILED_HIGHLEVEL;
+                break;
+            }
             default:
                 break;
         }
@@ -7235,13 +7242,6 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
 
                 if (!m_targets.GetItemTarget()->HasSocketedGems())
                     return SPELL_FAILED_NO_VALID_TARGETS;
-                break;
-            }
-            case SPELL_EFFECT_PCT_XP_GAIN:
-            case SPELL_EFFECT_XP_GAIN:
-            {
-                if(m_targets.GetUnitTarget()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
-                    return SPELL_FAILED_HIGHLEVEL;
                 break;
             }
             default:
