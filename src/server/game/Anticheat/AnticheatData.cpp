@@ -30,6 +30,7 @@ AnticheatData::AnticheatData()
     average = 0;
     creationTime = 0;
     hasDailyReport = false;
+    lastAnnounce = 0;
 }
 
 AnticheatData::~AnticheatData()

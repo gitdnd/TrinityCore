@@ -457,13 +457,17 @@ void AnticheatMgr::BuildReport(Player* player,uint8 reportType)
 
     if (m_Players[key].GetTotalReports() > sWorld->getIntConfig(CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION))
     {
-        // display warning at the center of the screen, hacky way?
-        std::string str = "";
-        str = "|cFFFFFC00[AC]|cFF00FFFF[|cFF60FF00" + std::string(player->GetName().c_str()) + "|cFF00FFFF] Possible cheater!";
-        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
-        data << str;
-        sWorld->SendGlobalGMMessage(&data);
-        sWorld->SendGMText(LANG_GM_BROADCAST, str.c_str());
+        if (m_Players[key].lastAnnounce + 60 * IN_MILLISECONDS < time(nullptr))
+        {
+            // display warning at the center of the screen, hacky way?
+            std::string str = "";
+            str = "|cFFFFFC00[AC]|cFF00FFFF[|cFF60FF00" + std::string(player->GetName().c_str()) + "|cFF00FFFF] Possible cheater!";
+            WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
+            data << str;
+            sWorld->SendGlobalGMMessage(&data);
+            sWorld->SendGMText(LANG_GM_BROADCAST, str.c_str());
+            m_Players[key].lastAnnounce = time(nullptr);
+        }
     }
 }
 

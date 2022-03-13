@@ -57,6 +57,7 @@ public:
 
     void SetDailyReportState(bool b);
     bool GetDailyReportState();
+    time_t lastAnnounce;
 private:
     uint32 lastOpcode;
     MovementInfo lastMovementInfo;
