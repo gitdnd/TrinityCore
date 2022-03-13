@@ -7245,6 +7245,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
 
                 if(m_targets.GetUnitTarget()->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
                     return SPELL_FAILED_HIGHLEVEL;
+                break;
             }
             default:
                 break;
