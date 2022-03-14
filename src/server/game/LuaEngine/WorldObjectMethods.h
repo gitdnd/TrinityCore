@@ -1272,6 +1272,7 @@ namespace LuaWorldObject
         ServerSideVisibilityType type = (ServerSideVisibilityType)Eluna::CHECKVAL<uint16>(L, 2);
         uint32 value = Eluna::CHECKVAL<uint32>(L, 3);
         obj->m_serverSideVisibility.SetValue(type, value);
+        obj->UpdateObjectVisibility();
         return 0;
     }
 
@@ -1280,6 +1281,7 @@ namespace LuaWorldObject
         ServerSideVisibilityType type = (ServerSideVisibilityType)Eluna::CHECKVAL<uint16>(L, 2);
         uint32 value = Eluna::CHECKVAL<uint32>(L, 3);
         obj->m_serverSideVisibilityDetect.SetValue(type, value);
+        obj->UpdateObjectVisibility();
         return 0;
     }
 };
