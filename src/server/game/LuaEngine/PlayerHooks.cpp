@@ -10,6 +10,8 @@
 #include "BindingMap.h"
 #include "ElunaIncludes.h"
 #include "ElunaTemplate.h"
+#include "World.h"
+#include "Chat.h"
 
 using namespace Hooks;
 
@@ -41,6 +43,7 @@ void Eluna::OnLearnTalents(Player* pPlayer, uint32 talentId, uint32 talentRank, 
 
 bool Eluna::OnCommand(Player* player, const char* text)
 {
+
     // If from console, player is NULL
     if (!player || player->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR)
     {
@@ -48,6 +51,11 @@ bool Eluna::OnCommand(Player* player, const char* text)
         std::transform(reload.begin(), reload.end(), reload.begin(), ::tolower);
         if (reload.find("reload eluna") == 0)
         {
+            if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))\
+            {
+                ChatHandler(player->GetSession()).SendSysMessage("Developmental features are disabled.");
+                return false;
+            }
             ReloadEluna();
             return false;
         }

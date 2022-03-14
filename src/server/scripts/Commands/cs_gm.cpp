@@ -50,6 +50,8 @@ public:
             { "ingame",  rbac::RBAC_PERM_COMMAND_GM_INGAME,   true, &HandleGMListIngameCommand, "" },
             { "list",    rbac::RBAC_PERM_COMMAND_GM_LIST,     true, &HandleGMListFullCommand,   "" },
             { "visible", rbac::RBAC_PERM_COMMAND_GM_VISIBLE, false, &HandleGMVisibleCommand,    "" },
+            { "setvisible", rbac::RBAC_PERM_COMMAND_GM_VISIBLE, false, &HandleSetGMVisibleCommand,    "" },
+            { "setdetect", rbac::RBAC_PERM_COMMAND_GM_VISIBLE, false, &HandleSetGMVisibleDetectCommand,    "" },
             { "",        rbac::RBAC_PERM_COMMAND_GM,         false, &HandleGMCommand,           "" },
         };
         static std::vector<ChatCommand> commandTable =
@@ -235,6 +237,46 @@ public:
         handler->SendSysMessage(LANG_USE_BOL);
         handler->SetSentErrorMessage(true);
         return false;
+    }
+
+    static bool HandleSetGMVisibleCommand(ChatHandler* handler, char const* args)
+    {
+        Player* _player = handler->GetSession()->GetPlayer();
+
+        if (!*args)
+        {
+            handler->PSendSysMessage(LANG_YOU_ARE, _player->isGMVisible() ? handler->GetTrinityString(LANG_VISIBLE) : handler->GetTrinityString(LANG_INVISIBLE));
+            return true;
+        }
+
+        int val = atoi((char*)args);
+        if (val < 0)
+            val = 0;
+
+        if (val > _player->GetSession()->GetSecurity())
+            val = _player->GetSession()->GetSecurity();
+
+        _player->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, val);
+        _player->UpdateObjectVisibility();
+        handler->PSendSysMessage("Set gm visibility to %i", val);
+        return true;
+    }
+
+    static bool HandleSetGMVisibleDetectCommand(ChatHandler* handler, char const* args)
+    {
+        Player* _player = handler->GetSession()->GetPlayer();
+
+        int val = atoi((char*)args);
+        if (val < 0)
+            val = 0;
+
+        if (val > _player->GetSession()->GetSecurity())
+            val = _player->GetSession()->GetSecurity();
+
+        _player->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, val);
+        _player->UpdateObjectVisibility();
+        handler->PSendSysMessage("Set gm visibility detection to %i", val);
+        return true;
     }
 
     //Enable\Disable GM Mode
