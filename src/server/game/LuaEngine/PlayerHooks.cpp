@@ -11,6 +11,7 @@
 #include "ElunaIncludes.h"
 #include "ElunaTemplate.h"
 #include "World.h"
+#include "Chat.h"
 
 using namespace Hooks;
 
@@ -50,8 +51,11 @@ bool Eluna::OnCommand(Player* player, const char* text)
         std::transform(reload.begin(), reload.end(), reload.begin(), ::tolower);
         if (reload.find("reload eluna") == 0)
         {
-            if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+            if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))\
+            {
+                ChatHandler(player->GetSession()).SendSysMessage("Developmental features are disabled.");
                 return false;
+            }
             ReloadEluna();
             return false;
         }
