@@ -403,9 +403,32 @@ class spell_mage_combustion : public SpellScriptLoader
                 return true;
             }
 
+            void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                auto caster = GetCaster();
+                if (!caster || !caster->ToPlayer())
+                    return;
+                // 180172 Heated Temperament
+                if (caster->HasAura(180172))
+                {
+                    auto player = caster->ToPlayer();
+                    auto points = player->GetComboPoints(player->GetComboTargetGUID());
+                    if (points > 0)
+                    {
+                        auto aura = aurEff->GetBase();
+                        if (aura)
+                        {
+                            aura->SetCharges(aura->GetCharges() + points);
+                            player->ClearComboPoints();
+                        }
+                    }
+                }
+            }
+
             void Register() override
             {
                 DoCheckProc += AuraCheckProcFn(spell_mage_combustion_AuraScript::CheckProc);
+                OnEffectApply += AuraEffectApplyFn(spell_mage_combustion_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -437,7 +460,7 @@ class spell_mage_combustion_proc : public SpellScriptLoader
 
             void Register() override
             {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -1112,6 +1135,17 @@ class spell_mage_living_bomb : public SpellScriptLoader
                 return ValidateSpellInfo({ static_cast<uint32>(spell->Effects[EFFECT_1].CalcValue()) });
             }
 
+            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->ToPlayer() && caster->HasAura(180171) && GetSpellInfo() && GetSpellInfo()->Id != 180177)
+                    {
+                        caster->ToPlayer()->ClearComboPoints();
+                    }
+                }
+            }
+
             void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
@@ -1119,11 +1153,29 @@ class spell_mage_living_bomb : public SpellScriptLoader
                     return;
 
                 if (Unit* caster = GetCaster())
-                    caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), aurEff);
+                {
+                    CastSpellExtraArgs args(aurEff);
+                    // Handle 180171 Pyromaniac bonus damage per combo point
+                    if (caster->ToPlayer() && caster->HasAura(180171) && GetSpellInfo() && GetSpellInfo()->Id != 180177)
+                    {
+                        auto player = caster->ToPlayer();
+                        auto lastPoints = player->GetLastComboPoints();
+                        if (lastPoints > 0)
+                        {
+                            player->ClearLastComboPoints();
+                            args.AddSpellBP0(689 * 0.1 * lastPoints);
+                            // Reproc on all targets one time (we use 180177 clone spell to prevent the loop)
+                            // Spell we cast now triggers 180177 on all nearby targets
+                            caster->CastSpell(GetTarget(), 180178);
+                        }
+                    }
+                    caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), args);
+                }
             }
 
             void Register() override
             {
+                AfterEffectApply += AuraEffectApplyFn(spell_mage_living_bomb_AuraScript::AfterApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
                 AfterEffectRemove += AuraEffectRemoveFn(spell_mage_living_bomb_AuraScript::AfterRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };

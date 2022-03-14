@@ -140,7 +140,7 @@ public:
         if (!*args)
             return false;
 
-        std::string name("Console");
+        std::string name(handler->GetTrinityString(LANG_CONSOLE));
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
@@ -153,7 +153,7 @@ public:
         if (!*args)
             return false;
 
-        std::string name("Console");
+        std::string name(handler->GetTrinityString(LANG_CONSOLE));
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 

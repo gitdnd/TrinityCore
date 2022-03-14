@@ -142,6 +142,8 @@ void AuraApplication::_InitFlags(Unit* caster, uint8 effMask)
                 break;
             }
         }
+        if(GetBase()->GetId() == 180250)
+            negativeFound = true;
         _flags |= negativeFound ? AFLAG_NEGATIVE : AFLAG_POSITIVE;
     }
     // aura is cast by friend
@@ -157,6 +159,8 @@ void AuraApplication::_InitFlags(Unit* caster, uint8 effMask)
                 break;
             }
         }
+        if (GetBase()->GetId() == 180250)
+            positiveFound = false;
         _flags |= positiveFound ? AFLAG_POSITIVE : AFLAG_NEGATIVE;
     }
 }
@@ -869,6 +873,16 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
     {
         modOwner = caster->GetSpellModOwner();
         maxDuration = caster->CalcSpellDuration(spellInfo);
+        //Hack till script hook is made
+        if (Unit* hack = caster->ToUnit())
+        {
+            //Icy Hot: 
+            if (spellInfo->Id == 44572 && hack->HasAura(SPELL_ICY_HOT))
+            {
+                maxDuration = std::round(maxDuration + (hack->GetComboPoints() * 0.5f));
+                hack->ClearComboPoints();
+            }
+        }
     }
     else
         maxDuration = spellInfo->GetDuration();
@@ -1157,6 +1171,7 @@ bool Aura::CanBeSaved() const
         case 55849: // Power Spark
         case 73822: // Hellscream's Warsong
         case 73828: // Strength of Wrynn
+        case 450003: //Evoker's Intellect Proc
             return false;
     }
 

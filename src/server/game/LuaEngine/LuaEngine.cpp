@@ -14,6 +14,7 @@
 #include "ElunaCreatureAI.h"
 #include "ElunaInstanceAI.h"
 #include <filesystem>
+#include "ElunaCompat.h"
 
 #if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS

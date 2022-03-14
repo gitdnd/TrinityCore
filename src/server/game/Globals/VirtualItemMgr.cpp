@@ -14,7 +14,7 @@ socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSe
 {
 }
 
-VirtualItemMgr & VirtualItemMgr::instance()
+VirtualItemMgr& VirtualItemMgr::instance()
 {
     static VirtualItemMgr obj;
     return obj;
@@ -30,7 +30,7 @@ VirtualItemMgr::VirtualItemMgr()
 
     for (auto InventoryType : armorInventoryType)
     {
-        uint32 min = minEntry + (blockCounter*block);
+        uint32 min = minEntry + (blockCounter * block);
         uint32 max = min + block - 1;
         armorGenerator[InventoryType] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
@@ -39,7 +39,7 @@ VirtualItemMgr::VirtualItemMgr()
 
     for (auto subclass : weaponSubclasses)
     {
-        uint32 min = minEntry + (blockCounter*block);
+        uint32 min = minEntry + (blockCounter * block);
         uint32 max = min + block - 1;
         weaponGenerator[subclass] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
@@ -90,32 +90,32 @@ void VirtualItemMgr::LoadStatGroupInfoFromDB()
 
 void VirtualItemMgr::LoadNamesFromDB()
 {
-	WriteGuard guard(lock);
+    WriteGuard guard(lock);
 
-	uint32 count = 0;
-	uint32 beginTime = getMSTime();
+    uint32 count = 0;
+    uint32 beginTime = getMSTime();
 
-	QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_names`");
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_names`");
 
-	if (!result)
-	{
-		TC_LOG_INFO("server.loading", "Loaded 0 available virtual item names, table item_generator_names is empty.");
-		return;
-	}
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item names, table item_generator_names is empty.");
+        return;
+    }
 
-	do{
-		Field* fields = result->Fetch();
-		int32 itemType = fields[0].GetInt32();
-		int32 subclass = fields[1].GetInt32();
+    do {
+        Field* fields = result->Fetch();
+        int32 itemType = fields[0].GetInt32();
+        int32 subclass = fields[1].GetInt32();
         int32 inventoryType = fields[2].GetInt32();
-		int32 array_id = fields[3].GetInt32();
-		std::string name = fields[4].GetString();
+        int32 array_id = fields[3].GetInt32();
+        std::string name = fields[4].GetString();
 
-		availableNames.push_back(NameInfo(itemType, subclass, inventoryType, array_id, name));
-		++count;
-	} while (result->NextRow());
+        availableNames.push_back(NameInfo(itemType, subclass, inventoryType, array_id, name));
+        ++count;
+    } while (result->NextRow());
 
-	TC_LOG_INFO("server.loading", "Loaded %u available virtual item names in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded %u available virtual item names in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 void VirtualItemMgr::LoadDisplaysFromDB()
@@ -171,8 +171,8 @@ void VirtualItemMgr::LoadSpellsFromDB()
         int32 subClass = fields[3].GetInt32();
         int32 inventoryType = fields[4].GetInt32();
         int8 statGroup = fields[5].GetInt8();
-        int8 minItemLevel = fields[6].GetInt32();
-        int8 maxItemLevel = fields[7].GetInt32();
+        int32 minItemLevel = fields[6].GetInt32();
+        int32 maxItemLevel = fields[7].GetInt32();
         uint32 SpellTrigger = fields[8].GetUInt32();
         int32  SpellCharges = fields[9].GetInt32();
         float  SpellPPMRate = fields[10].GetFloat();
@@ -192,12 +192,13 @@ void VirtualItemMgr::LoadSpellsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     GenerateQuality(output, modifier);
-    GenerateStats(output, modifier);
+    GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output);
     GenerateSockets(output, modifier);
-    GenerateSpells(output, modifier);
-    GenerateItemStats(output, modifier);
+    //GenerateSpells(output, modifier);
+    //GenerateItemStats(output, modifier);
+    GenerateItemStatsNew(output, modifier);
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
     uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
@@ -209,7 +210,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
 
 void initSeed(uint32& val, std::mt19937 generator)
 {
-    if(!val)
+    if (!val)
         val = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
 }
 
@@ -260,7 +261,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Generate base stats for the item.
     // Important that this is the first part to be generated after tempalte creation,
     // as some of the next function calls require information set in this function ie. quality, ilevel etc.
-    GenerateStats(output, modifier);
+    GenerateBaseStats(output, modifier);
 
     // Generate an item name based on type and quality
     GenerateItemName(output, modifier);
@@ -276,20 +277,20 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Generate primary and secondary stats.
     // Always do this last, as it has variable rand calls based on quality.
-    GenerateItemStats(output, modifier);
+    //GenerateItemStats(output, modifier);
+    GenerateItemStatsNew(output, modifier);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
     EntryGenerator* entryGenerator = Generator(output);
     if (!entryGenerator)
         return nullptr;
+
     uint32 entry = entryGenerator->GenerateEntry(store);
     output->ItemId = entry;
 
-    // Select a display ID for the item based on type, special case for trinkets and rings
-    bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
-    bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
+    // Select a display ID for the item based on type
+    uint32 display = GenerateItemDisplay(output, modifier);
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -301,13 +302,13 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     delete store[entry];
     store[entry] = output;
 
-    if(sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
+    if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
         output->InitializeQueryData();
 
     return output;
 }
 
-void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statSeed);
@@ -329,59 +330,55 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
 
     // Mod the virtual item level to allow higher or lower virtual item levels 
-    vLevel = vLevel + irand(-1, 5, generator);
+    vLevel += irand(-1, 5, generator);
     // Add all vLvl mods before generating a new ilevel
-    vLevel = vLevel + modifier.vLvlMod;
+    vLevel += modifier.vLvlMod;
 
     // Get the new item level based on above modifier virtual level
     ilevel = round(GenerateItemLevel(vLevel));
 
     // Modify the returned, newly generated iLevel based on quality
-    ilevel = ilevel + (int32(output->Quality) * 3);
+    ilevel += (int32(output->Quality) * 3);
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
-    ilevel = ilevel + irand(-3, 3, generator);
+    ilevel += irand(-3, 3, generator);
 
     // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
     if (modifier.isCrafted && !modifier.ilevel && ilevel >= output->ItemLevel)
-    {
         ilevel = output->ItemLevel;
-    }
 
     // If ilevel modifier is set, override all ilevel generation
     if (modifier.ilevel)
         ilevel = modifier.ilevel;
 
     // Hard cap of 325 across all items FIXME
-    if (ilevel > 325)
-    {
-        ilevel = 325;
-    }
+    if (ilevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
+        ilevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
     {
         // by default we assume 1 ilevel = 1 armor
-        output->Armor = 1 * ilevel;
+        float armorValue = (float)ilevel;
 
         // retrieve armor slot and type multiplier
-        float typeslotmod = VirtualModifier::GetTypeSlotArmorModifier(output);
-        output->Armor = output->Armor * typeslotmod;
+        armorValue *= VirtualModifier::GetTypeSlotArmorModifier(output);;
 
         // depending on quality, add multiplier to armor piece
-        float qmulti = ((int32(output->Quality) - int32(ITEM_QUALITY_NORMAL)) / 10.0f) + 1.0f;
-        output->Armor = output->Armor * qmulti;
+        // we use the same modifier as the stat quality modifier
+        // reconsider this if we ever need to change stat quality modifiers
+        armorValue *= VirtualModifier::GetQualityStatModifier(output);
 
         // add a random 10% increase or decrease of stats
-        float randmulti = (urand(90, 110, generator) / 100.0f);
-        output->Armor = output->Armor * randmulti;
+        armorValue = (float)urand((uint32)(armorValue * 0.9f), (uint32)(armorValue * 1.1f), generator);
+
+        // apply armor value to template
+        output->Armor = (uint32)armorValue;
     }
 
     // Apply block rating to shields
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-    {
         output->Block = uint32(0.93f * float(ilevel));
-    }
 
     // select stat group if the item is an armor piece or manually set as a modifier
     StatGroup statgroupid = modifier.statgroup;
@@ -400,9 +397,9 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     }
     StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
 
-     // If the stat group is still random, select a random stat group.
-     if (statgroupid == STAT_GROUP_RANDOM)
-         statgroupid = randtwo;
+    // If the stat group is still random, select a random stat group.
+    if (statgroupid == STAT_GROUP_RANDOM)
+        statgroupid = randtwo;
 
     ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
 
@@ -483,14 +480,14 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
         if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
-            output->Damage[0].DamageMin = output->Damage[0].DamageMin / 2.0f;
-            output->Damage[0].DamageMax = output->Damage[0].DamageMax / 2.0f;
+            output->Damage[0].DamageMin /= 2.0f;
+            output->Damage[0].DamageMax /= 2.0f;
         }
 
         // Apply a damage bonus based on item quality
         float damageBonus = (((output->Quality - 2.0f) / 10.0f) / 2.0f) + 1.0f;
-        output->Damage[0].DamageMin = output->Damage[0].DamageMin * damageBonus;
-        output->Damage[0].DamageMax = output->Damage[0].DamageMax * damageBonus;
+        output->Damage[0].DamageMin *= damageBonus;
+        output->Damage[0].DamageMax *= damageBonus;
     }
 
     // TODO: add custom descriptions to legendaries possibly?
@@ -503,7 +500,7 @@ void VirtualItemMgr::GenerateStats(VirtualItemTemplate* output, VirtualModifier 
     output->MaxDurability = 0; // Disable any form of durability for now
 }
 
-void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statValueSeed);
@@ -599,10 +596,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         for (uint32 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
         {
             // if we are at a free stat slot or we are at a stat slot that has the same stat type
-            if (j >= setStats || output->ItemStat[j].ItemStatType == selectedStats[i])
+            if (j >= setStats || output->ItemStat[j].ItemStatType == (uint32)selectedStats[i])
             {
                 uint32 finalStatValue = std::floor((float(pool) * (float(distributedPool[i]) / 100.0f)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
-                output->ItemStat[j].ItemStatType = selectedStats[i];
+                output->ItemStat[j].ItemStatType = (uint32)selectedStats[i];
                 output->ItemStat[j].ItemStatValue += finalStatValue;
                 setStats = std::max(setStats, uint32(j + 1));
                 break;
@@ -613,14 +610,218 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     output->StatsCount = setStats;
 }
 
+void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualModifier modifier) const
+{
+    std::mt19937 generator;
+    generator.seed(modifier.statValueSeed);
+
+    // get statgroup id
+    StatGroup statgroupid = output->statGroup;
+
+    // create key-value vector for selected stats
+    std::vector<std::pair<ItemModType, float>> selectedStats;
+
+    // get stats for primary and secondary stat groups
+    std::vector<ItemModType> primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
+    std::vector<ItemModType> secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
+
+    // shuffle vectors so we can pick top values without using any rand calls
+    std::shuffle(std::begin(primarystatgroup), std::end(primarystatgroup), generator);
+    std::shuffle(std::begin(secondarystatgroup), std::end(secondarystatgroup), generator);
+
+    // select stat pool
+    float pool = 0;
+    if (modifier.statpool == -1)
+        pool = (float)output->ItemLevel;
+    else
+        pool = (float)modifier.statpool;
+
+    // get stat pool amount
+    uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
+    uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
+
+    // if this is a trinket, randomly select which slot to generate a stat for
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+    {
+        // set both primary and secondary stats to none
+        primaryStatSlots = 0;
+        secondaryStatSlots = 0;
+
+        // randomly select primary or secondary stat
+        bool isPrimary = (urand(0, 1, generator) != 0);
+        if (isPrimary)
+            primaryStatSlots = 1;
+        else
+            secondaryStatSlots = 1;
+    }
+
+    // multiply the pool size by the base amounts of stat slots
+    pool *= (float)(primaryStatSlots + secondaryStatSlots);
+
+    // randomly select between -1 and +1 additional stat slots
+    // this does not apply to trinkets
+    if (output->Class != ITEM_CLASS_ARMOR && output->InventoryType != INVTYPE_TRINKET)
+    {
+        std::uniform_int_distribution<int> dist(-1, 1);
+        int primarySlotMod = dist(generator);
+        int secondarySlotMod = dist(generator);
+
+        // check whether or not the amount of stats exceeds the size of our stat group
+        if ((primaryStatSlots + primarySlotMod) > primarystatgroup.size())
+            primaryStatSlots = primarystatgroup.size();
+        else if ((primaryStatSlots + primarySlotMod) < 1) // never generate 0 primary stats
+            primaryStatSlots = 1;
+        else
+            primaryStatSlots += primarySlotMod;
+
+        if ((secondaryStatSlots + secondarySlotMod) > secondarystatgroup.size())
+            secondaryStatSlots = secondarystatgroup.size();
+        else
+            secondaryStatSlots += secondarySlotMod;
+    }
+
+
+    // if we still have any slots to generate stats for, continue
+    if (primaryStatSlots + secondaryStatSlots > 0)
+    {
+        // divide the pool by the modified amount of stat slots
+        pool /= (float)(primaryStatSlots + secondaryStatSlots);
+
+        // divide per-stat pool by predefined blizzlike value
+        pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
+
+        // generate primary stat values  for all stats in group
+        for (uint32 i = 0; i < primarystatgroup.size(); ++i)
+        {
+            // select random pool size value based on upper and lower bounds
+            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+
+            // mod stat points based on stat weight
+            statPoints *= VirtualModifier::GetStatRateNew(primarystatgroup[i]);
+
+            // mod stat points based on item quality
+            statPoints *= VirtualModifier::GetQualityStatModifier(output);
+
+            // mod stat points based on item slot
+            statPoints *= VirtualModifier::GetSlotStatModifier(output);
+
+            // mod stat points based on stat tier
+            statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD);
+
+            // hard coded overrides for primary stats
+            if (primarystatgroup[i] == ITEM_MOD_STAMINA)
+            {
+                switch (statgroupid)
+                {
+                    case STAT_GROUP_STR_DPS:
+                        statPoints *= 1.5f;
+                        break;
+                    case STAT_GROUP_STR_TANK:
+                        statPoints *= 1.73f;
+                        break;
+                    case STAT_GROUP_AGI_DPS:
+                    case STAT_GROUP_AGI_TANK:
+                        statPoints *= 1.32f;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (primarystatgroup[i] == ITEM_MOD_STRENGTH)
+            {
+                switch (statgroupid)
+                {
+                    case STAT_GROUP_STR_DPS:
+                    case STAT_GROUP_STR_TANK:
+                        statPoints *= 1.32f;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (primarystatgroup[i] == ITEM_MOD_AGILITY)
+            {
+                switch (statgroupid)
+                {
+                    case STAT_GROUP_AGI_DPS:
+                    case STAT_GROUP_AGI_TANK:
+                        statPoints *= 1.32f;
+                        break;
+                    case STAT_GROUP_AGI_RANGED:
+                        statPoints *= 1.28f;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (i < primaryStatSlots && primaryStatSlots > 0)
+            {
+                selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
+            }
+        }
+
+        // generate secondary stat values
+        for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
+        {
+            // select random pool size value based on upper and lower bounds
+            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+
+            // mod stat points based on stat weight
+            statPoints *= VirtualModifier::GetStatRateNew(secondarystatgroup[i]);
+
+            // mod stat points based on item quality
+            statPoints *= VirtualModifier::GetQualityStatModifier(output);
+
+            // mod stat points based on item slot
+            statPoints *= VirtualModifier::GetSlotStatModifier(output);
+
+            // mod stat points based on stat tier
+            statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
+
+            // hard coded behavior for weapons with spell power.
+            if (secondarystatgroup[i] == ITEM_MOD_SPELL_POWER)
+            {
+                switch (output->InventoryType)
+                {
+                    case INVTYPE_2HWEAPON:
+                    case INVTYPE_WEAPON:
+                    case INVTYPE_WEAPONMAINHAND:
+                    case INVTYPE_WEAPONOFFHAND:
+                        statPoints *= 4.0f;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (i < secondaryStatSlots && secondaryStatSlots > 0)
+                selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
+        }
+    }
+
+    // iterate selected stats and apply to item
+    uint32 setStats = 0;
+    for (uint32 i = 0; i < selectedStats.size(); ++i)
+    {
+        uint32 type = (uint32)selectedStats[i].first;
+        float value = selectedStats[i].second;
+
+        output->ItemStat[i].ItemStatType = type;
+        output->ItemStat[i].ItemStatValue = value;
+
+        setStats = std::max(setStats, uint32(i + 1));
+    }
+    output->StatsCount = setStats;
+}
+
 void VirtualItemMgr::GenerateVirtualLevelLookupArray()
 {
     WriteGuard guard(lock);
-    int32 i = 1;
     float iLevel = 0.0f;
 
     // Generate lookup table for Virtual Levels.
-    for (int i = 0; iLevel < 325.0f; ++i)
+    for (int i = 0; iLevel < sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL); ++i)
     {
         iLevel = GenerateItemLevel(i);
         virtual_level_info.insert(std::make_pair(i, VirtualLevelInfo(iLevel)));
@@ -633,195 +834,108 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     float x = float(virtualLevel) / 5000.0f;
 
     // Generate a logarithmic value to be used as the correct ilevel for the provided vlevel
-    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + 325.0f;
+    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + float(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL));
 
     return ilevel;
 }
 
-void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll) const
+void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
 {
     std::mt19937 generator;
     generator.seed(modifier.nameSeed);
 
     std::string fullName = "";
+    std::stringstream ss;
 
+    // For Weapons we always use inventoryType 0
+    uint32 inventoryType = 0;
     if (output->Class == ITEM_CLASS_ARMOR)
+        inventoryType = output->InventoryType;
+
+    // Retrieve all the string lists
+    std::map<uint32, std::vector<std::string>> nameLists;
+    std::map<uint32, std::string> selectedWords;
+    for (size_t i = 1; i <= 8; ++i)
     {
-        // Retrieve all the string lists
-        // For Weapons we always use inventoryType 0
-        std::map<uint32, std::vector<std::string>> nameLists;
-        std::map<uint32, std::string> selectedWords;
-        for (size_t i = 1; i <= 8; ++i)
+        NameInfo nameInfo(output->Class, output->SubClass, inventoryType, i);
+        auto list = GetNamesForNameInfo(&nameInfo);
+
+        // Make sure the current list is not empty. If it is, fall back to template item name.
+        if (list.empty())
         {
-            NameInfo nameInfo(output->Class, output->SubClass, output->InventoryType, i);
-            auto list = GetNamesForNameInfo(&nameInfo);
-
-            // Make sure the current list is not empty. If it is, fall back to template item name.
-            if (list.empty())
-            {
-                fullName = output->Name1;
-                break;
-            }
-
-            nameLists.insert(std::make_pair(i, list));
-
-            // Select a word from each list, as they are to be used across quality for regeneration.
-            selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
+            fullName = output->Name1;
+            break;
         }
 
-        // List 1: Unique names, like Malice, Mangler, Mercy etc.
-        // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
-        // List 3: Material names, like Bone, Copper, Diamond etc.
-        // List 4: Basic type name, like Blade, Razor, Maul etc.
-        // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
-        // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
+        nameLists.insert(std::make_pair(i, list));
 
-        if (fullName != output->Name1)
-        {
-            // Concat the correct full item name for the item quality
-            std::stringstream ss;
-
-            // Shields have their names generated like weapons.
-            if (output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
-            {
-                switch (output->Quality)
-                {
-                case ITEM_QUALITY_NORMAL:
-                {
-                    ss << selectedWords[8] << " " << selectedWords[4];
-                    break;
-                }
-                case ITEM_QUALITY_UNCOMMON:
-                {
-                    ss << selectedWords[3] << " " << selectedWords[4];
-                    break;
-                }
-                case ITEM_QUALITY_RARE:
-                {
-                    ss << selectedWords[2] << " " << selectedWords[4];
-                    break;
-                }
-                case ITEM_QUALITY_EPIC:
-                {
-                    ss << selectedWords[1];
-                    break;
-                }
-                case ITEM_QUALITY_LEGENDARY:
-                {
-                    ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
-                    break;
-                }
-                default:
-                    ss << fullName;
-                }
-            }
-            else
-            {
-                switch (output->Quality)
-                {
-                case ITEM_QUALITY_NORMAL:
-                {
-                    ss << selectedWords[8] << " " << selectedWords[5];
-                    break;
-                }
-                case ITEM_QUALITY_UNCOMMON:
-                {
-                    ss << selectedWords[4] << " " << selectedWords[5];
-                    break;
-                }
-                case ITEM_QUALITY_RARE:
-                {
-                    ss << selectedWords[4] << " " << selectedWords[5] << " of " << selectedWords[2];
-                    break;
-                }
-                case ITEM_QUALITY_EPIC:
-                {
-                    ss << selectedWords[3] << " " << selectedWords[4] << " " << selectedWords[5];
-                    break;
-                }
-                case ITEM_QUALITY_LEGENDARY:
-                {
-                    ss << selectedWords[1] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
-                    break;
-                }
-                default:
-                    ss << fullName;
-                }
-            }
-            fullName = ss.str();
-        }
+        // Select a word from each list, as they are to be used across quality for regeneration.
+        selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
     }
 
-    if (output->Class == ITEM_CLASS_WEAPON)
+    // the temporary name is the same as the template name, we can assume lists were missing. skip generating names.
+    if (fullName != output->Name1)
     {
-        // Retrieve all the string lists
-        // For Weapons we always use inventoryType 0
-        std::map<uint32, std::vector<std::string>> nameLists;
-        std::map<uint32, std::string> selectedWords;
-        for (size_t i = 1; i <= 8; ++i)
-        {
-            NameInfo nameInfo(output->Class, output->SubClass, 0, i);
-            auto list = GetNamesForNameInfo(&nameInfo);
-
-            // Make sure the current list is not empty. If it is, fall back to template item name.
-            if (list.empty())
-            {
-                fullName = output->Name1;
-                break;
-            }
-
-            nameLists.insert(std::make_pair(i, list));
-
-            // Select a word from each list, as they are to be used across quality for regeneration.
-            selectedWords.insert(std::make_pair(i, nameLists[i][urand(0, nameLists[i].size() - 1, generator)]));
-        }
-
-        std::stringstream ss;
-        // Concat the correct full item name for the item quality
-
         // List 1: Unique names, like Malice, Mangler, Mercy etc.
         // List 2: Prefixes, like Arcane, Arched, Bloodied etc.
         // List 3: Material names, like Bone, Copper, Diamond etc.
         // List 4: Basic type name, like Blade, Razor, Maul etc.
         // List 5: Exotic type name, like Blade, Carver etc. Contains more exotic, but also the basic, type names.
         // List 6: Suffixes, like "of Agony", "of Bloodlust" etc.
-        if (fullName != output->Name1)
+
+        // Shields have their names generated like weapons.
+        if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
         {
             switch (output->Quality)
             {
-            case ITEM_QUALITY_NORMAL:
-            {
-                ss << selectedWords[8] << " " << selectedWords[4];
-                break;
+                case ITEM_QUALITY_NORMAL:
+                    ss << selectedWords[8] << " " << selectedWords[5];
+                    break;
+                case ITEM_QUALITY_UNCOMMON:
+                    ss << selectedWords[4] << " " << selectedWords[5];
+                    break;
+                case ITEM_QUALITY_RARE:
+                    ss << selectedWords[4] << " " << selectedWords[5] << " of " << selectedWords[2];
+                    break;
+                case ITEM_QUALITY_EPIC:
+                    ss << selectedWords[3] << " " << selectedWords[4] << " " << selectedWords[5];
+                    break;
+                case ITEM_QUALITY_LEGENDARY:
+                    ss << selectedWords[1] << ", " << selectedWords[3] << " " << selectedWords[5] << " of " << selectedWords[7];
+                    break;
+                default:
+                    ss << fullName;
+                    break;
             }
-            case ITEM_QUALITY_UNCOMMON:
-            {
-                ss << selectedWords[3] << " " << selectedWords[4];
-                break;
-            }
-            case ITEM_QUALITY_RARE:
-            {
-                ss << selectedWords[2] << " " << selectedWords[4];
-                break;
-            }
-            case ITEM_QUALITY_EPIC:
-            {
-                ss << selectedWords[1];
-                break;
-            }
-            case ITEM_QUALITY_LEGENDARY:
-            {
-                ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
-                break;
-            }
-            default:
-                ss << fullName;
-            }
-            fullName = ss.str();
         }
-    }
 
-    output->Name1 = fullName;
+        // Shields have their names generated like weapons.
+        if (output->Class == ITEM_CLASS_WEAPON || (output->Class == ITEM_CLASS_ARMOR && output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD))
+        {
+            switch (output->Quality)
+            {
+                case ITEM_QUALITY_NORMAL:
+                    ss << selectedWords[8] << " " << selectedWords[4];
+                    break;
+                case ITEM_QUALITY_UNCOMMON:
+                    ss << selectedWords[3] << " " << selectedWords[4];
+                    break;
+                case ITEM_QUALITY_RARE:
+                    ss << selectedWords[2] << " " << selectedWords[4];
+                    break;
+                case ITEM_QUALITY_EPIC:
+                    ss << selectedWords[1];
+                    break;
+                case ITEM_QUALITY_LEGENDARY:
+                    ss << selectedWords[1] << ", " << selectedWords[5] << " " << selectedWords[6];
+                    break;
+                default:
+                    ss << fullName;
+                    break;
+            }
+        }
+        output->Name1 = ss.str();
+    }
 }
 
 uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier) const
@@ -830,11 +944,11 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualM
     generator.seed(modifier.displaySeed);
     std::list<uint32> displayLists;
     displayLists = GetDisplaysForDisplayInfo(output);
+
     // Attempt to find display at a quality up if none found
     if (displayLists.empty())
-    {
         displayLists = GetDisplaysForDisplayInfo(output, true);
-    }
+
     // If still empty, output an error
     if (displayLists.empty())
     {
@@ -855,105 +969,61 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     std::mt19937 generator;
     generator.seed(modifier.spellSeed);
 
-#define IFSKIP(spellinfo, requirement) if (spellinfo != -1 && spellinfo != requirement) continue
     std::list<itemSpellInfo> spells;
-    for (auto const &someSpells : availableSpells)
+    for (itemSpellInfo const someSpells : availableSpells)
     {
-        if (output->Quality != someSpells.quality)
+        if (someSpells.quality != -1 && output->Quality != someSpells.quality)
             continue;
-        IFSKIP(someSpells.itemClass, output->Class);
-        IFSKIP(someSpells.subClass, output->SubClass);
-        IFSKIP(someSpells.inventoryType, output->InventoryType);
-        IFSKIP(someSpells.statGroup, output->statGroup);
-        if (someSpells.maxItemLevel != -1 && output->ItemLevel > uint32(someSpells.maxItemLevel))
+
+        if (someSpells.itemClass != -1 && (int32)output->Class != someSpells.itemClass)
             continue;
-        if (someSpells.minItemLevel != -1 && output->ItemLevel < uint32(someSpells.minItemLevel))
+
+        if (someSpells.subClass != -1 && (int32)output->SubClass != someSpells.subClass)
             continue;
+
+        if (someSpells.inventoryType != -1 && (int32)output->InventoryType != someSpells.inventoryType)
+            continue;
+
+        if (someSpells.statGroup != -1 && output->statGroup != someSpells.statGroup)
+            continue;
+
+        if (someSpells.maxItemLevel != -1 && (int32)output->ItemLevel > someSpells.maxItemLevel)
+            continue;
+
+        if (someSpells.minItemLevel != -1 && (int32)output->ItemLevel < someSpells.minItemLevel)
+            continue;
+
         spells.push_back(someSpells);
     }
+
     if (spells.empty())
         return itemSpellInfo();
+
     auto selectedSpell = std::begin(spells);
     std::advance(selectedSpell, urand(0, uint32(std::size(spells)) - 1, generator));
-#undef IFSKIP
+
     return *selectedSpell;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.spellSeed);
-
-    //@todo Finalize these numbers, add more then 1 spell to generate.
-    bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
-    uint8 numSpellsToGenerate = isTrinket ? 1 : 0;
-
-    // FIXME twinkets should always generate a single spell, and the rest are from stat pool
-    // This will need to be refactored to support other items
-    /*switch (output->Quality)
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-    case ITEM_QUALITY_UNCOMMON:
+        if (output->Spells[i].SpellId == 0)
         {
-            float chance = isTrinket ? 60.f : 10.f;
-            if (roll_chance_f(chance))
-                numSpellsToGenerate += 1;
-        }break;
-    case ITEM_QUALITY_RARE:
-    {
-        float chance = isTrinket ? 70.f : 15.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate += 2;
-        else
-            numSpellsToGenerate += 1;
-    }break;
-    case ITEM_QUALITY_EPIC:
-    {
-        float chance = isTrinket ? 80.f : 20.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate += 3;
-        else
-            numSpellsToGenerate += 2;
-    }break;
-    case ITEM_QUALITY_LEGENDARY:
-    {
-        float chance = isTrinket ? 90.f : 25.f;
-        if (roll_chance_f(chance))
-            numSpellsToGenerate += 4;
-        else
-            numSpellsToGenerate += 3;
-    }break;
-    default:
-        break;
-    }*/
+            itemSpellInfo spell = GenerateSpell(output, modifier);
+            if (spell.spellId == 0)
+                continue;
 
-    //Prevent crash incase something goes dumb.
-    if (numSpellsToGenerate > MAX_ITEM_PROTO_SPELLS)
-        numSpellsToGenerate = MAX_ITEM_PROTO_SPELLS;
-
-    std::vector<uint32_t> spellsToUse;
-    for (uint8 i = 0; i < numSpellsToGenerate; ++i)
-    {
-        itemSpellInfo spell = GenerateSpell(output, modifier);
-        if (spell.spellId == 0)
-            continue;
-        // Skip spell if we have already used this one. Try a few times to fetch a unique spell
-        int tries = 0;
-        while (tries < 3 && std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
-        {
-            spell = GenerateSpell(output, modifier);
-            ++tries;
+            output->Spells[i].SpellId = spell.spellId;
+            output->Spells[i].SpellTrigger = spell.SpellTrigger;
+            output->Spells[i].SpellCharges = spell.SpellCharges;
+            output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
+            output->Spells[i].SpellCooldown = spell.SpellCooldown;
+            output->Spells[i].SpellCategory = spell.SpellCategory;
+            output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+            break;
         }
-        // If still a duplicate, skip
-        if (std::find(spellsToUse.begin(), spellsToUse.end(), spell.spellId) != spellsToUse.end())
-            continue;
-        spellsToUse.push_back(spell.spellId);
-        output->Spells[i].SpellId = spell.spellId;
-        output->Spells[i].SpellTrigger = spell.SpellTrigger;
-        output->Spells[i].SpellCharges = spell.SpellCharges;
-        output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
-        output->Spells[i].SpellCooldown = spell.SpellCooldown;
-        output->Spells[i].SpellCategory = spell.SpellCategory;
-        output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
     }
 }
 
@@ -967,18 +1037,18 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     uint32 socketMod = urand(0, 1, generator);
 
     switch (output->Quality) {
-    case ITEM_QUALITY_LEGENDARY:
-        socketCount = 2 + socketMod;
-        break;
-    case ITEM_QUALITY_EPIC:
-        socketCount = 2;
-        break;
-    case ITEM_QUALITY_RARE:
-        socketCount = 1 + socketMod;
-        break;
-    default:
-        socketCount = 1;
-        break;
+        case ITEM_QUALITY_LEGENDARY:
+            socketCount = 2 + socketMod;
+            break;
+        case ITEM_QUALITY_EPIC:
+            socketCount = 2;
+            break;
+        case ITEM_QUALITY_RARE:
+            socketCount = 1 + socketMod;
+            break;
+        default:
+            socketCount = 1;
+            break;
     }
 
     // reduce max amount of sockets depending on type
@@ -986,24 +1056,36 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     {
         switch (output->InventoryType)
         {
-        case INVTYPE_LEGS:
-        case INVTYPE_CHEST:
-            break;
-        case INVTYPE_HEAD:
-        case INVTYPE_SHOULDERS:
-            if (socketCount > 2)
+            case INVTYPE_LEGS:
+            case INVTYPE_CHEST:
+                break;
+            case INVTYPE_HEAD:
+            case INVTYPE_SHOULDERS:
+                if (socketCount > 2)
+                    socketCount = 2;
+                break;
+            case INVTYPE_WAIST:
+            case INVTYPE_CLOAK:
+            case INVTYPE_FEET:
+            case INVTYPE_WRISTS:
+            case INVTYPE_HANDS:
+                if (socketCount > 1)
+                    socketCount = 1;
+                break;
+            default:
+                socketCount = 0;
+                break;
+        }
+    }
+
+    if (output->Class == ITEM_CLASS_WEAPON)
+    {
+        switch (output->InventoryType)
+        {
+        case INVTYPE_2HWEAPON:
+            if (output->Quality > ITEM_QUALITY_RARE && socketCount < 2)
                 socketCount = 2;
             break;
-        case INVTYPE_WAIST:
-        case INVTYPE_CLOAK:
-        case INVTYPE_FEET:
-        case INVTYPE_WRISTS:
-        case INVTYPE_HANDS:
-            if (socketCount > 1)
-                socketCount = 1;
-            break;
-        default:
-            socketCount = 0;
         }
     }
 
@@ -1037,7 +1119,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 }
 
-void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
     std::mt19937 generator;
     generator.seed(modifier.qualitySeed);
@@ -1085,9 +1167,9 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     output->Quality = quality;
 }
 
-void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* output)
+void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
 {
-    uint8 stats [21] = {
+    uint8 stats[21] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_AGILITY,
         ITEM_MOD_INTELLECT,
@@ -1120,8 +1202,10 @@ uint32 VirtualItemMgr::EntryGenerator::GenerateEntry(VirtualItemMgr::Store const
     {
         if (i >= maxEntry)
             i = minEntry;
+
         if (i == nextEntry)
             break;
+
         if (store.find(i) == store.end())
         {
             nextEntry = i;
@@ -1173,6 +1257,7 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
 {
     if (!virtualItem)
         return false;
+
     EntryGenerator* generator = Generator(virtualItem);
     if (!generator)
         return false;
@@ -1180,10 +1265,12 @@ bool VirtualItemMgr::InsertEntry(VirtualItemTemplate* virtualItem)
     uint32 entry = virtualItem->ItemId;
     if (entry < minEntry || entry >= maxEntry || store.find(entry) != store.end())
         return false;
+
     store[entry] = virtualItem;
 
     if (entry == generator->PeekNext())
         generator->GenerateEntry(store);
+
     return true;
 }
 
@@ -1193,7 +1280,7 @@ int32 VirtualItemMgr::GetVirtualLevel(float ilevel) const
 {
     int32 vLevel = 1;
 
-    for (auto i=virtual_level_info.begin(); i!=virtual_level_info.end(); i++)
+    for (auto i = virtual_level_info.begin(); i != virtual_level_info.end(); i++)
     {
         float diff = ilevel / i->second.iLevel;
         if (diff < 1.0f)
@@ -1215,7 +1302,7 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate*
         quality = output->Quality + 1;
 
     if (quality == ITEM_QUALITY_LEGENDARY)
-        quality = quality - 1;
+        quality -= 1;
 
     for (auto displaysitr : availableDisplays)
     {
@@ -1261,79 +1348,153 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     return names;
 }
 
-std::vector<ItemModType> const & VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_primary_stats[group];
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const & VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const
+std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_sockets[group];
 }
 
-std::vector<StatGroup> const & VirtualModifier::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
+std::vector<StatGroup> const& VirtualModifier::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
 {
     return armor_type_stat_groups[output->SubClass];
+}
+
+uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
+{
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_COMMON);
+        case ITEM_QUALITY_UNCOMMON:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_UNCOMMON);
+        case ITEM_QUALITY_RARE:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_RARE);
+        case ITEM_QUALITY_EPIC:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_EPIC);
+        case ITEM_QUALITY_LEGENDARY:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_PRIMARY_LEGENDARY);
+        default:
+            return 1;
+    }
+
+    return 1;
+}
+
+uint32 VirtualModifier::GetSecondaryStatSlots(VirtualItemTemplate* output)
+{
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_COMMON);
+        case ITEM_QUALITY_UNCOMMON:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_UNCOMMON);
+        case ITEM_QUALITY_RARE:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_RARE);
+        case ITEM_QUALITY_EPIC:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_EPIC);
+        case ITEM_QUALITY_LEGENDARY:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_STATSLOT_SECONDARY_LEGENDARY);
+        default:
+            return 1;
+    }
+
+    return 1;
+}
+
+float VirtualModifier::GetQualityStatModifier(VirtualItemTemplate* output)
+{
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_COMMON);
+        case ITEM_QUALITY_UNCOMMON:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_UNCOMMON);
+        case ITEM_QUALITY_RARE:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_RARE);
+        case ITEM_QUALITY_EPIC:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_EPIC);
+        case ITEM_QUALITY_LEGENDARY:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_QUALITYMOD_LEGENDARY);
+        default:
+            return 1.0f;
+    }
+    return 1.0f;
 }
 
 float VirtualModifier::GetSlotStatModifier(VirtualItemTemplate* output)
 {
     switch (output->InventoryType)
     {
-    case INVTYPE_HEAD:
-    case INVTYPE_CHEST:
-    case INVTYPE_ROBE:
-    case INVTYPE_LEGS:
-    case INVTYPE_2HWEAPON:
-        return 1.0f;
-
-    case INVTYPE_SHOULDERS:
-    case INVTYPE_HANDS:
-    case INVTYPE_WAIST:
-    case INVTYPE_FEET:
-        return 0.75f;
-
-    case INVTYPE_WRISTS:
-    case INVTYPE_NECK:
-    case INVTYPE_CLOAK:
-    case INVTYPE_HOLDABLE:
-    case INVTYPE_SHIELD:
-        return 0.56f;
-
-    // Trinkets are extremely nerfed since they roll a single stat with a special effect
-    case INVTYPE_TRINKET:
-        return 0.2f;
-
-    case INVTYPE_WEAPON:
-    case INVTYPE_WEAPONMAINHAND:
-    case INVTYPE_WEAPONOFFHAND:
-    case INVTYPE_FINGER:
-        return 0.42f;
-
-    case INVTYPE_RANGED:
-    case INVTYPE_RANGEDRIGHT:
-    case INVTYPE_THROWN:
-        return 0.31f;
-
-    default:
-        return 1.0f;
+        case INVTYPE_HEAD:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_HEAD);
+        case INVTYPE_CHEST:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_CHEST);
+        case INVTYPE_ROBE:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_ROBE);
+        case INVTYPE_LEGS:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_LEGS);
+        case INVTYPE_2HWEAPON:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_2HWEAPON);
+        case INVTYPE_SHOULDERS:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_SHOULDERS);
+        case INVTYPE_HANDS:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_HANDS);
+        case INVTYPE_WAIST:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WAIST);
+        case INVTYPE_FEET:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_FEET);
+        case INVTYPE_WRISTS:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WRISTS);
+        case INVTYPE_NECK:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_NECK);
+        case INVTYPE_CLOAK:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_CLOAK);
+        case INVTYPE_HOLDABLE:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_HOLDABLE);
+        case INVTYPE_SHIELD:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_SHIELD);
+        case INVTYPE_WEAPON:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WEAPON);
+        case INVTYPE_WEAPONMAINHAND:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONMAINHAND);
+        case INVTYPE_WEAPONOFFHAND:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONOFFHAND);
+        case INVTYPE_FINGER:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_FINGER);
+        case INVTYPE_TRINKET:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_TRINKET);
+        case INVTYPE_RANGED:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_RANGED);
+        case INVTYPE_RANGEDRIGHT:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_RANGEDRIGHT);
+        case INVTYPE_THROWN:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_SLOTWEIGHT_THROWN);
+        default:
+            return 1.0f;
     }
     return 1.0f;
 }
@@ -1342,34 +1503,106 @@ float VirtualModifier::GetStatRate(ItemModType stat)
 {
     switch (stat)
     {
-    case ITEM_MOD_RANGED_ATTACK_POWER:
-        return 0.45f;
-    case ITEM_MOD_ARMOR_PENETRATION_RATING:
-        return 0.3f;
-    case ITEM_MOD_ATTACK_POWER:
-        return 0.5f;
-    case ITEM_MOD_SPELL_HEALING_DONE:
-        return 0.45f;
-    case ITEM_MOD_MANA_REGENERATION:
-        return 2.5f;
-    case ITEM_MOD_HEALTH_REGEN:
-        return 2.5f;
-    case ITEM_MOD_SPELL_PENETRATION:
-        return 0.8f;
-    case ITEM_MOD_BLOCK_VALUE:
-        return 0.65f;
-    case ITEM_MOD_SPELL_POWER:
-        return 0.86f;
-    case ITEM_MOD_DEFENSE_SKILL_RATING:
-        return 1.2f;
-    case ITEM_MOD_BLOCK_RATING:
-        return 1.2f;
-    case ITEM_MOD_INTELLECT:
-        return 1.9f;
-    case ITEM_MOD_SPIRIT:
-        return 1.65f;
-    default:
-        return 1.0f;
+        case ITEM_MOD_RANGED_ATTACK_POWER:
+            return 0.45f;
+        case ITEM_MOD_ARMOR_PENETRATION_RATING:
+            return 0.3f;
+        case ITEM_MOD_ATTACK_POWER:
+            return 0.5f;
+        case ITEM_MOD_SPELL_HEALING_DONE:
+            return 0.45f;
+        case ITEM_MOD_MANA_REGENERATION:
+            return 2.5f;
+        case ITEM_MOD_HEALTH_REGEN:
+            return 2.5f;
+        case ITEM_MOD_SPELL_PENETRATION:
+            return 0.8f;
+        case ITEM_MOD_BLOCK_VALUE:
+            return 0.65f;
+        case ITEM_MOD_SPELL_POWER:
+            return 0.86f;
+        case ITEM_MOD_DEFENSE_SKILL_RATING:
+            return 1.2f;
+        case ITEM_MOD_BLOCK_RATING:
+            return 1.2f;
+        case ITEM_MOD_INTELLECT:
+            return 1.9f;
+        case ITEM_MOD_SPIRIT:
+            return 1.65f;
+        default:
+            return 1.0f;
+    }
+    return 1.0f;
+}
+
+float VirtualModifier::GetStatRateNew(ItemModType stat)
+{
+    switch (stat)
+    {
+        /* Primary stats */
+        case ITEM_MOD_STAMINA:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_STAMINA);
+        case ITEM_MOD_AGILITY:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_AGILITY);
+        case ITEM_MOD_INTELLECT:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_INTELLECT);
+        case ITEM_MOD_STRENGTH:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_STRENGTH);
+        case ITEM_MOD_SPIRIT:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPIRIT);
+        /* Defensive stats */
+        case ITEM_MOD_DEFENSE_SKILL_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_DEFENSE_SKILL_RATING);
+        case ITEM_MOD_DODGE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_DODGE_RATING);
+        case ITEM_MOD_PARRY_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_PARRY_RATING);
+        case ITEM_MOD_BLOCK_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_BLOCK_RATING);
+        case ITEM_MOD_BLOCK_VALUE:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_BLOCK_VALUE);
+        /* Spell stats */
+        case ITEM_MOD_HIT_SPELL_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_SPELL_RATING);
+        case ITEM_MOD_HASTE_SPELL_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_SPELL_RATING);
+        case ITEM_MOD_CRIT_SPELL_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_SPELL_RATING);
+        case ITEM_MOD_MANA_REGENERATION:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_MANA_REGENERATION);
+        case ITEM_MOD_SPELL_POWER:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER);
+        case ITEM_MOD_SPELL_PENETRATION:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION);
+        /* Ranged stats */
+        case ITEM_MOD_HIT_RANGED_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_RANGED_RATING);
+        case ITEM_MOD_CRIT_RANGED_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_RANGED_RATING);
+        case ITEM_MOD_HASTE_RANGED_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_RANGED_RATING);
+        case ITEM_MOD_RANGED_ATTACK_POWER:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_RANGED_ATTACK_POWER);
+        /* Melee stats */
+        case ITEM_MOD_EXPERTISE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING);
+        case ITEM_MOD_HIT_MELEE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_MELEE_RATING);
+        case ITEM_MOD_CRIT_MELEE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_MELEE_RATING);
+        case ITEM_MOD_HASTE_MELEE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_MELEE_RATING);
+        case ITEM_MOD_ARMOR_PENETRATION_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_ARMOR_PENETRATION_RATING);
+        case ITEM_MOD_ATTACK_POWER:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_ATTACK_POWER);
+        /* Other / Unused */
+        case ITEM_MOD_HIT_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_RATING);
+        case ITEM_MOD_HEALTH_REGEN:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN);
+        default:
+            return 1.0f;
     }
     return 1.0f;
 }
@@ -1378,100 +1611,100 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
 {
     switch (output->SubClass)
     {
-    case ITEM_SUBCLASS_ARMOR_CLOTH:
-        switch (output->InventoryType)
-        {
-        case INVTYPE_HEAD:
-            return 1.05f;
-        case INVTYPE_SHOULDERS:
-            return 0.97f;
-        case INVTYPE_CHEST:
-            return 1.28f;
-        case INVTYPE_WAIST:
-            return 0.73f;
-        case INVTYPE_LEGS:
-            return 1.13f;
-        case INVTYPE_FEET:
-            return 0.9f;
-        case INVTYPE_WRISTS:
-            return 0.56f;
-        case INVTYPE_HANDS:
-            return 0.80f;
-        case INVTYPE_CLOAK:
-            return 0.66f;
+        case ITEM_SUBCLASS_ARMOR_CLOTH:
+            switch (output->InventoryType)
+            {
+                case INVTYPE_HEAD:
+                    return 1.05f;
+                case INVTYPE_SHOULDERS:
+                    return 0.97f;
+                case INVTYPE_CHEST:
+                    return 1.28f;
+                case INVTYPE_WAIST:
+                    return 0.73f;
+                case INVTYPE_LEGS:
+                    return 1.13f;
+                case INVTYPE_FEET:
+                    return 0.9f;
+                case INVTYPE_WRISTS:
+                    return 0.56f;
+                case INVTYPE_HANDS:
+                    return 0.80f;
+                case INVTYPE_CLOAK:
+                    return 0.66f;
+                default:
+                    return 1.0f;
+            }
+        case ITEM_SUBCLASS_ARMOR_LEATHER:
+            switch (output->InventoryType)
+            {
+                case INVTYPE_HEAD:
+                    return 2.13f;
+                case INVTYPE_SHOULDERS:
+                    return 2.0f;
+                case INVTYPE_CHEST:
+                    return 2.63f;
+                case INVTYPE_WAIST:
+                    return 1.95f;
+                case INVTYPE_LEGS:
+                    return 2.32f;
+                case INVTYPE_FEET:
+                    return 1.82f;
+                case INVTYPE_WRISTS:
+                    return 1.17f;
+                case INVTYPE_HANDS:
+                    return 1.66f;
+                default:
+                    return 1.0f;
+            }
+        case ITEM_SUBCLASS_ARMOR_MAIL:
+            switch (output->InventoryType)
+            {
+                case INVTYPE_HEAD:
+                    return 4.35f;
+                case INVTYPE_SHOULDERS:
+                    return 4.0f;
+                case INVTYPE_CHEST:
+                    return 5.34f;
+                case INVTYPE_WAIST:
+                    return 3.0f;
+                case INVTYPE_LEGS:
+                    return 4.68f;
+                case INVTYPE_FEET:
+                    return 3.69f;
+                case INVTYPE_WRISTS:
+                    return 2.35f;
+                case INVTYPE_HANDS:
+                    return 3.34f;
+                default:
+                    return 1.0f;
+            }
+        case ITEM_SUBCLASS_ARMOR_PLATE:
+            switch (output->InventoryType)
+            {
+                case INVTYPE_HEAD:
+                    return 5.38f;
+                case INVTYPE_SHOULDERS:
+                    return 5.28f;
+                case INVTYPE_CHEST:
+                    return 8.48f;
+                case INVTYPE_WAIST:
+                    return 3.73f;
+                case INVTYPE_LEGS:
+                    return 6.58f;
+                case INVTYPE_FEET:
+                    return 4.55f;
+                case INVTYPE_WRISTS:
+                    return 2.9f;
+                case INVTYPE_HANDS:
+                    return 4.15f;
+                default:
+                    return 1.0f;
+            }
+        case ITEM_SUBCLASS_ARMOR_SHIELD:
+            return 18.2f;
         default:
             return 1.0f;
-        }
-    case ITEM_SUBCLASS_ARMOR_LEATHER:
-        switch (output->InventoryType)
-        {
-        case INVTYPE_HEAD:
-            return 2.13f;
-        case INVTYPE_SHOULDERS:
-            return 2.0f;
-        case INVTYPE_CHEST:
-            return 2.63f;
-        case INVTYPE_WAIST:
-            return 1.95f;
-        case INVTYPE_LEGS:
-            return 2.32f;
-        case INVTYPE_FEET:
-            return 1.82f;
-        case INVTYPE_WRISTS:
-            return 1.17f;
-        case INVTYPE_HANDS:
-            return 1.66f;
-        default:
-            return 1.0f;
-        }
-    case ITEM_SUBCLASS_ARMOR_MAIL:
-        switch (output->InventoryType)
-        {
-        case INVTYPE_HEAD:
-            return 4.35f;
-        case INVTYPE_SHOULDERS:
-            return 4.0f;
-        case INVTYPE_CHEST:
-            return 5.34f;
-        case INVTYPE_WAIST:
-            return 3.0f;
-        case INVTYPE_LEGS:
-            return 4.68f;
-        case INVTYPE_FEET:
-            return 3.69f;
-        case INVTYPE_WRISTS:
-            return 2.35f;
-        case INVTYPE_HANDS:
-            return 3.34f;
-        default:
-            return 1.0f;
-        }
-    case ITEM_SUBCLASS_ARMOR_PLATE:
-        switch (output->InventoryType)
-        {
-        case INVTYPE_HEAD:
-            return 5.38f;
-        case INVTYPE_SHOULDERS:
-            return 5.28f;
-        case INVTYPE_CHEST:
-            return 8.48f;
-        case INVTYPE_WAIST:
-            return 3.73f;
-        case INVTYPE_LEGS:
-            return 6.58f;
-        case INVTYPE_FEET:
-            return 4.55f;
-        case INVTYPE_WRISTS:
-            return 2.9f;
-        case INVTYPE_HANDS:
-            return 4.15f;
-        default:
-            return 1.0f;
-        }
-    case ITEM_SUBCLASS_ARMOR_SHIELD:
-        return 18.2f;
-    default:
-        return 1.0f;
     }
     return 1.0f;
 }
@@ -1480,10 +1713,13 @@ VirtualItemTemplate* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 {
     if (entry < minEntry || entry >= maxEntry)
         return nullptr;
+
     ReadGuard guard(lock);
+
     auto it = store.find(entry);
     if (it != store.end())
         return it->second;
+
     return nullptr;
 }
 
@@ -1498,121 +1734,121 @@ void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output)
     if (ilevel <= 50)
     {
         switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60000;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60001;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60002;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60003;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60004;
-            break;
+            case ITEM_QUALITY_LEGENDARY:
+                output->DisenchantID = 60000;
+                break;
+            case ITEM_QUALITY_EPIC:
+                output->DisenchantID = 60001;
+                break;
+            case ITEM_QUALITY_RARE:
+                output->DisenchantID = 60002;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                output->DisenchantID = 60003;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                output->DisenchantID = 60004;
+                break;
         }
     }
     else if (ilevel > 50 && ilevel <= 100)
     {
         switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60005;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60006;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60007;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60008;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60009;
-            break;
+            case ITEM_QUALITY_LEGENDARY:
+                output->DisenchantID = 60005;
+                break;
+            case ITEM_QUALITY_EPIC:
+                output->DisenchantID = 60006;
+                break;
+            case ITEM_QUALITY_RARE:
+                output->DisenchantID = 60007;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                output->DisenchantID = 60008;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                output->DisenchantID = 60009;
+                break;
         }
     }
     else if (ilevel > 100 && ilevel <= 150)
     {
         switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60010;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60011;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60012;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60013;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60014;
-            break;
+            case ITEM_QUALITY_LEGENDARY:
+                output->DisenchantID = 60010;
+                break;
+            case ITEM_QUALITY_EPIC:
+                output->DisenchantID = 60011;
+                break;
+            case ITEM_QUALITY_RARE:
+                output->DisenchantID = 60012;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                output->DisenchantID = 60013;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                output->DisenchantID = 60014;
+                break;
         }
     }
     else if (ilevel > 150 && ilevel <= 200)
     {
         switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60015;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60016;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60017;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60018;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60019;
-            break;
+            case ITEM_QUALITY_LEGENDARY:
+                output->DisenchantID = 60015;
+                break;
+            case ITEM_QUALITY_EPIC:
+                output->DisenchantID = 60016;
+                break;
+            case ITEM_QUALITY_RARE:
+                output->DisenchantID = 60017;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                output->DisenchantID = 60018;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                output->DisenchantID = 60019;
+                break;
         }
     }
     else if (ilevel > 200 && ilevel <= 250)
     {
         switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60020;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60021;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60022;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60023;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60024;
-            break;
+            case ITEM_QUALITY_LEGENDARY:
+                output->DisenchantID = 60020;
+                break;
+            case ITEM_QUALITY_EPIC:
+                output->DisenchantID = 60021;
+                break;
+            case ITEM_QUALITY_RARE:
+                output->DisenchantID = 60022;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                output->DisenchantID = 60023;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                output->DisenchantID = 60024;
+                break;
         }
     }
     else if (ilevel > 250)
     {
         switch (quality) {
-        case ITEM_QUALITY_LEGENDARY:
-            output->DisenchantID = 60025;
-            break;
-        case ITEM_QUALITY_EPIC:
-            output->DisenchantID = 60026;
-            break;
-        case ITEM_QUALITY_RARE:
-            output->DisenchantID = 60027;
-            break;
-        case ITEM_QUALITY_UNCOMMON:
-            output->DisenchantID = 60028;
-            break;
-        case ITEM_QUALITY_NORMAL:
-            output->DisenchantID = 60029;
-            break;
+            case ITEM_QUALITY_LEGENDARY:
+                output->DisenchantID = 60025;
+                break;
+            case ITEM_QUALITY_EPIC:
+                output->DisenchantID = 60026;
+                break;
+            case ITEM_QUALITY_RARE:
+                output->DisenchantID = 60027;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                output->DisenchantID = 60028;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                output->DisenchantID = 60029;
+                break;
         }
     }
 }
@@ -1635,7 +1871,7 @@ bool VirtualItemMgr::IsVirtualTemplate(ItemTemplate const* base)
     if (base->Class == ITEM_CLASS_WEAPON)
     {
         for (auto subclass : weaponSubclasses)
-            if (base->SubClass == subclass)
+            if (base->SubClass == (uint32)subclass)
                 return true;
     }
     return false;

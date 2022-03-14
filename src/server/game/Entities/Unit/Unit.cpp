@@ -301,7 +301,7 @@ Unit::Unit(bool isWorldObject) :
     m_removedAurasCount(0), m_unitMovedByMe(nullptr), m_playerMovingMe(nullptr), m_charmer(nullptr), m_charmed(nullptr),
     i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_vehicle(nullptr), m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE), m_Diminishing(), m_combatManager(this), m_threatManager(this),
-    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_spellHistory(new SpellHistory(this))
+    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_lastComboPoints(0), m_spellHistory(new SpellHistory(this))
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -2927,6 +2927,21 @@ void Unit::_UpdateAutoRepeatSpell()
                 Spell::SendCastResult(ToPlayer(), autoRepeatSpellInfo, 1, result);
 
             return;
+        }
+
+        // Handle Bottled Dissent 180170 Talent
+        if (autoRepeatSpellInfo->Id == 5019 && HasAura(180170))
+        {
+            auto player = ToPlayer();
+            if (player)
+            {
+                auto item = player->GetWeaponForAttack(RANGED_ATTACK, true);
+                if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                {
+                    // Throw molotov and cancel current cast
+                    autoRepeatSpellInfo = sSpellMgr->GetSpellInfo(180168);
+                }
+            }
         }
 
         // we want to shoot
@@ -9662,7 +9677,8 @@ void Unit::UpdateCharmAI()
                  ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
                  ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
                  ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52123))
+                 ToCreature()->GetCreatureTemplate()->Entry == 52123 ||
+                 ToCreature()->GetCreatureTemplate()->Entry == 52207))
             {
                 if (GetAI())
                     return;
@@ -10112,7 +10128,7 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
             else // For attacker
             {
                 // Overpower on victim dodge
-                if ((hitMask & PROC_HIT_DODGE) && GetTypeId() == TYPEID_PLAYER)
+                /*if ((hitMask & PROC_HIT_DODGE) && GetTypeId() == TYPEID_PLAYER)
                 {
                     AddComboPoints(procTarget, 1);
                     StartReactiveTimer(REACTIVE_OVERPOWER);
@@ -10121,7 +10137,7 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
                 {
                     AddComboPoints(procTarget, 1);
                     StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
-                }
+                }*/
             }
         }
     }
@@ -10448,10 +10464,16 @@ void Unit::ClearComboPoints()
     // (NB: this Aura retains the CP while it's active - now that CP have reset, it shouldn't be there anymore)
     RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
 
+    m_lastComboPoints = m_comboPoints;
     m_comboPoints = 0;
     SendComboPoints();
     m_comboTarget->RemoveComboPointHolder(this);
     m_comboTarget = nullptr;
+}
+
+void Unit::ClearLastComboPoints()
+{
+    m_lastComboPoints = 0;
 }
 
 void Unit::SendComboPoints()
@@ -11720,13 +11742,14 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     if (GetTypeId() != TYPEID_PLAYER || charmer->GetTypeId() == TYPEID_UNIT)
     {
-        // Hardcode don't change AI for Druid
+        // Hardcode don't change AI for Eluna scripts
         if (ToCreature() &&
             (ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52123))
+            ToCreature()->GetCreatureTemplate()->Entry == 52123 ||
+            ToCreature()->GetCreatureTemplate()->Entry == 52207))
         {
             return;
         }

@@ -24,6 +24,7 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
+#include "AnticheatMgr.h"
 #include "AuctionHouseBot.h"
 #include "AuctionHouseMgr.h"
 #include "BattlefieldMgr.h"
@@ -870,6 +871,10 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_MAX_PLAYER_LEVEL] = sConfigMgr->GetIntDefault("MaxPlayerLevel", DEFAULT_MAX_LEVEL);
 
+    m_int_configs[CONFIG_MAX_TALENT_LEVEL] = sConfigMgr->GetIntDefault("MaxTalentLevel", 150);
+
+    m_int_configs[CONFIG_MAX_ITEM_LEVEL] = sConfigMgr->GetIntDefault("MaxVirtualItemLevel", 325);
+
     if (m_int_configs[CONFIG_MAX_PLAYER_LEVEL] > MAX_LEVEL)
     {
         TC_LOG_ERROR("server.loading", "MaxPlayerLevel (%i) must be in range 1..%u. Set to %u.", m_int_configs[CONFIG_MAX_PLAYER_LEVEL], MAX_LEVEL, MAX_LEVEL);
@@ -1438,6 +1443,80 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ITEMGEN_QUALITY_ARTIFACT]     = sConfigMgr->GetIntDefault("ItemGenerator.Artifact", 0);
     m_int_configs[CONFIG_ITEMGEN_QUALITY_HEIRLOOM]     = sConfigMgr->GetIntDefault("ItemGenerator.Heirloom", 0);
 
+    m_float_configs[CONFIG_ITEMGEN_STATGEN_POOLMOD] = sConfigMgr->GetFloatDefault("ItemGenerator.StatPool.Modifier", 0.4f);
+    m_float_configs[CONFIG_ITEMGEN_STATGEN_LOWBOUND] = sConfigMgr->GetFloatDefault("ItemGenerator.StatPool.LowBound", 0.9f);
+    m_float_configs[CONFIG_ITEMGEN_STATGEN_HIGHBOUND] = sConfigMgr->GetFloatDefault("ItemGenerator.StatPool.HighBound", 1.1f);
+    m_float_configs[CONFIG_ITEMGEN_STATGEN_PRIMARY_MOD] = sConfigMgr->GetFloatDefault("ItemGenerator.StatPool.PrimaryStatModifier", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD] = sConfigMgr->GetFloatDefault("ItemGenerator.StatPool.SecondaryStatModifier", 0.8f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_STAMINA] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.Stamina", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_AGILITY] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.Agility", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_INTELLECT] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.Intellect", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_STRENGTH] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.Strength", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPIRIT] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.Spirit", 0.6f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_DEFENSE_SKILL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.DefenseSkillRating", 0.83f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_DODGE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.DodgeRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_PARRY_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ParryRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_BLOCK_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.BlockRating", 0.83f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_BLOCK_VALUE] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.BlockValue", 0.83f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_SPELL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellHitRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_SPELL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellHasteRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_SPELL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellCritRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_MANA_REGENERATION] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ManaRegen", 0.4f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellPower", 1.35f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellPenetration", 1.1f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_RANGED_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedHitRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_RANGED_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedCritRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_RANGED_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedHasteRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_RANGED_ATTACK_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedAttackPower", 2.2f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ExpertiseRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_MELEE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MeleeHitRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_MELEE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MeleeCritRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_MELEE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MeleeHasteRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_ARMOR_PENETRATION_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ArmorPenetration", 1.1f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_ATTACK_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.AttackPower", 2.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HitRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HealthRegen", 0.4f);
+
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_HEAD] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Head", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_CHEST] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Chest", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_ROBE] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Robe", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_LEGS] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Legs", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_2HWEAPON] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.TwoHandWeapons", 1.1f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_SHOULDERS] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Shoulders", 0.75f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_HANDS] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Hands", 0.75f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_WAIST] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Waist", 0.75f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_FEET] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Feet", 0.75f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_WRISTS] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Wrists", 0.56f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_NECK] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Neck", 0.56f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_CLOAK] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Cloak", 0.56f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_HOLDABLE] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Holdable", 0.56f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_SHIELD] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Shield", 0.56f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_WEAPON] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Weapon", 0.42f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONMAINHAND] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.WeaponMainHand", 0.42f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_WEAPONOFFHAND] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.WeaponOffHand", 0.42f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_FINGER] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Finger", 0.42f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_TRINKET] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Trinket", 0.42f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_RANGED] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Ranged", 0.31f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_RANGEDRIGHT] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.RangedRight", 0.31f);
+    m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_THROWN] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Thrown", 0.31f);
+
+    m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_COMMON] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Common", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_UNCOMMON] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Uncommon", 1.1f);
+    m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_RARE] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Rare", 1.2f);
+    m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_EPIC] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Epic", 1.3f);
+    m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_LEGENDARY] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Legendary", 1.4f);
+
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_COMMON] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Common", 1);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_COMMON] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Common", 1);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_UNCOMMON] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Uncommon", 2);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_UNCOMMON] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Uncommon", 1);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_RARE] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Rare", 2);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_RARE] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Rare", 2);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_EPIC] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Epic", 2);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_EPIC] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Epic", 3);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_LEGENDARY] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Legendary", 2);
+    m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_LEGENDARY] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Legendary", 3);
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 
@@ -1478,6 +1557,11 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_PDUMP_NO_PATHS] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
     m_bool_configs[CONFIG_UI_QUESTLEVELS_IN_DIALOGS] = sConfigMgr->GetBoolDefault("UI.ShowQuestLevelsInDialogs", false);
+
+    m_bool_configs[CONFIG_ANTICHEAT_ENABLE] = sConfigMgr->GetBoolDefault("Anticheat.Enable", true);
+    m_int_configs[CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION] = sConfigMgr->GetIntDefault("Anticheat.ReportsForIngameWarnings", 70);
+    m_int_configs[CONFIG_ANTICHEAT_DETECTIONS_ENABLED] = sConfigMgr->GetIntDefault("Anticheat.DetectionsEnabled", 31);
+    m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_DAILY_REPORT] = sConfigMgr->GetIntDefault("Anticheat.MaxReportsForDailyReport", 70);
 
     // Wintergrasp battlefield
     m_bool_configs[CONFIG_WINTERGRASP_ENABLE] = sConfigMgr->GetBoolDefault("Wintergrasp.Enable", false);
@@ -3248,6 +3332,8 @@ void World::ResetDailyQuests()
 
     // reselect pools
     sQuestPoolMgr->ChangeDailyQuests();
+
+    sAnticheatMgr->ResetDailyReportStates();
 
     // store next reset time
     time_t now = GameTime::GetGameTime();

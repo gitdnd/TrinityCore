@@ -140,6 +140,12 @@ struct VirtualModifier
     static StatGroupData const premadeStatGroupData;
 
     /**
+     * Fetches the rate (point*rate = stat_amount) for the given item quality.
+     * Returns the stat rate.
+     */
+    static float GetQualityStatModifier(VirtualItemTemplate* item);
+
+    /**
      * Fetches the rate (point*rate = stat_amount) for the given item equip type.
      * Returns the stat rate.
      */
@@ -156,6 +162,15 @@ struct VirtualModifier
      * Returns the stat rate.
      */
     static float GetStatRate(ItemModType stat);
+
+    /**
+     * Fetches the rate (point*rate = stat_amount) for the given stat type.
+     * Returns the stat rate.
+     */
+    static float GetStatRateNew(ItemModType stat);
+
+    static uint32 GetPrimaryStatSlots(VirtualItemTemplate* item);
+    static uint32 GetSecondaryStatSlots(VirtualItemTemplate* item);
 };
 
 struct itemSpellInfo
@@ -347,12 +362,18 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
+    void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
     void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
+
+
+    /**
+     * Uses passed modifier to generate stats and edits output to have the generated stats.
+     */
+    void GenerateItemStatsNew(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
 
 
     /**

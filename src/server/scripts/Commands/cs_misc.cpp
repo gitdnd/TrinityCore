@@ -450,11 +450,7 @@ public:
             else
                 _player->SaveRecallPosition(); // save only in non-flight case
 
-            // to point to see at target with same orientation
-            float x, y, z;
-            target->GetClosePoint(x, y, z, _player->GetCombatReach(), 1.0f);
-
-            _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAbsoluteAngle(target), TELE_TO_GM_MODE);
+            _player->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), _player->GetAbsoluteAngle(target), TELE_TO_GM_MODE);
             _player->SetPhaseMask(target->GetPhaseMask(), true);
         }
         else
@@ -2713,7 +2709,7 @@ public:
         char* radius_str = strtok((char*)args, " ");
         char* step_str = args ? strtok(nullptr, " ") : "8";
         float radius= atof(radius_str);
-        uint8 step = atoi(radius_str);
+        uint8 step = atoi(step_str);
         if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
         {
             if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))

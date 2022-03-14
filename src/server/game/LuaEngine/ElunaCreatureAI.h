@@ -336,6 +336,7 @@ struct ElunaCreatureAI : ScriptedAI
         if (!sEluna->OwnerAttacked(me, target))
             ScriptedAI::OwnerAttacked(target);
     }
+
 #endif
 
 #if defined MANGOS || defined CMANGOS

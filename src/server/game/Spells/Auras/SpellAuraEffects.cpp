@@ -383,6 +383,8 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleTempLearnSpell,                            //317 SPELL_AURA_TEMP_LEARN_SPELL
     &AuraEffect::HandleWaterBreathing,                            //318 SPELL_AURA_DISABLE_FATIGUE
     &AuraEffect::HandleDamageSchoolBonus,                         //319 SPELL_AURA_DAMAGE_SCHOOL_BONUS
+    &AuraEffect::HandleModRatingPercent,                          //320 SPELL_AURA_MOD_RATING_PERCENT
+
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
@@ -4033,6 +4035,22 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
 }
 
 void AuraEffect::HandleModRatingFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    // Just recalculate ratings
+    for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
+        if (GetMiscValue() & (1 << rating))
+            target->ToPlayer()->ApplyRatingMod(CombatRating(rating), 0, apply);
+}
+
+void AuraEffect::HandleModRatingPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
     if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
         return;

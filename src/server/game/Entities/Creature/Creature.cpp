@@ -253,7 +253,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MapObject(), m_grou
     m_defaultMovementType(IDLE_MOTION_TYPE), m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false), m_cannotReachTarget(false), m_cannotReachTimer(0),
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), _waypointPathId(0), _currentWaypointNodeInfo(0, 0),
     m_formation(nullptr), m_triggerJustAppeared(true), m_respawnCompatibilityMode(false), _lastDamagedTime(0),
-    _regenerateHealth(true), _regenerateHealthLock(false)
+    _regenerateHealth(true), _regenerateHealthLock(false), blockMirror(false)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -587,12 +587,13 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
             SetHealth(previousHealth);
 
         SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
-        SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
+        /*SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_NATURE]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FROST]));
         SetStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_SHADOW]));
-        SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));
+        SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));*/
+        ApplyScaledResistances();
 
         SetCanModifyStats(true);
         UpdateAllStats();
@@ -1503,8 +1504,7 @@ void Creature::UpdateLevelDependantStats()
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
 
-    float armor = (float)stats->GenerateArmor(cInfo); /// @todo Why is this treated as uint32 when it's a float?
-    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
+    ApplyScaledArmor();
 }
 
 float Creature::_GetHealthMod(int32 Rank)
@@ -3383,4 +3383,65 @@ std::string Creature::GetDebugInfo() const
         << "AIName: " << GetAIName() << " ScriptName: " << GetScriptName()
         << " WaypointPath: " << GetWaypointPath() << " SpawnId: " << GetSpawnId();
     return sstr.str();
+}
+
+void Creature::ApplyScaledResistances()
+{
+    auto const cInfo = GetCreatureTemplate();
+    float holy = cInfo->resistance[SPELL_SCHOOL_HOLY];
+    float fire = cInfo->resistance[SPELL_SCHOOL_FIRE];
+    float nature = cInfo->resistance[SPELL_SCHOOL_NATURE];
+    float frost = cInfo->resistance[SPELL_SCHOOL_FROST];
+    float shadow = cInfo->resistance[SPELL_SCHOOL_SHADOW];
+    float arcane = cInfo->resistance[SPELL_SCHOOL_ARCANE];
+
+    if (GetDungeonLevel() > 1 && !IsPet())
+    {
+        // Set the resistance to 1/3 of the current dungeon level.
+        // This is fine for bosses up to ilevel 300
+        float scaledFlatResistances = (float)GetDungeonLevel() * 0.33f;
+
+        if ((GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB) == 0)
+        {
+            switch (cInfo->rank)
+            {
+            case CREATURE_ELITE_NORMAL:
+                scaledFlatResistances *= 0.66f;
+                break;
+            case CREATURE_ELITE_RAREELITE:
+            case CREATURE_ELITE_RARE:
+            case CREATURE_ELITE_ELITE:
+                scaledFlatResistances *= 0.33f;
+                break;
+            default:
+                break;
+            }
+        }
+
+
+        holy += scaledFlatResistances;
+        fire += scaledFlatResistances;
+        nature += scaledFlatResistances;
+        frost += scaledFlatResistances;
+        shadow += scaledFlatResistances;
+        arcane += scaledFlatResistances;
+    }
+
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, holy);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, fire);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, nature);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, frost);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, shadow);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, arcane);
+}
+
+void Creature::ApplyScaledArmor()
+{
+    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), GetCreatureTemplate()->unit_class);
+    float armor = stats->GenerateArmor(GetCreatureTemplate());
+    int dungeonLevel = GetDungeonLevel();
+    if(dungeonLevel > 1 && !IsPet())
+        armor += ((float)dungeonLevel / 1000.0f) * armor;
+
+    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }

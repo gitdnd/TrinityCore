@@ -532,11 +532,11 @@ private:
                 return false;
 
         // Override parameter "delay" with the configuration value if there are still players connected and "force" parameter was not specified
-        if (delay < (int32)sWorld->getIntConfig(CONFIG_FORCE_SHUTDOWN_THRESHOLD) && !(shutdownMask & SHUTDOWN_MASK_FORCE) && !IsOnlyUser(handler->GetSession()))
+        /*if (delay < (int32)sWorld->getIntConfig(CONFIG_FORCE_SHUTDOWN_THRESHOLD) && !(shutdownMask & SHUTDOWN_MASK_FORCE) && !IsOnlyUser(handler->GetSession()))
         {
             delay = (int32)sWorld->getIntConfig(CONFIG_FORCE_SHUTDOWN_THRESHOLD);
             handler->PSendSysMessage(LANG_SHUTDOWN_DELAYED, delay);
-        }
+        }*/
 
         sWorld->ShutdownServ(delay, shutdownMask, static_cast<uint8>(exitCode), std::string(reason));
 

@@ -41,6 +41,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "Chat.h"
+#include "WorldSession.h"
 
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
@@ -4623,7 +4625,7 @@ class spell_second_wind_health_aura : public AuraScript
 {
     PrepareAuraScript(spell_second_wind_health_aura);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
         return uint32(std::floor(GetTarget()->GetHealthPct())) <= 30;
     }
@@ -4638,7 +4640,7 @@ class spell_perseverance_health_aura : public AuraScript
 {
     PrepareAuraScript(spell_perseverance_health_aura);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
         return uint32(std::floor(GetTarget()->GetHealthPct())) <= 20;
     }
@@ -4781,20 +4783,741 @@ class spell_dead_eye_periodic_aura : public AuraScript
     }
 };
 
-class spell_generate_combopoint : public SpellScript
+static uint32 comboAuras[6] = { 180054, 180055, 180056, 180057, 180058, 180059 };
+
+class spell_generate_combopoint_all : public SpellScript
 {
-    PrepareSpellScript(spell_generate_combopoint);
+    PrepareSpellScript(spell_generate_combopoint_all);
 
     void HitHandler()
     {
-        Unit* unit = GetHitUnit();
-        if (unit)
-            unit->AddComboPoints(1);
+        bool hasAura = false;
+        for (uint32 checkAura : comboAuras)
+        {
+            hasAura = GetCaster()->HasAura(checkAura);
+            if (hasAura)
+                break;
+        }
+
+        if (!hasAura)
+            return;
+
+        uint32 points = 1;
+        if (GetCaster()->HasAura(180173)
+            && roll_chance_i(5))
+        {
+            points += 1;
+        }
+
+        if ((GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) != 0 && GetCaster()->HasAura(180247)
+            && roll_chance_i(5))
+        {
+            points += 1;
+        }
+
+        if ((GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) != 0 && GetCaster()->HasAura(180253)
+            && roll_chance_i(5))
+        {
+            points += 1;
+        }
+        //Generic Combo Point Add spell
+        //CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        //args.AddSpellBP0(points);
+        //GetCaster()->CastSpell(GetHitUnit(), 450003, args);
+        GetCaster()->AddComboPoints(GetHitUnit(), points);
+        //GetHitUnit()->AddComboPoints(1);
     }
 
     void Register() override
     {
-        OnHit += SpellHitFn(spell_generate_combopoint::HitHandler);
+        OnHit += SpellHitFn(spell_generate_combopoint_all::HitHandler);
+    }
+};
+
+class spell_talent_combulstibolt_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_combulstibolt_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        auto damage = eventInfo.GetDamageInfo()->GetDamage();
+        auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
+        damage = damage * (bonusFire / 100);
+        CastSpellExtraArgs args;
+        args.AddSpellBP0(damage);
+        target->CastSpell(target, 180186, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_combulstibolt_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_burningarmor_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_burningarmor_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        /*
+        auto damage = eventInfo.GetDamageInfo()->GetDamage();
+        auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
+        damage = damage * (bonusFire / 100);
+        */
+        int32 damage = caster->GetArmor() * 0.03;
+        CastSpellExtraArgs args;
+        args.AddSpellBP0(damage);
+        caster->CastSpell(target, 180188, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_burningarmor_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_engulf_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_engulf_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        // 180193 Engulfing Flames
+        if (target->HasAura(180193))
+        {
+            auto aura = target->GetAura(180193);
+            if (aura->GetStackAmount() == 10)
+            {
+                // Spread 180195 Engulfing Flames (triggers 180193 on nearby ally)
+                target->CastSpell(target, 180195);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_engulf_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_engulfing_flames_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_engulfing_flames_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto target = GetTarget();
+        if (!target)
+            return;
+        // 180193 Engulfing Flames
+        if (target->HasAura(180193))
+        {
+            if (target->GetAura(180193)->GetStackAmount() >= 10)
+            {
+                // Engulf
+                target->CastSpell(target, 180194);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT);
+        OnEffectApply += AuraEffectApplyFn(spell_talent_engulfing_flames_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAPPLY);
+    }
+};
+
+class spell_talent_fire_ward_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_fire_ward_aura);
+
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToPlayer())
+            return;
+        // 180172 Heated Temperament
+        if (caster->HasAura(180172))
+        {
+            auto player = caster->ToPlayer();
+            auto points = caster->GetComboPoints(caster->GetComboTargetGUID());
+            if (points > 0)
+            {
+                PreventDefaultAction();
+                player->ClearComboPoints();
+                CastSpellExtraArgs args;
+                args.AddSpellBP0((player->GetMaxHealth() * 0.01) * points);
+                // Magic Ward any magic school, based on max hp
+                player->CastSpell(player, 180198, args);
+                auto aura = aurEff->GetBase();
+                if (aura)
+                {
+                    aura->Remove();
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_fire_ward_aura::OnApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+// 180199 From The Ashes
+class spell_talent_from_the_ashes_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+            // Pile of Ash cannot be affected by Solar Flare
+            if (target->ToCreature() && target->ToCreature()->GetEntry() == 52206)
+                return;
+            // Resurrection
+            if (target->IsPlayer() && caster->IsFriendlyTo(target))
+            {
+                auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                if (summon)
+                {
+                    target->CastSpell(summon, 180200);
+                }
+            }
+            // Phoenix
+            else
+            {
+                auto summon = target->SummonCreature(52206, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+                if (summon)
+                {
+                    caster->CastSpell(summon, 180201);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180201 From The Ashes (Guardian Phoenix)
+class spell_talent_from_the_ashes_phoenix_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+
+            /*auto summon = caster->SummonCreature(52207, target->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
+            if (summon)
+            {
+                
+            }*/
+            // Summon Phoenix
+            caster->CastSpell(target, 180203);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_phoenix_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 180200 From The Ashes (Resurrection)
+class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        auto target = GetTarget();
+        if (!target || !caster || target == caster)
+            return;
+        if (target->getDeathState() == JUST_DIED)
+        {
+            // 180204 Solar Flare Immune (5min debuff after ress)
+            if (caster->isDead() && caster->ToPlayer() && !caster->HasAura(180204))
+            {
+                caster->ToPlayer()->ResurrectPlayer(0.2f);
+                caster->CastSpell(caster, 24171);
+                caster->CastSpell(caster, 180204);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_from_the_ashes_resurrection_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_talent_icy_veins_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_icy_veins_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToPlayer())
+            return;
+        // 180205 Winter's Mercy
+        if (caster->HasAura(180205))
+        {
+            auto player = caster->ToPlayer();
+            auto points = caster->GetComboPoints(caster->GetComboTargetGUID());
+            if (points > 0)
+            {
+                player->ClearComboPoints();
+                CastSpellExtraArgs args1;
+                args1.AddSpellBP0(20 + (5 * points));
+                // Icy Veins bonus speed bonus
+                player->CastSpell(player, 180207, args1);
+                CastSpellExtraArgs args2;
+                args2.AddSpellBP0(5 * points);
+                // Icy Veins damage taken bonus
+                player->CastSpell(player, 180208, args1);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_talent_icy_veins_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+// 180216 Heart of the Glacier
+class spell_talent_heart_glacier_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_heart_glacier_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target)
+            return;
+        // 180217 Frost Chill (up to 4 targets in area)
+        caster->CastSpell(target, 180217);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_heart_glacier_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 180219 Polar Affliction
+class spell_talent_polar_affliction_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_polar_affliction_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target || !caster->ToPlayer())
+            return;
+        // Calculate whether the target has a Frost debuff
+        bool hasFrostDebuff = false;
+        auto &targetAuras = target->GetAppliedAuras();
+        for (auto itr = targetAuras.begin(); itr != targetAuras.end(); itr++)
+        {
+            auto aura = itr->second;
+            auto base = aura->GetBase();
+            if (!aura->IsPositive() && base->GetSpellInfo() && base->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+            {
+                hasFrostDebuff = true;
+                break;
+            }
+        }
+        // Do nothing if no Frost debuff
+        if (!hasFrostDebuff)
+            return;
+        // If immune to Freeze/Stun effects, increase Frost damage taken instead
+        if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), 0, caster) ||
+            ((target->GetMechanicImmunityMask() & MECHANIC_STUN) > 0) ||
+            ((target->GetMechanicImmunityMask() & MECHANIC_FREEZE) > 0))
+        {
+            CastSpellExtraArgs args;
+            // (1000 + spellPower) * 0.25
+            args.AddSpellBP0((1000 + caster->ToPlayer()->GetBaseSpellPowerBonus()) * 0.25);
+            caster->CastSpell(target, 180231, args);
+        }
+        // Freeze (stun) the target and increase Frost crit damage
+        else
+        {
+            caster->CastSpell(target, 180230);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_polar_affliction_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 180232 Hammer of the North
+class spell_talent_hammer_of_the_north_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_hammer_of_the_north_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        auto target = eventInfo.GetProcTarget();
+        if (!caster || !target || !caster->ToPlayer())
+            return;
+        auto player = caster->ToPlayer();
+        if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+        {
+            player->ApplyEnchantment(mainItem, TEMP_ENCHANTMENT_SLOT, false);
+            mainItem->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 2500, 5000, 0, caster->GetGUID());
+            player->ApplyEnchantment(mainItem, TEMP_ENCHANTMENT_SLOT, true);
+        }
+        if (Item* offHand = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+        {
+            player->ApplyEnchantment(offHand, TEMP_ENCHANTMENT_SLOT, false);
+            offHand->SetEnchantment(TEMP_ENCHANTMENT_SLOT, 2500, 5000, 0, caster->GetGUID());
+            player->ApplyEnchantment(offHand, TEMP_ENCHANTMENT_SLOT, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_hammer_of_the_north_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_evokers_intellect_aura : public AuraScript
+{
+    PrepareAuraScript(spell_evokers_intellect_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 spell = eventInfo.GetSpellInfo()->Id;
+
+        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
+            uniqueSpells.clear();
+
+        uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
+
+        if (Aura* evokers = GetCaster()->GetAura(450002))
+            evokers->SetStackAmount(uniqueSpells.size());
+        else
+        {
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(450002))
+            {
+                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetCaster());
+                createInfo.SetCaster(GetCaster());
+
+                if (Aura* evoke = Aura::TryRefreshStackOrCreate(createInfo))
+                    evoke->SetStackAmount(uniqueSpells.size());
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_evokers_intellect_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+
+    std::vector<uint32> uniqueSpells;
+};
+
+class spell_talent_congelation_trigger_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_congelation_trigger_aura);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        auto caster = GetCaster();
+        if (!caster)
+        {
+            PreventDefaultAction();
+            return;
+        }
+        if (caster->GetHealthPct() > 35)
+        {
+            PreventDefaultAction();
+        }
+        // Trigger
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_congelation_trigger_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_congelation_actual_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_congelation_actual_aura);
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (GetCaster() && GetCaster()->GetHealthPct() > 35)
+        {
+            auto base = aurEff->GetBase();
+            if (base)
+            {
+                base->Remove();
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_congelation_actual_aura::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_frozenheart_trigger_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_frozenheart_trigger_aura);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        auto caster = GetCaster();
+        if (!caster)
+        {
+            PreventDefaultAction();
+            return;
+        }
+        if (caster->GetHealthPct() <= 75)
+        {
+            PreventDefaultAction();
+        }
+        // Trigger
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_frozenheart_trigger_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_frozenheart_actual_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_frozenheart_actual_aura);
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (GetCaster() && GetCaster()->GetHealthPct() <= 75)
+        {
+            auto base = aurEff->GetBase();
+            if (base)
+            {
+                base->Remove();
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_frozenheart_actual_aura::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_talent_coldtempered_aura : public AuraScript
+{
+    PrepareAuraScript(spell_talent_coldtempered_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        auto base = aurEff->GetBase();
+        if (base)
+            base->Remove();
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_coldtempered_aura::OnProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_cold_steel_aura : public SpellScriptLoader
+{
+public:
+    spell_cold_steel_aura() : SpellScriptLoader("spell_cold_steel_aura") { }
+
+    class spell_cold_steel_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_cold_steel_aura_AuraScript);
+
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return false;
+
+            if (eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            Player* player = eventInfo.GetActor()->ToPlayer();
+            if (Item* weapon = player->GetWeaponForAttack(eventInfo.GetDamageInfo()->GetAttackType()))
+                if (weapon->GetTemplate()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                    return false;
+                else
+                    return true;
+
+            return false;
+        }
+
+        void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            float damage = 0.f;
+
+            if (eventInfo.GetDamageInfo()->GetAttackType() == OFF_ATTACK)
+                damage = (actor->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + actor->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE)) / 2.f;
+            else
+                damage = (actor->GetFloatValue(UNIT_FIELD_MINDAMAGE) + actor->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2.f;
+
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(damage*0.05);
+            actor->CastSpell(eventInfo.GetProcTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, args);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(spell_cold_steel_aura_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(spell_cold_steel_aura_AuraScript::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_cold_steel_aura_AuraScript();
+    }
+};
+
+class spell_glaciation_aura : public AuraScript
+{
+    PrepareAuraScript(spell_glaciation_aura);
+
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetEffectiveHeal() > 0;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return;
+        // Non stacking.
+        if (eventInfo.GetProcTarget()->HasAura(180252, eventInfo.GetActor()->GetGUID()))
+            return;
+
+        int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 20.0f));
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(absorb);
+        eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), 180252, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_glaciation_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_glaciation_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_frostfire_bolt_combo_spender : public SpellScript
+{
+    PrepareSpellScript(spell_frostfire_bolt_combo_spender);
+
+    void OnHit()
+    {
+        if (!GetCaster()->HasAura(SPELL_ICY_HOT))
+            return;
+        uint8 comboPoints = GetCaster()->GetComboPoints(GetHitUnit());
+        if (!comboPoints)
+            return;
+        uint32 slowAmount = comboPoints * 5;
+        uint32 damageAmount = GetHitDamage() * (comboPoints * 0.05);
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(-slowAmount);
+        args.AddSpellBP1(damageAmount);
+        
+        GetCaster()->CastSpell(GetHitUnit(), 180254, args);
+        GetCaster()->ClearComboPoints();
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_frostfire_bolt_combo_spender::OnHit);
+    }
+};
+
+
+class spell_ice_barrier_combo_spender : public SpellScript
+{
+    PrepareSpellScript(spell_ice_barrier_combo_spender);
+
+    void OnHit()
+    {
+        if (!GetCaster()->HasAura(180205))
+            return;
+
+        uint8 comboPoints = GetCaster()->GetComboPoints();
+        if (!comboPoints)
+            return;
+
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(comboPoints);
+
+        GetCaster()->CastSpell(GetHitUnit(), 180255, args);
+        GetCaster()->ClearComboPoints();
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_ice_barrier_combo_spender::OnHit);
     }
 };
 
@@ -4939,5 +5662,27 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_warlords_charge_periodic_aura);
     RegisterAuraScript(spell_point_blank_periodic_aura);
     RegisterAuraScript(spell_dead_eye_periodic_aura);
-    RegisterSpellScript(spell_generate_combopoint);
+    RegisterAuraScript(spell_talent_combulstibolt_aura);
+    RegisterAuraScript(spell_talent_burningarmor_aura);
+    RegisterAuraScript(spell_talent_engulf_aura);
+    RegisterAuraScript(spell_talent_engulfing_flames_aura);
+    RegisterAuraScript(spell_talent_fire_ward_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
+    RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
+    RegisterAuraScript(spell_talent_icy_veins_aura);
+    RegisterAuraScript(spell_talent_heart_glacier_aura);
+    RegisterAuraScript(spell_talent_polar_affliction_aura);
+    RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
+    RegisterAuraScript(spell_talent_congelation_trigger_aura);
+    RegisterAuraScript(spell_talent_congelation_actual_aura);
+    RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
+    RegisterAuraScript(spell_talent_frozenheart_actual_aura);
+    RegisterAuraScript(spell_talent_coldtempered_aura);
+    RegisterAuraScript(spell_evokers_intellect_aura);
+    RegisterSpellScript(spell_generate_combopoint_all);
+    new spell_cold_steel_aura();
+    RegisterAuraScript(spell_glaciation_aura);
+    RegisterSpellScript(spell_frostfire_bolt_combo_spender);
+    RegisterSpellScript(spell_ice_barrier_combo_spender);
 }

@@ -428,7 +428,7 @@ class TC_GAME_API CreatureScript : public ScriptObject
     public:
         // Called when an unit exits a vehicle
         virtual void ModifyVehiclePassengerExitPos(Unit* /*passenger*/, Vehicle* /*vehicle*/, Position& /*pos*/) { }
-
+ 
         // Called when a CreatureAI object is needed for the creature.
         virtual CreatureAI* GetAI(Creature* /*creature*/) const = 0;
 };
@@ -1058,8 +1058,7 @@ class TC_GAME_API ScriptMgr
         void OnQuestStatusChange(Player* player, uint32 questId);
         void OnMovieComplete(Player* player, uint32 movieId);
         void OnPlayerRepop(Player* player);
-
-    public: /* AccountScript */
+     public: /* AccountScript */
 
         void OnAccountLogin(uint32 accountId);
         void OnFailedAccountLogin(uint32 accountId);

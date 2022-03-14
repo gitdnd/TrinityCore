@@ -20,6 +20,7 @@
 #include "AchievementMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "AnticheatMgr.h"
 #include "Bag.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
@@ -416,6 +417,7 @@ Player::Player(WorldSession* session): Unit(true)
 
     talent_level = 0;
     _averageItemLevel = 1;
+    m_canTeleport = false;
 }
 
 Player::~Player()
@@ -1734,7 +1736,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         SetSemaphoreTeleportNear(true);
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
         if (!GetSession()->PlayerLogout())
+        {
+            SetCanTeleport(true);
             SendTeleportPacket(m_teleport_dest, (options & TELE_TO_TRANSPORT_TELEPORT) != 0);
+        }
     }
     else
     {
@@ -1835,6 +1840,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             if (!GetSession()->PlayerLogout())
             {
+                SetCanTeleport(true);
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
                 data << uint32(mapid);
                 if (GetTransport())
@@ -2579,7 +2585,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     // XP to money conversion processed in Player::RewardQuest
     //if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     //    return;
-    if (level >= MAX_TALENT_LEVEL)
+    if (level >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         return;
 
     uint32 bonus_xp;
@@ -2596,14 +2602,14 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 newXP = GetXP() + xp + bonus_xp;
 
-    while (newXP >= nextLvlXP /*&& level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)*/)
+    while (newXP >= nextLvlXP && talent_level < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
     {
         newXP -= nextLvlXP;
 
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (level <= MAX_TALENT_LEVEL)
+        if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
             ++talent_level;
             CastSpell(this, 90299); // Talent level up visual
@@ -3665,7 +3671,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (itr == m_spells.end())
         return;                                             // already unleared
 
-    bool giveTalentPoints = disabled || !itr->second->disabled;
+    //bool giveTalentPoints = disabled || !itr->second->disabled;
 
     bool cur_active    = itr->second->active;
     bool cur_dependent = itr->second->dependent;
@@ -5603,6 +5609,14 @@ void Player::UpdateRating(CombatRating cr)
     for (AuraEffect const* aurEff : modRatingFromStat)
         if (aurEff->GetMiscValue() & (1 << cr))
             amount += int32(CalculatePct(GetStat(Stats(aurEff->GetMiscValueB())), aurEff->GetAmount()));
+
+    float ratingMulti = 1.f;
+    AuraEffectList const& modRatingPercent = GetAuraEffectsByType(SPELL_AURA_MOD_RATING_PERCENT);
+    for (AuraEffect const* aurEff : modRatingPercent)
+        if (aurEff->GetMiscValue() & (1 << cr))
+            ratingMulti += aurEff->GetAmount() / 100.f;
+
+    amount *= ratingMulti;
 
     if (amount < 0)
         amount = 0;
@@ -11932,7 +11946,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
     return EQUIP_ERR_OK;
 }
 
-InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObject const* lootedObject) const
+InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObject const* /*lootedObject*/) const
 {
     //if (!GetGroup() || !GetGroup()->isLFGGroup())
     //    return EQUIP_ERR_OK;    // not in LFG group
@@ -15485,7 +15499,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
-    if (GetTalentLevel() < MAX_TALENT_LEVEL)
+    if (GetTalentLevel() < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         GiveXP(XP, nullptr);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
@@ -17716,8 +17730,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     SetLevel(fields[6].GetUInt8(), false);
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
-    if (talent_level == 0)
-        talent_level = 1;
+    //if (talent_level == 0)
+    //    talent_level = 1;
 
     _LoadIntoDataField(fields[66].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
     _LoadIntoDataField(fields[69].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE * 2);
@@ -20113,6 +20127,8 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
     // save stats can be out of transaction
     if (m_session->isLogingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats(trans);
+
+    sAnticheatMgr->SavePlayerData(this);
 
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
@@ -27004,7 +27020,7 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 }
 
 
-float Player::UpdateCachedItemLevel(bool isLogin)
+float Player::UpdateCachedItemLevel(bool /*isLogin*/)
 {
     float sum = 0;
     uint32 count = 0;

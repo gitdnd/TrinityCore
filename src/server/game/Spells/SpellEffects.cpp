@@ -236,11 +236,13 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectAddStatToVirtualItem,                     //166 SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM
     &Spell::EffectCreateVirtualItem,                        //167 SPELL_EFFECT_CREATE_VIRTUAL_ITEM
     &Spell::EffectVirtualItemQualityUpgrade,                //168 SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE
-    &Spell::EffectUnused,                                   //169 SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE
+    &Spell::EffectItemLevelUpgrade,                         //169 SPELL_EFFECT_VIRTUAL_ITEM_LEVEL_UPGRADE
     &Spell::EffectUnused,                                   //170 SPELL_EFFECT_REMOVE_STAT_FROM_VIRTUAL_ITEM
     &Spell::EffectUnused,                                   //171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
     &Spell::EffectReRollVirtualItem,                        //172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
     &Spell::EffectExtractGems,                              //173 SPELL_EFFECT_EXTRACT_GEMS
+    &Spell::EffectPctXPGain,                                //174 SPELL_EFFECT_PCT_XP_GAIN
+    &Spell::EffectXPGain,                                   //175 SPELL_EFFECT_XP_GAIN
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -1333,11 +1335,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         {
             float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
             if (dungeonLevel < 50)
-                modifier *= 0.33;
+                modifier *= 0.33f;
             else if (dungeonLevel < 60)
-                modifier *= 0.5;
+                modifier *= 0.5f;
             else if (dungeonLevel < 75)
-                modifier *= 0.75;
+                modifier *= 0.75f;
             else if (dungeonLevel > 250)
                 modifier *= ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
 
@@ -2877,6 +2879,8 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         duration = 300;                                     // 5 mins
     else if (m_spellInfo->Id == 37360)
         duration = 300;                                     // 5 mins
+    else if (m_spellInfo->Id == 180233)
+        duration = 5;                                       // 5 seconds
     // default case
     else
         duration = 3600;                                    // 1 hour
@@ -3144,33 +3148,36 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     int32 fixed_bonus = 0;
     int32 spell_bonus = 0;                                  // bonus specific for spell
 
-    // Handle Bow/Gun Damage bonus talents
-    if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+    if (unitCaster->ToPlayer())
     {
         auto player = unitCaster->ToPlayer();
         // Handle Bow/Gun Damage bonus talents
-        //totalDamagePercentMod *= ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
-        // Gun Training
-        if (player->HasAura(180146))
+        if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
         {
-            auto stacks = player->GetAura(180146)->GetStackAmount();
-            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
-                item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+            // Handle Bow/Gun Damage bonus talents
+            //totalDamagePercentMod *= ApplyRangedTalentBonusDamage(unitCaster->ToPlayer());
+            // Gun Training
+            if (player->HasAura(180146))
             {
-                totalDamagePercentMod *= (1 + (0.05 * stacks));
+                auto stacks = player->GetAura(180146)->GetStackAmount();
+                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+                if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_GUN)
+                {
+                    totalDamagePercentMod *= (1 + (0.05 * stacks));
+                }
             }
-        }
-        // Bow Training
-        if (player->HasAura(180147))
-        {
-            auto stacks = player->GetAura(180147)->GetStackAmount();
-            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
-            if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
-                (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
-                    item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+            // Bow Training
+            if (player->HasAura(180147))
             {
-                totalDamagePercentMod *= (1 + (0.05 * stacks));
+                auto stacks = player->GetAura(180147)->GetStackAmount();
+                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+                if (item && item->GetTemplate()->Class == ITEM_CLASS_WEAPON &&
+                    (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                        item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_BOW))
+                {
+                    totalDamagePercentMod *= (1 + (0.05 * stacks));
+                }
             }
         }
     }
@@ -3758,6 +3765,28 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
 
     if (damage <= 0)
         return;
+
+    // 180173 Dragonborn talent
+    if (unitTarget->ToPlayer()
+        && unitTarget->ToPlayer()->HasAura(180173)
+        && roll_chance_i(5))
+    {
+        damage += 1;
+    }
+
+    if ((m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) != 0 && unitTarget->ToPlayer()
+        && unitTarget->ToPlayer()->HasAura(180247)
+        && roll_chance_i(5))
+    {
+        damage += 1;
+    }
+
+    if ((m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) != 0 && unitTarget->ToPlayer()
+        && unitTarget->ToPlayer()->HasAura(180253)
+        && roll_chance_i(5))
+    {
+        damage += 1;
+    }
 
     AddComboPointGain(unitTarget, damage);
 }
@@ -5390,7 +5419,13 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
             // randomize position for multiple summons
             pos = unitCaster->GetRandomPoint(*destTarget, radius);
 
-        TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, unitCaster, m_spellInfo->Id);
+        uint32 itemLevel = 0;
+        if (unitCaster->ToPlayer())
+            itemLevel = unitCaster->ToPlayer()->GetAverageItemLevel();
+        else if (unitCaster->ToCreature())
+            itemLevel = unitCaster->ToCreature()->GetDungeonLevel();
+
+        TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, unitCaster, m_spellInfo->Id, 0, itemLevel);
         if (!summon)
             return;
 
@@ -5631,7 +5666,7 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
     m_caster->CastSpell(unitTarget, m_spellInfo->Effects[effIndex].TriggerSpell, true);
 }
 
-void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
+void Spell::EffectReRollVirtualItemSockets(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -5654,7 +5689,7 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex effIndex)
     itemTarget->SaveVirtualItemInfo();
 }
 
-void Spell::EffectAddStatToVirtualItem(SpellEffIndex effIndex)
+void Spell::EffectAddStatToVirtualItem(SpellEffIndex /*effIndex*/)
 {
     Player* player = m_caster->ToPlayer();
     if (!player)
@@ -5713,6 +5748,9 @@ void Spell::EffectCreateVirtualItem(SpellEffIndex effIndex)
 
 void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
@@ -5725,7 +5763,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     modifier.quality = m_spellInfo->Effects[effIndex].MiscValue;
     modifier.seed = vItem->seed;
-    modifier.displaySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    modifier.displaySeed = vItem->displaySeed;
     modifier.nameSeed = vItem->nameSeed;
     modifier.qualitySeed = vItem->qualitySeed;
     modifier.socketSeed = vItem->socketSeed;
@@ -5737,18 +5775,18 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
-    sVirtualItemMgr.GenerateStats(vItem, modifier);
-    sVirtualItemMgr.GenerateItemStats(vItem, modifier);
+    sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStatsNew(vItem, modifier);
     sVirtualItemMgr.GenerateSockets(vItem, modifier);
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
-    sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
+    //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
     sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
 
     vItem->seed = modifier.seed;
     vItem->displaySeed = modifier.displaySeed;
     vItem->nameSeed = modifier.nameSeed;
     vItem->socketSeed = modifier.socketSeed;
-    vItem->spellSeed = modifier.spellSeed;
+    //vItem->spellSeed = modifier.spellSeed;
     vItem->statSeed = modifier.statSeed;
     vItem->statValueSeed = modifier.statValueSeed;
 
@@ -5760,6 +5798,9 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
 void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
     Player* player = m_caster->ToPlayer();
     if (!player)
         return;
@@ -5772,15 +5813,15 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     mod.statSeed = vItem->statSeed;
     mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
     mod.statpool = m_spellInfo->Effects[effIndex].MiscValueB != 0 ? m_spellInfo->Effects[effIndex].MiscValueB : -1;
-    sVirtualItemMgr.GenerateStats(vItem, mod);
-    sVirtualItemMgr.GenerateItemStats(vItem, mod);
+    sVirtualItemMgr.GenerateBaseStats(vItem, mod);
+    sVirtualItemMgr.GenerateItemStatsNew(vItem, mod);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
 }
 
-void Spell::EffectExtractGems(SpellEffIndex effIndex)
+void Spell::EffectExtractGems(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -5789,4 +5830,79 @@ void Spell::EffectExtractGems(SpellEffIndex effIndex)
         return;
 
     itemTarget->ExtractGems();
+}
+
+void Spell::EffectPctXPGain(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || !unitTarget->IsPlayer())
+        return;
+
+    Player* plr = unitTarget->ToPlayer();
+    uint32 requiredXp = plr->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+    uint32 xpToGive = CalculatePct(requiredXp, damage);
+    plr->GiveXP(xpToGive, plr);
+}
+
+void Spell::EffectXPGain(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || !unitTarget->IsPlayer())
+        return;
+
+    unitTarget->ToPlayer()->GiveXP(damage, unitTarget);
+}
+
+void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    VirtualModifier modifier;
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+
+    modifier.ilevel = m_spellInfo->Effects[effIndex].MiscValue;
+    modifier.seed = vItem->seed;
+    modifier.displaySeed = vItem->displaySeed;
+    modifier.nameSeed = vItem->nameSeed;
+    modifier.qualitySeed = vItem->qualitySeed;
+    modifier.socketSeed = vItem->socketSeed;
+    modifier.spellSeed = vItem->spellSeed;
+    modifier.statSeed = vItem->statSeed;
+    modifier.statValueSeed = vItem->statValueSeed;
+    modifier.quality = vItem->Quality;
+    modifier.statgroup = vItem->statGroup;
+
+    sVirtualItemMgr.InitSeedGen(modifier);
+    sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStatsNew(vItem, modifier);
+    sVirtualItemMgr.GenerateSockets(vItem, modifier);
+    sVirtualItemMgr.GenerateItemName(vItem, modifier);
+    //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
+    sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
+
+    vItem->seed = modifier.seed;
+    vItem->displaySeed = modifier.displaySeed;
+    vItem->nameSeed = modifier.nameSeed;
+    vItem->socketSeed = modifier.socketSeed;
+    //vItem->spellSeed = modifier.spellSeed;
+    vItem->statSeed = modifier.statSeed;
+    vItem->statValueSeed = modifier.statValueSeed;
+
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SaveVirtualItemInfo();
 }

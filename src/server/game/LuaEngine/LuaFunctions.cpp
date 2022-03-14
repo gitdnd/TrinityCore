@@ -899,6 +899,7 @@ ElunaRegister<Creature> CreatureMethods[] =
 
     { "RemoveQuest", &LuaCreature::RemoveQuest },
     { "AddQuest", &LuaCreature::AddQuest },
+    { "SendMirrorImage", &LuaCreature::SendMirrorToPlayer },
 
     { NULL, NULL }
 };

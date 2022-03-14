@@ -398,6 +398,7 @@ public:
     bool SummonedCreatureDies(Creature* me, Creature* summon, Unit* killer);
     bool OwnerAttackedBy(Creature* me, Unit* attacker);
     bool OwnerAttacked(Creature* me, Unit* target);
+    void OnMirrorPlayer(Creature* mirror, Player* player);
     void On_Reset(Creature* me);
 
     /* GameObject */

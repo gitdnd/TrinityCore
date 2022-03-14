@@ -4132,5 +4132,115 @@ ItemGenerator.Legendary = 0
 ItemGenerator.Artifact = 0
 ItemGenerator.Heirloom = 0
 
+ItemGenerator.StatPool.Modifier = 0.385
+ItemGenerator.StatPool.LowBound = 0.9
+ItemGenerator.StatPool.HighBound = 1.1
+ItemGenerator.StatPool.PrimaryStatModifier = 1.0
+ItemGenerator.StatPool.SecondaryStatModifier = 0.84
+
+ItemGenerator.StatWeight.Stamina = 1.0
+ItemGenerator.StatWeight.Agility = 1.0
+ItemGenerator.StatWeight.Intellect = 1.0
+ItemGenerator.StatWeight.Strength = 1.0
+ItemGenerator.StatWeight.Spirit = 0.8
+ItemGenerator.StatWeight.DefenseSkillRating = 0.83
+ItemGenerator.StatWeight.DodgeRating = 0.7
+ItemGenerator.StatWeight.ParryRating = 0.7
+ItemGenerator.StatWeight.BlockRating = 0.83
+ItemGenerator.StatWeight.BlockValue = 0.83
+ItemGenerator.StatWeight.SpellHitRating = 0.94
+ItemGenerator.StatWeight.SpellHasteRating = 0.94
+ItemGenerator.StatWeight.SpellCritRating = 0.94
+ItemGenerator.StatWeight.ManaRegen = 0.5
+ItemGenerator.StatWeight.SpellPower = 1.45
+ItemGenerator.StatWeight.SpellPenetration = 0.77
+ItemGenerator.StatWeight.RangedHitRating = 0.7
+ItemGenerator.StatWeight.RangedCritRating = 0.94
+ItemGenerator.StatWeight.RangedHasteRating = 0.7
+ItemGenerator.StatWeight.RangedAttackPower = 1.9
+ItemGenerator.StatWeight.ExpertiseRating = 0.6
+ItemGenerator.StatWeight.MeleeHitRating = 0.9
+ItemGenerator.StatWeight.MeleeCritRating = 0.93
+ItemGenerator.StatWeight.MeleeHasteRating = 0.93
+ItemGenerator.StatWeight.ArmorPenetration = 0.73
+ItemGenerator.StatWeight.AttackPower = 2.1
+ItemGenerator.StatWeight.HitRating = 0.9
+ItemGenerator.StatWeight.HealthRegen = 0.4
+
+ItemGenerator.SlotWeight.Head = 1.0
+ItemGenerator.SlotWeight.Chest = 1.0
+ItemGenerator.SlotWeight.Robe = 1.0
+ItemGenerator.SlotWeight.Legs = 1.0
+ItemGenerator.SlotWeight.TwoHandWeapons = 1.1
+ItemGenerator.SlotWeight.Shoulders = 0.75
+ItemGenerator.SlotWeight.Hands = 0.75
+ItemGenerator.SlotWeight.Waist = 0.75
+ItemGenerator.SlotWeight.Feet = 0.75
+ItemGenerator.SlotWeight.Wrists = 0.56
+ItemGenerator.SlotWeight.Neck = 0.56
+ItemGenerator.SlotWeight.Cloak = 0.56
+ItemGenerator.SlotWeight.Holdable = 0.56
+ItemGenerator.SlotWeight.Shield = 0.56
+ItemGenerator.SlotWeight.Weapon = 0.42
+ItemGenerator.SlotWeight.WeaponMainHand = 0.42
+ItemGenerator.SlotWeight.WeaponOffHand = 0.42
+ItemGenerator.SlotWeight.Finger = 0.42
+ItemGenerator.SlotWeight.Trinket = 0.42
+ItemGenerator.SlotWeight.Ranged = 0.31
+ItemGenerator.SlotWeight.RangedRight = 0.31
+ItemGenerator.SlotWeight.Thrown = 0.31
+
+ItemGenerator.QualityMod.Common = 1.0
+ItemGenerator.QualityMod.Uncommon = 1.1
+ItemGenerator.QualityMod.Rare = 1.2
+ItemGenerator.QualityMod.Epic = 1.3
+ItemGenerator.QualityMod.Legendary = 1.4
+
+ItemGenerator.StatSlot.Primary.Common = 1
+ItemGenerator.StatSlot.Secondary.Common = 1
+ItemGenerator.StatSlot.Primary.Uncommon = 2
+ItemGenerator.StatSlot.Secondary.Uncommon = 1
+ItemGenerator.StatSlot.Primary.Rare = 2
+ItemGenerator.StatSlot.Secondary.Rare = 2
+ItemGenerator.StatSlot.Primary.Epic = 2
+ItemGenerator.StatSlot.Secondary.Epic = 3
+ItemGenerator.StatSlot.Primary.Legendary = 2
+ItemGenerator.StatSlot.Secondary.Legendary = 3
+
 #
 ###################################################################################################
+
+
+#
+#     Anticheat.Enable
+#        Description: Enables or disables the Anticheat System functionality
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Anticheat.Enable = 1
+
+#     Anticheat.ReportsForIngameWarnings
+#        Description: How many reports the player must have to notify to GameMasters ingame when he generates a new report.
+#        Default:     70
+
+Anticheat.ReportsForIngameWarnings = 70
+
+#     Anticheat.DetectionsEnabled
+#        Description: It represents which detections are enabled.
+#
+#        SPEED_HACK_DETECTION            = 1
+#        FLY_HACK_DETECTION              = 2
+#        WALK_WATER_HACK_DETECTION       = 4
+#        JUMP_HACK_DETECTION             = 8
+#        TELEPORT_PLANE_HACK_DETECTION   = 16
+#        CLIMB_HACK_DETECTION            = 32
+#
+#        Default:     31
+
+Anticheat.DetectionsEnabled = 31
+
+#     Anticheat.MaxReportsForDailyReport
+#        Description: How many reports must the player have to make a report that it is in DB for a day (not only during the player's session).
+#        Default:     70
+
+Anticheat.MaxReportsForDailyReport = 70

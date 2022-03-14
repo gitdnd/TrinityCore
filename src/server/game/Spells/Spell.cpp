@@ -2458,6 +2458,14 @@ void Spell::TargetInfo::DoDamageAndTriggers(Spell* spell)
         bool const canEffectTrigger = !spell->m_spellInfo->HasAttribute(SPELL_ATTR3_CANT_TRIGGER_PROC) && spell->unitTarget->CanProc() &&
             (spell->CanExecuteTriggersOnHit(EffectMask) || MissCondition == SPELL_MISS_IMMUNE || MissCondition == SPELL_MISS_IMMUNE2);
 
+        /*/if ((MissCondition == SPELL_MISS_IMMUNE || MissCondition == SPELL_MISS_IMMUNE2) && spell->m_spellInfo->HasAura(SPELL_AURA_MOD_STUN)
+            && !spell->unitTarget->IsFriendlyTo(caster))
+        {
+            //Exigent Imposition
+            if (caster->HasAura(180245))
+                caster->CastSpell(spell->unitTarget, 180246, true);
+        }*/
+
         // Trigger info was not filled in Spell::prepareDataForTriggerSystem - we do it now
         if (canEffectTrigger && !procAttacker && !procVictim)
         {
@@ -3133,6 +3141,16 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         }
         else
             m_casttime = 0; // Set cast time to 0 if .cheat casttime is enabled.
+
+        // 180171 Pyromaniac Handle talent modify 42891 Pyroblast cast time
+        if (m_spellInfo && m_spellInfo->Id == 42891 && player->HasAura(180171))
+        {
+            auto points = player->GetComboPoints(player->GetComboTargetGUID());
+            m_casttime -= points * 5 * 100;
+            if (m_casttime < 0)
+                m_casttime = 0;
+            player->ClearComboPoints();
+        }
     }
     else
         m_casttime = m_spellInfo->CalcCastTime(this);
@@ -4203,6 +4221,11 @@ void Spell::SendSpellStart()
     if (!IsNeedSendToClient())
         return;
 
+    Powers powerType = m_spellInfo->PowerType;
+
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
     //TC_LOG_DEBUG("spells", "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_2;
@@ -4224,10 +4247,10 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_AMMO;
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsPet()))
-         && m_spellInfo->PowerType != POWER_HEALTH)
+         && powerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
-    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
+    if (m_spellInfo->RuneCostID && powerType == POWER_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
 
     WorldPackets::Spells::SpellStart packet;
@@ -4247,7 +4270,7 @@ void Spell::SendSpellStart()
     m_targets.Write(castData.Target);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(m_spellInfo->PowerType);
+        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(powerType);
 
     if (castFlags & CAST_FLAG_AMMO)
     {
@@ -4271,6 +4294,11 @@ void Spell::SendSpellGo()
     if (!IsNeedSendToClient())
         return;
 
+    Powers powerType = m_spellInfo->PowerType;
+
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
     // triggered spells with spell visual != 0
@@ -4282,13 +4310,13 @@ void Spell::SendSpellGo()
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsPet()))
-        && m_spellInfo->PowerType != POWER_HEALTH)
+        && powerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->ToPlayer()->GetClass() == CLASS_DEATH_KNIGHT)
         && m_spellInfo->RuneCostID
-        && m_spellInfo->PowerType == POWER_RUNE
+        && powerType == POWER_RUNE
         && !(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
@@ -4323,7 +4351,7 @@ void Spell::SendSpellGo()
     m_targets.Write(castData.Target);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(m_spellInfo->PowerType);
+        castData.RemainingPower = ASSERT_NOTNULL(m_caster->ToUnit())->GetPower(powerType);
 
     if (castFlags & CAST_FLAG_RUNE_LIST && !m_spellInfo->HasAura(SPELL_AURA_CONVERT_RUNE)) // rune cooldowns list
     {
@@ -4787,6 +4815,10 @@ void Spell::TakePower()
     }
 
     Powers powerType = Powers(m_spellInfo->PowerType);
+
+    if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
     bool hit = true;
     if (unitCaster->GetTypeId() == TYPEID_PLAYER)
     {
@@ -4818,7 +4850,10 @@ void Spell::TakePower()
     // health as power used
     if (powerType == POWER_HEALTH)
     {
-        unitCaster->ModifyHealth(-(int32)m_powerCost);
+        if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && (unitCaster->GetHealth() - m_powerCost) <= 0)
+            unitCaster->Kill(unitCaster, unitCaster, true);
+        else
+            unitCaster->ModifyHealth(-(int32)m_powerCost);
         return;
     }
 
@@ -5443,6 +5478,18 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
 
     if (!(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
+        /*if (Unit* unitCaster = m_caster->ToUnit())
+        {
+            if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && m_spellInfo->PowerType == POWER_MANA)
+            {
+                if (int32(unitCaster->GetHealth()) <= m_powerCost)
+                {
+                    m_customError = SPELL_CUSTOM_ERROR_NOT_ENOUGH_HEALTH;
+                    return SPELL_FAILED_CUSTOM_ERROR;
+                }
+            }
+        }*/
+
         castResult = CheckPower();
         if (castResult != SPELL_CAST_OK)
             return castResult;
@@ -5925,6 +5972,17 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                         if (bg->GetStatus() == STATUS_IN_PROGRESS)
                             return SPELL_FAILED_NOT_IN_BATTLEGROUND;
                 break;
+            case SPELL_EFFECT_PCT_XP_GAIN:
+            case SPELL_EFFECT_XP_GAIN:
+            {
+
+                if (Player* playerTarget = m_caster->ToPlayer())
+                {
+                    if (playerTarget->GetTalentLevel() >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+                        return SPELL_FAILED_HIGHLEVEL;
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -6539,26 +6597,31 @@ SpellCastResult Spell::CheckPower() const
     if (!unitCaster)
         return SPELL_CAST_OK;
 
+    Powers powerType = m_spellInfo->PowerType;
+
+    /*if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;*/
+
     // item cast not used power
     if (m_CastItem)
         return SPELL_CAST_OK;
 
     // health as power used - need check health amount
-    if (m_spellInfo->PowerType == POWER_HEALTH)
+    if (powerType == POWER_HEALTH)
     {
         if (int32(unitCaster->GetHealth()) <= m_powerCost)
             return SPELL_FAILED_CASTER_AURASTATE;
         return SPELL_CAST_OK;
     }
     // Check valid power type
-    if (m_spellInfo->PowerType >= MAX_POWERS)
+    if (powerType >= MAX_POWERS)
     {
         TC_LOG_ERROR("spells", "Spell::CheckPower: Unknown power type '%d'", m_spellInfo->PowerType);
         return SPELL_FAILED_UNKNOWN;
     }
 
     //check rune cost only if a spell has PowerType == POWER_RUNE
-    if (m_spellInfo->PowerType == POWER_RUNE)
+    if (powerType == POWER_RUNE)
     {
         SpellCastResult failReason = CheckRuneCost(m_spellInfo->RuneCostID);
         if (failReason != SPELL_CAST_OK)
@@ -6566,7 +6629,6 @@ SpellCastResult Spell::CheckPower() const
     }
 
     // Check power amount
-    Powers powerType = m_spellInfo->PowerType;
     if (int32(unitCaster->GetPower(powerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else
@@ -7162,7 +7224,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                if(m_targets.GetItemTarget()->GetTemplate()->Quality != m_spellInfo->Effects[i].MiscValue-1)
+                if(m_targets.GetItemTarget()->GetTemplate()->Quality != (uint32)m_spellInfo->Effects[i].MiscValue-1)
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 break;

@@ -24,6 +24,7 @@
 #include "LFGQueue.h"
 #include "LFGMgr.h"
 #include "Log.h"
+#include "Metric.h"
 
 namespace lfg
 {
@@ -76,6 +77,8 @@ char const* GetCompatibleString(LfgCompatibility compatibles)
             return "Too many players";
         case LFG_INCOMPATIBLES_WRONG_GROUP_SIZE:
             return "Wrong group size";
+        case LFG_INCOMPATIBLES_ITEM_LEVEL:
+            return "Incompatible item levels";
         default:
             return "Unknown";
     }
@@ -86,6 +89,9 @@ LfgQueueData::LfgQueueData() : joinTime(GameTime::GetGameTime()),
     tanks(LFG_TANKS_NEEDED),
     healers(LFG_HEALERS_NEEDED),
     dps(LFG_DPS_NEEDED)
+{ }
+
+LFGQueue::LFGQueue() : lastUpdate(GameTime::GetGameTime())
 { }
 
 std::string LFGQueue::GetDetailedMatchRoles(GuidList const& check) const
@@ -135,15 +141,14 @@ void LFGQueue::AddToQueue(ObjectGuid guid, bool reAdd)
     }
 
     if (reAdd)
-        AddToFrontCurrentQueue(guid);
+        itQueue->second.isQueued = true;
     else
-        AddToNewQueue(guid);
+        currentQueueStore.push_back(guid);
 }
 
 void LFGQueue::RemoveFromQueue(ObjectGuid guid)
 {
-    RemoveFromNewQueue(guid);
-    RemoveFromCurrentQueue(guid);
+    currentQueueStore.remove(guid);
     RemoveFromCompatibles(guid);
 
     std::ostringstream o;
@@ -167,32 +172,7 @@ void LFGQueue::RemoveFromQueue(ObjectGuid guid)
         QueueDataStore.erase(itDelete);
 }
 
-void LFGQueue::AddToNewQueue(ObjectGuid guid)
-{
-    newToQueueStore.push_back(guid);
-}
-
-void LFGQueue::RemoveFromNewQueue(ObjectGuid guid)
-{
-    newToQueueStore.remove(guid);
-}
-
-void LFGQueue::AddToCurrentQueue(ObjectGuid guid)
-{
-    currentQueueStore.push_back(guid);
-}
-
-void LFGQueue::AddToFrontCurrentQueue(ObjectGuid guid)
-{
-    currentQueueStore.push_front(guid);
-}
-
-void LFGQueue::RemoveFromCurrentQueue(ObjectGuid guid)
-{
-    currentQueueStore.remove(guid);
-}
-
-void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
+void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel)
 {
     bool isSolo = dungeons.find(STORMWINDVAULT) != dungeons.end();
     bool isRaid = dungeons.find(DRAGONISLESRAID) != dungeons.end();
@@ -201,7 +181,10 @@ void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet cons
     int healersNeeded = isRaid ? LFR_HEALERS_NEEDED : isThreeMan ? LFG_SMALL_HEALERS_NEEDED : LFG_HEALERS_NEEDED;
     int dpsNeeded = isRaid ? LFR_DPS_NEEDED : isThreeMan ? LFG_SMALL_DPS_NEEDED : LFG_DPS_NEEDED;
 
-    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo);
+    // TODO: calculate group penalty
+    int penalty = 0;
+
+    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo, itemLevel, penalty);
     AddToQueue(guid);
 }
 
@@ -303,25 +286,72 @@ LfgCompatibilityData* LFGQueue::GetCompatibilityData(std::string const& key)
 
 uint8 LFGQueue::FindGroups()
 {
-    uint8 proposals = 0;
-    GuidList firstNew;
-    while (!newToQueueStore.empty())
+    time_t now = GameTime::GetGameTime();
+    if (now <= lastUpdate)
     {
-        ObjectGuid frontguid = newToQueueStore.front();
-        TC_LOG_DEBUG("lfg.queue.match.check.new", "Checking [%s] newToQueue(%u), currentQueue(%u)", frontguid.ToString().c_str(),
-            uint32(newToQueueStore.size()), uint32(currentQueueStore.size()));
+        return 0;
+    }
+    int secondsSinceUpdate = now - lastUpdate;
+    lastUpdate = now;
 
-        firstNew.clear();
-        firstNew.push_back(frontguid);
-        RemoveFromNewQueue(frontguid);
+    GuidList check;
+    GuidList penalties;
+    GuidList toRemove;
+    for (GuidList::iterator it = currentQueueStore.begin(); it != currentQueueStore.end(); ++it)
+    {
+        ObjectGuid guid = *it;
+        LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
+        if (itQueue == QueueDataStore.end())
+        {
+            TC_LOG_ERROR("lfg.queue.match.check.new", "Guid: [%s] is not queued but listed as queued!", guid.ToString().c_str());
+            toRemove.push_back(guid);
+        }
+        else if (itQueue->second.isQueued)
+        {
+            // Calculate item level range (seconds * 0.5)
+            itQueue->second.itemLevelRange = (now - itQueue->second.joinTime) * 0.5;
+            if (itQueue->second.penalty >= 50)
+                penalties.push_back(guid);
+            else
+                check.push_back(guid);
+         //   TC_LOG_INFO("server.worldserver", "LFG guid [%s] updated to range %d - %d (itemLevel: %d, penalty: %d)", guid.ToString().c_str(), itQueue->second.itemLevel - range, itQueue->second.itemLevel + range, itQueue->second.itemLevel, itQueue->second.penalty);
+        }
+        else
+        {
+            // pause time queued while a proposal is active
+            itQueue->second.joinTime += secondsSinceUpdate;
+        }
+    }
+    while (!toRemove.empty())
+    {
+        RemoveFromQueue(toRemove.back());
+        toRemove.pop_back();
+    }
+    while (!penalties.empty())
+    {
+        check.push_back(penalties.back());
+        penalties.pop_back();
+    }
 
-        GuidList temporalList = currentQueueStore;
-        LfgCompatibility compatibles = FindNewGroups(firstNew, temporalList);
+    // Range updated, clear cached compatibles
+    CompatibleMapStore.clear();
+    uint8 proposals = 0;
+    GuidList first;
+    for (GuidList::iterator it = check.begin(); it != check.end(); ++it)
+    {
+        ObjectGuid guid = *it;
+        TC_LOG_DEBUG("lfg.queue.match.check.new", "Checking [%s] currentQueue(%u)", guid.ToString().c_str(),
+            uint32(check.size()));
+
+        first.clear();
+        first.push_back(guid);
+
+        GuidList temporalList = check;
+        temporalList.remove(guid);
+        LfgCompatibility compatibles = FindNewGroups(first, temporalList);
 
         if (compatibles == LFG_COMPATIBLES_MATCH)
             ++proposals;
-        else
-            AddToCurrentQueue(frontguid);                  // Lfg group not found, add this group to the queue.
     }
     return proposals;
 }
@@ -424,6 +454,10 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     // Check if more than one LFG group and number of players joining
     uint8 numPlayers = 0;
     uint8 numLfgGroups = 0;
+    int32 itemLevelLow = INT_MIN;
+    int32 itemLevelHigh = INT_MAX;
+    int32 penaltyMax = INT_MIN;
+    int32 penaltyTotal = 0;
     for (GuidList::const_iterator it = check.begin(); it != check.end() && numLfgGroups < 2 && numPlayers <= maxGroupSize; ++it)
     {
         ObjectGuid guid = *it;
@@ -434,6 +468,16 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
             RemoveFromQueue(guid);
             return LFG_COMPATIBILITY_PENDING;
         }
+
+        int32 low = itQueue->second.itemLevel - itQueue->second.itemLevelRange;
+        int32 high = itQueue->second.itemLevel + itQueue->second.itemLevelRange;
+        if (itemLevelLow < low)
+            itemLevelLow = low;
+        if (itemLevelHigh > high)
+            itemLevelHigh = high;
+        if (itQueue->second.penalty > penaltyMax)
+            penaltyMax = itQueue->second.penalty;
+        penaltyTotal += itQueue->second.penalty;
 
         // Store group so we don't need to call Mgr to get it later (if it's player group will be 0 otherwise would have joined as group)
         for (LfgRolesMap::const_iterator it2 = itQueue->second.roles.begin(); it2 != itQueue->second.roles.end(); ++it2)
@@ -448,6 +492,11 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
             ++numLfgGroups;
         }
     }
+
+    // TODO: calculate penalty
+    int32 penalty = penaltyMax - penaltyTotal / check.size();
+    itemLevelLow += penalty;
+    itemLevelHigh -= penalty;
 
     // Group with less that MAXGROUPSIZE members always compatible
     if (check.size() == 1 && numPlayers != maxGroupSize)
@@ -496,6 +545,12 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
                 }
                 if (itPlayer == proposalRoles.end())
                     proposalRoles[itRoles->first] = itRoles->second;
+            }
+            int32 itemLevel = QueueDataStore[*it].itemLevel;
+            if (itemLevel < itemLevelLow || itemLevel > itemLevelHigh)
+            {
+                SetCompatibles(strGuids, LFG_INCOMPATIBLES_ITEM_LEVEL);
+                return LFG_INCOMPATIBLES_ITEM_LEVEL;
             }
         }
 
@@ -599,17 +654,22 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
             data.accept = LFG_ANSWER_AGREE;
     }
 
+    int numInQueue = 0;
+    uint32 averageQueueTime = 0;
     // Mark proposal members as not queued (but not remove queue data)
     for (GuidList::const_iterator itQueue = proposal.queues.begin(); itQueue != proposal.queues.end(); ++itQueue)
     {
-        ObjectGuid guid = (*itQueue);
-        RemoveFromNewQueue(guid);
-        RemoveFromCurrentQueue(guid);
+        QueueDataStore[*itQueue].isQueued = false;
+        auto time = std::time(0) - QueueDataStore[*itQueue].joinTime;
+        averageQueueTime += time;
+        ++numInQueue;
     }
+    averageQueueTime /= numInQueue;
 
     sLFGMgr->AddProposal(proposal);
 
     TC_LOG_DEBUG("lfg.queue.match.compatibility.check", "Guids: (%s) MATCH! Group formed", GetDetailedMatchRoles(check).c_str());
+    TC_METRIC_VALUE("lfg_queue_pop_time", averageQueueTime);
     SetCompatibles(strGuids, LFG_COMPATIBLES_MATCH);
     return LFG_COMPATIBLES_MATCH;
 }
@@ -669,26 +729,32 @@ time_t LFGQueue::GetJoinTime(ObjectGuid guid)
     return QueueDataStore[guid].joinTime;
 }
 
+uint32 LFGQueue::GetItemLevel(ObjectGuid guid)
+{
+    return QueueDataStore[guid].itemLevel;
+}
+
+uint32 LFGQueue::GetItemLevelRange(ObjectGuid guid)
+{
+    return QueueDataStore[guid].itemLevelRange;
+}
+
 std::string LFGQueue::DumpQueueInfo() const
 {
     uint32 players = 0;
     uint32 groups = 0;
     uint32 playersInGroup = 0;
 
-    for (uint8 i = 0; i < 2; ++i)
+    for (GuidList::const_iterator it = currentQueueStore.begin(); it != currentQueueStore.end(); ++it)
     {
-        GuidList const& queue = i ? newToQueueStore : currentQueueStore;
-        for (GuidList::const_iterator it = queue.begin(); it != queue.end(); ++it)
+        ObjectGuid guid = *it;
+        if (guid.IsGroup())
         {
-            ObjectGuid guid = *it;
-            if (guid.IsGroup())
-            {
-                groups++;
-                playersInGroup += sLFGMgr->GetPlayerCount(guid);
-            }
-            else
-                players++;
+            groups++;
+            playersInGroup += sLFGMgr->GetPlayerCount(guid);
         }
+        else
+            players++;
     }
     std::ostringstream o;
     o << "Queued Players: " << players << " (in group: " << playersInGroup << ") Groups: " << groups << "\n";

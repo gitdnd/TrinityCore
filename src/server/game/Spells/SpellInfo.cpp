@@ -773,6 +773,9 @@ SpellEffectInfo::StaticData SpellEffectInfo::_data[TOTAL_SPELL_EFFECTS] =
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM }, // 171 SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM }, // 172 SPELL_EFFECT_REROLL_VIRTUAL_ITEM
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM }, // 173 SPELL_EFFECT_EXTRACT_GEMS
+    { EFFECT_IMPLICIT_TARGET_NONE, TARGET_OBJECT_TYPE_NONE }, // 174 SPELL_EFFECT_PCT_XP_GAIN
+    { EFFECT_IMPLICIT_TARGET_NONE, TARGET_OBJECT_TYPE_NONE }, // 175 SPELL_EFFECT_XP_GAIN
+
 
 };
 
@@ -3062,6 +3065,101 @@ uint32 SpellInfo::GetAllowedMechanicMask() const
     return _allowedMechanicMask;
 }
 
+bool SpellInfo::IsSupportSpell() const
+{
+    if (!IsPositive())
+        return false;
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        switch (Effects[i].Effect)
+        {
+        case SPELL_EFFECT_HEAL:
+        case SPELL_EFFECT_HEAL_PCT:
+        case SPELL_EFFECT_RESURRECT:
+        case SPELL_EFFECT_RESURRECT_NEW:
+            return true;
+            break;
+        case SPELL_EFFECT_APPLY_AURA:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        {
+            switch (Effects[i].ApplyAuraName)
+            {
+            case SPELL_AURA_DAMAGE_SHIELD:
+            case SPELL_AURA_PERIODIC_HEAL:
+                return true;
+                break;
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+            {
+                if (auto const trigger = sSpellMgr->GetSpellInfo(Effects[i].TriggerSpell))
+                    return trigger->IsSupportSpell();
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+
+        }
+    }
+
+    return false;
+}
+
+bool SpellInfo::IsPhysicalDamageSpell() const
+{
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        switch (Effects[i].Effect)
+        {
+        case SPELL_EFFECT_SCHOOL_DAMAGE:
+        case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+        case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+        case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+        case SPELL_EFFECT_WEAPON_DAMAGE:
+            return GetSchoolMask() == SPELL_SCHOOL_NORMAL;
+            break;
+        case SPELL_EFFECT_APPLY_AURA:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        {
+            switch (Effects[i].ApplyAuraName)
+            {
+            case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+            case SPELL_AURA_PERIODIC_DAMAGE:
+                return GetSchoolMask() == SPELL_SCHOOL_NORMAL;
+                break;
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+            {
+                if (auto const trigger = sSpellMgr->GetSpellInfo(Effects[i].TriggerSpell))
+                    return trigger->IsPhysicalDamageSpell();
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+
+        }
+    }
+    return false;
+}
+
 float SpellInfo::GetMinRange(bool positive /*= false*/) const
 {
     if (!RangeEntry)
@@ -3171,15 +3269,20 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     if (!unitCaster)
         return 0;
 
+    Powers usingPower = PowerType;
+
+    //if (unitCaster && unitCaster->HasAura(SPELL_BLOOD_MAGIC) && PowerType == POWER_MANA)
+        //usingPower = POWER_HEALTH;
+
     // Spell drain all exist power on cast (Only paladin lay of Hands)
     if (HasAttribute(SPELL_ATTR1_DRAIN_ALL_POWER))
     {
         // If power type - health drain all
-        if (PowerType == POWER_HEALTH)
+        if (usingPower == POWER_HEALTH)
             return unitCaster->GetHealth();
         // Else drain all power
-        if (PowerType < MAX_POWERS)
-            return unitCaster->GetPower(PowerType);
+        if (usingPower < MAX_POWERS)
+            return unitCaster->GetPower(usingPower);
         TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
         return 0;
     }
@@ -3189,7 +3292,7 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
     // PCT cost from total amount
     if (ManaCostPercentage)
     {
-        switch (PowerType)
+        switch (usingPower)
         {
             // health as power used
             case POWER_HEALTH:

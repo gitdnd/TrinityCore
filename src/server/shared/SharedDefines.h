@@ -975,7 +975,9 @@ enum SpellEffects
     SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE = 171,
     SPELL_EFFECT_REROLL_VIRTUAL_ITEM                = 172,
     SPELL_EFFECT_EXTRACT_GEMS                       = 173,
-    TOTAL_SPELL_EFFECTS                             = 174
+    SPELL_EFFECT_PCT_XP_GAIN                        = 174,
+    SPELL_EFFECT_XP_GAIN                            = 175,
+    TOTAL_SPELL_EFFECTS                             = 176
 };
 
 enum SpellCastResult
@@ -3873,6 +3875,12 @@ enum WorldState : uint32
     WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly quest reset time
     WS_DAILY_QUEST_RESET_TIME   = 20008,                     // Next daily quest reset time
     WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20009,      // Next daily calendar deletions of old events time
+};
+
+enum CustomSpells : uint32
+{
+    SPELL_BLOOD_MAGIC = 450000,
+    SPELL_ICY_HOT = 180206,
 };
 
 namespace Trinity

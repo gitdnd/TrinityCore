@@ -363,7 +363,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         int GetDungeonLevel() const {
             return _dungeonLevelOverride > 0 && _dungeonLevelOverride <= 10000 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
         }
-
+        bool blockMirror;
+        void ApplyScaledResistances();
+        void ApplyScaledArmor();
     protected:
         bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 entry, CreatureData const* data = nullptr, uint32 vehId = 0);
         bool InitEntry(uint32 entry, CreatureData const* data = nullptr);
