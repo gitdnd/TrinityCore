@@ -166,21 +166,22 @@ void VirtualItemMgr::LoadSpellsFromDB()
     do {
         Field* fields = result->Fetch();
         uint32 spellId = fields[0].GetUInt32();
-        uint32 quality = fields[1].GetUInt32();
-        int32 itemClass = fields[2].GetInt32();
-        int32 subClass = fields[3].GetInt32();
-        int32 inventoryType = fields[4].GetInt32();
-        int8 statGroup = fields[5].GetInt8();
-        int32 minItemLevel = fields[6].GetInt32();
-        int32 maxItemLevel = fields[7].GetInt32();
-        uint32 SpellTrigger = fields[8].GetUInt32();
-        int32  SpellCharges = fields[9].GetInt32();
-        float  SpellPPMRate = fields[10].GetFloat();
-        int32  SpellCooldown = fields[11].GetInt32();
-        uint32 SpellCategory = fields[12].GetUInt32();
-        int32  SpellCategoryCooldown = fields[13].GetInt32();
+        uint32 minQuality = fields[1].GetUInt32();
+        uint32 maxQuality = fields[2].GetUInt32();
+        int32 itemClass = fields[3].GetInt32();
+        int32 subClass = fields[4].GetInt32();
+        int32 inventoryType = fields[5].GetInt32();
+        int8 statGroup = fields[6].GetInt8();
+        int32 minItemLevel = fields[7].GetInt32();
+        int32 maxItemLevel = fields[8].GetInt32();
+        uint32 SpellTrigger = fields[9].GetUInt32();
+        int32  SpellCharges = fields[10].GetInt32();
+        float  SpellPPMRate = fields[11].GetFloat();
+        int32  SpellCooldown = fields[12].GetInt32();
+        uint32 SpellCategory = fields[13].GetUInt32();
+        int32  SpellCategoryCooldown = fields[14].GetInt32();
 
-        availableSpells.push_back(itemSpellInfo(spellId, quality, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
+        availableSpells.push_back(itemSpellInfo(spellId, minQuality, maxQuality, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown));
         ++count;
     } while (result->NextRow());
 
@@ -972,7 +973,10 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     std::list<itemSpellInfo> spells;
     for (itemSpellInfo const someSpells : availableSpells)
     {
-        if (someSpells.quality != -1 && output->Quality != someSpells.quality)
+        if (someSpells.minQuality != -1 && output->Quality < someSpells.minQuality)
+            continue;
+
+        if (someSpells.maxQuality != -1 && output->Quality > someSpells.maxQuality)
             continue;
 
         if (someSpells.itemClass != -1 && (int32)output->Class != someSpells.itemClass)
