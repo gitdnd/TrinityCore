@@ -176,10 +176,11 @@ struct VirtualModifier
 struct itemSpellInfo
 {
     itemSpellInfo() { spellId = 0; }
-    itemSpellInfo(uint32 sId, uint32 qual, int32 iClass, int32 sub, uint32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), quality(qual),
+    itemSpellInfo(uint32 sId, uint32 minQual, uint32 maxQual, int32 iClass, int32 sub, uint32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), minQuality(minQual), maxQuality(maxQual),
         itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
     uint32 spellId;
-    uint32 quality;
+    uint32 minQuality;
+    uint32 maxQuality;
     int32 itemClass;
     int32 subClass;
     int32 inventoryType;
