@@ -106,10 +106,13 @@ void Eluna::LoadScriptPaths()
 {
     lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
 
-    ELUNA_LOG_INFO("[Eluna]: Pulling git scripts...");
-    std::ostringstream command;
-    command << "cd " << std::filesystem::current_path() << "\\" << lua_folderpath << " & git pull --recurse-submodules";
-    system(command.str().c_str());
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+    {
+        ELUNA_LOG_INFO("[Eluna]: Pulling git scripts...");
+        std::ostringstream command;
+        command << "cd " << std::filesystem::current_path() << "\\" << lua_folderpath << " & git pull --recurse-submodules";
+        system(command.str().c_str());
+    }
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     lua_scripts.clear();

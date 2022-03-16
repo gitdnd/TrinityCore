@@ -1102,8 +1102,6 @@ class TC_GAME_API WorldSession
         QueryCallbackProcessor _queryProcessor;
         AsyncCallbackProcessor<TransactionCallback> _transactionCallbacks;
 
-        std::atomic<uint32> _addonMessageReceiveCount;
-
     friend class World;
     protected:
         class DosProtection

@@ -8,7 +8,6 @@
 #define PLAYERMETHODS_H
 #include <Achievements\AchievementMgr.h>
 #include <DungeonFinding\LFGMgr.h>
-#include <Metric\Metric.h>
 
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
@@ -3624,9 +3623,6 @@ namespace LuaPlayer
 #else
         receiver->GetSession()->SendPacket(&data);
 #endif
-
-        TC_METRIC_EVENT("addon_message_sent", "Sent", prefix);
-
         return 0;
     }
 
