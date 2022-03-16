@@ -3395,7 +3395,7 @@ void Creature::ApplyScaledResistances()
     float shadow = cInfo->resistance[SPELL_SCHOOL_SHADOW];
     float arcane = cInfo->resistance[SPELL_SCHOOL_ARCANE];
 
-    /*if (GetDungeonLevel() > 1 && !IsPet())
+    if (GetDungeonLevel() > 1 && !IsPet())
     {
         // Set the resistance to 1/3 of the current dungeon level.
         // This is fine for bosses up to ilevel 300
@@ -3425,7 +3425,7 @@ void Creature::ApplyScaledResistances()
         frost += scaledFlatResistances;
         shadow += scaledFlatResistances;
         arcane += scaledFlatResistances;
-    }*/
+    }
 
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, holy);
     SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, fire);
@@ -3439,9 +3439,9 @@ void Creature::ApplyScaledArmor()
 {
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), GetCreatureTemplate()->unit_class);
     float armor = stats->GenerateArmor(GetCreatureTemplate());
-    /*int dungeonLevel = GetDungeonLevel();
+    int dungeonLevel = GetDungeonLevel();
     if(dungeonLevel > 1 && !IsPet())
-        armor += ((float)dungeonLevel / 1000.0f) * armor;*/
+        armor += ((float)dungeonLevel / 1000.0f) * armor;
 
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }
