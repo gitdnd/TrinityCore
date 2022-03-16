@@ -605,7 +605,13 @@ bool Map::AddPlayerToMap(Player* player)
     if (player->IsAlive())
         ConvertCorpseToBones(player->GetGUID());
 
+    auto now = std::time(0);
     sScriptMgr->OnPlayerEnterMap(this, player);
+    uint32 timeTaken = std::time(0) - now;
+    if (timeTaken > 80)
+    {
+        TC_LOG_ERROR("network", "Time taken to call sScriptMgr::OnPlayerEnterMap = %u ms", timeTaken);
+    }
     player->ClearInactiveGemSpells();
     return true;
 }

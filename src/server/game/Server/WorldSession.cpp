@@ -140,8 +140,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _pendingTimeSyncRequests(),
     _timeSyncNextCounter(0),
     _timeSyncTimer(0),
-    _calendarEventCreationCooldown(0),
-    _addonMessageReceiveCount(0)
+    _calendarEventCreationCooldown(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -283,6 +282,11 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+    if (diff > 200)
+    {
+        TC_LOG_ERROR("network", "Update diff over 100ms: %u", diff);
+    }
+
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
@@ -440,8 +444,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     }
 
     TC_METRIC_VALUE("processed_packets", processedPackets);
-    TC_METRIC_VALUE("addon_messages", _addonMessageReceiveCount.load());
-    _addonMessageReceiveCount = 0;
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
 

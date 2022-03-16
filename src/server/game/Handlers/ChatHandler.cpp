@@ -274,8 +274,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (lang != LANG_ADDON)
         lang = LANG_UNIVERSAL;
-    else
-        ++_addonMessageReceiveCount;
 
     std::stringstream chatSpy;
     switch (type)
