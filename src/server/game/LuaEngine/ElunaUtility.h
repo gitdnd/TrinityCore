@@ -31,7 +31,7 @@
 template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
-    if (sWorld->setBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
     {
         std::ostringstream str;
         str << "DiscordScriptError.exe";
