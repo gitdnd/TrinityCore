@@ -282,7 +282,7 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
-    if (diff > 100)
+    if (diff > 200)
     {
         TC_LOG_ERROR("network", "Update diff over 100ms: %u", diff);
     }
