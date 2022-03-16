@@ -24,6 +24,7 @@
 #include "Database/QueryResult.h"
 #include "Log.h"
 #endif
+#include "World.h"
 #include <iostream>
 
 #ifdef TRINITY
