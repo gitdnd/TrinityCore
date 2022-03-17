@@ -447,14 +447,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Victory Rush
                 else if (m_spellInfo->SpellFamilyFlags[1] & 0x100)
                     ApplyPct(damage, unitCaster->GetTotalAttackPowerValue(BASE_ATTACK));
-                // Shockwave
-                else if (m_spellInfo->Id == 46968)
-                {
-                    int32 pct = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_2);
-                    if (pct > 0)
-                        damage += int32(CalculatePct(unitCaster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
-                    break;
-                }
                 break;
             }
             case SPELLFAMILY_WARLOCK:
@@ -476,54 +468,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Conflagrate - consumes Immolate or Shadowflame
                 else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
                 {
-                    AuraEffect const* aura = nullptr;                // found req. aura for damage calculation
 
-                    Unit::AuraEffectList const& mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
-                    {
-                        // for caster applied auras only
-                        if ((*i)->GetSpellInfo()->SpellFamilyName != SPELLFAMILY_WARLOCK ||
-                            (*i)->GetCasterGUID() != unitCaster->GetGUID())
-                            continue;
-
-                        // Immolate
-                        if ((*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x4)
-                        {
-                            aura = *i;                      // it selected always if exist
-                            break;
-                        }
-
-                        // Shadowflame
-                        if ((*i)->GetSpellInfo()->SpellFamilyFlags[2] & 0x00000002)
-                            aura = *i;                      // remember but wait possible Immolate as primary priority
-                    }
-
-                    // found Immolate or Shadowflame
-                    if (aura)
-                    {
-                        // Calculate damage of Immolate/Shadowflame tick
-                        int32 pdamage = aura->GetAmount();
-                        pdamage = unitTarget->SpellDamageBonusTaken(unitCaster, aura->GetSpellInfo(), pdamage, DOT);
-
-                        // And multiply by amount of ticks to get damage potential
-                        pdamage *= aura->GetSpellInfo()->GetMaxTicks();
-
-                        int32 pct_dir = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_1);
-                        damage += CalculatePct(pdamage, pct_dir);
-
-                        int32 pct_dot = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_2);
-                        int32 const dotBasePoints = CalculatePct(pdamage, pct_dot);
-
-                        ASSERT(m_spellInfo->GetMaxTicks() > 0);
-                        m_spellValue->EffectBasePoints[EFFECT_1] = dotBasePoints / m_spellInfo->GetMaxTicks();
-
-                        apply_direct_bonus = false;
-                        // Glyph of Conflagrate
-                        if (!unitCaster->HasAura(56235))
-                            unitTarget->RemoveAurasDueToSpell(aura->GetId(), unitCaster->GetGUID());
-
-                        break;
-                    }
                 }
                 // Shadow Bite
                 else if (m_spellInfo->SpellFamilyFlags[1] & 0x400000)
@@ -664,109 +609,142 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
                 break;
             }
-            case SPELLFAMILY_HUNTER:
+
+*/
+        }
+        if (unitCaster)
+        {
+            switch (this->m_spellInfo->Id)
             {
-                if (!unitCaster)
-                    break;
+            case 53595: // Hammer of Righteousness	
+            {
 
-                //Gore
-                if (m_spellInfo->SpellIconID == 1578)
+                float minTotal = 0.f;
+                float maxTotal = 0.f;
+
+                float tmpMin, tmpMax;
+                for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
                 {
-                    if (unitCaster->HasAura(57627))           // Charge 6 sec post-affect
-                        damage *= 2;
+                    unitCaster->CalculateMinMaxDamage(BASE_ATTACK, false, false, tmpMin, tmpMax, i);
+                    minTotal += tmpMin;
+                    maxTotal += tmpMax;
                 }
-                // Steady Shot
-                else if (m_spellInfo->SpellFamilyFlags[1] & 0x1)
-                {
-                    bool found = false;
-                    // check dazed affect
-                    Unit::AuraEffectList const& decSpeedList = unitTarget->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
-                    for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
-                    {
-                        if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == 0)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
 
-                    /// @todo should this be put on taken but not done?
-                    if (found)
-                        damage += m_spellInfo->Effects[EFFECT_1].CalcValue();
+                float average = (minTotal + maxTotal) / 2;
+                // Add main hand dps * effect[2] amount
+                int32 count = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_2);
+                damage += count * int32(average * IN_MILLISECONDS) / unitCaster->GetAttackTime(BASE_ATTACK);
+                break;
 
-                    if (Player* caster = unitCaster->ToPlayer())
-                    {
-                        // Add Ammo and Weapon damage plus RAP * 0.1
-                        float dmg_min = 0.f;
-                        float dmg_max = 0.f;
-                        for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-                        {
-                            dmg_min += caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE, i);
-                            dmg_max += caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE, i);
-                        }
-
-                        if (dmg_max == 0.0f && dmg_min > dmg_max)
-                            damage += int32(dmg_min);
-                        else
-                            damage += irand(int32(dmg_min), int32(dmg_max));
-                        damage += int32(caster->GetAmmoDPS() * caster->GetAttackTime(RANGED_ATTACK) * 0.001f);
-                    }
-                }
+            }
+            case 61411: // Shield of Righteousness	
+            {
+                uint8 level = unitCaster->GetLevel();
+                uint32 block_value = unitCaster->GetShieldBlockValue(uint32(float(level) * 29.5f), uint32(float(level) * 39.5f));
+                damage += CalculatePct(block_value, m_spellInfo->Effects[EFFECT_1].CalcValue());
                 break;
             }
-            case SPELLFAMILY_PALADIN:
+            case 49052: // Steady Shot 
             {
-                if (!unitCaster)
-                    break;
-
-                // Hammer of the Righteous
-                if (m_spellInfo->SpellFamilyFlags[1] & 0x00040000)
+                bool found = false;
+                // check dazed affect
+                Unit::AuraEffectList const& decSpeedList = unitTarget->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
+                for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
                 {
-                    float minTotal = 0.f;
-                    float maxTotal = 0.f;
+                    if ((*iter)->GetSpellInfo()->SpellIconID == 15 && (*iter)->GetSpellInfo()->Dispel == 0)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
 
-                    float tmpMin, tmpMax;
+                /// @todo should this be put on taken but not done?
+                if (found)
+                    damage += m_spellInfo->Effects[EFFECT_1].CalcValue();
+
+                if (Player* caster = unitCaster->ToPlayer())
+                {
+                    // Add Ammo and Weapon damage plus RAP * 0.1
+                    float dmg_min = 0.f;
+                    float dmg_max = 0.f;
                     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
                     {
-                        unitCaster->CalculateMinMaxDamage(BASE_ATTACK, false, false, tmpMin, tmpMax, i);
-                        minTotal += tmpMin;
-                        maxTotal += tmpMax;
+                        dmg_min += caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE, i);
+                        dmg_max += caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE, i);
                     }
 
-                    float average = (minTotal + maxTotal) / 2;
-                    // Add main hand dps * effect[2] amount
-                    int32 count = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_2);
-                    damage += count * int32(average * IN_MILLISECONDS) / unitCaster->GetAttackTime(BASE_ATTACK);
-                    break;
+                    if (dmg_max == 0.0f && dmg_min > dmg_max)
+                        damage += int32(dmg_min);
+                    else
+                        damage += irand(int32(dmg_min), int32(dmg_max));
+                    damage += int32(caster->GetAmmoDPS() * caster->GetAttackTime(RANGED_ATTACK) * 0.001f);
                 }
-                // Shield of Righteousness
-                if (m_spellInfo->SpellFamilyFlags[EFFECT_1] & 0x100000)
+                break;
+            }
+            case 17962: // Conflagrate
+            {
+                AuraEffect const* aura = nullptr;                // found req. aura for damage calculation
+
+                Unit::AuraEffectList const& mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
                 {
-                    uint8 level = unitCaster->GetLevel();
-                    uint32 block_value = unitCaster->GetShieldBlockValue(uint32(float(level) * 29.5f), uint32(float(level) * 39.5f));
-                    damage += CalculatePct(block_value, m_spellInfo->Effects[EFFECT_1].CalcValue());
+                    // for caster applied auras only
+                    if ((*i)->GetCasterGUID() != unitCaster->GetGUID())
+                        continue;
+
+                    // Immolate
+                    if ((*i)->GetSpellInfo()->Id == 47811)
+                    {
+                        aura = *i;                      // it selected always if exist
+                        break;
+                    }
+
+                    // Shadowflame
+                    if ((*i)->GetSpellInfo()->Id == 61290)
+                        aura = *i;                      // remember but wait possible Immolate as primary priority
+                }
+
+                // found Immolate or Shadowflame
+                if (aura)
+                {
+                    // Calculate damage of Immolate/Shadowflame tick
+                    int32 pdamage = aura->GetAmount();
+                    pdamage = unitTarget->SpellDamageBonusTaken(unitCaster, aura->GetSpellInfo(), pdamage, DOT);
+
+                    // And multiply by amount of ticks to get damage potential
+                    pdamage *= aura->GetSpellInfo()->GetMaxTicks();
+
+                    int32 pct_dir = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_1);
+                    damage += CalculatePct(pdamage, pct_dir);
+
+                    int32 pct_dot = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_2);
+                    int32 const dotBasePoints = CalculatePct(pdamage, pct_dot);
+
+                    ASSERT(m_spellInfo->GetMaxTicks() > 0);
+                    m_spellValue->EffectBasePoints[EFFECT_1] = dotBasePoints / m_spellInfo->GetMaxTicks();
+
+                    apply_direct_bonus = false;
+
                     break;
                 }
                 break;
             }
-            case SPELLFAMILY_DEATHKNIGHT:
+            case 46968: // Shockwave
             {
-                if (!unitCaster)
-                    break;
-
-                // Blood Boil - bonus for diseased targets
-                if (m_spellInfo->SpellFamilyFlags[0] & 0x00040000)
-                {
-                    if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0, 0x00000002, unitCaster->GetGUID()))
-                    {
-                        damage += m_damage / 2;
-                        damage += int32(unitCaster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.035f);
-                    }
-                }
+                int32 pct = unitCaster->CalculateSpellDamage(m_spellInfo, EFFECT_2);
+                if (pct > 0)
+                    damage += int32(CalculatePct(unitCaster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
                 break;
-            }*/
+            }
+            case 47488: // Shield Slam
+            {
+                uint8 level = unitCaster->GetLevel();
+                uint32 block_value = unitCaster->GetShieldBlockValue(uint32(float(level) * 24.5f), uint32(float(level) * 34.5f));
+                damage += int32(unitCaster->ApplyEffectModifiers(m_spellInfo, effIndex, float(block_value)));
+                break;
+            }
+            }
         }
-
         if (unitCaster && damage > 0 && apply_direct_bonus)
         {
             damage = unitCaster->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE, effIndex, { });

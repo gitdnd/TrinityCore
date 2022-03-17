@@ -1576,7 +1576,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data, WorldS
             *data << uint32(0);
             continue;
         }
-        //session->SendPacket(&proto->QueryData[static_cast<uint32>(session->GetSessionDbLocaleIndex())]);
+        session->SendPacket(&proto->QueryData[static_cast<uint32>(session->GetSessionDbLocaleIndex())]);
         SpellItemEnchantmentEntry const* enchant = nullptr;
 
         uint32 enchants = GetUInt32ValueFromArray(equipment, visualBase + 1);
