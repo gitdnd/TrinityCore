@@ -6133,7 +6133,7 @@ void ObjectMgr::LoadInstanceTemplate()
         instanceTemplate.AllowMount = fields[3].GetBool();
         instanceTemplate.Parent     = uint32(fields[1].GetUInt16());
         instanceTemplate.ScriptId   = sObjectMgr->GetScriptId(fields[2].GetString());
-        instanceTemplate.maxPlayerOverride = fields[3].GetUInt32();
+        instanceTemplate.maxPlayerOverride = fields[4].GetUInt32();
         _instanceTemplateStore[mapID] = instanceTemplate;
 
         ++count;
