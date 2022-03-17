@@ -514,16 +514,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (!unitCaster)
                     break;
 
-                // Ferocious Bite
-                if (unitCaster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags[0] & 0x000800000) && m_spellInfo->SpellVisual[0] == 6587)
-                {
-                    // converts each extra point of energy into ($f1+$AP/410) additional damage
-                    float ap = unitCaster->GetTotalAttackPowerValue(BASE_ATTACK);
-                    float multiple = ap / 410 + m_spellInfo->Effects[effIndex].DamageMultiplier;
-                    int32 energy = -(unitCaster->ModifyPower(POWER_ENERGY, -30));
-                    damage += int32(energy * multiple);
-                    damage += int32(CalculatePct(unitCaster->ToPlayer()->GetComboPoints() * ap, 7));
-                }
                 // Wrath
                 else if (m_spellInfo->SpellFamilyFlags[0] & 0x00000001)
                 {
@@ -746,6 +736,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
                         damage += damage / 4;
                 }
+                break;
+            }
+            case 48577: // Ferocious Bite
+            {
+                // converts each extra point of energy into ($f1+$AP/410) additional damage
+                float ap = unitCaster->GetTotalAttackPowerValue(BASE_ATTACK);
+                float multiple = ap / 410 + m_spellInfo->Effects[effIndex].DamageMultiplier;
+                int32 energy = -(unitCaster->ModifyPower(POWER_ENERGY, -30));
+                damage += int32(energy * multiple);
+                damage += int32(CalculatePct(unitCaster->ToPlayer()->GetComboPoints() * ap, 7));
                 break;
             }
             }
