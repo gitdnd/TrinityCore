@@ -459,11 +459,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 {
                     // Incinerate does more dmg (dmg*0.25) if the target have Immolate debuff.
                     // Check aura state for speed but aura state set not only for Immolate spell
-                    if (unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
-                    {
-                        if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
-                            damage += damage / 4;
-                    }
+
                 }
                 // Conflagrate - consumes Immolate or Shadowflame
                 else if (m_spellInfo->TargetAuraState == AURA_STATE_CONFLAGRATE)
@@ -741,6 +737,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 uint8 level = unitCaster->GetLevel();
                 uint32 block_value = unitCaster->GetShieldBlockValue(uint32(float(level) * 24.5f), uint32(float(level) * 34.5f));
                 damage += int32(unitCaster->ApplyEffectModifiers(m_spellInfo, effIndex, float(block_value)));
+                break;
+            }
+            case 47838: // Incinerate
+            {
+                if (unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
+                {
+                    if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
+                        damage += damage / 4;
+                }
                 break;
             }
             }
