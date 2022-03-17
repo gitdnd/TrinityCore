@@ -3163,29 +3163,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     /*
     switch (m_spellInfo->SpellFamilyName)
     {
-        case SPELLFAMILY_WARRIOR:
-        {
-            // Devastate (player ones)
-            if (m_spellInfo->SpellFamilyFlags[1] & 0x40)
-            {
-                unitCaster->CastSpell(unitTarget, 58567, true);
-                // 58388 - Glyph of Devastate dummy aura.
-                if (unitCaster->HasAura(58388))
-                    unitCaster->CastSpell(unitTarget, 58567, true);
 
-                if (Aura* aur = unitTarget->GetAura(58567, unitCaster->GetGUID()))
-                    fixed_bonus += (aur->GetStackAmount() - 1) * CalculateDamage(EFFECT_2); // subtract 1 so fixed bonus is not applied twice
-            }
-            else if (m_spellInfo->SpellFamilyFlags[0] & 0x8000000) // Mocking Blow
-            {
-                if (unitTarget->IsImmunedToSpellEffect(m_spellInfo, EFFECT_1, unitCaster) || unitTarget->GetTypeId() == TYPEID_PLAYER)
-                {
-                    m_damage = 0;
-                    return;
-                }
-            }
-            break;
-        }
         case SPELLFAMILY_ROGUE:
         {
             // Fan of Knives, Hemorrhage, Ghostly Strike
@@ -3344,6 +3322,30 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     case 47498: //Devastate
     {
         unitCaster->CastSpell(unitTarget, 58567, true);
+        break;
+    }
+    case 694: // Mocking Blow
+    {
+        if (unitTarget->IsImmunedToSpellEffect(m_spellInfo, EFFECT_1, unitCaster) || unitTarget->GetTypeId() == TYPEID_PLAYER)
+        {
+            m_damage = 0;
+            return;
+        }
+        break;
+    }
+    case 51723: // Fan of Knives
+    case 48660: // Hemorrhage
+    case 14278: // Ghostly Strike
+    {
+        // Hemorrhage
+        if (m_spellInfo->Id == 48660)
+            AddComboPointGain(unitTarget, 1);
+
+        // 50% more damage with daggers
+        if (unitCaster->GetTypeId() == TYPEID_PLAYER)
+            if (Item* item = unitCaster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
+                if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.5f;
         break;
     }
 
