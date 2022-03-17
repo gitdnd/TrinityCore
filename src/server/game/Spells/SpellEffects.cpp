@@ -3166,20 +3166,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
         case SPELLFAMILY_ROGUE:
         {
-            // Fan of Knives, Hemorrhage, Ghostly Strike
-            if ((m_spellInfo->SpellFamilyFlags[1] & 0x40000)
-                || (m_spellInfo->SpellFamilyFlags[0] & 0x6000000))
-            {
-                // Hemorrhage
-                if (m_spellInfo->SpellFamilyFlags[0] & 0x2000000)
-                    AddComboPointGain(unitTarget, 1);
-
-                // 50% more damage with daggers
-                if (unitCaster->GetTypeId() == TYPEID_PLAYER)
-                    if (Item* item = unitCaster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
-                        if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                            totalDamagePercentMod *= 1.5f;
-            }
             // Mutilate (for each hand)
             else if (m_spellInfo->SpellFamilyFlags[1] & 0x6)
             {
@@ -3203,16 +3189,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
                 if (found)
                     totalDamagePercentMod *= 1.2f;          // 120% if poisoned
-            }
-            break;
-        }
-        case SPELLFAMILY_PALADIN:
-        {
-            // Seal of Command Unleashed
-            if (m_spellInfo->Id == 20467)
-            {
-                spell_bonus += int32(0.08f * unitCaster->GetTotalAttackPowerValue(BASE_ATTACK));
-                spell_bonus += int32(0.13f * unitCaster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
             }
             break;
         }
@@ -3346,6 +3322,17 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             if (Item* item = unitCaster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                 if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                     totalDamagePercentMod *= 1.5f;
+        break;
+    }
+    case 20467: // Seal of Command Unleashed
+    {
+        spell_bonus += int32(0.08f * unitCaster->GetTotalAttackPowerValue(BASE_ATTACK));
+        spell_bonus += int32(0.13f * unitCaster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+        break;
+    }
+    case 48566:
+    {
+        AddComboPointGain(unitTarget, 1);
         break;
     }
 
