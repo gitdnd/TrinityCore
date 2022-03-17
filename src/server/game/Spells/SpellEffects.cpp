@@ -1352,8 +1352,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         AuraEffect* targetAura = nullptr;
         for (Unit::AuraEffectList::const_iterator i = RejorRegr.begin(); i != RejorRegr.end(); ++i)
         {
-            if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID
-                && (*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x50)
+            if ((*i)->GetSpellInfo()->Id == 48441 || (*i)->GetSpellInfo()->Id == 48443)
             {
                 if (!targetAura || (*i)->GetBase()->GetDuration() < targetAura->GetBase()->GetDuration())
                     targetAura = *i;
@@ -1371,7 +1370,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
         int32 tickcount = 0;
         // Rejuvenation
-        if (targetAura->GetSpellInfo()->SpellFamilyFlags[0] & 0x10)
+        if (targetAura->GetSpellInfo()->Id == 48441)
             tickcount = 4;
         // Regrowth
         else // if (targetAura->GetSpellInfo()->SpellFamilyFlags[0] & 0x40)
