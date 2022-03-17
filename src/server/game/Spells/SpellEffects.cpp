@@ -3202,23 +3202,12 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_DRUID:
         {
-            // Mangle (Cat): CP
-            if (m_spellInfo->SpellFamilyFlags[1] & 0x400)
-                AddComboPointGain(unitTarget, 1);
-
             // Shred, Maul - Rend and Tear
             else if (m_spellInfo->SpellFamilyFlags[0] & 0x00008800 && unitTarget->HasAuraState(AURA_STATE_BLEEDING))
             {
                 if (AuraEffect const* rendAndTear = unitCaster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 0))
                     AddPct(totalDamagePercentMod, rendAndTear->GetAmount());
             }
-            break;
-        }
-        case SPELLFAMILY_HUNTER:
-        {
-            // Kill Shot - bonus damage from Ranged Attack Power
-            if (m_spellInfo->SpellFamilyFlags[1] & 0x800000)
-                spell_bonus += int32(0.4f * unitCaster->GetTotalAttackPowerValue(RANGED_ATTACK));
             break;
         }
         case SPELLFAMILY_DEATHKNIGHT:
@@ -3330,12 +3319,16 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         spell_bonus += int32(0.13f * unitCaster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
         break;
     }
-    case 48566:
+    case 48566: // Mangle (Cat)
     {
         AddComboPointGain(unitTarget, 1);
         break;
     }
-
+    case 61006: // Kill Shot
+    {
+        spell_bonus += int32(0.4f * unitCaster->GetTotalAttackPowerValue(RANGED_ATTACK));
+        break;
+    }
     }
 
     bool normalized = false;
