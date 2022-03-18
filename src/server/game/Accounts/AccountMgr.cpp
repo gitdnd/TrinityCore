@@ -423,7 +423,7 @@ bool AccountMgr::IsBannedAccount(std::string const& name)
 
 bool AccountMgr::IsPlayerAccount(uint32 gmlevel)
 {
-    return gmlevel == SEC_PLAYER;
+    return gmlevel <= SEC_VIP;
 }
 
 bool AccountMgr::IsAdminAccount(uint32 gmlevel)
