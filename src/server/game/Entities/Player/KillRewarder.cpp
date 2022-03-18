@@ -25,6 +25,7 @@
 #include "InstanceScript.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ObjectMgr.h"
 
  // == KillRewarder ====================================================
  // KillRewarder encapsulates logic of rewarding player upon kill with:
@@ -150,6 +151,8 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
     }
     if (xp)
     {
+        if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
+            xp *= inst->mapXPRate;
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
         xp *= player->GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_PCT);
 

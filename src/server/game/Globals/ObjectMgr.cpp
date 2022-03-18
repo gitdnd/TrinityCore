@@ -6107,7 +6107,7 @@ void ObjectMgr::LoadInstanceTemplate()
     uint32 oldMSTime = getMSTime();
 
     //                                                0     1       2        4
-    QueryResult result = WorldDatabase.Query("SELECT map, parent, script, allowMount, maxPlayerOverride FROM instance_template");
+    QueryResult result = WorldDatabase.Query("SELECT map, parent, script, allowMount, maxPlayerOverride, mapXPRate FROM instance_template");
 
     if (!result)
     {
@@ -6134,6 +6134,7 @@ void ObjectMgr::LoadInstanceTemplate()
         instanceTemplate.Parent     = uint32(fields[1].GetUInt16());
         instanceTemplate.ScriptId   = sObjectMgr->GetScriptId(fields[2].GetString());
         instanceTemplate.maxPlayerOverride = fields[4].GetUInt32();
+        instanceTemplate.mapXPRate = fields[5].GetFloat();
         _instanceTemplateStore[mapID] = instanceTemplate;
 
         ++count;
