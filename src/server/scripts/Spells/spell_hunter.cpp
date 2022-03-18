@@ -249,13 +249,13 @@ class spell_hun_chimera_shot : public SpellScriptLoader
                             continue;
 
                         // Search only Serpent Sting, Viper Sting, Scorpid Sting auras
-                        flag96 familyFlag = aura->GetSpellInfo()->SpellFamilyFlags;
-                        if (!(familyFlag[1] & 0x00000080 || familyFlag[0] & 0x0000C000))
+                        uint32 Id = GetSpellInfo()->Id;
+                        if (Id != 49001 && Id != 3034 && Id != 3043)
                             continue;
                         if (AuraEffect const* aurEff = aura->GetEffect(EFFECT_0))
                         {
                             // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
-                            if (familyFlag[0] & 0x4000)
+                            if (Id == 49001)
                             {
                                 spellId = SPELL_HUNTER_CHIMERA_SHOT_SERPENT;
 
@@ -264,7 +264,7 @@ class spell_hun_chimera_shot : public SpellScriptLoader
                                 ApplyPct(basePoint, 40);
                             }
                             // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
-                            else if (familyFlag[1] & 0x00000080)
+                            else if (Id == 3034)
                             {
                                 spellId = SPELL_HUNTER_CHIMERA_SHOT_VIPER;
 
@@ -280,7 +280,7 @@ class spell_hun_chimera_shot : public SpellScriptLoader
                                 ApplyPct(basePoint, 60);
                             }
                             // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
-                            else if (familyFlag[0] & 0x00008000)
+                            else if (Id == 3043)
                                 spellId = SPELL_HUNTER_CHIMERA_SHOT_SCORPID;
 
                             // Refresh aura duration
