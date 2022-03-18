@@ -10128,16 +10128,16 @@ void Unit::ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMa
             else // For attacker
             {
                 // Overpower on victim dodge
-                /*if ((hitMask & PROC_HIT_DODGE) && GetTypeId() == TYPEID_PLAYER)
+                if ((hitMask & PROC_HIT_DODGE) && GetTypeId() == TYPEID_PLAYER)
                 {
-                    AddComboPoints(procTarget, 1);
+                    //AddComboPoints(procTarget, 1);
                     StartReactiveTimer(REACTIVE_OVERPOWER);
                 }
                 else if ((hitMask & PROC_HIT_CRITICAL) && IsHunterPet())
                 {
                     AddComboPoints(procTarget, 1);
                     StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
-                }*/
+                }
             }
         }
     }
@@ -10554,8 +10554,8 @@ void Unit::UpdateReactives(uint32 p_time)
                         ModifyAuraState(AURA_STATE_HUNTER_PARRY, false);
                     break;
                 case REACTIVE_OVERPOWER:
-                    if (GetTypeId() == TYPEID_PLAYER)
-                        ClearComboPoints();
+                    //if (GetTypeId() == TYPEID_PLAYER)
+                        //ClearComboPoints();
                     break;
                 case REACTIVE_WOLVERINE_BITE:
                     if (IsHunterPet())

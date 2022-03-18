@@ -6150,6 +6150,12 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 return SPELL_FAILED_ITEM_ALREADY_ENCHANTED;
     }
 
+    if (Unit* unitCaster = m_caster->ToUnit())
+    {
+        if (m_spellInfo->Id == 7384 && unitCaster->GetReactiveTimer(REACTIVE_OVERPOWER) >= 0)
+            return SPELL_FAILED_CASTER_AURASTATE;
+    }
+
     // check if caster has at least 1 combo point on target for spells that require combo points
     if (m_needComboPoints)
     {

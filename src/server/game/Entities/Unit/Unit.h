@@ -1600,7 +1600,7 @@ class TC_GAME_API Unit : public WorldObject
         void ClearAllReactives();
         void StartReactiveTimer(ReactiveType reactive) { m_reactiveTimer[reactive] = REACTIVE_TIMER_START;}
         void UpdateReactives(uint32 p_time);
-
+        uint32 GetReactiveTimer(ReactiveType reactive) { return m_reactiveTimer[reactive]; }
         // group updates
         void UpdateAuraForGroup(uint8 slot);
 
