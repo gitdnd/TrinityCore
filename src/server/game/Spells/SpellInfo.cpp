@@ -1986,11 +1986,7 @@ void SpellInfo::_LoadAuraState()
             return AURA_STATE_JUDGEMENT;
 
         // Conflagrate aura state on Immolate and Shadowflame
-        if (SpellFamilyName == SPELLFAMILY_WARLOCK &&
-            // Immolate
-            ((SpellFamilyFlags[0] & 4) ||
-                // Shadowflame
-            (SpellFamilyFlags[2] & 2)))
+        if (Id == 47811 || Id == 61290)
             return AURA_STATE_CONFLAGRATE;
 
         // Faerie Fire (druid versions)
@@ -2006,7 +2002,7 @@ void SpellInfo::_LoadAuraState()
             return AURA_STATE_WARRIOR_VICTORY_RUSH;
 
         // Swiftmend state on Regrowth & Rejuvenation
-        if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x50)
+        if (Id == 48443 || Id == 48441)
             return AURA_STATE_SWIFTMEND;
 
         // Deadly poison aura state
@@ -2227,6 +2223,10 @@ void SpellInfo::_LoadSpellDiminishInfo()
                 return DIMINISHING_TAUNT;
         }
 
+        // Deep Freeze
+        if (SpellIconID == 2939 && SpellVisual[0] == 9963)
+            return DIMINISHING_CONTROLLED_STUN;
+
         // Explicit Diminishing Groups
         switch (SpellFamilyName)
         {
@@ -2266,9 +2266,6 @@ void SpellInfo::_LoadSpellDiminishInfo()
                 // Shattered Barrier
                 else if (SpellVisual[0] == 12297)
                     return DIMINISHING_ROOT;
-                // Deep Freeze
-                else if (SpellIconID == 2939 && SpellVisual[0] == 9963)
-                    return DIMINISHING_CONTROLLED_STUN;
                 // Frost Nova / Freeze (Water Elemental)
                 else if (SpellIconID == 193)
                     return DIMINISHING_CONTROLLED_ROOT;
@@ -3478,6 +3475,32 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
     //We need scaling level info for some auras that compute bp 0 or positive but should be debuffs
     float bpScalePerLevel = spellInfo->Effects[effIndex].RealPointsPerLevel;
     int32 bp = spellInfo->Effects[effIndex].CalcValue();
+
+    if (spellInfo->Id == 40251)
+        return false;
+
+    if (spellInfo->Id == 43017 || spellInfo->Id == 43015)
+        return true;
+
+    // Arcane Missiles
+    if (spellInfo->Id == 42846)
+        return false;
+
+    if (spellInfo->Id == 47475 || spellInfo->Id == 47471)
+        return false;
+
+    if (spellInfo->Id == 34074)
+        return true;
+
+    if (spellInfo->Id == 60053)
+        return false;
+
+    if (spellInfo->Id == 53201)
+        return false;
+
+    if (spellInfo->Id == 180250)
+        return false;
+
     switch (spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
@@ -3503,43 +3526,9 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
                     break;
             }
             break;
-        case SPELLFAMILY_ROGUE:
-            // Shadow of Death, Teron Gorefiend, Black Temple
-            if (spellInfo->Id == 40251)
-                return false;
-            break;
-        case SPELLFAMILY_MAGE:
-            // Amplify Magic, Dampen Magic
-            if (spellInfo->SpellFamilyFlags[0] == 0x00002000)
-                return true;
-            // Permafrost (due to zero basepoint)
-            if (spellInfo->SpellFamilyFlags[2] == 0x00000010)
-                return false;
-            // Arcane Missiles
-            if (spellInfo->SpellFamilyFlags[0] == 0x00000800)
-                return false;
-            break;
-        case SPELLFAMILY_WARRIOR:
-            // Slam, Execute
-            if ((spellInfo->SpellFamilyFlags[0] & 0x20200000) != 0)
-                return false;
-            break;
         case SPELLFAMILY_PALADIN:
             // assortment of judgement related spells
             if (spellInfo->SpellFamilyFlags & flag96(0x208C0000, 0x00000208, 0x00000008))
-                return false;
-            break;
-        case SPELLFAMILY_HUNTER:
-            // Aspect of the Viper
-            if (spellInfo->Id == 34074)
-                return true;
-            // Explosive Shot
-            if (spellInfo->SpellFamilyFlags[1] == SPELLFAMILYFLAG1_HUNTER_EXPLOSIVE_SHOT)
-                return false;
-            break;
-        case SPELLFAMILY_DRUID:
-            // Starfall
-            if (spellInfo->SpellFamilyFlags[2] == 0x00000100)
                 return false;
             break;
         case SPELLFAMILY_DEATHKNIGHT:
