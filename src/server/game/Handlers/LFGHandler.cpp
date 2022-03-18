@@ -26,7 +26,8 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Chat.h"
-
+#include "SpellMgr.h"
+#include "SpellAuras.h"
 void BuildPlayerLockDungeonBlock(WorldPacket& data, lfg::LfgLockMap const& lock)
 {
     data << uint32(lock.size());                           // Size of lock dungeons
@@ -164,9 +165,22 @@ void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
     recvData >> lfgGroupID;
     recvData >> accept;
 
+
     TC_LOG_DEBUG("lfg", "CMSG_LFG_PROPOSAL_RESULT %s proposal: %u accept: %u",
         GetPlayerInfo().c_str(), lfgGroupID, accept ? 1 : 0);
     sLFGMgr->UpdateProposal(lfgGroupID, GetPlayer()->GetGUID(), accept);
+
+    if (!accept)
+    {
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(71041))
+        {
+            AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetPlayer());
+            createInfo.SetCaster(GetPlayer());
+
+            if (Aura* deserter = Aura::TryRefreshStackOrCreate(createInfo))
+                deserter->SetDuration(300000);
+        }
+    }
 }
 
 void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
