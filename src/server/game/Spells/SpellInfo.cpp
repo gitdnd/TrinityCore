@@ -2056,6 +2056,56 @@ void SpellInfo::_LoadSpellSpecific()
 {
     _spellSpecific = [this]() -> SpellSpecificType
     {
+        if (Id == 43046 || Id == 7301 || Id == 43008 || Id == 43024)
+            return SPELL_SPECIFIC_MAGE_ARMOR;
+
+        // Arcane brillance and Arcane intelect (normal check fails because of flags difference)
+        if (Id == 43002 || Id == 42995)
+            return SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE;
+
+        if (((SpellFamilyFlags[0] & 0x1000000) || Id == 12826) && Effects[0].ApplyAuraName == SPELL_AURA_MOD_CONFUSE)
+            return SPELL_SPECIFIC_MAGE_POLYMORPH;
+
+        if (Id == 12292) // Death Wish
+            return SPELL_SPECIFIC_WARRIOR_ENRAGE;
+
+        // Warlock (Demon Armor | Demon Skin | Fel Armor)
+        if (Id == 47889 || Id == 696 || Id == 47893)
+            return SPELL_SPECIFIC_WARLOCK_ARMOR;
+
+        //seed of corruption and corruption
+        if (Id == 47813 || Id == 47836)
+            return SPELL_SPECIFIC_WARLOCK_CORRUPTION;
+
+        if (Id == 48073 || Id == 48074)
+            return SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT;
+
+        // only hunter aspects have this (but not all aspects in hunter family)
+        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 49071)
+            return SPELL_SPECIFIC_ASPECT;
+
+        // Judgement of Wisdom, Judgement of Light, Judgement of Justice
+        if (Id == 20184 || Id == 20185 || Id == 20186)
+            return SPELL_SPECIFIC_JUDGEMENT;
+
+        // only hunter stings have this
+        if (Id == 49001 || Id == 3043 || Id == 3034 || Id == 49012)
+            return SPELL_SPECIFIC_STING;
+
+        if (Id == 47864 || Id == 47867 || Id == 18223 || Id == 47865 || Id == 11719)
+            return SPELL_SPECIFIC_CURSE;
+
+        // Collection of all the seal family flags. No other paladin spell has any of those.
+        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166)
+            return SPELL_SPECIFIC_SEAL;
+
+        if (Id == 10278 || Id == 1044 || Id == 62124 || Id == 6940 || Id == 1038)
+            return SPELL_SPECIFIC_HAND;
+
+        // only paladin auras have this (for palaldin class family)
+        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943)
+            return SPELL_SPECIFIC_AURA;
+
         switch (SpellFamilyName)
         {
             case SPELLFAMILY_GENERIC:
@@ -2129,93 +2179,6 @@ void SpellInfo::_LoadSpellSpecific()
                             break;
                     }
                 }
-                break;
-            }
-            case SPELLFAMILY_MAGE:
-            {
-                // family flags 18(Molten), 25(Frost/Ice), 28(Mage)
-                if (SpellFamilyFlags[0] & 0x12040000)
-                    return SPELL_SPECIFIC_MAGE_ARMOR;
-
-                // Arcane brillance and Arcane intelect (normal check fails because of flags difference)
-                if (SpellFamilyFlags[0] & 0x400)
-                    return SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE;
-
-                if ((SpellFamilyFlags[0] & 0x1000000) && Effects[0].ApplyAuraName == SPELL_AURA_MOD_CONFUSE)
-                    return SPELL_SPECIFIC_MAGE_POLYMORPH;
-
-                break;
-            }
-            case SPELLFAMILY_WARRIOR:
-            {
-                if (Id == 12292) // Death Wish
-                    return SPELL_SPECIFIC_WARRIOR_ENRAGE;
-
-                break;
-            }
-            case SPELLFAMILY_WARLOCK:
-            {
-                // only warlock curses have this
-                if (Dispel == DISPEL_CURSE)
-                    return SPELL_SPECIFIC_CURSE;
-
-                // Warlock (Demon Armor | Demon Skin | Fel Armor)
-                if (SpellFamilyFlags[1] & 0x20000020 || SpellFamilyFlags[2] & 0x00000010)
-                    return SPELL_SPECIFIC_WARLOCK_ARMOR;
-
-                //seed of corruption and corruption
-                if (SpellFamilyFlags[1] & 0x10 || SpellFamilyFlags[0] & 0x2)
-                    return SPELL_SPECIFIC_WARLOCK_CORRUPTION;
-                break;
-            }
-            case SPELLFAMILY_PRIEST:
-            {
-                // Divine Spirit and Prayer of Spirit
-                if (SpellFamilyFlags[0] & 0x20)
-                    return SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT;
-
-                break;
-            }
-            case SPELLFAMILY_HUNTER:
-            {
-                // only hunter stings have this
-                if (Dispel == DISPEL_POISON)
-                    return SPELL_SPECIFIC_STING;
-
-                // only hunter aspects have this (but not all aspects in hunter family)
-                if (SpellFamilyFlags.HasFlag(0x00380000, 0x00440000, 0x00001010))
-                    return SPELL_SPECIFIC_ASPECT;
-
-                break;
-            }
-            case SPELLFAMILY_PALADIN:
-            {
-                // Collection of all the seal family flags. No other paladin spell has any of those.
-                if (SpellFamilyFlags[1] & 0x26000C00
-                    || SpellFamilyFlags[0] & 0x0A000000)
-                    return SPELL_SPECIFIC_SEAL;
-
-                if (SpellFamilyFlags[0] & 0x00002190)
-                    return SPELL_SPECIFIC_HAND;
-
-                // Judgement of Wisdom, Judgement of Light, Judgement of Justice
-                if (Id == 20184 || Id == 20185 || Id == 20186)
-                    return SPELL_SPECIFIC_JUDGEMENT;
-
-                // only paladin auras have this (for palaldin class family)
-                if (SpellFamilyFlags[2] & 0x00000020)
-                    return SPELL_SPECIFIC_AURA;
-
-                break;
-            }
-            case SPELLFAMILY_SHAMAN:
-            {
-                // family flags 10 (Lightning), 42 (Earth), 37 (Water), proc shield from T2 8 pieces bonus
-                if (SpellFamilyFlags[1] & 0x420
-                    || SpellFamilyFlags[0] & 0x00000400
-                    || Id == 23552)
-                    return SPELL_SPECIFIC_ELEMENTAL_SHIELD;
-
                 break;
             }
             case SPELLFAMILY_DEATHKNIGHT:
