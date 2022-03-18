@@ -157,6 +157,7 @@ struct InstanceTemplate
     bool AllowMount;
     uint32 maxPlayerOverride;
     float mapXPRate;
+    uint32 vLvlMod;
 };
 
 typedef std::unordered_map<uint16, InstanceTemplate> InstanceTemplateContainer;
