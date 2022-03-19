@@ -174,10 +174,6 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         ItemTemplate const* personalProto;
                         if (VirtualItemMgr::IsVirtualTemplate(proto))
                         {
-
-                            if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
-                                modifier.vLvlMod = inst->vLvlMod;
-
                             int dungeonLevel = member->GetMap()->GetDungeonLevel();
                             int playerLevel = std::floor(member->GetAverageItemLevel());
                             modifier.plrAvgLvl = playerLevel > dungeonLevel ? dungeonLevel : playerLevel;
@@ -296,7 +292,16 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     Group* group = lootOwner->GetGroup();
 
     if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(lootOwner->GetMapId()))
-        modifier.vLvlMod += inst->vLvlMod;
+        modifier.vLvlMod = inst->vLvlMod;
+
+    if (!personal && group)
+    {
+        modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetDungeonLevel() : group->GetAvgItemLevel();
+    }
+    else
+    {
+        modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetDungeonLevel() : lootOwner->GetAverageItemLevel();
+    }
 
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 
