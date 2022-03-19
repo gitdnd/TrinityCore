@@ -176,15 +176,10 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         {
                             int dungeonLevel = member->GetMap()->GetDungeonLevel();
                             int playerLevel = std::floor(member->GetAverageItemLevel());
+                            modifier.plrAvgLvl = playerLevel > dungeonLevel ? dungeonLevel : playerLevel;
 
-                            if (playerLevel < dungeonLevel - 25)
+                            if (playerLevel >= dungeonLevel && playerLevel <= dungeonLevel + 50)
                                 modifier.plrAvgLvl = playerLevel;
-                            else if(playerLevel >= dungeonLevel - 25 && playerLevel <= dungeonLevel)
-                                modifier.plrAvgLvl = dungeonLevel;
-                            else if(playerLevel > dungeonLevel && playerLevel <= dungeonLevel + 50)
-                                modifier.plrAvgLvl = playerLevel;
-                            else if(playerLevel > dungeonLevel + 50)
-                                modifier.plrAvgLvl = dungeonLevel;
 
                             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;
