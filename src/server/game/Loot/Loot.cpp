@@ -176,7 +176,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         {
 
                             if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
-                                modifier.vLvlMod += inst->vLvlMod;
+                                modifier.vLvlMod = inst->vLvlMod;
 
                             int dungeonLevel = member->GetMap()->GetDungeonLevel();
                             int playerLevel = std::floor(member->GetAverageItemLevel());
