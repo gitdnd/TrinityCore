@@ -9841,6 +9841,81 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
     return NULL_SLOT;
 }
 
+uint8 Player::GetEquipSlot(ItemTemplate const* proto) const
+{
+    switch (proto->InventoryType)
+    {
+    case INVTYPE_HEAD:
+        return EQUIPMENT_SLOT_HEAD;
+        break;
+    case INVTYPE_SHOULDERS:
+        return EQUIPMENT_SLOT_SHOULDERS;
+        break;
+    case INVTYPE_BODY:
+        return EQUIPMENT_SLOT_BODY;
+        break;
+    case INVTYPE_CHEST:
+        return EQUIPMENT_SLOT_CHEST;
+        break;
+    case INVTYPE_ROBE:
+        return EQUIPMENT_SLOT_CHEST;
+        break;
+    case INVTYPE_WAIST:
+        return EQUIPMENT_SLOT_WAIST;
+        break;
+    case INVTYPE_LEGS:
+        return EQUIPMENT_SLOT_LEGS;
+        break;
+    case INVTYPE_FEET:
+        return EQUIPMENT_SLOT_FEET;
+        break;
+    case INVTYPE_WRISTS:
+        return EQUIPMENT_SLOT_WRISTS;
+        break;
+    case INVTYPE_HANDS:
+        return EQUIPMENT_SLOT_HANDS;
+        break;
+    case INVTYPE_CLOAK:
+        return EQUIPMENT_SLOT_BACK;
+        break;
+    case INVTYPE_WEAPON:
+    {
+        return EQUIPMENT_SLOT_MAINHAND;
+        break;
+    }
+    case INVTYPE_SHIELD:
+        return EQUIPMENT_SLOT_OFFHAND;
+        break;
+    case INVTYPE_RANGED:
+        return EQUIPMENT_SLOT_RANGED;
+        break;
+    case INVTYPE_2HWEAPON:
+        return EQUIPMENT_SLOT_MAINHAND;
+        break;
+    case INVTYPE_TABARD:
+        return EQUIPMENT_SLOT_TABARD;
+        break;
+    case INVTYPE_WEAPONMAINHAND:
+        return EQUIPMENT_SLOT_MAINHAND;
+        break;
+    case INVTYPE_WEAPONOFFHAND:
+        return EQUIPMENT_SLOT_OFFHAND;
+        break;
+    case INVTYPE_HOLDABLE:
+        return EQUIPMENT_SLOT_OFFHAND;
+        break;
+    case INVTYPE_THROWN:
+        return EQUIPMENT_SLOT_RANGED;
+        break;
+    case INVTYPE_RANGEDRIGHT:
+        return EQUIPMENT_SLOT_RANGED;
+        break;
+    default:
+        return NULL_SLOT;
+    }
+    return NULL_SLOT;
+}
+
 InventoryResult Player::CanUnequipItems(uint32 item, uint32 count) const
 {
     uint32 tempcount = 0;

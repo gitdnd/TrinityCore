@@ -40,6 +40,10 @@
 #include "WorldSession.h"
 #include "BankPackets.h"
 #include "Chat.h"
+#include "Item.h"
+#include "VirtualItemMgr.h"
+#include "World.h"
+
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
 {
@@ -4409,6 +4413,70 @@ class spell_item_floating_cult_thesis : public SpellScript
     }
 };
 
+class spell_item_transmog : public SpellScript
+{
+    PrepareSpellScript(spell_item_transmog);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+
+        if (const Item* target = GetExplTargetItem())
+        {
+            if (sVirtualItemMgr.GetVirtualTemplate(target->GetEntry()))
+            {
+                if (Item* itemSlot = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, caster->GetEquipSlot(target->GetTemplate())))
+                {
+                    if (!sVirtualItemMgr.GetVirtualTemplate(itemSlot->GetEntry()))
+                        return SPELL_FAILED_BAD_TARGETS;
+                }
+                else
+                    return SPELL_FAILED_BAD_TARGETS;
+            }
+            else
+                return SPELL_FAILED_BAD_TARGETS;
+        }
+        else
+            return SPELL_FAILED_BAD_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (Item* target = GetExplTargetItem())
+        {
+            if (VirtualItemTemplate * copy = sVirtualItemMgr.GetVirtualTemplate(target->GetEntry()))
+            {
+                if (Item* itemSlot = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, caster->GetEquipSlot(target->GetTemplate())))
+                {
+                    if (VirtualItemTemplate* vTarget = sVirtualItemMgr.GetVirtualTemplate(itemSlot->GetEntry()))
+                    {
+                        vTarget->DisplayInfoID = copy->DisplayInfoID;
+                        caster->DestroyItem(target->GetBagSlot(), target->GetSlot(), true);
+                        vTarget->InitializeQueryData();
+                        WorldPacket response = vTarget->BuildQueryData(LOCALE_enUS);
+                        sWorld->SendGlobalMessage(&response);
+                        ChatHandler(caster->GetSession()).SendSysMessage("Unequip and requip the item to apply it's new display.");
+                    }
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_transmog::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_transmog::CheckRequirement);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -4543,4 +4611,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_unlock_bank_slot);
     RegisterSpellScript(spell_item_temporal_time_crystal);
     RegisterSpellScript(spell_item_floating_cult_thesis);
+    RegisterSpellScript(spell_item_transmog);
 }
