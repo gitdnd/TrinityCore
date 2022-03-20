@@ -4450,16 +4450,18 @@ class spell_item_transmog : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (Item* target = GetExplTargetItem())
+        if (Item* source = GetExplTargetItem())
         {
-            if (VirtualItemTemplate * copy = sVirtualItemMgr.GetVirtualTemplate(target->GetEntry()))
+            if (VirtualItemTemplate * copy = sVirtualItemMgr.GetVirtualTemplate(source->GetEntry()))
             {
-                if (Item* itemSlot = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, caster->GetEquipSlot(target->GetTemplate())))
+                if (Item* transmogTarget = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, caster->GetEquipSlot(source->GetTemplate())))
                 {
-                    if (VirtualItemTemplate* vTarget = sVirtualItemMgr.GetVirtualTemplate(itemSlot->GetEntry()))
+                    if (VirtualItemTemplate* vTarget = sVirtualItemMgr.GetVirtualTemplate(transmogTarget->GetEntry()))
                     {
+                        uint32 count = 1;
                         vTarget->DisplayInfoID = copy->DisplayInfoID;
-                        caster->DestroyItem(target->GetBagSlot(), target->GetSlot(), true);
+                        vTarget->Sheath = copy->Sheath;
+                        caster->DestroyItemCount(source, count, true);
 
                         if (!vTarget->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC))
                             vTarget->FlagsCu |= ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC;
@@ -4467,7 +4469,7 @@ class spell_item_transmog : public SpellScript
                         vTarget->InitializeQueryData();
                         WorldPacket response = vTarget->BuildQueryData(LOCALE_enUS);
                         sWorld->SendGlobalMessage(&response);
-                        itemSlot->SaveVirtualItemInfo();
+                        transmogTarget->SaveVirtualItemInfo();
                         ChatHandler(caster->GetSession()).SendSysMessage("Unequip and requip the item to apply it's new display.");
                     }
                 }
