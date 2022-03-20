@@ -3455,6 +3455,9 @@ inline bool _isPositiveTarget(SpellInfo const* spellInfo, uint8 effIndex)
 
 bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unordered_set<std::pair<uint32, uint8>>& visited)
 {
+    if (spellInfo->Id == 180250)
+        return false;
+
     if (!spellInfo->Effects[effIndex].IsEffect())
         return true;
 
@@ -3496,9 +3499,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
         return false;
 
     if (spellInfo->Id == 53201)
-        return false;
-
-    if (spellInfo->Id == 180250)
         return false;
 
     switch (spellInfo->SpellFamilyName)
