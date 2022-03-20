@@ -7182,6 +7182,9 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
+                if (m_targets.GetItemTarget()->GetTemplate()->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_STATIC))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
@@ -7197,6 +7200,9 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     return SPELL_FAILED_NOT_WHILE_TRADING;
 
                 if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                if (m_targets.GetItemTarget()->GetTemplate()->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_STATIC))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
@@ -7228,6 +7234,9 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     return SPELL_FAILED_NOT_WHILE_TRADING;
 
                 if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                if (m_targets.GetItemTarget()->GetTemplate()->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_STATIC))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if(m_targets.GetItemTarget()->GetTemplate()->Quality != (uint32)m_spellInfo->Effects[i].MiscValue-1)

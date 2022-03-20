@@ -4460,6 +4460,10 @@ class spell_item_transmog : public SpellScript
                     {
                         vTarget->DisplayInfoID = copy->DisplayInfoID;
                         caster->DestroyItem(target->GetBagSlot(), target->GetSlot(), true);
+
+                        if (!vTarget->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC))
+                            vTarget->FlagsCu |= ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC;
+
                         vTarget->InitializeQueryData();
                         WorldPacket response = vTarget->BuildQueryData(LOCALE_enUS);
                         sWorld->SendGlobalMessage(&response);
