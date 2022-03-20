@@ -1058,7 +1058,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
     // reduce max amount of sockets depending on type
-    if (output->Class == ITEM_CLASS_ARMOR)
+    if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
     {
         switch (output->InventoryType)
         {
