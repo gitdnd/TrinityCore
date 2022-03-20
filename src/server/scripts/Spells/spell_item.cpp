@@ -4463,7 +4463,7 @@ class spell_item_transmog : public SpellScript
                         vTarget->InitializeQueryData();
                         WorldPacket response = vTarget->BuildQueryData(LOCALE_enUS);
                         sWorld->SendGlobalMessage(&response);
-                        vTarget->SaveVirtualItemInfo();
+                        itemSlot->SaveVirtualItemInfo();
                         ChatHandler(caster->GetSession()).SendSysMessage("Unequip and requip the item to apply it's new display.");
                     }
                 }
