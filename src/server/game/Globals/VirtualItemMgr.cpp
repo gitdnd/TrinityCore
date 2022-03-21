@@ -1316,6 +1316,9 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate*
         {
             if (displaysitr.quality < ITEM_QUALITY_EPIC)
                 continue;
+            if (displaysitr.quality >= ITEM_QUALITY_ARTIFACT)
+                continue;
+
         }
         else
         {
