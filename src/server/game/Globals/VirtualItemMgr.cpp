@@ -1307,13 +1307,21 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate*
     if (qualityOverride)
         quality = output->Quality + 1;
 
-    if (quality == ITEM_QUALITY_LEGENDARY)
-        quality -= 1;
+    //if (quality == ITEM_QUALITY_LEGENDARY)
+        //quality -= 1;
 
     for (auto displaysitr : availableDisplays)
     {
-        if (quality != displaysitr.quality)
-            continue;
+        if (quality == ITEM_QUALITY_LEGENDARY)
+        {
+            if (displaysitr.quality < ITEM_QUALITY_EPIC)
+                continue;
+        }
+        else
+        {
+            if (quality != displaysitr.quality)
+                continue;
+        }
 
         if (output->InventoryType != displaysitr.iInventoryType)
             continue;
