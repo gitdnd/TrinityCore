@@ -4428,6 +4428,9 @@ class spell_item_transmog : public SpellScript
 
         if (const Item* target = GetExplTargetItem())
         {
+            if (target->IsEquipped())
+                return SPELL_FAILED_BAD_TARGETS;
+
             if (sVirtualItemMgr.GetVirtualTemplate(target->GetEntry()))
             {
                 if (Item* itemSlot = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, caster->GetEquipSlot(target->GetTemplate())))
