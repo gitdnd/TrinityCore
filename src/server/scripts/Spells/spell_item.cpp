@@ -4435,6 +4435,10 @@ class spell_item_transmog : public SpellScript
             {
                 if (Item* itemSlot = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, caster->GetEquipSlot(target->GetTemplate())))
                 {
+                    if(target->GetTemplate()->Class == ITEM_CLASS_ARMOR && target->GetTemplate()->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD
+                        && itemSlot->GetTemplate()->Class != ITEM_CLASS_ARMOR && itemSlot->GetTemplate()->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
+                        return SPELL_FAILED_BAD_TARGETS;
+
                     if (!sVirtualItemMgr.GetVirtualTemplate(itemSlot->GetEntry()))
                         return SPELL_FAILED_BAD_TARGETS;
                 }
