@@ -7179,11 +7179,15 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
                     return SPELL_FAILED_NOT_WHILE_TRADING;
 
-                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                {
+                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
+                        return SPELL_FAILED_NO_VALID_TARGETS;
+                }
+                else
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                if (m_targets.GetItemTarget()->GetTemplate()->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_STATIC))
-                    return SPELL_FAILED_NO_VALID_TARGETS;
+
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
                     return SPELL_FAILED_NO_VALID_TARGETS;
@@ -7202,7 +7206,12 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                if (m_targets.GetItemTarget()->GetTemplate()->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_STATIC))
+                if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                {
+                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
+                        return SPELL_FAILED_NO_VALID_TARGETS;
+                }
+                else
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))

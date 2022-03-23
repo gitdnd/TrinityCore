@@ -1335,6 +1335,9 @@ void Item::SaveVirtualItemInfo()
         stmt->setUInt32(i++, itemTemplate->spellSeed);
         stmt->setUInt32(i++, itemTemplate->statValueSeed);
         stmt->setUInt8(i++, itemTemplate->statGroup);
+        stmt->setUInt32(i++, itemTemplate->customFlags);
+        stmt->setUInt8(i++, itemTemplate->Sheath);
+
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);
     }

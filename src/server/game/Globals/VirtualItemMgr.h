@@ -71,6 +71,10 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 displaySeed;
     uint32 spellSeed;
     uint32 statValueSeed;
+    uint32 customFlags;
+
+    inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
+
 };
 
 struct VirtualModifier

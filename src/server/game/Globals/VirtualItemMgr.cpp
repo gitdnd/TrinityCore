@@ -248,6 +248,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     else
         output->seed = modifier.seed;
 
+    output->customFlags = 0; // toDo: initalize in a proper function once flags are expanded.
+
     InitSeedGen(modifier);
     output->seed = modifier.seed;
     output->displaySeed = modifier.displaySeed;

@@ -4466,8 +4466,8 @@ class spell_item_transmog : public SpellScript
                         vTarget->Sheath = copy->Sheath;
                         caster->DestroyItemCount(source, count, true);
 
-                        if (!vTarget->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC))
-                            vTarget->FlagsCu |= ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC;
+                        if (!vTarget->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
+                            vTarget->customFlags |= VIRTUAL_ITEM_FLAG_DISPLAY_STATIC;
 
                         vTarget->InitializeQueryData();
                         WorldPacket response = vTarget->BuildQueryData(LOCALE_enUS);
