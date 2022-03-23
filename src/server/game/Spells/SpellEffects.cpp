@@ -1330,14 +1330,10 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         }
     }
 
-    // Talent: Saving Grace: Heal 10% extra on targets below 50% health
-    if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
-    {
-        addhealth *= 1.1;
-    }
+
     // Vessel of the Naaru (Vial of the Sunwell trinket)
     ///@todo: move this to scripts
-    else if (m_spellInfo->Id == 45064)
+    if (m_spellInfo->Id == 45064)
     {
         // Amount of heal - depends from stacked Holy Energy
         int32 damageAmount = 0;
@@ -1394,6 +1390,12 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         addhealth = unitCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, effIndex, { });
 
     addhealth = unitTarget->SpellHealingBonusTaken(unitCaster, m_spellInfo, addhealth, HEAL);
+
+    // Talent: Saving Grace: Heal 10% extra on targets below 50% health
+    if (unitTarget->GetHealthPct() <= 50 && unitCaster->HasSpell(180139))
+    {
+        addhealth += (addhealth * 0.1f);
+    }
 
     // Remove Grievious bite if fully healed
     if (unitTarget->HasAura(48920) && (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
