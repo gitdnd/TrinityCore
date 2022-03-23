@@ -964,7 +964,7 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualM
     }
     auto display = std::begin(displayLists);
     std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, generator));
-    if (output->HasFlag(ITEM_FLAGS_CU_VIRTUAL_ITEM_DISPLAY_STATIC))
+    if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
         return output->DisplayInfoID;
     return *display;
 }
