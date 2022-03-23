@@ -3474,7 +3474,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->base_entry = base_entry;
         itemTemplate->Name1 = fields[i++].GetString();
         itemTemplate->Quality = uint32(fields[i++].GetUInt8());
-        itemTemplate->DisplayInfoID = uint32(fields[i++].GetUInt16());
+        itemTemplate->DisplayInfoID = fields[i++].GetUInt32();
         itemTemplate->ItemLevel = uint32(fields[i++].GetUInt16());
         itemTemplate->StatsCount = uint32(fields[i++].GetUInt8());
         for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
