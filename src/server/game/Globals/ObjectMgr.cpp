@@ -3515,7 +3515,9 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->statValueSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statGroup = StatGroup(uint8(fields[i++].GetUInt8()));
         itemTemplate->customFlags = uint32(fields[i++].GetUInt32());
-        itemTemplate->Sheath = uint32(fields[i++].GetUInt8());
+        uint8 sheath = fields[i++].GetUInt8();
+        if(sheath != 0)
+            itemTemplate->Sheath = uint32(sheath);
 
 
         itemTemplate->MaxDurability = 0;
