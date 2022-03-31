@@ -5422,7 +5422,7 @@ uint32 Player::GetShieldBlockValue() const
 
 float Player::GetMeleeCritFromAgility() const
 {
-    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
+    uint8 level = 80; //GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
 
     GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass-1);
@@ -5469,7 +5469,7 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
          2.00f/1.15f     // Adventurer
     };
 
-    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
+    uint8 level = 80;//GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
@@ -5488,7 +5488,7 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) cons
 
 float Player::GetSpellCritFromIntellect() const
 {
-    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
+    uint8 level = 80;//GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
 
     GtChanceToSpellCritBaseEntry const* critBase  = sGtChanceToSpellCritBaseStore.LookupEntry(pclass-1);
@@ -5502,7 +5502,7 @@ float Player::GetSpellCritFromIntellect() const
 
 float Player::GetRatingMultiplier(CombatRating cr) const
 {
-    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
+    uint8 level = 80;//GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
 
     GtCombatRatingsEntry const* Rating = sGtCombatRatingsStore.LookupEntry(cr*GT_MAX_LEVEL+level-1);
     // gtOCTClassCombatRatingScalarStore.dbc starts with 1, CombatRating with zero, so cr+1
@@ -5534,7 +5534,7 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
 
 float Player::OCTRegenHPPerSpirit() const
 {
-    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
+    uint8 level = 80;// GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
 
     GtOCTRegenHPEntry     const* baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
@@ -5554,7 +5554,7 @@ float Player::OCTRegenHPPerSpirit() const
 
 float Player::OCTRegenMPPerSpirit() const
 {
-    uint8 level = GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
+    uint8 level = 80;// GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
     uint32 pclass = GetClass();
 
 //    GtOCTRegenMPEntry     const* baseRatio = sGtOCTRegenMPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
@@ -27747,6 +27747,13 @@ uint32 Player::GetGroupOrPlayerItemLevel()
     if (GetGroup())
         return GetGroup()->GetDungeonLevel();
     return GetAverageItemLevel();
+}
+
+uint32 Player::GetCappedGroupOrPlayerItemLevel()
+{
+    if (GetGroup())
+        return GetGroup()->GetCappedDungeonLevel();
+    return GetCappedItemLevel();
 }
 
 bool Player::IsInstanceBound(uint32 mapId)

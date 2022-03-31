@@ -2215,6 +2215,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendCooldownClear(uint32 spell);
         void SendSpellLearn(uint32 spell);
         uint32 GetGroupOrPlayerItemLevel();
+        uint32 GetCappedGroupOrPlayerItemLevel();
         void ClearInactiveGemSpells();
         uint32 GetTalentLevel() { return talent_level; }
         bool IsInstanceBound(uint32 mapId);
