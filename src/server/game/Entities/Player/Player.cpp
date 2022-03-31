@@ -27749,3 +27749,8 @@ bool Player::IsInstanceBound(uint32 mapId)
 {
     return GetBoundInstance(mapId, REGULAR_DIFFICULTY) != nullptr;
 }
+
+float Player::GetCappedItemLevel() const
+{
+    return std::clamp<float>(_averageItemLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
+}

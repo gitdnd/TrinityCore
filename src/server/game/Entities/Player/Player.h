@@ -2169,7 +2169,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
         Spell* m_spellModTakingSpell;
 
-        float Player::GetAverageItemLevel() const { return _averageItemLevel; }
+        float GetAverageItemLevel() const { return _averageItemLevel; }
+        float GetCappedItemLevel() const;
         float UpdateCachedItemLevel(bool isLogin = false);
 
         void AddItemLevelToSlotCache(uint8 slot, uint32 ilevel)

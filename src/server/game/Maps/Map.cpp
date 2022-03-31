@@ -4829,3 +4829,8 @@ std::string InstanceMap::GetDebugInfo() const
         << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
     return sstr.str();
 }
+
+int Map::GetCappedDungeonLevel() const
+{
+   return std::clamp<int>(i_dungeonLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
+}
