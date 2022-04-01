@@ -2030,6 +2030,12 @@ void Creature::setDeathState(DeathState s)
             GetMotionMaster()->MoveFall();
 
         Unit::setDeathState(CORPSE);
+
+        auto map = GetMap();
+        if (map->IsDungeon() || map->IsRaid())
+        {
+            sEluna->OnScoredCreatureDied(map, this);
+        }
     }
     else if (s == JUST_RESPAWNED)
     {

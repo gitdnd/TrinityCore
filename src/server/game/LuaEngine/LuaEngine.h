@@ -519,6 +519,7 @@ public:
     void OnRemove(Creature* creature);
     void OnRemove(GameObject* gameobject);
     void OnFreeInstanceId(uint32 instanceId);
+    void OnScoredCreatureDied(Map* map, Creature* creature);
 
     /* Instance */
     void OnInitialize(ElunaInstanceAI* ai);
