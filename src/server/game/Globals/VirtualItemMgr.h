@@ -71,6 +71,7 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 displaySeed;
     uint32 spellSeed;
     uint32 statValueSeed;
+    uint32 statGroupSeed;
     uint32 customFlags;
 
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
@@ -96,6 +97,7 @@ struct VirtualModifier
     uint32 displaySeed;
     uint32 spellSeed;
     uint32 statValueSeed;
+    uint32 statGroupSeed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
     uint32 vLvlMod;
@@ -367,18 +369,17 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
+    void GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+
+    /**
+     * Uses passed modifier to generate stats and edits output to have the generated stats.
+     */
     void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
-
-
-    /**
-     * Uses passed modifier to generate stats and edits output to have the generated stats.
-     */
-    void GenerateItemStatsNew(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
 
 
     /**

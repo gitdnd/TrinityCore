@@ -193,13 +193,13 @@ void VirtualItemMgr::LoadSpellsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     GenerateQuality(output, modifier);
+    GenerateStatGroup(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output);
     GenerateSockets(output, modifier);
     //GenerateSpells(output, modifier);
-    //GenerateItemStats(output, modifier);
-    GenerateItemStatsNew(output, modifier);
+    GenerateItemStats(output, modifier);
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
     uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
@@ -227,6 +227,7 @@ void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
     initSeed(modifier.displaySeed, generator);
     initSeed(modifier.spellSeed, generator);
     initSeed(modifier.statValueSeed, generator);
+    initSeed(modifier.statGroupSeed, generator);
 }
 
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
@@ -258,12 +259,14 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     output->spellSeed = modifier.spellSeed;
     output->statSeed = modifier.statSeed;
     output->statValueSeed = modifier.statValueSeed;
+    output->statGroupSeed = modifier.statGroupSeed;
 
     GenerateQuality(output, modifier);
 
+    // Select a stat group for the item
+    GenerateStatGroup(output, modifier);
+
     // Generate base stats for the item.
-    // Important that this is the first part to be generated after tempalte creation,
-    // as some of the next function calls require information set in this function ie. quality, ilevel etc.
     GenerateBaseStats(output, modifier);
 
     // Generate an item name based on type and quality
@@ -280,8 +283,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Generate primary and secondary stats.
     // Always do this last, as it has variable rand calls based on quality.
-    //GenerateItemStats(output, modifier);
-    GenerateItemStatsNew(output, modifier);
+    GenerateItemStats(output, modifier);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
@@ -309,6 +311,30 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->InitializeQueryData();
 
     return output;
+}
+
+void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier modifier) const
+{
+    std::mt19937 generator;
+    generator.seed(modifier.statGroupSeed);
+    StatGroup statgroupid;
+
+    // grab available armor type stat groups
+    std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
+
+    // armor has predefined stat groups, except some slots like trinkets, rings, cloaks etc.
+    if (!statgroups.empty() && output->Class == ITEM_CLASS_ARMOR && (output->SubClass != ITEM_SUBCLASS_ARMOR_CLOTH && output->InventoryType != INVTYPE_CLOAK))
+        statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
+    else // all weapons currently generate entirely random.
+        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
+
+    // if the modifier is not set to random (default value), override selected stat group
+    if (modifier.statgroup != STAT_GROUP_RANDOM)
+        statgroupid = modifier.statgroup;
+
+    ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
+
+    output->statGroup = statgroupid;
 }
 
 void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
@@ -383,31 +409,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
         output->Block = uint32(0.93f * float(ilevel));
 
-    // select stat group if the item is an armor piece or manually set as a modifier
-    StatGroup statgroupid = modifier.statgroup;
-    std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
-    if (!statgroups.empty())
-    {
-        bool isCloak = output->Class == ITEM_CLASS_ARMOR &&
-            output->SubClass == ITEM_SUBCLASS_ARMOR_CLOTH &&
-            output->InventoryType == INVTYPE_CLOAK;
-        StatGroup randone = statgroups[urand(0, statgroups.size() - 1, generator)];
-        if (output->Class == ITEM_CLASS_ARMOR && !isCloak)
-        {
-            if (!statgroups.empty() && modifier.statgroup == STAT_GROUP_RANDOM)
-                statgroupid = randone;
-        }
-    }
-    StatGroup randtwo = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
-
-    // If the stat group is still random, select a random stat group.
-    if (statgroupid == STAT_GROUP_RANDOM)
-        statgroupid = randtwo;
-
-    ASSERT(statgroupid < STAT_GROUP_COUNT); // must not be random anymore
-
-    output->statGroup = statgroupid;
-
     // If item is a weapon, then generate bot and top damage + speed
     if (output->Class == ITEM_CLASS_WEAPON)
     {
@@ -481,7 +482,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
-        if ((statgroupid == STAT_GROUP_HEALING || statgroupid == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
+        if ((output->statGroup == STAT_GROUP_HEALING || output->statGroup == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
             output->Damage[0].DamageMin /= 2.0f;
             output->Damage[0].DamageMax /= 2.0f;
@@ -503,117 +504,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     output->MaxDurability = 0; // Disable any form of durability for now
 }
 
-void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
-{
-    std::mt19937 generator;
-    generator.seed(modifier.statValueSeed);
-
-    // get statgroup id
-    StatGroup statgroupid = output->statGroup;
-
-    // decide stat amount
-    uint32 statscount = output->Quality;
-    if (statscount < 0)
-        statscount = 0;
-
-    ASSERT(statscount <= MAX_ITEM_PROTO_STATS);
-
-    // add up to two extra stats per item
-    uint32 statCountMod = urand(0, 2, generator);
-    statscount = statscount + statCountMod;
-
-    // Only a single stat on trinkets
-    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
-    {
-        statscount = 1;
-    }
-
-    // clear old stats
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-    {
-        output->ItemStat[i].ItemStatType = 0;
-        output->ItemStat[i].ItemStatValue = 0;
-    }
-
-    // select stat pool
-    int16 pool = 0;
-    if (modifier.statpool == -1)
-        pool = output->ItemLevel;
-    else
-        pool = modifier.statpool;
-
-    ASSERT(pool >= 0 && pool < 0x7FFF);
-
-    // modify stat pool size depending on item quality
-    pool = (pool * output->Quality) / 2;
-
-    // since our stats are based on the ilevel of the item, regenerating with a new ilevel causes problems.
-    // instead, we distribute the pool based on a static pool size, and use that as a percentage value
-    // when distributing the actual stat values.
-    int16 percentile_pool = 100;
-
-    std::vector<ItemModType> const& primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
-    std::vector<ItemModType> const& secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
-
-    std::vector<ItemModType> selectedStats;
-    std::vector<int16> distributedPool;
-
-    if (statscount && !primarystatgroup.empty() && !secondarystatgroup.empty())
-    {
-        // select stats from preselected stat group
-        for (uint32 i = 0; i < statscount; ++i)
-        {
-            // make sure primary stats are always selected before secondary stats
-            // trinkets should also only have secondary stats, not primary
-            if (i < 2 && !(output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET))
-                selectedStats.push_back(primarystatgroup[urand(0, primarystatgroup.size() - 1, generator)]);
-            else
-                selectedStats.push_back(secondarystatgroup[urand(0, secondarystatgroup.size() - 1, generator)]);
-        };
-
-        // distribute pool to stats
-        const float mineachpct = 0.5f / selectedStats.size();
-        ASSERT(mineachpct <= 1.0f / selectedStats.size() && mineachpct >= 0.0);
-
-        // calculate min amount and take that from the randomly distributed pool
-        int16 min_amount = std::floor(percentile_pool * mineachpct);
-        int16 workpool = percentile_pool - selectedStats.size() * min_amount;
-
-        // pick random positions from the workpool and use them to divide it into N random size parts
-        // then add those to distributedPool along with the minimum amounts
-        std::vector<int16> fences;
-        fences.push_back(0);
-        for (int32 i = 1; i < int32(selectedStats.size()); ++i)
-            fences.push_back(urand(0, workpool, generator));
-        fences.push_back(workpool);
-        std::sort(fences.begin(), fences.end());
-        for (int32 i = 1; i < int32(fences.size()); ++i)
-            distributedPool.push_back(min_amount + fences[i] - fences[i - 1]);
-    }
-
-    // apply new stats
-    distributedPool.resize(selectedStats.size()); // ensure counts match
-    uint32 setStats = 0;
-    for (size_t i = 0; i < std::min(selectedStats.size(), size_t(MAX_ITEM_PROTO_STATS)); ++i)
-    {
-        for (uint32 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
-        {
-            // if we are at a free stat slot or we are at a stat slot that has the same stat type
-            if (j >= setStats || output->ItemStat[j].ItemStatType == (uint32)selectedStats[i])
-            {
-                uint32 finalStatValue = std::floor((float(pool) * (float(distributedPool[i]) / 100.0f)) / VirtualModifier::GetStatRate(selectedStats[i]) * VirtualModifier::GetSlotStatModifier(output));
-                output->ItemStat[j].ItemStatType = (uint32)selectedStats[i];
-                output->ItemStat[j].ItemStatValue += finalStatValue;
-                setStats = std::max(setStats, uint32(j + 1));
-                break;
-            }
-        }
-    }
-
-    output->StatsCount = setStats;
-}
-
-void VirtualItemMgr::GenerateItemStatsNew(VirtualItemTemplate* output, VirtualModifier modifier) const
+void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statValueSeed);

@@ -3444,7 +3444,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         "spellid_3, spelltrigger_3, spellcharges_3, spellppmRate_3, spellcooldown_3, spellcategory_3, spellcategorycooldown_3, "
         "spellid_4, spelltrigger_4, spellcharges_4, spellppmRate_4, spellcooldown_4, spellcategory_4, spellcategorycooldown_4, "
         "spellid_5, spelltrigger_5, spellcharges_5, spellppmRate_5, spellcooldown_5, spellcategory_5, spellcategorycooldown_5, "
-        "seed, socketSeed, qualitySeed, statSeed, nameSeed, displaySeed, spellSeed, statValueSeed, statGroup, customFlags, sheath "
+        "seed, socketSeed, qualitySeed, statSeed, nameSeed, displaySeed, spellSeed, statValueSeed, statGroupSeed, statGroup, customFlags, sheath "
         "FROM item_template_virtual");
 
     if (!result)
@@ -3513,6 +3513,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->displaySeed = uint32(fields[i++].GetUInt32());
         itemTemplate->spellSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statValueSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->statGroupSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statGroup = StatGroup(uint8(fields[i++].GetUInt8()));
         itemTemplate->customFlags = uint32(fields[i++].GetUInt32());
         uint8 sheath = fields[i++].GetUInt8();

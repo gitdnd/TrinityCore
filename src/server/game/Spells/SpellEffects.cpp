@@ -5746,13 +5746,15 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     modifier.spellSeed = vItem->spellSeed;
     modifier.statSeed = vItem->statSeed;
     modifier.statValueSeed = vItem->statValueSeed;
+    modifier.statGroupSeed = vItem->statGroupSeed;
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateStatGroup(vItem, modifier);
     sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
-    sVirtualItemMgr.GenerateItemStatsNew(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStats(vItem, modifier);
     sVirtualItemMgr.GenerateSockets(vItem, modifier);
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
     //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
@@ -5790,7 +5792,7 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     mod.statgroup = StatGroup(m_spellInfo->Effects[effIndex].MiscValue);
     mod.statpool = m_spellInfo->Effects[effIndex].MiscValueB != 0 ? m_spellInfo->Effects[effIndex].MiscValueB : -1;
     sVirtualItemMgr.GenerateBaseStats(vItem, mod);
-    sVirtualItemMgr.GenerateItemStatsNew(vItem, mod);
+    sVirtualItemMgr.GenerateItemStats(vItem, mod);
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
@@ -5857,13 +5859,15 @@ void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
     modifier.spellSeed = vItem->spellSeed;
     modifier.statSeed = vItem->statSeed;
     modifier.statValueSeed = vItem->statValueSeed;
+    modifier.statGroupSeed = vItem->statGroupSeed;
     modifier.quality = vItem->Quality;
     modifier.statgroup = vItem->statGroup;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateStatGroup(vItem, modifier);
     sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
-    sVirtualItemMgr.GenerateItemStatsNew(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStats(vItem, modifier);
     sVirtualItemMgr.GenerateSockets(vItem, modifier);
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
     //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
