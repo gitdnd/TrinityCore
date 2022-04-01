@@ -3160,12 +3160,15 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
     if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && !(m_caster->ToPlayer()->IsCharmed() && m_caster->ToPlayer()->GetCharmerGUID().IsCreature()) && m_caster->ToPlayer()->isMoving() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
     {
-        // 1. Has casttime, 2. Or doesn't have flag to allow movement during channel
-        if (m_casttime || !m_spellInfo->IsMoveAllowedChannel())
+        if (!HasCastWhileMovingOverride())
         {
-            SendCastResult(SPELL_FAILED_MOVING);
-            finish(false);
-            return SPELL_FAILED_MOVING;
+            // 1. Has casttime, 2. Or doesn't have flag to allow movement during channel
+            if (m_casttime || !m_spellInfo->IsMoveAllowedChannel())
+            {
+                SendCastResult(SPELL_FAILED_MOVING);
+                finish(false);
+                return SPELL_FAILED_MOVING;
+            }
         }
     }
 
@@ -3824,14 +3827,17 @@ void Spell::update(uint32 difftime)
         m_caster->ToPlayer()->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT &&
         (m_spellInfo->Effects[EFFECT_0].Effect != SPELL_EFFECT_STUCK || !m_caster->ToPlayer()->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR)))
     {
-        // don't cancel for melee, autorepeat, triggered and instant spells
-        if (!m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered() && !(IsChannelActive() && m_spellInfo->IsMoveAllowedChannel()))
+        if (!HasCastWhileMovingOverride())
         {
-            // if charmed by creature, trust the AI not to cheat and allow the cast to proceed
-            // @todo this is a hack, "creature" movesplines don't differentiate turning/moving right now
-            // however, checking what type of movement the spline is for every single spline would be really expensive
-            if (!m_caster->ToPlayer()->GetCharmerGUID().IsCreature())
-                cancel();
+            // don't cancel for melee, autorepeat, triggered and instant spells
+            if (!m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered() && !(IsChannelActive() && m_spellInfo->IsMoveAllowedChannel()))
+            {
+                // if charmed by creature, trust the AI not to cheat and allow the cast to proceed
+                // @todo this is a hack, "creature" movesplines don't differentiate turning/moving right now
+                // however, checking what type of movement the spline is for every single spline would be really expensive
+                if (!m_caster->ToPlayer()->GetCharmerGUID().IsCreature())
+                    cancel();
+            }
         }
     }
 
@@ -5304,10 +5310,13 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
         // (not wand currently autorepeat cast delayed to moving stop anyway in spell update code)
         if (unitCaster->GetTypeId() == TYPEID_PLAYER && unitCaster->ToPlayer()->isMoving() && (!unitCaster->IsCharmed() || !unitCaster->GetCharmerGUID().IsCreature()))
         {
-            // skip stuck spell to allow use it in falling case and apply spell limitations at movement
-            if ((!unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) || m_spellInfo->Effects[EFFECT_0].Effect != SPELL_EFFECT_STUCK) &&
-                (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
-                return SPELL_FAILED_MOVING;
+            if (!HasCastWhileMovingOverride())
+            {
+                // skip stuck spell to allow use it in falling case and apply spell limitations at movement
+                if ((!unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) || m_spellInfo->Effects[EFFECT_0].Effect != SPELL_EFFECT_STUCK) &&
+                    (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
+                    return SPELL_FAILED_MOVING;
+            }
         }
 
         // Check vehicle flags
@@ -8367,6 +8376,21 @@ void Spell::CallScriptOnResistAbsorbCalculateHandlers(DamageInfo const& damageIn
 
         (*scritr)->_FinishScriptCall();
     }
+}
+
+bool Spell::HasCastWhileMovingOverride() const
+{
+    bool found = false;
+    Unit::AuraEffectList const& castWhileMoving = unitCaster->GetAuraEffectsByType(SPELL_AURA_CAST_WHILE_MOVING_OVERRIDE);
+    for (Unit::AuraEffectList::const_iterator i = castWhileMoving.begin(); i != castWhileMoving.end(); ++i)
+    {
+        if ((*i)->IsAffectedOnSpell(m_spellInfo))
+        {
+            found = true;
+            break;
+        }
+    }
+    return found;
 }
 
 namespace Trinity

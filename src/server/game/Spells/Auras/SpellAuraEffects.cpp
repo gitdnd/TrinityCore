@@ -384,6 +384,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleWaterBreathing,                            //318 SPELL_AURA_DISABLE_FATIGUE
     &AuraEffect::HandleDamageSchoolBonus,                         //319 SPELL_AURA_DAMAGE_SCHOOL_BONUS
     &AuraEffect::HandleModRatingPercent,                          //320 SPELL_AURA_MOD_RATING_PERCENT
+    &AuraEffect::HandleNoImmediateEffect,                         //321 SPELL_AURA_CAST_WHILE_MOVING implemented in multiple places in Spell.cpp
 
 };
 
