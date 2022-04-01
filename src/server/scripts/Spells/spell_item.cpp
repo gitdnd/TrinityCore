@@ -43,6 +43,7 @@
 #include "Item.h"
 #include "VirtualItemMgr.h"
 #include "World.h"
+#include "Guild.h"
 
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
@@ -4345,6 +4346,54 @@ class spell_item_unlock_bank_slot : public SpellScript
     }
 };
 
+class spell_item_unlock_guild_bank_slot : public SpellScript
+{
+    PrepareSpellScript(spell_item_unlock_guild_bank_slot);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (Guild* g = caster->GetGuild())
+        {
+            if (g->_GetPurchasedTabsSize() >= GUILD_BANK_MAX_TABS)
+            {
+                ChatHandler(caster->GetSession()).PSendSysMessage("Your guild bank is at max tabs.");
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            }
+
+        }
+        else
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You must be in a guild to use this item.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (Guild* g = caster->GetGuild())
+        {
+            g->_CreateNewBankTab();
+            g->_BroadcastEvent(GE_BANK_TAB_PURCHASED, ObjectGuid::Empty);
+            g->SendPermissions(caster->GetSession());
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_unlock_guild_bank_slot::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_unlock_guild_bank_slot::CheckRequirement);
+    }
+};
+
 class spell_item_temporal_time_crystal : public SpellScript
 {
     PrepareSpellScript(spell_item_temporal_time_crystal);
@@ -4626,6 +4675,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_crazy_alchemists_potion);
     RegisterSpellScript(spell_item_eggnog);
     RegisterSpellScript(spell_item_unlock_bank_slot);
+    RegisterSpellScript(spell_item_unlock_guild_bank_slot);
     RegisterSpellScript(spell_item_temporal_time_crystal);
     RegisterSpellScript(spell_item_floating_cult_thesis);
     RegisterSpellScript(spell_item_transmog);

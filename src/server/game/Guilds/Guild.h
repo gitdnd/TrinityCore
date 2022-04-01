@@ -725,6 +725,9 @@ class TC_GAME_API Guild
         void SetBankTabText(uint8 tabId, std::string const& text);
 
         void ResetTimes();
+        void _CreateNewBankTab();
+        void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, char const* param1 = nullptr, char const* param2 = nullptr, char const* param3 = nullptr) const;
+        inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
 
     protected:
         ObjectGuid::LowType m_id;
@@ -754,8 +757,7 @@ class TC_GAME_API Guild
 
         inline uint8 _GetLowestRankId() const { return uint8(m_ranks.size() - 1); }
 
-        inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
-        inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
+         inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
         inline BankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
 
         inline Member const* GetMember(ObjectGuid guid) const
@@ -784,8 +786,7 @@ class TC_GAME_API Guild
         // Creates log holders (either when loading or when creating guild)
         void _CreateLogHolders();
         // Tries to create new bank tab
-        void _CreateNewBankTab();
-        // Creates default guild ranks with names in given locale
+       // Creates default guild ranks with names in given locale
         void _CreateDefaultGuildRanks(CharacterDatabaseTransaction& trans, LocaleConstant loc);
         // Creates new rank
         bool _CreateRank(CharacterDatabaseTransaction& trans, std::string const& name, uint32 rights);
@@ -823,6 +824,5 @@ class TC_GAME_API Guild
         void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
         void _SendBankList(WorldSession* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
-        void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, char const* param1 = nullptr, char const* param2 = nullptr, char const* param3 = nullptr) const;
 };
 #endif
