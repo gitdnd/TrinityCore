@@ -348,7 +348,7 @@ namespace LuaMap
     */
     int GetPlayers(lua_State* L, Map* map)
     {
-        uint32 team = Eluna::CHECKVAL<uint32>(L, 2, TEAM_NEUTRAL);
+        bool includeGMS = Eluna::CHECKVAL<bool>(L, 2, false);
 
         lua_newtable(L);
         int tbl = lua_gettop(L);
@@ -364,8 +364,11 @@ namespace LuaMap
 #endif
             if (!player)
                 continue;
-            if (player->GetSession() && (team >= TEAM_NEUTRAL || (uint32)player->GetTeamId() == team))
+            if (player->GetSession())
             {
+                if (!includeGMS && player->IsGameMaster())
+                    continue;
+
                 Eluna::Push(L, player);
                 lua_rawseti(L, tbl, ++i);
             }
@@ -378,6 +381,12 @@ namespace LuaMap
     int GetDungeonLevel(lua_State* L, Map* map)
     {
         Eluna::Push(L, map->GetDungeonLevel());
+        return 1;
+    }
+
+    int GetCappedDungeonLevel(lua_State* L, Map* map)
+    {
+        Eluna::Push(L, map->GetCappedDungeonLevel());
         return 1;
     }
 };

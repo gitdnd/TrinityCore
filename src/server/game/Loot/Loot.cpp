@@ -291,14 +291,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(lootOwner->GetMapId()))
         modifier.vLvlMod = inst->vLvlMod;
 
-    if (!personal && group)
-    {
-        modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetCappedDungeonLevel() : group->GetCappedDungeonLevel();
-    }
-    else
-    {
-        modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetCappedDungeonLevel() : lootOwner->GetCappedItemLevel();
-    }
+
+    modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetCappedDungeonLevel() : lootOwner->GetCappedGroupOrPlayerItemLevel();
 
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 

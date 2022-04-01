@@ -406,6 +406,12 @@ namespace LuaGroup
         Eluna::Push(L, group->GetDungeonLevel());
         return 1;
     }
+
+    int GetCappedDungeonLevel(lua_State* L, Group* group)
+    {
+        Eluna::Push(L, group->GetCappedDungeonLevel());
+        return 1;
+    }
 };
 
 #endif

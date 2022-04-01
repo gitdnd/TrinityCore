@@ -765,6 +765,9 @@ ElunaRegister<Player> PlayerMethods[] =
     { "ClearHonorInfo", &LuaPlayer::ClearHonorInfo },
 #endif
     { "GetAvgItemLevel", &LuaPlayer::GetAvgItemLevel },
+    { "GetCappedAvgItemLevel", &LuaPlayer::GetCappedAvgItemLevel },
+    { "GetPlayerOrGroupItemLevel", &LuaPlayer::GetPlayerOrGroupItemLevel },
+    { "GetCappedPlayerOrGroupItemLevel", &LuaPlayer::GetCappedPlayerOrGroupItemLevel },
     { "QuestKillCredit", &LuaPlayer::QuestKillCredit },
     { "GetLFGRole", &LuaPlayer::GetLFGRole },
     { "UpdateAchievementCriteria", &LuaPlayer::UpdateAchievementCriteria },
@@ -1118,6 +1121,7 @@ ElunaRegister<Group> GroupMethods[] =
     // {"ConvertToLFG", &LuaGroup::ConvertToLFG},                 // :ConvertToLFG() - UNDOCUMENTED - Converts the group to an LFG group
     { "ConvertToRaid", &LuaGroup::ConvertToRaid },
     { "GetDungeonLevel", &LuaGroup::GetDungeonLevel },
+    { "GetCappedDungeonLevel", &LuaGroup::GetCappedDungeonLevel },
 
     { NULL, NULL }
 };
@@ -1268,6 +1272,7 @@ ElunaRegister<Map> MapMethods[] =
     // Other
     { "SaveInstanceData", &LuaMap::SaveInstanceData },
     { "GetDungeonLevel", &LuaMap::GetDungeonLevel },
+    { "GetCappedDungeonLevel", &LuaMap::GetCappedDungeonLevel },
 
     { NULL, NULL }
 };
