@@ -8381,13 +8381,16 @@ void Spell::CallScriptOnResistAbsorbCalculateHandlers(DamageInfo const& damageIn
 bool Spell::HasCastWhileMovingOverride() const
 {
     bool found = false;
-    Unit::AuraEffectList const& castWhileMoving = unitCaster->GetAuraEffectsByType(SPELL_AURA_CAST_WHILE_MOVING_OVERRIDE);
-    for (Unit::AuraEffectList::const_iterator i = castWhileMoving.begin(); i != castWhileMoving.end(); ++i)
+    if (Unit* uCaster = m_caster->ToUnit())
     {
-        if ((*i)->IsAffectedOnSpell(m_spellInfo))
+        Unit::AuraEffectList const& castWhileMoving = uCaster->GetAuraEffectsByType(SPELL_AURA_CAST_WHILE_MOVING_OVERRIDE);
+        for (Unit::AuraEffectList::const_iterator i = castWhileMoving.begin(); i != castWhileMoving.end(); ++i)
         {
-            found = true;
-            break;
+            if ((*i)->IsAffectedOnSpell(m_spellInfo))
+            {
+                found = true;
+                break;
+            }
         }
     }
     return found;
