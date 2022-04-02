@@ -3525,7 +3525,26 @@ void ObjectMgr::LoadVirtualItemTemplates()
         //itemTemplate->UpdateDisplay();
 
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))
+        {
             delete itemTemplate;
+            continue;
+        }
+        if (itemTemplate->HasFlag(VIRTUAL_ITEM_FLAG_REGENERATE))
+        {
+            VirtualModifier mod;
+            mod.seed = itemTemplate->seed;
+            mod.socketSeed = itemTemplate->socketSeed;
+            mod.qualitySeed = itemTemplate->qualitySeed;
+            mod.statSeed = itemTemplate->statSeed;
+            mod.nameSeed = itemTemplate->nameSeed;
+            mod.displaySeed = itemTemplate->displaySeed;
+            mod.spellSeed = itemTemplate->spellSeed;
+            mod.statValueSeed = itemTemplate->statValueSeed;
+            mod.statGroupSeed = itemTemplate->statGroupSeed;
+            sVirtualItemMgr.RegenerateItemInfo(itemTemplate, mod);
+            itemTemplate->customFlags &= ~VIRTUAL_ITEM_FLAG_REGENERATE;
+            // toDoL Implement some way of saving when not loaded.
+        }
         ++count;
 
         if (sWorld->getBoolConfig(CONFIG_CACHE_DATA_QUERIES))
