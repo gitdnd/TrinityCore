@@ -168,12 +168,6 @@ struct VirtualModifier
      */
     static float GetStatRate(ItemModType stat);
 
-    /**
-     * Fetches the rate (point*rate = stat_amount) for the given stat type.
-     * Returns the stat rate.
-     */
-    static float GetStatRateNew(ItemModType stat);
-
     static uint32 GetPrimaryStatSlots(VirtualItemTemplate* item);
     static uint32 GetSecondaryStatSlots(VirtualItemTemplate* item);
 };

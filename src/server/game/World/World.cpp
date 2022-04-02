@@ -1461,23 +1461,15 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_PARRY_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ParryRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_BLOCK_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.BlockRating", 0.83f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_BLOCK_VALUE] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.BlockValue", 0.83f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_SPELL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellHitRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_SPELL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellHasteRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_SPELL_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellCritRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_MANA_REGENERATION] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ManaRegen", 0.4f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellPower", 1.35f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellPenetration", 1.1f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_RANGED_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedHitRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_RANGED_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedCritRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_RANGED_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedHasteRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_RANGED_ATTACK_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.RangedAttackPower", 2.2f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ExpertiseRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_MELEE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MeleeHitRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_MELEE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MeleeCritRating", 1.0f);
-    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_MELEE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MeleeHasteRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_ARMOR_PENETRATION_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ArmorPenetration", 1.1f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_ATTACK_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.AttackPower", 2.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HIT_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HitRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HasteRating", 1.0f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.CritRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HealthRegen", 0.4f);
 
     m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_HEAD] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Head", 1.0f);

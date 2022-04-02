@@ -592,7 +592,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
             // mod stat points based on stat weight
-            statPoints *= VirtualModifier::GetStatRateNew(primarystatgroup[i]);
+            statPoints *= VirtualModifier::GetStatRate(primarystatgroup[i]);
 
             // mod stat points based on item quality
             statPoints *= VirtualModifier::GetQualityStatModifier(output);
@@ -660,7 +660,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
             // mod stat points based on stat weight
-            statPoints *= VirtualModifier::GetStatRateNew(secondarystatgroup[i]);
+            statPoints *= VirtualModifier::GetStatRate(secondarystatgroup[i]);
 
             // mod stat points based on item quality
             statPoints *= VirtualModifier::GetQualityStatModifier(output);
@@ -1411,42 +1411,6 @@ float VirtualModifier::GetStatRate(ItemModType stat)
 {
     switch (stat)
     {
-        case ITEM_MOD_RANGED_ATTACK_POWER:
-            return 0.45f;
-        case ITEM_MOD_ARMOR_PENETRATION_RATING:
-            return 0.3f;
-        case ITEM_MOD_ATTACK_POWER:
-            return 0.5f;
-        case ITEM_MOD_SPELL_HEALING_DONE:
-            return 0.45f;
-        case ITEM_MOD_MANA_REGENERATION:
-            return 2.5f;
-        case ITEM_MOD_HEALTH_REGEN:
-            return 2.5f;
-        case ITEM_MOD_SPELL_PENETRATION:
-            return 0.8f;
-        case ITEM_MOD_BLOCK_VALUE:
-            return 0.65f;
-        case ITEM_MOD_SPELL_POWER:
-            return 0.86f;
-        case ITEM_MOD_DEFENSE_SKILL_RATING:
-            return 1.2f;
-        case ITEM_MOD_BLOCK_RATING:
-            return 1.2f;
-        case ITEM_MOD_INTELLECT:
-            return 1.9f;
-        case ITEM_MOD_SPIRIT:
-            return 1.65f;
-        default:
-            return 1.0f;
-    }
-    return 1.0f;
-}
-
-float VirtualModifier::GetStatRateNew(ItemModType stat)
-{
-    switch (stat)
-    {
         /* Primary stats */
         case ITEM_MOD_STAMINA:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_STAMINA);
@@ -1470,43 +1434,27 @@ float VirtualModifier::GetStatRateNew(ItemModType stat)
         case ITEM_MOD_BLOCK_VALUE:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_BLOCK_VALUE);
         /* Spell stats */
-        case ITEM_MOD_HIT_SPELL_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_SPELL_RATING);
-        case ITEM_MOD_HASTE_SPELL_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_SPELL_RATING);
-        case ITEM_MOD_CRIT_SPELL_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_SPELL_RATING);
         case ITEM_MOD_MANA_REGENERATION:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_MANA_REGENERATION);
         case ITEM_MOD_SPELL_POWER:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER);
         case ITEM_MOD_SPELL_PENETRATION:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION);
-        /* Ranged stats */
-        case ITEM_MOD_HIT_RANGED_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_RANGED_RATING);
-        case ITEM_MOD_CRIT_RANGED_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_RANGED_RATING);
-        case ITEM_MOD_HASTE_RANGED_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_RANGED_RATING);
-        case ITEM_MOD_RANGED_ATTACK_POWER:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_RANGED_ATTACK_POWER);
         /* Melee stats */
         case ITEM_MOD_EXPERTISE_RATING:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING);
-        case ITEM_MOD_HIT_MELEE_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_MELEE_RATING);
-        case ITEM_MOD_CRIT_MELEE_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_MELEE_RATING);
-        case ITEM_MOD_HASTE_MELEE_RATING:
-            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_MELEE_RATING);
         case ITEM_MOD_ARMOR_PENETRATION_RATING:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_ARMOR_PENETRATION_RATING);
         case ITEM_MOD_ATTACK_POWER:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_ATTACK_POWER);
-        /* Other / Unused */
+        /* Global stats */
         case ITEM_MOD_HIT_RATING:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HIT_RATING);
+        case ITEM_MOD_HASTE_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HASTE_RATING);
+        case ITEM_MOD_CRIT_RATING:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_CRIT_RATING);
+        /* Other / Unused */
         case ITEM_MOD_HEALTH_REGEN:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN);
         default:
