@@ -10,7 +10,7 @@
 #include "SFMTRand.h"
 
 VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
-socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), isCrafted(false)
+socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), statGroupSeed(0), isCrafted(false)
 {
 }
 
@@ -253,6 +253,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     InitSeedGen(modifier);
     output->seed = modifier.seed;
+    output->qualitySeed = modifier.qualitySeed;
     output->displaySeed = modifier.displaySeed;
     output->nameSeed = modifier.nameSeed;
     output->socketSeed = modifier.socketSeed;

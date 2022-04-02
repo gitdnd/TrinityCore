@@ -5767,6 +5767,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     //vItem->spellSeed = modifier.spellSeed;
     vItem->statSeed = modifier.statSeed;
     vItem->statValueSeed = modifier.statValueSeed;
+    vItem->statGroupSeed = modifier.statGroupSeed;
 
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
@@ -5880,6 +5881,7 @@ void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
     //vItem->spellSeed = modifier.spellSeed;
     vItem->statSeed = modifier.statSeed;
     vItem->statValueSeed = modifier.statValueSeed;
+    vItem->statGroupSeed = modifier.statGroupSeed;
 
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
