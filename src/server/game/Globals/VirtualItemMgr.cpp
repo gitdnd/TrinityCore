@@ -642,9 +642,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                     case STAT_GROUP_AGI_TANK:
                         statPoints *= 1.32f;
                         break;
-                    case STAT_GROUP_AGI_RANGED:
-                        statPoints *= 1.28f;
-                        break;
                     default:
                         break;
                 }
@@ -1806,8 +1803,8 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_SPIRIT
     };
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
-        ITEM_MOD_HASTE_SPELL_RATING,
-        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
         ITEM_MOD_MANA_REGENERATION,
         ITEM_MOD_SPELL_POWER
     };
@@ -1821,9 +1818,9 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_INTELLECT
     };
     stat_group_secondary_stats[STAT_GROUP_INT_DPS] = {
-        ITEM_MOD_HIT_SPELL_RATING,
-        ITEM_MOD_HASTE_SPELL_RATING,
-        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
         ITEM_MOD_SPELL_POWER
         //ITEM_MOD_SPELL_PENETRATION
     };
@@ -1837,9 +1834,9 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_STRENGTH
     };
     stat_group_secondary_stats[STAT_GROUP_STR_DPS] = {
-        ITEM_MOD_HIT_MELEE_RATING,
-        ITEM_MOD_CRIT_MELEE_RATING,
-        ITEM_MOD_HASTE_MELEE_RATING,
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_HASTE_RATING,
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
@@ -1858,6 +1855,7 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
         ITEM_MOD_HIT_RATING,
+        ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_BLOCK_RATING,
         ITEM_MOD_BLOCK_VALUE
     };
@@ -1865,15 +1863,15 @@ VirtualModifier::StatGroupData::StatGroupData()
         SOCKET_COLOR_RED
     };
 
-    // Agi Melee DPS Data
+    // Agi DPS Data
     stat_group_primary_stats[STAT_GROUP_AGI_DPS] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_AGILITY
     };
     stat_group_secondary_stats[STAT_GROUP_AGI_DPS] = {
-        ITEM_MOD_HIT_MELEE_RATING,
-        ITEM_MOD_CRIT_MELEE_RATING,
-        ITEM_MOD_HASTE_MELEE_RATING,
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_HASTE_RATING,
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
@@ -1892,28 +1890,11 @@ VirtualModifier::StatGroupData::StatGroupData()
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
         ITEM_MOD_HIT_RATING,
+        ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_BLOCK_RATING,
         ITEM_MOD_BLOCK_VALUE
     };
     stat_group_sockets[STAT_GROUP_AGI_TANK] = {
-        SOCKET_COLOR_YELLOW
-    };
-
-    // Agi Ranged DPS Data
-    stat_group_primary_stats[STAT_GROUP_AGI_RANGED] = {
-        ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY,
-        ITEM_MOD_INTELLECT
-    };
-    stat_group_secondary_stats[STAT_GROUP_AGI_RANGED] = {
-        ITEM_MOD_HIT_RANGED_RATING,
-        ITEM_MOD_CRIT_RANGED_RATING,
-        ITEM_MOD_HASTE_RANGED_RATING,
-        ITEM_MOD_EXPERTISE_RATING,
-        ITEM_MOD_RANGED_ATTACK_POWER,
-        ITEM_MOD_ARMOR_PENETRATION_RATING
-    };
-    stat_group_sockets[STAT_GROUP_AGI_RANGED] = {
         SOCKET_COLOR_YELLOW
     };
 
@@ -1959,16 +1940,14 @@ VirtualModifier::StatGroupData::StatGroupData()
         STAT_GROUP_HEALING,
         STAT_GROUP_INT_DPS,
         STAT_GROUP_AGI_DPS,
-        STAT_GROUP_AGI_TANK,
-        STAT_GROUP_AGI_RANGED
+        STAT_GROUP_AGI_TANK
     };
 
     armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_MAIL] = {
         STAT_GROUP_HEALING,
         STAT_GROUP_STR_DPS,
         STAT_GROUP_STR_TANK,
-        STAT_GROUP_AGI_DPS,
-        STAT_GROUP_AGI_RANGED
+        STAT_GROUP_AGI_DPS
     };
 
     armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_PLATE] = {
