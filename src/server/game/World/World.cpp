@@ -2172,9 +2172,6 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     // VirtualItem
-    TC_LOG_INFO("server.loading", "Loading Virtual item stat groups...");
-    sVirtualItemMgr.LoadStatGroupInfoFromDB();
-
     TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
     sVirtualItemMgr.LoadNamesFromDB();
 

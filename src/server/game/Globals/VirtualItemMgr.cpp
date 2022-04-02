@@ -59,35 +59,6 @@ VirtualItemMgr::~VirtualItemMgr()
 
 // Database loading
 
-void VirtualItemMgr::LoadStatGroupInfoFromDB()
-{
-    WriteGuard guard(lock);
-
-    uint32 count = 0;
-    uint32 beginTime = getMSTime();
-
-    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_stat_group_info`");
-
-    if (!result)
-    {
-        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item stat group info entries, table item_generator_stat_group_info is empty.");
-        return;
-    }
-
-    do {
-        Field* fields = result->Fetch();
-        int32 statGroup = fields[0].GetInt32();
-        int32 statType = fields[1].GetInt32();
-        int32 statId = fields[2].GetInt32();
-        std::string comment = fields[3].GetString();
-
-        stat_group_info.push_back(StatGroupInfo(statGroup, statType, statId, comment));
-        ++count;
-    } while (result->NextRow());
-
-    TC_LOG_INFO("server.loading", "Loaded %u available virtual item stat group entries in %u MS.", count, GetMSTimeDiffToNow(beginTime));
-}
-
 void VirtualItemMgr::LoadNamesFromDB()
 {
     WriteGuard guard(lock);
@@ -283,7 +254,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateSpells(output, modifier);
 
     // Generate primary and secondary stats.
-    // Always do this last, as it has variable rand calls based on quality.
     GenerateItemStats(output, modifier);
 
     // Generate an entry based on item type
