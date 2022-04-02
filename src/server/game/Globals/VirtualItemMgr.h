@@ -225,23 +225,6 @@ public:
      */
     static VirtualItemMgr& instance();
 
-    /**
-     * Not thread safe.
-     * Loads all possible stat group entries from the stat group table into memory.
-     */
-    void LoadStatGroupInfoFromDB();
-
-    struct StatGroupInfo
-    {
-        StatGroupInfo() {}
-        StatGroupInfo(int32 group, int32 type, int32 stat) : statGroup(group), statType(type), statId(stat) {}
-        StatGroupInfo(int32 group, int32 type, int32 stat, std::string n) : statGroup(group), statType(type), statId(stat), comment(n) {}
-        int32 statGroup;
-        int32 statType;
-        int32 statId;
-        std::string comment;
-    };
-
 	/**
 	 * Not thread safe.
 	 * Loads all possible names from the generator table into memory.
@@ -437,7 +420,6 @@ private:
     std::vector<uint32> freed_entries;
 
     std::map<uint32, VirtualLevelInfo> virtual_level_info;
-    std::vector<StatGroupInfo> stat_group_info;
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
     std::vector<itemSpellInfo> availableSpells;
