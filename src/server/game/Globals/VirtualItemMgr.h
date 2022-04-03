@@ -308,7 +308,7 @@ public:
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
       */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier, int8 dontUseType);
 
     /**
      * Generates a randoml item name depending on item type, subclass and quality
@@ -386,7 +386,7 @@ public:
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
     void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
+    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier());
     void GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
     void UpdateDisenchantId(VirtualItemTemplate* output);

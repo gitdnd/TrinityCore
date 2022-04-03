@@ -828,7 +828,7 @@ uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualM
     return *display;
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier, int8 dontUseType)
 {
     std::mt19937 generator;
     generator.seed(modifier.spellSeed);
@@ -860,6 +860,9 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         if (someSpells.minItemLevel != -1 && (int32)output->ItemLevel < someSpells.minItemLevel)
             continue;
 
+        if (dontUseType != -1 && someSpells.SpellTrigger == dontUseType)
+            continue;
+
         spells.push_back(someSpells);
     }
 
@@ -872,11 +875,18 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     return *selectedSpell;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier)
 {
-    for (uint8 i = 0; i < MAX_GENERATED_SPELLS; ++i)
+    uint8 numOfSpell = 1;
+
+    if (numOfSpell > MAX_GENERATED_SPELLS)
+        numOfSpell = MAX_GENERATED_SPELLS;
+
+    int8 dontUseType = -1;
+
+    for (uint8 i = 0; i < numOfSpell; ++i)
     {
-        itemSpellInfo spell = GenerateSpell(output, modifier);
+        itemSpellInfo spell = GenerateSpell(output, modifier, dontUseType);
         if (spell.spellId == 0)
             continue;
 
@@ -887,7 +897,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
         output->Spells[i].SpellCooldown = spell.SpellCooldown;
         output->Spells[i].SpellCategory = spell.SpellCategory;
         output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
-        break;
+        dontUseType = spell.SpellTrigger;
     }
 }
 
