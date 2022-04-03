@@ -231,11 +231,12 @@ enum ItemFlagsCustom
 
 };
 
-enum VirtualItemFlags : uint32
+enum VirtualItemFlags
 {
-    VIRTUAL_ITEM_FLAG_STATIC = 0x0001,
-    VIRTUAL_ITEM_FLAG_DISPLAY_STATIC = 0x0002,
-    VIRTUAL_ITEM_FLAG_REGENERATE = 0x0004,
+    VIRTUAL_ITEM_FLAG_STATIC = 0x0001, // Items are not able to be modified
+    VIRTUAL_ITEM_FLAG_DISPLAY_STATIC = 0x0002, // Display is static so custom overrides don't get overidden.
+    VIRTUAL_ITEM_FLAG_REGENERATE = 0x0004, //Regenerates the item server startup.
+    VIRTUAL_ITEM_FLAG_HOOK_ON_PLAYER_LOOT = 0x0008, // Makes a spell function call upon looting.
 };
 
 enum BAG_FAMILY_MASK

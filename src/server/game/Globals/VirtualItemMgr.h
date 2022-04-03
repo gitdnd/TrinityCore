@@ -16,7 +16,7 @@
 class ObjectMgr;
 class World;
 
-enum StatGroup
+enum StatGroup : uint8
 {
     STAT_GROUP_HEALING,
     STAT_GROUP_INT_DPS,
@@ -192,6 +192,22 @@ struct itemSpellInfo
     int32  SpellCooldown;
     uint32 SpellCategory;
     int32  SpellCategoryCooldown;
+};
+
+#define MAX_LEGENDARY_SPELLS 3
+
+struct legendaryItemInfo
+{
+    uint32 legendaryId;
+    int minItemLevel;
+    int maxItemLevel;
+    int8 itemClass;
+    int8 itemSubClass;
+    int8 itemInventoryType;
+    int8 itemStatGroup;
+    _Spell legendarySpells[MAX_LEGENDARY_SPELLS];
+    float primaryStatModifier;
+    float secondaryStatModifier;
 };
 
 class VirtualItemMgr
@@ -376,6 +392,7 @@ public:
     void UpdateDisenchantId(VirtualItemTemplate* output);
     void InitSeedGen(VirtualModifier& modifier);
 
+    void LoadLegendaryTemplate();
 private:
 
     class EntryGenerator
@@ -423,6 +440,7 @@ private:
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
     std::vector<itemSpellInfo> availableSpells;
+    std::vector<legendaryItemInfo> legendaryTemplate;
 
     /**
      * Not thread safe.

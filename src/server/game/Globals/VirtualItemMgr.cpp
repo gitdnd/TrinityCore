@@ -1703,6 +1703,71 @@ bool VirtualItemMgr::IsVirtualTemplate(ItemTemplate const* base)
     return false;
 }
 
+void VirtualItemMgr::LoadLegendaryTemplate()
+{
+    WriteGuard guard(lock);
+
+    uint32 count = 0;
+    uint32 beginTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_legendary_template`");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item legendary templates, table item_generator_legendary_template is empty.");
+        return;
+    }
+
+    do {
+        Field* fields = result->Fetch();
+        legendaryItemInfo legTemp;
+        legTemp.legendaryId = fields[0].GetUInt32();
+        legTemp.minItemLevel = fields[1].GetInt32();
+        legTemp.maxItemLevel = fields[2].GetInt32();
+        legTemp.itemClass = fields[3].GetInt8();
+        legTemp.itemSubClass = fields[4].GetInt8();
+        legTemp.itemInventoryType = fields[5].GetInt8();
+        legTemp.itemStatGroup = fields[6].GetInt8();
+        legTemp.primaryStatModifier = fields[7].GetFloat();
+        legTemp.secondaryStatModifier = fields[8].GetFloat();
+        
+        uint32 SpellTrigger = fields[9].GetUInt32();
+        int32  SpellCharges = fields[10].GetInt32();
+        float  SpellPPMRate = fields[11].GetFloat();
+        int32  SpellCooldown = fields[12].GetInt32();
+        uint32 SpellCategory = fields[13].GetUInt32();
+        int32  SpellCategoryCooldown = fields[14].GetInt32();
+        for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
+        {
+            _Spell spell;
+            spell.SpellId = 0;
+            spell.SpellTrigger = 0;
+            spell.SpellCharges = -1;
+            spell.SpellPPMRate = 0.f;
+            spell.SpellCooldown = -1;
+            spell.SpellCategory = 0;
+            spell.SpellCategoryCooldown = -1;
+            if (QueryResult spellEntry = WorldDatabase.PQuery("SELECT SpellId, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown"
+                " FROM item_generator_legendary_spell_entry WHERE legendaryIndex = %u AND spellIndex = %u", legTemp.legendaryId, i))
+            {
+                Field* spellFields = spellEntry->Fetch();
+                spell.SpellId = fields[0].GetUInt32();
+                spell.SpellTrigger = fields[1].GetUInt32();
+                spell.SpellCharges = fields[2].GetInt32();
+                spell.SpellPPMRate = fields[3].GetFloat();
+                spell.SpellCooldown = fields[4].GetInt32();
+                spell.SpellCategory = fields[5].GetUInt32();
+                spell.SpellCategoryCooldown = fields[6].GetInt32();
+            }
+            legTemp.legendarySpells[i] = spell;
+        }
+        legendaryTemplate.emplace_back(legTemp);
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", "Loaded %u available virtual item legendary templates in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+}
+
 void VirtualItemTemplate::UpdateDisplay()
 {
     // Get the correct display ID
