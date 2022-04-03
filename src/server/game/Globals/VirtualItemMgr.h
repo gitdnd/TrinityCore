@@ -16,7 +16,7 @@
 class ObjectMgr;
 class World;
 
-enum StatGroup : uint8
+enum StatGroup
 {
     STAT_GROUP_HEALING,
     STAT_GROUP_INT_DPS,
@@ -193,7 +193,7 @@ struct itemSpellInfo
     uint32 SpellCategory;
     int32  SpellCategoryCooldown;
 };
-
+#define MAX_GENERATED_SPELLS 2
 #define MAX_LEGENDARY_SPELLS 3
 
 struct legendaryItemInfo

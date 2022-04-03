@@ -834,7 +834,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     generator.seed(modifier.spellSeed);
 
     std::list<itemSpellInfo> spells;
-    for (itemSpellInfo const someSpells : availableSpells)
+    for (itemSpellInfo const &someSpells : availableSpells)
     {
         if (someSpells.minQuality != -1 && output->Quality < someSpells.minQuality)
             continue;
@@ -874,23 +874,20 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
 
 void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
 {
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    for (uint8 i = 0; i < MAX_GENERATED_SPELLS; ++i)
     {
-        if (output->Spells[i].SpellId == 0)
-        {
-            itemSpellInfo spell = GenerateSpell(output, modifier);
-            if (spell.spellId == 0)
-                continue;
+        itemSpellInfo spell = GenerateSpell(output, modifier);
+        if (spell.spellId == 0)
+            continue;
 
-            output->Spells[i].SpellId = spell.spellId;
-            output->Spells[i].SpellTrigger = spell.SpellTrigger;
-            output->Spells[i].SpellCharges = spell.SpellCharges;
-            output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
-            output->Spells[i].SpellCooldown = spell.SpellCooldown;
-            output->Spells[i].SpellCategory = spell.SpellCategory;
-            output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
-            break;
-        }
+        output->Spells[i].SpellId = spell.spellId;
+        output->Spells[i].SpellTrigger = spell.SpellTrigger;
+        output->Spells[i].SpellCharges = spell.SpellCharges;
+        output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
+        output->Spells[i].SpellCooldown = spell.SpellCooldown;
+        output->Spells[i].SpellCategory = spell.SpellCategory;
+        output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+        break;
     }
 }
 
