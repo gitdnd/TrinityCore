@@ -1,4 +1,5 @@
 #include "VirtualItemMgr.h"
+#include "Containers.h"
 #include "Errors.h" // ASSERT macro
 #include "SharedDefines.h" // item quality enum
 #include "World.h" // config values
@@ -164,6 +165,7 @@ void VirtualItemMgr::LoadSpellsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     GenerateQuality(output, modifier);
+    GenerateLegendaryItemEffect(output, modifier);
     GenerateStatGroup(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
@@ -199,6 +201,7 @@ void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
     initSeed(modifier.spellSeed, generator);
     initSeed(modifier.statValueSeed, generator);
     initSeed(modifier.statGroupSeed, generator);
+    initSeed(modifier.legendarySeed, generator);
 }
 
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
@@ -237,6 +240,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Select a stat group for the item
     GenerateStatGroup(output, modifier);
+
+    // Generate Legendary (if item is legendary)
+    GenerateLegendaryItemEffect(output, modifier);
 
     // Generate base stats for the item.
     GenerateBaseStats(output, modifier);
@@ -505,6 +511,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
     uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
 
+    //toDo: Add legendary override for slots
     // if this is a trinket, randomly select which slot to generate a stat for
     if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
     {
@@ -558,9 +565,14 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         // generate primary stat values  for all stats in group
         for (uint32 i = 0; i < primarystatgroup.size(); ++i)
         {
+            float primaryStatMod = 1.f;
+            if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+                primaryStatMod = leg->primaryStatModifier;
+
             // select random pool size value based on upper and lower bounds
             float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
+            statPoints *= primaryStatMod;
             // mod stat points based on stat weight
             statPoints *= VirtualModifier::GetStatRate(primarystatgroup[i]);
 
@@ -626,8 +638,14 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         // generate secondary stat values
         for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
         {
+            float secondayStatMod = 1.f;
+            if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+                secondayStatMod = leg->secondaryStatModifier;
+
             // select random pool size value based on upper and lower bounds
             float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+
+            statPoints *= secondayStatMod;
 
             // mod stat points based on stat weight
             statPoints *= VirtualModifier::GetStatRate(secondarystatgroup[i]);
@@ -887,6 +905,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     for (uint8 i = 0; i < numOfSpell; ++i)
     {
         itemSpellInfo spell = GenerateSpell(output, modifier, dontUseType);
+
         if (spell.spellId == 0)
             continue;
 
@@ -1725,10 +1744,14 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         return;
     }
 
+    _LegendaryTemplateStore.reserve(result->GetRowCount());
+
     do {
         Field* fields = result->Fetch();
-        legendaryItemInfo legTemp;
-        legTemp.legendaryId = fields[0].GetUInt32();
+        uint32 entry = fields[0].GetUInt32();
+        legendaryItemInfo& legTemp = _LegendaryTemplateStore[entry];
+
+        legTemp.legendaryId = entry;
         legTemp.minItemLevel = fields[1].GetInt32();
         legTemp.maxItemLevel = fields[2].GetInt32();
         legTemp.itemClass = fields[3].GetInt8();
@@ -1738,12 +1761,6 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.primaryStatModifier = fields[7].GetFloat();
         legTemp.secondaryStatModifier = fields[8].GetFloat();
         
-        uint32 SpellTrigger = fields[9].GetUInt32();
-        int32  SpellCharges = fields[10].GetInt32();
-        float  SpellPPMRate = fields[11].GetFloat();
-        int32  SpellCooldown = fields[12].GetInt32();
-        uint32 SpellCategory = fields[13].GetUInt32();
-        int32  SpellCategoryCooldown = fields[14].GetInt32();
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
             _Spell spell;
@@ -1768,11 +1785,33 @@ void VirtualItemMgr::LoadLegendaryTemplate()
             }
             legTemp.legendarySpells[i] = spell;
         }
-        legendaryTemplate.emplace_back(legTemp);
         ++count;
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item legendary templates in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+}
+
+legendaryItemInfo const* VirtualItemMgr::GetLegendaryItemInfo(uint32 id) const
+{
+    return Trinity::Containers::MapGetValuePtr(_LegendaryTemplateStore, id);
+}
+
+void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier)
+{
+    std::mt19937 generator;
+    generator.seed(modifier.legendarySeed);
+    //toDo: Foe add selection.
+    output->legendaryId = 0;
+    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+    {
+        for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
+        {
+            if (leg->legendarySpells[i].SpellId != 0)
+            {
+                output->Spells[i + MAX_GENERATED_SPELLS] = leg->legendarySpells[i];
+            }
+        }
+    }
 }
 
 void VirtualItemTemplate::UpdateDisplay()

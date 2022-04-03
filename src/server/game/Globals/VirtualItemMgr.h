@@ -71,6 +71,8 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 spellSeed;
     uint32 statValueSeed;
     uint32 statGroupSeed;
+    uint32 legendarySeed;
+    uint32 legendaryId;
     uint32 customFlags;
 
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
@@ -97,6 +99,7 @@ struct VirtualModifier
     uint32 spellSeed;
     uint32 statValueSeed;
     uint32 statGroupSeed;
+    uint32 legendarySeed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
     uint32 vLvlMod;
@@ -209,6 +212,8 @@ struct legendaryItemInfo
     float primaryStatModifier;
     float secondaryStatModifier;
 };
+
+typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;
 
 class VirtualItemMgr
 {
@@ -393,6 +398,8 @@ public:
     void InitSeedGen(VirtualModifier& modifier);
 
     void LoadLegendaryTemplate();
+    legendaryItemInfo const* GetLegendaryItemInfo(uint32 id) const;
+    void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier);
 private:
 
     class EntryGenerator
@@ -440,7 +447,7 @@ private:
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
     std::vector<itemSpellInfo> availableSpells;
-    std::vector<legendaryItemInfo> legendaryTemplate;
+    LegendaryTemplateContainer _LegendaryTemplateStore;
 
     /**
      * Not thread safe.
