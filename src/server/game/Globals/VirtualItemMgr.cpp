@@ -463,12 +463,22 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
             case ITEM_SUBCLASS_WEAPON_AXE:
             case ITEM_SUBCLASS_WEAPON_MACE:
             case ITEM_SUBCLASS_WEAPON_SWORD:
+            {
+                output->Delay = (urand(15, 27, generator) * 100);
+                output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageType = 0;
+                break;
+            }
             case ITEM_SUBCLASS_WEAPON_FIST:
             {
                 output->Delay = (urand(15, 27, generator) * 100);
                 output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
+
+                // fist weapons need to either be main or offhand, special case for this
+                output->InventoryType = urand(0, 1, generator) > 0 ? INVTYPE_WEAPONMAINHAND : INVTYPE_WEAPONOFFHAND;
                 break;
             }
             case ITEM_SUBCLASS_WEAPON_DAGGER:
