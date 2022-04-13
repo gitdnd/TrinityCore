@@ -4199,6 +4199,16 @@ ItemGenerator.StatSlot.Secondary.Epic = 3
 ItemGenerator.StatSlot.Primary.Legendary = 2
 ItemGenerator.StatSlot.Secondary.Legendary = 3
 
+
+# Set chances are percentage chance for a quality type to roll a set.
+# 0 for disabled, 100 is max
+
+ItemGenerator.SetChance.Common = 1
+ItemGenerator.SetChance.Uncommon = 2
+ItemGenerator.SetChance.Rare = 5
+ItemGenerator.SetChance.Epic = 10
+ItemGenerator.SetChance.Legendary = 20
+
 #
 ###################################################################################################
 

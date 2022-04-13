@@ -1180,8 +1180,13 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
     itemSetInfo set = GenerateSet(output, modifier);
 
-    // debug 50% chance to apply set
-    if (urand(0, 1, generator) == 0)
+    uint32 qualityChance = VirtualModifier::GetSetChance(output);
+
+    ASSERT(qualityChance <= 100);
+
+    uint32 chanceRng = urand(1, 100, generator);
+
+    if (chanceRng <= qualityChance)
     {
         output->ItemSet = set.setId;
 
@@ -1661,6 +1666,26 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
             return 1.0f;
     }
     return 1.0f;
+}
+
+uint32 VirtualModifier::GetSetChance(VirtualItemTemplate* output)
+{
+    switch (output->Quality)
+    {
+        case ITEM_QUALITY_NORMAL:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_SETCHANCE_COMMON);
+        case ITEM_QUALITY_UNCOMMON:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_SETCHANCE_UNCOMMON);
+        case ITEM_QUALITY_RARE:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_SETCHANCE_RARE);
+        case ITEM_QUALITY_EPIC:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_SETCHANCE_EPIC);
+        case ITEM_QUALITY_LEGENDARY:
+            return sWorld->getIntConfig(CONFIG_ITEMGEN_SETCHANCE_LEGENDARY);
+        default:
+            return 0;
+    }
+    return 0;
 }
 
 VirtualItemTemplate* VirtualItemMgr::GetVirtualTemplate(uint32 entry)

@@ -1512,6 +1512,12 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_LEGENDARY] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Legendary", 2);
     m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_LEGENDARY] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Legendary", 3);
 
+    m_int_configs[CONFIG_ITEMGEN_SETCHANCE_COMMON] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Common", 1);
+    m_int_configs[CONFIG_ITEMGEN_SETCHANCE_UNCOMMON] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Uncommon", 2);
+    m_int_configs[CONFIG_ITEMGEN_SETCHANCE_RARE] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Rare", 5);
+    m_int_configs[CONFIG_ITEMGEN_SETCHANCE_EPIC] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Epic", 10);
+    m_int_configs[CONFIG_ITEMGEN_SETCHANCE_LEGENDARY] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Legendary", 20);
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 

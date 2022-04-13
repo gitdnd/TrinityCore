@@ -175,6 +175,8 @@ struct VirtualModifier
 
     static uint32 GetPrimaryStatSlots(VirtualItemTemplate* item);
     static uint32 GetSecondaryStatSlots(VirtualItemTemplate* item);
+
+    static uint32 GetSetChance(VirtualItemTemplate* item);
 };
 
 struct itemSpellInfo
