@@ -1285,6 +1285,7 @@ void Item::SaveVirtualItemInfo()
         stmt->setUInt32(i++, itemTemplate->base_entry);
         stmt->setUInt32(i++, GetGUID().GetCounter());
         stmt->setString(i++, itemTemplate->Name1);
+        stmt->setUInt32(i++, itemTemplate->InventoryType);
         stmt->setUInt8(i++, itemTemplate->Quality);
         stmt->setUInt32(i++, itemTemplate->DisplayInfoID);
         stmt->setUInt16(i++, itemTemplate->ItemLevel);
