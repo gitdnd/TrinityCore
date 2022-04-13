@@ -1305,11 +1305,15 @@ public:
         char const* seedStr = strtok(nullptr, " ");
         if (seedStr)
         {
-            modifier.seed = atoi(seedStr);
+            if (atoi(seedStr) > 0)
+                modifier.seed = atoi(seedStr);
+
             char const* ilevelStr = strtok(nullptr, " ");
             if (ilevelStr)
             {
-                modifier.ilevel = atoi(ilevelStr);
+                if(atoi(ilevelStr) > 0)
+                    modifier.ilevel = atoi(ilevelStr);
+
                 char const* qualityStr = strtok(nullptr, " ");
                 if (qualityStr)
                 {
