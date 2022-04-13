@@ -203,8 +203,8 @@ struct itemSpellInfo
 
 struct itemSetInfo
 {
-    itemSetInfo() {}
-    itemSetInfo(uint32 sId, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 minQual, uint32 maxQual, uint32 dispOverride) : setId(sId),
+    itemSetInfo() { setId = 0; }
+    itemSetInfo(uint32 sId, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, int32 minQual, int32 maxQual, uint32 dispOverride) : setId(sId),
         itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), minQuality(minQual), maxQuality(maxQual), displayOverride(dispOverride) {}
     uint32 setId;
     int32 itemClass;
@@ -213,8 +213,8 @@ struct itemSetInfo
     int8 statGroup;
     int32 minItemLevel;
     int32 maxItemLevel;
-    uint32 minQuality;
-    uint32 maxQuality;
+    int32 minQuality;
+    int32 maxQuality;
     uint32 displayOverride;
 };
 
@@ -342,6 +342,11 @@ public:
     itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier, int8 dontUseType);
 
     /**
+      * Returns a randomly generated item set depending on item type, subclass and quality
+      */
+    itemSetInfo GenerateSet(VirtualItemTemplate* item, VirtualModifier modifier);
+
+    /**
      * Generates a randoml item name depending on item type, subclass and quality
      */
     void GenerateItemName(VirtualItemTemplate* item, VirtualModifier modifier, bool reRoll = false) const;
@@ -404,6 +409,10 @@ public:
      */
     void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
 
+    /**
+     * Uses passed modifier to select an item set.
+     */
+    void GenerateItemSet(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier());
 
     /**
      * Converts a virtual player/group level into a usable item level.

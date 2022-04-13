@@ -184,8 +184,8 @@ void VirtualItemMgr::LoadSetsFromDB()
         int8 statGroup = fields[4].GetInt8();
         int32 minItemLevel = fields[5].GetInt32();
         int32 maxItemLevel = fields[6].GetInt32();
-        uint32 minQuality = fields[7].GetUInt32();
-        uint32 maxQuality = fields[8].GetUInt32();
+        int32 minQuality = fields[7].GetInt32();
+        int32 maxQuality = fields[8].GetInt32();
         uint32 displayOverride = fields[9].GetUInt32();
 
         availableItemSets.push_back(itemSetInfo(setId, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, minQuality, maxQuality, displayOverride));
@@ -208,6 +208,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateSockets(output, modifier);
     //GenerateSpells(output, modifier);
     GenerateItemStats(output, modifier);
+    //GenerateItemSet(output, modifier); should we ever regenerate selected sets?
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
     uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
@@ -299,6 +300,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Generate primary and secondary stats.
     GenerateItemStats(output, modifier);
+
+    // Generate item set
+    GenerateItemSet(output, modifier);
 
     // Generate an entry based on item type
     WriteGuard guard(lock);
@@ -515,7 +519,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // apply other item data
     output->ItemLevel = ilevel;
-    output->ItemSet = 0; // Temporary default to set 0, ie. no set. Need to add set handler based on stat groups.
     output->MaxDurability = 0; // Disable any form of durability for now
 }
 
@@ -931,6 +934,51 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     return *selectedSpell;
 }
 
+itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModifier modifier)
+{
+    std::mt19937 generator;
+    generator.seed(modifier.setSeed);
+
+    std::list<itemSetInfo> sets;
+    for (itemSetInfo const& someSets : availableItemSets)
+    {
+        if (someSets.minQuality != -1 && (int32)output->Quality < someSets.minQuality)
+            continue;
+
+        if (someSets.maxQuality != -1 && (int32)output->Quality > someSets.maxQuality)
+            continue;
+
+        if (someSets.itemClass != -1 && (int32)output->Class != someSets.itemClass)
+            continue;
+
+        if (someSets.subClass != -1 && (int32)output->SubClass != someSets.subClass)
+            continue;
+
+        if (someSets.inventoryType != -1 && (int32)output->InventoryType != someSets.inventoryType)
+            continue;
+
+        if (someSets.statGroup != -1 && output->statGroup != someSets.statGroup)
+            continue;
+
+        if (someSets.maxItemLevel != -1 && (int32)output->ItemLevel > someSets.maxItemLevel)
+            continue;
+
+        if (someSets.minItemLevel != -1 && (int32)output->ItemLevel < someSets.minItemLevel)
+            continue;
+
+
+        sets.push_back(someSets);
+    }
+
+    if (sets.empty())
+        return itemSetInfo();
+
+    auto selectedSet = std::begin(sets);
+    std::advance(selectedSet, urand(0, uint32(std::size(sets)) - 1, generator));
+
+    return *selectedSet;
+}
+
 void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     uint8 numOfSpell = 1;
@@ -1125,6 +1173,19 @@ void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
     };
 }
 
+void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifier modifier)
+{
+    std::mt19937 generator;
+    generator.seed(modifier.setSeed);
+
+    itemSetInfo set = GenerateSet(output, modifier);
+
+    if (output->Quality == ITEM_QUALITY_LEGENDARY)
+        output->ItemSet = set.setId;
+
+    if (set.displayOverride > 0)
+        output->DisplayInfoID = set.displayOverride;
+}
 
 uint32 VirtualItemMgr::EntryGenerator::GenerateEntry(VirtualItemMgr::Store const& store)
 {
@@ -1813,13 +1874,13 @@ void VirtualItemMgr::LoadLegendaryTemplate()
                 " FROM item_generator_legendary_spell_entry WHERE legendaryIndex = %u AND spellIndex = %u", legTemp.legendaryId, i))
             {
                 Field* spellFields = spellEntry->Fetch();
-                spell.SpellId = fields[0].GetUInt32();
-                spell.SpellTrigger = fields[1].GetUInt32();
-                spell.SpellCharges = fields[2].GetInt32();
-                spell.SpellPPMRate = fields[3].GetFloat();
-                spell.SpellCooldown = fields[4].GetInt32();
-                spell.SpellCategory = fields[5].GetUInt32();
-                spell.SpellCategoryCooldown = fields[6].GetInt32();
+                spell.SpellId = spellFields[0].GetUInt32();
+                spell.SpellTrigger = spellFields[1].GetUInt32();
+                spell.SpellCharges = spellFields[2].GetInt32();
+                spell.SpellPPMRate = spellFields[3].GetFloat();
+                spell.SpellCooldown = spellFields[4].GetInt32();
+                spell.SpellCategory = spellFields[5].GetUInt32();
+                spell.SpellCategoryCooldown = spellFields[6].GetInt32();
             }
             legTemp.legendarySpells[i] = spell;
         }
