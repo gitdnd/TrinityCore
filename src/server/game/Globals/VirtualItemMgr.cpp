@@ -211,7 +211,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     //GenerateItemSet(output, modifier); should we ever regenerate selected sets?
     bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
     bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier);
+    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier).displayId;
     if (display == 0)
         output->UpdateDisplay();
     else
@@ -315,7 +315,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     output->ItemId = entry;
 
     // Select a display ID for the item based on type
-    uint32 display = GenerateItemDisplay(output, modifier);
+    uint32 display = GenerateItemDisplay(output, modifier).displayId;
     /*std::stringstream ss;
     ss << "Generated item with display " << display;
     sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
@@ -870,37 +870,56 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
     }
 }
 
-uint32 VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier) const
+displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     std::mt19937 generator;
     generator.seed(modifier.displaySeed);
-    std::list<uint32> displayLists;
-    displayLists = GetDisplaysForDisplayInfo(output);
 
-    // Attempt to find display at a quality up if none found
-    if (displayLists.empty())
-        displayLists = GetDisplaysForDisplayInfo(output, true);
+    std::list<displayInfo> displays;
 
-    // If still empty, output an error
-    if (displayLists.empty())
+    for (displayInfo const& someDisplays : availableDisplays)
     {
-        std::ostringstream stream;
-        stream << "ERROR: Found no display id for item quality [" << output->Quality << "] class [";
-        stream << output->Class << "] subclass [" << output->SubClass << "] inventoryType [" << output->InventoryType << "]";
-        stream << ". Please report this to developers.";
-        sWorld->SendGlobalText(stream.str().c_str(), nullptr);
-        return 0;
+        if (output->Quality == ITEM_QUALITY_LEGENDARY)
+        {
+            if (someDisplays.quality < ITEM_QUALITY_EPIC)
+                continue;
+            if (someDisplays.quality >= ITEM_QUALITY_ARTIFACT)
+                continue;
+        }
+        else
+        {
+            if (output->Quality != someDisplays.quality)
+                continue;
+        }
+
+        if (output->InventoryType != someDisplays.iInventoryType)
+            continue;
+
+        if (output->Class != someDisplays.iClass)
+            continue;
+
+        if (output->SubClass != someDisplays.isubClass)
+            continue;
+
+        displays.push_back(someDisplays);
     }
-    auto display = std::begin(displayLists);
-    std::advance(display, urand(0, uint32(std::size(displayLists)) - 1, generator));
+
+    // if there are no found displays, default to DBC display
+    if (displays.empty())
+    {
+        return displayInfo();
+    }
+
+    auto display = std::begin(displays);
+    std::advance(display, urand(0, uint32(std::size(displays)) - 1, generator));
 
     // If a display ID has already been assigned, return this
     if (output->DisplayInfoID > 0)
-        return output->DisplayInfoID;
+        return displayInfo(output->DisplayInfoID);
 
     // If an item is flagged as static display, return the static display
     if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
-        return output->DisplayInfoID;
+        return displayInfo(output->DisplayInfoID);
 
     return *display;
 }
@@ -1330,7 +1349,6 @@ std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate*
                 continue;
             if (displaysitr.quality >= ITEM_QUALITY_ARTIFACT)
                 continue;
-
         }
         else
         {

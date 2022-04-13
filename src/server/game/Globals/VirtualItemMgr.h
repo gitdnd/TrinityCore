@@ -179,6 +179,18 @@ struct VirtualModifier
     static uint32 GetSetChance(VirtualItemTemplate* item);
 };
 
+struct displayInfo
+{
+    displayInfo() { displayId = 0; }
+    displayInfo(uint32 dId) { displayId = dId; }
+    displayInfo(uint32 iQ, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 dId) : quality(iQ), iClass(_class), isubClass(subclass), iInventoryType(inventoryType), displayId(dId) {}
+    uint32 quality;
+    uint32 iClass;
+    uint32 isubClass;
+    uint32 iInventoryType;
+    uint32 displayId;
+};
+
 struct itemSpellInfo
 {
     itemSpellInfo() { spellId = 0; }
@@ -308,16 +320,6 @@ public:
 
     void LoadDisplaysFromDB();
 
-    struct displayInfo
-    {
-        displayInfo(uint32 iQ, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 dId) : quality(iQ), iClass(_class), isubClass(subclass), iInventoryType(inventoryType), displayId(dId) {}
-        displayInfo(uint32 iQ, uint32 _class, uint32 subclass, uint32 inventoryType) : quality(iQ), iClass(_class), isubClass(subclass), iInventoryType(inventoryType) {}
-        uint32 quality;
-        uint32 iClass;
-        uint32 isubClass;
-        uint32 iInventoryType;
-        uint32 displayId;
-    };
 
     /**
       * Not thread safe.
@@ -336,7 +338,7 @@ public:
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
      */
-    uint32 GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier) const;
+    displayInfo GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier);
 
     /**
       * Returns a randomly generated item spell depending on item type, subclass and quality
