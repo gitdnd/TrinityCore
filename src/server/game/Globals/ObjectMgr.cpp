@@ -3514,6 +3514,8 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->spellSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statValueSeed = uint32(fields[i++].GetUInt32());
         itemTemplate->statGroupSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->setSeed = uint32(fields[i++].GetUInt32());
+        itemTemplate->legendarySeed = fields[i++].GetUInt32();
         itemTemplate->statGroup = StatGroup(uint8(fields[i++].GetUInt8()));
 
         itemTemplate->customFlags = uint32(fields[i++].GetUInt32());
@@ -3521,7 +3523,6 @@ void ObjectMgr::LoadVirtualItemTemplates()
         if(sheath != 0)
             itemTemplate->Sheath = uint32(sheath);
 
-        itemTemplate->legendarySeed = fields[i++].GetUInt32();
         itemTemplate->legendaryId = fields[i++].GetUInt32();
 
 
@@ -3545,6 +3546,8 @@ void ObjectMgr::LoadVirtualItemTemplates()
             mod.spellSeed = itemTemplate->spellSeed;
             mod.statValueSeed = itemTemplate->statValueSeed;
             mod.statGroupSeed = itemTemplate->statGroupSeed;
+            mod.setSeed = itemTemplate->setSeed;
+            mod.legendarySeed = itemTemplate->legendarySeed;
             sVirtualItemMgr.RegenerateItemInfo(itemTemplate, mod);
             itemTemplate->customFlags &= ~VIRTUAL_ITEM_FLAG_REGENERATE;
             // toDoL Implement some way of saving when not loaded.

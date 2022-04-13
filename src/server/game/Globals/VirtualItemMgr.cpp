@@ -160,6 +160,41 @@ void VirtualItemMgr::LoadSpellsFromDB()
     TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
+void VirtualItemMgr::LoadSetsFromDB()
+{
+    WriteGuard guard(lock);
+
+    uint32 count = 0;
+    uint32 beginTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT * FROM `item_generator_itemsets`");
+
+    if (!result)
+    {
+        TC_LOG_INFO("server.loading", "Loaded 0 available virtual item sets, table item_generator_itemsets is empty.");
+        return;
+    }
+
+    do {
+        Field* fields = result->Fetch();
+        uint32 setId = fields[0].GetUInt32();
+        int32 itemClass = fields[1].GetInt32();
+        int32 subClass = fields[2].GetInt32();
+        int32 inventoryType = fields[3].GetInt32();
+        int8 statGroup = fields[4].GetInt8();
+        int32 minItemLevel = fields[5].GetInt32();
+        int32 maxItemLevel = fields[6].GetInt32();
+        uint32 minQuality = fields[7].GetUInt32();
+        uint32 maxQuality = fields[8].GetUInt32();
+        uint32 displayOverride = fields[9].GetUInt32();
+
+        availableItemSets.push_back(itemSetInfo(setId, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, minQuality, maxQuality, displayOverride));
+        ++count;
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", "Loaded %u available virtual item sets in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+}
+
 // Generators
 
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
@@ -201,6 +236,7 @@ void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
     initSeed(modifier.spellSeed, generator);
     initSeed(modifier.statValueSeed, generator);
     initSeed(modifier.statGroupSeed, generator);
+    initSeed(modifier.setSeed, generator);
     initSeed(modifier.legendarySeed, generator);
 }
 
@@ -235,6 +271,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     output->statSeed = modifier.statSeed;
     output->statValueSeed = modifier.statValueSeed;
     output->statGroupSeed = modifier.statGroupSeed;
+    output->setSeed = modifier.setSeed;
+    output->legendarySeed = modifier.legendarySeed;
 
     GenerateQuality(output, modifier);
 

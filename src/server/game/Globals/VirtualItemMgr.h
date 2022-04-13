@@ -71,6 +71,7 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 spellSeed;
     uint32 statValueSeed;
     uint32 statGroupSeed;
+    uint32 setSeed;
     uint32 legendarySeed;
     uint32 legendaryId;
     uint32 customFlags;
@@ -99,6 +100,7 @@ struct VirtualModifier
     uint32 spellSeed;
     uint32 statValueSeed;
     uint32 statGroupSeed;
+    uint32 setSeed;
     uint32 legendarySeed;
     uint32 plrAvgLvl;
     bool isCrafted = false;
@@ -178,7 +180,7 @@ struct VirtualModifier
 struct itemSpellInfo
 {
     itemSpellInfo() { spellId = 0; }
-    itemSpellInfo(uint32 sId, uint32 minQual, uint32 maxQual, int32 iClass, int32 sub, uint32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), minQuality(minQual), maxQuality(maxQual),
+    itemSpellInfo(uint32 sId, uint32 minQual, uint32 maxQual, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), minQuality(minQual), maxQuality(maxQual),
         itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
     uint32 spellId;
     uint32 minQuality;
@@ -198,6 +200,23 @@ struct itemSpellInfo
 };
 #define MAX_GENERATED_SPELLS 2
 #define MAX_LEGENDARY_SPELLS 3
+
+struct itemSetInfo
+{
+    itemSetInfo() {}
+    itemSetInfo(uint32 sId, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 minQual, uint32 maxQual, uint32 dispOverride) : setId(sId),
+        itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), minQuality(minQual), maxQuality(maxQual), displayOverride(dispOverride) {}
+    uint32 setId;
+    int32 itemClass;
+    int32 subClass;
+    int32 inventoryType;
+    int8 statGroup;
+    int32 minItemLevel;
+    int32 maxItemLevel;
+    uint32 minQuality;
+    uint32 maxQuality;
+    uint32 displayOverride;
+};
 
 struct legendaryItemInfo
 {
@@ -304,6 +323,13 @@ public:
       */
 
     void LoadSpellsFromDB();
+
+    /**
+  * Not thread safe.
+  * Loads all possible sets from the generator table into memory.
+  */
+
+    void LoadSetsFromDB();
 
     /**
      * Returns a randomly generated item display depending on item type, subclass and quality
@@ -447,6 +473,7 @@ private:
 	std::vector<NameInfo> availableNames;
     std::vector<displayInfo> availableDisplays;
     std::vector<itemSpellInfo> availableSpells;
+    std::vector<itemSetInfo> availableItemSets;
     LegendaryTemplateContainer _LegendaryTemplateStore;
 
     /**

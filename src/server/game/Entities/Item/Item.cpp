@@ -1335,10 +1335,11 @@ void Item::SaveVirtualItemInfo()
         stmt->setUInt32(i++, itemTemplate->spellSeed);
         stmt->setUInt32(i++, itemTemplate->statValueSeed);
         stmt->setUInt32(i++, itemTemplate->statGroupSeed);
+        stmt->setUInt32(i++, itemTemplate->setSeed);
+        stmt->setUInt32(i++, itemTemplate->legendarySeed);
         stmt->setUInt8(i++, itemTemplate->statGroup);
         stmt->setUInt32(i++, itemTemplate->customFlags);
         stmt->setUInt8(i++, itemTemplate->Sheath);
-        stmt->setUInt32(i++, itemTemplate->legendarySeed);
         stmt->setUInt32(i++, itemTemplate->legendaryId);
 
         trans->Append(stmt);
