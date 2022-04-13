@@ -1180,11 +1180,14 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
     itemSetInfo set = GenerateSet(output, modifier);
 
-    if (output->Quality == ITEM_QUALITY_LEGENDARY)
+    // debug 50% chance to apply set
+    if (urand(0, 1, generator) == 0)
+    {
         output->ItemSet = set.setId;
 
-    if (set.displayOverride > 0)
-        output->DisplayInfoID = set.displayOverride;
+        if (set.displayOverride > 0)
+            output->DisplayInfoID = set.displayOverride;
+    }
 }
 
 uint32 VirtualItemMgr::EntryGenerator::GenerateEntry(VirtualItemMgr::Store const& store)
