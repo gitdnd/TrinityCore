@@ -11,7 +11,7 @@
 #include "SFMTRand.h"
 
 VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
-socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), statGroupSeed(0), isCrafted(false)
+socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), statGroupSeed(0), setSeed(0), legendarySeed(0), isCrafted(false)
 {
 }
 
@@ -875,7 +875,7 @@ displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, Vir
     std::mt19937 generator;
     generator.seed(modifier.displaySeed);
 
-    std::list<displayInfo> displays;
+    std::vector<displayInfo> displays;
 
     for (displayInfo const& someDisplays : availableDisplays)
     {
@@ -910,8 +910,8 @@ displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, Vir
         return displayInfo();
     }
 
-    auto display = std::begin(displays);
-    std::advance(display, urand(0, uint32(std::size(displays)) - 1, generator));
+    // shuffle list
+    std::shuffle(std::begin(displays), std::end(displays), generator);
 
     // If a display ID has already been assigned, return this
     if (output->DisplayInfoID > 0)
@@ -921,7 +921,7 @@ displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, Vir
     if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
         return displayInfo(output->DisplayInfoID);
 
-    return *display;
+    return displays.front();
 }
 
 itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier, int8 dontUseType)
