@@ -261,7 +261,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->seed = modifier.seed;
 
     output->customFlags = 0; // toDo: initalize in a proper function once flags are expanded.
-    output->DisplayInfoID = 0; // By default set to 0, assigned during generation
+    //output->DisplayInfoID = 0; // By default set to 0, assigned during generation
 
     InitSeedGen(modifier);
     output->seed = modifier.seed;
@@ -876,8 +876,7 @@ displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, Vir
     generator.seed(modifier.displaySeed);
 
     std::vector<displayInfo> displays;
-
-    for (displayInfo const& someDisplays : availableDisplays)
+    for (displayInfo const &someDisplays : availableDisplays)
     {
         if (output->Quality == ITEM_QUALITY_LEGENDARY)
         {
@@ -906,16 +905,14 @@ displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, Vir
 
     // if there are no found displays, default to DBC display
     if (displays.empty())
-    {
         return displayInfo();
-    }
 
     // shuffle list
     std::shuffle(std::begin(displays), std::end(displays), generator);
 
     // If a display ID has already been assigned, return this
-    if (output->DisplayInfoID > 0)
-        return displayInfo(output->DisplayInfoID);
+    //if (output->DisplayInfoID > 0)
+    //    return displayInfo(output->DisplayInfoID);
 
     // If an item is flagged as static display, return the static display
     if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
