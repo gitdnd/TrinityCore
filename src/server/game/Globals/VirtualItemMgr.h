@@ -42,6 +42,7 @@ struct VirtualItemTemplate : ItemTemplate
     VirtualItemTemplate(ItemTemplate const* base) : ItemTemplate(*base), base_entry(base->ItemId)
     {
         FlagsCu &= ~ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE; // virtual item should not be revirtualized?
+        statGroup = StatGroup(STAT_GROUP_RANDOM);
         seed = 0;
         socketSeed = 0;
         qualitySeed = 0;
@@ -102,7 +103,7 @@ struct VirtualModifier
         ilevel = 0;
         quality = 0;
         statpool = -1;
-        statgroup = StatGroup(0);
+        statgroup = StatGroup(STAT_GROUP_RANDOM);
         seed = 0;
         socketSeed = 0;
         qualitySeed = 0;
