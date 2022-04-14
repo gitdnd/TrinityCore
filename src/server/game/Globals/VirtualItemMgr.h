@@ -42,6 +42,19 @@ struct VirtualItemTemplate : ItemTemplate
     VirtualItemTemplate(ItemTemplate const* base) : ItemTemplate(*base), base_entry(base->ItemId)
     {
         FlagsCu &= ~ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE; // virtual item should not be revirtualized?
+        seed = 0;
+        socketSeed = 0;
+        qualitySeed = 0;
+        statSeed = 0;
+        nameSeed = 0;
+        displaySeed = 0;
+        spellSeed = 0;
+        statValueSeed = 0;
+        statGroupSeed = 0;
+        setSeed = 0;
+        legendarySeed = 0;
+        legendaryId = 0;
+        customFlags = 0;
         //Bonding = BIND_WHEN_PICKED_UP; // All items MUST be bound on pickup so they can not be mailed and thus failing some cleanup and memory management
     }
 
@@ -75,7 +88,6 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 legendarySeed;
 
     // misc
-    uint32 displayOverride;
     uint32 legendaryId;
     uint32 customFlags;
 
@@ -85,7 +97,28 @@ struct VirtualItemTemplate : ItemTemplate
 
 struct VirtualModifier
 {
-    VirtualModifier();
+    VirtualModifier()
+    {
+        ilevel = 0;
+        quality = 0;
+        statpool = -1;
+        statgroup = StatGroup(0);
+        seed = 0;
+        socketSeed = 0;
+        qualitySeed = 0;
+        statSeed = 0;
+        nameSeed = 0;
+        displaySeed = 0;
+        spellSeed = 0;
+        statValueSeed = 0;
+        statGroupSeed = 0;
+        setSeed = 0;
+        legendarySeed = 0;
+        plrAvgLvl = 0;
+        isCrafted = false;
+        vLvlMod = 0;
+        displayId = 0;
+    }
 
     /**
      * Different modifiers that can be edited to change the output when the modifier is used to generate stats.
@@ -106,7 +139,7 @@ struct VirtualModifier
     uint32 setSeed;
     uint32 legendarySeed;
     uint32 plrAvgLvl;
-    bool isCrafted = false;
+    bool isCrafted;
     uint32 vLvlMod;
     uint32 displayId;
 

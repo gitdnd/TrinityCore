@@ -903,16 +903,12 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     }
 
     // if a display override has been set earlier by set, legendary etc, apply this display
-    //if (output->displayOverride)
-    //    display = output->displayOverride;
+    if (modifier.displayId)
+        display = modifier.displayId;
 
     // If an item is flagged as static display, use the static display
-    if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
+    else if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
         display = output->DisplayInfoID;
-
-    // If a display ID has been manually assigned, use this display
-    if (modifier.displayId > 0)
-        display = modifier.displayId;
 
     output->DisplayInfoID = display;
 }
@@ -1220,8 +1216,8 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
     {
         output->ItemSet = set.setId;
 
-        if (set.displayOverride > 0)
-            output->displayOverride = set.displayOverride;
+        if (set.displayOverride)
+            modifier.displayId = set.displayOverride;
     }
 }
 
