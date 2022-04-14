@@ -43,7 +43,7 @@ struct VirtualItemTemplate : ItemTemplate
     {
         FlagsCu &= ~ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE; // virtual item should not be revirtualized?
         statGroup = StatGroup(STAT_GROUP_RANDOM);
-        seed = 0;
+        seed = 0; 
         socketSeed = 0;
         qualitySeed = 0;
         statSeed = 0;
@@ -155,18 +155,18 @@ struct VirtualModifier
         /**
          * Returns the primary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const;
 
         /**
          * Returns the secondary stats for the given stat group.
          */
-        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const;
 
 
         /**
          * Returns the sockets for the given stat group.
          */
-        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier modifier) const;
+        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator) const;
 
         /**
          * Returns the stat groups for the given armor subclass.
@@ -374,22 +374,22 @@ public:
     /**
      * Generates an item display randomly depending on item type, subclass and quality
      */
-    void GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier);
+    void GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier& modifier);
 
     /**
      * Returns a randomly generated item spell depending on item type, subclass and quality
      */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier, int8 dontUseType);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier& modifier, int8 dontUseType);
 
     /**
      * Returns a randomly generated item set depending on item type, subclass and quality
      */
-    itemSetInfo GenerateSet(VirtualItemTemplate* item, VirtualModifier modifier);
+    itemSetInfo GenerateSet(VirtualItemTemplate* item, VirtualModifier& modifier);
 
     /**
      * Generates a randoml item name depending on item type, subclass and quality
      */
-    void GenerateItemName(VirtualItemTemplate* item, VirtualModifier modifier, bool reRoll = false) const;
+    void GenerateItemName(VirtualItemTemplate* item, VirtualModifier& modifier) const;
 
 	/**
 	 * Return a vector of available names for the specified subclass.
@@ -421,7 +421,7 @@ public:
      * Uses passed base and modifier to generate a new VirtualItemTemplate.
      * Returns the newly created VirtualItemTemplate.
      */
-    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier = VirtualModifier());
+    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier = VirtualModifier());
 
 
     /**
@@ -432,22 +432,22 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false) const;
+    void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier()) const;
+    void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
 
     /**
      * Uses passed modifier to select an item set.
      */
-    void GenerateItemSet(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier());
+    void GenerateItemSet(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
 
     /**
      * Converts a virtual player/group level into a usable item level.
@@ -460,9 +460,9 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier());
-    void GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier = VirtualModifier(), bool reRoll = false);
+    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
+    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
+    void GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
     void UpdateDisenchantId(VirtualItemTemplate* output);
     void InitSeedGen(VirtualModifier& modifier);

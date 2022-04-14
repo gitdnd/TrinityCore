@@ -230,7 +230,7 @@ void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
     initSeed(modifier.legendarySeed, generator);
 }
 
-VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier modifier)
+VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier)
 {
     if (!base)
         return nullptr;
@@ -314,7 +314,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     return output;
 }
 
-void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier modifier) const
+void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statGroupSeed);
@@ -338,7 +338,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     output->statGroup = statgroupid;
 }
 
-void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
+void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statSeed);
@@ -514,7 +514,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     output->MaxDurability = 0; // Disable any form of durability for now
 }
 
-void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier modifier) const
+void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statValueSeed);
@@ -526,8 +526,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     std::vector<std::pair<ItemModType, float>> selectedStats;
 
     // get stats for primary and secondary stat groups
-    std::vector<ItemModType> primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator, modifier);
-    std::vector<ItemModType> secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator, modifier);
+    std::vector<ItemModType> primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator);
+    std::vector<ItemModType> secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator);
 
     // shuffle vectors so we can pick top values without using any rand calls
     std::shuffle(std::begin(primarystatgroup), std::end(primarystatgroup), generator);
@@ -752,7 +752,7 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     return ilevel;
 }
 
-void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/) const
+void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
     std::mt19937 generator;
     generator.seed(modifier.nameSeed);
@@ -851,7 +851,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
     }
 }
 
-void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier)
+void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
     std::mt19937 generator;
     generator.seed(modifier.displaySeed);
@@ -908,7 +908,7 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     output->DisplayInfoID = display;
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier, int8 dontUseType)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier& modifier, int8 dontUseType)
 {
     std::mt19937 generator;
     generator.seed(modifier.spellSeed);
@@ -955,7 +955,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     return *selectedSpell;
 }
 
-itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModifier modifier)
+itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
     std::mt19937 generator;
     generator.seed(modifier.setSeed);
@@ -1000,7 +1000,7 @@ itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModi
     return *selectedSet;
 }
 
-void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier modifier)
+void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
     uint8 numOfSpell = 1;
 
@@ -1027,7 +1027,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     }
 }
 
-void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier modifier, bool reRoll)
+void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier, bool reRoll)
 {
     std::mt19937 generator;
     generator.seed(modifier.socketSeed);
@@ -1090,7 +1090,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
     // set socket colors
-    std::vector<SocketColor> const& socketcolors = VirtualModifier().premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator, VirtualModifier());
+    std::vector<SocketColor> const& socketcolors = VirtualModifier().premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
@@ -1119,7 +1119,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 }
 
-void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier modifier, bool /*reRoll*/)
+void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier, bool /*reRoll*/)
 {
     std::mt19937 generator;
     generator.seed(modifier.qualitySeed);
@@ -1194,7 +1194,7 @@ void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
     };
 }
 
-void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifier modifier)
+void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
     std::mt19937 generator;
     generator.seed(modifier.setSeed);
@@ -1339,7 +1339,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     return names;
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1349,7 +1349,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrim
     return stat_group_primary_stats[group];
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
+std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1359,7 +1359,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSeco
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator, VirtualModifier /*modifier*/) const
+std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
