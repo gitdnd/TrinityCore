@@ -10,11 +10,6 @@
 #include "Log.h"
 #include "SFMTRand.h"
 
-VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
-socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), statGroupSeed(0), setSeed(0), legendarySeed(0), isCrafted(false), displayId(0)
-{
-}
-
 VirtualItemMgr& VirtualItemMgr::instance()
 {
     static VirtualItemMgr obj;
