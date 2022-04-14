@@ -903,8 +903,8 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     }
 
     // if a display override has been set earlier by set, legendary etc, apply this display
-    if (output->displayOverride)
-        display = output->displayOverride;
+    //if (output->displayOverride)
+    //    display = output->displayOverride;
 
     // If an item is flagged as static display, use the static display
     if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
