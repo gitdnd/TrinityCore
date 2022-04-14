@@ -903,7 +903,7 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     }
 
     // If a display ID has already been assigned, return this
-    if (modifier.displayId)
+    if (modifier.displayId > 0)
         display = modifier.displayId;
 
     // If an item is flagged as static display, return the static display
