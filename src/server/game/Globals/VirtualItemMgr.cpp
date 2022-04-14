@@ -274,7 +274,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a stat group for the item
     GenerateStatGroup(output, modifier);
 
-    // Generate Legendary (if item is legendary)
+    // Generate Legendary (if item is legendary)LegendaryTemplateContainer
     GenerateLegendaryItemEffect(output, modifier);
 
     // Generate base stats for the item.
@@ -902,13 +902,17 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
         display = displays.front().displayId;
     }
 
-    // If a display ID has already been assigned, return this
-    if (modifier.displayId > 0)
-        display = modifier.displayId;
+    // if a display override has been set earlier by set, legendary etc, apply this display
+    if (output->displayOverride)
+        display = output->displayOverride;
 
-    // If an item is flagged as static display, return the static display
+    // If an item is flagged as static display, use the static display
     if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
         display = output->DisplayInfoID;
+
+    // If a display ID has been manually assigned, use this display
+    if (modifier.displayId > 0)
+        display = modifier.displayId;
 
     output->DisplayInfoID = display;
 }
@@ -1217,7 +1221,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
         output->ItemSet = set.setId;
 
         if (set.displayOverride > 0)
-            modifier.displayId = set.displayOverride;
+            output->displayOverride = set.displayOverride;
     }
 }
 

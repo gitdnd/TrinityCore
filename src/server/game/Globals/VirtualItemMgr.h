@@ -73,6 +73,9 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 statGroupSeed;
     uint32 setSeed;
     uint32 legendarySeed;
+
+    // misc
+    uint32 displayOverride;
     uint32 legendaryId;
     uint32 customFlags;
 
