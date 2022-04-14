@@ -56,9 +56,9 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 seed;
 
     /**
-     * Updates the displayId used by the item from DBC data to match the current item entry's displayid.
+     * Returns the displayId used by the item from DBC data to match the current item entry's displayid.
      */
-    void UpdateDisplay();
+    uint32 GetDBCDisplay();
 
     StatGroup statGroup;
 
@@ -105,6 +105,7 @@ struct VirtualModifier
     uint32 plrAvgLvl;
     bool isCrafted = false;
     uint32 vLvlMod;
+    uint32 displayId;
 
     class StatGroupData
     {
@@ -322,32 +323,32 @@ public:
 
 
     /**
-      * Not thread safe.
-      * Loads all possible spells from the generator table into memory.
-      */
+     * Not thread safe.
+     * Loads all possible spells from the generator table into memory.
+     */
 
     void LoadSpellsFromDB();
 
     /**
-  * Not thread safe.
-  * Loads all possible sets from the generator table into memory.
-  */
+     * Not thread safe.
+     * Loads all possible sets from the generator table into memory.
+     */
 
     void LoadSetsFromDB();
 
     /**
-     * Returns a randomly generated item display depending on item type, subclass and quality
+     * Generates an item display randomly depending on item type, subclass and quality
      */
-    displayInfo GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier);
+    void GenerateItemDisplay(VirtualItemTemplate* item, VirtualModifier modifier);
 
     /**
-      * Returns a randomly generated item spell depending on item type, subclass and quality
-      */
+     * Returns a randomly generated item spell depending on item type, subclass and quality
+     */
     itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier modifier, int8 dontUseType);
 
     /**
-      * Returns a randomly generated item set depending on item type, subclass and quality
-      */
+     * Returns a randomly generated item set depending on item type, subclass and quality
+     */
     itemSetInfo GenerateSet(VirtualItemTemplate* item, VirtualModifier modifier);
 
     /**
@@ -359,11 +360,6 @@ public:
 	 * Return a vector of available names for the specified subclass.
 	 */
 	std::vector<std::string> GetNamesForNameInfo(NameInfo* info) const;
-
-    /**
-     * Return a vector of available displays for the specified requirements.
-     */
-    std::list<uint32> GetDisplaysForDisplayInfo(VirtualItemTemplate* item, bool qualityOverride = false) const;
 
     /**
      * Return a vector of available spells for the specified requirements.

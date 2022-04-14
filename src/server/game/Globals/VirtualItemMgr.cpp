@@ -11,7 +11,7 @@
 #include "SFMTRand.h"
 
 VirtualModifier::VirtualModifier() : ilevel(0), quality(MAX_ITEM_QUALITY), statpool(-1), statgroup(STAT_GROUP_RANDOM), seed(0), plrAvgLvl(0), vLvlMod(0),
-socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), statGroupSeed(0), setSeed(0), legendarySeed(0), isCrafted(false)
+socketSeed(0), qualitySeed(0), statSeed(0), nameSeed(0), displaySeed(0), spellSeed(0), statValueSeed(0), statGroupSeed(0), setSeed(0), legendarySeed(0), isCrafted(false), displayId(0)
 {
 }
 
@@ -209,13 +209,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     //GenerateSpells(output, modifier);
     GenerateItemStats(output, modifier);
     //GenerateItemSet(output, modifier); should we ever regenerate selected sets?
-    bool isTrinket = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET;
-    bool isRing = output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_FINGER;
-    uint32 display = isTrinket || isRing ? 0 : GenerateItemDisplay(output, modifier).displayId;
-    if (display == 0)
-        output->UpdateDisplay();
-    else
-        output->DisplayInfoID = display;
+    GenerateItemDisplay(output, modifier);
 }
 
 void initSeed(uint32& val, std::mt19937 generator)
@@ -261,7 +255,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
         output->seed = modifier.seed;
 
     output->customFlags = 0; // toDo: initalize in a proper function once flags are expanded.
-    //output->DisplayInfoID = 0; // By default set to 0, assigned during generation
 
     InitSeedGen(modifier);
     output->seed = modifier.seed;
@@ -315,14 +308,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     output->ItemId = entry;
 
     // Select a display ID for the item based on type
-    uint32 display = GenerateItemDisplay(output, modifier).displayId;
-    /*std::stringstream ss;
-    ss << "Generated item with display " << display;
-    sWorld->SendGlobalText(ss.str().c_str(), nullptr);*/
-    if (display == 0)
-        output->UpdateDisplay();
-    else
-        output->DisplayInfoID = display;
+    GenerateItemDisplay(output, modifier);
 
     delete store[entry];
     store[entry] = output;
@@ -870,10 +856,11 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
     }
 }
 
-displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier)
+void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     std::mt19937 generator;
     generator.seed(modifier.displaySeed);
+    uint32 display;
 
     std::vector<displayInfo> displays;
     for (displayInfo const &someDisplays : availableDisplays)
@@ -904,21 +891,26 @@ displayInfo VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, Vir
     }
 
     // if there are no found displays, default to DBC display
+    // else shuffle list and pick first
     if (displays.empty())
-        return displayInfo();
-
-    // shuffle list
-    std::shuffle(std::begin(displays), std::end(displays), generator);
+    {
+        display = output->GetDBCDisplay();
+    } 
+    else
+    {
+        std::shuffle(std::begin(displays), std::end(displays), generator);
+        display = displays.front().displayId;
+    }
 
     // If a display ID has already been assigned, return this
-    //if (output->DisplayInfoID > 0)
-    //    return displayInfo(output->DisplayInfoID);
+    if (modifier.displayId)
+        display = modifier.displayId;
 
     // If an item is flagged as static display, return the static display
     if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
-        return displayInfo(output->DisplayInfoID);
+        display = output->DisplayInfoID;
 
-    return displays.front();
+    output->DisplayInfoID = display;
 }
 
 itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier modifier, int8 dontUseType)
@@ -1225,7 +1217,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
         output->ItemSet = set.setId;
 
         if (set.displayOverride > 0)
-            output->DisplayInfoID = set.displayOverride;
+            modifier.displayId = set.displayOverride;
     }
 }
 
@@ -1325,46 +1317,6 @@ int32 VirtualItemMgr::GetVirtualLevel(float ilevel) const
     }
 
     return vLevel;
-}
-
-std::list<uint32> VirtualItemMgr::GetDisplaysForDisplayInfo(VirtualItemTemplate* output, bool qualityOverride) const
-{
-    std::list<uint32> displays;
-
-    uint32 quality = output->Quality;
-    if (qualityOverride)
-        quality = output->Quality + 1;
-
-    //if (quality == ITEM_QUALITY_LEGENDARY)
-        //quality -= 1;
-
-    for (auto displaysitr : availableDisplays)
-    {
-        if (quality == ITEM_QUALITY_LEGENDARY)
-        {
-            if (displaysitr.quality < ITEM_QUALITY_EPIC)
-                continue;
-            if (displaysitr.quality >= ITEM_QUALITY_ARTIFACT)
-                continue;
-        }
-        else
-        {
-            if (quality != displaysitr.quality)
-                continue;
-        }
-
-        if (output->InventoryType != displaysitr.iInventoryType)
-            continue;
-
-        if (output->Class != displaysitr.iClass)
-            continue;
-
-        if (output->SubClass != displaysitr.isubClass)
-            continue;
-
-        displays.push_back(displaysitr.displayId);
-    }
-    return displays;
 }
 
 std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) const
@@ -1974,11 +1926,13 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     }
 }
 
-void VirtualItemTemplate::UpdateDisplay()
+uint32 VirtualItemTemplate::GetDBCDisplay()
 {
     // Get the correct display ID
     if (ItemEntry const* dbcitem = sItemStore.LookupEntry(ItemId))
-        DisplayInfoID = dbcitem->DisplayId;
+        return dbcitem->DisplayId;
+
+    return 0;
 }
 
 // Data
