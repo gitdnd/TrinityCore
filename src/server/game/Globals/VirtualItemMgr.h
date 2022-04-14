@@ -185,8 +185,6 @@ struct VirtualModifier
 
 struct displayInfo
 {
-    displayInfo() { displayId = 0; }
-    displayInfo(uint32 dId) { displayId = dId; }
     displayInfo(uint32 iQ, uint32 _class, uint32 subclass, uint32 inventoryType, uint32 dId) : quality(iQ), iClass(_class), isubClass(subclass), iInventoryType(inventoryType), displayId(dId) {}
     uint32 quality;
     uint32 iClass;

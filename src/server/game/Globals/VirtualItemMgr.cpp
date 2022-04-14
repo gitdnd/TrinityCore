@@ -274,7 +274,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a stat group for the item
     GenerateStatGroup(output, modifier);
 
-    // Generate Legendary (if item is legendary)LegendaryTemplateContainer
+    // Generate Legendary (if item is legendary)
     GenerateLegendaryItemEffect(output, modifier);
 
     // Generate base stats for the item.
@@ -890,7 +890,7 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
         displays.push_back(someDisplays);
     }
 
-    // if there are no found displays, default to DBC display
+    // if there are no found displays, default to DBC display. Do the same for trinkets and rings.
     // else shuffle list and pick first
     if (displays.empty())
     {
@@ -1216,7 +1216,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
     uint32 chanceRng = urand(1, 100, generator);
 
-    if (chanceRng <= qualityChance)
+    if (set.setId > 0 && chanceRng <= qualityChance)
     {
         output->ItemSet = set.setId;
 
