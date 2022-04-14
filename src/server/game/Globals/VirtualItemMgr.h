@@ -219,7 +219,7 @@ struct itemSpellInfo
 
 struct itemSetInfo
 {
-    itemSetInfo() { setId = 0; }
+    itemSetInfo() { setId = 0, displayOverride = 0; }
     itemSetInfo(uint32 sId, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, int32 minQual, int32 maxQual, uint32 dispOverride) : setId(sId),
         itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), minQuality(minQual), maxQuality(maxQual), displayOverride(dispOverride) {}
     uint32 setId;
