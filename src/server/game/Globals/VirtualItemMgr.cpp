@@ -321,7 +321,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     StatGroup statgroupid;
 
     // grab available armor type stat groups
-    std::vector<StatGroup> const& statgroups = VirtualItemMgr().premadeStatGroupData.GetArmorSubclassStatGroups(output);
+    std::vector<StatGroup> const& statgroups = premadeStatGroupData.GetArmorSubclassStatGroups(output);
 
     bool isJewelry = output->InventoryType == INVTYPE_TRINKET || output->InventoryType == INVTYPE_NECK || output->InventoryType == INVTYPE_FINGER;
     bool isCloak = output->InventoryType == INVTYPE_CLOAK;
@@ -529,8 +529,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     std::vector<std::pair<ItemModType, float>> selectedStats;
 
     // get stats for primary and secondary stat groups
-    std::vector<ItemModType> primarystatgroup = VirtualItemMgr().premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator);
-    std::vector<ItemModType> secondarystatgroup = VirtualItemMgr().premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator);
+    std::vector<ItemModType> primarystatgroup = premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator);
+    std::vector<ItemModType> secondarystatgroup = premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator);
 
     // shuffle vectors so we can pick top values without using any rand calls
     std::shuffle(std::begin(primarystatgroup), std::end(primarystatgroup), generator);
@@ -1093,7 +1093,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
     // set socket colors
-    std::vector<SocketColor> const& socketcolors = VirtualItemMgr().premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator);
+    std::vector<SocketColor> const& socketcolors = premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
