@@ -103,7 +103,7 @@ struct VirtualModifier
         ilevel = 0;
         quality = MAX_ITEM_QUALITY;
         statpool = -1;
-        statgroup = StatGroup(STAT_GROUP_RANDOM);
+        statgroup = STAT_GROUP_RANDOM;
         seed = 0;
         socketSeed = 0;
         qualitySeed = 0;
