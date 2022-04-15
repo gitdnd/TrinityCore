@@ -2224,6 +2224,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetCanTeleport(bool value) { m_canTeleport = value; }
 
         void ClearInventory();
+        void ApplyVirtualItemLegendayEffects(Item* item);
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
