@@ -991,11 +991,14 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
             if (i != firstPrismatic)
                 return;
         }
-
-        if (GemProps[i]->color && !(GemProps[i]->color & itemProto->Socket[i].Color))
+        else
         {
-            _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
-            return;
+
+            if (!(GemProps[i]->color & itemProto->Socket[i].Color))
+            {
+                _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
+                return;
+            }
         }
 
         // tried to put normal gem in meta socket
