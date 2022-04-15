@@ -992,7 +992,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
                 return;
         }
 
-        if (GemProps[i]->color != SOCKET_COLOR_PRISMATIC && !(GemProps[i]->color & itemProto->Socket[i].Color))
+        if (GemProps[i]->color && !(GemProps[i]->color & itemProto->Socket[i].Color))
         {
             _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
             return;
@@ -1000,10 +1000,6 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
         // tried to put normal gem in meta socket
         if (itemProto->Socket[i].Color == SOCKET_COLOR_META && GemProps[i]->color != SOCKET_COLOR_META)
-            return;
-
-        // tried to put meta gem in normal socket
-        if (itemProto->Socket[i].Color != SOCKET_COLOR_META && GemProps[i]->color == SOCKET_COLOR_META)
             return;
     }
 
