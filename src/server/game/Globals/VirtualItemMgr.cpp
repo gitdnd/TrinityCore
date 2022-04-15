@@ -321,7 +321,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     StatGroup statgroupid;
 
     // grab available armor type stat groups
-    std::vector<StatGroup> const& statgroups = modifier.premadeStatGroupData.GetArmorSubclassStatGroups(output);
+    std::vector<StatGroup> const& statgroups = VirtualItemMgr().premadeStatGroupData.GetArmorSubclassStatGroups(output);
 
     // armor has predefined stat groups, except some slots like trinkets, rings, cloaks etc.
     if (!statgroups.empty() && output->Class == ITEM_CLASS_ARMOR && (output->SubClass != ITEM_SUBCLASS_ARMOR_CLOTH && output->InventoryType != INVTYPE_CLOAK))
@@ -526,8 +526,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     std::vector<std::pair<ItemModType, float>> selectedStats;
 
     // get stats for primary and secondary stat groups
-    std::vector<ItemModType> primarystatgroup = modifier.premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator);
-    std::vector<ItemModType> secondarystatgroup = modifier.premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator);
+    std::vector<ItemModType> primarystatgroup = VirtualItemMgr().premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator);
+    std::vector<ItemModType> secondarystatgroup = VirtualItemMgr().premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator);
 
     // shuffle vectors so we can pick top values without using any rand calls
     std::shuffle(std::begin(primarystatgroup), std::end(primarystatgroup), generator);
@@ -1090,7 +1090,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     }
 
     // set socket colors
-    std::vector<SocketColor> const& socketcolors = VirtualModifier().premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator);
+    std::vector<SocketColor> const& socketcolors = VirtualItemMgr().premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator);
     if (!socketcolors.empty())
     {
         for (int32 i = 0; i < socketCount; ++i)
@@ -1339,7 +1339,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     return names;
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const
+std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1349,7 +1349,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupPrim
     return stat_group_primary_stats[group];
 }
 
-std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const
+std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1359,7 +1359,7 @@ std::vector<ItemModType> const& VirtualModifier::StatGroupData::GetStatGroupSeco
     return stat_group_secondary_stats[group];
 }
 
-std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator) const
+std::vector<SocketColor> const& VirtualItemMgr::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
         group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
@@ -1369,7 +1369,7 @@ std::vector<SocketColor> const& VirtualModifier::StatGroupData::GetStatGroupSock
     return stat_group_sockets[group];
 }
 
-std::vector<StatGroup> const& VirtualModifier::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
+std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
 {
     return armor_type_stat_groups[output->SubClass];
 }
@@ -1930,9 +1930,7 @@ uint32 VirtualItemTemplate::GetDBCDisplay()
     return 0;
 }
 
-// Data
-
-VirtualModifier::StatGroupData::StatGroupData()
+VirtualItemMgr::StatGroupData::StatGroupData()
 {
     // Healing Data
     stat_group_primary_stats[STAT_GROUP_HEALING] = {
@@ -1949,7 +1947,6 @@ VirtualModifier::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_HEALING] = {
         SOCKET_COLOR_BLUE
     };
-
     // Int DPS Data
     stat_group_primary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_STAMINA,
@@ -1965,7 +1962,6 @@ VirtualModifier::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_INT_DPS] = {
         SOCKET_COLOR_BLUE
     };
-
     // Str DPS Data
     stat_group_primary_stats[STAT_GROUP_STR_DPS] = {
         ITEM_MOD_STAMINA,
@@ -1982,7 +1978,6 @@ VirtualModifier::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_STR_DPS] = {
         SOCKET_COLOR_RED
     };
-
     // Str Tank Data
     stat_group_primary_stats[STAT_GROUP_STR_TANK] = {
         ITEM_MOD_STAMINA,
@@ -2000,7 +1995,6 @@ VirtualModifier::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_STR_TANK] = {
         SOCKET_COLOR_RED
     };
-
     // Agi DPS Data
     stat_group_primary_stats[STAT_GROUP_AGI_DPS] = {
         ITEM_MOD_STAMINA,
@@ -2017,7 +2011,6 @@ VirtualModifier::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_AGI_DPS] = {
         SOCKET_COLOR_YELLOW
     };
-
     // Agi Tank Data
     stat_group_primary_stats[STAT_GROUP_AGI_TANK] = {
         ITEM_MOD_STAMINA,
@@ -2035,7 +2028,6 @@ VirtualModifier::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_AGI_TANK] = {
         SOCKET_COLOR_YELLOW
     };
-
     // Stat group for all stats
     stat_group_primary_stats[STAT_GROUP_ALL] = {
         ITEM_MOD_STAMINA,
@@ -2067,27 +2059,23 @@ VirtualModifier::StatGroupData::StatGroupData()
         SOCKET_COLOR_RED,
         SOCKET_COLOR_BLUE
     };
-
     // type stat groups
     armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_CLOTH] = {
         STAT_GROUP_HEALING,
         STAT_GROUP_INT_DPS
     };
-
     armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_LEATHER] = {
         STAT_GROUP_HEALING,
         STAT_GROUP_INT_DPS,
         STAT_GROUP_AGI_DPS,
         STAT_GROUP_AGI_TANK
     };
-
     armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_MAIL] = {
         STAT_GROUP_HEALING,
         STAT_GROUP_STR_DPS,
         STAT_GROUP_STR_TANK,
         STAT_GROUP_AGI_DPS
     };
-
     armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_PLATE] = {
         STAT_GROUP_HEALING,
         STAT_GROUP_INT_DPS,
@@ -2096,7 +2084,7 @@ VirtualModifier::StatGroupData::StatGroupData()
     };
 }
 
-VirtualModifier::StatGroupData const VirtualModifier::premadeStatGroupData;
+VirtualItemMgr::StatGroupData const VirtualItemMgr::premadeStatGroupData;
 
 const std::vector<InventoryType> VirtualItemMgr::armorInventoryType = {
     //INVTYPE_NON_EQUIP,

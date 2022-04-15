@@ -42,7 +42,6 @@ struct VirtualItemTemplate : ItemTemplate
     VirtualItemTemplate(ItemTemplate const* base) : ItemTemplate(*base), base_entry(base->ItemId)
     {
         FlagsCu &= ~ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE; // virtual item should not be revirtualized?
-        statGroup = StatGroup(STAT_GROUP_RANDOM);
         seed = 0; 
         socketSeed = 0;
         qualitySeed = 0;
@@ -93,7 +92,6 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 customFlags;
 
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
-
 };
 
 struct VirtualModifier
@@ -143,49 +141,6 @@ struct VirtualModifier
     bool isCrafted;
     uint32 vLvlMod;
     uint32 displayId;
-
-    class StatGroupData
-    {
-    public:
-        /**
-         * Generates the premade stat groups and similar in addition to constructing the object itself.
-         */
-        StatGroupData();
-
-        /**
-         * Returns the primary stats for the given stat group.
-         */
-        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const;
-
-        /**
-         * Returns the secondary stats for the given stat group.
-         */
-        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const;
-
-
-        /**
-         * Returns the sockets for the given stat group.
-         */
-        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator) const;
-
-        /**
-         * Returns the stat groups for the given armor subclass.
-         */
-        std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
-
-    private:
-
-        std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
-        std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
-        std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
-        std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
-    };
-
-    /**
-     * A static object used to fetch different predefined stat groups and similar.
-     * The object has various methods to access these lists.
-     */
-    static StatGroupData const premadeStatGroupData;
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
@@ -356,7 +311,6 @@ public:
 
     void LoadDisplaysFromDB();
 
-
     /**
      * Not thread safe.
      * Loads all possible spells from the generator table into memory.
@@ -397,11 +351,6 @@ public:
 	std::vector<std::string> GetNamesForNameInfo(NameInfo* info) const;
 
     /**
-     * Return a vector of available spells for the specified requirements.
-     */
-    //std::list<itemSpellInfo> GetSpells(VirtualItemTemplate* item) const;
-
-    /**
      * Creates all used generators and sets their entry ranges in addition to constructing the object itself.
      */
     VirtualItemMgr();
@@ -422,7 +371,6 @@ public:
      * Returns the newly created VirtualItemTemplate.
      */
     VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier = VirtualModifier());
-
 
     /**
      * Used to regenerate item info of virtual items.
@@ -470,7 +418,41 @@ public:
     void LoadLegendaryTemplate();
     legendaryItemInfo const* GetLegendaryItemInfo(uint32 id) const;
     void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier);
+
 private:
+
+    class StatGroupData
+    {
+        friend class VirtualItemMgr;
+    public:
+        /**
+         * Generates the premade stat groups and similar in addition to constructing the object itself.
+         */
+        StatGroupData();
+        /**
+         * Returns the primary stats for the given stat group.
+         */
+        std::vector<ItemModType> const& GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const;
+        /**
+         * Returns the secondary stats for the given stat group.
+         */
+        std::vector<ItemModType> const& GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const;
+        /**
+         * Returns the sockets for the given stat group.
+         */
+        std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator) const;
+        /**
+         * Returns the stat groups for the given armor subclass.
+         */
+        std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
+    private:
+        std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
+        std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
+        std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
+        std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
+    };
+
+    static StatGroupData const premadeStatGroupData;
 
     class EntryGenerator
     {
