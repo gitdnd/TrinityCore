@@ -1070,6 +1070,9 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
     {
         if (leg->socketMod)
             socketCount = leg->socketMod;
+
+        if (leg->generatePrismatic && socketCount >= 3)
+            socketCount = 2;
     }
 
     // set socket colors
