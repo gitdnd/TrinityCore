@@ -309,96 +309,112 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         {
             switch (opHandle->Status)
             {
-                case STATUS_LOGGEDIN:
-                    if (!_player)
+            case STATUS_LOGGEDIN:
+                if (!_player)
+                {
+                    // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
+                    //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
+                    //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
+                    if (!m_playerRecentlyLogout)
                     {
-                        // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
-                        //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
-                        //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
-                        if (!m_playerRecentlyLogout)
-                        {
-                            requeuePackets.push_back(packet);
-                            deletePacket = false;
-                            TC_LOG_DEBUG("network", "Re-enqueueing packet with opcode %s with with status STATUS_LOGGEDIN. "
-                                "Player is currently not in world yet.", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str());
-                        }
+                        requeuePackets.push_back(packet);
+                        deletePacket = false;
+                        TC_LOG_DEBUG("network", "Re-enqueueing packet with opcode %s with with status STATUS_LOGGEDIN. "
+                            "Player is currently not in world yet.", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str());
                     }
-                    else if (_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        sScriptMgr->OnPacketReceive(this, *packet);
+                }
+                else if (_player->IsInWorld())
+                {
+                    sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
-#endif
-                        opHandle->Call(this, *packet);
-                        LogUnprocessedTail(packet);
-                    }
-                    // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
-                    break;
-                case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
-                    if (!_player && !m_playerRecentlyLogout && !m_playerLogout) // There's a short delay between _player = null and m_playerRecentlyLogout = true during logout
-                        LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
-                            "the player has not logged in yet and not recently logout");
-                    else if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        // not expected _player or must checked in packet hanlder
-                        sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
-#endif
-                        opHandle->Call(this, *packet);
-                        LogUnprocessedTail(packet);
-                    }
-                    break;
-                case STATUS_TRANSFER:
-                    if (!_player)
-                        LogUnexpectedOpcode(packet, "STATUS_TRANSFER", "the player has not logged in yet");
-                    else if (_player->IsInWorld())
-                        LogUnexpectedOpcode(packet, "STATUS_TRANSFER", "the player is still in world");
-                    else if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
-#endif
-                        opHandle->Call(this, *packet);
-                        LogUnprocessedTail(packet);
-                    }
-                    break;
-                case STATUS_AUTHED:
-                    // prevent cheating with skip queue wait
-                    if (m_inQueue)
-                    {
-                        LogUnexpectedOpcode(packet, "STATUS_AUTHED", "the player not pass queue yet");
+                    if (!sEluna->OnPacketReceive(this, *packet))
                         break;
-                    }
-
-                    // some auth opcodes can be recieved before STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes
-                    // however when we recieve CMSG_CHAR_ENUM we are surely no longer during the logout process.
-                    if (packet->GetOpcode() == CMSG_CHAR_ENUM)
-                        m_playerRecentlyLogout = false;
-
-                    if (AntiDOS.EvaluateOpcode(*packet, currentTime))
-                    {
-                        sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
 #endif
-                        opHandle->Call(this, *packet);
-                        LogUnprocessedTail(packet);
+                    opHandle->Call(this, *packet);
+                    LogUnprocessedTail(packet);
+                }
+                // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
+                break;
+            case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
+                if (!_player && !m_playerRecentlyLogout && !m_playerLogout) // There's a short delay between _player = null and m_playerRecentlyLogout = true during logout
+                    LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
+                        "the player has not logged in yet and not recently logout");
+                else
+                {
+                    if (GetSecurity() < SEC_ADMINISTRATOR)
+                    {
+                        if (!AntiDOS.EvaluateOpcode(*packet, currentTime))
+                            break;
                     }
+
+                    // not expected _player or must checked in packet hanlder
+                    sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                    if (!sEluna->OnPacketReceive(this, *packet))
+                        break;
+#endif
+                    opHandle->Call(this, *packet);
+                    LogUnprocessedTail(packet);
+                }
+                break;
+            case STATUS_TRANSFER:
+                if (!_player)
+                    LogUnexpectedOpcode(packet, "STATUS_TRANSFER", "the player has not logged in yet");
+                else if (_player->IsInWorld())
+                    LogUnexpectedOpcode(packet, "STATUS_TRANSFER", "the player is still in world");
+                else
+                {
+                    if (GetSecurity() < SEC_ADMINISTRATOR)
+                    {
+                        if (!AntiDOS.EvaluateOpcode(*packet, currentTime))
+                            break;
+                    }
+
+                    sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                    if (!sEluna->OnPacketReceive(this, *packet))
+                        break;
+#endif
+                    opHandle->Call(this, *packet);
+                    LogUnprocessedTail(packet);
+                }
+                break;
+            case STATUS_AUTHED:
+                // prevent cheating with skip queue wait
+                if (m_inQueue)
+                {
+                    LogUnexpectedOpcode(packet, "STATUS_AUTHED", "the player not pass queue yet");
                     break;
-                case STATUS_NEVER:
-                    TC_LOG_ERROR("network.opcode", "Received not allowed opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
-                        , GetPlayerInfo().c_str());
+                }
+
+                // some auth opcodes can be recieved before STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes
+                // however when we recieve CMSG_CHAR_ENUM we are surely no longer during the logout process.
+                if (packet->GetOpcode() == CMSG_CHAR_ENUM)
+                    m_playerRecentlyLogout = false;
+
+                if (GetSecurity() < SEC_ADMINISTRATOR)
+                {
+                    if (!AntiDOS.EvaluateOpcode(*packet, currentTime))
+                        break;
+                }
+
+
+                sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                if (!sEluna->OnPacketReceive(this, *packet))
                     break;
-                case STATUS_UNHANDLED:
-                    TC_LOG_DEBUG("network.opcode", "Received not handled opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
-                        , GetPlayerInfo().c_str());
-                    break;
+#endif
+                opHandle->Call(this, *packet);
+                LogUnprocessedTail(packet);
+                break;
+            case STATUS_NEVER:
+                TC_LOG_ERROR("network.opcode", "Received not allowed opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
+                    , GetPlayerInfo().c_str());
+                break;
+            case STATUS_UNHANDLED:
+                TC_LOG_DEBUG("network.opcode", "Received not handled opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
+                    , GetPlayerInfo().c_str());
+                break;
             }
         }
         catch (WorldPackets::InvalidHyperlinkException const& ihe)

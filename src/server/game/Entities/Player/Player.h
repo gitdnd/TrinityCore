@@ -2223,6 +2223,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool CanTeleport() { return m_canTeleport; }
         void SetCanTeleport(bool value) { m_canTeleport = value; }
 
+        void ClearInventory();
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

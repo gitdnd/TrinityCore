@@ -27765,3 +27765,30 @@ float Player::GetCappedItemLevel() const
 {
     return std::clamp<float>(_averageItemLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
 }
+
+void Player::ClearInventory()
+{
+    for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; i++)
+    {
+        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            uint32 count = pItem->GetCount();
+            DestroyItemCount(pItem, count, true);
+        }
+    }
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+    {
+        if (Bag* pBag = GetBagByPos(i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); j++)
+            {
+                if (Item* pItem = GetItemByPos(i, j))
+                {
+                    uint32 count = pItem->GetCount();
+                    DestroyItemCount(pItem, count, true);
+                }
+            }
+        }
+    }
+}
