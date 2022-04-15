@@ -1847,6 +1847,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.generatePrismatic = fields[10].GetBool();
         legTemp.primaryStatCountMod = fields[11].GetUInt8();
         legTemp.secondaryStatCountMod = fields[12].GetUInt8();
+        legTemp.statGroupOverride = fields[13].GetUInt8();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
@@ -1916,6 +1917,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     std::advance(selectedLegendary, urand(0, uint32(std::size(legList)) - 1, generator));
 
     output->legendaryId = selectedLegendary->legendaryId;
+    output->statGroup = StatGroup(selectedLegendary->statGroupOverride);
 
     for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
     {
@@ -2039,9 +2041,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_AGILITY,
         ITEM_MOD_INTELLECT,
         ITEM_MOD_SPIRIT,
-        ITEM_MOD_STRENGTH
-    };
-    stat_group_secondary_stats[STAT_GROUP_ALL] = {
+        ITEM_MOD_STRENGTH,
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
@@ -2050,7 +2050,30 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_CRIT_SPELL_RATING,
         ITEM_MOD_MANA_REGENERATION,
         ITEM_MOD_SPELL_POWER,
-        //ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_RANGED_RATING,
+        ITEM_MOD_CRIT_RANGED_RATING,
+        ITEM_MOD_HASTE_RANGED_RATING,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_RANGED_ATTACK_POWER,
+        ITEM_MOD_ARMOR_PENETRATION_RATING
+    };
+    stat_group_secondary_stats[STAT_GROUP_ALL] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_STRENGTH,
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_HIT_SPELL_RATING,
+        ITEM_MOD_HASTE_SPELL_RATING,
+        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_SPELL_PENETRATION,
         ITEM_MOD_HIT_RANGED_RATING,
         ITEM_MOD_CRIT_RANGED_RATING,
         ITEM_MOD_HASTE_RANGED_RATING,

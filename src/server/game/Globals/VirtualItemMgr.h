@@ -239,6 +239,7 @@ struct legendaryItemInfo
     bool generatePrismatic;
     uint8 primaryStatCountMod;
     uint8 secondaryStatCountMod;
+    uint8 statGroupOverride;
 };
 
 typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;
