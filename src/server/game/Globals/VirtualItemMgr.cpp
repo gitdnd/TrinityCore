@@ -563,14 +563,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondaryStatSlots = 1;
     }
 
-    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
-    {
-        if (leg->primaryStatCountMod)
-            primaryStatSlots = leg->primaryStatCountMod;
-
-        if (leg->secondaryStatCountMod)
-            secondaryStatSlots = leg->secondaryStatCountMod;
-    }
 
     // multiply the pool size by the base amounts of stat slots
     pool *= (float)(primaryStatSlots + secondaryStatSlots);
@@ -597,6 +589,14 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondaryStatSlots += secondarySlotMod;
     }
 
+    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+    {
+        if (leg->primaryStatCountMod)
+            primaryStatSlots = leg->primaryStatCountMod;
+
+        if (leg->secondaryStatCountMod)
+            secondaryStatSlots = leg->secondaryStatCountMod;
+    }
 
     // if we still have any slots to generate stats for, continue
     if (primaryStatSlots + secondaryStatSlots > 0)
