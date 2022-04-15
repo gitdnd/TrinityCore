@@ -252,8 +252,6 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     else
         output->seed = modifier.seed;
 
-    output->customFlags = 0; // toDo: initalize in a proper function once flags are expanded.
-
     InitSeedGen(modifier);
     output->seed = modifier.seed;
     output->qualitySeed = modifier.qualitySeed;
@@ -550,7 +548,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
     uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
 
-    //toDo: Add legendary override for slots
     // if this is a trinket, randomly select which slot to generate a stat for
     if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
     {
@@ -564,6 +561,15 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             primaryStatSlots = 1;
         else
             secondaryStatSlots = 1;
+    }
+
+    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+    {
+        if (leg->primaryStatCountMod)
+            primaryStatSlots = leg->primaryStatCountMod;
+
+        if (leg->secondaryStatCountMod)
+            secondaryStatSlots = leg->secondaryStatCountMod;
     }
 
     // multiply the pool size by the base amounts of stat slots
@@ -1076,6 +1082,12 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
                 socketCount = 2;
             break;
         }
+    }
+
+    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+    {
+        if (leg->socketMod)
+            socketCount = leg->socketMod;
     }
 
     // set socket colors
@@ -1856,7 +1868,18 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.itemStatGroup = fields[6].GetInt8();
         legTemp.primaryStatModifier = fields[7].GetFloat();
         legTemp.secondaryStatModifier = fields[8].GetFloat();
-        
+        legTemp.socketMod = fields[9].GetUInt8();
+        legTemp.generatePrismatic = fields[9].GetBool();
+        legTemp.primaryStatCountMod = fields[10].GetUInt8();
+        legTemp.secondaryStatCountMod = fields[11].GetUInt8();
+
+        if (legTemp.socketMod > 3)
+            legTemp.socketMod = 3;
+
+        if (legTemp.socketMod == 3 && legTemp.generatePrismatic)
+            legTemp.socketMod = 2;
+
+
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
             _Spell spell;
@@ -1919,14 +1942,11 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 
     output->legendaryId = selectedLegendary->legendaryId;
 
-    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+    for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
     {
-        for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
+        if (selectedLegendary->legendarySpells[i].SpellId != 0)
         {
-            if (leg->legendarySpells[i].SpellId != 0)
-            {
-                output->Spells[i + MAX_GENERATED_SPELLS] = leg->legendarySpells[i];
-            }
+            output->Spells[i + MAX_GENERATED_SPELLS] = selectedLegendary->legendarySpells[i];
         }
     }
 }

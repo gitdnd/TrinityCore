@@ -235,6 +235,10 @@ struct legendaryItemInfo
     _Spell legendarySpells[MAX_LEGENDARY_SPELLS];
     float primaryStatModifier;
     float secondaryStatModifier;
+    uint8 socketMod;
+    bool generatePrismatic;
+    uint8 primaryStatCountMod;
+    uint8 secondaryStatCountMod;
 };
 
 typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;

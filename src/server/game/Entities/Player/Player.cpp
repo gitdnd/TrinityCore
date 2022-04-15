@@ -12228,6 +12228,8 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
             stmt->setString(1, ss.str());
             CharacterDatabase.Execute(stmt);
         }
+
+        ApplyVirtualItemLegendayEffects(pItem);
     }
     return pItem;
 }
@@ -27788,6 +27790,32 @@ void Player::ClearInventory()
                     uint32 count = pItem->GetCount();
                     DestroyItemCount(pItem, count, true);
                 }
+            }
+        }
+    }
+}
+
+void Player::ApplyVirtualItemLegendayEffects(Item* item)
+{
+    if (item->GetTemplate()->Quality != ITEM_QUALITY_LEGENDARY)
+        return;
+
+    if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(item->GetEntry()))
+    {
+        if (legendaryItemInfo const* legInfo = sVirtualItemMgr.GetLegendaryItemInfo(vItem->legendaryId))
+        {
+            if (legInfo->generatePrismatic)
+            {
+                SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(3729);
+                if (!enchant)
+                    return;
+
+                ApplyEnchantment(item, PRISMATIC_ENCHANTMENT_SLOT, false);
+
+                item->SetEnchantment(PRISMATIC_ENCHANTMENT_SLOT, 3729, 0, 0, GetGUID());
+
+                // add new enchanting if equipped
+                ApplyEnchantment(item, PRISMATIC_ENCHANTMENT_SLOT, true);
             }
         }
     }
