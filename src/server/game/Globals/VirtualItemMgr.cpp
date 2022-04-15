@@ -323,8 +323,11 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     // grab available armor type stat groups
     std::vector<StatGroup> const& statgroups = VirtualItemMgr().premadeStatGroupData.GetArmorSubclassStatGroups(output);
 
+    bool isJewelry = output->InventoryType == INVTYPE_TRINKET || output->InventoryType == INVTYPE_NECK || output->InventoryType == INVTYPE_FINGER;
+    bool isCloak = output->InventoryType == INVTYPE_CLOAK;
+
     // armor has predefined stat groups, except some slots like trinkets, rings, cloaks etc.
-    if (!statgroups.empty() && output->Class == ITEM_CLASS_ARMOR && (output->SubClass != ITEM_SUBCLASS_ARMOR_CLOTH && output->InventoryType != INVTYPE_CLOAK))
+    if (!statgroups.empty() && ((output->Class == ITEM_CLASS_ARMOR && !isCloak) || !isJewelry))
         statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
     else // all weapons currently generate entirely random.
         statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
