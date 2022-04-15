@@ -10,6 +10,9 @@
 #include "Log.h"
 #include "SFMTRand.h"
 
+#define SelectSkip(a,b) if( a > 0 && a != b) continue
+#define SelectMinMaxSkip(min,max,value) if((min > 0 && min > value) || (max > 0 && max < value )) continue
+
 VirtualItemMgr& VirtualItemMgr::instance()
 {
     static VirtualItemMgr obj;
@@ -919,29 +922,12 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     std::list<itemSpellInfo> spells;
     for (itemSpellInfo const &someSpells : availableSpells)
     {
-        if (someSpells.minQuality != -1 && output->Quality < someSpells.minQuality)
-            continue;
-
-        if (someSpells.maxQuality != -1 && output->Quality > someSpells.maxQuality)
-            continue;
-
-        if (someSpells.itemClass != -1 && (int32)output->Class != someSpells.itemClass)
-            continue;
-
-        if (someSpells.subClass != -1 && (int32)output->SubClass != someSpells.subClass)
-            continue;
-
-        if (someSpells.inventoryType != -1 && (int32)output->InventoryType != someSpells.inventoryType)
-            continue;
-
-        if (someSpells.statGroup != -1 && output->statGroup != someSpells.statGroup)
-            continue;
-
-        if (someSpells.maxItemLevel != -1 && (int32)output->ItemLevel > someSpells.maxItemLevel)
-            continue;
-
-        if (someSpells.minItemLevel != -1 && (int32)output->ItemLevel < someSpells.minItemLevel)
-            continue;
+        SelectMinMaxSkip(someSpells.minQuality, someSpells.maxQuality, output->Quality);
+        SelectMinMaxSkip(someSpells.minItemLevel, someSpells.maxItemLevel, output->ItemLevel);
+        SelectSkip(someSpells.itemClass, output->Class);
+        SelectSkip(someSpells.subClass, output->SubClass);
+        SelectSkip(someSpells.inventoryType, output->InventoryType);
+        SelectSkip(someSpells.statGroup, output->statGroup);
 
         if (dontUseType != -1 && someSpells.SpellTrigger == dontUseType)
             continue;
@@ -1908,10 +1894,31 @@ legendaryItemInfo const* VirtualItemMgr::GetLegendaryItemInfo(uint32 id) const
 
 void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
+    if (output->Quality != ITEM_QUALITY_LEGENDARY)
+        return;
+
     std::mt19937 generator;
     generator.seed(modifier.legendarySeed);
-    //toDo: Foe add selection.
-    output->legendaryId = 0;
+    std::list<legendaryItemInfo> legList;
+
+    for (auto const& itr : _LegendaryTemplateStore)
+    {
+        SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, output->ItemLevel);
+        SelectSkip(itr.second.itemClass, output->Class);
+        SelectSkip(itr.second.itemSubClass, output->SubClass);
+        SelectSkip(itr.second.itemInventoryType, output->InventoryType);
+        SelectSkip(itr.second.itemStatGroup, output->statGroup);
+        legList.push_back(itr.second);
+    }
+
+    if (legList.empty())
+        return;
+
+    auto selectedLegendary = std::begin(legList);
+    std::advance(selectedLegendary, urand(0, uint32(std::size(legList)) - 1, generator));
+
+    output->legendaryId = selectedLegendary->legendaryId;
+
     if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
     {
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)

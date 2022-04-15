@@ -179,6 +179,12 @@ namespace Trinity
             std::shuffle(std::begin(container), std::end(container), RandomEngine::Instance());
         }
 
+        template<class C>
+        inline void RandomShuffle(C& container, std::mt19937 generator)
+        {
+            std::shuffle(std::begin(container), std::end(container), generator);
+        }
+
         /**
          * @fn bool Trinity::Containers::Intersects(Iterator first1, Iterator last1, Iterator first2, Iterator last2)
          *
