@@ -1844,9 +1844,9 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.primaryStatModifier = fields[7].GetFloat();
         legTemp.secondaryStatModifier = fields[8].GetFloat();
         legTemp.socketMod = fields[9].GetUInt8();
-        legTemp.generatePrismatic = fields[9].GetBool();
-        legTemp.primaryStatCountMod = fields[10].GetUInt8();
-        legTemp.secondaryStatCountMod = fields[11].GetUInt8();
+        legTemp.generatePrismatic = fields[10].GetBool();
+        legTemp.primaryStatCountMod = fields[11].GetUInt8();
+        legTemp.secondaryStatCountMod = fields[12].GetUInt8();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
