@@ -10,8 +10,8 @@
 #include "Log.h"
 #include "SFMTRand.h"
 
-#define SelectSkip(a,b) if( a > 0 && a != b) continue
-#define SelectMinMaxSkip(min,max,value) if((min > 0 && min > value) || (max > 0 && max < value )) continue
+#define SelectSkip(a,b) if( a >= 0 && a != b) continue
+#define SelectMinMaxSkip(min,max,value) if((min >= 0 && min > value) || (max >= 0 && max < value )) continue
 
 VirtualItemMgr& VirtualItemMgr::instance()
 {
@@ -952,30 +952,12 @@ itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModi
     std::list<itemSetInfo> sets;
     for (itemSetInfo const& someSets : availableItemSets)
     {
-        if (someSets.minQuality != -1 && (int32)output->Quality < someSets.minQuality)
-            continue;
-
-        if (someSets.maxQuality != -1 && (int32)output->Quality > someSets.maxQuality)
-            continue;
-
-        if (someSets.itemClass != -1 && (int32)output->Class != someSets.itemClass)
-            continue;
-
-        if (someSets.subClass != -1 && (int32)output->SubClass != someSets.subClass)
-            continue;
-
-        if (someSets.inventoryType != -1 && (int32)output->InventoryType != someSets.inventoryType)
-            continue;
-
-        if (someSets.statGroup != -1 && output->statGroup != someSets.statGroup)
-            continue;
-
-        if (someSets.maxItemLevel != -1 && (int32)output->ItemLevel > someSets.maxItemLevel)
-            continue;
-
-        if (someSets.minItemLevel != -1 && (int32)output->ItemLevel < someSets.minItemLevel)
-            continue;
-
+        SelectMinMaxSkip(someSets.minQuality, someSets.maxQuality, (int32)output->Quality);
+        SelectMinMaxSkip(someSets.minItemLevel, someSets.maxItemLevel, (int32)output->ItemLevel);
+        SelectSkip(someSets.itemClass, (int32)output->Class);
+        SelectSkip(someSets.subClass, (int32)output->SubClass);
+        SelectSkip(someSets.inventoryType, (int32)output->InventoryType);
+        SelectSkip(someSets.statGroup, output->statGroup);
 
         sets.push_back(someSets);
     }
@@ -1311,17 +1293,10 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
     std::vector<std::string> names;
     for (auto name : availableNames)
     {
-        if (info->array_id != name.array_id && name.array_id != -1)
-            continue;
-
-        if (info->itemType != name.itemType && name.itemType != -1)
-            continue;
-
-        if (info->subclass != name.subclass && name.subclass != -1)
-            continue;
-
-        if (info->inventoryType != name.inventoryType && name.inventoryType != -1)
-            continue;
+        SelectSkip(name.array_id, info->array_id);
+        SelectSkip(name.itemType, info->itemType);
+        SelectSkip(name.subclass, info->subclass);
+        SelectSkip(name.inventoryType, info->inventoryType);
 
         names.push_back(name.name);
     }
