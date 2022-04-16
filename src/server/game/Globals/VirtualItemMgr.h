@@ -117,6 +117,7 @@ struct VirtualModifier
         isCrafted = false;
         vLvlMod = 0;
         displayId = 0;
+        nameOverride = "";
     }
 
     /**
@@ -141,6 +142,7 @@ struct VirtualModifier
     bool isCrafted;
     uint32 vLvlMod;
     uint32 displayId;
+    std::string nameOverride;
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.

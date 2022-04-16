@@ -766,6 +766,12 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
 
 void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
+    if (!modifier.nameOverride.empty())
+    {
+        output->Name1 = modifier.nameOverride;
+        return;
+    }
+
     std::mt19937 generator;
     generator.seed(modifier.nameSeed);
 
