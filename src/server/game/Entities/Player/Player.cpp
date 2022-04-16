@@ -27799,20 +27799,16 @@ void Player::ApplyVirtualItemLegendayEffects(Item* item)
 {
     if (item->GetTemplate()->Quality != ITEM_QUALITY_LEGENDARY)
         return;
-    ChatHandler(GetSession()).PSendSysMessage("Player::ApplyVirtualItemLegendayEffects");
+
     if (VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(item->GetEntry()))
     {
         if (legendaryItemInfo const* legInfo = sVirtualItemMgr.GetLegendaryItemInfo(vItem->legendaryId))
         {
             if (legInfo->generatePrismatic)
             {
-                ChatHandler(GetSession()).PSendSysMessage("Player::ApplyVirtualItemLegendayEffects Lookup Enchant");
-
                 SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(3729);
                 if (!enchant)
                     return;
-
-                ChatHandler(GetSession()).PSendSysMessage("Player::ApplyVirtualItemLegendayEffects Found Enchant Applying Enchant");
 
                 ApplyEnchantment(item, PRISMATIC_ENCHANTMENT_SLOT, false);
 
