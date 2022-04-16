@@ -3431,13 +3431,13 @@ namespace LuaPlayer
         uint32 itemCount = Eluna::CHECKVAL<uint32>(L, 3, 1);
         uint32 displayId = Eluna::CHECKVAL<uint32>(L, 4, 0);
 
-        VirtualItemModifier modifier;
+        VirtualModifier modifier;
         modifier.displayId = displayId;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, itemCount, &noSpaceForCount);
-        if (msg != EQUIP_ERR_OK)\
+        if (msg != EQUIP_ERR_OK)
             itemCount -= noSpaceForCount;
 
         if (itemCount == 0 || dest.empty())
