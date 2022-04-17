@@ -3431,10 +3431,12 @@ namespace LuaPlayer
         uint32 itemCount = Eluna::CHECKVAL<uint32>(L, 3, 1);
         uint32 displayId = Eluna::CHECKVAL<uint32>(L, 4, 0);
         const char* name = Eluna::CHECKVAL<const char*>(L, 5, "");
+        uint8 quality = Eluna::CHECKVAL<uint8>(L, 6, 1);
 
         VirtualModifier modifier;
         modifier.displayId = displayId;
         modifier.nameOverride = name;
+        modifier.quality = quality;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
