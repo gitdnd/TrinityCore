@@ -1012,6 +1012,7 @@ ElunaRegister<Item> ItemMethods[] =
 
     // Other
     { "SaveToDB", &LuaItem::SaveToDB },
+    { "GetDisenchantId", &LuaItem::GetDisenchantId },
 
     { NULL, NULL }
 };
