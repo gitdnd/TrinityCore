@@ -786,6 +786,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "ResetInstances", &LuaPlayer::ResetInstances },
     { "IsInstanceBound", &LuaPlayer::IsInstanceBound },
     { "GetTalentLevel", &LuaPlayer::GetTalentLevel },
+    { "ScrapItemByEntry", &LuaPlayer::ScrapItemByEntry },
 
     { NULL, NULL }
 };

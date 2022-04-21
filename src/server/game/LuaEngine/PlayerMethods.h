@@ -4429,5 +4429,22 @@ namespace LuaPlayer
         Eluna::Push(L, player->GetTalentLevel());
         return 1;
     }
+
+    int ScrapItemByEntry(lua_State* L, Player* player)
+    {
+        uint32 itemId = Eluna::CHECKVAL<uint32>(L, 2);
+
+        if (player->HasItemCount(itemId, 1, true))
+        {
+            ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemId);
+            if (pProto)
+            {
+                player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
+                player->DestroyItemCount(itemId, 1, true);
+            }
+        }
+
+        return 0;
+    }
 };
 #endif

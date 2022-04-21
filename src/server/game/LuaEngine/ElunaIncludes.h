@@ -23,6 +23,7 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
+#include "LootMgr.h"
 #include "Mail.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
