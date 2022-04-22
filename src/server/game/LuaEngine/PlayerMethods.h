@@ -4442,23 +4442,21 @@ namespace LuaPlayer
                     for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
                     {
                         uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(enchant_slot));
-                        if (enchant_id)
-                        {
-                            SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-                            if (enchantEntry)
-                            {
-                                uint32 gemid = enchantEntry->GemID;
-                                if (gemid)
-                                {
-                                    ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(gemid);
-                                    if (gemProto)
-                                    {
-                                        if (gemProto->DisenchantID > 0)
-                                            player->AutoStoreLoot(gemProto->DisenchantID, LootTemplates_Disenchant, true);
-                                    }
-                                }
-                            }
-                        }
+                        if (!enchant_id)
+                            continue;
+
+                        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                        if (!enchantEntry)
+                            continue;
+
+                        ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(enchantEntry->GemID);
+                        if (!gemProto)
+                            continue;
+
+                        if (!gemProto->DisenchantID > 0)
+                            continue;
+
+                        player->AutoStoreLoot(gemProto->DisenchantID, LootTemplates_Disenchant, true);
                     }
 
                 }
