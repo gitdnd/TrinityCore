@@ -4432,15 +4432,41 @@ namespace LuaPlayer
 
     int ScrapItemByEntry(lua_State* L, Player* player)
     {
-        uint32 itemId = Eluna::CHECKVAL<uint32>(L, 2);
-
-        if (player->HasItemCount(itemId, 1, true))
+        Item* item = Eluna::CHECKOBJ<Item>(L, 2, false);
+        if (item)
         {
-            ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemId);
-            if (pProto)
+            if (player->HasItemCount(item->GetEntry(), 1, true))
             {
-                player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
-                player->DestroyItemCount(itemId, 1, true);
+                if (item->HasSocketedGems())
+                {
+                    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+                    {
+                        uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(enchant_slot));
+                        if (enchant_id)
+                        {
+                            SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                            if (enchantEntry)
+                            {
+                                uint32 gemid = enchantEntry->GemID;
+                                if (gemid)
+                                {
+                                    ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(gemid);
+                                    if (gemProto)
+                                    {
+                                        if (gemProto->DisenchantID > 0)
+                                            player->AutoStoreLoot(gemProto->DisenchantID, LootTemplates_Disenchant, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                if(item->GetTemplate()->DisenchantID > 0)
+                    player->AutoStoreLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, true);
+
+                player->DestroyItemCount(item->GetEntry(), 1, true);
             }
         }
 
