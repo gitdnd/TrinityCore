@@ -4430,7 +4430,7 @@ namespace LuaPlayer
         return 1;
     }
 
-    int ScrapItemByEntry(lua_State* L, Player* player)
+    int ScrapItem(lua_State* L, Player* player)
     {
         Item* item = Eluna::CHECKOBJ<Item>(L, 2, false);
         if (item)
@@ -4453,7 +4453,7 @@ namespace LuaPlayer
                         if (!gemProto)
                             continue;
 
-                        if (!gemProto->DisenchantID > 0)
+                        if (gemProto->DisenchantID == 0)
                             continue;
 
                         player->AutoStoreLoot(gemProto->DisenchantID, LootTemplates_Disenchant, true);
