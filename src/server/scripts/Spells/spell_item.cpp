@@ -4452,7 +4452,7 @@ class spell_item_floating_cult_thesis : public SpellScript
     {
         Player* caster = GetCaster()->ToPlayer();
         caster->ResetInstances(INSTANCE_RESET_ALL, false);
-        caster->TeleportTo(768, 12126.85f, 15339.47f, 857.3f, 6.261189f);
+        caster->TeleportTo(769, 12163.0f, 15235.968f, 857.5f, 1.6f);
     }
 
     void Register() override
