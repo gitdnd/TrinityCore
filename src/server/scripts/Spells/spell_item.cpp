@@ -44,6 +44,7 @@
 #include "VirtualItemMgr.h"
 #include "World.h"
 #include "Guild.h"
+#include "Group.h"
 
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
@@ -4440,9 +4441,20 @@ class spell_item_floating_cult_thesis : public SpellScript
     SpellCastResult CheckRequirement()
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (caster->GetMapId() == 768)
+        if (caster->GetMapId() == 769)
         {
-            ChatHandler(caster->GetSession()).PSendSysMessage("You must exit The Timeways before using the Floating Cult Thesis.");
+            ChatHandler(caster->GetSession()).PSendSysMessage("You must exit the Floating Cult before using the Floating Cult Thesis.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        Group* group = caster->GetGroup();
+        if (!group)
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You must be in a party to use this.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        if (group->GetMembersCount() != 2)
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("Your party must have only two players to use this.");
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         }
         return SPELL_CAST_OK;
@@ -4452,7 +4464,18 @@ class spell_item_floating_cult_thesis : public SpellScript
     {
         Player* caster = GetCaster()->ToPlayer();
         caster->ResetInstances(INSTANCE_RESET_ALL, false);
-        caster->TeleportTo(769, 12163.0f, 15235.968f, 857.5f, 1.6f);
+        Group* group = caster->GetGroup();
+        if (!group || group->GetMembersCount() != 2)
+        {
+            return;
+        }
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (itr->GetSource() && itr->GetSource()->GetDistance2d(caster) < 50.0f)
+            {
+                itr->GetSource()->TeleportTo(769, 12163.0f, 15235.968f, 857.5f, 1.6f);
+            }
+        }
     }
 
     void Register() override
