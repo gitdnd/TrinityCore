@@ -5125,7 +5125,8 @@ void Player::RepopAtGraveyard()
         SetPhaseMask(1, true);
         SetCanSeePhaseOne(true);
         SetCanSeeUniquePhase(false);
-        // Hub map and coords
+
+        // Default Hub map and coords
         uint32 mapId = 765;
         float x = 56.48f;
         float y = 539.11f;
@@ -5139,6 +5140,15 @@ void Player::RepopAtGraveyard()
             y = 15392.59f;
             z = 857.065f;
             o = 1.561345f;
+        }
+        // If in The Vault
+        else if (GetMap() && GetMap()->GetId() == 35)
+        {
+            mapId = 35;
+            x = -1.115f;
+            y = 65.37f;
+            z = -27.5f;
+            o = 1.54559f;
         }
            
         TeleportTo(mapId, x, y, z, o, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
