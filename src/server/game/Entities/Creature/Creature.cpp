@@ -268,6 +268,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MapObject(), m_grou
 
     ResetLootMode(); // restore default loot mode
     m_isTempWorldObject = false;
+    _dungeonLevelOverride = 0;
 }
 
 void Creature::AddToWorld()
@@ -3450,4 +3451,12 @@ void Creature::ApplyScaledArmor()
         armor += ((float)dungeonLevel / 1000.0f) * armor;
 
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
+}
+
+int Creature::GetDungeonLevel() const
+{
+    if (Player const* owner = GetCharmerOrOwnerPlayerOrPlayerItself())
+        return owner->GetAverageItemLevel();
+
+    return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
 }

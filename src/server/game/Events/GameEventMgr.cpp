@@ -1007,6 +1007,8 @@ void GameEventMgr::LoadHolidayDates()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded %u holiday dates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+
+    //load game event spells
 }
 
 uint32 GameEventMgr::GetNPCFlag(Creature* cr)
