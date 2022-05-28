@@ -751,5 +751,11 @@ namespace LuaItem
 #endif
         return 0;
     }
-};
+
+    int GetDisenchantId(lua_State* L, Item* item)
+    {
+        Eluna::Push(L, item->GetTemplate()->DisenchantID);
+        return 1;
+    }
+};    
 #endif

@@ -4429,5 +4429,46 @@ namespace LuaPlayer
         Eluna::Push(L, player->GetTalentLevel());
         return 1;
     }
+
+    int ScrapItem(lua_State* L, Player* player)
+    {
+        Item* item = Eluna::CHECKOBJ<Item>(L, 2, false);
+        if (item)
+        {
+            if (player->HasItemCount(item->GetEntry(), 1, true))
+            {
+                if (item->HasSocketedGems())
+                {
+                    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+                    {
+                        uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(enchant_slot));
+                        if (!enchant_id)
+                            continue;
+
+                        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                        if (!enchantEntry)
+                            continue;
+
+                        ItemTemplate const* gemProto = sObjectMgr->GetItemTemplate(enchantEntry->GemID);
+                        if (!gemProto)
+                            continue;
+
+                        if (gemProto->DisenchantID == 0)
+                            continue;
+
+                        player->AutoStoreLoot(gemProto->DisenchantID, LootTemplates_Disenchant, true);
+                    }
+
+                }
+
+                if(item->GetTemplate()->DisenchantID > 0)
+                    player->AutoStoreLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, true);
+
+                player->DestroyItemCount(item->GetEntry(), 1, true);
+            }
+        }
+
+        return 0;
+    }
 };
 #endif

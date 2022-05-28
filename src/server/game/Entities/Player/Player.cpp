@@ -5123,14 +5123,41 @@ void Player::RepopAtGraveyard()
     {
         // Reset phase to 1 on repop
         SetPhaseMask(1, true);
-        // Hub map and coords
-        TeleportTo(765, 56.48f, 539.11f, 715.5f, 4.305573f, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+        SetCanSeePhaseOne(true);
+        SetCanSeeUniquePhase(false);
+
+        // Default Hub map and coords
+        uint32 mapId = 765;
+        float x = 56.48f;
+        float y = 539.11f;
+        float z = 715.5f;
+        float o = 4.305573f;
+        // If in Floating Cult
+        if (GetMap() && GetMap()->GetId() == 769)
+        {
+            mapId = 769;
+            x = 12325.34f;
+            y = 15392.59f;
+            z = 857.065f;
+            o = 1.561345f;
+        }
+        // If in The Vault
+        else if (GetMap() && GetMap()->GetId() == 35)
+        {
+            mapId = 35;
+            x = -1.115f;
+            y = 65.37f;
+            z = -27.5f;
+            o = 1.54559f;
+        }
+           
+        TeleportTo(mapId, x, y, z, o, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
         {
             WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4);  // show spirit healer position on minimap
             // Hub map and coords
-            data << 765;
-            data << TaggedPosition<Position::XYZ>(56.48f, 539.11f, 715.5f);
+            data << mapId;
+            data << TaggedPosition<Position::XYZ>(x, y, z);
             SendDirectMessage(&data);
         }
     }
@@ -25378,6 +25405,8 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
     for (uint32 i = 0; i < max_slot; ++i)
     {
         LootItem* lootItem = loot.LootItemInSlot(i, this);
+        if (lootItem == nullptr)
+            continue;
 
         ItemPosCountVec dest;
         InventoryResult msg = CanStoreNewItem(bag, slot, dest, lootItem->itemid, lootItem->count);

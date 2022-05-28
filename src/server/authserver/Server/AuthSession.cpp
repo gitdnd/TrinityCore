@@ -1009,7 +1009,7 @@ bool AuthSession::HandleLogonProof()
             proof.error = 0;
             proof.AccountFlags = 0x00800000;    // 0x01 = GM, 0x08 = Trial, 0x00800000 = Pro pass (arena tournament)
             proof.SurveyId = 0;
-            proof.LoginFlags = 0;               // 0x1 = has account message
+            proof.LoginFlags = 0x1;               // 0x1 = has account message
 
             packet.resize(sizeof(proof));
             std::memcpy(packet.contents(), &proof, sizeof(proof));

@@ -786,6 +786,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "ResetInstances", &LuaPlayer::ResetInstances },
     { "IsInstanceBound", &LuaPlayer::IsInstanceBound },
     { "GetTalentLevel", &LuaPlayer::GetTalentLevel },
+    { "ScrapItem", &LuaPlayer::ScrapItem },
 
     { NULL, NULL }
 };
@@ -1012,6 +1013,7 @@ ElunaRegister<Item> ItemMethods[] =
 
     // Other
     { "SaveToDB", &LuaItem::SaveToDB },
+    { "GetDisenchantId", &LuaItem::GetDisenchantId },
 
     { NULL, NULL }
 };
