@@ -79,7 +79,7 @@ float frand(float min, float max)
 float frand(float min, float max, std::mt19937& generator)
 {
     assert(max >= min);
-    std::uniform_int_distribution<float> uid(min, max);
+    std::uniform_real_distribution<float> uid(min, max);
     return uid(generator);
 }
 
