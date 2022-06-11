@@ -294,6 +294,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetCappedDungeonLevel() : lootOwner->GetCappedGroupOrPlayerItemLevel();
 
+    modifier.magicFind = lootOwner->GetMagicFind();
+
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
