@@ -1118,11 +1118,14 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
 
     // decide quality
     uint32 quality = output->Quality;
+    float magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
+
+    output->generatedMagicFind = magicFind;
 
     // these are not percentage chances. They represent areas of a number line made from their sum
-    static const uint32 chances[MAX_ITEM_QUALITY] = {
+    static const float chances[MAX_ITEM_QUALITY] = {
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
-        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON),
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON) - magicFind,
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_UNCOMMON),
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_RARE),
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_EPIC),
@@ -1131,13 +1134,13 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
     };
 
-    uint32 sum = 0;
+    float sum = 0;
     for (auto u : chances)
         sum += u;
 
     if (sum >= 1)
     {
-        uint32 rand = urand(1, sum, generator);
+        float rand = frand(1.f, sum, generator);
         sum = 0;
         for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
         {

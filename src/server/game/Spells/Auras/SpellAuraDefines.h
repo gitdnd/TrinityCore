@@ -399,7 +399,8 @@ enum AuraType : uint32
     SPELL_AURA_DAMAGE_SCHOOL_BONUS                          = 319,
     SPELL_AURA_MOD_RATING_PERCENT                           = 320,
     SPELL_AURA_CAST_WHILE_MOVING_OVERRIDE                   = 321,
-    TOTAL_AURAS                                             = 322
+    SPELL_AURA_MAGIC_FIND                                   = 322,
+    TOTAL_AURAS                                             = 323,
 };
 
 enum AuraObjectType

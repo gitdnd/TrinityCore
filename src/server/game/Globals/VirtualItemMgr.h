@@ -55,6 +55,7 @@ struct VirtualItemTemplate : ItemTemplate
         legendarySeed = 0;
         legendaryId = 0;
         customFlags = 0;
+        generatedMagicFind = 0.f;
         //Bonding = BIND_WHEN_PICKED_UP; // All items MUST be bound on pickup so they can not be mailed and thus failing some cleanup and memory management
     }
 
@@ -90,6 +91,7 @@ struct VirtualItemTemplate : ItemTemplate
     // misc
     uint32 legendaryId;
     uint32 customFlags;
+    float generatedMagicFind;
 
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
 };
@@ -118,6 +120,7 @@ struct VirtualModifier
         vLvlMod = 0;
         displayId = 0;
         nameOverride = "";
+        magicFind = 0.f;
     }
 
     /**
@@ -143,6 +146,7 @@ struct VirtualModifier
     uint32 vLvlMod;
     uint32 displayId;
     std::string nameOverride;
+    float magicFind;
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.

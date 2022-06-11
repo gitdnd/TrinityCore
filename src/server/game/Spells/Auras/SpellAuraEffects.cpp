@@ -385,6 +385,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleDamageSchoolBonus,                         //319 SPELL_AURA_DAMAGE_SCHOOL_BONUS
     &AuraEffect::HandleModRatingPercent,                          //320 SPELL_AURA_MOD_RATING_PERCENT
     &AuraEffect::HandleNoImmediateEffect,                         //321 SPELL_AURA_CAST_WHILE_MOVING implemented in multiple places in Spell.cpp
+    &AuraEffect::HandleMagicFind,                                 //322 SPELL_AURA_MAGIC_FIND
 
 };
 
@@ -5881,6 +5882,22 @@ void AuraEffect::HandleDamageSchoolBonus(AuraApplication const* aurApp, uint8 mo
     amount = apply ? amount + GetAmount() : amount - GetAmount();
 
     target->SetBonusSchoolModifierPct(school, amount);
+}
+
+void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    if (aurApp->GetTarget()->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* target = aurApp->GetTarget()->ToPlayer();
+
+    float amount = target->GetMagicFind();
+    amount = apply ? amount + GetAmount() : amount - GetAmount();
+
+    target->SetMagicFind(amount);
 }
 
 template TC_GAME_API void AuraEffect::GetTargetList(std::list<Unit*>&) const;

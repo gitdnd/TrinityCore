@@ -418,6 +418,7 @@ Player::Player(WorldSession* session): Unit(true)
     talent_level = 0;
     _averageItemLevel = 1;
     m_canTeleport = false;
+    magicFind = 0.f;
 }
 
 Player::~Player()

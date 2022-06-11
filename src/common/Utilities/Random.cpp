@@ -76,6 +76,13 @@ float frand(float min, float max)
     return urd(engine);
 }
 
+float frand(float min, float max, std::mt19937& generator)
+{
+    assert(max >= min);
+    std::uniform_int_distribution<float> uid(min, max);
+    return uid(generator);
+}
+
 Milliseconds randtime(Milliseconds min, Milliseconds max)
 {
     long long diff = max.count() - min.count();
