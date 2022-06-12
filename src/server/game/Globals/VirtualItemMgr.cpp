@@ -1134,14 +1134,10 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
     };
 
-    std::ostringstream debug;
-    std::ostringstream debug2;
-    debug << "Mod MF " << modifier.magicFind << " Gen MF " << output->generatedMagicFind;
     float sum = 0;
     for (auto u : chances)
     {
         sum += u;
-        debug << " chance " << u << " sum " << sum;
     }
 
     if (sum >= 1)
@@ -1151,7 +1147,6 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
         for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
         {
             sum += chances[i];
-            debug2 << "roll quality " << i << " chance " << chances[i] << " sum " << sum << " rand " << rand;
             if (sum < rand)
                 continue;
 
@@ -1159,8 +1154,6 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
             break;
         }
     }
-    sWorld->SendGlobalText(debug.str().c_str(), nullptr);
-    sWorld->SendGlobalText(debug2.str().c_str(), nullptr);
 
     quality = std::max(output->Quality, quality); // dont generate quality below original
 
