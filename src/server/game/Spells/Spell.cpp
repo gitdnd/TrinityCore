@@ -7286,6 +7286,31 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     return SPELL_FAILED_NO_VALID_TARGETS;
                 break;
             }
+            case SPELL_EFFECT_HONE_VIRTUAL_ITEM:
+            {
+                if (!m_targets.GetItemTarget())
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                // prevent disenchanting in trade slot
+                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
+                    return SPELL_FAILED_NOT_WHILE_TRADING;
+
+                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                {
+                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
+                        return SPELL_FAILED_NO_VALID_TARGETS;
+
+                    if(vTemp->honePct >= (uint32)m_spellInfo->Effects[i].MiscValue)
+                        return SPELL_FAILED_NO_VALID_TARGETS;
+                }
+                else
+                    return SPELL_FAILED_NO_VALID_TARGETS;
+
+                break;
+            }
             default:
                 break;
         }

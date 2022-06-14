@@ -56,6 +56,7 @@ struct VirtualItemTemplate : ItemTemplate
         legendaryId = 0;
         customFlags = 0;
         generatedMagicFind = 0.f;
+        honePct = 0.f;
         //Bonding = BIND_WHEN_PICKED_UP; // All items MUST be bound on pickup so they can not be mailed and thus failing some cleanup and memory management
     }
 
@@ -92,7 +93,7 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 legendaryId;
     uint32 customFlags;
     float generatedMagicFind;
-
+    float honePct;
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
 };
 
@@ -121,6 +122,7 @@ struct VirtualModifier
         displayId = 0;
         nameOverride = "";
         magicFind = 0.f;
+        statPoolPctModifier = 0.f;
     }
 
     /**
@@ -147,7 +149,7 @@ struct VirtualModifier
     uint32 displayId;
     std::string nameOverride;
     float magicFind;
-
+    float statPoolPctModifier;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
@@ -209,8 +211,9 @@ struct itemSpellInfo
     uint32 SpellCategory;
     int32  SpellCategoryCooldown;
 };
-#define MAX_GENERATED_SPELLS 2
-#define MAX_LEGENDARY_SPELLS 3
+constexpr uint8 MAX_GENERATED_SPELLS = 1;
+constexpr uint8 MAX_LEGENDARY_SPELLS = 3;
+constexpr uint8 HONED_SPELL_SLOT = MAX_GENERATED_SPELLS + MAX_LEGENDARY_SPELLS + 1;
 
 struct itemSetInfo
 {

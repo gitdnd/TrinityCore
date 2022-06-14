@@ -243,6 +243,8 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectExtractGems,                              //173 SPELL_EFFECT_EXTRACT_GEMS
     &Spell::EffectPctXPGain,                                //174 SPELL_EFFECT_PCT_XP_GAIN
     &Spell::EffectXPGain,                                   //175 SPELL_EFFECT_XP_GAIN
+    &Spell::EffectHoneVirtualItem,                          //176 SPELL_EFFECT_HONE_VIRTUAL_ITEM
+
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
@@ -5863,6 +5865,66 @@ void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
     modifier.statGroupSeed = vItem->statGroupSeed;
     modifier.quality = vItem->Quality;
     modifier.statgroup = vItem->statGroup;
+
+    sVirtualItemMgr.InitSeedGen(modifier);
+    sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateStatGroup(vItem, modifier);
+    sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
+    sVirtualItemMgr.GenerateItemStats(vItem, modifier);
+    sVirtualItemMgr.GenerateSockets(vItem, modifier);
+    sVirtualItemMgr.GenerateItemName(vItem, modifier);
+    //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
+    sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
+
+    vItem->seed = modifier.seed;
+    vItem->displaySeed = modifier.displaySeed;
+    vItem->nameSeed = modifier.nameSeed;
+    vItem->socketSeed = modifier.socketSeed;
+    //vItem->spellSeed = modifier.spellSeed;
+    vItem->statSeed = modifier.statSeed;
+    vItem->statValueSeed = modifier.statValueSeed;
+    vItem->statGroupSeed = modifier.statGroupSeed;
+
+    vItem->InitializeQueryData();
+    WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
+    sWorld->SendGlobalMessage(&response);
+    itemTarget->SaveVirtualItemInfo();
+}
+
+void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    if (!itemTarget)
+        return;
+
+    VirtualModifier modifier;
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+
+    modifier.quality = vItem->Quality;
+    modifier.seed = vItem->seed;
+    modifier.displaySeed = vItem->displaySeed;
+    modifier.nameSeed = vItem->nameSeed;
+    modifier.qualitySeed = vItem->qualitySeed;
+    modifier.socketSeed = vItem->socketSeed;
+    modifier.spellSeed = vItem->spellSeed;
+    modifier.statSeed = vItem->statSeed;
+    modifier.statValueSeed = vItem->statValueSeed;
+    modifier.statGroupSeed = vItem->statGroupSeed;
+    modifier.ilevel = vItem->ItemLevel;
+    modifier.statgroup = vItem->statGroup;
+
+    float honePct = modifier.statPoolPctModifier + vItem->honePct;
+
+    if (honePct > m_spellInfo->Effects[effIndex].MiscValue) // cap
+        honePct = m_spellInfo->Effects[effIndex].MiscValue;
+
+    modifier.statPoolPctModifier = honePct;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);

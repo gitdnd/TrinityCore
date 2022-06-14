@@ -406,6 +406,13 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         // add a random 10% increase or decrease of stats
         armorValue = (float)urand((uint32)(armorValue * 0.9f), (uint32)(armorValue * 1.1f), generator);
 
+        float honePct = modifier.statPoolPctModifier;
+        if (honePct > 0)
+        {
+            honePct = modifier.statPoolPctModifier / 100;
+            armorValue += armorValue * honePct;
+        }
+
         // apply armor value to template
         output->Armor = (uint32)armorValue;
     }
@@ -597,6 +604,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondaryStatSlots += secondarySlotMod;
     }
 
+    //Random hone percent in future?
+    //output->honePct = modifier.statPoolPctModifier;
+    float honePct = modifier.statPoolPctModifier;
+    if (honePct > 0)
+        honePct = modifier.statPoolPctModifier / 100;
 
     // if we still have any slots to generate stats for, continue
     if (primaryStatSlots + secondaryStatSlots > 0)
@@ -611,8 +623,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         for (uint32 i = 0; i < primarystatgroup.size(); ++i)
         {
             float primaryStatMod = 1.f;
+
             if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
                 primaryStatMod = leg->primaryStatModifier;
+
+            primaryStatMod += honePct;
 
             // select random pool size value based on upper and lower bounds
             float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
@@ -684,8 +699,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         for (uint32 i = 0; i < secondarystatgroup.size(); ++i)
         {
             float secondayStatMod = 1.f;
+
             if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
                 secondayStatMod = leg->secondaryStatModifier;
+
+            secondayStatMod += honePct;
 
             // select random pool size value based on upper and lower bounds
             float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);

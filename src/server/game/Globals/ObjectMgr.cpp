@@ -3445,7 +3445,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         "spellid_4, spelltrigger_4, spellcharges_4, spellppmRate_4, spellcooldown_4, spellcategory_4, spellcategorycooldown_4, "
         "spellid_5, spelltrigger_5, spellcharges_5, spellppmRate_5, spellcooldown_5, spellcategory_5, spellcategorycooldown_5, "
         "seed, socketSeed, qualitySeed, statSeed, nameSeed, displaySeed, spellSeed, statValueSeed, statGroupSeed, setSeed, legendarySeed, "
-        "statGroup, customFlags, sheath, legendaryId, generatedMagicFind "
+        "statGroup, customFlags, sheath, legendaryId, generatedMagicFind, honePercent "
         "FROM item_template_virtual");
 
     if (!result)
@@ -3532,6 +3532,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->legendaryId = fields[i++].GetUInt32();
 
         itemTemplate->generatedMagicFind = fields[i++].GetFloat();
+        itemTemplate->honePct = fields[i++].GetFloat();
 
         itemTemplate->MaxDurability = 0;
         //itemTemplate->UpdateDisplay();
@@ -3556,6 +3557,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
             mod.setSeed = itemTemplate->setSeed;
             mod.legendarySeed = itemTemplate->legendarySeed;
             mod.magicFind = itemTemplate->generatedMagicFind;
+            mod.statPoolPctModifier = itemTemplate->honePct;
             sVirtualItemMgr.RegenerateItemInfo(itemTemplate, mod);
             itemTemplate->customFlags &= ~VIRTUAL_ITEM_FLAG_REGENERATE;
             // toDoL Implement some way of saving when not loaded.
