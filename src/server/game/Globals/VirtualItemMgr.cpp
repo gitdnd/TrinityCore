@@ -514,6 +514,14 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         float damageBonus = (((output->Quality - 2.0f) / 10.0f) / 2.0f) + 1.0f;
         output->Damage[0].DamageMin *= damageBonus;
         output->Damage[0].DamageMax *= damageBonus;
+        float honePct = modifier.statPoolPctModifier;
+        if (honePct > 0)
+        {
+            honePct = modifier.statPoolPctModifier / 100;
+            output->Damage[0].DamageMin += output->Damage[0].DamageMin * honePct;
+            output->Damage[0].DamageMax += output->Damage[0].DamageMax * honePct;
+        }
+
     }
 
     // TODO: add custom descriptions to legendaries possibly?
