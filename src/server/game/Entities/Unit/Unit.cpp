@@ -9672,12 +9672,7 @@ void Unit::UpdateCharmAI()
         else
         {
             // HARRY: Hardcoded charm AI override disable in DungeonMode
-            if (ToCreature() &&
-                (ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52123))
+            if (IsCreature() && ShouldIgnoreAiSwitch(GetEntry()))
             {
                 if (GetAI())
                     return;
@@ -11742,12 +11737,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     if (GetTypeId() != TYPEID_PLAYER || charmer->GetTypeId() == TYPEID_UNIT)
     {
         // Hardcode don't change AI for Eluna scripts
-        if (ToCreature() &&
-            (ToCreature()->GetCreatureTemplate()->Entry == 52051 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52123))
+        if (IsCreature() && ShouldIgnoreAiSwitch(GetEntry()))
         {
             return;
         }
@@ -13702,4 +13692,23 @@ void Unit::OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain,
             CastSpell(victim, 180047 + i, args);
         }
     }
+}
+
+static bool ShouldIgnoreAiSwitch(uint32 entry)
+{
+    switch (entry)
+    {
+    case 52051:
+    case 52066:
+    case 52090:
+    case 52104:
+    case 52123:
+    {
+        return true;
+        break;
+    }
+    default:
+        return false;
+    }
+    return false;
 }
