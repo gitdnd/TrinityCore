@@ -5134,7 +5134,7 @@ void Player::RepopAtGraveyard()
         float z = 715.5f;
         float o = 4.305573f;
         // If in Floating Cult
-        if (GetMap() && GetMap()->GetId() == 769)
+        if (GetMap() && GetMap()->GetId() == 769 && IsDead())
         {
             mapId = 769;
             x = 12325.34f;
@@ -5143,7 +5143,7 @@ void Player::RepopAtGraveyard()
             o = 1.561345f;
         }
         // If in The Vault
-        else if (GetMap() && GetMap()->GetId() == 35)
+        else if (GetMap() && GetMap()->GetId() == 35 && IsDead())
         {
             mapId = 35;
             x = -1.115f;
