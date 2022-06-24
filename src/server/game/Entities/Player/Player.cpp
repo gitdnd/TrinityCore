@@ -5070,7 +5070,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
     return TotalCost;
 }
 
-void Player::RepopAtGraveyard()
+void Player::RepopAtGraveyard(bool ignore_overrides)
 {
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
@@ -5133,22 +5133,25 @@ void Player::RepopAtGraveyard()
         float z = 715.5f;
         float o = 4.305573f;
         // If in Floating Cult
-        if (GetMap() && GetMap()->GetId() == 769 && !IsAlive())
+        if (!ignore_overrides)
         {
-            mapId = 769;
-            x = 12325.34f;
-            y = 15392.59f;
-            z = 857.065f;
-            o = 1.561345f;
-        }
-        // If in The Vault
-        else if (GetMap() && GetMap()->GetId() == 35 && !IsAlive())
-        {
-            mapId = 35;
-            x = -1.115f;
-            y = 65.37f;
-            z = -27.5f;
-            o = 1.54559f;
+            if (GetMap() && GetMap()->GetId() == 769)
+            {
+                mapId = 769;
+                x = 12325.34f;
+                y = 15392.59f;
+                z = 857.065f;
+                o = 1.561345f;
+            }
+            // If in The Vault
+            else if (GetMap() && GetMap()->GetId() == 35)
+            {
+                mapId = 35;
+                x = -1.115f;
+                y = 65.37f;
+                z = -27.5f;
+                o = 1.54559f;
+            }
         }
            
         TeleportTo(mapId, x, y, z, o, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
@@ -22503,7 +22506,7 @@ void Player::UpdateHomebindTime(uint32 time)
         if (time >= m_HomebindTimer)
         {
             // teleport to nearest graveyard
-            RepopAtGraveyard();
+            RepopAtGraveyard(true);
         }
         else
             m_HomebindTimer -= time;

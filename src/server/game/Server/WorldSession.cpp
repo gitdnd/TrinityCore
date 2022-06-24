@@ -528,7 +528,7 @@ void WorldSession::LogoutPlayer(bool save)
         {
             _player->CombatStop();
             _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            _player->RepopAtGraveyard(true);
         }
         else if (_player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         {
@@ -536,11 +536,11 @@ void WorldSession::LogoutPlayer(bool save)
             _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             _player->KillPlayer();
             _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            _player->RepopAtGraveyard(true);
         }
         else if (_player->HasPendingBind())
         {
-            _player->RepopAtGraveyard();
+            _player->RepopAtGraveyard(true);
             _player->SetPendingBind(0, 0);
         }
         else if (_player->GetMapId() != 765 && GetSecurity() < SEC_ADMINISTRATOR)

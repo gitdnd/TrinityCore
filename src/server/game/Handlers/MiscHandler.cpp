@@ -1559,7 +1559,7 @@ void WorldSession::HandleInstanceLockResponse(WorldPacket& recvPacket)
     if (accept)
         _player->BindToInstance();
     else
-        _player->RepopAtGraveyard();
+        _player->RepopAtGraveyard(true);
 
     _player->SetPendingBind(0, 0);
 }

@@ -1711,7 +1711,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetResurrectionSpellId();
         void ResurrectPlayer(float restore_percent, bool applySickness = false);
         void BuildPlayerRepop();
-        void RepopAtGraveyard();
+        void RepopAtGraveyard(bool ignore_overrides = false);
 
         void RemoveGhoul();
 

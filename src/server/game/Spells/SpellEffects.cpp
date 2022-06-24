@@ -3877,7 +3877,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
         // player is in corpse
         if (!player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
             player->BuildPlayerRepop();
-        player->RepopAtGraveyard();
+        player->RepopAtGraveyard(true);
         return;
     }
 

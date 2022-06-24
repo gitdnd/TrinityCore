@@ -1020,7 +1020,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     if (pCurrChar->getDeathState() == CORPSE)
     {
         pCurrChar->BuildPlayerRepop();
-        pCurrChar->RepopAtGraveyard();
+        pCurrChar->RepopAtGraveyard(true);
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
