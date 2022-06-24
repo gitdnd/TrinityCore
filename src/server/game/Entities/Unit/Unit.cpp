@@ -9677,8 +9677,7 @@ void Unit::UpdateCharmAI()
                  ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
                  ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
                  ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52123 ||
-                 ToCreature()->GetCreatureTemplate()->Entry == 52207))
+                 ToCreature()->GetCreatureTemplate()->Entry == 52123))
             {
                 if (GetAI())
                     return;
@@ -11748,8 +11747,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
             ToCreature()->GetCreatureTemplate()->Entry == 52066 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52090 ||
             ToCreature()->GetCreatureTemplate()->Entry == 52104 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52123 ||
-            ToCreature()->GetCreatureTemplate()->Entry == 52207))
+            ToCreature()->GetCreatureTemplate()->Entry == 52123))
         {
             return;
         }
