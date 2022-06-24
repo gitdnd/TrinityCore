@@ -418,7 +418,6 @@ Player::Player(WorldSession* session): Unit(true)
     talent_level = 0;
     _averageItemLevel = 1;
     m_canTeleport = false;
-    magicFind = 0.f;
 }
 
 Player::~Player()
@@ -5134,7 +5133,7 @@ void Player::RepopAtGraveyard()
         float z = 715.5f;
         float o = 4.305573f;
         // If in Floating Cult
-        if (GetMap() && GetMap()->GetId() == 769 && IsDead())
+        if (GetMap() && GetMap()->GetId() == 769 && !IsAlive())
         {
             mapId = 769;
             x = 12325.34f;
@@ -5143,7 +5142,7 @@ void Player::RepopAtGraveyard()
             o = 1.561345f;
         }
         // If in The Vault
-        else if (GetMap() && GetMap()->GetId() == 35 && IsDead())
+        else if (GetMap() && GetMap()->GetId() == 35 && !IsAlive())
         {
             mapId = 35;
             x = -1.115f;
