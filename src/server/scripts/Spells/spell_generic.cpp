@@ -5226,43 +5226,6 @@ class spell_talent_hammer_of_the_north_aura : public AuraScript
     }
 };
 
-class spell_evokers_intellect_aura : public AuraScript
-{
-    PrepareAuraScript(spell_evokers_intellect_aura);
-
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        uint32 spell = eventInfo.GetSpellInfo()->Id;
-
-        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
-            uniqueSpells.clear();
-
-        uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
-
-        if (Aura* evokers = GetCaster()->GetAura(450002))
-            evokers->SetStackAmount(uniqueSpells.size());
-        else
-        {
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(450002))
-            {
-                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetCaster());
-                createInfo.SetCaster(GetCaster());
-
-                if (Aura* evoke = Aura::TryRefreshStackOrCreate(createInfo))
-                    evoke->SetStackAmount(uniqueSpells.size());
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_evokers_intellect_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-
-    std::vector<uint32> uniqueSpells;
-};
-
 class spell_talent_congelation_trigger_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_congelation_trigger_aura);
@@ -5683,7 +5646,6 @@ void AddSC_generic_spell_scripts()
     RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
     RegisterAuraScript(spell_talent_frozenheart_actual_aura);
     RegisterAuraScript(spell_talent_coldtempered_aura);
-    RegisterAuraScript(spell_evokers_intellect_aura);
     RegisterSpellScript(spell_generate_combopoint_all);
     new spell_cold_steel_aura();
     RegisterAuraScript(spell_glaciation_aura);

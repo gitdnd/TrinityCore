@@ -37,14 +37,6 @@
 #include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
-#include "BankPackets.h"
-#include "Chat.h"
-#include "Item.h"
-#include "VirtualItemMgr.h"
-#include "World.h"
-#include "Guild.h"
-#include "Group.h"
 
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader

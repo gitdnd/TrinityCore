@@ -301,6 +301,43 @@ class spell_item_transmog : public SpellScript
     }
 };
 
+class spell_evokers_intellect_aura : public AuraScript
+{
+    PrepareAuraScript(spell_evokers_intellect_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 spell = eventInfo.GetSpellInfo()->Id;
+
+        if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
+            uniqueSpells.clear();
+
+        uniqueSpells.emplace_back(eventInfo.GetSpellInfo()->Id);
+
+        if (Aura* evokers = GetCaster()->GetAura(450002))
+            evokers->SetStackAmount(uniqueSpells.size());
+        else
+        {
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(450002))
+            {
+                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, GetCaster());
+                createInfo.SetCaster(GetCaster());
+
+                if (Aura* evoke = Aura::TryRefreshStackOrCreate(createInfo))
+                    evoke->SetStackAmount(uniqueSpells.size());
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_evokers_intellect_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+
+    std::vector<uint32> uniqueSpells;
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -309,4 +346,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_temporal_time_crystal);
     RegisterSpellScript(spell_item_floating_cult_thesis);
     RegisterSpellScript(spell_item_transmog);
+    RegisterAuraScript(spell_evokers_intellect_aura);
 }
