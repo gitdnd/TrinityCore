@@ -21,6 +21,10 @@ void AddSC_GOMove_commandscript();
 void AddSC_FallOfDalaran();
 void AddSC_DragonIsles();
 void AddSC_chromie_script();
+void AddSC_Spells_Custom_Items();
+void AddSC_Spells_Custom_Talents();
+void AddSC_Spells_Custom_Generic();
+void AddSC_NPCS_Custom_Pets();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -30,4 +34,8 @@ void AddCustomScripts()
     AddSC_FallOfDalaran();
     AddSC_DragonIsles();
     AddSC_chromie_script();
+    AddSC_Spells_Custom_Items();
+    AddSC_Spells_Custom_Talents();
+    AddSC_Spells_Custom_Generic();
+    AddSC_NPCS_Custom_Pets();
 }
