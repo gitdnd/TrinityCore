@@ -923,6 +923,39 @@ public:
     }
 };
 
+class spell_from_the_ashes_proc_engulf : public SpellScriptLoader
+{
+public:
+    spell_from_the_ashes_proc_engulf() : SpellScriptLoader("spell_from_the_ashes_proc_engulf") { }
+
+    class spell_from_the_ashes_proc_engulf_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_from_the_ashes_proc_engulf_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            auto caster = GetCaster();
+            auto target = eventInfo.GetProcTarget();
+            if (!caster || !target ||
+                (eventInfo.GetDamageInfo()->GetDamage() == 0 &&
+                 eventInfo.GetHealInfo()->GetHeal() == 0))
+            {
+                PreventDefaultAction();
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_from_the_ashes_proc_engulf_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_from_the_ashes_proc_engulf_AuraScript();
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -954,4 +987,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_glaciation_aura);
     RegisterSpellScript(spell_frostfire_bolt_combo_spender);
     RegisterSpellScript(spell_ice_barrier_combo_spender);
+    RegisterAuraScript(spell_from_the_ashes_proc_engulf);
 }
