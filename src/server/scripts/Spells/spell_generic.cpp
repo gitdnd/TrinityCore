@@ -4895,16 +4895,20 @@ class spell_talent_engulf_aura : public AuraScript
     {
         auto caster = GetCaster();
         auto target = eventInfo.GetProcTarget();
-        if (!caster || !target)
+        PreventDefaultAction();
+        if (!caster || !target ||
+            (eventInfo.GetDamageInfo()->GetDamage() == 0 &&
+                eventInfo.GetHealInfo()->GetHeal() == 0))
             return;
+        caster->CastSpell(target, 180193, true);
         // 180193 Engulfing Flames
         if (target->HasAura(180193))
         {
             auto aura = target->GetAura(180193);
-            if (aura->GetStackAmount() == 10)
+            if (aura && aura->GetStackAmount() == 10)
             {
                 // Spread 180195 Engulfing Flames (triggers 180193 on nearby ally)
-                target->CastSpell(target, 180195);
+                target->CastSpell(target, 180195, true);
             }
         }
     }
@@ -4930,7 +4934,7 @@ class spell_talent_engulfing_flames_aura : public AuraScript
             if (target->GetAura(180193)->GetStackAmount() >= 10)
             {
                 // Engulf
-                target->CastSpell(target, 180194);
+                target->CastSpell(target, 180194, true);
             }
         }
     }

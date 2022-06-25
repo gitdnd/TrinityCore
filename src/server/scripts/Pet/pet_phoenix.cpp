@@ -16,7 +16,7 @@ enum PhoenixSpells
 
 enum PhoenixTimers
 {
-    TIMER_PHEONIX_FIREBALL = 4000
+    TIMER_PHEONIX_FIREBALL = 3500
 };
 
 class npc_pet_phoenix : public CreatureScript
