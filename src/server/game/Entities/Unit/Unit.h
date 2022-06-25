@@ -1696,6 +1696,7 @@ class TC_GAME_API Unit : public WorldObject
 
         void OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto);
         void OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain, SpellInfo const* spellProto);
+        bool ShouldIgnoreAiSwitch(uint32 entry);
 
     protected:
         explicit Unit (bool isWorldObject);

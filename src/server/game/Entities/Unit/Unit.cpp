@@ -13694,7 +13694,7 @@ void Unit::OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain,
     }
 }
 
-static bool ShouldIgnoreAiSwitch(uint32 entry)
+bool Unit::ShouldIgnoreAiSwitch(uint32 entry)
 {
     switch (entry)
     {
