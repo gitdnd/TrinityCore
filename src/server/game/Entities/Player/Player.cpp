@@ -2612,9 +2612,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
             ++talent_level;
-            CastSpellExtraArgs args = CastSpellExtraArgs();
-            args.SetTriggerFlags(TriggerCastFlags(TRIGGERED_IGNORE_CAST_IN_PROGRESS));
-            CastSpell(this, 90299, args); // Talent level up visual
+            CastSpell(this, 90299, true); // Talent level up visual
             SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
             InitTalentForLevel();
             ChatHandler(GetSession()).SendSysMessage(("Your talent level has increased to " + std::to_string(talent_level) + ".").c_str());
