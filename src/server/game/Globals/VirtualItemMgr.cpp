@@ -486,8 +486,8 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
             case ITEM_SUBCLASS_WEAPON_CROSSBOW:
             {
                 output->Delay = (urand(27, 30, generator) * 100);
-                output->Damage[0].DamageMin = ((1.2f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
-                output->Damage[0].DamageMax = ((1.2f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMin = ((1.35f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
+                output->Damage[0].DamageMax = ((1.35f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
                 break;
             }
@@ -504,7 +504,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
-        if ((output->statGroup == STAT_GROUP_HEALING || output->statGroup == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
+        if ((output->statGroup == STAT_GROUP_HEALING || output->statGroup == STAT_GROUP_INT_DPS) && output->InventoryType != INVTYPE_RANGED)
         {
             output->Damage[0].DamageMin /= 2.0f;
             output->Damage[0].DamageMax /= 2.0f;
