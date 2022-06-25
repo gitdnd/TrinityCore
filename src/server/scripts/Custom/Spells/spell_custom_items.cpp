@@ -338,6 +338,139 @@ class spell_evokers_intellect_aura : public AuraScript
     std::vector<uint32> uniqueSpells;
 };
 
+class spell_item_rename_character : public SpellScript
+{
+    PrepareSpellScript(spell_item_rename_character);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->HasAtLoginFlag(AT_LOGIN_RENAME))
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You are already have a pending rename.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* plrTarget = GetCaster()->ToPlayer())
+            plrTarget->SetAtLoginFlag(AT_LOGIN_RENAME);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_rename_character::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_rename_character::CheckRequirement);
+    }
+};
+
+class spell_item_customize_character : public SpellScript
+{
+    PrepareSpellScript(spell_item_customize_character);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->HasAtLoginFlag(AT_LOGIN_CUSTOMIZE))
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You are already have a pending customization.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* plrTarget = GetCaster()->ToPlayer())
+            plrTarget->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_customize_character::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_customize_character::CheckRequirement);
+    }
+};
+
+class spell_item_faction_change_character : public SpellScript
+{
+    PrepareSpellScript(spell_item_faction_change_character);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->HasAtLoginFlag(AT_LOGIN_CHANGE_FACTION))
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You are already have a pending faction change.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* plrTarget = GetCaster()->ToPlayer())
+            plrTarget->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_faction_change_character::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_faction_change_character::CheckRequirement);
+    }
+};
+
+class spell_item_change_race_character : public SpellScript
+{
+    PrepareSpellScript(spell_item_change_race_character);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (caster->HasAtLoginFlag(AT_LOGIN_CHANGE_RACE))
+        {
+            ChatHandler(caster->GetSession()).PSendSysMessage("You are already have a pending race change.");
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* plrTarget = GetCaster()->ToPlayer())
+            plrTarget->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_change_race_character::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_change_race_character::CheckRequirement);
+    }
+};
+
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -347,4 +480,8 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_floating_cult_thesis);
     RegisterSpellScript(spell_item_transmog);
     RegisterAuraScript(spell_evokers_intellect_aura);
+    RegisterSpellScript(spell_item_rename_character);
+    RegisterSpellScript(spell_item_customize_character);
+    RegisterSpellScript(spell_item_faction_change_character);
+    RegisterSpellScript(spell_item_change_race_character);
 }
