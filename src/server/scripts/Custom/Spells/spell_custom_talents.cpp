@@ -987,5 +987,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_glaciation_aura);
     RegisterSpellScript(spell_frostfire_bolt_combo_spender);
     RegisterSpellScript(spell_ice_barrier_combo_spender);
-    RegisterSpellScript(spell_from_the_ashes_proc_engulf);
+    new spell_from_the_ashes_proc_engulf();
 }
