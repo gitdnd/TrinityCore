@@ -6829,6 +6829,10 @@ void Player::RewardReputation(Quest const* quest)
         if (!rep)
             continue;
 
+        uint32 champFaction = GetChampioningFaction();
+        if (champFaction)
+            rewardFactionId = GetChampioningFaction();
+
         if (quest->IsDaily())
             rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, rewardFactionId, noQuestBonus);
         else if (quest->IsWeekly())

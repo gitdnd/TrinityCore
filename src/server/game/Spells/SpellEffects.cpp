@@ -4271,6 +4271,10 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
 
     uint32 factionId = m_spellInfo->Effects[effIndex].MiscValue;
 
+    uint32 champFaction = player->GetChampioningFaction();
+    if (champFaction)
+        factionId = champFaction;
+
     FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId);
     if (!factionEntry)
         return;
