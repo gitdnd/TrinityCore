@@ -432,7 +432,7 @@ public:
     void LoadLegendaryTemplate();
     legendaryItemInfo const* GetLegendaryItemInfo(uint32 id) const;
     void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier);
-
+    void UpdateHoneDisplaySpell(VirtualItemTemplate* output);
 private:
 
     class StatGroupData

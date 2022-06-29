@@ -1968,6 +1968,17 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     }
 }
 
+void VirtualItemMgr::UpdateHoneDisplaySpell(VirtualItemTemplate* output)
+{
+    output->Spells[HONED_SPELL_SLOT].SpellId = 410000 + output->honePct;
+    output->Spells[HONED_SPELL_SLOT].SpellTrigger = ITEM_SPELLTRIGGER_ON_NO_DELAY_USE;
+    output->Spells[HONED_SPELL_SLOT].SpellCharges = -1;
+    output->Spells[HONED_SPELL_SLOT].SpellPPMRate = 0.f;
+    output->Spells[HONED_SPELL_SLOT].SpellCooldown = -1;
+    output->Spells[HONED_SPELL_SLOT].SpellCategory = 0;
+    output->Spells[HONED_SPELL_SLOT].SpellCategoryCooldown = -1;
+}
+
 uint32 VirtualItemTemplate::GetDBCDisplay()
 {
     // Get the correct display ID
