@@ -5919,7 +5919,7 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
 
-    float honePct = modifier.statPoolPctModifier + vItem->honePct;
+    float honePct = damage + vItem->honePct;
 
     if (honePct > m_spellInfo->Effects[effIndex].MiscValue) // cap
         honePct = m_spellInfo->Effects[effIndex].MiscValue;
