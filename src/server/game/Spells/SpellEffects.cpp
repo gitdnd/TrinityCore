@@ -5941,7 +5941,7 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
     sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
 
     vItem->honePct = honePct;
-    sVirtualItemMgr.UpdateHoleDisplaySpell(vItem);
+    sVirtualItemMgr.UpdateHoneDisplaySpell(vItem);
 
     vItem->InitializeQueryData();
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
