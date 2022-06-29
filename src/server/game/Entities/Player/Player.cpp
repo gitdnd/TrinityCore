@@ -6763,10 +6763,10 @@ void Player::RewardReputation(Unit* victim, float rate)
     if (GetChampioningFaction())
     {
         // support for: Championing - http://www.wowwiki.com/Championing
-        Map const* map = GetMap();
-        if (map->IsNonRaidDungeon())
-            if (LFGDungeonEntry const* dungeon = GetLFGDungeon(map->GetId(), map->GetDifficulty()))
-                if (dungeon->reclevel == 80)
+        //Map const* map = GetMap();
+        //if (map->IsNonRaidDungeon())
+        //    if (LFGDungeonEntry const* dungeon = GetLFGDungeon(map->GetId(), map->GetDifficulty()))
+        //        if (dungeon->reclevel == 80)
                     ChampioningFaction = GetChampioningFaction();
     }
 
@@ -6828,6 +6828,10 @@ void Player::RewardReputation(Quest const* quest)
 
         if (!rep)
             continue;
+
+        uint32 champFaction = GetChampioningFaction();
+        if (champFaction)
+            rewardFactionId = GetChampioningFaction();
 
         if (quest->IsDaily())
             rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, rewardFactionId, noQuestBonus);

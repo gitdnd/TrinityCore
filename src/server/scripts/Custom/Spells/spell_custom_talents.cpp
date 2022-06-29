@@ -16,7 +16,7 @@ class spell_talent_combulstibolt_aura : public AuraScript
         PreventDefaultAction();
         auto caster = GetCaster();
         auto target = eventInfo.GetProcTarget();
-        if (!caster || !target)
+        if (!caster || !target || !eventInfo.GetDamageInfo())
             return;
         auto damage = eventInfo.GetDamageInfo()->GetDamage();
         auto bonusFire = caster->GetBonusSchoolModifierPct(SPELL_SCHOOL_FIRE);
@@ -69,9 +69,7 @@ class spell_talent_engulf_aura : public AuraScript
         auto caster = GetCaster();
         auto target = eventInfo.GetProcTarget();
         PreventDefaultAction();
-        if (!caster || !target ||
-            (eventInfo.GetDamageInfo()->GetDamage() == 0 &&
-                eventInfo.GetHealInfo()->GetHeal() == 0))
+        if (!caster || !target)
             return;
         caster->CastSpell(target, 180193, true);
         // 180193 Engulfing Flames
@@ -850,6 +848,8 @@ public:
             if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
             {
                 PreventDefaultAction();
+                if (!eventInfo.GetDamageInfo())
+                    return;
                 uint32 spell = spellInfo->Effects[0].TriggerSpell;
                 uint32 proc_dmg = (float(eventInfo.GetDamageInfo()->GetDamage()) * (float(aurEff->GetAmount()) / 100.0));
                 CastSpellExtraArgs args(aurEff);
@@ -923,6 +923,41 @@ public:
     }
 };
 
+class spell_from_the_ashes_proc_engulf : public SpellScriptLoader
+{
+public:
+    spell_from_the_ashes_proc_engulf() : SpellScriptLoader("spell_from_the_ashes_proc_engulf") { }
+
+    class spell_from_the_ashes_proc_engulf_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_from_the_ashes_proc_engulf_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            auto caster = GetCaster();
+            auto target = eventInfo.GetProcTarget();
+            auto damageInfo = eventInfo.GetDamageInfo();
+            auto healInfo = eventInfo.GetHealInfo();
+            if (!caster || !target ||
+                ((!damageInfo || damageInfo->GetDamage() == 0) &&
+                (!healInfo || healInfo->GetHeal() == 0)))
+            {
+                PreventDefaultAction();
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_from_the_ashes_proc_engulf_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_from_the_ashes_proc_engulf_AuraScript();
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -954,4 +989,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_glaciation_aura);
     RegisterSpellScript(spell_frostfire_bolt_combo_spender);
     RegisterSpellScript(spell_ice_barrier_combo_spender);
+    new spell_from_the_ashes_proc_engulf();
 }

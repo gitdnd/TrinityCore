@@ -4590,6 +4590,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                 case 57820: // Ebon Champion
                 case 57821: // Champion of the Kirin Tor
                 case 57822: // Wyrmrest Champion
+                case 91021: // Horde Adventurers Champion
+                case 91022: // Alliance Adventurers Champion
                 {
                     if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                         break;
@@ -4604,6 +4606,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             case 57820: FactionID = 1098; break; // Knights of the Ebon Blade
                             case 57821: FactionID = 1090; break; // Kirin Tor
                             case 57822: FactionID = 1091; break; // The Wyrmrest Accord
+                            case 91021: FactionID = 1165; break; // The Horde Adventurers
+                            case 91022: FactionID = 1164; break; // The Alliance Adventurers
                         }
                     }
                     caster->ToPlayer()->SetChampioningFaction(FactionID);
