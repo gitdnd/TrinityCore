@@ -213,7 +213,7 @@ struct itemSpellInfo
 };
 constexpr uint8 MAX_GENERATED_SPELLS = 1;
 constexpr uint8 MAX_LEGENDARY_SPELLS = 3;
-constexpr uint8 HONED_SPELL_SLOT = MAX_GENERATED_SPELLS + MAX_LEGENDARY_SPELLS + 1;
+constexpr uint8 HONED_SPELL_SLOT = MAX_GENERATED_SPELLS + MAX_LEGENDARY_SPELLS;
 
 struct itemSetInfo
 {
