@@ -95,8 +95,26 @@ class spell_generate_combopoint_all : public SpellScript
     }
 };
 
+class spell_gen_fly_in_hub : public AuraScript
+{
+    PrepareAuraScript(spell_gen_fly_in_hub);
+
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        //@todo:Make a function to grab flyable maps
+        if (GetCaster()->GetMapId() != 765 || !GetCaster()->HasAura(450010))
+            PreventDefaultAction();
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_fly_in_hub::HandleApplyEffect, EFFECT_2, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 void AddSC_Spells_Custom_Generic()
 {
     RegisterAuraScript(spell_gen_between_cast_periodic);
     RegisterSpellScript(spell_generate_combopoint_all);
+    RegisterAuraScript(spell_gen_fly_in_hub);
 }
