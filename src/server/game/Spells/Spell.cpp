@@ -7226,10 +7226,10 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                if (m_targets.GetItemTarget()->HasSocketedGems())
+                /*if (m_targets.GetItemTarget()->HasSocketedGems())
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                /*bool foundSocket = false;
+                bool foundSocket = false;
 
                 for (int32 i = 0; i < MAX_GEM_SOCKETS; ++i)
                 {
