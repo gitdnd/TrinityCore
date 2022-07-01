@@ -958,6 +958,16 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     generator.seed(modifier.spellSeed);
 
     std::list<itemSpellInfo> spells;
+    bool hasExistingOnUse = false;
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+        {
+            hasExistingOnUse = true;
+            break;
+        }
+    }
+
     for (itemSpellInfo const &someSpells : availableSpells)
     {
         SelectMinMaxSkip(someSpells.minQuality, someSpells.maxQuality, output->Quality);
@@ -967,11 +977,8 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         SelectSkip(someSpells.inventoryType, output->InventoryType);
         SelectSkip(someSpells.statGroup, output->statGroup);
 
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-        {
-            if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
+        if (someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse) // Don't stack two on use effects.
                 continue;
-        }
 
         if (dontUseType != -1 && someSpells.SpellTrigger == dontUseType)
             continue;
@@ -1945,7 +1952,15 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     std::mt19937 generator;
     generator.seed(modifier.legendarySeed);
     std::list<legendaryItemInfo> legList;
-
+    bool hasExistingOnUse = false;
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
+        {
+            hasExistingOnUse = true;
+            break;
+        }
+    }
     for (auto const& itr : _LegendaryTemplateStore)
     {
         SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, output->ItemLevel);
@@ -1955,14 +1970,8 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
         SelectSkip(itr.second.itemStatGroup, output->statGroup);
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
-            if (itr.second.legendarySpells[i].SpellId != 0 && itr.second.legendarySpells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
-            {
-                for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-                {
-                    if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
-                        continue;
-                }
-            }
+            if (itr.second.legendarySpells[i].SpellId != 0 && itr.second.legendarySpells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse)
+                continue;
         }
         legList.push_back(itr.second);
     }
