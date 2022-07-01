@@ -1349,3 +1349,32 @@ void Item::SaveVirtualItemInfo()
         CharacterDatabase.CommitTransaction(trans);
     }
 }
+
+void Item::ToogleStats(bool apply)
+{
+    if (!IsEquipped())
+        return;
+
+    uint8 slot = GetSlot();
+
+    GetOwner()->_ApplyItemMods(this, GetSlot(), apply);
+
+    if (slot == EQUIPMENT_SLOT_MAINHAND)
+        GetOwner()->UpdateExpertise(BASE_ATTACK);
+
+    else if (slot == EQUIPMENT_SLOT_OFFHAND)
+        GetOwner()->UpdateExpertise(OFF_ATTACK);
+
+    switch (slot)
+    {
+    case EQUIPMENT_SLOT_MAINHAND:
+    case EQUIPMENT_SLOT_OFFHAND:
+    case EQUIPMENT_SLOT_RANGED:
+        GetOwner()->RecalculateRating(CR_ARMOR_PENETRATION);
+    default:
+        break;
+    }
+
+    if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
+        GetOwner()->CheckTitanGripPenalty();
+}

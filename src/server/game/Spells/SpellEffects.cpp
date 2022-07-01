@@ -5740,6 +5740,9 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
+    itemTarget->ToogleStats(false);
+
+
     VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
@@ -5779,6 +5782,8 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
+    itemTarget->ToogleStats(true);
+
 }
 
 void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
@@ -5793,6 +5798,8 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
+    itemTarget->ToogleStats(false);
+
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
     VirtualModifier mod;
     mod.statSeed = vItem->statSeed;
@@ -5804,6 +5811,8 @@ void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
+    itemTarget->ToogleStats(true);
+
 }
 
 void Spell::EffectExtractGems(SpellEffIndex /*effIndex*/)
@@ -5854,6 +5863,9 @@ void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
+    itemTarget->ToogleStats(false);
+
+
     VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
@@ -5893,6 +5905,8 @@ void Spell::EffectItemLevelUpgrade(SpellEffIndex effIndex)
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
+    itemTarget->ToogleStats(true);
+
 }
 
 void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
@@ -5906,6 +5920,8 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
 
     if (!itemTarget)
         return;
+
+    itemTarget->ToogleStats(false);
 
     VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
@@ -5947,4 +5963,5 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
+    itemTarget->ToogleStats(true);
 }
