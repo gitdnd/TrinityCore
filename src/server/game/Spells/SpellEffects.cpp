@@ -5774,6 +5774,8 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
+    sVirtualItemMgr.GenerateLegendaryItemEffect(vItem, modifier);
+    player->ApplyVirtualItemLegendayEffects(itemTarget);
     sVirtualItemMgr.GenerateStatGroup(vItem, modifier);
     sVirtualItemMgr.GenerateBaseStats(vItem, modifier);
     sVirtualItemMgr.GenerateItemStats(vItem, modifier);
@@ -5781,8 +5783,6 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
     //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
     sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
-    sVirtualItemMgr.GenerateLegendaryItemEffect(vItem, modifier);
-    player->ApplyVirtualItemLegendayEffects(itemTarget);
 
     vItem->seed = modifier.seed;
     vItem->displaySeed = modifier.displaySeed;
