@@ -967,6 +967,12 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         SelectSkip(someSpells.inventoryType, output->InventoryType);
         SelectSkip(someSpells.statGroup, output->statGroup);
 
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        {
+            if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
+                continue;
+        }
+
         if (dontUseType != -1 && someSpells.SpellTrigger == dontUseType)
             continue;
 
@@ -1947,6 +1953,17 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
         SelectSkip(itr.second.itemSubClass, output->SubClass);
         SelectSkip(itr.second.itemInventoryType, output->InventoryType);
         SelectSkip(itr.second.itemStatGroup, output->statGroup);
+        for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
+        {
+            if (itr.second.legendarySpells[i].SpellId != 0 && itr.second.legendarySpells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            {
+                for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+                {
+                    if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
+                        continue;
+                }
+            }
+        }
         legList.push_back(itr.second);
     }
 
