@@ -5660,6 +5660,19 @@ void Spell::EffectReRollVirtualItemSockets(SpellEffIndex /*effIndex*/)
     if (!itemTarget)
         return;
 
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    {
+        uint32 enchant_id = itemTarget->GetEnchantmentId(EnchantmentSlot(enchant_slot));
+        if (!enchant_id)
+            continue;
+
+        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+        if (!enchantEntry)
+            continue;
+
+        player->ApplyEnchantment(itemTarget, EnchantmentSlot(enchant_slot), false);
+        itemTarget->SetEnchantment(EnchantmentSlot(enchant_slot), 0, 0, 0, player->GetGUID());
+    }
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
     VirtualModifier mod;

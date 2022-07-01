@@ -7229,7 +7229,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (m_targets.GetItemTarget()->HasSocketedGems())
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
-                bool foundSocket = false;
+                /*bool foundSocket = false;
 
                 for (int32 i = 0; i < MAX_GEM_SOCKETS; ++i)
                 {
@@ -7238,7 +7238,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 }
 
                 if (!foundSocket)
-                    return SPELL_FAILED_NO_VALID_TARGETS;
+                    return SPELL_FAILED_NO_VALID_TARGETS;*/
 
                 break;
             }
