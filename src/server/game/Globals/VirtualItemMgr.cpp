@@ -978,7 +978,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         SelectSkip(someSpells.statGroup, output->statGroup);
 
         if (someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse) // Don't stack two on use effects.
-                continue;
+            continue;
 
         if (dontUseType != -1 && someSpells.SpellTrigger == dontUseType)
             continue;
