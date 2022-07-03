@@ -1024,7 +1024,20 @@ itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModi
 
 void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
-    uint8 numOfSpell = 1;
+
+    uint8 numOfSpell = 0;
+
+    // Only Guarantee spells on trinkets
+    if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+        numOfSpell = 1;
+    else
+    {
+        std::mt19937 generator;
+        generator.seed(modifier.spellSeed);
+        float randChance = frand(0.f, 100.f, generator);
+        if (randChance >= sWorld->getFloatConfig(WorldFloatConfigs(CONFIG_ITEMGEN_SPELL_CHANCE_POOR + output->Quality - 1)))
+            numOfSpell = 1;
+    }
 
     if (numOfSpell > MAX_GENERATED_SPELLS)
         numOfSpell = MAX_GENERATED_SPELLS;
@@ -1914,7 +1927,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
 
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
-            _Spell spell;
+            _Spell spell = _Spell();
             spell.SpellId = 0;
             spell.SpellTrigger = 0;
             spell.SpellCharges = -1;

@@ -1500,6 +1500,13 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_RARE] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Rare", 1.2f);
     m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_EPIC] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Epic", 1.3f);
     m_float_configs[CONFIG_ITEMGEN_QUALITYMOD_LEGENDARY] = sConfigMgr->GetFloatDefault("ItemGenerator.QualityMod.Legendary", 1.4f);
+    m_float_configs[CONFIG_ITEMGEN_SPELL_CHANCE_POOR] = sConfigMgr->GetFloatDefault("ItemGenerator.SpellChance.Poor", 0.f);
+    m_float_configs[CONFIG_ITEMGEN_SPELL_CHANCE_NORMAL] = sConfigMgr->GetFloatDefault("ItemGenerator.SpellChance.Normal", 0.f);
+    m_float_configs[CONFIG_ITEMGEN_SPELL_CHANCE_UNCOMMON] = sConfigMgr->GetFloatDefault("ItemGenerator.SpellChance.UnCommon", 0.f);
+    m_float_configs[CONFIG_ITEMGEN_SPELL_CHANCE_RARE] = sConfigMgr->GetFloatDefault("ItemGenerator.SpellChance.Rare", 0.f);
+    m_float_configs[CONFIG_ITEMGEN_SPELL_CHANCE_EPIC] = sConfigMgr->GetFloatDefault("ItemGenerator.SpellChance.Epic", 0.f);
+    m_float_configs[CONFIG_ITEMGEN_SPELL_CHANCE_LEGENDARY] = sConfigMgr->GetFloatDefault("ItemGenerator.SpellChance.Legendary", 0.f);
+
 
     m_int_configs[CONFIG_ITEMGEN_STATSLOT_PRIMARY_COMMON] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Primary.Common", 1);
     m_int_configs[CONFIG_ITEMGEN_STATSLOT_SECONDARY_COMMON] = sConfigMgr->GetIntDefault("ItemGenerator.StatSlot.Secondary.Common", 1);
