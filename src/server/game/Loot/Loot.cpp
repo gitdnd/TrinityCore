@@ -287,11 +287,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
-    uint32 debugMf = 0;
-    std::ostringstream debug;
 
-    debug << "Loot Owner: " << lootOwner->GetName().c_str() << " MF: " << lootOwner->GetMagicFind() << " Aura MF: " << lootOwner->GetAuraAmount(SPELL_AURA_MAGIC_FIND);
-    sWorld->SendGMText(debug.str().c_str());
     VirtualModifier modifier = VirtualModifier();
     Group* group = lootOwner->GetGroup();
 

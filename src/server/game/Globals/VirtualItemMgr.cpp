@@ -1160,10 +1160,6 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     float magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
 
     output->generatedMagicFind = magicFind;
-
-    std::ostringstream debug;
-    debug << "Genearted MF: " << output->generatedMagicFind;
-    sWorld->SendGMText(debug.str().c_str());
     
     // these are not percentage chances. They represent areas of a number line made from their sum
     static const uint32 chances[MAX_ITEM_QUALITY] = {
