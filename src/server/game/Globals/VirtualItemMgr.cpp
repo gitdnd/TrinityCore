@@ -1189,6 +1189,9 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
         sum = 0;
         for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
         {
+            if (chances[i] <= 0)
+                continue;
+
             sum += chances[i];
             if (sum < rand)
                 continue;
