@@ -977,6 +977,12 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         SelectSkip(someSpells.inventoryType, output->InventoryType);
         SelectSkip(someSpells.statGroup, output->statGroup);
 
+        if(someSpells.itemClass <= -2)
+        {
+            if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
+                continue;
+        }
+
         if (someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse) // Don't stack two on use effects.
             continue;
 
