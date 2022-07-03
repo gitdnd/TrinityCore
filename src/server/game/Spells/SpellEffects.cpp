@@ -5798,7 +5798,6 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
     itemTarget->ToogleStats(true);
-
 }
 
 void Spell::EffectReRollVirtualItem(SpellEffIndex effIndex)

@@ -1698,6 +1698,7 @@ class TC_GAME_API Unit : public WorldObject
         void OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain, SpellInfo const* spellProto);
         bool ShouldIgnoreAiSwitch(uint32 entry);
 
+        int32 GetAuraAmount(uint32 aura_type);
     protected:
         explicit Unit (bool isWorldObject);
 

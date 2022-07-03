@@ -13712,3 +13712,13 @@ bool Unit::ShouldIgnoreAiSwitch(uint32 entry)
     }
     return false;
 }
+
+int32 Unit::GetAuraAmount(uint32 aura_type)
+{
+    int32 amnt = 0;
+    AuraEffectList const& aurAmnt = GetAuraEffectsByType(AuraType(aura_type));
+    for (AuraEffect const* aurEff : aurAmnt)
+        amnt += aurEff->GetAmount();
+
+    return amnt;
+}
