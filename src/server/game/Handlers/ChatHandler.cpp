@@ -267,9 +267,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             msg.erase(end, msg.end());
         }
 
-        // validate hyperlinks
-        if (!ValidateHyperlinksAndMaybeKick(msg))
-            return;
+        if (AccountMgr::IsPlayerAccount(GetSecurity()))
+        {
+            // validate hyperlinks
+            if (!ValidateHyperlinksAndMaybeKick(msg))
+                return;
+        }
     }
 
     if (lang != LANG_ADDON)
