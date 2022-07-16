@@ -1081,14 +1081,14 @@ struct MapEntry
     // Helpers
     uint32 Expansion() const { return addon; }
 
-    bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || MapID == 768; } // 768 The Timeways
-    bool IsNonRaidDungeon() const { return map_type == MAP_INSTANCE || MapID == 768; } // 768 The Timeways
-    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA || MapID == 768; } // 768 The Timeways
+    bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || MapID == 768 || MapID == 770; } // 768 The Timeways, 770 Orgrimmar Arena
+    bool IsNonRaidDungeon() const { return map_type == MAP_INSTANCE || MapID == 768 || MapID == 770; } // 768 The Timeways, 770 Orgrimmar Arena
+    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA || MapID == 768 || MapID == 770; } // 768 The Timeways, 770 Orgrimmar Arena
     bool IsRaid() const { return map_type == MAP_RAID; }
     bool IsBattleground() const { return map_type == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return map_type == MAP_ARENA; }
     bool IsBattlegroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
-    bool IsWorldMap() const { return map_type == MAP_COMMON && MapID != 768; } // 768 The Timeways
+    bool IsWorldMap() const { return map_type == MAP_COMMON && MapID != 768 && MapID != 770; } // 768 The Timeways
 
     bool GetEntrancePos(int32 &mapid, float &x, float &y) const
     {
