@@ -361,7 +361,10 @@ class spell_item_rename_character : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Player* plrTarget = GetCaster()->ToPlayer())
+        {
             plrTarget->SetAtLoginFlag(AT_LOGIN_RENAME);
+            ChatHandler(plrTarget->GetSession()).PSendSysMessage("Logout to apply your rename.");
+        }
     }
 
     void Register() override
@@ -394,7 +397,10 @@ class spell_item_customize_character : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Player* plrTarget = GetCaster()->ToPlayer())
+        {
             plrTarget->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+            ChatHandler(plrTarget->GetSession()).PSendSysMessage("Logout to apply your recustomization.");
+        }
     }
 
     void Register() override
@@ -427,7 +433,10 @@ class spell_item_faction_change_character : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Player* plrTarget = GetCaster()->ToPlayer())
+        {
             plrTarget->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+            ChatHandler(plrTarget->GetSession()).PSendSysMessage("Logout to apply your faction change.");
+        }
     }
 
     void Register() override
@@ -460,7 +469,10 @@ class spell_item_change_race_character : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Player* plrTarget = GetCaster()->ToPlayer())
+        {
             plrTarget->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+            ChatHandler(plrTarget->GetSession()).PSendSysMessage("Logout to apply your race change.");
+        }
     }
 
     void Register() override
