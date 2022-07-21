@@ -737,12 +737,16 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
         return;
 
     uint32 dungeonId = 0;
-
+    //debug: Remove ASAP
+    std::ostringstream debug;
+    debug << "UpdateEncounterState ";
+    
     for (auto const& encounter : *encounters)
     {
         if (encounter->creditType == type && encounter->creditEntry == creditEntry)
         {
             completedEncounters |= 1 << encounter->dbcEntry->encounterIndex;
+            debug << " found encounter " << encounter->dbcEntry << " encounter index " << encounter->dbcEntry->encounterIndex << " encounterMask " << completedEncounters;
             if (encounter->lastEncounterDungeon)
             {
                 dungeonId = encounter->lastEncounterDungeon;
@@ -751,7 +755,7 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
             }
         }
     }
-
+    sWorld->SendGMText(debug.str().c_str());
     if (dungeonId)
     {
         Map::PlayerList const& players = instance->GetPlayers();

@@ -1434,6 +1434,10 @@ void LFGMgr::FinishDungeon(ObjectGuid gguid, const uint32 dungeonId, Map const* 
 
     if (GetState(gguid) == LFG_STATE_FINISHED_DUNGEON) // Shouldn't happen. Do not reward multiple times
     {
+        // debug: Remove ASAP
+        std::ostringstream debug;
+        debug << " LFGMgr::FinishDungeon called twice, dungeon id " << gDungeonId;
+        sWorld->SendGMText(debug.str().c_str());
         TC_LOG_DEBUG("lfg.dungeon.finish", "Group: %s already rewarded", gguid.ToString().c_str());
         return;
     }
