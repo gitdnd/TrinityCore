@@ -25,6 +25,7 @@ void AddSC_Spells_Custom_Items();
 void AddSC_Spells_Custom_Talents();
 void AddSC_Spells_Custom_Generic();
 void AddSC_NPCS_Custom_Pets();
+void AddSC_Instance_Dummies();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -38,4 +39,5 @@ void AddCustomScripts()
     AddSC_Spells_Custom_Talents();
     AddSC_Spells_Custom_Generic();
     AddSC_NPCS_Custom_Pets();
+    AddSC_Instance_Dummies();
 }
