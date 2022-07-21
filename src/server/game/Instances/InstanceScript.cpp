@@ -746,7 +746,7 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
         if (encounter->creditType == type && encounter->creditEntry == creditEntry)
         {
             completedEncounters |= 1 << encounter->dbcEntry->encounterIndex;
-            debug << " found encounter " << encounter->dbcEntry << " encounter index " << encounter->dbcEntry->encounterIndex << " encounterMask " << completedEncounters;
+            debug << " found encounter " << encounter->dbcEntry->id << " encounter index " << encounter->dbcEntry->encounterIndex << " encounterMask " << completedEncounters;
             if (encounter->lastEncounterDungeon)
             {
                 dungeonId = encounter->lastEncounterDungeon;
