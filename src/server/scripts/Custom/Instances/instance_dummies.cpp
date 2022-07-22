@@ -62,9 +62,30 @@ public:
     }
 };
 
+class instance_valour_keep : public InstanceMapScript
+{
+public:
+    instance_valour_keep() : InstanceMapScript("instance_valour_keep", 763) { }
+
+    struct instance_valour_keep_InstanceMapScript : public InstanceScript
+    {
+        instance_valour_keep_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders("VK");
+            SetBossNumber(7);
+        }
+    };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_valour_keep_InstanceMapScript(map);
+    }
+};
+
 void AddSC_Instance_Dummies()
 {
     new instance_kara_crypts();
     new instance_fall_of_dalaran();
     new instance_northshire_siege();
+    new instance_valour_keep();
 }
