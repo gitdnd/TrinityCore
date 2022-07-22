@@ -42,8 +42,29 @@ public:
     }
 };
 
+class instance_northshire_siege : public InstanceMapScript
+{
+public:
+    instance_northshire_siege() : InstanceMapScript("instance_northshire_siege", 762) { }
+
+    struct instance_northshire_siege_InstanceMapScript : public InstanceScript
+    {
+        instance_northshire_siege_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders("NS");
+            SetBossNumber(3);
+        }
+    };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_northshire_siege_InstanceMapScript(map);
+    }
+};
+
 void AddSC_Instance_Dummies()
 {
     new instance_kara_crypts();
     new instance_fall_of_dalaran();
+    new instance_northshire_siege();
 }
