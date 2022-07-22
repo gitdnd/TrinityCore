@@ -2017,11 +2017,11 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
         if (m_CastItem->GetEnchantmentId(EnchantmentSlot(j)))
             pNewItem->SetEnchantment(EnchantmentSlot(j), m_CastItem->GetEnchantmentId(EnchantmentSlot(j)), m_CastItem->GetEnchantmentDuration(EnchantmentSlot(j)), m_CastItem->GetEnchantmentCharges(EnchantmentSlot(j)));
 
-    if (m_CastItem->GetUInt32Value(ITEM_FIELD_DURABILITY) < m_CastItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY))
+    /*if (m_CastItem->GetUInt32Value(ITEM_FIELD_DURABILITY) < m_CastItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY))
     {
         double lossPercent = 1 - m_CastItem->GetUInt32Value(ITEM_FIELD_DURABILITY) / double(m_CastItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY));
         player->DurabilityLoss(pNewItem, lossPercent);
-    }
+    }*/
 
     if (player->IsInventoryPos(pos))
     {
@@ -4767,6 +4767,9 @@ void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectDurabilityDamage(SpellEffIndex effIndex)
 {
+    // Disable this spell effect for now since we repurpose durability logic.
+    return;
+
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
@@ -4796,6 +4799,9 @@ void Spell::EffectDurabilityDamage(SpellEffIndex effIndex)
 
 void Spell::EffectDurabilityDamagePCT(SpellEffIndex effIndex)
 {
+    // Disable this spell effect for now since we repurpose durability logic.
+    return;
+
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 

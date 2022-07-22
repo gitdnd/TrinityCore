@@ -4897,7 +4897,7 @@ void Spell::TakeAmmo()
         if (item->GetMaxStackCount() == 1)
         {
             // decrease durability for non-stackable throw weapon
-            player->DurabilityPointLossForEquipSlot(EQUIPMENT_SLOT_RANGED);
+            // player->DurabilityPointLossForEquipSlot(EQUIPMENT_SLOT_RANGED);
         }
         else
         {
