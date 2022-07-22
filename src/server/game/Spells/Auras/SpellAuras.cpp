@@ -1168,8 +1168,13 @@ bool Aura::CanBeSaved() const
         case 73822: // Hellscream's Warsong
         case 73828: // Strength of Wrynn
         case 450003: //Evoker's Intellect Proc
+        case 51520: //Fall of dalaran morphs
             return false;
     }
+
+    //Fall of dalaran morphs
+    if (GetId() >= 51534 && GetId() <= 51552)
+        return false;
 
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())
