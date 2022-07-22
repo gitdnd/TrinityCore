@@ -72,7 +72,7 @@ public:
         instance_valour_keep_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetHeaders("VK");
-            SetBossNumber(7);
+            SetBossNumber(4);
         }
     };
 
