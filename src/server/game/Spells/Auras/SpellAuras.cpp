@@ -1169,6 +1169,7 @@ bool Aura::CanBeSaved() const
         case 73828: // Strength of Wrynn
         case 450003: //Evoker's Intellect Proc
         case 51520: //Fall of dalaran morphs
+        case 90061: // Medivh's Dream
             return false;
     }
 
