@@ -533,7 +533,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     std::ostringstream debug;
     uint32 durability = round((output->ItemLevel * (output->Quality / 10)) + 25);
     debug << "ILvL " << output->ItemLevel << " Quality " << output->Quality << " Quality Mod " << output->Quality / 10 << " ilvl * quality " << output->ItemLevel * (output->Quality / 10) << " final " << durability;
-    sWorld->SendGMText(debug.str().c_str())
+    sWorld->SendGMText(debug.str().c_str());
      //output->MaxDurability = 0; // Disable any form of durability for now
     output->MaxDurability = durability; // ToDo: Change or make static? 
 }
