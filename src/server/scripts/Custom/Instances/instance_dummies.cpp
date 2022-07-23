@@ -82,10 +82,52 @@ public:
     }
 };
 
+class instance_worlds_end : public InstanceMapScript
+{
+public:
+    instance_worlds_end() : InstanceMapScript("instance_worlds_end", 309) { }
+
+    struct instance_worlds_end_InstanceMapScript : public InstanceScript
+    {
+        instance_worlds_end_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders("WE");
+            SetBossNumber(4);
+        }
+    };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_worlds_end_InstanceMapScript(map);
+    }
+};
+
+class instance_stromgarde : public InstanceMapScript
+{
+public:
+    instance_stromgarde() : InstanceMapScript("instance_stromgarde", 309) { }
+
+    struct instance_stromgarde_InstanceMapScript : public InstanceScript
+    {
+        instance_stromgarde_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders("SG");
+            SetBossNumber(7);
+        }
+    };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_stromgarde_InstanceMapScript(map);
+    }
+};
+
 void AddSC_Instance_Dummies()
 {
     new instance_kara_crypts();
     new instance_fall_of_dalaran();
     new instance_northshire_siege();
     new instance_valour_keep();
+    new instance_worlds_end();
+    new instance_stromgarde();
 }

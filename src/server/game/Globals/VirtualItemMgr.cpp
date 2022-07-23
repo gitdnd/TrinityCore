@@ -530,7 +530,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // apply other item data
     output->ItemLevel = ilevel;
-    std::ostringstream debug;
      //output->MaxDurability = 0; // Disable any form of durability for now
     output->MaxDurability = round(float((output->ItemLevel * (output->Quality / 10.f)) + 25));
 }
