@@ -7181,22 +7181,8 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             case SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE:
             case SPELL_EFFECT_REROLL_VIRTUAL_ITEM:
             {
-                if (!m_targets.GetItemTarget())
+                if (!IsVirtualItemTargetValid())
                     return SPELL_FAILED_NO_VALID_TARGETS;
-
-                // prevent disenchanting in trade slot
-                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
-                    return SPELL_FAILED_NOT_WHILE_TRADING;
-
-                if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
-                {
-                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
-                        return SPELL_FAILED_NO_VALID_TARGETS;
-                }
-                else
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
                     return SPELL_FAILED_NO_VALID_TARGETS;
@@ -7205,22 +7191,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS:
             {
-                if (!m_targets.GetItemTarget())
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                // prevent disenchanting in trade slot
-                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
-                    return SPELL_FAILED_NOT_WHILE_TRADING;
-
-                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
-                {
-                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
-                        return SPELL_FAILED_NO_VALID_TARGETS;
-                }
-                else
+                if (!IsVirtualItemTargetValid())
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
@@ -7244,22 +7215,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE:
             {
-                if (!m_targets.GetItemTarget())
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                // prevent disenchanting in trade slot
-                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
-                    return SPELL_FAILED_NOT_WHILE_TRADING;
-
-                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
-                {
-                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
-                        return SPELL_FAILED_NO_VALID_TARGETS;
-                }
-                else
+                if (!IsVirtualItemTargetValid())
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if(m_targets.GetItemTarget()->GetTemplate()->Quality != (uint32)m_spellInfo->Effects[i].MiscValue-1)
@@ -7269,14 +7225,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_EXTRACT_GEMS:
             {
-                if (!m_targets.GetItemTarget())
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                // prevent disenchanting in trade slot
-                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
-                    return SPELL_FAILED_NOT_WHILE_TRADING;
-
-                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                if (!IsVirtualItemTargetValid())
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (m_spellInfo->Effects[i].BasePoints > 0 && m_spellInfo->Effects[i].BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
@@ -7288,21 +7237,11 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_HONE_VIRTUAL_ITEM:
             {
-                if (!m_targets.GetItemTarget())
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-                // prevent disenchanting in trade slot
-                if (m_targets.GetItemTarget()->GetOwnerGUID() != player->GetGUID())
-                    return SPELL_FAILED_NOT_WHILE_TRADING;
-
-                if (!sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+                if (!IsVirtualItemTargetValid())
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
                 {
-                    if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
-                        return SPELL_FAILED_NO_VALID_TARGETS;
-
                     if(vTemp->honePct >= (uint32)m_spellInfo->Effects[i].MiscValue)
                         return SPELL_FAILED_NO_VALID_TARGETS;
 
@@ -7317,10 +7256,6 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                             return SPELL_FAILED_NO_VALID_TARGETS;
                     }
                 }
-                else
-                    return SPELL_FAILED_NO_VALID_TARGETS;
-
-
                 break;
             }
             default:
@@ -8040,6 +7975,29 @@ void Spell::AssertEffectExecuteData() const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         ASSERT(!m_effectExecuteData[i]);
+}
+
+bool Spell::IsVirtualItemTargetValid() const
+{
+    if (!m_targets.GetItemTarget())
+        return false;
+
+    // prevent disenchanting in trade slot
+    if (m_targets.GetItemTarget()->GetOwnerGUID() != GetCaster()->GetGUID())
+        return false;
+
+    if (m_targets.GetItemTarget()->IsBroken())
+        return false;
+
+    if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
+    {
+        if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
+            return false;
+    }
+    else
+        return false;
+
+    return true;
 }
 
 void Spell::LoadScripts()
