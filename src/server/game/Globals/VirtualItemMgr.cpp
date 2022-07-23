@@ -531,7 +531,8 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     // apply other item data
     output->ItemLevel = ilevel;
     //output->MaxDurability = 0; // Disable any form of durability for now
-    output->MaxDurability = 25 + (ilevel * (output->Quality / 10)); // ToDo: Change or make static? 
+    uint32 durability = round(25 + (output->ItemLevel * (output->Quality / 10)));
+    output->MaxDurability = durability; // ToDo: Change or make static? 
 }
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
