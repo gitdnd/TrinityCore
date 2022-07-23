@@ -249,7 +249,8 @@ public:
             return true;
         }
 
-        int val = atoi((char*)args);
+        int32 val = atoi((char*)args);
+
         if (val < 0)
             val = 0;
 
@@ -264,9 +265,13 @@ public:
 
     static bool HandleSetGMVisibleDetectCommand(ChatHandler* handler, char const* args)
     {
+        if (!*args)
+            return false;
+
         Player* _player = handler->GetSession()->GetPlayer();
 
-        int val = atoi((char*)args);
+        int32 val = atoi((char*)args);
+
         if (val < 0)
             val = 0;
 

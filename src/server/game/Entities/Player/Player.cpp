@@ -18504,6 +18504,9 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     _LoadEquipmentSets(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
+    if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+        SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+
     return true;
 }
 
