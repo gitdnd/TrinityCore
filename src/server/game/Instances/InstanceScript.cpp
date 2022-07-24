@@ -755,7 +755,7 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
             }
         }
     }
-    sWorld->SendGMText(debug.str().c_str());
+    //sWorld->SendGMText(debug.str().c_str());
     if (dungeonId)
     {
         Map::PlayerList const& players = instance->GetPlayers();
