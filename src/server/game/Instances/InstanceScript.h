@@ -303,6 +303,8 @@ class TC_GAME_API InstanceScript : public ZoneScript
 
         bool _SkipCheckRequiredBosses(Player const* player = nullptr) const;
 
+        uint8 GetMaxCombatReses() { return maxCombatReses; }
+        uint8 GetCurrentCombatReses() { return currentCombatReses; };
     private:
         static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
         void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
@@ -324,6 +326,9 @@ class TC_GAME_API InstanceScript : public ZoneScript
     #endif // #ifndef TRINITY_API_USE_DYNAMIC_LINKING
 
         friend class debug_commandscript;
+
+        uint8 maxCombatReses;
+        uint8 currentCombatReses;
 };
 
 #endif // TRINITY_INSTANCE_DATA_H

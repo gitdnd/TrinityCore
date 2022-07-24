@@ -114,6 +114,7 @@ public:
             { "creature_text_locale",          rbac::RBAC_PERM_COMMAND_RELOAD_CRETURE_TEXT_LOCALE,              true,  &HandleReloadLocalesCreatureTextCommand,        "" },
             { "gameobject_template_locale",    rbac::RBAC_PERM_COMMAND_RELOAD_GAMEOBJECT_TEMPLATE_LOCALE,       true,  &HandleReloadLocalesGameobjectCommand,          "" },
             { "gossip_menu_option_locale",     rbac::RBAC_PERM_COMMAND_RELOAD_GOSSIP_MENU_OPTION_LOCALE,        true,  &HandleReloadLocalesGossipMenuOptionCommand,    "" },
+            { "item_template",                 rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_TEMPLATE,                true,  &HandleReloadItemTemplateCommand,           "" },
             { "item_template_locale",          rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_TEMPLATE_LOCALE,             true,  &HandleReloadLocalesItemCommand,                "" },
             { "item_set_name_locale",          rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_SET_NAME_LOCALE,             true,  &HandleReloadLocalesItemSetNameCommand,         "" },
             { "npc_text_locale",               rbac::RBAC_PERM_COMMAND_RELOAD_NPC_TEXT_LOCALE,                  true,  &HandleReloadLocalesNpcTextCommand,             "" },
@@ -1208,6 +1209,31 @@ public:
         handler->SendGlobalGMSysMessage("RBAC data reloaded.");
         return true;
     }
+
+    static bool HandleReloadItemTemplateCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        Tokenizer entries(std::string(args), ' ');
+
+        for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
+        {
+            uint32 entry = uint32(atoi(*itr));
+
+            sObjectMgr->LoadItemTemplate(entry);
+            if (const ItemTemplate* reloadItem = sObjectMgr->GetItemTemplate(entry))
+            {
+                WorldPacket response = reloadItem->BuildQueryData(LOCALE_enUS);
+                sWorld->SendGlobalMessage(&response);
+            }
+            
+        }
+        handler->SendGlobalGMSysMessage("item template reloaded.");
+        return true;
+    }
+
+
 };
 
 void AddSC_reload_commandscript()
