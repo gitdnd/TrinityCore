@@ -447,18 +447,23 @@ public:
                 continue;
             }
 
-            CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry);
+            /*CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry);
             if (!cInfo)
             {
                 handler->PSendSysMessage(LANG_COMMAND_CREATURESTORAGE_NOTFOUND, entry);
                 continue;
-            }
+            }*/
 
             TC_LOG_INFO("misc", "Reloading creature template entry %u", entry);
 
             Field* fields = result->Fetch();
-            sObjectMgr->LoadCreatureTemplate(fields);
-            sObjectMgr->CheckCreatureTemplate(cInfo);
+            sObjectMgr->LoadCreatureTemplateCustom(fields);
+            if (const CreatureTemplate* reloadCreature = sObjectMgr->GetCreatureTemplate(entry))
+            {
+                sObjectMgr->CheckCreatureTemplate(reloadCreature);
+                WorldPacket response = reloadCreature->BuildQueryData(LOCALE_enUS);
+                sWorld->SendGlobalMessage(&response);
+            }
         }
 
         sObjectMgr->InitializeQueriesData(QUERY_DATA_CREATURES);
