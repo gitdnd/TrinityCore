@@ -4095,7 +4095,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->generatedMagicFind = fields[i++].GetFloat();
         itemTemplate->honePct = fields[i++].GetFloat();
 
-        //itemTemplate->MaxDurability = 0;
+        itemTemplate->MaxDurability = round(float((itemTemplate->ItemLevel * (itemTemplate->Quality / 10.f)) + 25));;
         //itemTemplate->UpdateDisplay();
 
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))
