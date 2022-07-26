@@ -5941,10 +5941,25 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
+    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+
+    float honePct = damage + vItem->honePct;
+
+    if (honePct > m_spellInfo->Effects[effIndex].MiscValue) // cap
+        honePct = m_spellInfo->Effects[effIndex].MiscValue;
+
+    float honeChance = 100 - ((vItem->honePct / m_spellInfo->Effects[effIndex].MiscValue) * 100);
+
+    if (!roll_chance_f(honeChance))
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage("Your honing has failed and the item has been damaged.");
+        player->DurabilityLoss(itemTarget, float(5) / 100.0f);
+        return;
+    }
+ 
     itemTarget->ToogleStats(false);
 
     VirtualModifier modifier;
-    VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
     modifier.quality = vItem->Quality;
     modifier.seed = vItem->seed;
@@ -5959,10 +5974,6 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
 
-    float honePct = damage + vItem->honePct;
-
-    if (honePct > m_spellInfo->Effects[effIndex].MiscValue) // cap
-        honePct = m_spellInfo->Effects[effIndex].MiscValue;
 
     modifier.statPoolPctModifier = honePct;
 

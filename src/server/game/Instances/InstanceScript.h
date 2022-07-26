@@ -269,6 +269,10 @@ class TC_GAME_API InstanceScript : public ZoneScript
         void ResetAreaTriggerDone(uint32 id) { _activatedAreaTriggers.erase(id); }
         bool IsAreaTriggerDone(uint32 id) const { return _activatedAreaTriggers.find(id) != _activatedAreaTriggers.end(); }
 
+        uint8 GetMaxCombatReses() { return maxCombatReses; }
+        uint8 GetCurrentCombatReses() { return currentCombatReses; };
+        void UseCombatResCharge();
+
     protected:
         void SetHeaders(std::string const& dataHeaders);
         void SetBossNumber(uint32 number) { bosses.resize(number); }
@@ -303,8 +307,7 @@ class TC_GAME_API InstanceScript : public ZoneScript
 
         bool _SkipCheckRequiredBosses(Player const* player = nullptr) const;
 
-        uint8 GetMaxCombatReses() { return maxCombatReses; }
-        uint8 GetCurrentCombatReses() { return currentCombatReses; };
+
     private:
         static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
         void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);

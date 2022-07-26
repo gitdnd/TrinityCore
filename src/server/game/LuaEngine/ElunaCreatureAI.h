@@ -149,6 +149,11 @@ struct ElunaCreatureAI : ScriptedAI
                     player->RemoveAurasDueToSpell(90191); // Dungeon Death
                 }
             }
+
+            if (me->GetInstanceScript())
+            {
+                me->GetInstanceScript()->DoUpdateWorldState(304, me->GetInstanceScript()->GetMaxCombatReses());
+            }
         }
         if (!sEluna->JustDied(me, killer))
             ScriptedAI::JustDied(killer);

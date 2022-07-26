@@ -815,3 +815,9 @@ bool InstanceHasScript(WorldObject const* obj, char const* scriptName)
 
     return false;
 }
+
+void InstanceScript::UseCombatResCharge()
+{
+    currentCombatReses -= 1;
+    DoUpdateWorldState(304, currentCombatReses);
+}
