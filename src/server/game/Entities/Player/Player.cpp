@@ -4931,13 +4931,13 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
 
 void Player::DurabilityPointsLoss(Item* item, int32 points)
 {
-    item->SetUInt32Value(ITEM_FIELD_DURABILITY, item->GetTemplate()->MaxDurability);
-    return;
-    if (HasAuraType(SPELL_AURA_PREVENT_DURABILITY_LOSS))
-        return;
+    //item->SetUInt32Value(ITEM_FIELD_DURABILITY, item->GetTemplate()->MaxDurability);
+    //return;
+    //if (HasAuraType(SPELL_AURA_PREVENT_DURABILITY_LOSS))
+        //return;
 
     // Hack to disable durability loss, ez
-    points = 0;
+    //points = 0;
 
     int32 pMaxDurability = item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
     int32 pOldDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
