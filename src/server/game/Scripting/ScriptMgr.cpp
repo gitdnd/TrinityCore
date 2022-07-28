@@ -1077,9 +1077,9 @@ void ScriptMgr::Initialize()
 
         if (hackdelete)
         {
-            WorldDatabase.PQuery("update creature_template set ScriptName = '' where ScriptName = %s", scriptName.c_str());
-            WorldDatabase.PQuery("update gameobject_template set ScriptName = '' where ScriptName = %s", scriptName.c_str());
-            WorldDatabase.PQuery("Delete from spell_script_names where ScriptName = '%s'", scriptName.c_str());
+            WorldDatabase.PQuery("update creature_template set ScriptName = \"\" where ScriptName = \"%s\"", scriptName.c_str());
+            WorldDatabase.PQuery("update gameobject_template set ScriptName = \"\" where ScriptName = \"%s\"", scriptName.c_str());
+            WorldDatabase.PQuery("Delete from spell_script_names where ScriptName = \"%s\"", scriptName.c_str());
         }
 
         TC_LOG_ERROR("sql.sql", "ScriptName '%s' exists in database, "
