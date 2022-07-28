@@ -285,7 +285,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Generate the items sockets based on type and quality
     GenerateSockets(output, modifier);
 
-    // Add spells to items like trinkets and legendaries(todo)
+    // Add spells to items like trinkets
     GenerateSpells(output, modifier);
 
     // Generate primary and secondary stats.

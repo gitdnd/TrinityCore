@@ -1067,13 +1067,20 @@ void ScriptMgr::Initialize()
 
     // Remove the used scripts from the given container.
     sScriptRegistryCompositum->RemoveUsedScriptsFromContainer(unusedScriptNames);
-
+    bool hackdelete = sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT);
     for (std::string const& scriptName : unusedScriptNames)
     {
         // Avoid complaining about empty script names since the
         // script name container contains a placeholder as the 0 element.
         if (scriptName.empty())
             continue;
+
+        if (hackdelete)
+        {
+            WorldDatabase.PQuery("update creature_template set ScriptName = '' where ScriptName = %s", scriptName.c_str());
+            WorldDatabase.PQuery("update gameobject_template set ScriptName = '' where ScriptName = %s", scriptName.c_str());
+            WorldDatabase.PQuery("Delete from spell_script_names where ScriptName = '%s'", scriptName.c_str());
+        }
 
         TC_LOG_ERROR("sql.sql", "ScriptName '%s' exists in database, "
                      "but no core script found!", scriptName.c_str());
