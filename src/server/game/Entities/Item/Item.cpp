@@ -481,7 +481,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     if (GetItemRandomPropertyId() < 0)
         UpdateItemSuffixFactor();
 
-    uint32 durability = std::clamp((uint32)fields[8].GetUInt16(), 0, proto->MaxDurability);
+    uint32 durability = std::clamp((uint32)fields[8].GetUInt16(), (uint32)0, proto->MaxDurability);
     SetUInt32Value(ITEM_FIELD_DURABILITY, durability);
     // update max durability (and durability) if need
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, proto->MaxDurability);
