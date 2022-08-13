@@ -687,6 +687,7 @@ public:
 
         // Name, spawn, guid, entry, faction, display should be last, this is the most important info to read
         handler->PSendSysMessage(LANG_NPCINFO_CHAR, npcflags, faction, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, displayid, nativeid, target->GetDungeonLevel());
+        handler->PSendSysMessage("Main Hand Damage: %f/%f\nOff Hand Damage: %f/%f\nRanged Damage: %f/%f", target->GetFloatValue(UNIT_FIELD_MINDAMAGE), target->GetFloatValue(UNIT_FIELD_MAXDAMAGE), target->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE), target->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE), target->GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE), target->GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
 
         return true;
     }
