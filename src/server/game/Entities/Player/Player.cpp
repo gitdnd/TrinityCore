@@ -2445,7 +2445,8 @@ void Player::SetGameMaster(bool on)
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
         SetFactionForRace(GetRace());
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
-        RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+        if(!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+            RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
             pet->SetFaction(GetFaction());
