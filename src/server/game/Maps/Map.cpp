@@ -4838,8 +4838,10 @@ int Map::GetCappedDungeonLevel() const
 void Map::SetDungeonLevel(uint32 value)
 {
     i_dungeonLevel = value;
-    for (auto itr = GetCreatureBySpawnIdStore().begin(); itr != GetCreatureBySpawnIdStore().end(); ++itr)
+    for (auto itr = i_worldObjects.begin(); itr != i_worldObjects.end(); ++itr)
     {
-        itr->second->UpdateDungeonScaling(value);
+        WorldObject* obj = *itr;
+        if (Creature* creatureObject = obj->ToCreature())
+            creatureObject->UpdateDungeonScaling(value);
     }
 }

@@ -75,6 +75,8 @@ public:
             { "standstate",   rbac::RBAC_PERM_COMMAND_MODIFY_STANDSTATE,   false, &HandleModifyStandStateCommand,    "" },
             { "talentpoints", rbac::RBAC_PERM_COMMAND_MODIFY_TALENTPOINTS, false, &HandleModifyTalentCommand,        "" },
             { "xp",           rbac::RBAC_PERM_COMMAND_MODIFY_XP,           false, &HandleModifyXPCommand,            "" },
+            //@todo: Add own rbac perm
+            { "dungeonlevel",           rbac::RBAC_PERM_COMMAND_MODIFY_XP, false, &HandleModifyDungeonLevel,         "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -1020,6 +1022,25 @@ public:
 
         // we can run the command
         target->GiveXP(xp, nullptr);
+        return true;
+    }
+
+    static bool HandleModifyDungeonLevel(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        int32 dungeonLevel = atoi((char*)args);
+
+        if (dungeonLevel < 20)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // we can run the command
+        handler->getSelectedPlayerOrSelf()->GetMap()->SetDungeonLevel(dungeonLevel);
         return true;
     }
 };
