@@ -1040,7 +1040,9 @@ public:
         }
 
         // we can run the command
+        handler->PSendSysMessage("Setting dungeon level to %i.", dungeonLevel);
         handler->getSelectedPlayerOrSelf()->GetMap()->SetDungeonLevel(dungeonLevel);
+        handler->PSendSysMessage("Finished setting dungeon level to %i.", dungeonLevel);
         return true;
     }
 };

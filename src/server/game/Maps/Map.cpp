@@ -4838,7 +4838,7 @@ int Map::GetCappedDungeonLevel() const
 void Map::SetDungeonLevel(uint32 value)
 {
     i_dungeonLevel = value;
-    for (auto itr = i_worldObjects.begin(); itr != i_worldObjects.end(); ++itr)
+    for (auto itr = m_activeNonPlayers.begin(); itr != m_activeNonPlayers.end(); ++itr)
     {
         WorldObject* obj = *itr;
         if (Creature* creatureObject = obj->ToCreature())
