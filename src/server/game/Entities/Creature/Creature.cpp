@@ -3488,6 +3488,9 @@ void Creature::UpdateDungeonScaling(uint32 newLevel)
 
         health = uint32(health * dungeonLevelMod);
     }
+    std::ostringstream debug;
+    debug << " Updating " << GetName().c_str() << " from " << GetHealth() << " to " << health;
+    sWorld->SendGMText(debug.str().c_str());
     float preScaleHealthPct = GetHealthPct();
     SetCreateHealth(health);
     SetMaxHealth(health);
