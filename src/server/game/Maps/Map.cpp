@@ -4838,14 +4838,14 @@ int Map::GetCappedDungeonLevel() const
 void Map::SetDungeonLevel(uint32 value)
 {
     i_dungeonLevel = value;
-    std::ostringstream debug;
+    //std::ostringstream debug;
     for (auto itr = _creatureBySpawnIdStore.begin(); itr != _creatureBySpawnIdStore.end(); ++itr)
     {
-        debug << "Updating: ";
+        //debug << "Updating: ";
         Creature* obj = itr->second;
-        debug << obj->GetName().c_str() << " ";
+        //debug << obj->GetName().c_str() << " ";
         obj->UpdateDungeonScaling(value);
-        sWorld->SendGMText(debug.str().c_str());
+        //sWorld->SendGMText(debug.str().c_str());
     }
 
 }
