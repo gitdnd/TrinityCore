@@ -4844,7 +4844,7 @@ void Map::SetDungeonLevel(int value)
         //debug << "Updating: ";
         Creature* obj = itr->second;
         //debug << obj->GetName().c_str() << " ";
-        obj->UpdateDungeonScaling(value);
+        obj->UpdateDungeonScaling();
         //sWorld->SendGMText(debug.str().c_str());
     }
 
