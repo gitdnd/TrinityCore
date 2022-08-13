@@ -4834,3 +4834,12 @@ int Map::GetCappedDungeonLevel() const
 {
    return std::clamp<int>(i_dungeonLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
 }
+
+void Map::SetDungeonLevel(uint32 value)
+{
+    i_dungeonLevel = value;
+    for (auto itr = GetCreatureBySpawnIdStore().begin(); itr != GetCreatureBySpawnIdStore().end(); ++itr)
+    {
+        itr->second->UpdateDungeonScaling(value);
+    }
+}

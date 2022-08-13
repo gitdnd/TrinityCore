@@ -451,6 +451,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         MapDifficulty const* GetMapDifficulty() const;
         int GetDungeonLevel() const { return i_dungeonLevel; }
         int GetCappedDungeonLevel() const;
+        void SetDungeonLevel(uint32 value);
         bool Instanceable() const;
         bool IsDungeon() const;
         bool IsNonRaidDungeon() const;

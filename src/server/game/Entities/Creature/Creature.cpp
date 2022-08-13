@@ -3460,3 +3460,66 @@ int Creature::GetDungeonLevel() const
 
     return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
 }
+
+void Creature::UpdateDungeonScaling(uint32 newLevel)
+{
+    CreatureTemplate const* cInfo = GetCreatureTemplate();
+    uint32 rank = IsPet() ? 0 : cInfo->rank;
+    CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
+
+    // health
+    float healthmod = _GetHealthMod(rank);
+
+    uint32 basehp = stats->GenerateHealth(cInfo);
+    uint32 health = uint32(basehp * healthmod);
+
+    if (newLevel > 0 && newLevel <= 10000)
+    {
+        // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
+        float dungeonLevelMod = (std::pow(float(newLevel), 2) / 10000.0f) + 1.0f;
+        if (newLevel < 50)
+            dungeonLevelMod = dungeonLevelMod * 0.5;
+        else if (newLevel < 60)
+            dungeonLevelMod = dungeonLevelMod * 0.65;
+        else if (newLevel < 75)
+            dungeonLevelMod = dungeonLevelMod * 0.8;
+        else if (newLevel > 250)
+            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(newLevel, 2)) / 500000.0f) + 0.88f);
+
+        health = uint32(health * dungeonLevelMod);
+    }
+    float preScaleHealthPct = GetHealthPct();
+    SetCreateHealth(health);
+    SetMaxHealth(health);
+    SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
+    SetHealth(CountPctFromMaxHealth(preScaleHealthPct));
+
+    float basedamage = stats->GenerateBaseDamage(cInfo);
+
+    if (newLevel > 0 && newLevel < 10000)
+    {
+        // FIXME(Harry): Come up with a better scaling system
+        float dungeonLevelMod = (std::pow(float(newLevel), 2) / 15000.0f) + 1.0f;
+        if (newLevel < 50)
+            dungeonLevelMod = dungeonLevelMod * 0.5;
+        else if (newLevel > 250)
+            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(newLevel, 2)) / 100000.0f) + 0.38f);
+
+        basedamage = uint32(basedamage * dungeonLevelMod);
+    }
+
+    float weaponBaseMinDamage = basedamage;
+    float weaponBaseMaxDamage = basedamage * 1.5f;
+
+    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, weaponBaseMinDamage);
+    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
+
+    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, weaponBaseMinDamage);
+    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
+
+    SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, weaponBaseMinDamage);
+    SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
+
+    ApplyScaledResistances();
+    ApplyScaledArmor();
+}
