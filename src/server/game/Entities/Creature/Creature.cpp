@@ -3475,7 +3475,7 @@ void Creature::UpdateDungeonScaling()
 
     int dungeonLevel = GetDungeonLevel();
 
-    if (dungeonLevel > 0 && dungeonLevel <= 10000)
+    if (dungeonLevel)
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
         float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
@@ -3490,10 +3490,7 @@ void Creature::UpdateDungeonScaling()
 
         health = uint32(health * dungeonLevelMod);
     }
-
-    //std::ostringstream debug;
-    //debug << " Updating " << GetName().c_str() << " from " << GetHealth() << " to " << health;
-    //sWorld->SendGMText(debug.str().c_str());
+    // Get health before scaling to preserve current boss progress @todo: Scale up the player damage loot requirements with dungeon level changes.
     float preScaleHealthPct = GetHealthPct();
     SetCreateHealth(health);
     SetMaxHealth(health);
@@ -3502,7 +3499,7 @@ void Creature::UpdateDungeonScaling()
 
     float basedamage = stats->GenerateBaseDamage(cInfo);
 
-    if (dungeonLevel > 0 && dungeonLevel < 10000)
+    if (dungeonLevel)
     {
         // FIXME(Harry): Come up with a better scaling system
         float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
