@@ -4835,7 +4835,7 @@ int Map::GetCappedDungeonLevel() const
    return std::clamp<int>(i_dungeonLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
 }
 
-void Map::SetDungeonLevel(uint32 value)
+void Map::SetDungeonLevel(int value)
 {
     i_dungeonLevel = value;
     //std::ostringstream debug;

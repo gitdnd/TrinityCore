@@ -3461,7 +3461,7 @@ int Creature::GetDungeonLevel() const
     return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
 }
 
-void Creature::UpdateDungeonScaling(uint32 newLevel)
+void Creature::UpdateDungeonScaling()
 {
     CreatureTemplate const* cInfo = GetCreatureTemplate();
     uint32 rank = IsPet() ? 0 : cInfo->rank;
@@ -3473,21 +3473,24 @@ void Creature::UpdateDungeonScaling(uint32 newLevel)
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
 
-    if (newLevel > 0 && newLevel <= 10000)
+    int dungeonLevel = GetDungeonLevel();
+
+    if (dungeonLevel > 0 && dungeonLevel <= 10000)
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
-        float dungeonLevelMod = (std::pow(float(newLevel), 2) / 10000.0f) + 1.0f;
-        if (newLevel < 50)
+        float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
+        if (dungeonLevel < 50)
             dungeonLevelMod = dungeonLevelMod * 0.5;
-        else if (newLevel < 60)
+        else if (dungeonLevel < 60)
             dungeonLevelMod = dungeonLevelMod * 0.65;
-        else if (newLevel < 75)
+        else if (dungeonLevel < 75)
             dungeonLevelMod = dungeonLevelMod * 0.8;
-        else if (newLevel > 250)
-            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(newLevel, 2)) / 500000.0f) + 0.88f);
+        else if (dungeonLevel > 250)
+            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(dungeonLevel, 2)) / 500000.0f) + 0.88f);
 
         health = uint32(health * dungeonLevelMod);
     }
+
     //std::ostringstream debug;
     //debug << " Updating " << GetName().c_str() << " from " << GetHealth() << " to " << health;
     //sWorld->SendGMText(debug.str().c_str());
@@ -3499,14 +3502,14 @@ void Creature::UpdateDungeonScaling(uint32 newLevel)
 
     float basedamage = stats->GenerateBaseDamage(cInfo);
 
-    if (newLevel > 0 && newLevel < 10000)
+    if (dungeonLevel > 0 && dungeonLevel < 10000)
     {
         // FIXME(Harry): Come up with a better scaling system
-        float dungeonLevelMod = (std::pow(float(newLevel), 2) / 15000.0f) + 1.0f;
-        if (newLevel < 50)
+        float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
+        if (dungeonLevel < 50)
             dungeonLevelMod = dungeonLevelMod * 0.5;
-        else if (newLevel > 250)
-            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(newLevel, 2)) / 100000.0f) + 0.38f);
+        else if (dungeonLevel > 250)
+            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
 
         basedamage = uint32(basedamage * dungeonLevelMod);
     }
