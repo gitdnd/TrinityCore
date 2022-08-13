@@ -4839,16 +4839,12 @@ void Map::SetDungeonLevel(uint32 value)
 {
     i_dungeonLevel = value;
     std::ostringstream debug;
-    for (auto itr = m_activeNonPlayers.begin(); itr != m_activeNonPlayers.end(); ++itr)
+    for (auto itr = _creatureBySpawnIdStore.begin(); itr != _creatureBySpawnIdStore.end(); ++itr)
     {
         debug << "Updating: ";
-        WorldObject* obj = *itr;
+        Creature* obj = itr->second;
         debug << obj->GetName().c_str() << " ";
-        if (Creature* creatureObject = obj->ToCreature())
-        {
-            debug << " is creature ";
-            creatureObject->UpdateDungeonScaling(value);
-        }
+        obj->UpdateDungeonScaling(value);
         sWorld->SendGMText(debug.str().c_str());
     }
 
