@@ -3522,8 +3522,10 @@ void Creature::UpdateDungeonScaling()
     SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, weaponBaseMinDamage);
     SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
 
-    SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
-    SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
+    //SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
+    //SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
+    UpdateAttackPowerAndDamage();
+    UpdateAttackPowerAndDamage(true);
     debug << " new " << m_weaponDamage[BASE_ATTACK][MINDAMAGE][0] << " unit field " << GetFloatValue(UNIT_FIELD_MINDAMAGE);
     sWorld->SendGMText(debug.str().c_str());
     ApplyScaledResistances();
