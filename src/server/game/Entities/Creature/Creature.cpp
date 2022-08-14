@@ -3467,7 +3467,6 @@ void Creature::UpdateDungeonScaling()
     uint32 rank = IsPet() ? 0 : cInfo->rank;
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
 
-    // health
     float healthmod = _GetHealthMod(rank);
 
     uint32 basehp = stats->GenerateHealth(cInfo);
@@ -3478,7 +3477,6 @@ void Creature::UpdateDungeonScaling()
     float weaponBaseMinDamage = stats->GenerateBaseDamage(cInfo);
 
     int dungeonLevel = GetDungeonLevel();
-    std::ostringstream debug;
 
     if (dungeonLevel)
     {
@@ -3502,8 +3500,7 @@ void Creature::UpdateDungeonScaling()
         else if (dungeonLevel > 250)
             dungeonDamageLevelMod *= (float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f;
 
-        weaponBaseMinDamage = uint32(weaponBaseMinDamage * dungeonDamageLevelMod);
-        debug << "Previous min damage " << m_weaponDamage[BASE_ATTACK][MINDAMAGE][0] << " unit field " << GetFloatValue(UNIT_FIELD_MINDAMAGE) << " calc " << weaponBaseMinDamage;
+        weaponBaseMinDamage *= dungeonDamageLevelMod;
     }
 
     SetCreateHealth(health);
@@ -3522,12 +3519,8 @@ void Creature::UpdateDungeonScaling()
     SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, weaponBaseMinDamage);
     SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
 
-    //SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
-    //SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
-    debug << " new " << m_weaponDamage[BASE_ATTACK][MINDAMAGE][0] << " unit field " << GetFloatValue(UNIT_FIELD_MINDAMAGE);
-    sWorld->SendGMText(debug.str().c_str());
     ApplyScaledResistances();
     ApplyScaledArmor();
 }
