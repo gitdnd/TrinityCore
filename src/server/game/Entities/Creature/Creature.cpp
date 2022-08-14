@@ -3472,47 +3472,46 @@ void Creature::UpdateDungeonScaling()
 
     uint32 basehp = stats->GenerateHealth(cInfo);
     uint32 health = uint32(basehp * healthmod);
+    // Get health before scaling to preserve current boss progress @todo: Scale up the player damage loot requirements with dungeon level changes.
+    float preScaleHealthPct = GetHealthPct();
+
+    float weaponBaseMinDamage = stats->GenerateBaseDamage(cInfo);
 
     int dungeonLevel = GetDungeonLevel();
+    std::ostringstream debug;
 
     if (dungeonLevel)
     {
         // FIXME(Harry): Come up with a better scaling system (((dungeonLevel^2)/10000)+1)
         float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 10000.0f) + 1.0f;
         if (dungeonLevel < 50)
-            dungeonLevelMod = dungeonLevelMod * 0.5;
+            dungeonLevelMod *= 0.5;
         else if (dungeonLevel < 60)
-            dungeonLevelMod = dungeonLevelMod * 0.65;
+            dungeonLevelMod *= 0.65;
         else if (dungeonLevel < 75)
-            dungeonLevelMod = dungeonLevelMod * 0.8;
+            dungeonLevelMod *= 0.8;
         else if (dungeonLevel > 250)
-            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(dungeonLevel, 2)) / 500000.0f) + 0.88f);
+            dungeonLevelMod *= (float(std::pow(dungeonLevel, 2)) / 500000.0f) + 0.88f;
 
         health = uint32(health * dungeonLevelMod);
+
+        // FIXME(Harry): Come up with a better scaling system
+        float dungeonDamageLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
+        if (dungeonLevel < 50)
+            dungeonDamageLevelMod *= 0.5;
+        else if (dungeonLevel > 250)
+            dungeonDamageLevelMod *= (float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f;
+
+        weaponBaseMinDamage = uint32(weaponBaseMinDamage * dungeonDamageLevelMod);
+        debug << "Previous min damage " << m_weaponDamage[BASE_ATTACK][MINDAMAGE][0] << " unit field " << GetFloatValue(UNIT_FIELD_MINDAMAGE) << " calc " << weaponBaseMinDamage;
     }
-    // Get health before scaling to preserve current boss progress @todo: Scale up the player damage loot requirements with dungeon level changes.
-    float preScaleHealthPct = GetHealthPct();
+
     SetCreateHealth(health);
     SetMaxHealth(health);
     SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
     SetHealth(CountPctFromMaxHealth(preScaleHealthPct));
 
-    float basedamage = stats->GenerateBaseDamage(cInfo);
-
-    if (dungeonLevel)
-    {
-        // FIXME(Harry): Come up with a better scaling system
-        float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
-        if (dungeonLevel < 50)
-            dungeonLevelMod = dungeonLevelMod * 0.5;
-        else if (dungeonLevel > 250)
-            dungeonLevelMod = dungeonLevelMod * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
-
-        basedamage = uint32(basedamage * dungeonLevelMod);
-    }
-
-    float weaponBaseMinDamage = basedamage;
-    float weaponBaseMaxDamage = basedamage * 1.5f;
+    float weaponBaseMaxDamage = weaponBaseMinDamage * 1.5f;
 
     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, weaponBaseMinDamage);
     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
@@ -3525,7 +3524,8 @@ void Creature::UpdateDungeonScaling()
 
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
-
+    debug << " new " << m_weaponDamage[BASE_ATTACK][MINDAMAGE][0] << " unit field " << GetFloatValue(UNIT_FIELD_MINDAMAGE);
+    sWorld->SendGMText(debug.str().c_str());
     ApplyScaledResistances();
     ApplyScaledArmor();
 }
