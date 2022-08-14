@@ -41,6 +41,7 @@
 class Battleground;
 class BattlegroundMap;
 class CreatureGroup;
+class Eluna;
 class GameObjectModel;
 class Group;
 class InstanceMap;
@@ -320,6 +321,7 @@ inline bool CompareRespawnInfo::operator()(RespawnInfo const* a, RespawnInfo con
 class TC_GAME_API Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
+    friend class Eluna;
     public:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, Map* _parent = nullptr);
         virtual ~Map();
@@ -646,7 +648,8 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         }
 
         virtual std::string GetDebugInfo() const;
-
+        Eluna* GetEluna() const { return eluna; }
+        Eluna* eluna;
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
