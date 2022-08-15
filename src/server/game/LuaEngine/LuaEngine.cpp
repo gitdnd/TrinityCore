@@ -80,8 +80,6 @@ void Eluna::Initialize()
 
     LoadScriptPaths();
 
-    eventMgr = new EventMgr(this);
-    RunScripts();
 
     // Must be before creating GEluna
     // This is checked on Eluna creation
@@ -89,6 +87,9 @@ void Eluna::Initialize()
 
     // Create global eluna
     GEluna = new Eluna();
+
+    eventMgr = new EventMgr(this);
+    RunScripts();
 }
 
 void Eluna::Uninitialize()
