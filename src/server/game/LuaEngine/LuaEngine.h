@@ -135,7 +135,7 @@ public:
     Eluna& operator=(const Eluna&) = delete;
 private:
     static bool reload;
-    static bool initialized;
+    bool initialized;
     static LockType lock;
 
     // Lua script locations
@@ -250,12 +250,12 @@ public:
 
     BindingMap< UniqueObjectKey<Hooks::CreatureEvents> >*  CreatureUniqueBindings;
 
-    static void Initialize();
-    static void Uninitialize();
+    void Initialize();
+    void Uninitialize();
     // This function is used to make eluna reload
     static void ReloadEluna() { LOCK_ELUNA; reload = true; }
     static LockType& GetLock() { return lock; };
-    static bool IsInitialized() { return initialized; }
+    bool const IsInitialized() { return initialized; }
     // Never returns nullptr
     static Eluna* GetEluna(lua_State* L)
     {
@@ -318,7 +318,7 @@ public:
 
     void RunScripts();
     bool ShouldReload() const { return reload; }
-    bool IsEnabled() const { return enabled && IsInitialized(); }
+    bool IsEnabled() const { return enabled && initialized; }
     bool HasLuaState() const { return L != NULL; }
     uint64 GetCallstackId() const { return callstackid; }
     int Register(lua_State* L, uint8 reg, uint32 entry, uint64 guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);

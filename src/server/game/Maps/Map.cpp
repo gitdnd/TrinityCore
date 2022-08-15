@@ -77,6 +77,7 @@ Map::~Map()
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
+    eluna->Uninitialize();
     delete eluna;
     eluna = nullptr;
 
@@ -278,6 +279,7 @@ m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transpo
 i_gridExpiry(expiry),
 i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
 {
+    eluna->Initialize();
     m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {

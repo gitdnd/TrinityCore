@@ -62,7 +62,7 @@ std::string Eluna::lua_folderpath;
 std::string Eluna::lua_requirepath;
 Eluna* Eluna::GEluna = NULL;
 bool Eluna::reload = false;
-bool Eluna::initialized = false;
+//bool Eluna::initialized = false;
 Eluna::LockType Eluna::lock;
 
 extern void RegisterFunctions(Eluna* E);
@@ -71,14 +71,17 @@ void Eluna::Initialize()
 {
     LOCK_ELUNA;
     ASSERT(!IsInitialized());
-
+    /*
 #if defined TRINITY || AZEROTHCORE
     // For instance data the data column needs to be able to hold more than 255 characters (tinytext)
     // so we change it to TEXT automatically on startup
     CharacterDatabase.DirectExecute("ALTER TABLE `instance` CHANGE COLUMN `data` `data` TEXT NOT NULL");
-#endif
+#endif*/
 
     LoadScriptPaths();
+
+    eventMgr = new EventMgr(this);
+    RunScripts();
 
     // Must be before creating GEluna
     // This is checked on Eluna creation
@@ -135,7 +138,7 @@ void Eluna::LoadScriptPaths()
 void Eluna::_ReloadEluna()
 {
     LOCK_ELUNA;
-    ASSERT(IsInitialized());
+    //ASSERT(IsInitialized());
 
     eWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
 
@@ -193,7 +196,7 @@ CreatureUniqueBindings(NULL)
 
     // Set event manager. Must be after setting sEluna
     // on multithread have a map of state pointers and here insert this pointer to the map and then save a pointer of that pointer to the EventMgr
-    eventMgr = new EventMgr(&Eluna::GEluna);
+    //eventMgr = new EventMgr(&Eluna::GEluna);
 }
 
 Eluna::~Eluna()

@@ -1678,8 +1678,8 @@ void World::SetInitialWorldSettings()
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
-    TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
-    Eluna::Initialize();
+    //TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
+    //Eluna::Initialize();
 #endif
 
     ///- Initialize pool manager
@@ -2323,8 +2323,8 @@ void World::SetInitialWorldSettings()
 #ifdef ELUNA
     ///- Run eluna scripts.
     // in multithread foreach: run scripts
-    sEluna->RunScripts();
-    sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
+    //sEluna->RunScripts();
+    //sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
 #endif
 
     // Preload all cells, if required for the base maps
