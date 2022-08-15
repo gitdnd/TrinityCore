@@ -87,9 +87,6 @@ void Eluna::Initialize()
 
     // Create global eluna
     GEluna = new Eluna();
-
-    eventMgr = new EventMgr(this);
-    RunScripts();
 }
 
 void Eluna::Uninitialize()
@@ -189,9 +186,12 @@ InstanceEventBindings(NULL),
 
 CreatureUniqueBindings(NULL)
 {
-    ASSERT(IsInitialized());
+    Initialize();
+    //ASSERT(IsInitialized());
 
     OpenLua();
+    eventMgr = new EventMgr(this);
+    RunScripts();
 
     // Replace this with map insert if making multithread version
 
