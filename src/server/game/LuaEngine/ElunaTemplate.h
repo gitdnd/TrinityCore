@@ -18,37 +18,46 @@ extern "C"
 #include "SharedDefines.h"
 #include "ElunaCompat.h"
 
+
 class ElunaGlobal
 {
 public:
+    struct ElunaRegister
+    {
+        const char* name;
+        int(*mfunc)(Eluna*);
+    };
+
     static int thunk(lua_State* L)
     {
-        luaL_Reg* l = static_cast<luaL_Reg*>(lua_touserdata(L, lua_upvalueindex(1)));
-        int top = lua_gettop(L);
-        int expected = l->func(L);
-        int args = lua_gettop(L) - top;
-        if (args < 0 || args > expected)
+        ElunaRegister* l = static_cast<ElunaRegister*>(lua_touserdata(L, lua_upvalueindex(1)));
+        Eluna* E = static_cast<Eluna*>(lua_touserdata(L, lua_upvalueindex(2)));
+        int args = lua_gettop(L);
+        int expected = l->mfunc(E);
+        args = lua_gettop(L) - args;
+        if (args < 0 || args > expected) // Assert instead?
         {
             ELUNA_LOG_ERROR("[Eluna]: %s returned unexpected amount of arguments %i out of %i. Report to devs", l->name, args, expected);
-            ASSERT(false);
         }
-        lua_settop(L, top + expected);
+        for (; args < expected; ++args)
+            lua_pushnil(L);
         return expected;
     }
 
-    static void SetMethods(Eluna* E, luaL_Reg* methodTable)
+    static void SetMethods(Eluna* E, ElunaRegister* methodTable)
     {
-        ASSERT(E);
-        ASSERT(methodTable);
+        if (!methodTable)
+            return;
 
         lua_pushglobaltable(E->L);
 
-        for (; methodTable && methodTable->name && methodTable->func; ++methodTable)
+        for (; methodTable && methodTable->name && methodTable->mfunc; ++methodTable)
         {
             lua_pushstring(E->L, methodTable->name);
             lua_pushlightuserdata(E->L, (void*)methodTable);
-            lua_pushcclosure(E->L, thunk, 1);
-            lua_rawset(E->L, -3);
+            lua_pushlightuserdata(E->L, (void*)E);
+            lua_pushcclosure(E->L, thunk, 2);
+            lua_settable(E->L, -3);
         }
 
         lua_remove(E->L, -1);
@@ -116,7 +125,7 @@ template<typename T>
 struct ElunaRegister
 {
     const char* name;
-    int(*mfunc)(lua_State*, T*);
+    int(*mfunc)(Eluna*, T*);
 };
 
 template<typename T>

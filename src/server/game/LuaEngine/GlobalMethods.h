@@ -1182,7 +1182,7 @@ namespace LuaGlobalFunctions
     /**
      * Reloads the Lua engine.
      */
-    int ReloadEluna(lua_State* /*L*/)
+    int ReloadEluna(Eluna* /*L*/)
     {
         Eluna::ReloadEluna();
         return 0;
@@ -2040,7 +2040,7 @@ namespace LuaGlobalFunctions
     /**
      * Saves all [Player]s.
      */
-    int SaveAllPlayers(lua_State* /*L*/)
+    int SaveAllPlayers(Eluna* /*L*/)
     {
         eObjectAccessor()SaveAllPlayers();
         return 0;
