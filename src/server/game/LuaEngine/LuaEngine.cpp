@@ -60,7 +60,7 @@ Eluna::ScriptList Eluna::lua_scripts;
 Eluna::ScriptList Eluna::lua_extensions;
 std::string Eluna::lua_folderpath;
 std::string Eluna::lua_requirepath;
-Eluna* Eluna::GEluna = NULL;
+//Eluna* Eluna::GEluna = NULL;
 bool Eluna::reload = false;
 //bool Eluna::initialized = false;
 Eluna::LockType Eluna::lock;
@@ -86,7 +86,7 @@ void Eluna::Initialize()
     initialized = true;
 
     // Create global eluna
-    GEluna = new Eluna();
+    //GEluna = new Eluna();
 }
 
 void Eluna::Uninitialize()
@@ -94,8 +94,8 @@ void Eluna::Uninitialize()
     LOCK_ELUNA;
     ASSERT(IsInitialized());
 
-    delete GEluna;
-    GEluna = NULL;
+    //delete GEluna;
+    //GEluna = NULL;
 
     lua_scripts.clear();
     lua_extensions.clear();

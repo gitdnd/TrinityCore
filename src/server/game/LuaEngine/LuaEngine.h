@@ -225,7 +225,7 @@ private:
     void Push(T const* ptr)                     { Push(L, ptr); ++push_counter; }
 
 public:
-    static Eluna* GEluna;
+    //static Eluna* GEluna;
 
     lua_State* L;
     EventMgr* eventMgr;
@@ -557,5 +557,5 @@ template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);
 template<> WorldObject* Eluna::CHECKOBJ<WorldObject>(lua_State* L, int narg, bool error);
 template<> ElunaObject* Eluna::CHECKOBJ<ElunaObject>(lua_State* L, int narg, bool error);
 
-#define sEluna Eluna::GEluna
+//#define sEluna Eluna::GEluna
 #endif
