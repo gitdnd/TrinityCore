@@ -18,14 +18,14 @@ namespace LuaGameObject
      * @param uint32 questId : quest entry Id to check
      * @return bool hasQuest
      */
-    int HasQuest(lua_State* L, GameObject* go)
+    int HasQuest(Eluna* E, GameObject* go)
     {
-        uint32 questId = Eluna::CHECKVAL<uint32>(L, 2);
+        uint32 questId = Eluna::CHECKVAL<uint32>(E->L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(L, go->hasQuest(questId));
+        Eluna::Push(E->L, go->hasQuest(questId));
 #else
-        Eluna::Push(L, go->HasQuest(questId));
+        Eluna::Push(E->L, go->HasQuest(questId));
 #endif
         return 1;
     }
@@ -35,9 +35,9 @@ namespace LuaGameObject
      *
      * @return bool isSpawned
      */
-    int IsSpawned(lua_State* L, GameObject* go)
+    int IsSpawned(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->isSpawned());
+        Eluna::Push(E->L, go->isSpawned());
         return 1;
     }
 
@@ -46,9 +46,9 @@ namespace LuaGameObject
      *
      * @return bool isTransport
      */
-    int IsTransport(lua_State* L, GameObject* go)
+    int IsTransport(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->IsTransport());
+        Eluna::Push(E->L, go->IsTransport());
         return 1;
     }
 
@@ -57,15 +57,15 @@ namespace LuaGameObject
      *
      * @return bool isActive
      */
-    int IsActive(lua_State* L, GameObject* go)
+    int IsActive(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->isActiveObject());
+        Eluna::Push(E->L, go->isActiveObject());
         return 1;
     }
 
-    /*int IsDestructible(lua_State* L, GameObject* go) // TODO: Implementation core side
+    /*int IsDestructible(Eluna* E, GameObject* go) // TODO: Implementation core side
     {
-        Eluna::Push(L, go->IsDestructibleBuilding());
+        Eluna::Push(E->L, go->IsDestructibleBuilding());
         return 1;
     }*/
 
@@ -74,9 +74,9 @@ namespace LuaGameObject
      *
      * @return uint32 displayId
      */
-    int GetDisplayId(lua_State* L, GameObject* go)
+    int GetDisplayId(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->GetDisplayId());
+        Eluna::Push(E->L, go->GetDisplayId());
         return 1;
     }
 
@@ -95,9 +95,9 @@ namespace LuaGameObject
      *
      * @return [GOState] goState
      */
-    int GetGoState(lua_State* L, GameObject* go)
+    int GetGoState(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->GetGoState());
+        Eluna::Push(E->L, go->GetGoState());
         return 1;
     }
 
@@ -117,9 +117,9 @@ namespace LuaGameObject
      *
      * @return [LootState] lootState
      */
-    int GetLootState(lua_State* L, GameObject* go)
+    int GetLootState(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->getLootState());
+        Eluna::Push(E->L, go->getLootState());
         return 1;
     }
 
@@ -130,9 +130,9 @@ namespace LuaGameObject
      *
      * @return [Player] player
      */
-    int GetLootRecipient(lua_State* L, GameObject* go)
+    int GetLootRecipient(Eluna* E, GameObject* go)
     {
-        Eluna::Push(L, go->GetLootRecipient());
+        Eluna::Push(E->L, go->GetLootRecipient());
         return 1;
     }
 
@@ -143,12 +143,12 @@ namespace LuaGameObject
      *
      * @return [Group] group
      */
-    int GetLootRecipientGroup(lua_State* L, GameObject* go)
+    int GetLootRecipientGroup(Eluna* E, GameObject* go)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(L, go->GetLootRecipientGroup());
+        Eluna::Push(E->L, go->GetLootRecipientGroup());
 #else
-        Eluna::Push(L, go->GetGroupLootRecipient());
+        Eluna::Push(E->L, go->GetGroupLootRecipient());
 #endif
         return 1;
     }
@@ -158,15 +158,15 @@ namespace LuaGameObject
      *
      * @return uint32 dbguid
      */
-    int GetDBTableGUIDLow(lua_State* L, GameObject* go)
+    int GetDBTableGUIDLow(Eluna* E, GameObject* go)
     {
 #ifdef TRINITY
-        Eluna::Push(L, go->GetSpawnId());
+        Eluna::Push(E->L, go->GetSpawnId());
 #elif AZEROTHCORE
-        Eluna::Push(L, go->GetDBTableGUIDLow());
+        Eluna::Push(E->L, go->GetDBTableGUIDLow());
 #else
         // on mangos based this is same as lowguid
-        Eluna::Push(L, go->GetGUIDLow());
+        Eluna::Push(E->L, go->GetGUIDLow());
 #endif
         return 1;
     }
@@ -185,9 +185,9 @@ namespace LuaGameObject
      *
      * @param [GOState] state : all available go states can be seen above
      */
-    int SetGoState(lua_State* L, GameObject* go)
+    int SetGoState(Eluna* E, GameObject* go)
     {
-        uint32 state = Eluna::CHECKVAL<uint32>(L, 2, 0);
+        uint32 state = Eluna::CHECKVAL<uint32>(E->L, 2, 0);
 
         if (state == 0)
             go->SetGoState(GO_STATE_ACTIVE);
@@ -221,9 +221,9 @@ namespace LuaGameObject
      *
      * @param [LootState] state : all available loot states can be seen above
      */
-    int SetLootState(lua_State* L, GameObject* go)
+    int SetLootState(Eluna* E, GameObject* go)
     {
-        uint32 state = Eluna::CHECKVAL<uint32>(L, 2, 0);
+        uint32 state = Eluna::CHECKVAL<uint32>(E->L, 2, 0);
 
         if (state == 0)
             go->SetLootState(GO_NOT_READY);
@@ -241,7 +241,7 @@ namespace LuaGameObject
      * Saves [GameObject] to the database
      *
      */
-    int SaveToDB(lua_State* /*L*/, GameObject* go)
+    int SaveToDB(Eluna* /*E*/, GameObject* go)
     {
         go->SaveToDB();
         return 0;
@@ -254,9 +254,9 @@ namespace LuaGameObject
      *
      * @param bool deleteFromDB : if true, it will delete the [GameObject] from the database
      */
-    int RemoveFromWorld(lua_State* L, GameObject* go)
+    int RemoveFromWorld(Eluna* E, GameObject* go)
     {
-        bool deldb = Eluna::CHECKVAL<bool>(L, 2, false);
+        bool deldb = Eluna::CHECKVAL<bool>(E->L, 2, false);
 
         // cs_gobject.cpp copy paste
 #if defined TRINITY || AZEROTHCORE
@@ -285,7 +285,7 @@ namespace LuaGameObject
         go->SetRespawnTime(0);
         go->Delete();
 
-        Eluna::CHECKOBJ<ElunaObject>(L, 1)->Invalidate();
+        Eluna::CHECKOBJ<ElunaObject>(E->L, 1)->Invalidate();
         return 0;
     }
 
@@ -294,9 +294,9 @@ namespace LuaGameObject
      *
      * @param uint32 delay = 0 : cooldown time in seconds to restore the [GameObject] back to normal. 0 for infinite duration
      */
-    int UseDoorOrButton(lua_State* L, GameObject* go)
+    int UseDoorOrButton(Eluna* E, GameObject* go)
     {
-        uint32 delay = Eluna::CHECKVAL<uint32>(L, 2, 0);
+        uint32 delay = Eluna::CHECKVAL<uint32>(E->L, 2, 0);
 
         go->UseDoorOrButton(delay);
         return 0;
@@ -307,7 +307,7 @@ namespace LuaGameObject
      *
      * The gameobject may be automatically respawned by the core
      */
-    int Despawn(lua_State* /*L*/, GameObject* go)
+    int Despawn(Eluna* /*E*/, GameObject* go)
     {
         go->SetLootState(GO_JUST_DEACTIVATED);
         return 0;
@@ -316,7 +316,7 @@ namespace LuaGameObject
     /**
      * Respawns a [GameObject]
      */
-    int Respawn(lua_State* /*L*/, GameObject* go)
+    int Respawn(Eluna* /*E*/, GameObject* go)
     {
         go->Respawn();
         return 0;
@@ -329,9 +329,9 @@ namespace LuaGameObject
      *
      * @param int32 delay = 0 : cooldown time in seconds to respawn or despawn the object. 0 means never
      */
-    int SetRespawnTime(lua_State* L, GameObject* go)
+    int SetRespawnTime(Eluna* E, GameObject* go)
     {
-        int32 respawn = Eluna::CHECKVAL<int32>(L, 2);
+        int32 respawn = Eluna::CHECKVAL<int32>(E->L, 2);
 
         go->SetRespawnTime(respawn);
         return 0;
