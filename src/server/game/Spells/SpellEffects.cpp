@@ -785,11 +785,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     m_caster->GetMap()->ScriptsStart(sSpellScripts, uint32(m_spellInfo->Id | (effIndex << 24)), m_caster, unitTarget);
 #ifdef ELUNA
     if (gameObjTarget)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+        m_caster->GetMap()->GetEluna()->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+        m_caster->GetMap()->GetEluna()->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
     else if (itemTarget)
-        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
+        m_caster->GetMap()->GetEluna()->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
 #endif
 }
 
@@ -1824,9 +1824,9 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
 
         player->PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-        if (sEluna->OnGossipHello(player, gameObjTarget))
+        if (player->GetMap()->GetEluna()->OnGossipHello(player, gameObjTarget))
             return;
-        if (sEluna->OnGameObjectUse(player, gameObjTarget))
+        if (player->GetMap()->GetEluna()->OnGameObjectUse(player, gameObjTarget))
             return;
 #endif
         if (gameObjTarget->AI()->GossipHello(player))

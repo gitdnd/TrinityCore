@@ -3534,9 +3534,9 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
 
 #ifdef ELUNA
     if (Creature* creature = obj->ToCreature())
-        sEluna->OnRemove(creature);
+        GetEluna()->OnRemove(creature);
     else if (GameObject* gameobject = obj->ToGameObject())
-        sEluna->OnRemove(gameobject);
+        GetEluna()->OnRemove(gameobject);
 #endif
 
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
@@ -3978,7 +3978,7 @@ void InstanceMap::CreateInstanceData(bool load)
     bool isElunaAI = false;
 
 #ifdef ELUNA
-    i_data = sEluna->GetInstanceData(this);
+    i_data = GetEluna()->GetInstanceData(this);
     if (i_data)
         isElunaAI = true;
 #endif

@@ -215,7 +215,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         }
 
 #ifdef ELUNA
-        sEluna->OnLootMoney(player, loot->gold);
+        player->GetMap()->GetEluna()->OnLootMoney(player, loot->gold);
 #endif
         loot->gold = 0;
 
@@ -498,7 +498,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item.itemid, item.count);
 
 #ifdef ELUNA
-    sEluna->OnLootItem(target, newitem, item.count, lootguid);
+    target->GetMap()->GetEluna()->OnLootItem(target, newitem, item.count, lootguid);
 #endif
     // mark as looted
     item.count = 0;

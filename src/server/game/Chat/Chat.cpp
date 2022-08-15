@@ -259,7 +259,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
             {
 #ifdef ELUNA
-                if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, oldtext))
+                if (!Eluna::GEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, oldtext))
                     return true;
 #endif
                 if (m_session && !m_session->HasPermission(rbac::RBAC_PERM_COMMANDS_NOTIFY_COMMAND_NOT_FOUND_ERROR))
@@ -389,7 +389,7 @@ bool ChatHandler::_ParseCommands(char const* text)
         return true;
 
 #ifdef ELUNA
-    if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text))
+    if (!Eluna::GEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text))
         return true;
 #endif
 

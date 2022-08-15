@@ -323,7 +323,7 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     if (GameObject* go = GetPlayer()->GetGameObjectIfCanInteractWith(guid))
     {
 #ifdef ELUNA
-        if (sEluna->OnGameObjectUse(_player, go))
+        if (_player->GetMap()->GetEluna()->OnGameObjectUse(_player, go))
             return;
 #endif
         if (go->AI()->OnReportUse(_player))
@@ -639,7 +639,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 
     if (Creature* pMirror = unit->ToCreature())
     {
-        sEluna->OnMirrorPlayer(pMirror, GetPlayer());
+        _player->GetMap()->GetEluna()->OnMirrorPlayer(pMirror, GetPlayer());
         if (pMirror->blockMirror)
             return;
     }
