@@ -2711,7 +2711,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::CREATURE_EVENT_COUNT; ++i)
                 E->CreatureEventBindings->Clear(Key((Hooks::CreatureEvents)i, entry));
         }
@@ -2749,7 +2749,7 @@ namespace LuaGlobalFunctions
             uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 1);
             uint32 instanceId = Eluna::CHECKVAL<uint32>(E->L, 2);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::CREATURE_EVENT_COUNT; ++i)
                 E->CreatureUniqueBindings->Clear(Key((Hooks::CreatureEvents)i, guid, instanceId));
         }
@@ -2786,7 +2786,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::GOSSIP_EVENT_COUNT; ++i)
                 E->CreatureGossipBindings->Clear(Key((Hooks::GossipEvents)i, entry));
         }
@@ -2822,7 +2822,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::GAMEOBJECT_EVENT_COUNT; ++i)
                 E->GameObjectEventBindings->Clear(Key((Hooks::GameObjectEvents)i, entry));
         }
@@ -2858,7 +2858,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::GOSSIP_EVENT_COUNT; ++i)
                 E->GameObjectGossipBindings->Clear(Key((Hooks::GossipEvents)i, entry));
         }
@@ -2948,7 +2948,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::ITEM_EVENT_COUNT; ++i)
                 E->ItemEventBindings->Clear(Key((Hooks::ItemEvents)i, entry));
         }
@@ -2984,7 +2984,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::GOSSIP_EVENT_COUNT; ++i)
                 E->ItemGossipBindings->Clear(Key((Hooks::GossipEvents)i, entry));
         }
@@ -3017,7 +3017,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::PACKET_EVENT_COUNT; ++i)
                 E->PacketEventBindings->Clear(Key((Hooks::PacketEvents)i, entry));
         }
@@ -3077,7 +3077,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::GOSSIP_EVENT_COUNT; ++i)
                 E->PlayerGossipBindings->Clear(Key((Hooks::GossipEvents)i, entry));
         }
@@ -3137,7 +3137,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::INSTANCE_EVENT_COUNT; ++i)
                 E->MapEventBindings->Clear(Key((Hooks::InstanceEvents)i, entry));
         }
@@ -3171,7 +3171,7 @@ namespace LuaGlobalFunctions
         {
             uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-            Eluna* E = Eluna::GetEluna(E->L);
+            //Eluna* E = Eluna::GetEluna(E->L);
             for (uint32 i = 1; i < Hooks::INSTANCE_EVENT_COUNT; ++i)
                 E->InstanceEventBindings->Clear(Key((Hooks::InstanceEvents)i, entry));
         }

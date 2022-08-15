@@ -2151,7 +2151,7 @@ namespace LuaUnit
      *
      * @param bool reset = true : cleans movement
      */
-    int MoveExpire(Eluna* E, Unit* unit)
+    int MoveExpire(Eluna* /*E*/, Unit* unit)
     {
 #ifdef TRINITY
         //(void) L; // ensure that the variable is referenced in order to pass compiler checks
@@ -2168,7 +2168,7 @@ namespace LuaUnit
      *
      * @param bool reset = true : clean movement
      */
-    int MoveClear(Eluna* E, Unit* unit)
+    int MoveClear(Eluna* /*E*/, Unit* unit)
     {
 #ifdef TRINITY
         //(void) L; // ensure that the variable is referenced in order to pass compiler checks

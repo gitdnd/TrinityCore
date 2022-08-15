@@ -127,7 +127,12 @@ public:
 
     typedef std::recursive_mutex LockType;
     typedef std::lock_guard<LockType> Guard;
+    Eluna();
+    ~Eluna();
 
+    // Prevent copy
+    Eluna(Eluna const&) = delete;
+    Eluna& operator=(const Eluna&) = delete;
 private:
     static bool reload;
     static bool initialized;
@@ -160,13 +165,6 @@ private:
     std::unordered_map<uint32, int> instanceDataRefs;
     // Map from map ID -> Lua table ref
     std::unordered_map<uint32, int> continentDataRefs;
-
-    Eluna();
-    ~Eluna();
-
-    // Prevent copy
-    Eluna(Eluna const&) = delete;
-    Eluna& operator=(const Eluna&) = delete;
 
     void OpenLua();
     void CloseLua();
