@@ -649,63 +649,63 @@ bool Eluna::ExecuteCall(int params, int res)
 
 void Eluna::Push()
 {
-    lua_pushnil(L);
     ++push_counter;
+    lua_pushnil(L);
 }
 void Eluna::Push( const long long l)
 {
-    ElunaTemplate<long long>::Push(this, new long long(l));
     ++push_counter;
+    ElunaTemplate<long long>::Push(this, new long long(l));
 }
 void Eluna::Push( const unsigned long long l)
 {
-    ElunaTemplate<unsigned long long>::Push(this, new unsigned long long(l));
     ++push_counter;
+    ElunaTemplate<unsigned long long>::Push(this, new unsigned long long(l));
 }
 void Eluna::Push( const long l)
 {
-    Push(static_cast<long long>(l));
     ++push_counter;
+    Push(static_cast<long long>(l));
 }
 void Eluna::Push( const unsigned long l)
 {
-    Push(static_cast<unsigned long long>(l));
     ++push_counter;
+    Push(static_cast<unsigned long long>(l));
 }
 void Eluna::Push( const int i)
 {
-    lua_pushinteger(L, i);
     ++push_counter;
+    lua_pushinteger(L, i);
 }
 void Eluna::Push( const unsigned int u)
 {
-    lua_pushunsigned(L, u);
     ++push_counter;
+    lua_pushunsigned(L, u);
 }
 void Eluna::Push( const double d)
 {
-    lua_pushnumber(L, d);
     ++push_counter;
+    lua_pushnumber(L, d);
 }
 void Eluna::Push( const float f)
 {
-    lua_pushnumber(L, f);
     ++push_counter;
+    lua_pushnumber(L, f);
 }
 void Eluna::Push(const bool b)
 {
-    lua_pushboolean(L, b);
     ++push_counter;
+    lua_pushboolean(L, b);
 }
 void Eluna::Push( const std::string& str)
 {
-    lua_pushstring(L, str.c_str());
     ++push_counter;
+    lua_pushstring(L, str.c_str());
 }
 void Eluna::Push( const char* str)
 {
-    lua_pushstring(L, str);
     ++push_counter;
+    lua_pushstring(L, str);
 }
 void Eluna::Push( Pet const* pet)
 {

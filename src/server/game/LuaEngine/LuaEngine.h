@@ -272,8 +272,8 @@ public:
     template<typename T>
     void Push(T const* ptr)
     {
-        ElunaTemplate<T>::Push(this, ptr);
         ++push_counter;
+        ElunaTemplate<T>::Push(this, ptr);
     }
 
     /*
