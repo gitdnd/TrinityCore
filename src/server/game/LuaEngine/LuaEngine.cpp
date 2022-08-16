@@ -939,13 +939,13 @@ static int cancelBinding(lua_State *L)
 }
 
 template<typename K>
-static void createCancelCallback(lua_State* L, uint64 bindingID, BindingMap<K>* bindings)
+static void createCancelCallback(Eluna* E, uint64 bindingID, BindingMap<K>* bindings)
 {
-    //Eluna::Push(bindingID);
-    lua_pushlightuserdata(L, bindings);
+    E->Push(bindingID);
+    lua_pushlightuserdata(E->L, bindings);
     // Stack: bindingID, bindings
 
-    lua_pushcclosure(L, &cancelBinding<K>, 2);
+    lua_pushcclosure(E->L, &cancelBinding<K>, 2);
     // Stack: cancel_callback
 }
 
@@ -961,7 +961,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EventKey<Hooks::ServerEvents>((Hooks::ServerEvents)event_id);
                 bindingID = ServerEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, ServerEventBindings);
+                createCancelCallback(this, bindingID, ServerEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -971,7 +971,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EventKey<Hooks::PlayerEvents>((Hooks::PlayerEvents)event_id);
                 bindingID = PlayerEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, PlayerEventBindings);
+                createCancelCallback(this, bindingID, PlayerEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -981,7 +981,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EventKey<Hooks::GuildEvents>((Hooks::GuildEvents)event_id);
                 bindingID = GuildEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, GuildEventBindings);
+                createCancelCallback(this, bindingID, GuildEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -991,7 +991,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EventKey<Hooks::GroupEvents>((Hooks::GroupEvents)event_id);
                 bindingID = GroupEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, GroupEventBindings);
+                createCancelCallback(this, bindingID, GroupEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1001,7 +1001,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EventKey<Hooks::VehicleEvents>((Hooks::VehicleEvents)event_id);
                 bindingID = VehicleEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, VehicleEventBindings);
+                createCancelCallback(this, bindingID, VehicleEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1011,7 +1011,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EventKey<Hooks::BGEvents>((Hooks::BGEvents)event_id);
                 bindingID = BGEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, BGEventBindings);
+                createCancelCallback(this, bindingID, BGEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1028,7 +1028,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                 auto key = EntryKey<Hooks::PacketEvents>((Hooks::PacketEvents)event_id, entry);
                 bindingID = PacketEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, PacketEventBindings);
+                createCancelCallback(this, bindingID, PacketEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1047,7 +1047,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                     auto key = EntryKey<Hooks::CreatureEvents>((Hooks::CreatureEvents)event_id, entry);
                     bindingID = CreatureEventBindings->Insert(key, functionRef, shots);
-                    createCancelCallback(L, bindingID, CreatureEventBindings);
+                    createCancelCallback(this, bindingID, CreatureEventBindings);
                 }
                 else
                 {
@@ -1060,7 +1060,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                     auto key = UniqueObjectKey<Hooks::CreatureEvents>((Hooks::CreatureEvents)event_id, guid, instanceId);
                     bindingID = CreatureUniqueBindings->Insert(key, functionRef, shots);
-                    createCancelCallback(L, bindingID, CreatureUniqueBindings);
+                    createCancelCallback(this, bindingID, CreatureUniqueBindings);
                 }
                 return 1; // Stack: callback
             }
@@ -1078,7 +1078,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                 auto key = EntryKey<Hooks::GossipEvents>((Hooks::GossipEvents)event_id, entry);
                 bindingID = CreatureGossipBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, CreatureGossipBindings);
+                createCancelCallback(this, bindingID, CreatureGossipBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1095,7 +1095,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                 auto key = EntryKey<Hooks::GameObjectEvents>((Hooks::GameObjectEvents)event_id, entry);
                 bindingID = GameObjectEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, GameObjectEventBindings);
+                createCancelCallback(this, bindingID, GameObjectEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1112,7 +1112,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                 auto key = EntryKey<Hooks::GossipEvents>((Hooks::GossipEvents)event_id, entry);
                 bindingID = GameObjectGossipBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, GameObjectGossipBindings);
+                createCancelCallback(this, bindingID, GameObjectGossipBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1129,7 +1129,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                 auto key = EntryKey<Hooks::ItemEvents>((Hooks::ItemEvents)event_id, entry);
                 bindingID = ItemEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, ItemEventBindings);
+                createCancelCallback(this, bindingID, ItemEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1146,7 +1146,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
 
                 auto key = EntryKey<Hooks::GossipEvents>((Hooks::GossipEvents)event_id, entry);
                 bindingID = ItemGossipBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, ItemGossipBindings);
+                createCancelCallback(this, bindingID, ItemGossipBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1156,7 +1156,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EntryKey<Hooks::GossipEvents>((Hooks::GossipEvents)event_id, entry);
                 bindingID = PlayerGossipBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, PlayerGossipBindings);
+                createCancelCallback(this, bindingID, PlayerGossipBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1165,7 +1165,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EntryKey<Hooks::InstanceEvents>((Hooks::InstanceEvents)event_id, entry);
                 bindingID = MapEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, MapEventBindings);
+                createCancelCallback(this, bindingID, MapEventBindings);
                 return 1; // Stack: callback
             }
             break;
@@ -1174,7 +1174,7 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
             {
                 auto key = EntryKey<Hooks::InstanceEvents>((Hooks::InstanceEvents)event_id, entry);
                 bindingID = InstanceEventBindings->Insert(key, functionRef, shots);
-                createCancelCallback(L, bindingID, InstanceEventBindings);
+                createCancelCallback(this, bindingID, InstanceEventBindings);
                 return 1; // Stack: callback
             }
             break;
