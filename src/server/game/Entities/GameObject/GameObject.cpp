@@ -2407,7 +2407,8 @@ void GameObject::SetGoState(GOState state)
 {
     SetByteValue(GAMEOBJECT_BYTES_1, 0, state);
 #ifdef ELUNA
-    GetMap()->GetEluna()->OnGameObjectStateChanged(this, state);
+    if(IsInWorld())
+        GetMap()->GetEluna()->OnGameObjectStateChanged(this, state);
 #endif
     if (AI())
         AI()->OnStateChanged(state);
