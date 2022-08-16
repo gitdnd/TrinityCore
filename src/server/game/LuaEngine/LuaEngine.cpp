@@ -70,7 +70,8 @@ extern void RegisterFunctions(Eluna* E);
 void Eluna::Initialize()
 {
     LOCK_ELUNA;
-    ASSERT(!IsInitialized());
+    printf("Initializing Eluna\n");
+    //ASSERT(!IsInitialized());
     /*
 #if defined TRINITY || AZEROTHCORE
     // For instance data the data column needs to be able to hold more than 255 characters (tinytext)
@@ -92,7 +93,8 @@ void Eluna::Initialize()
 void Eluna::Uninitialize()
 {
     LOCK_ELUNA;
-    ASSERT(IsInitialized());
+    printf("Uninitializing Eluna\n");
+    //ASSERT(IsInitialized());
 
     //delete GEluna;
     //GEluna = NULL;
@@ -227,6 +229,9 @@ void Eluna::CloseLua()
 
 void Eluna::OpenLua()
 {
+    printf("Opening Lua\n");
+    if (!IsInitialized())
+        printf("Not initialized yet opening lua \n");
     enabled = eConfigMgr->GetBoolDefault("Eluna.Enabled", true);
     if (!IsEnabled())
     {
@@ -459,8 +464,12 @@ static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second
 void Eluna::RunScripts()
 {
     LOCK_ELUNA;
+    printf("Running scripts \n");
     if (!IsEnabled())
+    {
+        printf("Running scripts while not enabled \n");
         return;
+    }
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     uint32 count = 0;
