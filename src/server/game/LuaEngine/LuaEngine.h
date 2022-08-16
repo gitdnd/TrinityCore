@@ -273,6 +273,7 @@ public:
     void Push(T const* ptr)
     {
         ElunaTemplate<T>::Push(this, ptr);
+        ++push_counter;
     }
 
     /*
