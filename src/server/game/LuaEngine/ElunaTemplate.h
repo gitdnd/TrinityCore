@@ -68,7 +68,7 @@ class ElunaObject
 {
 public:
     template<typename T>
-    ElunaObject(T * obj, bool manageMemory);
+    ElunaObject(T * obj, bool manageMemory, Eluna* _e);
 
     ~ElunaObject()
     {
@@ -77,7 +77,7 @@ public:
     // Get wrapped object pointer
     void* GetObj() const { return object; }
     // Returns whether the object is valid or not
-    bool IsValid() const { return !callstackid || callstackid == sEluna->GetCallstackId(); }
+    bool IsValid() const { return !callstackid || callstackid == e->GetCallstackId(); }
     // Returns whether the object can be invalidated or not
     bool CanInvalidate() const { return _invalidate; }
     // Returns pointer to the wrapped object's type name
@@ -96,7 +96,7 @@ public:
         ASSERT(!valid || (valid && object));
         if (valid)
             if (CanInvalidate())
-                callstackid = sEluna->GetCallstackId();
+                callstackid = e->GetCallstackId();
             else
                 callstackid = 0;
         else
@@ -119,6 +119,7 @@ private:
     bool _invalidate;
     void* object;
     const char* type_name;
+    Eluna* e;
 };
 
 template<typename T>
@@ -177,7 +178,7 @@ public:
         lua_setfield(E->L, metatable, "__newindex");
 
         // make new indexes saved to methods
-        lua_pushcfunction(E->L, Add);
+        /*lua_pushcfunction(E->L, Add);
         lua_setfield(E->L, metatable, "__add");
 
         // make new indexes saved to methods
@@ -226,7 +227,7 @@ public:
 
         // make new indexes saved to methods
         lua_pushcfunction(E->L, Call);
-        lua_setfield(E->L, metatable, "__call");
+        lua_setfield(E->L, metatable, "__call");*/
 
         // special method to get the object type
         lua_pushcfunction(E->L, GetType);
@@ -271,35 +272,35 @@ public:
         lua_remove(E->L, -1);
     }
 
-    static int Push(lua_State* L, T const* obj)
+    static int Push(Eluna* E, T const* obj)
     {
         if (!obj)
         {
-            lua_pushnil(L);
+            lua_pushnil(E->L);
             return 1;
         }
 
         // Create new userdata
-        ElunaObject** ptrHold = static_cast<ElunaObject**>(lua_newuserdata(L, sizeof(ElunaObject*)));
+        ElunaObject** ptrHold = static_cast<ElunaObject**>(lua_newuserdata(E->L, sizeof(ElunaObject*)));
         if (!ptrHold)
         {
             ELUNA_LOG_ERROR("%s could not create new userdata", tname);
-            lua_pushnil(L);
+            lua_pushnil(E->L);
             return 1;
         }
-        *ptrHold = new ElunaObject(const_cast<T*>(obj), manageMemory);
+        *ptrHold = new ElunaObject(const_cast<T*>(obj), manageMemory, E);
 
         // Set metatable for it
-        lua_pushstring(L, tname);
-        lua_rawget(L, LUA_REGISTRYINDEX);
-        if (!lua_istable(L, -1))
+        lua_pushstring(E->L, tname);
+        lua_rawget(E->L, LUA_REGISTRYINDEX);
+        if (!lua_istable(E->L, -1))
         {
             ELUNA_LOG_ERROR("%s missing metatable", tname);
-            lua_pop(L, 2);
-            lua_pushnil(L);
+            lua_pop(E->L, 2);
+            lua_pushnil(E->L);
             return 1;
         }
-        lua_setmetatable(L, -2);
+        lua_setmetatable(E->L, -2);
         return 1;
     }
 
@@ -398,25 +399,25 @@ public:
         return expected;
     }
 
-    static int ArithmeticError(lua_State* L) { return luaL_error(L, "attempt to perform arithmetic on a %s value", tname); }
-    static int CompareError(lua_State* L) { return luaL_error(L, "attempt to compare %s", tname); }
-    static int Add(lua_State* L) { return ArithmeticError(L); }
-    static int Substract(lua_State* L) { return ArithmeticError(L); }
-    static int Multiply(lua_State* L) { return ArithmeticError(L); }
-    static int Divide(lua_State* L) { return ArithmeticError(L); }
-    static int Mod(lua_State* L) { return ArithmeticError(L); }
-    static int Pow(lua_State* L) { return ArithmeticError(L); }
-    static int UnaryMinus(lua_State* L) { return ArithmeticError(L); }
-    static int Concat(lua_State* L) { return luaL_error(L, "attempt to concatenate a %s value", tname); }
-    static int Length(lua_State* L) { return luaL_error(L, "attempt to get length of a %s value", tname); }
-    static int Equal(lua_State* L) { Eluna::Push(L, Eluna::CHECKOBJ<T>(L, 1) == Eluna::CHECKOBJ<T>(L, 2)); return 1; }
-    static int Less(lua_State* L) { return CompareError(L); }
-    static int LessOrEqual(lua_State* L) { return CompareError(L); }
-    static int Call(lua_State* L) { return luaL_error(L, "attempt to call a %s value", tname); }
+    static int ArithmeticError(Eluna* E) { return luaL_error(E->L, "attempt to perform arithmetic on a %s value", tname); }
+    static int CompareError(Eluna* E) { return luaL_error(E->L, "attempt to compare %s", tname); }
+    static int Add(Eluna* E) { return ArithmeticError(E); }
+    static int Substract(Eluna* E) { return ArithmeticError(E); }
+    static int Multiply(Eluna* E) { return ArithmeticError(E); }
+    static int Divide(Eluna* E) { return ArithmeticError(E); }
+    static int Mod(Eluna* E) { return ArithmeticError(E); }
+    static int Pow(Eluna* E) { return ArithmeticError(E); }
+    static int UnaryMinus(Eluna* E) { return ArithmeticError(E); }
+    static int Concat(Eluna* E) { return luaL_error(E->L, "attempt to concatenate a %s value", tname); }
+    static int Length(Eluna* E) { return luaL_error(E->L, "attempt to get length of a %s value", tname); }
+    static int Equal(Eluna* E) { Eluna::Push(E->L, Eluna::CHECKOBJ<T>(E->L, 1) == Eluna::CHECKOBJ<T>(E->L, 2)); return 1; }
+    static int Less(Eluna* E) { return CompareError(E); }
+    static int LessOrEqual(Eluna* E) { return CompareError(E); }
+    static int Call(Eluna* E) { return luaL_error(E->L, "attempt to call a %s value", tname); }
 };
 
 template<typename T>
-ElunaObject::ElunaObject(T * obj, bool manageMemory) : callstackid(1), _invalidate(!manageMemory), object(obj), type_name(ElunaTemplate<T>::tname)
+ElunaObject::ElunaObject(T * obj, bool manageMemory, Eluna * _e) : callstackid(1), _invalidate(!manageMemory), object(obj), e(_e), type_name(ElunaTemplate<T>::tname)
 {
     SetValid(true);
 }

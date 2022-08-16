@@ -34,7 +34,7 @@ namespace LuaGlobalFunctions
      */
     int GetLuaEngine(Eluna* E)
     {
-        Eluna::Push(E->L, "ElunaEngine");
+        E->Push("ElunaEngine");
         return 1;
     }
 
@@ -47,7 +47,7 @@ namespace LuaGlobalFunctions
      */
     int GetCoreName(Eluna* E)
     {
-        Eluna::Push(E->L, CORE_NAME);
+        E->Push(CORE_NAME);
         return 1;
     }
 
@@ -62,7 +62,7 @@ namespace LuaGlobalFunctions
      */
     int GetCoreVersion(Eluna* E)
     {
-        Eluna::Push(E->L, CORE_VERSION);
+        E->Push(CORE_VERSION);
         return 1;
     }
 
@@ -76,13 +76,13 @@ namespace LuaGlobalFunctions
     int GetCoreExpansion(Eluna* E)
     {
 #ifdef CLASSIC
-        Eluna::Push(E->L, 0);
+        E->Push(0);
 #elif defined(TBC)
-        Eluna::Push(E->L, 1);
+        E->Push(1);
 #elif defined(WOTLK)
-        Eluna::Push(E->L, 2);
+        E->Push(2);
 #elif defined(CATA)
-        Eluna::Push(E->L, 3);
+        E->Push(3);
 #endif
         return 1;
     }
@@ -97,7 +97,7 @@ namespace LuaGlobalFunctions
     {
         uint32 questId = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-        Eluna::Push(E->L, eObjectMgr->GetQuestTemplate(questId));
+        E->Push(eObjectMgr->GetQuestTemplate(questId));
         return 1;
     }
 
@@ -110,7 +110,7 @@ namespace LuaGlobalFunctions
     int GetPlayerByGUID(Eluna* E)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 1);
-        Eluna::Push(E->L, eObjectAccessor()FindPlayer(ObjectGuid(guid)));
+        E->Push(eObjectAccessor()FindPlayer(ObjectGuid(guid)));
         return 1;
     }
 
@@ -123,7 +123,7 @@ namespace LuaGlobalFunctions
     int GetPlayerByName(Eluna* E)
     {
         const char* name = Eluna::CHECKVAL<const char*>(E->L, 1);
-        Eluna::Push(E->L, eObjectAccessor()FindPlayerByName(name));
+        E->Push(eObjectAccessor()FindPlayerByName(name));
         return 1;
     }
 
@@ -135,9 +135,9 @@ namespace LuaGlobalFunctions
     int GetGameTime(Eluna* E)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, GameTime::GetGameTime());
+        E->Push(GameTime::GetGameTime());
 #else
-        Eluna::Push(E->L, eWorld->GetGameTime());
+        E->Push(eWorld->GetGameTime());
 #endif
         return 1;
     }
@@ -173,7 +173,7 @@ namespace LuaGlobalFunctions
             {
                 if ((team == TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->isGameMaster()))
                 {
-                    Eluna::Push(E->L, player);
+                    E->Push(player);
                     lua_rawseti(E->L, tbl, ++i);
                 }
             }
@@ -200,7 +200,7 @@ namespace LuaGlobalFunctions
                     if ((team == TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->isGameMaster()))
 #endif
                     {
-                        Eluna::Push(E->L, player);
+                        E->Push(player);
                         lua_rawseti(E->L, tbl, ++i);
                     }
                 }
@@ -220,7 +220,7 @@ namespace LuaGlobalFunctions
     int GetGuildByName(Eluna* E)
     {
         const char* name = Eluna::CHECKVAL<const char*>(E->L, 1);
-        Eluna::Push(E->L, eGuildMgr->GetGuildByName(name));
+        E->Push(eGuildMgr->GetGuildByName(name));
         return 1;
     }
 
@@ -236,7 +236,7 @@ namespace LuaGlobalFunctions
         uint32 mapid = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 instance = Eluna::CHECKVAL<uint32>(E->L, 2, 0);
 
-        Eluna::Push(E->L, eMapMgr->FindMap(mapid, instance));
+        E->Push(eMapMgr->FindMap(mapid, instance));
         return 1;
     }
 
@@ -250,7 +250,7 @@ namespace LuaGlobalFunctions
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 1);
 
-        Eluna::Push(E->L, eGuildMgr->GetGuildByLeader(ObjectGuid(guid)));
+        E->Push(eGuildMgr->GetGuildByLeader(ObjectGuid(guid)));
         return 1;
     }
 
@@ -261,7 +261,7 @@ namespace LuaGlobalFunctions
      */
     int GetPlayerCount(Eluna* E)
     {
-        Eluna::Push(E->L, eWorld->GetActiveSessionCount());
+        E->Push(eWorld->GetActiveSessionCount());
         return 1;
     }
 
@@ -278,7 +278,7 @@ namespace LuaGlobalFunctions
     int GetPlayerGUID(Eluna* E)
     {
         uint32 lowguid = Eluna::CHECKVAL<uint32>(E->L, 1);
-        Eluna::Push(E->L, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER));
+        E->Push(MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER));
         return 1;
     }
 
@@ -294,7 +294,7 @@ namespace LuaGlobalFunctions
     int GetItemGUID(Eluna* E)
     {
         uint32 lowguid = Eluna::CHECKVAL<uint32>(E->L, 1);
-        Eluna::Push(E->L, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_ITEM));
+        E->Push(MAKE_NEW_GUID(lowguid, 0, HIGHGUID_ITEM));
         return 1;
     }
 
@@ -313,7 +313,7 @@ namespace LuaGlobalFunctions
     {
         uint32 lowguid = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT));
+        E->Push(MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT));
         return 1;
     }
 
@@ -332,7 +332,7 @@ namespace LuaGlobalFunctions
     {
         uint32 lowguid = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, MAKE_NEW_GUID(lowguid, entry, HIGHGUID_UNIT));
+        E->Push(MAKE_NEW_GUID(lowguid, entry, HIGHGUID_UNIT));
         return 1;
     }
 
@@ -359,7 +359,7 @@ namespace LuaGlobalFunctions
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 1);
 
-        Eluna::Push(E->L, GUID_LOPART(guid));
+        E->Push(GUID_LOPART(guid));
         return 1;
     }
 
@@ -406,7 +406,7 @@ namespace LuaGlobalFunctions
 #endif
             "0:0:0:0|h[" << name << "]|h|r";
 
-        Eluna::Push(E->L, oss.str());
+        E->Push(oss.str());
         return 1;
     }
 
@@ -423,7 +423,7 @@ namespace LuaGlobalFunctions
     int GetGUIDType(Eluna* E)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 1);
-        Eluna::Push(E->L, static_cast<int>(GUID_HIPART(guid)));
+        E->Push(static_cast<int>(GUID_HIPART(guid)));
         return 1;
     }
 
@@ -438,7 +438,7 @@ namespace LuaGlobalFunctions
     int GetGUIDEntry(Eluna* E)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 1);
-        Eluna::Push(E->L, GUID_ENPART(guid));
+        E->Push(GUID_ENPART(guid));
         return 1;
     }
 
@@ -477,7 +477,7 @@ namespace LuaGlobalFunctions
         if (!areaEntry)
             return luaL_argerror(E->L, 1, "valid Area or Zone ID expected");
 
-        Eluna::Push(E->L, areaEntry->area_name[locale]);
+        E->Push(areaEntry->area_name[locale]);
         return 1;
     }
 
@@ -495,7 +495,7 @@ namespace LuaGlobalFunctions
 
         for (GameEventMgr::ActiveEvents::const_iterator i = activeEvents.begin(); i != activeEvents.end(); ++i)
         {
-            Eluna::Push(E->L, *i);
+            E->Push(*i);
             lua_rawseti(E->L, tbl, counter);
 
             counter++;
@@ -1224,15 +1224,15 @@ namespace LuaGlobalFunctions
 #if defined TRINITY || AZEROTHCORE
         ElunaQuery result = WorldDatabase.Query(query);
         if (result)
-            Eluna::Push(E->L, new ElunaQuery(result));
+            E->Push(new ElunaQuery(result));
         else
-            Eluna::Push(E->L);
+            E->Push();
 #else
         ElunaQuery* result = WorldDatabase.QueryNamed(query);
         if (result)
-            Eluna::Push(E->L, result);
+            E->Push(result);
         else
-            Eluna::Push(E->L);
+            E->Push();
 #endif
         return 1;
     }
@@ -1275,15 +1275,15 @@ namespace LuaGlobalFunctions
 #if defined TRINITY || AZEROTHCORE
         QueryResult result = CharacterDatabase.Query(query);
         if (result)
-            Eluna::Push(E->L, new QueryResult(result));
+            E->Push(new QueryResult(result));
         else
-            Eluna::Push(E->L);
+            E->Push();
 #else
         QueryNamedResult* result = CharacterDatabase.QueryNamed(query);
         if (result)
-            Eluna::Push(E->L, result);
+            E->Push(result);
         else
-            Eluna::Push(E->L);
+            E->Push();
 #endif
         return 1;
     }
@@ -1326,15 +1326,15 @@ namespace LuaGlobalFunctions
 #if defined TRINITY || AZEROTHCORE
         QueryResult result = LoginDatabase.Query(query);
         if (result)
-            Eluna::Push(E->L, new QueryResult(result));
+            E->Push(new QueryResult(result));
         else
-            Eluna::Push(E->L);
+            E->Push();
 #else
         QueryNamedResult* result = LoginDatabase.QueryNamed(query);
         if (result)
-            Eluna::Push(E->L, result);
+            E->Push(result);
         else
-            Eluna::Push(E->L);
+            E->Push();
 #endif
         return 1;
     }
@@ -1383,10 +1383,10 @@ namespace LuaGlobalFunctions
         uint32 min, max;
         if (lua_istable(E->L, 2))
         {
-            Eluna::Push(E->L, 1);
+            E->Push(1);
             lua_gettable(E->L, 2);
             min = Eluna::CHECKVAL<uint32>(E->L, -1);
-            Eluna::Push(E->L, 2);
+            E->Push(2);
             lua_gettable(E->L, 2);
             max = Eluna::CHECKVAL<uint32>(E->L, -1);
             lua_pop(E->L, 2);
@@ -1403,7 +1403,7 @@ namespace LuaGlobalFunctions
         if (functionRef != LUA_REFNIL && functionRef != LUA_NOREF)
         {
             E->eventMgr->globalProcessor->AddEvent(functionRef, min, max, repeats);
-            Eluna::Push(E->L, functionRef);
+            E->Push(functionRef);
         }
         return 1;
     }
@@ -1476,7 +1476,7 @@ namespace LuaGlobalFunctions
         uint32 phase = Eluna::CHECKVAL<uint32>(E->L, 11, PHASEMASK_NORMAL);
         if (!phase)
         {
-            Eluna::Push(E->L);
+            E->Push();
             return 1;
         }
 #endif
@@ -1485,7 +1485,7 @@ namespace LuaGlobalFunctions
         Map* map = eMapMgr->FindMap(mapID, instanceID);
         if (!map)
         {
-            Eluna::Push(E->L);
+            E->Push();
             return 1;
         }
 
@@ -1496,7 +1496,7 @@ namespace LuaGlobalFunctions
                 CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(entry);
                 if (!cinfo)
                 {
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1510,14 +1510,14 @@ namespace LuaGlobalFunctions
                 uint32 lowguid = eObjectMgr->GenerateStaticCreatureLowGuid();
                 if (!lowguid)
                 {
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
                 if (!pCreature->Create(lowguid, pos, cinfo))
                 {
                     delete pCreature;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1539,14 +1539,14 @@ namespace LuaGlobalFunctions
                 if (durorresptime)
                     pCreature->ForcedDespawn(durorresptime);
 
-                Eluna::Push(E->L, pCreature);
+                E->Push(pCreature);
             }
             else
             {
                 CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(entry);
                 if (!cinfo)
                 {
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1561,7 +1561,7 @@ namespace LuaGlobalFunctions
                 {
                     delete pCreature;
                     {
-                        Eluna::Push(E->L);
+                        E->Push();
                         return 1;
                     }
                 }
@@ -1578,7 +1578,7 @@ namespace LuaGlobalFunctions
                 if (pCreature->IsLinkingEventTrigger())
                     map->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
 
-                Eluna::Push(E->L, pCreature);
+                E->Push(pCreature);
             }
 
             return 1;
@@ -1591,7 +1591,7 @@ namespace LuaGlobalFunctions
                 const GameObjectInfo* gInfo = ObjectMgr::GetGameObjectInfo(entry);
                 if (!gInfo)
                 {
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1599,7 +1599,7 @@ namespace LuaGlobalFunctions
                 uint32 db_lowGUID = eObjectMgr->GenerateStaticGameObjectLowGuid();
                 if (!db_lowGUID)
                 {
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1611,7 +1611,7 @@ namespace LuaGlobalFunctions
 #endif
                 {
                     delete pGameObj;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1631,7 +1631,7 @@ namespace LuaGlobalFunctions
                 if (!pGameObj->LoadFromDB(db_lowGUID, map))
                 {
                     delete pGameObj;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1641,7 +1641,7 @@ namespace LuaGlobalFunctions
 
                 eObjectMgr->AddGameobjectToGrid(db_lowGUID, eObjectMgr->GetGOData(db_lowGUID));
 
-                Eluna::Push(E->L, pGameObj);
+                E->Push(pGameObj);
             }
             else
             {
@@ -1654,7 +1654,7 @@ namespace LuaGlobalFunctions
 #endif
                 {
                     delete pGameObj;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1662,7 +1662,7 @@ namespace LuaGlobalFunctions
 
                 map->Add(pGameObj);
 
-                Eluna::Push(E->L, pGameObj);
+                E->Push(pGameObj);
             }
             return 1;
         }
@@ -1670,7 +1670,7 @@ namespace LuaGlobalFunctions
         Map* map = eMapMgr->FindMap(mapID, instanceID);
         if (!map)
         {
-            Eluna::Push(E->L);
+            E->Push();
             return 1;
         }
 
@@ -1688,7 +1688,7 @@ namespace LuaGlobalFunctions
 #endif
                 {
                     delete creature;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1711,19 +1711,19 @@ namespace LuaGlobalFunctions
 #endif
                 {
                     delete creature;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
                 eObjectMgr->AddCreatureToGrid(db_guid, eObjectMgr->GetCreatureData(db_guid));
-                Eluna::Push(E->L, creature);
+                E->Push(creature);
             }
             else
             {
                 TempSummon* creature = map->SummonCreature(entry, pos, NULL, durorresptime);
                 if (!creature)
                 {
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 
@@ -1732,7 +1732,7 @@ namespace LuaGlobalFunctions
                 else
                     creature->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
 
-                Eluna::Push(E->L, creature);
+                E->Push(creature);
             }
 
             return 1;
@@ -1743,13 +1743,13 @@ namespace LuaGlobalFunctions
             const GameObjectTemplate* objectInfo = eObjectMgr->GetGameObjectTemplate(entry);
             if (!objectInfo)
             {
-                Eluna::Push(E->L);
+                E->Push();
                 return 1;
             }
 
             if (objectInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(objectInfo->displayId))
             {
-                Eluna::Push(E->L);
+                E->Push();
                 return 1;
             }
 
@@ -1764,7 +1764,7 @@ namespace LuaGlobalFunctions
 #endif
             {
                 delete object;
-                Eluna::Push(E->L);
+                E->Push();
                 return 1;
             }
 
@@ -1794,7 +1794,7 @@ namespace LuaGlobalFunctions
 #endif
                 {
                     delete object;
-                    Eluna::Push(E->L);
+                    E->Push();
                     return 1;
                 }
 #ifndef AZEROTHCORE
@@ -1805,11 +1805,11 @@ namespace LuaGlobalFunctions
             }
             else
                 map->AddToMap(object);
-            Eluna::Push(E->L, object);
+            E->Push(object);
             return 1;
         }
 #endif
-        Eluna::Push(E->L);
+        E->Push();
         return 1;
     }
 
@@ -1827,7 +1827,7 @@ namespace LuaGlobalFunctions
         if (opcode >= NUM_MSG_TYPES)
             return luaL_argerror(E->L, 1, "valid opcode expected");
 
-        Eluna::Push(E->L, new WorldPacket((OpcodesList)opcode, size));
+        E->Push(new WorldPacket((OpcodesList)opcode, size));
         return 1;
     }
 
@@ -2016,21 +2016,21 @@ namespace LuaGlobalFunctions
         switch (result)
         {
         case BanReturn::BAN_SUCCESS:
-            Eluna::Push(E->L, 0);
+            E->Push(0);
             break;
         case BanReturn::BAN_SYNTAX_ERROR:
-            Eluna::Push(E->L, 1);
+            E->Push(1);
             break;
         case BanReturn::BAN_NOTFOUND:
-            Eluna::Push(E->L, 2);
+            E->Push(2);
             break;
 #ifdef AZEROTHCORE
         case BanReturn::BAN_LONGER_EXISTS:
-            Eluna::Push(E->L, 3);
+            E->Push(3);
             break;
 #elif TRINITY
         case BanReturn::BAN_EXISTS:
-            Eluna::Push(E->L, 3);
+            E->Push(3);
             break;
 #endif
         }
@@ -2161,7 +2161,7 @@ namespace LuaGlobalFunctions
     {
         uint32 a = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 b = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, a & b);
+        E->Push(a & b);
         return 1;
     }
 
@@ -2176,7 +2176,7 @@ namespace LuaGlobalFunctions
     {
         uint32 a = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 b = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, a | b);
+        E->Push(a | b);
         return 1;
     }
 
@@ -2191,7 +2191,7 @@ namespace LuaGlobalFunctions
     {
         uint32 a = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 b = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, a << b);
+        E->Push(a << b);
         return 1;
     }
 
@@ -2206,7 +2206,7 @@ namespace LuaGlobalFunctions
     {
         uint32 a = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 b = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, a >> b);
+        E->Push(a >> b);
         return 1;
     }
 
@@ -2221,7 +2221,7 @@ namespace LuaGlobalFunctions
     {
         uint32 a = Eluna::CHECKVAL<uint32>(E->L, 1);
         uint32 b = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, a ^ b);
+        E->Push(a ^ b);
         return 1;
     }
 
@@ -2234,7 +2234,7 @@ namespace LuaGlobalFunctions
     int bit_not(Eluna* E)
     {
         uint32 a = Eluna::CHECKVAL<uint32>(E->L, 1);
-        Eluna::Push(E->L, ~a);
+        E->Push(~a);
         return 1;
     }
 
@@ -2275,13 +2275,13 @@ namespace LuaGlobalFunctions
         int start = lua_gettop(E->L);
         int end = start;
 
-        Eluna::Push(E->L);
+        E->Push();
         // Stack: {nodes}, mountA, mountH, price, pathid, {nodes}, nil
         while (lua_next(E->L, -2) != 0)
         {
             // Stack: {nodes}, mountA, mountH, price, pathid, {nodes}, key, value
             luaL_checktype(E->L, -1, LUA_TTABLE);
-            Eluna::Push(E->L);
+            E->Push();
             // Stack: {nodes}, mountA, mountH, price, pathid, {nodes}, key, value, nil
             while (lua_next(E->L, -2) != 0)
             {
@@ -2297,7 +2297,7 @@ namespace LuaGlobalFunctions
 
             while (end - start < 8) // fill optional args with 0
             {
-                Eluna::Push(E->L, 0);
+                E->Push(0);
                 lua_insert(E->L, end++);
                 // Stack: {nodes}, mountA, mountH, price, pathid, {nodes}, node, key, value
             }
@@ -2390,7 +2390,7 @@ namespace LuaGlobalFunctions
         pathEntry->ID = pathId;
         pathEntry->price = price;
         sTaxiPathStore.SetEntry(pathId, pathEntry);
-        Eluna::Push(E->L, pathId);
+        E->Push(pathId);
         return 1;
     }
 
@@ -2425,7 +2425,7 @@ namespace LuaGlobalFunctions
         uint8 bag = Eluna::CHECKVAL<uint8>(E->L, 1);
         uint8 slot = Eluna::CHECKVAL<uint8>(E->L, 2);
 
-        Eluna::Push(E->L, Player::IsInventoryPos(bag, slot));
+        E->Push(Player::IsInventoryPos(bag, slot));
         return 1;
     }
 
@@ -2443,7 +2443,7 @@ namespace LuaGlobalFunctions
         uint8 bag = Eluna::CHECKVAL<uint8>(E->L, 1);
         uint8 slot = Eluna::CHECKVAL<uint8>(E->L, 2);
 
-        Eluna::Push(E->L, Player::IsEquipmentPos(bag, slot));
+        E->Push(Player::IsEquipmentPos(bag, slot));
         return 1;
     }
 
@@ -2461,7 +2461,7 @@ namespace LuaGlobalFunctions
         uint8 bag = Eluna::CHECKVAL<uint8>(E->L, 1);
         uint8 slot = Eluna::CHECKVAL<uint8>(E->L, 2);
 
-        Eluna::Push(E->L, Player::IsBankPos(bag, slot));
+        E->Push(Player::IsBankPos(bag, slot));
         return 1;
     }
 
@@ -2479,7 +2479,7 @@ namespace LuaGlobalFunctions
         uint8 bag = Eluna::CHECKVAL<uint8>(E->L, 1);
         uint8 slot = Eluna::CHECKVAL<uint8>(E->L, 2);
 
-        Eluna::Push(E->L, Player::IsBagPos((bag << 8) + slot));
+        E->Push(Player::IsBagPos((bag << 8) + slot));
         return 1;
     }
 
@@ -2493,7 +2493,7 @@ namespace LuaGlobalFunctions
     {
         uint16 eventId = Eluna::CHECKVAL<uint16>(E->L, 1);
 
-        Eluna::Push(E->L, eGameEventMgr->IsActiveEvent(eventId));
+        E->Push(eGameEventMgr->IsActiveEvent(eventId));
         return 1;
     }
 
@@ -2504,7 +2504,7 @@ namespace LuaGlobalFunctions
      */
     int GetCurrTime(Eluna* E)
     {
-        Eluna::Push(E->L, ElunaUtil::GetCurrTime());
+        E->Push(ElunaUtil::GetCurrTime());
         return 1;
     }
 
@@ -2518,7 +2518,7 @@ namespace LuaGlobalFunctions
     {
         uint32 oldtimems = Eluna::CHECKVAL<uint32>(E->L, 1);
 
-        Eluna::Push(E->L, ElunaUtil::GetTimeDiff(oldtimems));
+        E->Push(ElunaUtil::GetTimeDiff(oldtimems));
         return 1;
     }
 
@@ -2625,7 +2625,7 @@ namespace LuaGlobalFunctions
         else if (!lua_isnoneornil(E->L, 1))
             init = Eluna::CHECKVAL<long long>(E->L, 1);
 
-        Eluna::Push(E->L, init);
+        E->Push(init);
         return 1;
     }
 
@@ -2657,7 +2657,7 @@ namespace LuaGlobalFunctions
         else if (!lua_isnoneornil(E->L, 1))
             init = Eluna::CHECKVAL<unsigned long long>(E->L, 1);
 
-        Eluna::Push(E->L, init);
+        E->Push(init);
         return 1;
     }
 

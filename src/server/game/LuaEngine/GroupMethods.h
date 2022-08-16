@@ -21,7 +21,7 @@ namespace LuaGroup
     int IsLeader(Eluna* E, Group* group)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
-        Eluna::Push(E->L, group->IsLeader(ObjectGuid(guid)));
+        E->Push(group->IsLeader(ObjectGuid(guid)));
         return 1;
     }
 
@@ -32,7 +32,7 @@ namespace LuaGroup
      */
     int IsFull(Eluna* E, Group* group)
     {
-        Eluna::Push(E->L, group->IsFull());
+        E->Push(group->IsFull());
         return 1;
     }
 
@@ -43,7 +43,7 @@ namespace LuaGroup
      */
     int IsRaidGroup(Eluna* E, Group* group)
     {
-        Eluna::Push(E->L, group->isRaidGroup());
+        E->Push(group->isRaidGroup());
         return 1;
     }
 
@@ -54,7 +54,7 @@ namespace LuaGroup
      */
     int IsBGGroup(Eluna* E, Group* group)
     {
-        Eluna::Push(E->L, group->isBGGroup());
+        E->Push(group->isBGGroup());
         return 1;
     }
 
@@ -67,7 +67,7 @@ namespace LuaGroup
     int IsMember(Eluna* E, Group* group)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
-        Eluna::Push(E->L, group->IsMember(ObjectGuid(guid)));
+        E->Push(group->IsMember(ObjectGuid(guid)));
         return 1;
     }
 
@@ -80,7 +80,7 @@ namespace LuaGroup
     int IsAssistant(Eluna* E, Group* group)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
-        Eluna::Push(E->L, group->IsAssistant(ObjectGuid(guid)));
+        E->Push(group->IsAssistant(ObjectGuid(guid)));
         return 1;
     }
 
@@ -95,7 +95,7 @@ namespace LuaGroup
     {
         Player* player1 = Eluna::CHECKOBJ<Player>(E->L, 2);
         Player* player2 = Eluna::CHECKOBJ<Player>(E->L, 3);
-        Eluna::Push(E->L, group->SameSubGroup(player1, player2));
+        E->Push(group->SameSubGroup(player1, player2));
         return 1;
     }
 
@@ -115,7 +115,7 @@ namespace LuaGroup
             return 0;
         }
 
-        Eluna::Push(E->L, group->HasFreeSlotSubGroup(subGroup));
+        E->Push(group->HasFreeSlotSubGroup(subGroup));
         return 1;
     }
 
@@ -131,7 +131,7 @@ namespace LuaGroup
 
         if (player->GetGroup() || !group->IsCreated() || group->IsFull())
         {
-            Eluna::Push(E->L, false);
+            E->Push(false);
             return 1;
         }
 
@@ -146,19 +146,19 @@ namespace LuaGroup
         bool success = group->AddMember(player->GetObjectGuid(), player->GetName());
 #endif
 
-        Eluna::Push(E->L, success);
+        E->Push(success);
         return 1;
     }
 
     /*int IsLFGGroup(Eluna* E, Group* group) // TODO: Implementation
     {
-        Eluna::Push(E->L, group->isLFGGroup());
+        E->Push(group->isLFGGroup());
         return 1;
     }*/
 
     /*int IsBFGroup(Eluna* E, Group* group) // TODO: Implementation
     {
-        Eluna::Push(E->L, group->isBFGroup());
+        E->Push(group->isBFGroup());
         return 1;
     }*/
 
@@ -184,7 +184,7 @@ namespace LuaGroup
             if (!member || !member->GetSession())
                 continue;
 
-            Eluna::Push(E->L, member);
+            E->Push(member);
             lua_rawseti(E->L, tbl, ++i);
         }
 
@@ -200,9 +200,9 @@ namespace LuaGroup
     int GetLeaderGUID(Eluna* E, Group* group)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, group->GetLeaderGUID());
+        E->Push(group->GetLeaderGUID());
 #else
-        Eluna::Push(E->L, group->GetLeaderGuid());
+        E->Push(group->GetLeaderGuid());
 #endif
         return 1;
     }
@@ -215,9 +215,9 @@ namespace LuaGroup
     int GetGUID(Eluna* E, Group* group)
     {
 #ifdef CLASSIC
-        Eluna::Push(E->L, group->GetId());
+        E->Push(group->GetId());
 #else
-        Eluna::Push(E->L, group->GET_GUID());
+        E->Push(group->GET_GUID());
 #endif
         return 1;
     }
@@ -232,9 +232,9 @@ namespace LuaGroup
     {
         const char* name = Eluna::CHECKVAL<const char*>(E->L, 2);
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, group->GetMemberGUID(name));
+        E->Push(group->GetMemberGUID(name));
 #else
-        Eluna::Push(E->L, group->GetMemberGuid(name));
+        E->Push(group->GetMemberGuid(name));
 #endif
         return 1;
     }
@@ -246,7 +246,7 @@ namespace LuaGroup
      */
     int GetMembersCount(Eluna* E, Group* group)
     {
-        Eluna::Push(E->L, group->GetMembersCount());
+        E->Push(group->GetMembersCount());
         return 1;
     }
 
@@ -259,7 +259,7 @@ namespace LuaGroup
     int GetMemberGroup(Eluna* E, Group* group)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
-        Eluna::Push(E->L, group->GetMemberGroup(ObjectGuid(guid)));
+        E->Push(group->GetMemberGroup(ObjectGuid(guid)));
         return 1;
     }
 
@@ -320,9 +320,9 @@ namespace LuaGroup
         uint32 method = Eluna::CHECKVAL<uint32>(E->L, 3, 0);
 
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, group->RemoveMember(ObjectGuid(guid), (RemoveMethod)method));
+        E->Push(group->RemoveMember(ObjectGuid(guid), (RemoveMethod)method));
 #else
-        Eluna::Push(E->L, group->RemoveMember(ObjectGuid(guid), method));
+        E->Push(group->RemoveMember(ObjectGuid(guid), method));
 #endif
         return 1;
     }
@@ -403,13 +403,13 @@ namespace LuaGroup
 
     int GetDungeonLevel(Eluna* E, Group* group)
     {
-        Eluna::Push(E->L, group->GetDungeonLevel());
+        E->Push(group->GetDungeonLevel());
         return 1;
     }
 
     int GetCappedDungeonLevel(Eluna* E, Group* group)
     {
-        Eluna::Push(E->L, group->GetCappedDungeonLevel());
+        E->Push(group->GetCappedDungeonLevel());
         return 1;
     }
 };

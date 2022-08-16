@@ -150,7 +150,7 @@ uint32 ElunaInstanceAI::GetData(uint32 key) const
     instance->GetEluna()->PushInstanceData(L, const_cast<ElunaInstanceAI*>(this), false);
     // Stack: instance_data
 
-    Eluna::Push(L, key);
+    instance->GetEluna()->Push(key);
     // Stack: instance_data, key
 
     lua_gettable(L, -2);
@@ -172,8 +172,8 @@ void ElunaInstanceAI::SetData(uint32 key, uint32 value)
     instance->GetEluna()->PushInstanceData(L, this, false);
     // Stack: instance_data
 
-    Eluna::Push(L, key);
-    Eluna::Push(L, value);
+    instance->GetEluna()->Push(key);
+    instance->GetEluna()->Push(value);
     // Stack: instance_data, key, value
 
     lua_settable(L, -3);
@@ -192,7 +192,7 @@ uint64 ElunaInstanceAI::GetData64(uint32 key) const
     instance->GetEluna()->PushInstanceData(L, const_cast<ElunaInstanceAI*>(this), false);
     // Stack: instance_data
 
-    Eluna::Push(L, key);
+    instance->GetEluna()->Push(key);
     // Stack: instance_data, key
 
     lua_gettable(L, -2);
@@ -214,8 +214,8 @@ void ElunaInstanceAI::SetData64(uint32 key, uint64 value)
     instance->GetEluna()->PushInstanceData(L, this, false);
     // Stack: instance_data
 
-    Eluna::Push(L, key);
-    Eluna::Push(L, value);
+    instance->GetEluna()->Push(key);
+    instance->GetEluna()->Push(value);
     // Stack: instance_data, key, value
 
     lua_settable(L, -3);
