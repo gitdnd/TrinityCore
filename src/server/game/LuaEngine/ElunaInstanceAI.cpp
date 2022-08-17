@@ -11,7 +11,6 @@
 
 void ElunaInstanceAI::Initialize()
 {
-    LOCK_ELUNA;
     ASSERT(!instance->GetEluna()->HasInstanceData(instance));
 
     // Create a new table for instance data.
@@ -24,8 +23,6 @@ void ElunaInstanceAI::Initialize()
 
 void ElunaInstanceAI::Load(const char* data)
 {
-    LOCK_ELUNA;
-
     // If we get passed NULL (i.e. `Reload` was called) then use
     //   the last known save data (or maybe just an empty string).
     if (!data)
@@ -105,7 +102,6 @@ void ElunaInstanceAI::Load(const char* data)
 
 const char* ElunaInstanceAI::Save() const
 {
-    LOCK_ELUNA;
     lua_State* L = instance->GetEluna()->L;
     // Stack: (empty)
 
@@ -143,7 +139,6 @@ const char* ElunaInstanceAI::Save() const
 
 uint32 ElunaInstanceAI::GetData(uint32 key) const
 {
-    LOCK_ELUNA;
     lua_State* L = instance->GetEluna()->L;
     // Stack: (empty)
 
@@ -165,7 +160,6 @@ uint32 ElunaInstanceAI::GetData(uint32 key) const
 
 void ElunaInstanceAI::SetData(uint32 key, uint32 value)
 {
-    LOCK_ELUNA;
     lua_State* L = instance->GetEluna()->L;
     // Stack: (empty)
 
@@ -185,7 +179,6 @@ void ElunaInstanceAI::SetData(uint32 key, uint32 value)
 
 uint64 ElunaInstanceAI::GetData64(uint32 key) const
 {
-    LOCK_ELUNA;
     lua_State* L = instance->GetEluna()->L;
     // Stack: (empty)
 
@@ -207,7 +200,6 @@ uint64 ElunaInstanceAI::GetData64(uint32 key) const
 
 void ElunaInstanceAI::SetData64(uint32 key, uint64 value)
 {
-    LOCK_ELUNA;
     lua_State* L = instance->GetEluna()->L;
     // Stack: (empty)
 

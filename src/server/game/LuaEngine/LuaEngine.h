@@ -116,7 +116,6 @@ struct LuaScript
 
 #define ELUNA_OBJECT_STORE  "Eluna Object Store"
 #define ELUNA_STATE_PTR     "Eluna State Ptr"
-#define LOCK_ELUNA Eluna::Guard __guard(Eluna::GetLock())
 
 #ifndef TRINITY
 #define TC_GAME_API
@@ -127,7 +126,6 @@ public:
     typedef std::list<LuaScript> ScriptList;
 
     typedef std::recursive_mutex LockType;
-    typedef std::lock_guard<LockType> Guard;
     Eluna();
     ~Eluna();
 
@@ -254,7 +252,7 @@ public:
     void Initialize();
     void Uninitialize();
     // This function is used to make eluna reload
-    static void ReloadEluna() { LOCK_ELUNA; reload = true; }
+    static void ReloadEluna() { reload = true; }
     static LockType& GetLock() { return lock; };
     bool const IsInitialized() { return initialized; }
     // Never returns nullptr

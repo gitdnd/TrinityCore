@@ -69,7 +69,6 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::Initialize()
 {
-    LOCK_ELUNA;
     printf("Initializing Eluna\n");
     //ASSERT(!IsInitialized());
     /*
@@ -92,7 +91,6 @@ void Eluna::Initialize()
 
 void Eluna::Uninitialize()
 {
-    LOCK_ELUNA;
     printf("Uninitializing Eluna\n");
     //ASSERT(IsInitialized());
 
@@ -471,7 +469,6 @@ static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second
 
 void Eluna::RunScripts()
 {
-    LOCK_ELUNA;
     printf("Running scripts \n");
     if (!IsEnabled())
     {
@@ -1345,8 +1342,6 @@ void Eluna::CreateInstanceData(Map const* map)
  */
 void Eluna::FreeInstanceId(uint32 instanceId)
 {
-    LOCK_ELUNA;
-
     if (!IsEnabled())
         return;
 

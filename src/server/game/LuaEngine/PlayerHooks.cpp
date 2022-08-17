@@ -20,16 +20,14 @@ using namespace Hooks;
         return;\
     auto key = EventKey<PlayerEvents>(EVENT);\
     if (!PlayerEventBindings->HasBindingsFor(key))\
-        return;\
-    LOCK_ELUNA
+        return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, RETVAL) \
     if (!IsEnabled())\
         return RETVAL;\
     auto key = EventKey<PlayerEvents>(EVENT);\
     if (!PlayerEventBindings->HasBindingsFor(key))\
-        return RETVAL;\
-    LOCK_ELUNA
+        return RETVAL;
 
 void Eluna::OnLearnTalents(Player* pPlayer, uint32 talentId, uint32 talentRank, uint32 spellid)
 {
