@@ -77,7 +77,7 @@ Map::~Map()
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
-    eluna->Uninitialize();
+    //eluna->Uninitialize();
     delete eluna;
     eluna = nullptr;
 

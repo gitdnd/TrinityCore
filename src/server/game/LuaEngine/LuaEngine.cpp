@@ -204,8 +204,8 @@ CreatureUniqueBindings(NULL)
 
 Eluna::~Eluna()
 {
-    ASSERT(IsInitialized());
-
+    //ASSERT(IsInitialized());
+    Uninitialize();
     CloseLua();
 
     delete eventMgr;
