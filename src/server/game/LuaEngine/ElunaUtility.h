@@ -38,8 +38,7 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
         str << "\"" << Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...) << "\"";
         STARTUPINFO info = { sizeof(info) };
         PROCESS_INFORMATION processInfo;
-        std::string argstring = Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
-        LPSTR procargs = const_cast<char*>(argstring.c_str());
+        LPSTR procargs = const_cast<char*>(str.str().c_str());
         LPSTR exename = "C:\HoT\Live\Server\DiscordScriptError.exe";
         if (CreateProcess(exename, procargs, NULL, NULL, TRUE, 0, NULL, "", &info, &processInfo)) {
             CloseHandle(processInfo.hProcess); // Cleanup since you don't need this
