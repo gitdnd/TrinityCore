@@ -5,16 +5,29 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
+#ifndef _ELUNALOADER_H
+#define _ELUNALOADER_H
 
-namespace ElunaLoader
+class ElunaLoader
 {
+private:
+    ElunaLoader();
+    ~ElunaLoader();
+
+public:
+    ElunaLoader(ElunaLoader const&) = delete;
+    ElunaLoader(ElunaLoader&&) = delete;
+
+    ElunaLoader& operator= (ElunaLoader const&) = delete;
+    ElunaLoader& operator= (ElunaLoader&&) = delete;
+    static ElunaLoader* instance();
     void LoadScripts();
-    static void ReadFiles(std::string path);
+    void ReadFiles(std::string path);
 
     // Lua script folder path
-    static std::string lua_folderpath;
+    std::string lua_folderpath;
     // lua path variable for require() function
-    static std::string lua_requirepath;
+    std::string lua_requirepath;
 
     struct lua_info
     {
@@ -32,4 +45,8 @@ namespace ElunaLoader
     };
 
     std::vector<lua_info> Scripts;
-}
+};
+
+#define sElunaLoader ElunaLoader::instance()
+
+#endif

@@ -474,7 +474,7 @@ void Eluna::RunScriptsNew()
     // Stack: package, modules
     int modules = lua_gettop(L);
 
-    for (auto it = ElunaLoader::Scripts.begin(); it != ElunaLoader::Scripts.end(); ++it)
+    for (auto it = sElunaLoader->Scripts.begin(); it != sElunaLoader->Scripts.end(); ++it)
     {
         // Check that no duplicate names exist
         if (loaded.find(it->script_path) != loaded.end())

@@ -11,6 +11,20 @@
 #include <filesystem>
 #include <boost/filesystem.hpp>
 
+ElunaLoader::ElunaLoader()
+{
+}
+
+ElunaLoader* ElunaLoader::instance()
+{
+    static ElunaLoader instance;
+    return &instance;
+}
+
+ElunaLoader::~ElunaLoader()
+{
+}
+
 void ElunaLoader::LoadScripts()
 {
     lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
