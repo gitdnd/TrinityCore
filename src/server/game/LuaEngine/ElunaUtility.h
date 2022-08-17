@@ -31,7 +31,7 @@
 template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
-    return;
+    //return;
     if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
     {
         std::ostringstream str;
