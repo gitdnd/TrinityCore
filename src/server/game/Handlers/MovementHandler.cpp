@@ -291,7 +291,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     if (!movementInfo.pos.IsPositionValid())
     {
-        ChatHandler(this).PSendSysMessage("Desync F detected, report to devs.");
+        //ChatHandler(this).PSendSysMessage("Desync F detected, report to devs.");
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
@@ -309,7 +309,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
         {
-            ChatHandler(this).PSendSysMessage("Desync detected, attempting to fix.");
+            //ChatHandler(this).PSendSysMessage("Desync detected, attempting to fix.");
             recvData.rfinish();                 // prevent warnings spam
             if (Player* plrMover = mover->ToPlayer())
             {
@@ -398,7 +398,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
     if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
-        ChatHandler(this).PSendSysMessage("Desync D detected, report to devs.");
+        //ChatHandler(this).PSendSysMessage("Desync D detected, report to devs.");
         TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
         movementInfo.time = GameTime::GetGameTimeMS();
     }
