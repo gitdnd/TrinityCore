@@ -40,11 +40,13 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
         PROCESS_INFORMATION processInfo;
         std::string argstring = Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
         LPSTR procargs = const_cast<char*>(argstring.c_str());
-        LPSTR exename = "DiscordScriptError.exe";
+        LPSTR exename = "C:\HoT\Live\Server\DiscordScriptError.exe";
         if (CreateProcess(exename, procargs, NULL, NULL, TRUE, 0, NULL, "", &info, &processInfo)) {
             CloseHandle(processInfo.hProcess); // Cleanup since you don't need this
             CloseHandle(processInfo.hThread); // Cleanup since you don't need this
         }
+        else
+            prtintf("Error making proc");
         //std::system(str.str().c_str());
     }
     //std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");
