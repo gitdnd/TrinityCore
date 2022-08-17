@@ -294,8 +294,6 @@ void Eluna::OnWorldUpdate(uint32 diff)
             _ReloadEluna();
     }
 
-    eventMgr->globalProcessor->Update(diff);
-
     START_HOOK(WORLD_EVENT_ON_UPDATE);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
@@ -347,8 +345,7 @@ void Eluna::OnPlayerLeave(Map* map, Player* player)
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
     START_HOOK(MAP_EVENT_ON_UPDATE);
-    // enable this for multithread
-    // eventMgr->globalProcessor->Update(diff);
+    UpdateEventMgr(diff);
     Push(map);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
