@@ -46,7 +46,7 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
             CloseHandle(processInfo.hThread); // Cleanup since you don't need this
         }
         else
-            prtintf("Error making proc");
+            printf("Error making proc\n");
         //std::system(str.str().c_str());
     }
     //std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");
