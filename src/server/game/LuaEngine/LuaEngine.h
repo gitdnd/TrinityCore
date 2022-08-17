@@ -316,6 +316,7 @@ public:
     void PushInstanceData(lua_State* L, ElunaInstanceAI* ai, bool incrementCounter = true);
 
     void RunScripts();
+    void RunScriptsNew();
     bool ShouldReload() const { return reload; }
     bool IsEnabled() const { return enabled && initialized; }
     bool HasLuaState() const { return L != NULL; }
