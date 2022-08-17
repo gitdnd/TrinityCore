@@ -144,6 +144,7 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "CreateUint64", &LuaGlobalFunctions::CreateULongLong },
     { "StartGameEvent", &LuaGlobalFunctions::StartGameEvent },
     { "StopGameEvent", &LuaGlobalFunctions::StopGameEvent },
+    { "GetElunaMapId", &LuaGlobalFunctions::GetElunaMapId },
 
     { NULL, NULL }
 };

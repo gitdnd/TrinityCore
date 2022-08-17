@@ -277,7 +277,7 @@ m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
-i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
+i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna(id))
 {
     printf("Loading %u\n", GetId());
     //eluna->Initialize();
