@@ -177,7 +177,8 @@ boundMapId(MapId)
 
     OpenLua();
     eventMgr = new EventMgr(this);
-    RunScripts();
+    //RunScripts();
+    RunScriptsNew();
 
     // Replace this with map insert if making multithread version
 

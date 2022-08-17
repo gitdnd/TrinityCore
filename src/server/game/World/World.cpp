@@ -87,6 +87,7 @@
 #include "WeatherMgr.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaLoader.h"
 #endif
 #include "WhoListStorage.h"
 #include "WorldSession.h"
@@ -2323,6 +2324,7 @@ void World::SetInitialWorldSettings()
 #ifdef ELUNA
     ///- Run eluna scripts.
     // in multithread foreach: run scripts
+    ElunaLoader::LoadScripts();
     //sEluna->RunScripts();
     //sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
 #endif
