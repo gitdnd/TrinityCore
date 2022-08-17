@@ -31,14 +31,17 @@
 template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
-    //return;
+    return;
     if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
     {
         std::ostringstream str;
         str << "\"" << Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...) << "\"";
         STARTUPINFO info = { sizeof(info) };
         PROCESS_INFORMATION processInfo;
-        if (CreateProcess("DiscordScriptError.exe", str.str().c_str(), NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
+        std::string argstring = Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        LPSTR procargs = const_cast<char*>(argstring.c_str());
+        LPSTR exename = "DiscordScriptError.exe";
+        if (CreateProcess(exename, procargs, NULL, NULL, TRUE, 0, NULL, "", &info, &processInfo)) {
             CloseHandle(processInfo.hProcess); // Cleanup since you don't need this
             CloseHandle(processInfo.hThread); // Cleanup since you don't need this
         }
