@@ -126,7 +126,7 @@ public:
     typedef std::list<LuaScript> ScriptList;
 
     typedef std::recursive_mutex LockType;
-    Eluna();
+    Eluna(uint32 MapId);
     ~Eluna();
 
     // Prevent copy
@@ -135,7 +135,8 @@ public:
 private:
     static bool reload;
     bool initialized;
-    static LockType lock;
+    uint32 boundMapId;
+    //static LockType lock;
 
     // Lua script locations
     static ScriptList lua_scripts;
@@ -253,7 +254,7 @@ public:
     void Uninitialize();
     // This function is used to make eluna reload
     static void ReloadEluna() { reload = true; }
-    static LockType& GetLock() { return lock; };
+    //static LockType& GetLock() { return lock; };
     bool const IsInitialized() { return initialized; }
     // Never returns nullptr
     static Eluna* GetEluna(lua_State* L)
@@ -553,6 +554,7 @@ public:
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
 
     //void UpdateEventMgr(uint32 diff) { eventMgr->globalProcessor->Update(diff); }
+    uint32 GetBoundMapId() const { return boundMapId; }
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);

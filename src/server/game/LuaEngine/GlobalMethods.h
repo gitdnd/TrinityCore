@@ -3184,5 +3184,11 @@ namespace LuaGlobalFunctions
 
         return 0;
     }
+
+    int GetElunaMapId(Eluna* E)
+    {
+        Eluna::Push(E->L, E->GetBoundMapId());
+        return 1;
+    }
 }
 #endif

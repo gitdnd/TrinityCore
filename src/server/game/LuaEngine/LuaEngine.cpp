@@ -48,7 +48,7 @@ std::string Eluna::lua_requirepath;
 //Eluna* Eluna::GEluna = NULL;
 bool Eluna::reload = false;
 //bool Eluna::initialized = false;
-Eluna::LockType Eluna::lock;
+//Eluna::LockType Eluna::lock;
 
 extern void RegisterFunctions(Eluna* E);
 
@@ -143,7 +143,7 @@ void Eluna::_ReloadEluna()
     reload = false;*/
 }
 
-Eluna::Eluna() :
+Eluna::Eluna(uint32 MapId) :
 event_level(0),
 push_counter(0),
 enabled(false),
@@ -169,7 +169,8 @@ PlayerGossipBindings(NULL),
 MapEventBindings(NULL),
 InstanceEventBindings(NULL),
 
-CreatureUniqueBindings(NULL)
+CreatureUniqueBindings(NULL),
+boundMapId(MapId)
 {
     Initialize();
     //ASSERT(IsInitialized());
