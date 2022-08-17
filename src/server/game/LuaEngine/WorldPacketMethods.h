@@ -27,7 +27,7 @@ namespace LuaPacket
      */
     int GetOpcode(Eluna* E, WorldPacket* packet)
     {
-        E->Push(packet->GetOpcode());
+        Eluna::Push(E->L, packet->GetOpcode());
         return 1;
     }
 
@@ -38,7 +38,7 @@ namespace LuaPacket
      */
     int GetSize(Eluna* E, WorldPacket* packet)
     {
-        E->Push(packet->size());
+        Eluna::Push(E->L, packet->size());
         return 1;
     }
 
@@ -65,7 +65,7 @@ namespace LuaPacket
     {
         int8 _byte;
         (*packet) >> _byte;
-        E->Push(_byte);
+        Eluna::Push(E->L, _byte);
         return 1;
     }
 
@@ -78,7 +78,7 @@ namespace LuaPacket
     {
         uint8 _ubyte;
         (*packet) >> _ubyte;
-        E->Push(_ubyte);
+        Eluna::Push(E->L, _ubyte);
         return 1;
     }
 
@@ -91,7 +91,7 @@ namespace LuaPacket
     {
         int16 _short;
         (*packet) >> _short;
-        E->Push(_short);
+        Eluna::Push(E->L, _short);
         return 1;
     }
 
@@ -104,7 +104,7 @@ namespace LuaPacket
     {
         uint16 _ushort;
         (*packet) >> _ushort;
-        E->Push(_ushort);
+        Eluna::Push(E->L, _ushort);
         return 1;
     }
 
@@ -117,7 +117,7 @@ namespace LuaPacket
     {
         int32 _long;
         (*packet) >> _long;
-        E->Push(_long);
+        Eluna::Push(E->L, _long);
         return 1;
     }
 
@@ -130,7 +130,7 @@ namespace LuaPacket
     {
         uint32 _ulong;
         (*packet) >> _ulong;
-        E->Push(_ulong);
+        Eluna::Push(E->L, _ulong);
         return 1;
     }
 
@@ -143,7 +143,7 @@ namespace LuaPacket
     {
         float _val;
         (*packet) >> _val;
-        E->Push(_val);
+        Eluna::Push(E->L, _val);
         return 1;
     }
 
@@ -156,7 +156,7 @@ namespace LuaPacket
     {
         double _val;
         (*packet) >> _val;
-        E->Push(_val);
+        Eluna::Push(E->L, _val);
         return 1;
     }
 
@@ -169,7 +169,7 @@ namespace LuaPacket
     {
         uint64 guid;
         (*packet) >> guid;
-        E->Push(guid);
+        Eluna::Push(E->L, guid);
         return 1;
     }
 
@@ -182,7 +182,7 @@ namespace LuaPacket
     {
         std::string _val;
         (*packet) >> _val;
-        E->Push(_val);
+        Eluna::Push(E->L, _val);
         return 1;
     }
 

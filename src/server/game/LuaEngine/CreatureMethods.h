@@ -22,7 +22,7 @@ namespace LuaCreature
      */
     int IsReputationGainDisabled(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsReputationGainDisabled());
+        Eluna::Push(E->L, creature->IsReputationGainDisabled());
         return 1;
     }
 
@@ -38,9 +38,9 @@ namespace LuaCreature
         uint32 quest_id = Eluna::CHECKVAL<uint32>(E->L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->hasInvolvedQuest(quest_id));
+        Eluna::Push(E->L, creature->hasInvolvedQuest(quest_id));
 #else
-        E->Push(creature->HasInvolvedQuest(quest_id));
+        Eluna::Push(E->L, creature->HasInvolvedQuest(quest_id));
 #endif
         return 1;
     }
@@ -57,9 +57,9 @@ namespace LuaCreature
         bool mustBeDead = Eluna::CHECKVAL<bool>(E->L, 2, false);
 
 #ifdef MANGOS
-        E->Push(creature->IsTargetableForAttack(mustBeDead));
+        Eluna::Push(E->L, creature->IsTargetableForAttack(mustBeDead));
 #else
-        E->Push(creature->isTargetableForAttack(mustBeDead));
+        Eluna::Push(E->L, creature->isTargetableForAttack(mustBeDead));
 #endif
         return 1;
     }
@@ -79,7 +79,7 @@ namespace LuaCreature
         Unit* enemy = Eluna::CHECKOBJ<Unit>(E->L, 3);
         bool checkfaction = Eluna::CHECKVAL<bool>(E->L, 4, true);
 
-        E->Push(creature->CanAssistTo(u, enemy, checkfaction));
+        Eluna::Push(E->L, creature->CanAssistTo(u, enemy, checkfaction));
         return 1;
     }
 
@@ -91,7 +91,7 @@ namespace LuaCreature
      */
     int HasSearchedAssistance(Eluna* E, Creature* creature)
     {
-        E->Push(creature->HasSearchedAssistance());
+        Eluna::Push(E->L, creature->HasSearchedAssistance());
         return 1;
     }
 
@@ -106,9 +106,9 @@ namespace LuaCreature
         Player* player = Eluna::CHECKOBJ<Player>(E->L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->isTappedBy(player));
+        Eluna::Push(E->L, creature->isTappedBy(player));
 #else
-        E->Push(creature->IsTappedBy(player));
+        Eluna::Push(E->L, creature->IsTappedBy(player));
 #endif
         return 1;
     }
@@ -122,9 +122,9 @@ namespace LuaCreature
     int HasLootRecipient(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->hasLootRecipient());
+        Eluna::Push(E->L, creature->hasLootRecipient());
 #else
-        E->Push(creature->HasLootRecipient());
+        Eluna::Push(E->L, creature->HasLootRecipient());
 #endif
         return 1;
     }
@@ -138,10 +138,10 @@ namespace LuaCreature
     int CanAggro(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(!creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC));
+        Eluna::Push(E->L, !creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC));
 #else
-        // E->Push(creature->CanInitiateAttack());
-        E->Push(!creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE));
+        // Eluna::Push(E->L, creature->CanInitiateAttack());
+        Eluna::Push(E->L, !creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE));
 #endif
         return 1;
     }
@@ -154,7 +154,7 @@ namespace LuaCreature
      */
     int CanSwim(Eluna* E, Creature* creature)
     {
-        E->Push(creature->CanSwim());
+        Eluna::Push(E->L, creature->CanSwim());
         return 1;
     }
 
@@ -166,7 +166,7 @@ namespace LuaCreature
      */
     int CanWalk(Eluna* E, Creature* creature)
     {
-        E->Push(creature->CanWalk());
+        Eluna::Push(E->L, creature->CanWalk());
         return 1;
     }
 
@@ -178,7 +178,7 @@ namespace LuaCreature
      */
     int IsInEvadeMode(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsInEvadeMode());
+        Eluna::Push(E->L, creature->IsInEvadeMode());
         return 1;
     }
 
@@ -191,9 +191,9 @@ namespace LuaCreature
     int IsElite(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->isElite());
+        Eluna::Push(E->L, creature->isElite());
 #else
-        E->Push(creature->IsElite());
+        Eluna::Push(E->L, creature->IsElite());
 #endif
         return 1;
     }
@@ -206,7 +206,7 @@ namespace LuaCreature
      */
     int IsGuard(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsGuard());
+        Eluna::Push(E->L, creature->IsGuard());
         return 1;
     }
 
@@ -218,7 +218,7 @@ namespace LuaCreature
      */
     int IsCivilian(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsCivilian());
+        Eluna::Push(E->L, creature->IsCivilian());
         return 1;
     }
 
@@ -230,7 +230,7 @@ namespace LuaCreature
      */
     int IsRacialLeader(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsRacialLeader());
+        Eluna::Push(E->L, creature->IsRacialLeader());
         return 1;
     }
 
@@ -243,9 +243,9 @@ namespace LuaCreature
     int IsWorldBoss(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->isWorldBoss());
+        Eluna::Push(E->L, creature->isWorldBoss());
 #else
-        E->Push(creature->IsWorldBoss());
+        Eluna::Push(E->L, creature->IsWorldBoss());
 #endif
         return 1;
     }
@@ -263,16 +263,16 @@ namespace LuaCreature
 
 #if defined TRINITY
         if (const SpellInfo* info = sSpellMgr->GetSpellInfo(spell))
-            E->Push(info->GetCategory() && creature->GetSpellHistory()->HasCooldown(spell));
+            Eluna::Push(E->L, info->GetCategory() && creature->GetSpellHistory()->HasCooldown(spell));
         else
-            E->Push(false);
+            Eluna::Push(E->L, false);
 #elif AZEROTHCORE
         if (const SpellInfo* info = sSpellMgr->GetSpellInfo(spell))
-            E->Push(info->GetCategory() && creature->HasSpellCooldown(spell));
+            Eluna::Push(E->L, info->GetCategory() && creature->HasSpellCooldown(spell));
         else
-            E->Push(false);
+            Eluna::Push(E->L, false);
 #else
-        E->Push(creature->HasCategoryCooldown(spell));
+        Eluna::Push(E->L, creature->HasCategoryCooldown(spell));
 #endif
         return 1;
     }
@@ -288,7 +288,7 @@ namespace LuaCreature
     {
         uint32 id = Eluna::CHECKVAL<uint32>(E->L, 2);
 
-        E->Push(creature->HasSpell(id));
+        Eluna::Push(E->L, creature->HasSpell(id));
         return 1;
     }
 
@@ -304,9 +304,9 @@ namespace LuaCreature
         uint32 questId = Eluna::CHECKVAL<uint32>(E->L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->hasQuest(questId));
+        Eluna::Push(E->L, creature->hasQuest(questId));
 #else
-        E->Push(creature->HasQuest(questId));
+        Eluna::Push(E->L, creature->HasQuest(questId));
 #endif
         return 1;
     }
@@ -323,9 +323,9 @@ namespace LuaCreature
         uint32 spellId = Eluna::CHECKVAL<uint32>(E->L, 2);
 
 #ifdef TRINITY
-        E->Push(creature->GetSpellHistory()->HasCooldown(spellId));
+        Eluna::Push(E->L, creature->GetSpellHistory()->HasCooldown(spellId));
 #else
-        E->Push(creature->HasSpellCooldown(spellId));
+        Eluna::Push(E->L, creature->HasSpellCooldown(spellId));
 #endif
         return 1;
     }
@@ -338,7 +338,7 @@ namespace LuaCreature
      */
     int CanFly(Eluna* E, Creature* creature)
     {
-        E->Push(creature->CanFly());
+        Eluna::Push(E->L, creature->CanFly());
         return 1;
     }
 
@@ -351,7 +351,7 @@ namespace LuaCreature
      */
     int IsTrigger(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsTrigger());
+        Eluna::Push(E->L, creature->IsTrigger());
         return 1;
     }
 
@@ -362,7 +362,7 @@ namespace LuaCreature
      */
     int IsDamageEnoughForLootingAndReward(Eluna* E, Creature* creature)
     {
-        E->Push(creature->IsDamageEnoughForLootingAndReward());
+        Eluna::Push(E->L, creature->IsDamageEnoughForLootingAndReward());
         return 1;
     }
 
@@ -379,9 +379,9 @@ namespace LuaCreature
         Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
 #ifndef AZEROTHCORE
         bool force = Eluna::CHECKVAL<bool>(E->L, 3, true);
-        E->Push(creature->CanStartAttack(target, force));
+        Eluna::Push(E->L, creature->CanStartAttack(target, force));
 #else
-        E->Push(creature->CanStartAttack(target));
+        Eluna::Push(E->L, creature->CanStartAttack(target));
 #endif
         return 1;
     }
@@ -396,7 +396,7 @@ namespace LuaCreature
     {
         uint16 lootMode = Eluna::CHECKVAL<uint16>(E->L, 2);
 
-        E->Push(creature->HasLootMode(lootMode));
+        Eluna::Push(E->L, creature->HasLootMode(lootMode));
         return 1;
     }
 #endif
@@ -411,7 +411,7 @@ namespace LuaCreature
      */
     int GetRespawnDelay(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetRespawnDelay());
+        Eluna::Push(E->L, creature->GetRespawnDelay());
         return 1;
     }
 
@@ -424,9 +424,9 @@ namespace LuaCreature
     int GetWanderRadius(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->GetWanderDistance());
+        Eluna::Push(E->L, creature->GetWanderDistance());
 #else
-        E->Push(creature->GetRespawnRadius());
+        Eluna::Push(E->L, creature->GetRespawnRadius());
 #endif
         return 1;
     }
@@ -439,7 +439,7 @@ namespace LuaCreature
      */
     int GetWaypointPath(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetWaypointPath());
+        Eluna::Push(E->L, creature->GetWaypointPath());
         return 1;
     }
 #endif
@@ -452,11 +452,11 @@ namespace LuaCreature
     int GetCurrentWaypointId(Eluna* E, Creature* creature)
     {
 #ifdef TRINITY
-        E->Push(creature->GetCurrentWaypointInfo().first);
+        Eluna::Push(E->L, creature->GetCurrentWaypointInfo().first);
 #elif AZEROTHCORE
-        E->Push(creature->GetCurrentWaypointID());
+        Eluna::Push(E->L, creature->GetCurrentWaypointID());
 #else
-        E->Push(creature->GetMotionMaster()->getLastReachedWaypoint());
+        Eluna::Push(E->L, creature->GetMotionMaster()->getLastReachedWaypoint());
 #endif
         return 1;
     }
@@ -468,7 +468,7 @@ namespace LuaCreature
      */
     int GetDefaultMovementType(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetDefaultMovementType());
+        Eluna::Push(E->L, creature->GetDefaultMovementType());
         return 1;
     }
 
@@ -483,11 +483,11 @@ namespace LuaCreature
         Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->GetAggroRange(target));
+        Eluna::Push(E->L, creature->GetAggroRange(target));
 #else
         float AttackDist = creature->GetAttackDistance(target);
         float ThreatRadius = sWorld.getConfig(CONFIG_FLOAT_THREAT_RADIUS);
-        E->Push(ThreatRadius > AttackDist ? ThreatRadius : AttackDist);
+        Eluna::Push(E->L, ThreatRadius > AttackDist ? ThreatRadius : AttackDist);
 #endif
         return 1;
     }
@@ -506,7 +506,7 @@ namespace LuaCreature
     {
         Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
 
-        E->Push(creature->GetAttackDistance(target));
+        Eluna::Push(E->L, creature->GetAttackDistance(target));
         return 1;
     }
 #endif
@@ -519,9 +519,9 @@ namespace LuaCreature
     int GetLootRecipientGroup(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->GetLootRecipientGroup());
+        Eluna::Push(E->L, creature->GetLootRecipientGroup());
 #else
-        E->Push(creature->GetGroupLootRecipient());
+        Eluna::Push(E->L, creature->GetGroupLootRecipient());
 #endif
         return 1;
     }
@@ -533,7 +533,7 @@ namespace LuaCreature
      */
     int GetLootRecipient(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetLootRecipient());
+        Eluna::Push(E->L, creature->GetLootRecipient());
         return 1;
     }
 
@@ -548,7 +548,7 @@ namespace LuaCreature
      */
     int GetScriptName(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetScriptName());
+        Eluna::Push(E->L, creature->GetScriptName());
         return 1;
     }
 
@@ -563,7 +563,7 @@ namespace LuaCreature
      */
     int GetAIName(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetAIName());
+        Eluna::Push(E->L, creature->GetAIName());
         return 1;
     }
 
@@ -577,7 +577,7 @@ namespace LuaCreature
      */
     int GetScriptId(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetScriptId());
+        Eluna::Push(E->L, creature->GetScriptId());
         return 1;
     }
 
@@ -593,16 +593,16 @@ namespace LuaCreature
 
 #ifdef TRINITY
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
-            E->Push(creature->GetSpellHistory()->GetRemainingCooldown(spellInfo));
+            Eluna::Push(E->L, creature->GetSpellHistory()->GetRemainingCooldown(spellInfo));
         else
-            E->Push(0);
+            Eluna::Push(E->L, 0);
 #elif AZEROTHCORE
         if (sSpellMgr->GetSpellInfo(spell))
-            E->Push(creature->GetSpellCooldown(spell));
+            Eluna::Push(E->L, creature->GetSpellCooldown(spell));
         else
-            E->Push(0);
+            Eluna::Push(E->L, 0);
 #else
-        E->Push(creature->GetCreatureSpellCooldownDelay(spell));
+        Eluna::Push(E->L, creature->GetCreatureSpellCooldownDelay(spell));
 #endif
         return 1;
     }
@@ -614,7 +614,7 @@ namespace LuaCreature
      */
     int GetCorpseDelay(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetCorpseDelay());
+        Eluna::Push(E->L, creature->GetCorpseDelay());
         return 1;
     }
 
@@ -636,10 +636,10 @@ namespace LuaCreature
         creature->GetRespawnCoord(x, y, z, &o);
 #endif
 
-        E->Push(x);
-        E->Push(y);
-        E->Push(z);
-        E->Push(o);
+        Eluna::Push(E->L, x);
+        Eluna::Push(E->L, y);
+        Eluna::Push(E->L, z);
+        Eluna::Push(E->L, o);
         return 4;
     }
 
@@ -763,7 +763,7 @@ namespace LuaCreature
                     std::list<Unit*>::const_iterator itr = targetList.begin();
                     if (position)
                         std::advance(itr, position);
-                    E->Push(*itr);
+                    Eluna::Push(E->L, *itr);
                 }
                 break;
             case SELECT_TARGET_FARTHEST:
@@ -772,7 +772,7 @@ namespace LuaCreature
                     std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
                     if (position)
                         std::advance(ritr, position);
-                    E->Push(*ritr);
+                    Eluna::Push(E->L, *ritr);
                 }
                 break;
             case SELECT_TARGET_RANDOM:
@@ -782,7 +782,7 @@ namespace LuaCreature
                         std::advance(itr, urand(0, position));
                     else
                         std::advance(itr, urand(0, targetList.size() - 1));
-                    E->Push(*itr);
+                    Eluna::Push(E->L, *itr);
                 }
                 break;
             default:
@@ -819,7 +819,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
 #endif
             if (!target)
                 continue;
-            E->Push(target);
+            Eluna::Push(E->L, target);
             lua_rawseti(E->L, tbl, ++i);
         }
 
@@ -835,11 +835,11 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     int GetAITargetsCount(Eluna* E, Creature* creature)
     {
 #ifdef TRINITY
-        E->Push(creature->GetThreatManager().GetThreatenedByMeList().size());
+        Eluna::Push(E->L, creature->GetThreatManager().GetThreatenedByMeList().size());
 #elif AZEROTHCORE
-        E->Push(creature->getThreatManager().getThreatList().size());
+        Eluna::Push(E->L, creature->getThreatManager().getThreatList().size());
 #else
-        E->Push(creature->GetThreatManager().getThreatList().size());
+        Eluna::Push(E->L, creature->GetThreatManager().getThreatList().size());
 #endif
         return 1;
     }
@@ -854,7 +854,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
      */
     int GetNPCFlags(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetUInt32Value(UNIT_NPC_FLAGS));
+        Eluna::Push(E->L, creature->GetUInt32Value(UNIT_NPC_FLAGS));
         return 1;
     }
 
@@ -866,7 +866,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
      */
     int GetShieldBlockValue(Eluna* E, Creature* creature)
     {
-        E->Push(creature->GetShieldBlockValue());
+        Eluna::Push(E->L, creature->GetShieldBlockValue());
         return 1;
     }
 #endif
@@ -874,7 +874,7 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
 #if defined(TRINITY) || AZEROTHCORE
     int GetLootMode(Eluna* E, Creature* creature) // TODO: Implement LootMode features
     {
-        E->Push(creature->GetLootMode());
+        Eluna::Push(E->L, creature->GetLootMode());
         return 1;
     }
 #endif
@@ -887,10 +887,10 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     int GetDBTableGUIDLow(Eluna* E, Creature* creature)
     {
 #ifdef TRINITY
-        E->Push(creature->GetSpawnId());
+        Eluna::Push(E->L, creature->GetSpawnId());
 #else
         // on mangos based this is same as lowguid
-        E->Push(creature->GetGUIDLow());
+        Eluna::Push(E->L, creature->GetGUIDLow());
 #endif
         return 1;
     }
@@ -1302,9 +1302,9 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
     int SelectVictim(Eluna* E, Creature* creature)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(creature->SelectVictim());
+        Eluna::Push(E->L, creature->SelectVictim());
 #else
-        E->Push(creature->SelectHostileTarget());
+        Eluna::Push(E->L, creature->SelectHostileTarget());
 #endif
         return 1;
     }
@@ -1466,11 +1466,11 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
 #if defined TRINITY || AZEROTHCORE
         CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry);
         if (cInfo)
-            E->Push(cInfo->family);
+            Eluna::Push(E->L, cInfo->family);
 #else
         CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(entry);
         if (cInfo)
-            E->Push(cInfo->Family);
+            Eluna::Push(E->L, cInfo->Family);
 #endif
         return 1;
     }

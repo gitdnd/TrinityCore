@@ -28,7 +28,7 @@ namespace LuaTransport
 
         for (auto it = list.begin(); it != list.end(); ++it)
         {
-            E->Push(*it);
+            Eluna::Push(E->L, *it);
             lua_rawseti(E->L, tbl, ++i);
         }
 
@@ -44,7 +44,7 @@ namespace LuaTransport
         auto z = Eluna::CHECKVAL<int32>(E->L, 5);
         auto o = Eluna::CHECKVAL<int32>(E->L, 6);
         auto summonType = Eluna::CHECKVAL<uint32>(E->L, 7);
-        E->Push(obj->SummonPassenger(entry, Position(x, y, z, o), (TempSummonType)summonType));
+        Eluna::Push(E->L, obj->SummonPassenger(entry, Position(x, y, z, o), (TempSummonType)summonType));
         return 1;
     }
 };

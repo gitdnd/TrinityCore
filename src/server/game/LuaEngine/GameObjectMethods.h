@@ -23,9 +23,9 @@ namespace LuaGameObject
         uint32 questId = Eluna::CHECKVAL<uint32>(E->L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        E->Push(go->hasQuest(questId));
+        Eluna::Push(E->L, go->hasQuest(questId));
 #else
-        E->Push(go->HasQuest(questId));
+        Eluna::Push(E->L, go->HasQuest(questId));
 #endif
         return 1;
     }
@@ -37,7 +37,7 @@ namespace LuaGameObject
      */
     int IsSpawned(Eluna* E, GameObject* go)
     {
-        E->Push(go->isSpawned());
+        Eluna::Push(E->L, go->isSpawned());
         return 1;
     }
 
@@ -48,7 +48,7 @@ namespace LuaGameObject
      */
     int IsTransport(Eluna* E, GameObject* go)
     {
-        E->Push(go->IsTransport());
+        Eluna::Push(E->L, go->IsTransport());
         return 1;
     }
 
@@ -59,13 +59,13 @@ namespace LuaGameObject
      */
     int IsActive(Eluna* E, GameObject* go)
     {
-        E->Push(go->isActiveObject());
+        Eluna::Push(E->L, go->isActiveObject());
         return 1;
     }
 
     /*int IsDestructible(Eluna* E, GameObject* go) // TODO: Implementation core side
     {
-        E->Push(go->IsDestructibleBuilding());
+        Eluna::Push(E->L, go->IsDestructibleBuilding());
         return 1;
     }*/
 
@@ -76,7 +76,7 @@ namespace LuaGameObject
      */
     int GetDisplayId(Eluna* E, GameObject* go)
     {
-        E->Push(go->GetDisplayId());
+        Eluna::Push(E->L, go->GetDisplayId());
         return 1;
     }
 
@@ -97,7 +97,7 @@ namespace LuaGameObject
      */
     int GetGoState(Eluna* E, GameObject* go)
     {
-        E->Push(go->GetGoState());
+        Eluna::Push(E->L, go->GetGoState());
         return 1;
     }
 
@@ -119,7 +119,7 @@ namespace LuaGameObject
      */
     int GetLootState(Eluna* E, GameObject* go)
     {
-        E->Push(go->getLootState());
+        Eluna::Push(E->L, go->getLootState());
         return 1;
     }
 
@@ -132,7 +132,7 @@ namespace LuaGameObject
      */
     int GetLootRecipient(Eluna* E, GameObject* go)
     {
-        E->Push(go->GetLootRecipient());
+        Eluna::Push(E->L, go->GetLootRecipient());
         return 1;
     }
 
@@ -146,9 +146,9 @@ namespace LuaGameObject
     int GetLootRecipientGroup(Eluna* E, GameObject* go)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(go->GetLootRecipientGroup());
+        Eluna::Push(E->L, go->GetLootRecipientGroup());
 #else
-        E->Push(go->GetGroupLootRecipient());
+        Eluna::Push(E->L, go->GetGroupLootRecipient());
 #endif
         return 1;
     }
@@ -161,12 +161,12 @@ namespace LuaGameObject
     int GetDBTableGUIDLow(Eluna* E, GameObject* go)
     {
 #ifdef TRINITY
-        E->Push(go->GetSpawnId());
+        Eluna::Push(E->L, go->GetSpawnId());
 #elif AZEROTHCORE
-        E->Push(go->GetDBTableGUIDLow());
+        Eluna::Push(E->L, go->GetDBTableGUIDLow());
 #else
         // on mangos based this is same as lowguid
-        E->Push(go->GetGUIDLow());
+        Eluna::Push(E->L, go->GetGUIDLow());
 #endif
         return 1;
     }

@@ -73,10 +73,10 @@ void Eluna::OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* o
     lua_rawgeti(L, LUA_REGISTRYINDEX, funcRef);
 
     // Push parameters
-    Push(funcRef);
-    Push(delay);
-    Push(calls);
-    Push(obj);
+    Push(L, funcRef);
+    Push(L, delay);
+    Push(L, calls);
+    Push(L, obj);
 
     // Call function
     ExecuteCall(4, 0);

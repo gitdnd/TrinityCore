@@ -53,9 +53,9 @@ namespace LuaQuest
     {
         uint32 flag = Eluna::CHECKVAL<uint32>(E->L, 2);
 #if defined TRINITY || AZEROTHCORE
-        E->Push(quest->HasFlag(flag));
+        Eluna::Push(E->L, quest->HasFlag(flag));
 #else
-        E->Push(quest->HasQuestFlag((QuestFlags)flag));
+        Eluna::Push(E->L, quest->HasQuestFlag((QuestFlags)flag));
 #endif
         return 1;
     }
@@ -68,7 +68,7 @@ namespace LuaQuest
      */
     int IsDaily(Eluna* E, Quest* quest)
     {
-        E->Push(quest->IsDaily());
+        Eluna::Push(E->L, quest->IsDaily());
         return 1;
     }
 #endif
@@ -80,7 +80,7 @@ namespace LuaQuest
      */
     int IsRepeatable(Eluna* E, Quest* quest)
     {
-        E->Push(quest->IsRepeatable());
+        Eluna::Push(E->L, quest->IsRepeatable());
         return 1;
     }
 
@@ -91,7 +91,7 @@ namespace LuaQuest
      */
     int GetId(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetQuestId());
+        Eluna::Push(E->L, quest->GetQuestId());
         return 1;
     }
 
@@ -102,7 +102,7 @@ namespace LuaQuest
      */
     int GetLevel(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetQuestLevel());
+        Eluna::Push(E->L, quest->GetQuestLevel());
         return 1;
     }
 
@@ -113,7 +113,7 @@ namespace LuaQuest
      */
     int GetMinLevel(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetMinLevel());
+        Eluna::Push(E->L, quest->GetMinLevel());
         return 1;
     }
 
@@ -124,7 +124,7 @@ namespace LuaQuest
      */
     int GetNextQuestId(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetNextQuestId());
+        Eluna::Push(E->L, quest->GetNextQuestId());
         return 1;
     }
 
@@ -135,7 +135,7 @@ namespace LuaQuest
      */
     int GetPrevQuestId(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetPrevQuestId());
+        Eluna::Push(E->L, quest->GetPrevQuestId());
         return 1;
     }
 
@@ -146,7 +146,7 @@ namespace LuaQuest
      */
     int GetNextQuestInChain(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetNextQuestInChain());
+        Eluna::Push(E->L, quest->GetNextQuestInChain());
         return 1;
     }
 
@@ -158,9 +158,9 @@ namespace LuaQuest
     int GetFlags(Eluna* E, Quest* quest)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(quest->GetFlags());
+        Eluna::Push(E->L, quest->GetFlags());
 #else
-        E->Push(quest->GetQuestFlags());
+        Eluna::Push(E->L, quest->GetQuestFlags());
 #endif
         return 1;
     }
@@ -174,13 +174,13 @@ namespace LuaQuest
      */
     int GetType(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetType());
+        Eluna::Push(E->L, quest->GetType());
         return 1;
     }
 
     /*int GetMaxLevel(Eluna* E, Quest* quest)
     {
-        E->Push(quest->GetMaxLevel());
+        Eluna::Push(E->L, quest->GetMaxLevel());
         return 1;
     }*/
 };

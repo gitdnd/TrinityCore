@@ -137,7 +137,7 @@ void Eluna::LoadScriptPaths()
 
 void Eluna::_ReloadEluna()
 {
-    /*LOCK_ELUNA;
+    LOCK_ELUNA;
     //ASSERT(IsInitialized());
 
     eWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
@@ -157,7 +157,7 @@ void Eluna::_ReloadEluna()
     // Run scripts from laoded paths
     sEluna->RunScripts();
 
-    reload = false;*/
+    reload = false;
 }
 
 Eluna::Eluna() :
@@ -525,7 +525,7 @@ void Eluna::RunScripts()
             {
                 // if result evaluates to false, change it to true
                 lua_pop(L, 1);
-                Push(true);
+                Push(L, true);
             }
             lua_setfield(L, modules, it->filename.c_str());
             // Stack: package, modules
@@ -647,141 +647,129 @@ bool Eluna::ExecuteCall(int params, int res)
     return true;
 }
 
-void Eluna::Push()
+void Eluna::Push(lua_State* luastate)
 {
-    ++push_counter;
-    lua_pushnil(L);
+    lua_pushnil(luastate);
 }
-void Eluna::Push( const long long l)
+void Eluna::Push(lua_State* luastate, const long long l)
 {
-    ++push_counter;
-    ElunaTemplate<long long>::Push(this, new long long(l));
+    ElunaTemplate<long long>::Push(luastate, new long long(l));
 }
-void Eluna::Push( const unsigned long long l)
+void Eluna::Push(lua_State* luastate, const unsigned long long l)
 {
-    ++push_counter;
-    ElunaTemplate<unsigned long long>::Push(this, new unsigned long long(l));
+    ElunaTemplate<unsigned long long>::Push(luastate, new unsigned long long(l));
 }
-void Eluna::Push( const long l)
+void Eluna::Push(lua_State* luastate, const long l)
 {
-    ++push_counter;
-    Push(static_cast<long long>(l));
+    Push(luastate, static_cast<long long>(l));
 }
-void Eluna::Push( const unsigned long l)
+void Eluna::Push(lua_State* luastate, const unsigned long l)
 {
-    ++push_counter;
-    Push(static_cast<unsigned long long>(l));
+    Push(luastate, static_cast<unsigned long long>(l));
 }
-void Eluna::Push( const int i)
+void Eluna::Push(lua_State* luastate, const int i)
 {
-    ++push_counter;
-    lua_pushinteger(L, i);
+    lua_pushinteger(luastate, i);
 }
-void Eluna::Push( const unsigned int u)
+void Eluna::Push(lua_State* luastate, const unsigned int u)
 {
-    ++push_counter;
-    lua_pushunsigned(L, u);
+    lua_pushunsigned(luastate, u);
 }
-void Eluna::Push( const double d)
+void Eluna::Push(lua_State* luastate, const double d)
 {
-    ++push_counter;
-    lua_pushnumber(L, d);
+    lua_pushnumber(luastate, d);
 }
-void Eluna::Push( const float f)
+void Eluna::Push(lua_State* luastate, const float f)
 {
-    ++push_counter;
-    lua_pushnumber(L, f);
+    lua_pushnumber(luastate, f);
 }
-void Eluna::Push(const bool b)
+void Eluna::Push(lua_State* luastate, const bool b)
 {
-    ++push_counter;
-    lua_pushboolean(L, b);
+    lua_pushboolean(luastate, b);
 }
-void Eluna::Push( const std::string& str)
+void Eluna::Push(lua_State* luastate, const std::string& str)
 {
-    ++push_counter;
-    lua_pushstring(L, str.c_str());
+    lua_pushstring(luastate, str.c_str());
 }
-void Eluna::Push( const char* str)
+void Eluna::Push(lua_State* luastate, const char* str)
 {
-    ++push_counter;
-    lua_pushstring(L, str);
+    lua_pushstring(luastate, str);
 }
-void Eluna::Push( Pet const* pet)
+void Eluna::Push(lua_State* luastate, Pet const* pet)
 {
-    Push<Creature>(pet);
+    Push<Creature>(luastate, pet);
 }
-void Eluna::Push(TempSummon const* summon)
+void Eluna::Push(lua_State* luastate, TempSummon const* summon)
 {
-    Push<Creature>(summon);
+    Push<Creature>(luastate, summon);
 }
-void Eluna::Push(Unit const* unit)
+void Eluna::Push(lua_State* luastate, Unit const* unit)
 {
     if (!unit)
     {
-        Push();
+        Push(luastate);
         return;
     }
     switch (unit->GetTypeId())
     {
         case TYPEID_UNIT:
-            Push(unit->ToCreature());
+            Push(luastate, unit->ToCreature());
             break;
         case TYPEID_PLAYER:
-            Push(unit->ToPlayer());
+            Push(luastate, unit->ToPlayer());
             break;
         default:
-            ElunaTemplate<Unit>::Push(this, unit);
+            ElunaTemplate<Unit>::Push(luastate, unit);
     }
 }
-void Eluna::Push( WorldObject const* obj)
+void Eluna::Push(lua_State* luastate, WorldObject const* obj)
 {
     if (!obj)
     {
-        Push();
+        Push(luastate);
         return;
     }
     switch (obj->GetTypeId())
     {
         case TYPEID_UNIT:
-            Push(obj->ToCreature());
+            Push(luastate, obj->ToCreature());
             break;
         case TYPEID_PLAYER:
-            Push(obj->ToPlayer());
+            Push(luastate, obj->ToPlayer());
             break;
         case TYPEID_GAMEOBJECT:
-            Push(obj->ToGameObject());
+            Push(luastate, obj->ToGameObject());
             break;
         case TYPEID_CORPSE:
-            Push(obj->ToCorpse());
+            Push(luastate, obj->ToCorpse());
             break;
         default:
-            ElunaTemplate<WorldObject>::Push(this, obj);
+            ElunaTemplate<WorldObject>::Push(luastate, obj);
     }
 }
-void Eluna::Push( Object const* obj)
+void Eluna::Push(lua_State* luastate, Object const* obj)
 {
     if (!obj)
     {
-        Push();
+        Push(luastate);
         return;
     }
     switch (obj->GetTypeId())
     {
         case TYPEID_UNIT:
-            Push(obj->ToCreature());
+            Push(luastate, obj->ToCreature());
             break;
         case TYPEID_PLAYER:
-            Push(obj->ToPlayer());
+            Push(luastate, obj->ToPlayer());
             break;
         case TYPEID_GAMEOBJECT:
-            Push(obj->ToGameObject());
+            Push(luastate, obj->ToGameObject());
             break;
         case TYPEID_CORPSE:
-            Push(obj->ToCorpse());
+            Push(luastate, obj->ToCorpse());
             break;
         default:
-            ElunaTemplate<Object>::Push(this, obj);
+            ElunaTemplate<Object>::Push(luastate, obj);
     }
 }
 
@@ -962,8 +950,8 @@ static int cancelBinding(lua_State *L)
 template<typename K>
 static void createCancelCallback(Eluna* E, uint64 bindingID, BindingMap<K>* bindings)
 {
-    E->Push(bindingID);
-    lua_pushlightuserdata(E->L, bindings);
+    Eluna::Push(L, bindingID);
+    lua_pushlightuserdata(L, bindings);
     // Stack: bindingID, bindings
 
     lua_pushcclosure(E->L, &cancelBinding<K>, 2);

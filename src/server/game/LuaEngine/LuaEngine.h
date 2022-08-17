@@ -207,6 +207,23 @@ private:
         return CallAllFunctionsBool<K, K>(bindings, NULL, key, key, default_value);
     }
 
+    // Non-static pushes, to be used in hooks.
+    // These just call the correct static version with the main thread's Lua state.
+    void Push()                                 { Push(L); ++push_counter; }
+    void Push(const long long value)            { Push(L, value); ++push_counter; }
+    void Push(const unsigned long long value)   { Push(L, value); ++push_counter; }
+    void Push(const long value)                 { Push(L, value); ++push_counter; }
+    void Push(const unsigned long value)        { Push(L, value); ++push_counter; }
+    void Push(const int value)                  { Push(L, value); ++push_counter; }
+    void Push(const unsigned int value)         { Push(L, value); ++push_counter; }
+    void Push(const bool value)                 { Push(L, value); ++push_counter; }
+    void Push(const float value)                { Push(L, value); ++push_counter; }
+    void Push(const double value)               { Push(L, value); ++push_counter; }
+    void Push(const std::string& value)         { Push(L, value); ++push_counter; }
+    void Push(const char* value)                { Push(L, value); ++push_counter; }
+    template<typename T>
+    void Push(T const* ptr)                     { Push(L, ptr); ++push_counter; }
+
 public:
     //static Eluna* GEluna;
 
@@ -252,28 +269,27 @@ public:
     }
 
     // Static pushes, can be used by anything, including methods.
-    void Push(); // nil
-    void Push(const long long);
-    void Push(const unsigned long long);
-    void Push(const long);
-    void Push(const unsigned long);
-    void Push(const int);
-    void Push(const unsigned int);
-    void Push(const bool);
-    void Push(const float);
-    void Push(const double);
-    void Push(const std::string&);
-    void Push(const char*);
-    void Push(Object const* obj);
-    void Push(WorldObject const* obj);
-    void Push(Unit const* unit);
-    void Push(Pet const* pet);
-    void Push(TempSummon const* summon);
+    static void Push(lua_State* luastate); // nil
+    static void Push(lua_State* luastate, const long long);
+    static void Push(lua_State* luastate, const unsigned long long);
+    static void Push(lua_State* luastate, const long);
+    static void Push(lua_State* luastate, const unsigned long);
+    static void Push(lua_State* luastate, const int);
+    static void Push(lua_State* luastate, const unsigned int);
+    static void Push(lua_State* luastate, const bool);
+    static void Push(lua_State* luastate, const float);
+    static void Push(lua_State* luastate, const double);
+    static void Push(lua_State* luastate, const std::string&);
+    static void Push(lua_State* luastate, const char*);
+    static void Push(lua_State* luastate, Object const* obj);
+    static void Push(lua_State* luastate, WorldObject const* obj);
+    static void Push(lua_State* luastate, Unit const* unit);
+    static void Push(lua_State* luastate, Pet const* pet);
+    static void Push(lua_State* luastate, TempSummon const* summon);
     template<typename T>
-    void Push(T const* ptr)
+    static void Push(lua_State* luastate, T const* ptr)
     {
-        ++push_counter;
-        ElunaTemplate<T>::Push(this, ptr);
+        ElunaTemplate<T>::Push(luastate, ptr);
     }
 
     /*

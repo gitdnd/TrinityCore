@@ -46,9 +46,9 @@ namespace LuaQuery
         CheckFields(E, result);
 
 #if defined TRINITY || AZEROTHCORE
-        E->Push(RESULT->Fetch()[col].IsNull());
+        Eluna::Push(E->L, RESULT->Fetch()[col].IsNull());
 #else
-        E->Push(RESULT->Fetch()[col].IsNULL());
+        Eluna::Push(E->L, RESULT->Fetch()[col].IsNULL());
 #endif
         return 1;
     }
@@ -60,7 +60,7 @@ namespace LuaQuery
      */
     int GetColumnCount(Eluna* E, ElunaQuery* result)
     {
-        E->Push(RESULT->GetFieldCount());
+        Eluna::Push(E->L, RESULT->GetFieldCount());
         return 1;
     }
 
@@ -72,9 +72,9 @@ namespace LuaQuery
     int GetRowCount(Eluna* E, ElunaQuery* result)
     {
         if (RESULT->GetRowCount() > (uint32)-1)
-            E->Push((uint32)-1);
+            Eluna::Push(E->L, (uint32)-1);
         else
-            E->Push((uint32)(RESULT->GetRowCount()));
+            Eluna::Push(E->L, (uint32)(RESULT->GetRowCount()));
         return 1;
     }
 
@@ -88,7 +88,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetBool());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetBool());
         return 1;
     }
 
@@ -102,7 +102,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetUInt8());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetUInt8());
         return 1;
     }
 
@@ -116,7 +116,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetUInt16());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetUInt16());
         return 1;
     }
 
@@ -130,7 +130,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetUInt32());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetUInt32());
         return 1;
     }
 
@@ -144,7 +144,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetUInt64());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetUInt64());
         return 1;
     }
 
@@ -158,7 +158,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetInt8());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetInt8());
         return 1;
     }
 
@@ -172,7 +172,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetInt16());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetInt16());
         return 1;
     }
 
@@ -186,7 +186,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetInt32());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetInt32());
         return 1;
     }
 
@@ -200,7 +200,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetInt64());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetInt64());
         return 1;
     }
 
@@ -214,7 +214,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetFloat());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetFloat());
         return 1;
     }
 
@@ -228,7 +228,7 @@ namespace LuaQuery
     {
         uint32 col = Eluna::CHECKVAL<uint32>(E->L, 2);
         CheckFields(E, result);
-        E->Push(RESULT->Fetch()[col].GetDouble());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetDouble());
         return 1;
     }
 
@@ -244,9 +244,9 @@ namespace LuaQuery
         CheckFields(E, result);
 
 #ifndef TRINITY
-        E->Push(RESULT->Fetch()[col].GetString());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetString());
 #else
-        E->Push(RESULT->Fetch()[col].GetCString());
+        Eluna::Push(E->L, RESULT->Fetch()[col].GetCString());
 #endif
         return 1;
     }
@@ -262,7 +262,7 @@ namespace LuaQuery
      */
     int NextRow(Eluna* E, ElunaQuery* result)
     {
-        E->Push(RESULT->NextRow());
+        Eluna::Push(E->L, RESULT->NextRow());
         return 1;
     }
 
@@ -298,11 +298,11 @@ namespace LuaQuery
         for (uint32 i = 0; i < col; ++i)
         {
 #if defined TRINITY || AZEROTHCORE
-            E->Push(RESULT->GetFieldName(i));
+            Eluna::Push(E->L, RESULT->GetFieldName(i));
 
             const char* str = row[i].GetCString();
             if (row[i].IsNull() || !str)
-                E->Push();
+                Eluna::Push(E->L);
             else
             {
                 // MYSQL_TYPE_LONGLONG Interpreted as string for lua
@@ -328,15 +328,15 @@ namespace LuaQuery
                     case MYSQL_TYPE_DECIMAL:
                     case MYSQL_TYPE_NEWDECIMAL:
 #endif
-                        E->Push(strtod(str, NULL));
+                        Eluna::Push(E->L, strtod(str, NULL));
                         break;
                     default:
-                        E->Push(str);
+                        Eluna::Push(E->L, str);
                         break;
         }
     }
 #else
-            E->Push(names[i]);
+            Eluna::Push(E->L, names[i]);
 
             const char* str = row[i].GetString();
             if (row[i].IsNULL() || !str)
@@ -352,10 +352,10 @@ namespace LuaQuery
                     case MYSQL_TYPE_LONG:
                     case MYSQL_TYPE_FLOAT:
                     case MYSQL_TYPE_DOUBLE:
-                        E->Push(strtod(str, NULL));
+                        Eluna::Push(E->L, strtod(str, NULL));
                         break;
                     default:
-                        E->Push(str);
+                        Eluna::Push(E->L, str);
                         break;
                 }
             }
