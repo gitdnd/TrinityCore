@@ -137,7 +137,7 @@ void Eluna::LoadScriptPaths()
 
 void Eluna::_ReloadEluna()
 {
-    LOCK_ELUNA;
+    /*LOCK_ELUNA;
     //ASSERT(IsInitialized());
 
     eWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
@@ -157,7 +157,7 @@ void Eluna::_ReloadEluna()
     // Run scripts from laoded paths
     sEluna->RunScripts();
 
-    reload = false;
+    reload = false;*/
 }
 
 Eluna::Eluna() :
@@ -254,6 +254,14 @@ void Eluna::OpenLua()
 
     // Register methods and functions
     RegisterFunctions(this);
+
+    // Create hidden table with weak values
+    lua_newtable(L);
+    lua_newtable(L);
+    lua_pushstring(L, "v");
+    lua_setfield(L, -2, "__mode");
+    lua_setmetatable(L, -2);
+    lua_setfield(L, LUA_REGISTRYINDEX, ELUNA_OBJECT_STORE);
 
     // Set lua require folder paths (scripts folder structure)
     lua_getglobal(L, "package");
@@ -545,12 +553,24 @@ void Eluna::RunScripts()
 
 void Eluna::InvalidateObjects()
 {
-    ++callstackid;
+    lua_pushstring(L, ELUNA_OBJECT_STORE);
+    lua_rawget(L, LUA_REGISTRYINDEX);
+    ASSERT(lua_istable(L, -1));
+
+    lua_pushnil(L);
+    while (lua_next(L, -2))
+    {
+        if (ElunaObject* elunaObj = CHECKOBJ<ElunaObject>(L, -1, false))
+            elunaObj->Invalidate();
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+    /*++callstackid;
 #ifdef TRINITY
     ASSERT(callstackid, "Callstackid overflow");
 #else
     ASSERT(callstackid && "Callstackid overflow");
-#endif
+#endif*/
 }
 
 void Eluna::Report(lua_State* _L)
@@ -950,8 +970,8 @@ static int cancelBinding(lua_State *L)
 template<typename K>
 static void createCancelCallback(Eluna* E, uint64 bindingID, BindingMap<K>* bindings)
 {
-    Eluna::Push(L, bindingID);
-    lua_pushlightuserdata(L, bindings);
+    Eluna::Push(E->L, bindingID);
+    lua_pushlightuserdata(E->L, bindings);
     // Stack: bindingID, bindings
 
     lua_pushcclosure(E->L, &cancelBinding<K>, 2);

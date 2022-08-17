@@ -114,6 +114,7 @@ struct LuaScript
     std::string modulepath;
 };
 
+#define ELUNA_OBJECT_STORE  "Eluna Object Store"
 #define ELUNA_STATE_PTR     "Eluna State Ptr"
 #define LOCK_ELUNA Eluna::Guard __guard(Eluna::GetLock())
 

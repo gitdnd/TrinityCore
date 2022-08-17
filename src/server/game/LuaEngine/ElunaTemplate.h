@@ -77,7 +77,7 @@ public:
     // Get wrapped object pointer
     void* GetObj() const { return object; }
     // Returns whether the object is valid or not
-    bool IsValid() const { return !callstackid || callstackid == sEluna->GetCallstackId(); }
+    bool IsValid() const { return _isvalid; }
     // Returns whether the object can be invalidated or not
     bool CanInvalidate() const { return _invalidate; }
     // Returns pointer to the wrapped object's type name
@@ -94,13 +94,7 @@ public:
     void SetValid(bool valid)
     {
         ASSERT(!valid || (valid && object));
-        if (valid)
-            if (CanInvalidate())
-                callstackid = sEluna->GetCallstackId();
-            else
-                callstackid = 0;
-        else
-            callstackid = 1;
+        _isvalid = valid;
     }
     // Sets whether the pointer will be invalidated at end of calls
     void SetValidation(bool invalidate)
@@ -111,11 +105,11 @@ public:
     void Invalidate()
     {
         if (CanInvalidate())
-            callstackid = 1;
+            _isvalid = false;
     }
 
 private:
-    uint64 callstackid;
+    bool _isvalid;
     bool _invalidate;
     void* object;
     const char* type_name;
@@ -279,11 +273,31 @@ public:
             return 1;
         }
 
+        void* obj_voidptr = static_cast<void*>(const_cast<T*>(obj));
+
+        lua_pushstring(L, ELUNA_OBJECT_STORE);
+        lua_rawget(L, LUA_REGISTRYINDEX);
+        ASSERT(lua_istable(L, -1));
+        lua_pushlightuserdata(L, obj_voidptr);
+        lua_rawget(L, -2);
+        if (ElunaObject* elunaObj = Eluna::CHECKTYPE(L, -1, tname, false))
+        {
+            // set userdata valid
+            elunaObj->SetValid(true);
+
+            // remove userdata_table, leave userdata
+            lua_remove(L, -2);
+            return 1;
+        }
+        lua_pop(L, 1);
+
+        // left userdata_table in stack
         // Create new userdata
         ElunaObject** ptrHold = static_cast<ElunaObject**>(lua_newuserdata(L, sizeof(ElunaObject*)));
         if (!ptrHold)
         {
             ELUNA_LOG_ERROR("%s could not create new userdata", tname);
+            lua_pop(L, 2);
             lua_pushnil(L);
             return 1;
         }
@@ -295,11 +309,15 @@ public:
         if (!lua_istable(L, -1))
         {
             ELUNA_LOG_ERROR("%s missing metatable", tname);
-            lua_pop(L, 2);
+            lua_pop(L, 3);
             lua_pushnil(L);
             return 1;
         }
         lua_setmetatable(L, -2);
+        lua_pushlightuserdata(L, obj_voidptr);
+        lua_pushvalue(L, -2);
+        lua_rawset(L, -4);
+        lua_remove(L, -2);
         return 1;
     }
 
@@ -416,7 +434,7 @@ public:
 };
 
 template<typename T>
-ElunaObject::ElunaObject(T * obj, bool manageMemory) : callstackid(1), _invalidate(!manageMemory), object(obj), type_name(ElunaTemplate<T>::tname)
+ElunaObject::ElunaObject(T * obj, bool manageMemory) : _isvalid(false), _invalidate(!manageMemory), object(obj), type_name(ElunaTemplate<T>::tname)
 {
     SetValid(true);
 }
