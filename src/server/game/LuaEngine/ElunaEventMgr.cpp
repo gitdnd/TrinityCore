@@ -28,7 +28,6 @@ ElunaEventProcessor::~ElunaEventProcessor()
 {
     // can be called from multiple threads
     {
-        LOCK_ELUNA;
         RemoveEvents_internal();
     }
 

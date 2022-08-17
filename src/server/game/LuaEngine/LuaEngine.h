@@ -551,7 +551,7 @@ public:
     void OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
 
-    void UpdateEventMgr(uint32 diff) { eventMgr->globalProcessor->Update(diff); }
+    //void UpdateEventMgr(uint32 diff) { eventMgr->globalProcessor->Update(diff); }
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);
