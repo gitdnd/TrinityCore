@@ -17031,7 +17031,7 @@ void Player::AdvanceQuestObjective(uint32 targetQuest, uint32 objectiveId, Objec
     }
 }
 
-void Player::SetQuestObjective(uint32 targetQuest, uint32 objectiveId, uint32 newValue, ObjectGuid guid)
+void Player::SetQuestObjective(uint32 targetQuest, uint32 /*objectiveId*/, uint32 newValue, ObjectGuid /*guid*/)
 {
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {

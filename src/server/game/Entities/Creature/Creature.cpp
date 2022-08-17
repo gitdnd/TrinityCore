@@ -3485,9 +3485,9 @@ void Creature::UpdateDungeonScaling()
         if (dungeonLevel < 50)
             dungeonLevelMod *= 0.5;
         else if (dungeonLevel < 60)
-            dungeonLevelMod *= 0.65;
+            dungeonLevelMod *= 0.65f;
         else if (dungeonLevel < 75)
-            dungeonLevelMod *= 0.8;
+            dungeonLevelMod *= 0.8f;
         else if (dungeonLevel > 250)
             dungeonLevelMod *= (float(std::pow(dungeonLevel, 2)) / 500000.0f) + 0.88f;
 
@@ -3496,7 +3496,7 @@ void Creature::UpdateDungeonScaling()
         // FIXME(Harry): Come up with a better scaling system
         float dungeonDamageLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
         if (dungeonLevel < 50)
-            dungeonDamageLevelMod *= 0.5;
+            dungeonDamageLevelMod *= 0.5f;
         else if (dungeonLevel > 250)
             dungeonDamageLevelMod *= (float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f;
 

@@ -5846,7 +5846,7 @@ void Spell::EffectExtractGems(SpellEffIndex /*effIndex*/)
     itemTarget->ExtractGems();
 }
 
-void Spell::EffectPctXPGain(SpellEffIndex effIndex)
+void Spell::EffectPctXPGain(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -5860,7 +5860,7 @@ void Spell::EffectPctXPGain(SpellEffIndex effIndex)
     plr->GiveXP(xpToGive, plr);
 }
 
-void Spell::EffectXPGain(SpellEffIndex effIndex)
+void Spell::EffectXPGain(SpellEffIndex /*effIndex*/ )
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
