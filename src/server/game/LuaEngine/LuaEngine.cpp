@@ -15,22 +15,7 @@
 #include "ElunaInstanceAI.h"
 #include <filesystem>
 #include "ElunaCompat.h"
-
-#if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
-#if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(AC_PLATFORM) && defined(AC_PLATFORM_WINDOWS)
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(PLATFORM) && defined(PLATFORM_WINDOWS)
-#if PLATFORM == PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#else
-#error Eluna could not determine platform
-#endif
+#include "ElunaLoader.h"
 
 // Some dummy includes containing BOOST_VERSION:
 // ObjectAccessor.h Config.h Log.h
@@ -468,6 +453,83 @@ static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second
     return first.filepath < second.filepath;
 }
 
+void Eluna::RunScriptsNew()
+{
+    printf("Running scripts \n");
+    if (!IsEnabled())
+    {
+        printf("Running scripts while not enabled \n");
+        return;
+    }
+
+    uint32 oldMSTime = ElunaUtil::GetCurrTime();
+    uint32 count = 0;
+
+    std::unordered_map<std::string, std::string> loaded; // filename, path
+
+    lua_getglobal(L, "package");
+    // Stack: package
+    luaL_getsubtable(L, -1, "loaded");
+    // Stack: package, modules
+    int modules = lua_gettop(L);
+
+    for (auto it = ElunaLoader::Scripts.begin(); it != ElunaLoader::Scripts.end(); ++it)
+    {
+        // Check that no duplicate names exist
+        if (loaded.find(it->script_path) != loaded.end())
+        {
+            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`. File with same name already loaded from `%s`, rename either file", it->script_path, loaded[it->script_name].c_str());
+            continue;
+        }
+        loaded[it->script_name] = it->script_path;
+
+        lua_getfield(L, modules, it->script_name);
+        // Stack: package, modules, module
+        if (!lua_isnoneornil(L, -1))
+        {
+            lua_pop(L, 1);
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` was already loaded or required", it->script_path);
+            continue;
+        }
+        lua_pop(L, 1);
+        // Stack: package, modules
+
+        if (luaL_loadbuffer(L, it->script_content, strlen(it->script_content), it->script_name))
+        {
+            // Stack: package, modules, errmsg
+            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->script_path);
+            Report(L);
+            // Stack: package, modules
+            continue;
+        }
+        // Stack: package, modules, filefunc
+
+        if (ExecuteCall(0, 1))
+        {
+            // Stack: package, modules, result
+            if (lua_isnoneornil(L, -1) || (lua_isboolean(L, -1) && !lua_toboolean(L, -1)))
+            {
+                // if result evaluates to false, change it to true
+                lua_pop(L, 1);
+                Push(L, true);
+            }
+            lua_setfield(L, modules, it->script_name);
+            // Stack: package, modules
+
+            // successfully loaded and ran file
+            ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->script_path);
+            ++count;
+            continue;
+        }
+    }
+
+    // Stack: package, modules
+    lua_pop(L, 2);
+    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
+
+    OnLuaStateOpen();
+}
+
 void Eluna::RunScripts()
 {
     printf("Running scripts \n");
@@ -493,6 +555,7 @@ void Eluna::RunScripts()
     luaL_getsubtable(L, -1, "loaded");
     // Stack: package, modules
     int modules = lua_gettop(L);
+
     for (ScriptList::const_iterator it = scripts.begin(); it != scripts.end(); ++it)
     {
         // Check that no duplicate names exist

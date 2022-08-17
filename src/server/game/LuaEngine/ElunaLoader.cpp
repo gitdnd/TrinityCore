@@ -11,23 +11,6 @@
 #include <filesystem>
 #include <boost/filesystem.hpp>
 
-#if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
-#if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(AC_PLATFORM) && defined(AC_PLATFORM_WINDOWS)
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(PLATFORM) && defined(PLATFORM_WINDOWS)
-#if PLATFORM == PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#else
-#error Eluna could not determine platform
-#endif
-
-
 void ElunaLoader::LoadScripts()
 {
     lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
@@ -50,7 +33,6 @@ void ElunaLoader::LoadScripts()
 
     ELUNA_LOG_DEBUG("[Eluna]: Loaded %u scripts in %u ms", uint32(Scripts.size()), ElunaUtil::GetTimeDiff(oldMSTime));
 }
-
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
 void ElunaLoader::ReadFiles(std::string path)
@@ -103,7 +85,7 @@ void ElunaLoader::ReadFiles(std::string path)
                 std::string content{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
 
                 // push contents to script struct
-                Scripts.push_back(lua_info(content.c_str(), scriptname.c_str(), extension.c_str()));
+                Scripts.push_back(lua_info(content.c_str(), scriptname.c_str(), extension.c_str(), fullpath.c_str()));
 
                 // close file
                 file.close();
