@@ -126,7 +126,7 @@ public:
     typedef std::list<LuaScript> ScriptList;
 
     typedef std::recursive_mutex LockType;
-    Eluna(uint32 MapId);
+    Eluna();
     ~Eluna();
 
     // Prevent copy
@@ -555,6 +555,7 @@ public:
 
     //void UpdateEventMgr(uint32 diff) { eventMgr->globalProcessor->Update(diff); }
     uint32 GetBoundMapId() const { return boundMapId; }
+    void SetBoundMapId(uint32 id) { boundMapId = id; }
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);

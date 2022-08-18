@@ -277,7 +277,7 @@ m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
-i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna(id))
+i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
 {
     printf("Loading %u\n", GetId());
     //eluna->Initialize();
@@ -300,6 +300,8 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna(id))
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     sScriptMgr->OnCreateMap(this);
+    if (GetEluna())
+        GetEluna()->SetBoundMapId(id);
 }
 
 void Map::InitVisibilityDistance()

@@ -143,7 +143,7 @@ void Eluna::_ReloadEluna()
     reload = false;*/
 }
 
-Eluna::Eluna(uint32 MapId) :
+Eluna::Eluna() :
 event_level(0),
 push_counter(0),
 enabled(false),
@@ -168,9 +168,7 @@ ItemGossipBindings(NULL),
 PlayerGossipBindings(NULL),
 MapEventBindings(NULL),
 InstanceEventBindings(NULL),
-
-CreatureUniqueBindings(NULL),
-boundMapId(MapId)
+CreatureUniqueBindings(NULL)
 {
     Initialize();
     //ASSERT(IsInitialized());
