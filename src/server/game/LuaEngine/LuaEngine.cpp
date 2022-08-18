@@ -256,7 +256,7 @@ void Eluna::RunScripts()
         lua_pop(L, 1);
         // Stack: package, modules
 
-        if (luaL_loadbuffer(L, it->filedata.c_str(), it->filedata.size(), it->filename.c_str()))
+        if (luaL_loadbuffer(L, it->filedata.c_str(), it->filedata.size(), it->filepath.c_str()))
         {
             // Stack: package, modules, errmsg
             ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
