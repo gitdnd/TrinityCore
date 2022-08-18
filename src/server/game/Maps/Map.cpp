@@ -18,6 +18,7 @@
 #include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
@@ -280,7 +281,28 @@ i_gridExpiry(expiry),
 i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
 {
     printf("Loading %u\n", GetId());
-    //eluna->Initialize();
+
+    // lua state begins uninitialized
+    eluna = nullptr;
+
+    std::string maps = sConfigMgr->GetStringDefault("Eluna.OnlyOnMaps", "");
+    Tokenizer mapIds(maps, ',');
+
+    // if no maps in OnlyOnMaps, default to enabled for all maps.
+    if (mapIds.size() == 0)
+        eluna = new Eluna();
+    else
+    {
+        for (auto itr = mapIds.begin(); itr != mapIds.end(); itr++)
+        {
+            if (uint32(atoi(*itr)) == GetId())
+            {
+                eluna = new Eluna();
+                break;
+            }
+        }
+    }
+
     m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
