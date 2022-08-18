@@ -1545,13 +1545,7 @@ void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
 
 #ifdef ELUNA
     if (map->GetEluna())
-    {
-        uint32 startTime = getMSTime();
         map->GetEluna()->OnUpdate(map, diff);
-        uint32 endTime = getMSTime();
-        uint32 timeSpent = endTime - startTime;
-        TC_LOG_ERROR("network", "Map %u spent %u ms in Lua state", map->GetId(), timeSpent);
-    }
 #endif
 
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
