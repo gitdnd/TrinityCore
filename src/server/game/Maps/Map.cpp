@@ -299,9 +299,9 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
 
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
-    sScriptMgr->OnCreateMap(this);
     if (GetEluna())
         GetEluna()->SetBoundMapId(id);
+    sScriptMgr->OnCreateMap(this);
 }
 
 void Map::InitVisibilityDistance()
