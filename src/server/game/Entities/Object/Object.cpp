@@ -1835,9 +1835,9 @@ void WorldObject::SetMap(Map* map)
     m_InstanceId = map->GetInstanceId();
 
 #ifdef ELUNA
+    delete elunaEvents;
     if (GetMap()->GetEluna())
     {
-        delete elunaEvents;
         // On multithread replace this with a pointer to map's Eluna pointer stored in a map
         elunaEvents = new ElunaEventProcessor(GetMap()->GetEluna(), this);
     }
