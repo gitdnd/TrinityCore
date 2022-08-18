@@ -112,6 +112,7 @@ struct LuaScript
     std::string filename;
     std::string filepath;
     std::string modulepath;
+    std::string filedata;
 };
 
 #define ELUNA_OBJECT_STORE  "Eluna Object Store"

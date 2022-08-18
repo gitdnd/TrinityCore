@@ -122,10 +122,22 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
         return;
     bool extension = ext == ".ext";
 
+    // open file
+    std::ifstream file(fullpath, std::ios::in | std::ios::binary);
+    if (!file.is_open())
+        return;
+
+    // read contents
+    std::string content{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+
+    // close file
+    file.close();
+
     LuaScript script;
     script.fileext = ext;
     script.filename = filename;
     script.filepath = fullpath;
+    script.filedata = content;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
     if (extension)
         lua_extensions.push_back(script);
