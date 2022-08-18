@@ -31,7 +31,7 @@ ElunaEventProcessor::~ElunaEventProcessor()
         RemoveEvents_internal();
     }
 
-    if (obj && E->IsInitialized())
+    if (obj)
     {
         EventMgr::Guard guard(E->eventMgr->GetLock());
         E->eventMgr->processors.erase(this);
@@ -115,7 +115,7 @@ void ElunaEventProcessor::AddEvent(int funcRef, uint32 min, uint32 max, uint32 r
 void ElunaEventProcessor::RemoveEvent(LuaEvent* luaEvent)
 {
     // Unreference if should and if Eluna was not yet uninitialized and if the lua state still exists
-    if (luaEvent->state != LUAEVENT_STATE_ERASE && E->IsInitialized() && E->HasLuaState())
+    if (luaEvent->state != LUAEVENT_STATE_ERASE && E->HasLuaState())
     {
         // Free lua function ref
         luaL_unref(E->L, LUA_REGISTRYINDEX, luaEvent->funcRef);
