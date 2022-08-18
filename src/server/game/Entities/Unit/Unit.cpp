@@ -13633,7 +13633,7 @@ std::string Unit::GetDebugInfo() const
     return sstr.str();
 }
 
-void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto)
+void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* /*cleanDamage*/, DamageEffectType damagetype, SpellSchoolMask /*damageSchoolMask*/, SpellInfo const* spellProto)
 {
     if (GetTypeId() != TYPEID_PLAYER)
         return;
