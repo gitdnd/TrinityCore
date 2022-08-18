@@ -7,6 +7,7 @@
 
 #ifndef _ELUNALOADER_H
 #define _ELUNALOADER_H
+struct LuaScript;
 
 class ElunaLoader
 {
@@ -23,28 +24,19 @@ public:
     static ElunaLoader* instance();
     void LoadScripts();
     void ReadFiles(std::string path);
+    void AddScriptPath(std::string filename, const std::string& fullpath);
+    void CombineLists();
 
     // Lua script folder path
     std::string lua_folderpath;
     // lua path variable for require() function
     std::string lua_requirepath;
 
-    struct lua_info
-    {
-        lua_info(const char* content, const char* name, const char* extension, const char* path) {
-            this->script_content = content;
-            this->script_name = name;
-            this->script_extension = extension;
-            this->script_path = path;
-        }
-
-        const char* script_content;
-        const char* script_name;
-        const char* script_extension;
-        const char* script_path;
-    };
-
-    std::vector<lua_info> Scripts;
+    //std::vector<LuaScript> Scripts;
+    typedef std::list<LuaScript> ScriptList;
+    ScriptList lua_scripts;
+    ScriptList lua_extensions;
+    ScriptList combined_scripts;
 };
 
 #define sElunaLoader ElunaLoader::instance()

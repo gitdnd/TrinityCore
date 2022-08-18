@@ -139,13 +139,13 @@ private:
     //static LockType lock;
 
     // Lua script locations
-    static ScriptList lua_scripts;
+    /*static ScriptList lua_scripts;
     static ScriptList lua_extensions;
 
     // Lua script folder path
     static std::string lua_folderpath;
     // lua path variable for require() function
-    static std::string lua_requirepath;
+    static std::string lua_requirepath;*/
 
     // A counter for lua event stacks that occur (see event_level).
     // This is used to determine whether an object belongs to the current call stack or not.
@@ -176,9 +176,9 @@ private:
     // Use ReloadEluna() to make eluna reload
     // This is called on world update to reload eluna
     static void _ReloadEluna();
-    static void LoadScriptPaths();
-    static void GetScripts(std::string path);
-    static void AddScriptPath(std::string filename, const std::string& fullpath);
+    //static void LoadScriptPaths();
+    //static void GetScripts(std::string path);
+    //static void AddScriptPath(std::string filename, const std::string& fullpath);
 
     static int StackTrace(lua_State *_L);
     static void Report(lua_State* _L);
@@ -316,7 +316,7 @@ public:
      */
     void PushInstanceData(lua_State* L, ElunaInstanceAI* ai, bool incrementCounter = true);
 
-    void RunScripts();
+    //void RunScripts();
     void RunScriptsNew();
     bool ShouldReload() const { return reload; }
     bool IsEnabled() const { return enabled && initialized; }

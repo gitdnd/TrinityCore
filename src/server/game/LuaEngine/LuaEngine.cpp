@@ -40,11 +40,11 @@ extern "C"
 
 // Additional lua libraries
 };
-
+/*
 Eluna::ScriptList Eluna::lua_scripts;
 Eluna::ScriptList Eluna::lua_extensions;
 std::string Eluna::lua_folderpath;
-std::string Eluna::lua_requirepath;
+std::string Eluna::lua_requirepath;*/
 //Eluna* Eluna::GEluna = NULL;
 bool Eluna::reload = false;
 //bool Eluna::initialized = false;
@@ -63,7 +63,7 @@ void Eluna::Initialize()
     CharacterDatabase.DirectExecute("ALTER TABLE `instance` CHANGE COLUMN `data` `data` TEXT NOT NULL");
 #endif*/
 
-    LoadScriptPaths();
+    //LoadScriptPaths();
 
 
     // Must be before creating GEluna
@@ -82,24 +82,24 @@ void Eluna::Uninitialize()
     //delete GEluna;
     //GEluna = NULL;
 
-    lua_scripts.clear();
-    lua_extensions.clear();
+    //lua_scripts.clear();
+    //lua_extensions.clear();
 
     initialized = false;
 }
 
-void Eluna::LoadScriptPaths()
+/*void Eluna::LoadScriptPaths()
 {
     lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
 
-    /*if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
     {
         ELUNA_LOG_INFO("[Eluna]: Pulling git scripts...");
         std::ostringstream command;
         command << "cd " << std::filesystem::current_path() << "\\" << lua_folderpath << " & git pull --recurse-submodules";
         system(command.str().c_str());
-    }*/
-
+    }
+    
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     lua_scripts.clear();
     lua_extensions.clear();
@@ -116,7 +116,7 @@ void Eluna::LoadScriptPaths()
         lua_requirepath.erase(lua_requirepath.end() - 1);
 
     ELUNA_LOG_DEBUG("[Eluna]: Loaded %u scripts in %u ms", uint32(lua_scripts.size() + lua_extensions.size()), ElunaUtil::GetTimeDiff(oldMSTime));
-}
+}*/
 
 void Eluna::_ReloadEluna()
 {
@@ -250,7 +250,7 @@ void Eluna::OpenLua()
 
     // Set lua require folder paths (scripts folder structure)
     lua_getglobal(L, "package");
-    lua_pushstring(L, lua_requirepath.c_str());
+    lua_pushstring(L, sElunaLoader->lua_requirepath.c_str());
     lua_setfield(L, -2, "path");
     lua_pushstring(L, ""); // erase cpath
     lua_setfield(L, -2, "cpath");
@@ -324,7 +324,7 @@ void Eluna::DestroyBindStores()
 
     CreatureUniqueBindings = NULL;
 }
-
+/*
 void Eluna::AddScriptPath(std::string filename, const std::string& fullpath)
 {
     ELUNA_LOG_DEBUG("[Eluna]: AddScriptPath Checking file `%s`", fullpath.c_str());
@@ -452,7 +452,7 @@ void Eluna::GetScripts(std::string path)
 static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second)
 {
     return first.filepath < second.filepath;
-}
+}*/
 
 void Eluna::RunScriptsNew()
 {
@@ -474,31 +474,31 @@ void Eluna::RunScriptsNew()
     // Stack: package, modules
     int modules = lua_gettop(L);
 
-    for (auto it = sElunaLoader->Scripts.begin(); it != sElunaLoader->Scripts.end(); ++it)
+    for (ScriptList::const_iterator it = sElunaLoader->combined_scripts.begin(); it != sElunaLoader->combined_scripts.end(); ++it)
     {
         // Check that no duplicate names exist
-        if (loaded.find(it->script_path) != loaded.end())
+        if (loaded.find(it->filename) != loaded.end())
         {
-            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`. File with same name already loaded from `%s`, rename either file", it->script_path, loaded[it->script_name].c_str());
+            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`. File with same name already loaded from `%s`, rename either file", it->filepath.c_str(), loaded[it->filename].c_str());
             continue;
         }
-        loaded[it->script_name] = it->script_path;
+        loaded[it->filename] = it->filepath;
 
-        lua_getfield(L, modules, it->script_name);
+        lua_getfield(L, modules, it->filename.c_str());
         // Stack: package, modules, module
         if (!lua_isnoneornil(L, -1))
         {
             lua_pop(L, 1);
-            ELUNA_LOG_DEBUG("[Eluna]: `%s` was already loaded or required", it->script_path);
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` was already loaded or required", it->filepath.c_str());
             continue;
         }
         lua_pop(L, 1);
         // Stack: package, modules
 
-        if (luaL_loadbuffer(L, it->script_content, strlen(it->script_content), it->script_name))
+        if (luaL_loadfile(L, it->filepath.c_str()))
         {
             // Stack: package, modules, errmsg
-            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->script_path);
+            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
             Report(L);
             // Stack: package, modules
             continue;
@@ -514,23 +514,22 @@ void Eluna::RunScriptsNew()
                 lua_pop(L, 1);
                 Push(L, true);
             }
-            lua_setfield(L, modules, it->script_name);
+            lua_setfield(L, modules, it->filename.c_str());
             // Stack: package, modules
 
             // successfully loaded and ran file
-            ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->script_path);
+            ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->filepath.c_str());
             ++count;
             continue;
         }
     }
-
     // Stack: package, modules
     lua_pop(L, 2);
     ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
 
     OnLuaStateOpen();
 }
-
+/*
 void Eluna::RunScripts()
 {
     printf("Running scripts \n");
@@ -611,7 +610,7 @@ void Eluna::RunScripts()
     ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
 
     OnLuaStateOpen();
-}
+}*/
 
 void Eluna::InvalidateObjects()
 {
