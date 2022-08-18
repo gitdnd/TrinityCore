@@ -2178,8 +2178,9 @@ void ScriptMgr::OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId)
 void ScriptMgr::OnPlayerSave(Player* player)
 {
 #ifdef ELUNA
-    if (player->GetMap()->GetEluna() && player->IsInWorld())
-        player->GetMap()->GetEluna()->OnSave(player);
+    if (player->IsInWorld())
+        if (player->GetMap()->GetEluna())
+            player->GetMap()->GetEluna()->OnSave(player);
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnSave(player);
 }
@@ -2187,8 +2188,9 @@ void ScriptMgr::OnPlayerSave(Player* player)
 void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent, uint8 extendState)
 {
 #ifdef ELUNA
-    if (player->GetMap()->GetEluna() && player->IsInWorld())
-        player->GetMap()->GetEluna()->OnBindToInstance(player, difficulty, mapid, permanent);
+    if(player->IsInWorld())
+        if (player->GetMap()->GetEluna())
+            player->GetMap()->GetEluna()->OnBindToInstance(player, difficulty, mapid, permanent);
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnBindToInstance(player, difficulty, mapid, permanent, extendState);
 }
