@@ -292,7 +292,8 @@ void Creature::AddToWorld()
             GetZoneScript()->OnCreatureCreate(this);
 
 #ifdef ELUNA
-        GetMap()->GetEluna()->OnAddToWorld(this);
+        if (GetMap()->GetEluna())
+            GetMap()->GetEluna()->OnAddToWorld(this);
 #endif
     }
 }
@@ -302,7 +303,8 @@ void Creature::RemoveFromWorld()
     if (IsInWorld())
     {
 #ifdef ELUNA
-        GetMap()->GetEluna()->OnRemoveFromWorld(this);
+        if (GetMap()->GetEluna())
+            GetMap()->GetEluna()->OnRemoveFromWorld(this);
 #endif
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
@@ -2033,9 +2035,12 @@ void Creature::setDeathState(DeathState s)
         Unit::setDeathState(CORPSE);
 
         auto map = GetMap();
-        if (map->IsDungeon() || map->IsRaid())
+        if (map->GetEluna())
         {
-            map->GetEluna()->OnScoredCreatureDied(map, this);
+            if (map->IsDungeon() || map->IsRaid())
+            {
+                map->GetEluna()->OnScoredCreatureDied(map, this);
+            }
         }
     }
     else if (s == JUST_RESPAWNED)

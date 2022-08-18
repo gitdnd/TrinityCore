@@ -230,7 +230,8 @@ void GameObject::AddToWorld()
         WorldObject::AddToWorld();
 
 #ifdef ELUNA
-        GetMap()->GetEluna()->OnAddToWorld(this);
+        if (GetMap()->GetEluna())
+            GetMap()->GetEluna()->OnAddToWorld(this);
 #endif
     }
 }
@@ -241,7 +242,8 @@ void GameObject::RemoveFromWorld()
     if (IsInWorld())
     {
 #ifdef ELUNA
-        GetMap()->GetEluna()->OnRemoveFromWorld(this);
+        if (GetMap()->GetEluna())
+            GetMap()->GetEluna()->OnRemoveFromWorld(this);
 #endif
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
@@ -432,7 +434,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 void GameObject::Update(uint32 diff)
 {
 #ifdef ELUNA
-    GetMap()->GetEluna()->UpdateAI(this, diff);
+    if (GetMap()->GetEluna())
+        GetMap()->GetEluna()->UpdateAI(this, diff);
 #endif
     m_Events.Update(diff);
 
@@ -1498,8 +1501,9 @@ void GameObject::Use(Unit* user)
 
         playerUser->PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-        if (GetMap()->GetEluna()->OnGossipHello(playerUser, this))
-            return;
+        if (GetMap()->GetEluna())
+            if (GetMap()->GetEluna()->OnGossipHello(playerUser, this))
+                return;
 #endif
         if (AI()->GossipHello(playerUser))
             return;
@@ -2290,7 +2294,8 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
         case GO_DESTRUCTIBLE_DAMAGED:
         {
 #ifdef ELUNA
-            GetMap()->GetEluna()->OnDamaged(this, attackerOrHealer);
+            if (GetMap()->GetEluna())
+                GetMap()->GetEluna()->OnDamaged(this, attackerOrHealer);
 #endif
             EventInform(m_goInfo->building.damagedEvent, attackerOrHealer);
             AI()->Damaged(attackerOrHealer, m_goInfo->building.damagedEvent);
@@ -2318,7 +2323,8 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, WorldOb
         case GO_DESTRUCTIBLE_DESTROYED:
         {
 #ifdef ELUNA
-            GetMap()->GetEluna()->OnDestroyed(this, attackerOrHealer);
+            if (GetMap()->GetEluna())
+                GetMap()->GetEluna()->OnDestroyed(this, attackerOrHealer);
 #endif
             EventInform(m_goInfo->building.destroyedEvent, attackerOrHealer);
             AI()->Destroyed(attackerOrHealer, m_goInfo->building.destroyedEvent);
@@ -2376,7 +2382,8 @@ void GameObject::SetLootState(LootState state, Unit* unit)
         m_lootStateUnitGUID.Clear();
 
 #ifdef ELUNA
-    GetMap()->GetEluna()->OnLootStateChanged(this, state);
+    if (GetMap()->GetEluna())
+        GetMap()->GetEluna()->OnLootStateChanged(this, state);
 #endif
     AI()->OnLootStateChanged(state, unit);
 
@@ -2407,7 +2414,7 @@ void GameObject::SetGoState(GOState state)
 {
     SetByteValue(GAMEOBJECT_BYTES_1, 0, state);
 #ifdef ELUNA
-    if(IsInWorld())
+    if(IsInWorld() && GetMap()->GetEluna())
         GetMap()->GetEluna()->OnGameObjectStateChanged(this, state);
 #endif
     if (AI())

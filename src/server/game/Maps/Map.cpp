@@ -3561,10 +3561,13 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
 #ifdef ELUNA
-    if (Creature* creature = obj->ToCreature())
-        GetEluna()->OnRemove(creature);
-    else if (GameObject* gameobject = obj->ToGameObject())
-        GetEluna()->OnRemove(gameobject);
+    if (GetEluna())
+    {
+        if (Creature* creature = obj->ToCreature())
+            GetEluna()->OnRemove(creature);
+        else if (GameObject* gameobject = obj->ToGameObject())
+            GetEluna()->OnRemove(gameobject);
+    }
 #endif
 
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
@@ -4006,9 +4009,12 @@ void InstanceMap::CreateInstanceData(bool load)
     bool isElunaAI = false;
 
 #ifdef ELUNA
-    i_data = GetEluna()->GetInstanceData(this);
-    if (i_data)
-        isElunaAI = true;
+    if (GetEluna())
+    {
+        i_data = GetEluna()->GetInstanceData(this);
+        if (i_data)
+            isElunaAI = true;
+    }
 #endif
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID

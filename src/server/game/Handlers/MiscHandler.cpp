@@ -83,7 +83,8 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
     }
 
 #ifdef ELUNA
-    GetPlayer()->GetMap()->GetEluna()->OnRepop(GetPlayer());
+    if (GetPlayer()->GetMap()->GetEluna())
+        GetPlayer()->GetMap()->GetEluna()->OnRepop(GetPlayer());
 #endif
 
     //this is spirit release confirm?
@@ -180,10 +181,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         if (unit)
         {
 #ifdef ELUNA
-            if (!_player->GetMap()->GetEluna()->OnGossipSelectCode(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
+            if(_player->GetMap()->GetEluna())
+                if (!_player->GetMap()->GetEluna()->OnGossipSelectCode(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
 #endif
-            if (!unit->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
-                _player->OnGossipSelect(unit, gossipListId, menuId);
+                if (!unit->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
+                    _player->OnGossipSelect(unit, gossipListId, menuId);
         }
         else if (item)
         {
@@ -196,10 +198,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         else
         {
 #ifdef ELUNA
-            if (!_player->GetMap()->GetEluna()->OnGossipSelectCode(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
+            if (_player->GetMap()->GetEluna())
+                if (!_player->GetMap()->GetEluna()->OnGossipSelectCode(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
 #endif
-            if (!go->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
-                _player->OnGossipSelect(go, gossipListId, menuId);
+                if (!go->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
+                    _player->OnGossipSelect(go, gossipListId, menuId);
         }
     }
     else
@@ -207,10 +210,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         if (unit)
         {
 #ifdef ELUNA
-            if (!_player->GetMap()->GetEluna()->OnGossipSelect(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
+            if (_player->GetMap()->GetEluna())
+                if (!_player->GetMap()->GetEluna()->OnGossipSelect(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
 #endif
-            if (!unit->AI()->GossipSelect(_player, menuId, gossipListId))
-                _player->OnGossipSelect(unit, gossipListId, menuId);
+                if (!unit->AI()->GossipSelect(_player, menuId, gossipListId))
+                    _player->OnGossipSelect(unit, gossipListId, menuId);
         }
         else if (item)
         {
@@ -223,10 +227,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         else
         {
 #ifdef ELUNA
-            if (!_player->GetMap()->GetEluna()->OnGossipSelect(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
+            if (_player->GetMap()->GetEluna())
+                if (!_player->GetMap()->GetEluna()->OnGossipSelect(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
 #endif
-            if (!go->AI()->GossipSelect(_player, menuId, gossipListId))
-                _player->OnGossipSelect(go, gossipListId, menuId);
+                if (!go->AI()->GossipSelect(_player, menuId, gossipListId))
+                    _player->OnGossipSelect(go, gossipListId, menuId);
         }
     }
 }

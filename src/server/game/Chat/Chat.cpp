@@ -261,7 +261,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 #ifdef ELUNA
                 //if (!Eluna::GEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, oldtext))
                     //return true;
-                if (GetSession())
+                if (GetSession() && GetSession()->GetPlayer()->GetMap()->GetEluna())
                     if(!GetSession()->GetPlayer()->GetMap()->GetEluna()->OnCommand(GetSession()->GetPlayer(), oldtext))
                         return true;
 #endif
@@ -394,7 +394,7 @@ bool ChatHandler::_ParseCommands(char const* text)
 #ifdef ELUNA
     //if (!Eluna::GEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text))
         //return true;
-    if (GetSession())
+    if (GetSession() && GetSession()->GetPlayer()->GetMap()->GetEluna())
         if (!GetSession()->GetPlayer()->GetMap()->GetEluna()->OnCommand(GetSession()->GetPlayer(), text))
             return true;
 #endif
