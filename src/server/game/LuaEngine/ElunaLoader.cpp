@@ -30,12 +30,18 @@ void ElunaLoader::LoadScripts()
 {
     lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
 
-    uint32 oldMSTime = ElunaUtil::GetCurrTime();
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+    {
+        ELUNA_LOG_INFO("[Eluna]: Pulling git scripts...");
+        std::ostringstream command;
+        command << "cd " << std::filesystem::current_path() << "\\" << lua_folderpath << " & git pull --recurse-submodules";
+        system(command.str().c_str());
+    }
 
-    // clear script storage
-    lua_extensions.clear();
+    uint32 oldMSTime = ElunaUtil::GetCurrTime();
     lua_scripts.clear();
-    combined_scripts.clear();
+    lua_extensions.clear();
+    combined_scripts.clear()
 #ifndef ELUNA_WINDOWS
     if (lua_folderpath[0] == '~')
         if (const char* home = getenv("HOME"))
@@ -44,6 +50,7 @@ void ElunaLoader::LoadScripts()
     ELUNA_LOG_INFO("[Eluna]: Searching scripts from `%s`", lua_folderpath.c_str());
     lua_requirepath.clear();
     ReadFiles(lua_folderpath);
+    CombineLists();
     // Erase last ;
     if (!lua_requirepath.empty())
         lua_requirepath.erase(lua_requirepath.end() - 1);
