@@ -80,7 +80,6 @@ MapManager* MapManager::instance()
 
 Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel)
 {
-    printf("Create BaseMap %u\n", id);
     Map* map = FindBaseMap(id);
 
     if (map == nullptr)

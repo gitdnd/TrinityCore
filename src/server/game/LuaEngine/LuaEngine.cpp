@@ -40,107 +40,29 @@ extern "C"
 
 // Additional lua libraries
 };
-/*
-Eluna::ScriptList Eluna::lua_scripts;
-Eluna::ScriptList Eluna::lua_extensions;
-std::string Eluna::lua_folderpath;
-std::string Eluna::lua_requirepath;*/
-//Eluna* Eluna::GEluna = NULL;
+
 bool Eluna::reload = false;
-//bool Eluna::initialized = false;
-//Eluna::LockType Eluna::lock;
 
 extern void RegisterFunctions(Eluna* E);
 
-void Eluna::Initialize()
-{
-    printf("Initializing Eluna\n");
-    //ASSERT(!IsInitialized());
-    /*
-#if defined TRINITY || AZEROTHCORE
-    // For instance data the data column needs to be able to hold more than 255 characters (tinytext)
-    // so we change it to TEXT automatically on startup
-    CharacterDatabase.DirectExecute("ALTER TABLE `instance` CHANGE COLUMN `data` `data` TEXT NOT NULL");
-#endif*/
-
-    //LoadScriptPaths();
-
-
-    // Must be before creating GEluna
-    // This is checked on Eluna creation
-    initialized = true;
-
-    // Create global eluna
-    //GEluna = new Eluna();
-}
-
-void Eluna::Uninitialize()
-{
-    printf("Uninitializing Eluna\n");
-    //ASSERT(IsInitialized());
-
-    //delete GEluna;
-    //GEluna = NULL;
-
-    //lua_scripts.clear();
-    //lua_extensions.clear();
-
-    initialized = false;
-}
-
-/*void Eluna::LoadScriptPaths()
-{
-    lua_folderpath = eConfigMgr->GetStringDefault("Eluna.ScriptPath", "lua_scripts");
-
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
-    {
-        ELUNA_LOG_INFO("[Eluna]: Pulling git scripts...");
-        std::ostringstream command;
-        command << "cd " << std::filesystem::current_path() << "\\" << lua_folderpath << " & git pull --recurse-submodules";
-        system(command.str().c_str());
-    }
-    
-    uint32 oldMSTime = ElunaUtil::GetCurrTime();
-    lua_scripts.clear();
-    lua_extensions.clear();
-#ifndef ELUNA_WINDOWS
-    if (lua_folderpath[0] == '~')
-        if (const char* home = getenv("HOME"))
-            lua_folderpath.replace(0, 1, home);
-#endif
-    ELUNA_LOG_INFO("[Eluna]: Searching scripts from `%s`", lua_folderpath.c_str());
-    lua_requirepath.clear();
-    GetScripts(lua_folderpath);
-    // Erase last ;
-    if (!lua_requirepath.empty())
-        lua_requirepath.erase(lua_requirepath.end() - 1);
-
-    ELUNA_LOG_DEBUG("[Eluna]: Loaded %u scripts in %u ms", uint32(lua_scripts.size() + lua_extensions.size()), ElunaUtil::GetTimeDiff(oldMSTime));
-}*/
-
 void Eluna::_ReloadEluna()
 {
-    /*LOCK_ELUNA;
-    //ASSERT(IsInitialized());
 
     eWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
 
     // Remove all timed events
-    sEluna->eventMgr->SetStates(LUAEVENT_STATE_ERASE);
+    eventMgr->SetStates(LUAEVENT_STATE_ERASE);
 
     // Close lua
-    sEluna->CloseLua();
-
-    // Reload script paths
-    LoadScriptPaths();
+    CloseLua();
 
     // Open new lua and libaraies
-    sEluna->OpenLua();
+    OpenLua();
 
     // Run scripts from laoded paths
-    sEluna->RunScripts();
+    RunScripts();
 
-    reload = false;*/
+    reload = false;
 }
 
 Eluna::Eluna() :
@@ -167,27 +89,14 @@ MapEventBindings(NULL),
 InstanceEventBindings(NULL),
 CreatureUniqueBindings(NULL)
 {
-    Initialize();
-    //ASSERT(IsInitialized());
-
     OpenLua();
     eventMgr = new EventMgr(this);
-    //RunScripts();
-    RunScriptsNew();
-
-    // Replace this with map insert if making multithread version
-
-    // Set event manager. Must be after setting sEluna
-    // on multithread have a map of state pointers and here insert this pointer to the map and then save a pointer of that pointer to the EventMgr
-    //eventMgr = new EventMgr(&Eluna::GEluna);
+    RunScripts();
 }
 
 Eluna::~Eluna()
 {
-    //ASSERT(IsInitialized());
-    Uninitialize();
     CloseLua();
-
     delete eventMgr;
     eventMgr = NULL;
 }
@@ -210,15 +119,6 @@ void Eluna::CloseLua()
 void Eluna::OpenLua()
 {
     printf("Opening Lua\n");
-    if (!IsInitialized())
-        printf("Not initialized yet opening lua \n");
-    enabled = eConfigMgr->GetBoolDefault("Eluna.Enabled", true);
-    if (!IsEnabled())
-    {
-        ELUNA_LOG_INFO("[Eluna]: Eluna is disabled in config");
-        return;
-    }
-
 
     L = luaL_newstate();
 
@@ -319,144 +219,10 @@ void Eluna::DestroyBindStores()
 
     CreatureUniqueBindings = NULL;
 }
-/*
-void Eluna::AddScriptPath(std::string filename, const std::string& fullpath)
-{
-    ELUNA_LOG_DEBUG("[Eluna]: AddScriptPath Checking file `%s`", fullpath.c_str());
 
-    // split file name
-    std::size_t extDot = filename.find_last_of('.');
-    if (extDot == std::string::npos)
-        return;
-    std::string ext = filename.substr(extDot);
-    filename = filename.substr(0, extDot);
-
-    // check extension and add path to scripts to load
-    if (ext != ".lua" && ext != ".dll" && ext != ".so" && ext != ".ext")
-        return;
-    bool extension = ext == ".ext";
-
-    LuaScript script;
-    script.fileext = ext;
-    script.filename = filename;
-    script.filepath = fullpath;
-    script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
-    if (extension)
-        lua_extensions.push_back(script);
-    else
-        lua_scripts.push_back(script);
-    ELUNA_LOG_DEBUG("[Eluna]: AddScriptPath add path `%s`", fullpath.c_str());
-}
-
-// Finds lua script files from given path (including subdirectories) and pushes them to scripts
-void Eluna::GetScripts(std::string path)
-{
-    ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
-
-#ifdef USING_BOOST
-    boost::filesystem::path someDir(path);
-    boost::filesystem::directory_iterator end_iter;
-
-    if (boost::filesystem::exists(someDir) && boost::filesystem::is_directory(someDir))
-    {
-        lua_requirepath +=
-            path + "/?.lua;" +
-            path + "/?.ext;" +
-            path + "/?.dll;" +
-            path + "/?.so;";
-
-        for (boost::filesystem::directory_iterator dir_iter(someDir); dir_iter != end_iter; ++dir_iter)
-        {
-            std::string fullpath = dir_iter->path().generic_string();
-
-            // Check if file is hidden
-#ifdef ELUNA_WINDOWS
-            DWORD dwAttrib = GetFileAttributes(fullpath.c_str());
-            if (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_HIDDEN))
-                continue;
-#else
-            std::string name = dir_iter->path().filename().generic_string().c_str();
-            if (name[0] == '.')
-                continue;
-#endif
-
-            // load subfolder
-            if (boost::filesystem::is_directory(dir_iter->status()))
-            {
-                GetScripts(fullpath);
-                continue;
-            }
-
-            if (boost::filesystem::is_regular_file(dir_iter->status()))
-            {
-                // was file, try add
-                std::string filename = dir_iter->path().filename().generic_string();
-                AddScriptPath(filename, fullpath);
-            }
-        }
-    }
-#else
-    ACE_Dirent dir;
-    if (dir.open(path.c_str()) == -1) // Error opening directory, return
-        return;
-
-    lua_requirepath +=
-        path + "/?.lua;" +
-        path + "/?.ext;" +
-        path + "/?.dll;" +
-        path + "/?.so;";
-
-    ACE_DIRENT *directory = 0;
-    while ((directory = dir.read()))
-    {
-        // Skip the ".." and "." files.
-        if (ACE::isdotdir(directory->d_name))
-            continue;
-
-        std::string fullpath = path + "/" + directory->d_name;
-
-        // Check if file is hidden
-#ifdef ELUNA_WINDOWS
-        DWORD dwAttrib = GetFileAttributes(fullpath.c_str());
-        if (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_HIDDEN))
-            continue;
-#else
-        std::string name = directory->d_name;
-        if (name[0] == '.')
-            continue;
-#endif
-
-        ACE_stat stat_buf;
-        if (ACE_OS::lstat(fullpath.c_str(), &stat_buf) == -1)
-            continue;
-
-        // load subfolder
-        if ((stat_buf.st_mode & S_IFMT) == (S_IFDIR))
-        {
-            GetScripts(fullpath);
-            continue;
-        }
-
-        // was file, try add
-        std::string filename = directory->d_name;
-        AddScriptPath(filename, fullpath);
-    }
-#endif
-}
-
-static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second)
-{
-    return first.filepath < second.filepath;
-}*/
-
-void Eluna::RunScriptsNew()
+void Eluna::RunScripts()
 {
     printf("Running scripts \n");
-    if (!IsEnabled())
-    {
-        printf("Running scripts while not enabled \n");
-        return;
-    }
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     uint32 count = 0;
@@ -524,88 +290,6 @@ void Eluna::RunScriptsNew()
 
     OnLuaStateOpen();
 }
-/*
-void Eluna::RunScripts()
-{
-    printf("Running scripts \n");
-    if (!IsEnabled())
-    {
-        printf("Running scripts while not enabled \n");
-        return;
-    }
-
-    uint32 oldMSTime = ElunaUtil::GetCurrTime();
-    uint32 count = 0;
-
-    ScriptList scripts;
-    lua_extensions.sort(ScriptPathComparator);
-    lua_scripts.sort(ScriptPathComparator);
-    scripts.insert(scripts.end(), lua_extensions.begin(), lua_extensions.end());
-    scripts.insert(scripts.end(), lua_scripts.begin(), lua_scripts.end());
-
-    std::unordered_map<std::string, std::string> loaded; // filename, path
-
-    lua_getglobal(L, "package");
-    // Stack: package
-    luaL_getsubtable(L, -1, "loaded");
-    // Stack: package, modules
-    int modules = lua_gettop(L);
-
-    for (ScriptList::const_iterator it = scripts.begin(); it != scripts.end(); ++it)
-    {
-        // Check that no duplicate names exist
-        if (loaded.find(it->filename) != loaded.end())
-        {
-            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`. File with same name already loaded from `%s`, rename either file", it->filepath.c_str(), loaded[it->filename].c_str());
-            continue;
-        }
-        loaded[it->filename] = it->filepath;
-
-        lua_getfield(L, modules, it->filename.c_str());
-        // Stack: package, modules, module
-        if (!lua_isnoneornil(L, -1))
-        {
-            lua_pop(L, 1);
-            ELUNA_LOG_DEBUG("[Eluna]: `%s` was already loaded or required", it->filepath.c_str());
-            continue;
-        }
-        lua_pop(L, 1);
-        // Stack: package, modules
-
-        if (luaL_loadfile(L, it->filepath.c_str()))
-        {
-            // Stack: package, modules, errmsg
-            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
-            Report(L);
-            // Stack: package, modules
-            continue;
-        }
-        // Stack: package, modules, filefunc
-
-        if (ExecuteCall(0, 1))
-        {
-            // Stack: package, modules, result
-            if (lua_isnoneornil(L, -1) || (lua_isboolean(L, -1) && !lua_toboolean(L, -1)))
-            {
-                // if result evaluates to false, change it to true
-                lua_pop(L, 1);
-                Push(L, true);
-            }
-            lua_setfield(L, modules, it->filename.c_str());
-            // Stack: package, modules
-
-            // successfully loaded and ran file
-            ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->filepath.c_str());
-            ++count;
-            continue;
-        }
-    }
-    // Stack: package, modules
-    lua_pop(L, 2);
-    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
-
-    OnLuaStateOpen();
-}*/
 
 void Eluna::InvalidateObjects()
 {
@@ -621,12 +305,6 @@ void Eluna::InvalidateObjects()
         lua_pop(L, 1);
     }
     lua_pop(L, 1);
-    /*++callstackid;
-#ifdef TRINITY
-    ASSERT(callstackid, "Callstackid overflow");
-#else
-    ASSERT(callstackid && "Callstackid overflow");
-#endif*/
 }
 
 void Eluna::Report(lua_State* _L)
@@ -1317,9 +995,6 @@ int Eluna::CallOneFunction(int number_of_functions, int number_of_arguments, int
 
 CreatureAI* Eluna::GetAI(Creature* creature)
 {
-    if (!IsEnabled())
-        return NULL;
-
     for (int i = 1; i < Hooks::CREATURE_EVENT_COUNT; ++i)
     {
         Hooks::CreatureEvents event_id = (Hooks::CreatureEvents)i;
@@ -1337,9 +1012,6 @@ CreatureAI* Eluna::GetAI(Creature* creature)
 
 InstanceData* Eluna::GetInstanceData(Map* map)
 {
-    if (!IsEnabled())
-        return NULL;
-
     for (int i = 1; i < Hooks::INSTANCE_EVENT_COUNT; ++i)
     {
         Hooks::InstanceEvents event_id = (Hooks::InstanceEvents)i;
@@ -1401,9 +1073,6 @@ void Eluna::CreateInstanceData(Map const* map)
  */
 void Eluna::FreeInstanceId(uint32 instanceId)
 {
-    if (!IsEnabled())
-        return;
-
     for (int i = 1; i < Hooks::INSTANCE_EVENT_COUNT; ++i)
     {
         auto key = EntryKey<Hooks::InstanceEvents>((Hooks::InstanceEvents)i, instanceId);

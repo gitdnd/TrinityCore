@@ -301,6 +301,7 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
 
     if (GetEluna())
         GetEluna()->SetBoundMapId(GetId());
+
     sScriptMgr->OnCreateMap(this);
 }
 

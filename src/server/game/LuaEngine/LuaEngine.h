@@ -134,18 +134,7 @@ public:
     Eluna& operator=(const Eluna&) = delete;
 private:
     static bool reload;
-    bool initialized;
     uint32 boundMapId;
-    //static LockType lock;
-
-    // Lua script locations
-    /*static ScriptList lua_scripts;
-    static ScriptList lua_extensions;
-
-    // Lua script folder path
-    static std::string lua_folderpath;
-    // lua path variable for require() function
-    static std::string lua_requirepath;*/
 
     // A counter for lua event stacks that occur (see event_level).
     // This is used to determine whether an object belongs to the current call stack or not.
@@ -175,10 +164,8 @@ private:
 
     // Use ReloadEluna() to make eluna reload
     // This is called on world update to reload eluna
-    static void _ReloadEluna();
-    //static void LoadScriptPaths();
-    //static void GetScripts(std::string path);
-    //static void AddScriptPath(std::string filename, const std::string& fullpath);
+    void _ReloadEluna();
+
 
     static int StackTrace(lua_State *_L);
     static void Report(lua_State* _L);
@@ -225,8 +212,6 @@ private:
     void Push(T const* ptr)                     { Push(L, ptr); ++push_counter; }
 
 public:
-    //static Eluna* GEluna;
-
     lua_State* L;
     EventMgr* eventMgr;
 
@@ -250,12 +235,8 @@ public:
 
     BindingMap< UniqueObjectKey<Hooks::CreatureEvents> >*  CreatureUniqueBindings;
 
-    void Initialize();
-    void Uninitialize();
     // This function is used to make eluna reload
     static void ReloadEluna() { reload = true; }
-    //static LockType& GetLock() { return lock; };
-    bool const IsInitialized() { return initialized; }
     // Never returns nullptr
     static Eluna* GetEluna(lua_State* L)
     {
@@ -317,11 +298,9 @@ public:
     void PushInstanceData(lua_State* L, ElunaInstanceAI* ai, bool incrementCounter = true);
 
     //void RunScripts();
-    void RunScriptsNew();
+    void RunScripts();
     bool ShouldReload() const { return reload; }
-    bool IsEnabled() const { return enabled && initialized; }
     bool HasLuaState() const { return L != NULL; }
-    uint64 GetCallstackId() const { return callstackid; }
     int Register(lua_State* L, uint8 reg, uint32 entry, uint64 guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);
 
     // Checks
@@ -553,7 +532,6 @@ public:
     void OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
 
-    //void UpdateEventMgr(uint32 diff) { eventMgr->globalProcessor->Update(diff); }
     uint32 GetBoundMapId() const { return boundMapId; }
     void SetBoundMapId(uint32 id) { boundMapId = id; }
 };
