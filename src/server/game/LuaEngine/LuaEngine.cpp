@@ -147,17 +147,14 @@ Eluna::Eluna() :
 event_level(0),
 push_counter(0),
 enabled(false),
-
 L(NULL),
 eventMgr(NULL),
-
 ServerEventBindings(NULL),
 PlayerEventBindings(NULL),
 GuildEventBindings(NULL),
 GroupEventBindings(NULL),
 VehicleEventBindings(NULL),
 BGEventBindings(NULL),
-
 PacketEventBindings(NULL),
 CreatureEventBindings(NULL),
 CreatureGossipBindings(NULL),

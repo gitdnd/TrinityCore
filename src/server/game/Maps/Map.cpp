@@ -300,7 +300,7 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     if (GetEluna())
-        GetEluna()->SetBoundMapId(id);
+        GetEluna()->SetBoundMapId(GetId());
     sScriptMgr->OnCreateMap(this);
 }
 

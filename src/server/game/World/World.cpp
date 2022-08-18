@@ -1680,7 +1680,7 @@ void World::SetInitialWorldSettings()
 #ifdef ELUNA
     ///- Initialize Lua Engine
     //TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
-    //Eluna::Initialize();
+    sElunaLoader->LoadScripts();
 #endif
 
     ///- Initialize pool manager
@@ -2324,7 +2324,7 @@ void World::SetInitialWorldSettings()
 #ifdef ELUNA
     ///- Run eluna scripts.
     // in multithread foreach: run scripts
-    sElunaLoader->LoadScripts();
+    //sElunaLoader->LoadScripts();
     //sEluna->RunScripts();
     //sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
 #endif
