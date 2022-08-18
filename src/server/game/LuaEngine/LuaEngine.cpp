@@ -264,15 +264,6 @@ void Eluna::RunScripts()
             // Stack: package, modules
             continue;
         }
-
-        /*if (luaL_loadfile(L, it->filepath.c_str()))
-        {
-            // Stack: package, modules, errmsg
-            ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
-            Report(L);
-            // Stack: package, modules
-            continue;
-        }*/
         // Stack: package, modules, filefunc
 
         if (ExecuteCall(0, 1))
