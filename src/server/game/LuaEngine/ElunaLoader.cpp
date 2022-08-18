@@ -41,7 +41,7 @@ void ElunaLoader::LoadScripts()
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     lua_scripts.clear();
     lua_extensions.clear();
-    combined_scripts.clear()
+    combined_scripts.clear();
 #ifndef ELUNA_WINDOWS
     if (lua_folderpath[0] == '~')
         if (const char* home = getenv("HOME"))
