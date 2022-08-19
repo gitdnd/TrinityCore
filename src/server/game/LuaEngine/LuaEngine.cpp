@@ -59,8 +59,6 @@ void Eluna::_ReloadEluna()
 
     // Run scripts from laoded paths
     RunScripts();
-
-    reload = false;
 }
 
 Eluna::Eluna(uint32 MapId) :

@@ -1184,7 +1184,7 @@ namespace LuaGlobalFunctions
      */
     int ReloadEluna(Eluna* /*L*/)
     {
-        Eluna::ReloadEluna();
+        sMapMgr->ReloadEluna(-1);
         return 0;
     }
 
