@@ -47,6 +47,7 @@
 #include "VMapFactory.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaLoader.h"
 #endif
 #include "Weather.h"
 #include "WeatherMgr.h"
@@ -285,25 +286,15 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
     // lua state begins uninitialized
     eluna = nullptr;
 
-    std::string maps = sConfigMgr->GetStringDefault("Eluna.OnlyOnMaps", "");
-    Tokenizer mapIds(maps, ',');
+    m_parentMap = (_parent ? _parent : this);
 
-    // if no maps in OnlyOnMaps, default to enabled for all maps.
-    if (mapIds.size() == 0)
-        eluna = new Eluna();
-    else
+    if (sElunaLoader->ShouldMapLoadEluna(id))
     {
-        for (auto itr = mapIds.begin(); itr != mapIds.end(); itr++)
-        {
-            if (uint32(atoi(*itr)) == GetId())
-            {
-                eluna = new Eluna();
-                break;
-            }
-        }
+        //eluna = new Eluna();
+        if(m_parentMap == this) // We are the parent map load eluna
+            eluna = new Eluna();
     }
 
-    m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)

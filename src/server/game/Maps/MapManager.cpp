@@ -392,7 +392,8 @@ void MapManager::ReloadEluna(int32 mapId)
             if (map->GetEluna())
                 map->GetEluna()->_ReloadEluna();
         }
-
+        // Only if each instance gets a state.
+        /*
         if (!map->Instanceable())
             continue;
 
@@ -401,7 +402,7 @@ void MapManager::ReloadEluna(int32 mapId)
         {
             if (mitr->second->GetEluna())
                 mitr->second->GetEluna()->_ReloadEluna();
-        }
+        }*/
     }
 
 }

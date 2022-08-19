@@ -56,6 +56,13 @@ void ElunaLoader::LoadScripts()
         lua_requirepath.erase(lua_requirepath.end() - 1);
 
     ELUNA_LOG_INFO("[Eluna]: Loaded %u scripts in %u ms", uint32(combined_scripts.size()), ElunaUtil::GetTimeDiff(oldMSTime));
+    requiredMaps.clear();
+    std::string maps = sConfigMgr->GetStringDefault("Eluna.OnlyOnMaps", "");
+    Tokenizer mapIds(maps, ',');
+    for (Tokenizer::const_iterator itr = mapIds.begin(); itr != mapIds.end(); ++itr)
+    {
+        requiredMaps.emplace_back(atoi(*itr));
+    }
 }
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
@@ -160,4 +167,12 @@ void ElunaLoader::CombineLists()
     lua_scripts.sort(ScriptPathComparator);
     combined_scripts.insert(combined_scripts.end(), lua_extensions.begin(), lua_extensions.end());
     combined_scripts.insert(combined_scripts.end(), lua_scripts.begin(), lua_scripts.end());
+}
+
+bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
+{
+    if (!requiredMaps.size())
+        return true;
+
+    return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
 }

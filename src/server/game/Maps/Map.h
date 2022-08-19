@@ -648,7 +648,13 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         }
 
         virtual std::string GetDebugInfo() const;
-        Eluna* GetEluna() const { return eluna; }
+        Eluna* GetEluna() const
+        {
+            if (GetParent() != this)
+                return GetParent()->GetEluna();
+
+            return eluna;
+        }
         Eluna* eluna;
     private:
         void LoadMapAndVMap(int gx, int gy);
