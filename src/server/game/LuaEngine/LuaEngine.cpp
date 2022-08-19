@@ -240,7 +240,7 @@ void Eluna::RunScripts()
         // check that the script file is either global or meant to be loaded for this map
         if (it->mapId != -1 && it->mapId != int32(GetBoundMapId()))
         {
-            ELUNA_LOG_DEBUG("[Eluna]: `%s` is not tagged to load for mapId: %u", it->filename.c_str(), GetBoundMapId());
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged `%i` and will not load for mapId: %u", it->filename.c_str(), it->mapId, GetBoundMapId());
             continue;
         }
 
