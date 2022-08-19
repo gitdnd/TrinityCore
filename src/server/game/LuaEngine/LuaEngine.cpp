@@ -239,9 +239,9 @@ void Eluna::RunScripts()
     for (ScriptList::const_iterator it = sElunaLoader->combined_scripts.begin(); it != sElunaLoader->combined_scripts.end(); ++it)
     {
         // check that the script file is either global or meant to be loaded for this map
-        if (it->mapId != -1 && it->mapId != int32(GetBoundMapId()))
+        if (it->mapId != -1 && it->mapId != int32(boundMapId))
         {
-            ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged `%i` and will not load for mapId: %u", it->filename.c_str(), it->mapId, GetBoundMapId());
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged %i and will not load for mapId: %u (%i)", it->filename.c_str(), it->mapId, boundMapId, int32(boundMapId));
             continue;
         }
 
