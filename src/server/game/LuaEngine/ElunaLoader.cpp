@@ -59,7 +59,7 @@ void ElunaLoader::LoadScripts()
 }
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
-void ElunaLoader::ReadFiles(std::string path)
+void ElunaLoader::ReadFiles(std::string path, int32 mapId = -1)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 
@@ -92,7 +92,8 @@ void ElunaLoader::ReadFiles(std::string path)
             // load subfolder
             if (boost::filesystem::is_directory(dir_iter->status()))
             {
-                ReadFiles(fullpath);
+                ELUNA_LOG_DEBUG("[Eluna]: Path is folder, full path is `%s`", fullpath.c_str())
+                ReadFiles(fullpath, mapId);
                 continue;
             }
 
@@ -100,13 +101,13 @@ void ElunaLoader::ReadFiles(std::string path)
             {
                 // was file, try add
                 std::string filename = dir_iter->path().filename().generic_string();
-                AddScriptPath(filename, fullpath);
+                AddScriptPath(filename, fullpath, mapId);
             }
         }
     }
 }
 
-void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpath)
+void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpath, int32 mapId)
 {
     ELUNA_LOG_DEBUG("[Eluna]: AddScriptPath Checking file `%s`", fullpath.c_str());
 
@@ -137,8 +138,10 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.fileext = ext;
     script.filename = filename;
     script.filepath = fullpath;
-    script.filedata = content;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
+    script.filedata = content;
+    script.mapId = mapId;
+
     if (extension)
         lua_extensions.push_back(script);
     else
