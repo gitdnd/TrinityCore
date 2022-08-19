@@ -65,7 +65,7 @@ void Eluna::_ReloadEluna()
     reload = false;
 }
 
-Eluna::Eluna() :
+Eluna::Eluna(uint32 MapId) :
 event_level(0),
 push_counter(0),
 enabled(false),
@@ -87,7 +87,8 @@ ItemGossipBindings(NULL),
 PlayerGossipBindings(NULL),
 MapEventBindings(NULL),
 InstanceEventBindings(NULL),
-CreatureUniqueBindings(NULL)
+CreatureUniqueBindings(NULL),
+boundMapId(MapId)
 {
     OpenLua();
     eventMgr = new EventMgr(this);

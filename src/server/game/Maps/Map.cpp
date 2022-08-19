@@ -278,26 +278,23 @@ m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
-i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
+i_scriptLock(false), _respawnCheckTimer(0), eluna(nullptr)
 {
     printf("Loading %u\n", GetId());
-
-    // lua state begins uninitialized
-    eluna = nullptr;
 
     std::string maps = sConfigMgr->GetStringDefault("Eluna.OnlyOnMaps", "");
     Tokenizer mapIds(maps, ',');
 
     // if no maps in OnlyOnMaps, default to enabled for all maps.
     if (mapIds.size() == 0)
-        eluna = new Eluna();
+        eluna = new Eluna(id);
     else
     {
         for (auto itr = mapIds.begin(); itr != mapIds.end(); itr++)
         {
             if (uint32(atoi(*itr)) == GetId())
             {
-                eluna = new Eluna();
+                eluna = new Eluna(id);
                 break;
             }
         }
@@ -320,9 +317,6 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
     Map::InitVisibilityDistance();
 
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
-
-    if (GetEluna())
-        GetEluna()->SetBoundMapId(GetId());
 
     sScriptMgr->OnCreateMap(this);
 }
