@@ -59,7 +59,7 @@ void ElunaLoader::LoadScripts()
 }
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
-void ElunaLoader::ReadFiles(std::string path, int32 mapId)
+void ElunaLoader::ReadFiles(std::string path)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 
@@ -91,36 +91,33 @@ void ElunaLoader::ReadFiles(std::string path, int32 mapId)
             // load subfolder
             if (boost::filesystem::is_directory(dir_iter->status()))
             {
-                // if object is a subdirectory and mapId is -1 (all) then see if subfolder is a map specific subfolder
-                if (mapId == -1)
-                {
-                    // strip base folder path and trailing slash from fullpath
-                    std::string subfolder = dir_iter->path().generic_string();
-                    subfolder = subfolder.erase(0, lua_folderpath.size() + 1);
-
-                    // stringstream used for conversion
-                    std::stringstream ss;
-
-                    // push subfolder int to subMapId
-                    ss << subfolder;
-                    ss >> mapId;
-
-                    // if this failed, then we revert back to all maps
-                    if (ss.fail())
-                        mapId = -1;
-
-                    // just in case we have a subfolder named an int less than all..
-                    if (mapId < -1)
-                        mapId = -1;
-
-                }
-
-                ReadFiles(fullpath, mapId);
+                ReadFiles(fullpath);
                 continue;
             }
 
             if (boost::filesystem::is_regular_file(dir_iter->status()))
             {
+                int32 mapId;
+
+                // strip base folder path and trailing slash from fullpath
+                std::string subfolder = dir_iter->path().generic_string();
+                subfolder = subfolder.erase(0, lua_folderpath.size() + 1);
+
+                // stringstream used for conversion
+                std::stringstream ss;
+
+                // push subfolder int to subMapId
+                ss << subfolder;
+                ss >> mapId;
+
+                // if this failed, then we load the script for all maps
+                if (ss.fail())
+                    mapId = -1;
+
+                // just in case we have a subfolder named an int less than all..
+                if (mapId < -1)
+                    mapId = -1;
+
                 // was file, try add
                 std::string filename = dir_iter->path().filename().generic_string();
                 AddScriptPath(filename, fullpath, mapId);
