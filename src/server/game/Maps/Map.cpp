@@ -279,10 +279,11 @@ m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
-i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
+i_scriptLock(false), _respawnCheckTimer(0), eluna(nullptr)
 {
     printf("Loading %u\n", GetId());
 
+<<<<<<< HEAD
     // lua state begins uninitialized
     eluna = nullptr;
 
@@ -290,9 +291,9 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
 
     if (sElunaLoader->ShouldMapLoadEluna(id))
     {
-        //eluna = new Eluna();
+        //eluna = new Eluna(id);
         if(m_parentMap == this) // We are the parent map load eluna
-            eluna = new Eluna();
+            eluna = new Eluna(id);
     }
 
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -311,9 +312,6 @@ i_scriptLock(false), _respawnCheckTimer(0), eluna(new Eluna())
     Map::InitVisibilityDistance();
 
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
-
-    if (GetEluna())
-        GetEluna()->SetBoundMapId(GetId());
 
     sScriptMgr->OnCreateMap(this);
 }
