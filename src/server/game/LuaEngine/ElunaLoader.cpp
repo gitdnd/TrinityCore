@@ -77,7 +77,6 @@ void ElunaLoader::ReadFiles(std::string path, int32 mapId)
         for (boost::filesystem::directory_iterator dir_iter(someDir); dir_iter != end_iter; ++dir_iter)
         {
             std::string fullpath = dir_iter->path().generic_string();
-
             // Check if file is hidden
 #ifdef ELUNA_WINDOWS
             DWORD dwAttrib = GetFileAttributes(fullpath.c_str());
@@ -92,7 +91,30 @@ void ElunaLoader::ReadFiles(std::string path, int32 mapId)
             // load subfolder
             if (boost::filesystem::is_directory(dir_iter->status()))
             {
-                ELUNA_LOG_DEBUG("[Eluna]: Path is folder, full path is `%s`", fullpath.c_str())
+                // if object is a subdirectory and mapId is -1 (all) then see if subfolder is a map specific subfolder
+                if (mapId == -1)
+                {
+                    // strip base folder path and trailing slash from fullpath
+                    std::string subfolder = dir_iter->path().generic_string();
+                    subfolder = subfolder.erase(0, lua_folderpath.size() + 1);
+
+                    // stringstream used for conversion
+                    std::stringstream ss;
+
+                    // push subfolder int to subMapId
+                    ss << subfolder;
+                    ss >> mapId;
+
+                    // if this failed, then we revert back to all maps
+                    if (ss.fail())
+                        mapId = -1;
+
+                    // just in case we have a subfolder named an int less than all..
+                    if (mapId < -1)
+                        mapId = -1;
+
+                }
+
                 ReadFiles(fullpath, mapId);
                 continue;
             }
