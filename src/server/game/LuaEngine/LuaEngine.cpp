@@ -237,6 +237,13 @@ void Eluna::RunScripts()
 
     for (ScriptList::const_iterator it = sElunaLoader->combined_scripts.begin(); it != sElunaLoader->combined_scripts.end(); ++it)
     {
+        // check that the script file is either global or meant to be loaded for this map
+        if (it->mapId != -1 && it->mapId != int32(GetBoundMapId()))
+        {
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` is not tagged to load for mapId: %u", it->filename.c_str(), GetBoundMapId());
+            continue;
+        }
+
         // Check that no duplicate names exist
         if (loaded.find(it->filename) != loaded.end())
         {
