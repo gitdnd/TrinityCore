@@ -41,8 +41,6 @@ extern "C"
 // Additional lua libraries
 };
 
-bool Eluna::reload = false;
-
 extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()

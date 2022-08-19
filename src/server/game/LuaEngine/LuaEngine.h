@@ -135,7 +135,6 @@ public:
     Eluna(Eluna const&) = delete;
     Eluna& operator=(const Eluna&) = delete;
 private:
-    static bool reload;
     uint32 boundMapId;
 
     // A counter for lua event stacks that occur (see event_level).
@@ -163,11 +162,6 @@ private:
     void CreateBindStores();
     void InvalidateObjects();
     bool ExecuteCall(int params, int res);
-
-    // Use ReloadEluna() to make eluna reload
-    // This is called on world update to reload eluna
-    void _ReloadEluna();
-
 
     static int StackTrace(lua_State *_L);
     static void Report(lua_State* _L);
@@ -237,8 +231,6 @@ public:
 
     BindingMap< UniqueObjectKey<Hooks::CreatureEvents> >*  CreatureUniqueBindings;
 
-    // This function is used to make eluna reload
-    static void ReloadEluna() { reload = true; }
     // Never returns nullptr
     static Eluna* GetEluna(lua_State* L)
     {
@@ -301,7 +293,6 @@ public:
 
     //void RunScripts();
     void RunScripts();
-    bool ShouldReload() const { return reload; }
     bool HasLuaState() const { return L != NULL; }
     int Register(lua_State* L, uint8 reg, uint32 entry, uint64 guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);
 
@@ -533,6 +524,8 @@ public:
 #endif
     void OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
+
+    void _ReloadEluna();
 
     uint32 GetBoundMapId() const { return boundMapId; }
     void SetBoundMapId(uint32 id) { boundMapId = id; }
