@@ -59,7 +59,7 @@ void ElunaLoader::LoadScripts()
 }
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
-void ElunaLoader::ReadFiles(std::string path, int32 mapId = -1)
+void ElunaLoader::ReadFiles(std::string path, int32 mapId)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 

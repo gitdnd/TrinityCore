@@ -23,7 +23,7 @@ public:
     ElunaLoader& operator= (ElunaLoader&&) = delete;
     static ElunaLoader* instance();
     void LoadScripts();
-    void ReadFiles(std::string path, int32 mapId);
+    void ReadFiles(std::string path, int32 mapId = -1);
     void AddScriptPath(std::string filename, const std::string& fullpath, int32 mapId);
     void CombineLists();
 
