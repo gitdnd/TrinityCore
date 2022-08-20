@@ -905,7 +905,6 @@ void Map::Update(uint32 t_diff)
     if (!m_mapRefManager.isEmpty() || !m_activeNonPlayers.empty())
         ProcessRelocationNotifies(t_diff);
 
-    TC_LOG_DEBUG("eluna", "[Eluna]: Map::Update reached for: %u", this->GetId());
     sScriptMgr->OnMapUpdate(this, t_diff);
 
     TC_METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),

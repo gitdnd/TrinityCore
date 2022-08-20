@@ -40,7 +40,6 @@ ElunaEventProcessor::~ElunaEventProcessor()
 
 void ElunaEventProcessor::Update(uint32 diff)
 {
-    ELUNA_LOG_DEBUG("[Eluna]: Eluna EventProcessor Update reached for map: %u", E->GetBoundMapId());
     m_time += diff;
     for (EventList::iterator it = eventList.begin(); it != eventList.end() && it->first <= m_time; it = eventList.begin())
     {
