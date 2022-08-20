@@ -45,8 +45,7 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
-
-    eWorld->SendServerMessage(SERVER_MSG_STRING, "Reloading Eluna...");
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %u", boundMapId).c_str());
 
     // Remove all timed events
     eventMgr->SetStates(LUAEVENT_STATE_ERASE);
@@ -115,7 +114,7 @@ void Eluna::CloseLua()
 
 void Eluna::OpenLua()
 {
-    printf("Opening Lua\n");
+    ELUNA_LOG_DEBUG("[Eluna]: Opening Lua state for map: %u", boundMapId);
 
     L = luaL_newstate();
 
@@ -219,7 +218,7 @@ void Eluna::DestroyBindStores()
 
 void Eluna::RunScripts()
 {
-    printf("Running scripts \n");
+    ELUNA_LOG_DEBUG("[Eluna]: Running scripts for map: %u", boundMapId);
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     uint32 count = 0;
@@ -237,7 +236,7 @@ void Eluna::RunScripts()
         // check that the script file is either global or meant to be loaded for this map
         if (it->mapId != -1 && it->mapId != int32(boundMapId))
         {
-            ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged %i and will not load for mapId: %u", it->filename.c_str(), it->mapId, boundMapId);
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged %i and will not load for map: %u", it->filename.c_str(), it->mapId, boundMapId);
             continue;
         }
 
@@ -290,7 +289,7 @@ void Eluna::RunScripts()
     }
     // Stack: package, modules
     lua_pop(L, 2);
-    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
+    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %u", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 
     OnLuaStateOpen();
 }
