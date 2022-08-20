@@ -45,9 +45,7 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
-    std::stringstream ss;
-    ss << "[Eluna] Reloading state for Map: " << boundMapId;
-    eWorld->SendServerGMMessage(SERVER_MSG_STRING, ss.str().c_str());
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %u", boundMapId).c_str());
 
     // Remove all timed events
     eventMgr->SetStates(LUAEVENT_STATE_ERASE);

@@ -281,9 +281,6 @@ m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transpo
 i_gridExpiry(expiry),
 i_scriptLock(false), _respawnCheckTimer(0)
 {
-    printf("Loading %u\n", GetId());
-
-
     // lua state begins uninitialized
     eluna = nullptr;
 
