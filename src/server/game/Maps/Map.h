@@ -331,6 +331,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         // currently unused for normal maps
         bool CanUnload(uint32 diff)
         {
+            return false;
             if (!m_unloadTimer)
                 return false;
 
@@ -655,6 +656,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
             return eluna;
         }
+        Eluna* GetSelfEluna() const { return eluna; }
         Eluna* eluna;
     private:
         void LoadMapAndVMap(int gx, int gy);

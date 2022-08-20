@@ -49,6 +49,8 @@ EndScriptData */
 #include <limits>
 #include <map>
 #include <set>
+#include "MapManager.h"
+#include "Map.h"
 
 using namespace Trinity::ChatCommands;
 class debug_commandscript : public CommandScript
@@ -124,7 +126,8 @@ public:
             { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
             { "spawndynobj",   rbac::RBAC_PERM_COMMAND_DEBUG,              false, &HandleSpawnDynamicObject,           "" },
             { "objectcount",   rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugObjectCountCommand,      "" },
-            { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" }
+            { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
+            { "spawninstances",rbac::RBAC_PERM_COMMAND_DEBUG,               true,  & HandleDebugSpawnInstancesCommand,   "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -2007,6 +2010,20 @@ public:
         {
             handler->PSendSysMessage("Dyn Obj spawn failed.");
             delete dynObj;
+        }
+        return true;
+    }
+
+    static bool HandleDebugSpawnInstancesCommand(ChatHandler* handler, CommandArgs* args)
+    {
+        auto numberOfInstances = args->TryConsume<uint32>();
+        if (numberOfInstances)
+        {
+            for (uint32 i = 0; i < numberOfInstances.get(); ++i)
+            {
+                sMapMgr->CreateMap(handler->GetSession()->GetPlayer()->GetMapId(), handler->GetSession()->GetPlayer());
+                handler->PSendSysMessage("Spawned %u of of %u instances.", i, numberOfInstances.get());
+            }
         }
         return true;
     }
