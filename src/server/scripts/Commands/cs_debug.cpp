@@ -127,7 +127,7 @@ public:
             { "spawndynobj",   rbac::RBAC_PERM_COMMAND_DEBUG,              false, &HandleSpawnDynamicObject,           "" },
             { "objectcount",   rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugObjectCountCommand,      "" },
             { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
-            { "spawninstances",rbac::RBAC_PERM_COMMAND_DEBUG,               true,  & HandleDebugSpawnInstancesCommand,   "" }
+            { "spawninstances",rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugSpawnInstancesCommand,   "" }
         };
         static std::vector<ChatCommand> commandTable =
         {

@@ -1248,10 +1248,10 @@ public:
     {
         if (!*args)
         {
-            if (Player * p = handler->GetSession()->GetPlayer())
+            if (handler->GetSession())
             {
                 sElunaLoader->LoadScripts();
-                sMapMgr->ReloadEluna(p->GetMapId());
+                sMapMgr->ReloadEluna(handler->GetSession()->GetPlayer()->GetMapId());
             }
         }
         else if (args == "all")
@@ -1261,7 +1261,6 @@ public:
         }
         else
         {
-
             Tokenizer entries(std::string(args), ' ');
             if(entries.size() >= 1)
                 sElunaLoader->LoadScripts();
