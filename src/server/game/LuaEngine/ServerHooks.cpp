@@ -335,6 +335,7 @@ void Eluna::OnPlayerLeave(Map* map, Player* player)
 
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
+    TC_LOG_DEBUG("[Eluna]: Eluna OnMapUpdate reached for: %u", map->GetId());
     START_HOOK(MAP_EVENT_ON_UPDATE);
     eventMgr->globalProcessor->Update(diff);
     Push(map);
