@@ -1542,7 +1542,7 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
 void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
 {
     ASSERT(map);
-    TC_LOG_DEBUG("[Eluna]: ScriptMgr OnMapUpdate reached for: %u", map->GetId());
+    TC_LOG_DEBUG("eluna", "[Eluna]: ScriptMgr OnMapUpdate reached for: %u", map->GetId());
 #ifdef ELUNA
     if (map->GetEluna())
         map->GetEluna()->OnUpdate(map, diff);
