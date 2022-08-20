@@ -26,6 +26,7 @@ public:
     void ReadFiles(std::string path);
     void AddScriptPath(std::string filename, const std::string& fullpath, int32 mapId);
     void CombineLists();
+    bool ShouldMapLoadEluna(uint32 mapId);
 
     // Lua script folder path
     std::string lua_folderpath;
@@ -37,6 +38,7 @@ public:
     ScriptList lua_scripts;
     ScriptList lua_extensions;
     ScriptList combined_scripts;
+    std::list<uint32> requiredMaps;
 };
 
 #define sElunaLoader ElunaLoader::instance()

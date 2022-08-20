@@ -285,11 +285,6 @@ void Eluna::OnShutdownCancel()
 
 void Eluna::OnWorldUpdate(uint32 diff)
 {
-    {
-        if (ShouldReload())
-            _ReloadEluna();
-    }
-
     START_HOOK(WORLD_EVENT_ON_UPDATE);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);

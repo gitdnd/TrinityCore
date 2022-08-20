@@ -41,8 +41,6 @@ extern "C"
 // Additional lua libraries
 };
 
-bool Eluna::reload = false;
-
 extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
@@ -62,8 +60,6 @@ void Eluna::_ReloadEluna()
 
     // Run scripts from laoded paths
     RunScripts();
-
-    reload = false;
 }
 
 Eluna::Eluna(uint32 MapId) :

@@ -47,6 +47,7 @@
 #include "VMapFactory.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaLoader.h"
 #endif
 #include "Weather.h"
 #include "WeatherMgr.h"
@@ -278,29 +279,23 @@ m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
-i_scriptLock(false), _respawnCheckTimer(0), eluna(nullptr)
+i_scriptLock(false), _respawnCheckTimer(0)
 {
     printf("Loading %u\n", GetId());
 
-    std::string maps = sConfigMgr->GetStringDefault("Eluna.OnlyOnMaps", "");
-    Tokenizer mapIds(maps, ',');
 
-    // if no maps in OnlyOnMaps, default to enabled for all maps.
-    if (mapIds.size() == 0)
-        eluna = new Eluna(id);
-    else
-    {
-        for (auto itr = mapIds.begin(); itr != mapIds.end(); itr++)
-        {
-            if (uint32(atoi(*itr)) == GetId())
-            {
-                eluna = new Eluna(id);
-                break;
-            }
-        }
-    }
+    // lua state begins uninitialized
+    eluna = nullptr;
 
     m_parentMap = (_parent ? _parent : this);
+
+    if (sElunaLoader->ShouldMapLoadEluna(id))
+    {
+        //eluna = new Eluna(id);
+        if(m_parentMap == this) // We are the parent map load eluna
+            eluna = new Eluna(id);
+    }
+
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)

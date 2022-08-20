@@ -37,24 +37,6 @@ void Eluna::OnLearnTalents(Player* pPlayer, uint32 talentId, uint32 talentRank, 
 
 bool Eluna::OnCommand(Player* player, const char* text)
 {
-
-    // If from console, player is NULL
-    if (!player || player->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR)
-    {
-        std::string reload = text;
-        std::transform(reload.begin(), reload.end(), reload.begin(), ::tolower);
-        if (reload.find("reload eluna") == 0)
-        {
-            if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))\
-            {
-                ChatHandler(player->GetSession()).SendSysMessage("Developmental features are disabled.");
-                return false;
-            }
-            ReloadEluna();
-            return false;
-        }
-    }
-
     START_HOOK_WITH_RETVAL(PLAYER_EVENT_ON_COMMAND, true);
     Push(player);
     Push(text);

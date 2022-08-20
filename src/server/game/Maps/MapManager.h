@@ -138,6 +138,7 @@ class TC_GAME_API MapManager
         void DecreaseScheduledScriptCount() { --_scheduledScripts; }
         void DecreaseScheduledScriptCount(std::size_t count) { _scheduledScripts -= count; }
         bool IsScriptScheduled() const { return _scheduledScripts > 0; }
+        void ReloadEluna(int32 mapId = 0);
 
     private:
         typedef std::unordered_map<uint32, Map*> MapMapType;
