@@ -741,6 +741,7 @@ class TC_GAME_API World
         void SendGMText(uint32 string_id, ...);
         void SendGMText(char const* text);
         void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
+        void SendServerGMMessage(ServerMessageType type, const char* text = "", Player* player = nullptr);
         void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);

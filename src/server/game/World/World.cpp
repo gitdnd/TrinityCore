@@ -3184,6 +3184,20 @@ void World::SendServerMessage(ServerMessageType type, const char *text, Player* 
         SendGlobalMessage(&data);
 }
 
+/// Send a server message to the user(s)
+void World::SendServerGMMessage(ServerMessageType type, const char* text, Player* player)
+{
+    WorldPacket data(SMSG_SERVER_MESSAGE, 50);              // guess size
+    data << uint32(type);
+    if (type <= SERVER_MSG_STRING)
+        data << text;
+
+    if (player)
+        player->SendDirectMessage(&data);
+    else
+        SendGlobalGMMessage(&data);
+}
+
 void World::UpdateSessions(uint32 diff)
 {
     ///- Add new sessions
