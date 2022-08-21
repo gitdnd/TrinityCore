@@ -336,7 +336,7 @@ void Eluna::OnPlayerLeave(Map* map, Player* player)
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
     // only update the globalProcessor if the map being updated is the parent map
-    if(map->GetParent() == map)
+    if(map->IsParent())
         eventMgr->globalProcessor->Update(diff);
 
     START_HOOK(MAP_EVENT_ON_UPDATE);
