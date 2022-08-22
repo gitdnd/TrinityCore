@@ -287,11 +287,8 @@ i_scriptLock(false), _respawnCheckTimer(0)
     m_parentMap = (_parent ? _parent : this);
 
     if (sElunaLoader->ShouldMapLoadEluna(id))
-    {
-        //eluna = new Eluna(id);
-        if(m_parentMap == this) // We are the parent map load eluna
+        if(IsParent()) // We are the parent map load eluna
             eluna = new Eluna(id);
-    }
 
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
