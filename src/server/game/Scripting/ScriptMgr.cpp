@@ -2157,7 +2157,8 @@ void ScriptMgr::OnPlayerLogout(Player* player)
 void ScriptMgr::OnPlayerCreate(Player* player)
 {
 #ifdef ELUNA
-    //Eluna::GEluna->OnCreate(player);
+    if (player->GetMap()->GetEluna())
+        player->GetMap()->GetEluna()->OnCreate(player);
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnCreate(player);
 }
