@@ -151,6 +151,12 @@ World::World()
 /// World destructor
 World::~World()
 {
+#ifdef ELUNA
+    // Delete world Eluna state
+    delete eluna;
+    eluna = nullptr;
+#endif
+
     ///- Empty the kicked session set
     while (!m_sessions.empty())
     {
@@ -1679,8 +1685,11 @@ void World::SetInitialWorldSettings()
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
-    //TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
+    TC_LOG_INFO("server.loading", "Loading Lua scripts...");
     sElunaLoader->LoadScripts();
+
+    TC_LOG_INFO("server.loading", "Starting Eluna world state...");
+    eluna = new Eluna(NULL);
 #endif
 
     ///- Initialize pool manager
@@ -2321,14 +2330,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Calculate guild limitation(s) reset time...");
     InitGuildResetTime();
 
-#ifdef ELUNA
-    ///- Run eluna scripts.
-    // in multithread foreach: run scripts
-    //sElunaLoader->LoadScripts();
-    //sEluna->RunScripts();
-    //sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
-#endif
-
     // Preload all cells, if required for the base maps
     if (sWorld->getBoolConfig(CONFIG_BASEMAP_LOAD_GRIDS))
     {
@@ -2429,6 +2430,11 @@ void World::LoadAutobroadcasts()
 /// Update the World !
 void World::Update(uint32 diff)
 {
+    if (diff > 200)
+    {
+        TC_LOG_ERROR("network", "Update diff over 100ms: %u", diff);
+    }
+
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
     time_t currentGameTime = GameTime::GetGameTime();

@@ -10,6 +10,7 @@
 #include "ElunaUtility.h"
 #include "ElunaIncludes.h"
 #include <filesystem>
+#include <fstream>
 #include <boost/filesystem.hpp>
 
 ElunaLoader::ElunaLoader()

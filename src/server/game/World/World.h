@@ -35,6 +35,9 @@
 #include <map>
 #include <unordered_map>
 
+#ifdef ELUNA
+class Eluna;
+#endif
 class Player;
 class WorldPacket;
 class WorldSession;
@@ -652,6 +655,9 @@ struct CharacterInfo
 /// The World
 class TC_GAME_API World
 {
+#ifdef ELUNA
+    friend class Eluna;
+#endif
     public:
         static World* instance();
 
@@ -857,6 +863,11 @@ class TC_GAME_API World
         void TriggerGuidAlert();
         bool IsGuidWarning() { return _guidWarn; }
         bool IsGuidAlert() { return _guidAlert; }
+
+#ifdef ELUNA
+        Eluna* GetEluna() const { return eluna; }
+        Eluna* eluna;
+#endif
 
     protected:
         void _UpdateGameTime();

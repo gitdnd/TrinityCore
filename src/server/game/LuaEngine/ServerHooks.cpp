@@ -285,6 +285,8 @@ void Eluna::OnShutdownCancel()
 
 void Eluna::OnWorldUpdate(uint32 diff)
 {
+    eventMgr->globalProcessor->Update(diff);
+
     START_HOOK(WORLD_EVENT_ON_UPDATE);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
