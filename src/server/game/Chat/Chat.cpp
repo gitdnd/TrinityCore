@@ -259,11 +259,8 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
             {
 #ifdef ELUNA
-                //if (!Eluna::GEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, oldtext))
-                    //return true;
-                if (GetSession() && GetSession()->GetPlayer()->GetMap()->GetEluna())
-                    if(!GetSession()->GetPlayer()->GetMap()->GetEluna()->OnCommand(GetSession()->GetPlayer(), oldtext))
-                        return true;
+                if(!sWorld->GetEluna()->OnCommand(GetSession()->GetPlayer(), oldtext))
+                    return true;
 #endif
                 if (m_session && !m_session->HasPermission(rbac::RBAC_PERM_COMMANDS_NOTIFY_COMMAND_NOT_FOUND_ERROR))
                     return false;
@@ -392,10 +389,7 @@ bool ChatHandler::_ParseCommands(char const* text)
         return true;
 
 #ifdef ELUNA
-    //if (!Eluna::GEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text))
-        //return true;
-    if (GetSession() && GetSession()->GetPlayer()->GetMap()->GetEluna())
-        if (!GetSession()->GetPlayer()->GetMap()->GetEluna()->OnCommand(GetSession()->GetPlayer(), text))
+        if (!sWorld->GetEluna()->OnCommand(GetSession()->GetPlayer(), text))
             return true;
 #endif
 
