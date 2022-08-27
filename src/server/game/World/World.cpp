@@ -1689,7 +1689,8 @@ void World::SetInitialWorldSettings()
     sElunaLoader->LoadScripts();
 
     TC_LOG_INFO("server.loading", "Starting Eluna world state...");
-    eluna = new Eluna(NULL);
+    // use map id -1 for the global Eluna state
+    eluna = new Eluna(-1);
 #endif
 
     ///- Initialize pool manager

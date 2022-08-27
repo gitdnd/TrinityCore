@@ -128,14 +128,14 @@ public:
     typedef std::list<LuaScript> ScriptList;
 
     typedef std::recursive_mutex LockType;
-    Eluna(uint32 MapId);
+    Eluna(int32 MapId);
     ~Eluna();
 
     // Prevent copy
     Eluna(Eluna const&) = delete;
     Eluna& operator=(const Eluna&) = delete;
 private:
-    uint32 boundMapId;
+    int32 boundMapId;
 
     // A counter for lua event stacks that occur (see event_level).
     // This is used to determine whether an object belongs to the current call stack or not.
@@ -527,7 +527,7 @@ public:
 
     void _ReloadEluna();
 
-    uint32 GetBoundMapId() const { return boundMapId; }
+    int32 GetBoundMapId() const { return boundMapId; }
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);

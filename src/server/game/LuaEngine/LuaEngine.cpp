@@ -45,8 +45,7 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
-    if(boundMapId != NULL)
-        eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %u", boundMapId).c_str());
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %i", boundMapId).c_str());
 
     // Remove all timed events
     eventMgr->SetStates(LUAEVENT_STATE_ERASE);
@@ -61,7 +60,7 @@ void Eluna::_ReloadEluna()
     RunScripts();
 }
 
-Eluna::Eluna(uint32 MapId) :
+Eluna::Eluna(int32 MapId) :
 event_level(0),
 push_counter(0),
 enabled(false),
@@ -115,8 +114,7 @@ void Eluna::CloseLua()
 
 void Eluna::OpenLua()
 {
-    if(boundMapId != NULL)
-        ELUNA_LOG_DEBUG("[Eluna]: Opening Lua state for map: %u", boundMapId);
+    ELUNA_LOG_DEBUG("[Eluna]: Opening Lua state for map: %i", boundMapId);
 
     L = luaL_newstate();
 
@@ -220,8 +218,7 @@ void Eluna::DestroyBindStores()
 
 void Eluna::RunScripts()
 {
-    if(boundMapId != NULL)
-        ELUNA_LOG_DEBUG("[Eluna]: Running scripts for map: %u", boundMapId);
+    ELUNA_LOG_DEBUG("[Eluna]: Running scripts for map: %i", boundMapId);
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
     uint32 count = 0;
@@ -237,13 +234,10 @@ void Eluna::RunScripts()
     for (ScriptList::const_iterator it = sElunaLoader->combined_scripts.begin(); it != sElunaLoader->combined_scripts.end(); ++it)
     {
         // check that the script file is either global or meant to be loaded for this map
-        if (boundMapId != NULL)
+        if (it->mapId != -1 && it->mapId != boundMapId)
         {
-            if (it->mapId != -1 && it->mapId != int32(boundMapId))
-            {
-                ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged %i and will not load for map: %u", it->filename.c_str(), it->mapId, boundMapId);
-                continue;
-            }
+            ELUNA_LOG_DEBUG("[Eluna]: `%s` is tagged %i and will not load for map: %i", it->filename.c_str(), it->mapId, boundMapId);
+            continue;
         }
 
         // Check that no duplicate names exist
@@ -296,8 +290,7 @@ void Eluna::RunScripts()
     // Stack: package, modules
     lua_pop(L, 2);
 
-    if(boundMapId != NULL)
-        ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %u", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
+    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %i", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 
     OnLuaStateOpen();
 }

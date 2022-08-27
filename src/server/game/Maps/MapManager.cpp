@@ -382,7 +382,7 @@ void MapManager::ReloadEluna(int32 mapId)
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         Map* map = itr->second;
-        if (mapId >= 0 && mapId == itr->first)
+        if (mapId >= 0 && uint32(mapId) == itr->first)
         {
             if (map->GetEluna())
                 map->GetEluna()->_ReloadEluna();
