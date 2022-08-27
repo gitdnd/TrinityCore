@@ -226,7 +226,7 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
 
 #ifdef ELUNA
     if (!IsActiveEvent(event_id))
-        sWorld->GetEluna()->OnGameEventStart(event_id);
+        sWorld->GetEluna()->OnGameEventStop(event_id);
 #endif
 }
 
