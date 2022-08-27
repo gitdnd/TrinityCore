@@ -865,6 +865,10 @@ namespace LuaWorldObject
             min = max = Eluna::CHECKVAL<uint32>(E->L, 3);
         uint32 repeats = Eluna::CHECKVAL<uint32>(E->L, 4, 1);
 
+        // Object-specific timed events should only ever exist in map states.
+        if (obj->GetMapId() == -1)
+            return luaL_error(E->L, "Attempted to register object-specific timed event in world context.. Aborting.");
+
         if (min > max)
             return luaL_argerror(E->L, 3, "min is bigger than max delay");
 
