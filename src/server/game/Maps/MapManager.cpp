@@ -379,6 +379,10 @@ void MapManager::FreeInstanceId(uint32 instanceId)
 
 void MapManager::ReloadEluna(int32 mapId)
 {
+    // Reloads the global Eluna state
+    if(mapId == -1)
+        sWorld->GetEluna()->_ReloadEluna();
+
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         Map* map = itr->second;
