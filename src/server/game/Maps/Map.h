@@ -654,17 +654,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         }
 
         virtual std::string GetDebugInfo() const;
-#ifdef ELUNA
-        Eluna* GetEluna() const
-        {
-            if (GetParent() != this)
-                return GetParent()->GetEluna();
-
-            return eluna;
-        }
-        Eluna* GetSelfEluna() const { return eluna; }
-        Eluna* eluna;
-#endif
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
@@ -835,6 +824,17 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         typedef std::function<void(Map*)> FarSpellCallback;
         void AddFarSpellCallback(FarSpellCallback&& callback);
 
+        bool IsParentMap() const { return GetParent() == this; }
+#ifdef ELUNA
+        Eluna* GetEluna() const
+        {
+            // For per instance eluna states remove IsParent() check.
+            if (IsParentMap())
+                return eluna;
+
+            return GetParent()->GetEluna();
+        }
+#endif
     private:
         // Type specific code for add/remove to/from grid
         template<class T>
@@ -922,6 +922,10 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         std::unordered_set<Object*> _updateObjects;
 
         MPSCQueue<FarSpellCallback> _farSpellCallbacks;
+
+#ifdef ELUNA
+        Eluna* eluna;
+#endif
 };
 
 enum InstanceResetMethod

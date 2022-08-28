@@ -1064,7 +1064,7 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 void WorldObject::Update (uint32 time_diff)
 {
 #ifdef ELUNA
-    if(elunaEvents && GetMap()->GetEluna())
+    if (elunaEvents) // can be null on maps without eluna
         elunaEvents->Update(time_diff);
 #endif
 }
@@ -1836,13 +1836,11 @@ void WorldObject::SetMap(Map* map)
     m_InstanceId = map->GetInstanceId();
 
 #ifdef ELUNA
+    //@todo: possibly look into cleanly clearing all pending events from previous map's event mgr.
     delete elunaEvents;
-    elunaEvents = nullptr;
-    if (GetMap()->GetEluna())
-    {
-        // On multithread replace this with a pointer to map's Eluna pointer stored in a map
-        elunaEvents = new ElunaEventProcessor(GetMap()->GetEluna(), this);
-    }
+    elunaEvents = nullptr; // set to null in case map doesn't use eluna
+    if (Eluna* e = map->GetEluna())
+        elunaEvents = new ElunaEventProcessor(e, this);
 #endif
 
     if (IsWorldObject())
@@ -3601,6 +3599,16 @@ std::string WorldObject::GetDebugInfo() const
          << "Name: " << GetName();
     return sstr.str();
 }
+
+#ifdef ELUNA
+Eluna* WorldObject::GetEluna() const
+{
+    if (IsInWorld())
+        return GetMap()->GetEluna();
+
+    return nullptr;
+}
+#endif
 
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>&, uint32, float) const;
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::deque<GameObject*>&, uint32, float) const;

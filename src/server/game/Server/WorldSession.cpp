@@ -247,8 +247,14 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     sScriptMgr->OnPacketSend(this, *packet);
 
 #ifdef ELUNA
-    //if (!Eluna::GEluna->OnPacketSend(this, *packet))
-        //return;
+    if (Player* plr = GetPlayer())
+    {
+        if (Eluna* e = plr->GetEluna())
+        {
+            if (!e->OnPacketSend(this, *packet))
+                return;
+        }
+    }
 #endif
 
     TC_LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());

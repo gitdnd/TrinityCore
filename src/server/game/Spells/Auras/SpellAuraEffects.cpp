@@ -5080,8 +5080,8 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
 #ifdef ELUNA
             Creature* c = target->ToCreature();
             if (c && caster)
-                if(caster->GetMap()->GetEluna())
-                    caster->GetMap()->GetEluna()->OnDummyEffect(triggerCaster, GetId(), SpellEffIndex(GetEffIndex()), c);
+                if (Eluna* e = caster->GetEluna())
+                    e->OnDummyEffect(triggerCaster, GetId(), SpellEffIndex(GetEffIndex()), c);
 #endif
             triggerCaster->CastSpell(target, triggerSpellId, args);
             TC_LOG_DEBUG("spells.aura.effect", "AuraEffect::HandlePeriodicTriggerSpellAuraTick: Spell %u Trigger %u", GetId(), triggeredSpellInfo->Id);

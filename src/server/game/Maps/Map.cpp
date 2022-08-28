@@ -286,9 +286,14 @@ i_scriptLock(false), _respawnCheckTimer(0)
 
     m_parentMap = (_parent ? _parent : this);
 
+#ifdef ELUNA
     if (sElunaLoader->ShouldMapLoadEluna(id))
-        if(IsParent()) // We are the parent map load eluna
+    {
+        //Remove check to have per instance eluna states.
+        if (IsParentMap())
             eluna = new Eluna(id);
+    }
+#endif
 
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
@@ -3544,12 +3549,12 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
 #ifdef ELUNA
-    if (GetEluna())
+    if (Eluna* e = GetEluna())
     {
         if (Creature* creature = obj->ToCreature())
-            GetEluna()->OnRemove(creature);
+            e->OnRemove(creature);
         else if (GameObject* gameobject = obj->ToGameObject())
-            GetEluna()->OnRemove(gameobject);
+            e->OnRemove(gameobject);
     }
 #endif
 
@@ -3992,9 +3997,9 @@ void InstanceMap::CreateInstanceData(bool load)
     bool isElunaAI = false;
 
 #ifdef ELUNA
-    if (GetEluna())
+    if (Eluna* e = GetEluna())
     {
-        i_data = GetEluna()->GetInstanceData(this);
+        i_data = e->GetInstanceData(this);
         if (i_data)
             isElunaAI = true;
     }

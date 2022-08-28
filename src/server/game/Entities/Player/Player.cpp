@@ -4706,8 +4706,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     CastAllObtainSpells();
 
 #ifdef ELUNA
-    if (GetMap()->GetEluna())
-        GetMap()->GetEluna()->OnResurrect(this);
+    if (Eluna* e = GetEluna())
+        e->OnResurrect(this);
 #endif
     if (!applySickness)
         return;
@@ -12050,9 +12050,9 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
             return EQUIP_ERR_NONE;
 
 #ifdef ELUNA
-    if (GetMap()->GetEluna())
+    if (Eluna* e = GetEluna())
     {
-        InventoryResult eres = GetMap()->GetEluna()->OnCanUseItem(this, proto->ItemId);
+        InventoryResult eres = e->OnCanUseItem(this, proto->ItemId);
         if (eres != EQUIP_ERR_OK)
             return eres;
     }
@@ -12519,8 +12519,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         ApplyEquipCooldown(pItem2);
         UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnEquip(this, pItem2, bag, slot);
+        if (Eluna* e = GetEluna())
+            e->OnEquip(this, pItem, bag, slot);
 #endif
         UpdateArmorPassives();
         return pItem2;
@@ -12565,8 +12565,8 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
         UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnEquip(this, pItem, (pos >> 8), slot);
+        if (Eluna* e = GetEluna())
+            e->OnEquip(this, pItem, (pos >> 8), slot);
 #endif
     }
 }
@@ -15335,8 +15335,8 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
         case TYPEID_UNIT:
             PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->OnQuestAccept(this, questGiver->ToCreature(), quest);
+            if (Eluna* e = GetEluna())
+                e->OnQuestAccept(this, questGiver->ToCreature(), quest);
 #endif
             questGiver->ToCreature()->AI()->QuestAccept(this, quest);
             break;
@@ -15371,8 +15371,8 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
         case TYPEID_GAMEOBJECT:
             PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->OnQuestAccept(this, questGiver->ToGameObject(), quest);
+            if (Eluna* e = GetEluna())
+                e->OnQuestAccept(this, questGiver->ToGameObject(), quest);
 #endif
             questGiver->ToGameObject()->AI()->QuestAccept(this, quest);
             break;
@@ -16496,8 +16496,8 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         case TYPEID_GAMEOBJECT:
         {
 #ifdef ELUNA
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->GetDialogStatus(this, questgiver->ToGameObject());
+            if (Eluna* e = GetEluna())
+                e->GetDialogStatus(this, questgiver->ToGameObject());
 #endif
             if (auto ai = questgiver->ToGameObject()->AI())
                 if (auto questStatus = ai->GetDialogStatus(this))
@@ -16509,8 +16509,8 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         case TYPEID_UNIT:
         {
 #ifdef ELUNA
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->GetDialogStatus(this, questgiver->ToCreature());
+            if (Eluna* e = GetEluna())
+                e->GetDialogStatus(this, questgiver->ToCreature());
 #endif
             if (auto ai = questgiver->ToCreature()->AI())
                 if (auto questStatus = ai->GetDialogStatus(this))
@@ -25531,8 +25531,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             sLootItemStorage->RemoveStoredLootItemForContainer(loot->containerID, item->itemid, item->count);
 
 #ifdef ELUNA
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnLootItem(this, newitem, item->count, this->GetLootGUID());
+        if (Eluna* e = GetEluna())
+            e->OnLootItem(this, newitem, item->count, this->GetLootGUID());
 #endif
     }
     else
@@ -25989,8 +25989,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 
 #ifdef ELUNA
-    if (GetMap()->GetEluna())
-        GetMap()->GetEluna()->OnLearnTalents(this, talentId, talentRank, spellid);
+    if (Eluna* e = GetEluna())
+        e->OnLearnTalents(this, talentId, talentRank, spellid);
 #endif
     UpdateArmorPassives();
 }

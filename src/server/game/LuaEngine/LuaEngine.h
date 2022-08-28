@@ -295,6 +295,7 @@ public:
     void RunScripts();
     bool HasLuaState() const { return L != NULL; }
     int Register(lua_State* L, uint8 reg, uint32 entry, uint64 guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);
+    void UpdateEluna(uint32 diff);
 
     // Checks
     template<typename T> static T CHECKVAL(lua_State* luastate, int narg);
@@ -311,6 +312,8 @@ public:
     CreatureAI* GetAI(Creature* creature);
     InstanceData* GetInstanceData(Map* map);
     void FreeInstanceId(uint32 instanceId);
+
+    int32 GetBoundMapId() const { return boundMapId; }
 
     /* Custom */
     void OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* obj);
@@ -526,8 +529,6 @@ public:
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
 
     void _ReloadEluna();
-
-    int32 GetBoundMapId() const { return boundMapId; }
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);
