@@ -8,6 +8,7 @@
 #define _ELUNA_INCLUDES_H
 
 // Required
+#ifndef CMANGOS
 #include "AccountMgr.h"
 #include "AuctionHouseMgr.h"
 #include "Cell.h"
@@ -25,7 +26,6 @@
 #include "Language.h"
 #include "LootMgr.h"
 #include "Mail.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -37,19 +37,57 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
+#else
+#include "Accounts/AccountMgr.h"
+#include "AuctionHouse/AuctionHouseMgr.h"
+#include "Grids/Cell.h"
+#include "Grids/CellImpl.h"
+#include "Chat/Chat.h"
+#include "Chat/Channel.h"
+#include "Server/DBCStores.h"
+#include "GameEvents/GameEventMgr.h"
+#include "Entities/GossipDef.h"
+#include "Grids/GridNotifiers.h"
+#include "Grids/GridNotifiersImpl.h"
+#include "Groups/Group.h"
+#include "Guilds/Guild.h"
+#include "Guilds/GuildMgr.h"
+#include "Tools/Language.h"
+#include "Mails/Mail.h"
+#include "Maps/MapManager.h"
+#include "Globals/ObjectAccessor.h"
+#include "Globals/ObjectMgr.h"
+#include "Server/Opcodes.h"
+#include "Entities/Player.h"
+#include "Entities/Pet.h"
+#include "Reputation/ReputationMgr.h"
+#include "DBScripts/ScriptMgr.h"
+#include "Spells/Spell.h"
+#include "Spells/SpellAuras.h"
+#include "Spells/SpellMgr.h"
+#include "Entities/TemporarySpawn.h"
+#include "Server/WorldSession.h"
+#endif
+#include "WorldPacket.h"
 
 #if defined TRINITY
 #include "GitRevision.h"
 #include "SpellHistory.h"
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#endif
+
+#if defined AZEROTHCORE
+#include "MapMgr.h"
+#elif defined CMANGOS
+#include "Maps/MapManager.h"
+#else
+#include "MapManager.h"
 #endif
 
 #if defined TRINITY || defined AZEROTHCORE
 #include "Config.h"
 #include "GameEventMgr.h"
+#include "GitRevision.h"
 #include "GroupMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
@@ -61,21 +99,37 @@
 #else
 #include "Config/Config.h"
 #ifdef CMANGOS
-#include "AI/AggressorAI.h"
+#include "AI/BaseAI/UnitAI.h"
 #else
 #include "AggressorAI.h"
 #endif
 #include "BattleGroundMgr.h"
+#ifndef CMANGOS
 #include "SQLStorages.h"
+#else
+#include "Server/SQLStorages.h"
+#endif
+#ifdef MANGOS
+#include "GitRevision.h"
+#else
 #include "revision.h"
+#endif
 #endif
 
 #if (!defined(TBC) && !defined(CLASSIC))
+#ifndef CMANGOS
 #include "Vehicle.h"
+#else
+#include "Entities/Vehicle.h"
+#endif
 #endif
 
 #ifndef CLASSIC
+#ifndef CMANGOS
 #include "ArenaTeam.h"
+#else
+#include "Arena/ArenaTeam.h"
+#endif
 #endif
 
 #ifndef CLASSIC
@@ -93,31 +147,20 @@ typedef Opcodes                 OpcodesList;
 
 #ifdef CMANGOS
 #define CORE_NAME               "cMaNGOS"
-#define CORE_VERSION            REVISION_DATE " " REVISION_TIME
+#define CORE_VERSION            REVISION_DATE " " REVISION_ID
 #endif
 
 #ifdef TRINITY
 #define CORE_NAME               "TrinityCore"
-#define CORE_VERSION            (GitRevision::GetDate())
-#define eWorld                  (sWorld)
-#define eMapMgr                 (sMapMgr)
-#define eConfigMgr              (sConfigMgr)
-#define eGuildMgr               (sGuildMgr)
-#define eObjectMgr              (sObjectMgr)
-#define eAccountMgr             (sAccountMgr)
-#define eAuctionMgr             (sAuctionMgr)
-#define eGameEventMgr           (sGameEventMgr)
-#define eObjectAccessor()       ObjectAccessor::
 #define REGEN_TIME_FULL
-
-#ifdef CATA
-#define NUM_MSG_TYPES           NUM_OPCODE_HANDLERS
-#endif
 #endif
 
 #ifdef AZEROTHCORE
 #define CORE_NAME               "AzerothCore"
-#define CORE_VERSION            ""
+#endif
+
+#if defined TRINITY || defined AZEROTHCORE
+#define CORE_VERSION            (GitRevision::GetFullVersion())
 #define eWorld                  (sWorld)
 #define eMapMgr                 (sMapMgr)
 #define eConfigMgr              (sConfigMgr)
@@ -127,6 +170,10 @@ typedef Opcodes                 OpcodesList;
 #define eAuctionMgr             (sAuctionMgr)
 #define eGameEventMgr           (sGameEventMgr)
 #define eObjectAccessor()       ObjectAccessor::
+#endif
+
+#ifdef CATA
+#define NUM_MSG_TYPES           NUM_OPCODE_HANDLERS
 #endif
 
 #if !defined TRINITY && !AZEROTHCORE
@@ -145,7 +192,8 @@ typedef Opcodes                 OpcodesList;
 #define MAX_TALENT_SPECS        MAX_TALENT_SPEC_COUNT
 #define TEAM_NEUTRAL            TEAM_INDEX_NEUTRAL
 
-#if defined(TBC) || defined(WOTLK) || defined(CATA)
+
+#if (defined(TBC) || defined(WOTLK) || defined(CATA)) && !defined(MANGOS)
 #define PLAYER_FIELD_LIFETIME_HONORABLE_KILLS   PLAYER_FIELD_LIFETIME_HONORBALE_KILLS
 #endif
 
@@ -157,7 +205,11 @@ typedef Opcodes                 OpcodesList;
 #define UNIT_BYTE2_FLAG_SANCTUARY   UNIT_BYTE2_FLAG_SUPPORTABLE
 #endif
 
+#ifndef CMANGOS
 typedef TemporarySummon TempSummon;
+#else
+typedef TemporarySpawn TempSummon;
+#endif
 typedef SpellEntry SpellInfo;
 #endif // TRINITY
 

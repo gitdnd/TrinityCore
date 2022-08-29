@@ -12,8 +12,13 @@
 #include <mutex>
 #include <memory>
 #include "Common.h"
+#ifndef CMANGOS
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
+#else
+#include "Globals/SharedDefines.h"
+#include "Entities/ObjectGuid.h"
+#endif
 #ifdef TRINITY
 #include "QueryResult.h"
 #include "Log.h"
@@ -27,23 +32,6 @@
 #include "World.h"
 #include <iostream>
 
-#if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
-#if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(AC_PLATFORM) && defined(AC_PLATFORM_WINDOWS)
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(PLATFORM) && defined(PLATFORM_WINDOWS)
-#if PLATFORM == PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#else
-#error Eluna could not determine platform
-#endif
-
-#ifdef TRINITY
 template<typename Format, typename... Args>
 inline void sendWebhook(Format&& fmt, Args&&... args)
 {
@@ -58,18 +46,9 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
     //ShellExecute(NULL, "open", "C:\\HoT\\Development\\Server\\DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
 }
 
+#if defined(TRINITY) || defined(AZEROTHCORE)
 typedef QueryResult ElunaQuery;
-#define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
-//#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
-#define ELUNA_LOG_ERROR(...) \
-{ \
-    sendWebhook(__VA_ARGS__); \
-    TC_LOG_ERROR("eluna", __VA_ARGS__); \
-}
-
-#define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #define GET_GUID                GetGUID
-
 #define HIGHGUID_PLAYER         HighGuid::Player
 #define HIGHGUID_UNIT           HighGuid::Unit
 #define HIGHGUID_ITEM           HighGuid::Item
@@ -83,12 +62,16 @@ typedef QueryResult ElunaQuery;
 #define HIGHGUID_MO_TRANSPORT   HighGuid::Mo_Transport
 #define HIGHGUID_INSTANCE       HighGuid::Instance
 #define HIGHGUID_GROUP          HighGuid::Group
-#elif AZEROTHCORE
-typedef QueryResult ElunaQuery;
-#define ELUNA_LOG_INFO(...)     sLog->outString(__VA_ARGS__);
-#define ELUNA_LOG_ERROR(...)    sLog->outError(__VA_ARGS__);
-#define ELUNA_LOG_DEBUG(...)    sLog->outDebug(LOG_FILTER_NONE,__VA_ARGS__);
-#define GET_GUID                GetGUID
+#endif
+
+#ifdef TRINITY
+#define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
+#define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
+#elif defined(AZEROTHCORE)
+#define ELUNA_LOG_INFO(...)     LOG_INFO("eluna", __VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    LOG_ERROR("eluna", __VA_ARGS__);
+#define ELUNA_LOG_DEBUG(...)    LOG_DEBUG("eluna", __VA_ARGS__);
 #else
 typedef QueryNamedResult ElunaQuery;
 #define ASSERT                  MANGOS_ASSERT
@@ -101,7 +84,7 @@ typedef QueryNamedResult ElunaQuery;
 #define GetTemplate             GetProto
 #endif
 
-#if defined(TRINITY) || defined(MANGOS)
+#if defined(TRINITY) || defined(AZEROTHCORE) || defined(MANGOS) || defined(CMANGOS)
 #ifndef MAKE_NEW_GUID
 #define MAKE_NEW_GUID(l, e, h)  ObjectGuid(h, e, l)
 #endif

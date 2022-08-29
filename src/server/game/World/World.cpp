@@ -2331,6 +2331,11 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Calculate guild limitation(s) reset time...");
     InitGuildResetTime();
 
+#ifdef ELUNA
+    eluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
+    sElunaLoader->PreloadElunaMaps();
+#endif
+
     // Preload all cells, if required for the base maps
     if (sWorld->getBoolConfig(CONFIG_BASEMAP_LOAD_GRIDS))
     {

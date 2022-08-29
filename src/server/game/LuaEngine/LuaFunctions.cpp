@@ -78,6 +78,7 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     // Getters
     { "GetLuaEngine", &LuaGlobalFunctions::GetLuaEngine },
     { "GetCoreName", &LuaGlobalFunctions::GetCoreName },
+    { "GetRealmID", &LuaGlobalFunctions::GetRealmID },
     { "GetCoreVersion", &LuaGlobalFunctions::GetCoreVersion },
     { "GetCoreExpansion", &LuaGlobalFunctions::GetCoreExpansion },
     { "GetQuest", &LuaGlobalFunctions::GetQuest },
@@ -188,7 +189,7 @@ ElunaRegister<Object> ObjectMethods[] =
     { "ToCorpse", &LuaObject::ToCorpse },
     { "ToTransport", &LuaObject::ToTransport },
     { "RemoveFlag", &LuaObject::RemoveFlag },
- 
+
     { NULL, NULL }
 };
 
@@ -344,6 +345,7 @@ ElunaRegister<Unit> UnitMethods[] =
 #endif
     { "SetWaterWalk", &LuaUnit::SetWaterWalk },
     { "SetStandState", &LuaUnit::SetStandState },
+    { "SetInCombatWith", &LuaUnit::SetInCombatWith },
     { "ModifyPower", &LuaUnit::ModifyPower },
 
     // Boolean
@@ -396,6 +398,9 @@ ElunaRegister<Unit> UnitMethods[] =
     { "AddAura", &LuaUnit::AddAura },
     { "RemoveAura", &LuaUnit::RemoveAura },
     { "RemoveAllAuras", &LuaUnit::RemoveAllAuras },
+#if !defined(CLASSIC)
+    { "RemoveArenaAuras", &LuaUnit::RemoveArenaAuras },
+#endif
     { "ClearInCombat", &LuaUnit::ClearInCombat },
     { "DeMorph", &LuaUnit::DeMorph },
     { "SendUnitWhisper", &LuaUnit::SendUnitWhisper },
@@ -409,7 +414,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "StopSpellCast", &LuaUnit::StopSpellCast },
     { "InterruptSpell", &LuaUnit::InterruptSpell },
     { "SendChatMessageToPlayer", &LuaUnit::SendChatMessageToPlayer },
-    { "Emote", &LuaUnit::Emote },
+    { "PerformEmote", &LuaUnit::Emote },
     { "EmoteState", &LuaUnit::EmoteState },
     { "CountPctFromCurHealth", &LuaUnit::CountPctFromCurHealth },
     { "CountPctFromMaxHealth", &LuaUnit::CountPctFromMaxHealth },
@@ -476,6 +481,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetItemByPos", &LuaPlayer::GetItemByPos },
     { "GetItemByEntry", &LuaPlayer::GetItemByEntry },
     { "GetItemByGUID", &LuaPlayer::GetItemByGUID },
+    { "GetMailItem", &LuaPlayer::GetMailItem },
     { "GetReputation", &LuaPlayer::GetReputation },
     { "GetEquippedItemBySlot", &LuaPlayer::GetEquippedItemBySlot },
     { "GetQuestLevel", &LuaPlayer::GetQuestLevel },
@@ -580,7 +586,6 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SetFFA", &LuaPlayer::SetFFA },
 #endif
 
-
     // Boolean
     { "IsInGroup", &LuaPlayer::IsInGroup },
     { "IsInGuild", &LuaPlayer::IsInGuild },
@@ -618,6 +623,9 @@ ElunaRegister<Player> PlayerMethods[] =
     // {"HasPendingBind", &LuaPlayer::HasPendingBind},                                      // :HasPendingBind() - UNDOCUMENTED - Returns true if the player has a pending instance bind
 #if (!defined(TBC) && !defined(CLASSIC))
     { "HasAchieved", &LuaPlayer::HasAchieved },
+#if defined(TRINITY) || defined(AZEROTHCORE)
+    { "SetAchievement", &LuaPlayer::SetAchievement },
+#endif
 #endif
     { "CanUninviteFromGroup", &LuaPlayer::CanUninviteFromGroup },
     { "IsRested", &LuaPlayer::IsRested },
@@ -675,6 +683,9 @@ ElunaRegister<Player> PlayerMethods[] =
     { "ModifyMoney", &LuaPlayer::ModifyMoney },
     { "LearnSpell", &LuaPlayer::LearnSpell },
     { "LearnTalent", &LuaPlayer::LearnTalent },
+#if !defined(CLASSIC)
+    { "RemoveArenaSpellCooldowns", &LuaPlayer::RemoveArenaSpellCooldowns },
+#endif
     { "RemoveItem", &LuaPlayer::RemoveItem },
     { "RemoveLifetimeKills", &LuaPlayer::RemoveLifetimeKills },
     { "ResurrectPlayer", &LuaPlayer::ResurrectPlayer },
@@ -741,6 +752,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SendTabardVendorActivate", &LuaPlayer::SendTabardVendorActivate },
     { "SendSpiritResurrect", &LuaPlayer::SendSpiritResurrect },
     { "SendTaxiMenu", &LuaPlayer::SendTaxiMenu },
+    { "SendUpdateWorldState", &LuaPlayer::SendUpdateWorldState },
     { "RewardQuest", &LuaPlayer::RewardQuest },
     { "SendAuctionMenu", &LuaPlayer::SendAuctionMenu },
     { "SendShowMailBox", &LuaPlayer::SendShowMailBox },
@@ -819,6 +831,7 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "GetLootRecipient", &LuaCreature::GetLootRecipient },
     { "GetLootRecipientGroup", &LuaCreature::GetLootRecipientGroup },
     { "GetNPCFlags", &LuaCreature::GetNPCFlags },
+    { "GetExtraFlags", &LuaCreature::GetExtraFlags },
 #if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
     { "GetShieldBlockValue", &LuaCreature::GetShieldBlockValue },
 #endif
@@ -826,6 +839,9 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "GetCreatureFamily", &LuaCreature::GetCreatureFamily },
 
     // Setters
+#if defined(TRINITY) || defined(AZEROTHCORE)
+    { "SetRegeneratingHealth", &LuaCreature::SetRegeneratingHealth },
+#endif
     { "SetHover", &LuaCreature::SetHover },
     { "SetDisableGravity", &LuaCreature::SetDisableGravity },
     { "SetAggroEnabled", &LuaCreature::SetAggroEnabled },
@@ -841,7 +857,9 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SetLootMode", &LuaCreature::SetLootMode },
 #endif
     { "SetNPCFlags", &LuaCreature::SetNPCFlags },
+#if defined(TRINITY) || AZEROTHCORE
     { "SetReactState", &LuaCreature::SetReactState },
+#endif
     { "SetDeathState", &LuaCreature::SetDeathState },
     { "SetWalk", &LuaCreature::SetWalk },
     { "SetHomePosition", &LuaCreature::SetHomePosition },
@@ -849,6 +867,9 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SetWaypoint", &LuaCreature::SetWaypoint },
 
     // Boolean
+#if defined(TRINITY) || defined(AZEROTHCORE)
+    { "IsDungeonBoss", &LuaCreature::IsDungeonBoss },
+#endif
     { "IsWorldBoss", &LuaCreature::IsWorldBoss },
     { "IsRacialLeader", &LuaCreature::IsRacialLeader },
     { "IsCivilian", &LuaCreature::IsCivilian },
@@ -1003,7 +1024,7 @@ ElunaRegister<Item> ItemMethods[] =
     { "IsEquipped", &LuaItem::IsEquipped },
     { "HasQuest", &LuaItem::HasQuest },
     { "IsPotion", &LuaItem::IsPotion },
-#if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
+#if defined(WOTLK)
     { "IsWeaponVellum", &LuaItem::IsWeaponVellum },
     { "IsArmorVellum", &LuaItem::IsArmorVellum },
 #endif
@@ -1015,6 +1036,7 @@ ElunaRegister<Item> ItemMethods[] =
     // Other
     { "SaveToDB", &LuaItem::SaveToDB },
     { "GetDisenchantId", &LuaItem::GetDisenchantId },
+
 
     { NULL, NULL }
 };
@@ -1111,7 +1133,9 @@ ElunaRegister<Group> GroupMethods[] =
     { "RemoveMember", &LuaGroup::RemoveMember },
     { "Disband", &LuaGroup::Disband },
     { "IsFull", &LuaGroup::IsFull },
-    // {"IsLFGGroup", &LuaGroup::IsLFGGroup},                     // :IsLFGGroup() - UNDOCUMENTED - Returns true if the group is an LFG group
+#if !(defined(CLASSIC) || defined(TBC))
+    { "IsLFGGroup", &LuaGroup::IsLFGGroup },
+#endif
     { "IsRaidGroup", &LuaGroup::IsRaidGroup },
     { "IsBGGroup", &LuaGroup::IsBGGroup },
     // {"IsBFGroup", &LuaGroup::IsBFGroup},                       // :IsBFGroup() - UNDOCUMENTED - Returns true if the group is a battlefield group
@@ -1351,18 +1375,18 @@ template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
 #endif
 
 // Template by Mud from http://stackoverflow.com/questions/4484437/lua-integer-type/4485511#4485511
-template<> int ElunaTemplate<unsigned long long>::Add(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) + Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Substract(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) - Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Multiply(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) * Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Divide(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) / Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Mod(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) % Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-// template<> int ElunaTemplate<unsigned long long>::UnaryMinus(lua_State* L) { Eluna::Push(L, -Eluna::CHECKVAL<unsigned long long>(L, 1)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Equal(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) == Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Less(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) < Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::LessOrEqual(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) <= Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Add(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) + Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Substract(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) - Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Multiply(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) * Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Divide(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) / Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Mod(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) % Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+// template<> int ElunaTemplate<unsigned long long>::UnaryMinus(lua_State* L) { Eluna::GetEluna(L)->Push(-Eluna::CHECKVAL<unsigned long long>(L, 1)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Equal(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) == Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Less(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) < Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::LessOrEqual(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<unsigned long long>(L, 1) <= Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
 template<> int ElunaTemplate<unsigned long long>::Pow(lua_State* L)
 {
-    Eluna::Push(L, static_cast<unsigned long long>(powl(static_cast<long double>(Eluna::CHECKVAL<unsigned long long>(L, 1)), static_cast<long double>(Eluna::CHECKVAL<unsigned long long>(L, 2)))));
+    Eluna::GetEluna(L)->Push(static_cast<unsigned long long>(powl(static_cast<long double>(Eluna::CHECKVAL<unsigned long long>(L, 1)), static_cast<long double>(Eluna::CHECKVAL<unsigned long long>(L, 2)))));
     return 1;
 }
 template<> int ElunaTemplate<unsigned long long>::ToString(lua_State* L)
@@ -1370,22 +1394,22 @@ template<> int ElunaTemplate<unsigned long long>::ToString(lua_State* L)
     unsigned long long l = Eluna::CHECKVAL<unsigned long long>(L, 1);
     std::ostringstream ss;
     ss << l;
-    Eluna::Push(L, ss.str());
+    Eluna::GetEluna(L)->Push(ss.str());
     return 1;
 }
 
-template<> int ElunaTemplate<long long>::Add(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) + Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::Substract(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) - Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::Multiply(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) * Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::Divide(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) / Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::Mod(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) % Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::UnaryMinus(lua_State* L) { Eluna::Push(L, -Eluna::CHECKVAL<long long>(L, 1)); return 1; }
-template<> int ElunaTemplate<long long>::Equal(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) == Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::Less(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) < Eluna::CHECKVAL<long long>(L, 2)); return 1; }
-template<> int ElunaTemplate<long long>::LessOrEqual(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) <= Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Add(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) + Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Substract(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) - Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Multiply(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) * Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Divide(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) / Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Mod(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) % Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::UnaryMinus(lua_State* L) { Eluna::GetEluna(L)->Push(-Eluna::CHECKVAL<long long>(L, 1)); return 1; }
+template<> int ElunaTemplate<long long>::Equal(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) == Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Less(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) < Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::LessOrEqual(lua_State* L) { Eluna::GetEluna(L)->Push(Eluna::CHECKVAL<long long>(L, 1) <= Eluna::CHECKVAL<long long>(L, 2)); return 1; }
 template<> int ElunaTemplate<long long>::Pow(lua_State* L)
 {
-    Eluna::Push(L, static_cast<long long>(powl(static_cast<long double>(Eluna::CHECKVAL<long long>(L, 1)), static_cast<long double>(Eluna::CHECKVAL<long long>(L, 2)))));
+    Eluna::GetEluna(L)->Push(static_cast<long long>(powl(static_cast<long double>(Eluna::CHECKVAL<long long>(L, 1)), static_cast<long double>(Eluna::CHECKVAL<long long>(L, 2)))));
     return 1;
 }
 template<> int ElunaTemplate<long long>::ToString(lua_State* L)
@@ -1393,7 +1417,7 @@ template<> int ElunaTemplate<long long>::ToString(lua_State* L)
     long long l = Eluna::CHECKVAL<long long>(L, 1);
     std::ostringstream ss;
     ss << l;
-    Eluna::Push(L, ss.str());
+    Eluna::GetEluna(L)->Push(ss.str());
     return 1;
 }
 

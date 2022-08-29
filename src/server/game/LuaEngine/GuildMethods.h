@@ -30,16 +30,14 @@ namespace LuaGuild
         {
             if (player->IsInWorld() && player->GetGuildId() == guild->GetId())
             {
-                Eluna::Push(E->L, player);
+                E->Push(player);
                 lua_rawseti(E->L, tbl, ++i);
             }
         });
 #else
         {
-#ifdef TRINITY
+#if defined TRINITY || AZEROTHCORE
             boost::shared_lock<boost::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
-#elif defined(AZEROTHCORE)
-            ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
 #else
             HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
 #endif
@@ -50,7 +48,7 @@ namespace LuaGuild
                 {
                     if (player->IsInWorld() && player->GetGuildId() == guild->GetId())
                     {
-                        Eluna::Push(E->L, player);
+                        E->Push(player);
                         lua_rawseti(E->L, tbl, ++i);
                     }
                 }
@@ -69,9 +67,9 @@ namespace LuaGuild
     int GetMemberCount(Eluna* E, Guild* guild)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, guild->GetMemberCount());
+        E->Push(guild->GetMemberCount());
 #else
-        Eluna::Push(E->L, guild->GetMemberSize());
+        E->Push(guild->GetMemberSize());
 #endif
         return 1;
     }
@@ -84,9 +82,9 @@ namespace LuaGuild
     int GetLeader(Eluna* E, Guild* guild)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, eObjectAccessor()FindPlayer(guild->GetLeaderGUID()));
+        E->Push(eObjectAccessor()FindPlayer(guild->GetLeaderGUID()));
 #else
-        Eluna::Push(E->L, eObjectAccessor()FindPlayer(guild->GetLeaderGuid()));
+        E->Push(eObjectAccessor()FindPlayer(guild->GetLeaderGuid()));
 #endif
         return 1;
     }
@@ -94,14 +92,14 @@ namespace LuaGuild
     /**
      * Returns [Guild] leader GUID
      *
-     * @return uint64 leaderGUID
+     * @return ObjectGuid leaderGUID
      */
     int GetLeaderGUID(Eluna* E, Guild* guild)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, guild->GetLeaderGUID());
+        E->Push(guild->GetLeaderGUID());
 #else
-        Eluna::Push(E->L, guild->GetLeaderGuid());
+        E->Push(guild->GetLeaderGuid());
 #endif
         return 1;
     }
@@ -113,7 +111,7 @@ namespace LuaGuild
      */
     int GetId(Eluna* E, Guild* guild)
     {
-        Eluna::Push(E->L, guild->GetId());
+        E->Push(guild->GetId());
         return 1;
     }
 
@@ -124,7 +122,7 @@ namespace LuaGuild
      */
     int GetName(Eluna* E, Guild* guild)
     {
-        Eluna::Push(E->L, guild->GetName());
+        E->Push(guild->GetName());
         return 1;
     }
 
@@ -135,7 +133,7 @@ namespace LuaGuild
      */
     int GetMOTD(Eluna* E, Guild* guild)
     {
-        Eluna::Push(E->L, guild->GetMOTD());
+        E->Push(guild->GetMOTD());
         return 1;
     }
 
@@ -147,9 +145,9 @@ namespace LuaGuild
     int GetInfo(Eluna* E, Guild* guild)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, guild->GetInfo());
+        E->Push(guild->GetInfo());
 #else
-        Eluna::Push(E->L, guild->GetGINFO());
+        E->Push(guild->GetGINFO());
 #endif
         return 1;
     }
@@ -277,8 +275,7 @@ namespace LuaGuild
         CharacterDatabaseTransaction trans(nullptr);
         guild->DeleteMember(trans, player->GET_GUID(), isDisbanding);
 #elif defined AZEROTHCORE
-        SQLTransaction trans(nullptr);
-        guild->DeleteMember(trans, player->GET_GUID(), isDisbanding);
+        guild->DeleteMember(player->GET_GUID(), isDisbanding);
 #else
         guild->DelMember(player->GET_GUID(), isDisbanding);
 #endif

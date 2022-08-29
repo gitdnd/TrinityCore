@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2010 - 2022 Eluna Lua Engine <https://elunaluaengine.github.io/>
+ * This program is free software licensed under GPL version 3
+ * Please see the included DOCS/LICENSE.md for more information
+ */
+
 #include "ElunaCompat.h"
 
 #if LUA_VERSION_NUM == 501

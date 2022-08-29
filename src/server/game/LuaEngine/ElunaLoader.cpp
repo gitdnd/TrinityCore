@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include "MapManager.h"
 
 ElunaLoader::ElunaLoader()
 {
@@ -51,19 +52,26 @@ void ElunaLoader::LoadScripts()
     ELUNA_LOG_INFO("[Eluna]: Searching scripts from `%s`", lua_folderpath.c_str());
     lua_requirepath.clear();
     ReadFiles(lua_folderpath);
+
+    // Combine extensions and lua scripts into one list for proper loading order.
     CombineLists();
+
     // Erase last ;
     if (!lua_requirepath.empty())
         lua_requirepath.erase(lua_requirepath.end() - 1);
 
     ELUNA_LOG_INFO("[Eluna]: Loaded %u scripts in %u ms", uint32(combined_scripts.size()), ElunaUtil::GetTimeDiff(oldMSTime));
+
     requiredMaps.clear();
+    
     std::string maps = sConfigMgr->GetStringDefault("Eluna.OnlyOnMaps", "");
     Tokenizer mapIds(maps, ',');
     for (Tokenizer::const_iterator itr = mapIds.begin(); itr != mapIds.end(); ++itr)
     {
         requiredMaps.emplace_back(atoi(*itr));
     }
+
+    preloadMaps = eConfigMgr->GetBoolDefault("Eluna.PreloadOnlyOnMaps", false);
 }
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
@@ -195,4 +203,17 @@ bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
         return true;
 
     return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
+}
+
+void ElunaLoader::PreloadElunaMaps()
+{
+    // Don't preload maps if not enabled or eluna has a state for every map.
+    if (!preloadMaps || !requiredMaps.size())
+        return;
+
+    for (uint32 mapId : requiredMaps)
+    {
+        // Creates the parent map for every entry in requiredMaps, will break if any emulator unloads parent maps.
+        sMapMgr->CreateBaseMap(mapId);
+    }
 }

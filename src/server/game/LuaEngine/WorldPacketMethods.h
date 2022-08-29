@@ -27,7 +27,7 @@ namespace LuaPacket
      */
     int GetOpcode(Eluna* E, WorldPacket* packet)
     {
-        Eluna::Push(E->L, packet->GetOpcode());
+        E->Push(packet->GetOpcode());
         return 1;
     }
 
@@ -38,7 +38,7 @@ namespace LuaPacket
      */
     int GetSize(Eluna* E, WorldPacket* packet)
     {
-        Eluna::Push(E->L, packet->size());
+        E->Push(packet->size());
         return 1;
     }
 
@@ -52,7 +52,11 @@ namespace LuaPacket
         uint32 opcode = Eluna::CHECKVAL<uint32>(E->L, 2);
         if (opcode >= NUM_MSG_TYPES)
             return luaL_argerror(E->L, 2, "valid opcode expected");
+#if defined CMANGOS && defined CLASSIC
+        packet->SetOpcode((Opcodes)opcode);
+#else
         packet->SetOpcode((OpcodesList)opcode);
+#endif
         return 0;
     }
 
@@ -65,7 +69,7 @@ namespace LuaPacket
     {
         int8 _byte;
         (*packet) >> _byte;
-        Eluna::Push(E->L, _byte);
+        E->Push(_byte);
         return 1;
     }
 
@@ -78,7 +82,7 @@ namespace LuaPacket
     {
         uint8 _ubyte;
         (*packet) >> _ubyte;
-        Eluna::Push(E->L, _ubyte);
+        E->Push(_ubyte);
         return 1;
     }
 
@@ -91,7 +95,7 @@ namespace LuaPacket
     {
         int16 _short;
         (*packet) >> _short;
-        Eluna::Push(E->L, _short);
+        E->Push(_short);
         return 1;
     }
 
@@ -104,7 +108,7 @@ namespace LuaPacket
     {
         uint16 _ushort;
         (*packet) >> _ushort;
-        Eluna::Push(E->L, _ushort);
+        E->Push(_ushort);
         return 1;
     }
 
@@ -117,7 +121,7 @@ namespace LuaPacket
     {
         int32 _long;
         (*packet) >> _long;
-        Eluna::Push(E->L, _long);
+        E->Push(_long);
         return 1;
     }
 
@@ -130,7 +134,7 @@ namespace LuaPacket
     {
         uint32 _ulong;
         (*packet) >> _ulong;
-        Eluna::Push(E->L, _ulong);
+        E->Push(_ulong);
         return 1;
     }
 
@@ -143,7 +147,7 @@ namespace LuaPacket
     {
         float _val;
         (*packet) >> _val;
-        Eluna::Push(E->L, _val);
+        E->Push(_val);
         return 1;
     }
 
@@ -156,20 +160,20 @@ namespace LuaPacket
     {
         double _val;
         (*packet) >> _val;
-        Eluna::Push(E->L, _val);
+        E->Push(_val);
         return 1;
     }
 
     /**
      * Reads and returns an unsigned 64-bit integer value from the [WorldPacket].
      *
-     * @return uint64 value : value returned as string
+     * @return ObjectGuid value : value returned as string
      */
     int ReadGUID(Eluna* E, WorldPacket* packet)
     {
-        uint64 guid;
+        ObjectGuid guid;
         (*packet) >> guid;
-        Eluna::Push(E->L, guid);
+        E->Push(guid);
         return 1;
     }
 
@@ -182,18 +186,18 @@ namespace LuaPacket
     {
         std::string _val;
         (*packet) >> _val;
-        Eluna::Push(E->L, _val);
+        E->Push(_val);
         return 1;
     }
 
     /**
      * Writes an unsigned 64-bit integer value to the [WorldPacket].
      *
-     * @param uint64 value : the value to be written to the [WorldPacket]
+     * @param ObjectGuid value : the value to be written to the [WorldPacket]
      */
     int WriteGUID(Eluna* E, WorldPacket* packet)
     {
-        uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
+        ObjectGuid guid = Eluna::CHECKVAL<ObjectGuid>(E->L, 2);
         (*packet) << guid;
         return 0;
     }

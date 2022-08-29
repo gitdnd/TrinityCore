@@ -100,7 +100,6 @@ public:
             { "creature_template",             rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_TEMPLATE,                true,  &HandleReloadCreatureTemplateCommand,           "" },
             { "disables",                      rbac::RBAC_PERM_COMMAND_RELOAD_DISABLES,                         true,  &HandleReloadDisablesCommand,                   "" },
             { "disenchant_loot_template",      rbac::RBAC_PERM_COMMAND_RELOAD_DISENCHANT_LOOT_TEMPLATE,         true,  &HandleReloadLootTemplatesDisenchantCommand,    "" },
-            { "eluna",                         rbac::RBAC_PERM_COMMAND_RELOAD_CONFIG,                           true,  &HandleReloadElunaCommand,                      "" },
             { "event_scripts",                 rbac::RBAC_PERM_COMMAND_RELOAD_EVENT_SCRIPTS,                    true,  &HandleReloadEventScriptsCommand,               "" },
             { "fishing_loot_template",         rbac::RBAC_PERM_COMMAND_RELOAD_FISHING_LOOT_TEMPLATE,            true,  &HandleReloadLootTemplatesFishingCommand,       "" },
             { "graveyard_zone",                rbac::RBAC_PERM_COMMAND_RELOAD_GRAVEYARD_ZONE,                   true,  &HandleReloadGameGraveyardZoneCommand,          "" },
@@ -1241,37 +1240,6 @@ public:
             
         }
         handler->SendGlobalGMSysMessage("item template reloaded.");
-        return true;
-    }
-
-    static bool HandleReloadElunaCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-        {
-            if (handler->GetSession())
-            {
-                sElunaLoader->LoadScripts();
-                sMapMgr->ReloadEluna(handler->GetSession()->GetPlayer()->GetMapId());
-            }
-        }
-        else if (args == "all")
-        {
-            sElunaLoader->LoadScripts();
-            sMapMgr->ReloadEluna(-1);
-        }
-        else
-        {
-            Tokenizer entries(std::string(args), ' ');
-            if(entries.size() >= 1)
-                sElunaLoader->LoadScripts();
-
-            for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
-            {
-                uint32 mapId = uint32(atoi(*itr));
-                sMapMgr->ReloadEluna(mapId);
-            }
-        }
-
         return true;
     }
 };

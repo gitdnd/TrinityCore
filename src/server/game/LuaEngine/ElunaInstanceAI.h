@@ -10,10 +10,15 @@
 #include "LuaEngine.h"
 #if defined(TRINITY) || AZEROTHCORE
 #include "InstanceScript.h"
+#elif defined CMANGOS
+#include "Maps/InstanceData.h"
 #else
 #include "InstanceData.h"
 #endif
 
+#ifdef TRINITY
+#include "Map.h"
+#endif
 
 /*
  * This class is a small wrapper around `InstanceData`,
@@ -61,11 +66,19 @@ private:
     std::string lastSaveData;
 
 public:
+#ifdef TRINITY
+    ElunaInstanceAI(Map* map) : InstanceData(map->ToInstanceMap())
+    {
+    }
+#else
     ElunaInstanceAI(Map* map) : InstanceData(map)
     {
     }
+#endif
 
+#ifndef TRINITY
     void Initialize() override;
+#endif
 
     /*
      * These are responsible for serializing/deserializing the instance's
