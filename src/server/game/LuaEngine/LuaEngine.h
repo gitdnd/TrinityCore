@@ -151,6 +151,13 @@ public:
     typedef std::list<LuaScript> ScriptList;
     typedef std::recursive_mutex LockType;
 
+    Eluna(int32 mapId);
+    ~Eluna();
+
+    // Prevent copy
+    Eluna(Eluna const&) = delete;
+    Eluna& operator=(const Eluna&) = delete;
+
     void ReloadEluna() { reload = true; }
 
 private:
@@ -171,9 +178,6 @@ private:
     //  this is used to keep track of how many arguments were pushed.
     uint8 push_counter;
     bool enabled;
-
-    // The map id that this Eluna object is tied to. -1 is reserved for objects without a bound map id.
-    int32 boundMapId;
 
     // Map from instance ID -> Lua table ref
     std::unordered_map<uint32, int> instanceDataRefs;
@@ -236,6 +240,7 @@ private:
     template<typename T>
     void HookPush(T const* ptr)                     { Push(ptr); ++push_counter; }
 
+    int32 boundMapId;
 public:
 
     lua_State* L;
@@ -346,13 +351,6 @@ public:
     void FreeInstanceId(uint32 instanceId);
 
     int32 GetBoundMapId() const { return boundMapId; }
-
-    Eluna(int32 mapId);
-    ~Eluna();
-
-    // Prevent copy
-    Eluna(Eluna const&) = delete;
-    Eluna& operator=(const Eluna&) = delete;
 
     /* Custom */
     void OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* obj);
