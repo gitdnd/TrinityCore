@@ -364,7 +364,6 @@ void MapManager::FreeInstanceId(uint32 instanceId)
     _nextInstanceId = std::min(instanceId, _nextInstanceId);
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
-    sWorld->GetEluna()->OnFreeInstanceId(instanceId);
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
