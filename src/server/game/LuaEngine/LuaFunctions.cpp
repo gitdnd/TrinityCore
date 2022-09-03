@@ -414,7 +414,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "StopSpellCast", &LuaUnit::StopSpellCast },
     { "InterruptSpell", &LuaUnit::InterruptSpell },
     { "SendChatMessageToPlayer", &LuaUnit::SendChatMessageToPlayer },
-    { "PerformEmote", &LuaUnit::Emote },
+    { "Emote", &LuaUnit::Emote },
     { "EmoteState", &LuaUnit::EmoteState },
     { "CountPctFromCurHealth", &LuaUnit::CountPctFromCurHealth },
     { "CountPctFromMaxHealth", &LuaUnit::CountPctFromMaxHealth },
@@ -1036,7 +1036,6 @@ ElunaRegister<Item> ItemMethods[] =
     // Other
     { "SaveToDB", &LuaItem::SaveToDB },
     { "GetDisenchantId", &LuaItem::GetDisenchantId },
-
 
     { NULL, NULL }
 };

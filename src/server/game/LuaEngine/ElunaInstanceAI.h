@@ -67,7 +67,7 @@ private:
 
 public:
 #ifdef TRINITY
-    ElunaInstanceAI(Map* map) : InstanceData(map->ToInstanceMap())
+    ElunaInstanceAI(Map* map) : InstanceData(map)
     {
     }
 #else
@@ -76,9 +76,9 @@ public:
     }
 #endif
 
-#ifndef TRINITY
+
     void Initialize() override;
-#endif
+
 
     /*
      * These are responsible for serializing/deserializing the instance's

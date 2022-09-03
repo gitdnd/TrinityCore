@@ -59,8 +59,6 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
-    eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %i", boundMapId).c_str());
-
     // Remove all timed events
     eventMgr->SetStates(LUAEVENT_STATE_ERASE);
 
@@ -80,6 +78,7 @@ Eluna::Eluna(int32 mapId) :
 event_level(0),
 push_counter(0),
 enabled(false),
+boundMapId(mapId),
 
 L(NULL),
 eventMgr(NULL),
@@ -102,8 +101,7 @@ PlayerGossipBindings(NULL),
 MapEventBindings(NULL),
 InstanceEventBindings(NULL),
 
-CreatureUniqueBindings(NULL),
-boundMapId(mapId)
+CreatureUniqueBindings(NULL)
 {
     OpenLua();
     eventMgr = new EventMgr(this);

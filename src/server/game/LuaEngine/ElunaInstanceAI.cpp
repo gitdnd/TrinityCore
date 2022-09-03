@@ -8,12 +8,8 @@
 #include "ElunaUtility.h"
 #include "lmarshal.h"
 
-
-#ifndef TRINITY
 void ElunaInstanceAI::Initialize()
 {
-    LOCK_ELUNA;
-
     ASSERT(!instance->GetEluna()->HasInstanceData(instance));
 
     // Create a new table for instance data.
@@ -23,7 +19,6 @@ void ElunaInstanceAI::Initialize()
 
     instance->GetEluna()->OnInitialize(this);
 }
-#endif
 
 void ElunaInstanceAI::Load(const char* data)
 {
