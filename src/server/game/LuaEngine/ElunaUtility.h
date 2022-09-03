@@ -66,7 +66,7 @@ typedef QueryResult ElunaQuery;
 
 #ifdef TRINITY
 #define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
-#define ELUNA_LOG_ERROR(...)    sendWebhook(__VA_ARGS__); TC_LOG_ERROR("eluna", __VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
 #define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #elif defined(AZEROTHCORE)
 #define ELUNA_LOG_INFO(...)     LOG_INFO("eluna", __VA_ARGS__);
