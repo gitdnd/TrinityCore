@@ -335,7 +335,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         // currently unused for normal maps
         bool CanUnload(uint32 diff)
         {
-            return false;
             if (!m_unloadTimer)
                 return false;
 
