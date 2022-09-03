@@ -431,7 +431,8 @@ Unit::~Unit()
 void Unit::Update(uint32 p_time)
 {
 #ifdef ELUNA
-    if (elunaEvents) // can be null on maps without eluna
+    // only update events if you are on a Lua state enabled map
+    if(elunaEvents && GetMap()->GetEluna())
         elunaEvents->Update(p_time);
 #endif
 

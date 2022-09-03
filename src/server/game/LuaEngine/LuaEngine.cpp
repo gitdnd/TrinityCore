@@ -953,11 +953,6 @@ int Eluna::Register(lua_State* L, uint8 regtype, uint32 entry, uint64 guid, uint
     return 0;
 }
 
-void Eluna::UpdateEluna(uint32 diff)
-{
-    eventMgr->globalProcessor->Update(diff);
-}
-
 /*
  * Cleans up the stack, effectively undoing all Push calls and the Setup call.
  */

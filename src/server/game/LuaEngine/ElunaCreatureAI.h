@@ -55,13 +55,13 @@ struct ElunaCreatureAI : ScriptedAI
         {
             for (auto& point : movepoints)
             {
-                if (!me->GetEluna()->MovementInform(me, point.first, point.second))
+                if (!me->GetMap()->GetEluna()->MovementInform(me, point.first, point.second))
                     ScriptedAI::MovementInform(point.first, point.second);
             }
             movepoints.clear();
         }
 
-        if (!me->GetEluna()->UpdateAI(me, diff))
+        if (!me->GetMap()->GetEluna()->UpdateAI(me, diff))
         {
 #if defined TRINITY || AZEROTHCORE
             if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
@@ -99,7 +99,7 @@ struct ElunaCreatureAI : ScriptedAI
                 }
             }
         }
-        if (!me->GetEluna()->EnterCombat(me, target))
+        if (!me->GetMap()->GetEluna()->EnterCombat(me, target))
             ScriptedAI::JustEngagedWith(target);
     }
 #else
@@ -119,7 +119,7 @@ struct ElunaCreatureAI : ScriptedAI
     void DamageTaken(Unit* attacker, uint32& damage) override
 #endif
     {
-        if (!me->GetEluna()->DamageTaken(me, attacker, damage))
+        if (!me->GetMap()->GetEluna()->DamageTaken(me, attacker, damage))
         {
 #if AZEROTHCORE
             ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
@@ -157,28 +157,28 @@ struct ElunaCreatureAI : ScriptedAI
                 me->GetInstanceScript()->DoUpdateWorldState(304, me->GetInstanceScript()->GetMaxCombatReses());
             }
         }
-        if (!me->GetEluna()->JustDied(me, killer))
+        if (!me->GetMap()->GetEluna()->JustDied(me, killer))
             ScriptedAI::JustDied(killer);
     }
 
     //Called at creature killing another unit
     void KilledUnit(Unit* victim) override
     {
-        if (!me->GetEluna()->KilledUnit(me, victim))
+        if (!me->GetMap()->GetEluna()->KilledUnit(me, victim))
             ScriptedAI::KilledUnit(victim);
     }
 
     // Called when the creature summon successfully other creature
     void JustSummoned(Creature* summon) override
     {
-        if (!me->GetEluna()->JustSummoned(me, summon))
+        if (!me->GetMap()->GetEluna()->JustSummoned(me, summon))
             ScriptedAI::JustSummoned(summon);
     }
 
     // Called when a summoned creature is despawned
     void SummonedCreatureDespawn(Creature* summon) override
     {
-        if (!me->GetEluna()->SummonedCreatureDespawn(me, summon))
+        if (!me->GetMap()->GetEluna()->SummonedCreatureDespawn(me, summon))
             ScriptedAI::SummonedCreatureDespawn(summon);
     }
 
@@ -193,7 +193,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called before EnterCombat even before the creature is in combat.
     void AttackStart(Unit* target) override
     {
-        if (!me->GetEluna()->AttackStart(me, target))
+        if (!me->GetMap()->GetEluna()->AttackStart(me, target))
             ScriptedAI::AttackStart(target);
     }
 
@@ -221,7 +221,7 @@ struct ElunaCreatureAI : ScriptedAI
                 }
             }
         }
-        if (!me->GetEluna()->EnterEvadeMode(me))
+        if (!me->GetMap()->GetEluna()->EnterEvadeMode(me))
             ScriptedAI::EnterEvadeMode();
     }
 #else
@@ -237,7 +237,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called when creature appears in the world (spawn, respawn, grid load etc...)
     void JustAppeared() override
     {
-        if (!me->GetEluna()->JustRespawned(me))
+        if (!me->GetMap()->GetEluna()->JustRespawned(me))
             ScriptedAI::JustAppeared();
     }
 #else
@@ -252,21 +252,21 @@ struct ElunaCreatureAI : ScriptedAI
     // Called at reaching home after evade
     void JustReachedHome() override
     {
-        if (!me->GetEluna()->JustReachedHome(me))
+        if (!me->GetMap()->GetEluna()->JustReachedHome(me))
             ScriptedAI::JustReachedHome();
     }
 
     // Called at text emote receive from player
     void ReceiveEmote(Player* player, uint32 emoteId) override
     {
-        if (!me->GetEluna()->ReceiveEmote(me, player, emoteId))
+        if (!me->GetMap()->GetEluna()->ReceiveEmote(me, player, emoteId))
             ScriptedAI::ReceiveEmote(player, emoteId);
     }
 
     // called when the corpse of this creature gets removed
     void CorpseRemoved(uint32& respawnDelay) override
     {
-        if (!me->GetEluna()->CorpseRemoved(me, respawnDelay))
+        if (!me->GetMap()->GetEluna()->CorpseRemoved(me, respawnDelay))
             ScriptedAI::CorpseRemoved(respawnDelay);
     }
 
@@ -280,7 +280,7 @@ struct ElunaCreatureAI : ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->GetEluna()->MoveInLineOfSight(me, who))
+        if (!me->GetMap()->GetEluna()->MoveInLineOfSight(me, who))
             ScriptedAI::MoveInLineOfSight(who);
     }
 
@@ -291,7 +291,7 @@ struct ElunaCreatureAI : ScriptedAI
     void SpellHit(Unit* caster, SpellInfo const* spell) override
 #endif
     {
-        if (!me->GetEluna()->SpellHit(me, caster, spell))
+        if (!me->GetMap()->GetEluna()->SpellHit(me, caster, spell))
             ScriptedAI::SpellHit(caster, spell);
     }
 
@@ -302,7 +302,7 @@ struct ElunaCreatureAI : ScriptedAI
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
 #endif
     {
-        if (!me->GetEluna()->SpellHitTarget(me, target, spell))
+        if (!me->GetMap()->GetEluna()->SpellHitTarget(me, target, spell))
             ScriptedAI::SpellHitTarget(target, spell);
     }
 
@@ -312,7 +312,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called when the creature is summoned successfully by other creature
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (!summoner->ToUnit() || !me->GetEluna()->OnSummoned(me, summoner->ToUnit()))
+        if (!summoner->ToUnit() || !me->GetMap()->GetEluna()->OnSummoned(me, summoner->ToUnit()))
             ScriptedAI::IsSummonedBy(summoner);
     }
 #else
@@ -326,21 +326,21 @@ struct ElunaCreatureAI : ScriptedAI
 
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
-        if (!me->GetEluna()->SummonedCreatureDies(me, summon, killer))
+        if (!me->GetMap()->GetEluna()->SummonedCreatureDies(me, summon, killer))
             ScriptedAI::SummonedCreatureDies(summon, killer);
     }
 
     // Called when owner takes damage
     void OwnerAttackedBy(Unit* attacker) override
     {
-        if (!me->GetEluna()->OwnerAttackedBy(me, attacker))
+        if (!me->GetMap()->GetEluna()->OwnerAttackedBy(me, attacker))
             ScriptedAI::OwnerAttackedBy(attacker);
     }
 
     // Called when owner attacks something
     void OwnerAttacked(Unit* target) override
     {
-        if (!me->GetEluna()->OwnerAttacked(me, target))
+        if (!me->GetMap()->GetEluna()->OwnerAttacked(me, target))
             ScriptedAI::OwnerAttacked(target);
     }
 
