@@ -13,58 +13,56 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
-    if (!IsEnabled())\
-        return;\
     auto key = EventKey<GroupEvents>(EVENT);\
     if (!GroupEventBindings->HasBindingsFor(key))\
         return;
 
-void Eluna::OnAddMember(Group* group, ObjectGuid guid)
+void Eluna::OnAddMember(Group* group, uint64 guid)
 {
     START_HOOK(GROUP_EVENT_ON_MEMBER_ADD);
-    HookPush(group);
-    HookPush(guid);
+    Push(group);
+    Push(guid);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnInviteMember(Group* group, ObjectGuid guid)
+void Eluna::OnInviteMember(Group* group, uint64 guid)
 {
     START_HOOK(GROUP_EVENT_ON_MEMBER_INVITE);
-    HookPush(group);
-    HookPush(guid);
+    Push(group);
+    Push(guid);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnRemoveMember(Group* group, ObjectGuid guid, uint8 method)
+void Eluna::OnRemoveMember(Group* group, uint64 guid, uint8 method)
 {
     START_HOOK(GROUP_EVENT_ON_MEMBER_REMOVE);
-    HookPush(group);
-    HookPush(guid);
-    HookPush(method);
+    Push(group);
+    Push(guid);
+    Push(method);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
+void Eluna::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid)
 {
     START_HOOK(GROUP_EVENT_ON_LEADER_CHANGE);
-    HookPush(group);
-    HookPush(newLeaderGuid);
-    HookPush(oldLeaderGuid);
+    Push(group);
+    Push(newLeaderGuid);
+    Push(oldLeaderGuid);
     CallAllFunctions(GroupEventBindings, key);
 }
 
 void Eluna::OnDisband(Group* group)
 {
     START_HOOK(GROUP_EVENT_ON_DISBAND);
-    HookPush(group);
+    Push(group);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnCreate(Group* group, ObjectGuid leaderGuid, GroupType groupType)
+void Eluna::OnCreate(Group* group, uint64 leaderGuid, GroupType groupType)
 {
     START_HOOK(GROUP_EVENT_ON_CREATE);
-    HookPush(group);
-    HookPush(leaderGuid);
-    HookPush(groupType);
+    Push(group);
+    Push(leaderGuid);
+    Push(groupType);
     CallAllFunctions(GroupEventBindings, key);
 }

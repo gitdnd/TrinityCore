@@ -17,14 +17,14 @@ namespace LuaCorpse
     /**
      * Returns the GUID of the [Player] that left the [Corpse] behind.
      *
-     * @return ObjectGuid ownerGUID
+     * @return uint64 ownerGUID
      */
     int GetOwnerGUID(Eluna* E, Corpse* corpse)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(corpse->GetOwnerGUID());
+        Eluna::Push(E->L, corpse->GetOwnerGUID());
 #else
-        E->Push(corpse->GetOwnerGuid());
+        Eluna::Push(E->L, corpse->GetOwnerGuid());
 #endif
         return 1;
     }
@@ -36,7 +36,7 @@ namespace LuaCorpse
      */
     int GetGhostTime(Eluna* E, Corpse* corpse)
     {
-        E->Push(corpse->GetGhostTime());
+        Eluna::Push(E->L, corpse->GetGhostTime());
         return 1;
     }
 
@@ -54,7 +54,7 @@ namespace LuaCorpse
      */
     int GetType(Eluna* E, Corpse* corpse)
     {
-        E->Push(corpse->GetType());
+        Eluna::Push(E->L, corpse->GetType());
         return 1;
     }
 

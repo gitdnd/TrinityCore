@@ -28,7 +28,7 @@ namespace LuaAura
      */
     int GetCaster(Eluna* E, Aura* aura)
     {
-        E->Push(aura->GetCaster());
+        Eluna::Push(E->L, aura->GetCaster());
         return 1;
     }
 
@@ -40,9 +40,9 @@ namespace LuaAura
     int GetCasterGUID(Eluna* E, Aura* aura)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(aura->GetCasterGUID());
+        Eluna::Push(E->L, aura->GetCasterGUID());
 #else
-        E->Push(aura->GetCasterGuid());
+        Eluna::Push(E->L, aura->GetCasterGuid());
 #endif
         return 1;
     }
@@ -54,10 +54,10 @@ namespace LuaAura
      */
     int GetCasterLevel(Eluna* E, Aura* aura)
     {
-#if defined(TRINITY) || CMANGOS
-        E->Push(aura->GetCaster()->GetLevel());
+#ifdef TRINITY
+        Eluna::Push(E->L, aura->GetCaster()->GetLevel());
 #else
-        E->Push(aura->GetCaster()->getLevel());
+        Eluna::Push(E->L, aura->GetCaster()->getLevel());
 #endif
         return 1;
     }
@@ -70,9 +70,9 @@ namespace LuaAura
     int GetDuration(Eluna* E, Aura* aura)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(aura->GetDuration());
+        Eluna::Push(E->L, aura->GetDuration());
 #else
-        E->Push(aura->GetAuraDuration());
+        Eluna::Push(E->L, aura->GetAuraDuration());
 #endif
         return 1;
     }
@@ -84,7 +84,7 @@ namespace LuaAura
      */
     int GetAuraId(Eluna* E, Aura* aura)
     {
-        E->Push(aura->GetId());
+        Eluna::Push(E->L, aura->GetId());
         return 1;
     }
 
@@ -99,9 +99,9 @@ namespace LuaAura
     int GetMaxDuration(Eluna* E, Aura* aura)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(aura->GetMaxDuration());
+        Eluna::Push(E->L, aura->GetMaxDuration());
 #else
-        E->Push(aura->GetAuraMaxDuration());
+        Eluna::Push(E->L, aura->GetAuraMaxDuration());
 #endif
         return 1;
     }
@@ -115,7 +115,7 @@ namespace LuaAura
      */
     int GetStackAmount(Eluna* E, Aura* aura)
     {
-        E->Push(aura->GetStackAmount());
+        Eluna::Push(E->L, aura->GetStackAmount());
         return 1;
     }
 
@@ -127,9 +127,9 @@ namespace LuaAura
     int GetOwner(Eluna* E, Aura* aura)
     {
 #if defined TRINITY || defined AZEROTHCORE
-        E->Push(aura->GetOwner());
+        Eluna::Push(E->L, aura->GetOwner());
 #else
-        E->Push(aura->GetTarget());
+        Eluna::Push(E->L, aura->GetTarget());
 #endif
         return 1;
     }
@@ -192,8 +192,6 @@ namespace LuaAura
         uint8 amount = Eluna::CHECKVAL<uint8>(E->L, 2);
 #if defined TRINITY || defined AZEROTHCORE
         aura->SetStackAmount(amount);
-#elif defined CMANGOS
-        aura->GetHolder()->SetStackAmount(amount, aura->GetTarget());
 #else
         aura->GetHolder()->SetStackAmount(amount);
 #endif

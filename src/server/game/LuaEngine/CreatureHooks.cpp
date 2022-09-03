@@ -14,8 +14,6 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT, CREATURE) \
-    if (!IsEnabled())\
-        return;\
     auto entry_key = EntryKey<CreatureEvents>(EVENT, CREATURE->GetEntry());\
     auto unique_key = UniqueObjectKey<CreatureEvents>(EVENT, CREATURE->GET_GUID(), CREATURE->GetInstanceId());\
     if (!CreatureEventBindings->HasBindingsFor(entry_key))\
@@ -23,8 +21,6 @@ using namespace Hooks;
             return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, CREATURE, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto entry_key = EntryKey<CreatureEvents>(EVENT, CREATURE->GetEntry());\
     auto unique_key = UniqueObjectKey<CreatureEvents>(EVENT, CREATURE->GET_GUID(), CREATURE->GetInstanceId());\
     if (!CreatureEventBindings->HasBindingsFor(entry_key))\
@@ -34,67 +30,67 @@ using namespace Hooks;
 void Eluna::OnDummyEffect(WorldObject* pCaster, uint32 spellId, SpellEffIndex effIndex, Creature* pTarget)
 {
     START_HOOK(CREATURE_EVENT_ON_DUMMY_EFFECT, pTarget);
-    HookPush(pCaster);
-    HookPush(spellId);
-    HookPush(effIndex);
-    HookPush(pTarget);
+    Push(pCaster);
+    Push(spellId);
+    Push(effIndex);
+    Push(pTarget);
     CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 bool Eluna::OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_QUEST_ACCEPT, pCreature, false);
-    HookPush(pPlayer);
-    HookPush(pCreature);
-    HookPush(pQuest);
+    Push(pPlayer);
+    Push(pCreature);
+    Push(pQuest);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 bool Eluna::OnQuestReward(Player* pPlayer, Creature* pCreature, Quest const* pQuest, uint32 opt)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_QUEST_REWARD, pCreature, false);
-    HookPush(pPlayer);
-    HookPush(pCreature);
-    HookPush(pQuest);
-    HookPush(opt);
+    Push(pPlayer);
+    Push(pCreature);
+    Push(pQuest);
+    Push(opt);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 void Eluna::GetDialogStatus(const Player* pPlayer, const Creature* pCreature)
 {
     START_HOOK(CREATURE_EVENT_ON_DIALOG_STATUS, pCreature);
-    HookPush(pPlayer);
-    HookPush(pCreature);
+    Push(pPlayer);
+    Push(pCreature);
     CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 void Eluna::OnAddToWorld(Creature* pCreature)
 {
     START_HOOK(CREATURE_EVENT_ON_ADD, pCreature);
-    HookPush(pCreature);
+    Push(pCreature);
     CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 void Eluna::OnRemoveFromWorld(Creature* pCreature)
 {
     START_HOOK(CREATURE_EVENT_ON_REMOVE, pCreature);
-    HookPush(pCreature);
+    Push(pCreature);
     CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 bool Eluna::OnSummoned(Creature* pCreature, Unit* pSummoner)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_SUMMONED, pCreature, false);
-    HookPush(pCreature);
-    HookPush(pSummoner);
+    Push(pCreature);
+    Push(pSummoner);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 bool Eluna::UpdateAI(Creature* me, const uint32 diff)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_AIUPDATE, me, false);
-    HookPush(me);
-    HookPush(diff);
+    Push(me);
+    Push(diff);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -103,8 +99,8 @@ bool Eluna::UpdateAI(Creature* me, const uint32 diff)
 bool Eluna::EnterCombat(Creature* me, Unit* target)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_ENTER_COMBAT, me, false);
-    HookPush(me);
-    HookPush(target);
+    Push(me);
+    Push(target);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -113,9 +109,9 @@ bool Eluna::DamageTaken(Creature* me, Unit* attacker, uint32& damage)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_DAMAGE_TAKEN, me, false);
     bool result = false;
-    HookPush(me);
-    HookPush(attacker);
-    HookPush(damage);
+    Push(me);
+    Push(attacker);
+    Push(damage);
     int damageIndex = lua_gettop(L);
     int n = SetupStack(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key, 3);
 
@@ -145,8 +141,8 @@ bool Eluna::JustDied(Creature* me, Unit* killer)
 {
     On_Reset(me);
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_DIED, me, false);
-    HookPush(me);
-    HookPush(killer);
+    Push(me);
+    Push(killer);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -154,8 +150,8 @@ bool Eluna::JustDied(Creature* me, Unit* killer)
 bool Eluna::KilledUnit(Creature* me, Unit* victim)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_TARGET_DIED, me, false);
-    HookPush(me);
-    HookPush(victim);
+    Push(me);
+    Push(victim);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -163,8 +159,8 @@ bool Eluna::KilledUnit(Creature* me, Unit* victim)
 bool Eluna::JustSummoned(Creature* me, Creature* summon)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_JUST_SUMMONED_CREATURE, me, false);
-    HookPush(me);
-    HookPush(summon);
+    Push(me);
+    Push(summon);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -172,8 +168,8 @@ bool Eluna::JustSummoned(Creature* me, Creature* summon)
 bool Eluna::SummonedCreatureDespawn(Creature* me, Creature* summon)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_SUMMONED_CREATURE_DESPAWN, me, false);
-    HookPush(me);
-    HookPush(summon);
+    Push(me);
+    Push(summon);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -181,9 +177,9 @@ bool Eluna::SummonedCreatureDespawn(Creature* me, Creature* summon)
 bool Eluna::MovementInform(Creature* me, uint32 type, uint32 id)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_REACH_WP, me, false);
-    HookPush(me);
-    HookPush(type);
-    HookPush(id);
+    Push(me);
+    Push(type);
+    Push(id);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -191,8 +187,8 @@ bool Eluna::MovementInform(Creature* me, uint32 type, uint32 id)
 bool Eluna::AttackStart(Creature* me, Unit* target)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_PRE_COMBAT, me, false);
-    HookPush(me);
-    HookPush(target);
+    Push(me);
+    Push(target);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -201,7 +197,7 @@ bool Eluna::EnterEvadeMode(Creature* me)
 {
     On_Reset(me);
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_LEAVE_COMBAT, me, false);
-    HookPush(me);
+    Push(me);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -210,7 +206,7 @@ bool Eluna::JustRespawned(Creature* me)
 {
     On_Reset(me);
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_SPAWN, me, false);
-    HookPush(me);
+    Push(me);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -218,7 +214,7 @@ bool Eluna::JustRespawned(Creature* me)
 bool Eluna::JustReachedHome(Creature* me)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_REACH_HOME, me, false);
-    HookPush(me);
+    Push(me);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -226,9 +222,9 @@ bool Eluna::JustReachedHome(Creature* me)
 bool Eluna::ReceiveEmote(Creature* me, Player* player, uint32 emoteId)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_RECEIVE_EMOTE, me, false);
-    HookPush(me);
-    HookPush(player);
-    HookPush(emoteId);
+    Push(me);
+    Push(player);
+    Push(emoteId);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -237,8 +233,8 @@ bool Eluna::CorpseRemoved(Creature* me, uint32& respawnDelay)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_CORPSE_REMOVED, me, false);
     bool result = false;
-    HookPush(me);
-    HookPush(respawnDelay);
+    Push(me);
+    Push(respawnDelay);
     int respawnDelayIndex = lua_gettop(L);
     int n = SetupStack(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key, 2);
 
@@ -266,8 +262,8 @@ bool Eluna::CorpseRemoved(Creature* me, uint32& respawnDelay)
 bool Eluna::MoveInLineOfSight(Creature* me, Unit* who)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_MOVE_IN_LOS, me, false);
-    HookPush(me);
-    HookPush(who);
+    Push(me);
+    Push(who);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -275,7 +271,7 @@ bool Eluna::MoveInLineOfSight(Creature* me, Unit* who)
 void Eluna::On_Reset(Creature* me) // Not an override, custom
 {
     START_HOOK(CREATURE_EVENT_ON_RESET, me);
-    HookPush(me);
+    Push(me);
     CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -283,9 +279,9 @@ void Eluna::On_Reset(Creature* me) // Not an override, custom
 bool Eluna::SpellHit(Creature* me, WorldObject* caster, SpellInfo const* spell)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_HIT_BY_SPELL, me, false);
-    HookPush(me);
-    HookPush(caster);
-    HookPush(spell->Id); // Pass spell object?
+    Push(me);
+    Push(caster);
+    Push(spell->Id); // Pass spell object?
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -293,9 +289,9 @@ bool Eluna::SpellHit(Creature* me, WorldObject* caster, SpellInfo const* spell)
 bool Eluna::SpellHitTarget(Creature* me, WorldObject* target, SpellInfo const* spell)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_SPELL_HIT_TARGET, me, false);
-    HookPush(me);
-    HookPush(target);
-    HookPush(spell->Id); // Pass spell object?
+    Push(me);
+    Push(target);
+    Push(spell->Id); // Pass spell object?
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -304,9 +300,9 @@ bool Eluna::SpellHitTarget(Creature* me, WorldObject* target, SpellInfo const* s
 bool Eluna::SummonedCreatureDies(Creature* me, Creature* summon, Unit* killer)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_SUMMONED_CREATURE_DIED, me, false);
-    HookPush(me);
-    HookPush(summon);
-    HookPush(killer);
+    Push(me);
+    Push(summon);
+    Push(killer);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -314,8 +310,8 @@ bool Eluna::SummonedCreatureDies(Creature* me, Creature* summon, Unit* killer)
 bool Eluna::OwnerAttackedBy(Creature* me, Unit* attacker)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_OWNER_ATTACKED_AT, me, false);
-    HookPush(me);
-    HookPush(attacker);
+    Push(me);
+    Push(attacker);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
@@ -323,16 +319,16 @@ bool Eluna::OwnerAttackedBy(Creature* me, Unit* attacker)
 bool Eluna::OwnerAttacked(Creature* me, Unit* target)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_OWNER_ATTACKED, me, false);
-    HookPush(me);
-    HookPush(target);
+    Push(me);
+    Push(target);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 void Eluna::OnMirrorPlayer(Creature* mirror, Player* player)
 {
     START_HOOK(CREATURE_EVENT_ON_MIRROR_IMAGE, mirror);
-    HookPush(mirror);
-    HookPush(player);
+    Push(mirror);
+    Push(player);
     CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 

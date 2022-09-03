@@ -15,15 +15,11 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
-    if (!IsEnabled())\
-        return;\
     auto key = EventKey<ServerEvents>(EVENT);\
     if (!ServerEventBindings->HasBindingsFor(key))\
         return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto key = EventKey<ServerEvents>(EVENT);\
     if (!ServerEventBindings->HasBindingsFor(key))\
         return RETVAL;
@@ -31,33 +27,33 @@ using namespace Hooks;
 bool Eluna::OnAddonMessage(Player* sender, uint32 type, std::string& msg, Player* receiver, Guild* guild, Group* group, Channel* channel)
 {
     START_HOOK_WITH_RETVAL(ADDON_EVENT_ON_MESSAGE, true);
-    HookPush(sender);
-    HookPush(type);
+    Push(sender);
+    Push(type);
 
     auto delimeter_position = msg.find('\t');
     if (delimeter_position == std::string::npos)
     {
-        HookPush(msg); // prefix
-        HookPush(); // msg
+        Push(msg); // prefix
+        Push(); // msg
     }
     else
     {
         std::string prefix = msg.substr(0, delimeter_position);
         std::string content = msg.substr(delimeter_position + 1, std::string::npos);
-        HookPush(prefix);
-        HookPush(content);
+        Push(prefix);
+        Push(content);
     }
 
     if (receiver)
-        HookPush(receiver);
+        Push(receiver);
     else if (guild)
-        HookPush(guild);
+        Push(guild);
     else if (group)
-        HookPush(group);
+        Push(group);
     else if (channel)
-        HookPush(channel->GetChannelId());
+        Push(channel->GetChannelId());
     else
-        HookPush();
+        Push();
 
     return CallAllFunctionsBool(ServerEventBindings, key, true);
 }
@@ -70,10 +66,10 @@ void Eluna::OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* o
     lua_rawgeti(L, LUA_REGISTRYINDEX, funcRef);
 
     // Push parameters
-    Push(funcRef);
-    Push(delay);
-    Push(calls);
-    Push(obj);
+    Push(L, funcRef);
+    Push(L, delay);
+    Push(L, calls);
+    Push(L, obj);
 
     // Call function
     ExecuteCall(4, 0);
@@ -85,14 +81,14 @@ void Eluna::OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* o
 void Eluna::OnGameEventStart(uint32 eventid)
 {
     START_HOOK(GAME_EVENT_START);
-    HookPush(eventid);
+    Push(eventid);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnGameEventStop(uint32 eventid)
 {
     START_HOOK(GAME_EVENT_STOP);
-    HookPush(eventid);
+    Push(eventid);
     CallAllFunctions(ServerEventBindings, key);
 }
 
@@ -112,11 +108,11 @@ void Eluna::OnLuaStateOpen()
 bool Eluna::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pTrigger)
 {
     START_HOOK_WITH_RETVAL(TRIGGER_EVENT_ON_TRIGGER, false);
-    HookPush(pPlayer);
+    Push(pPlayer);
 #ifndef AZEROTHCORE
-    HookPush(pTrigger->id);
+    Push(pTrigger->id);
 #else
-    HookPush(pTrigger->entry);
+    Push(pTrigger->entry);
 #endif
     return CallAllFunctionsBool(ServerEventBindings, key);
 }
@@ -125,60 +121,51 @@ bool Eluna::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pTrigger)
 void Eluna::OnChange(Weather* /*weather*/, uint32 zone, WeatherState state, float grade)
 {
     START_HOOK(WEATHER_EVENT_ON_CHANGE);
-    HookPush(zone);
-    HookPush(state);
-    HookPush(grade);
+    Push(zone);
+    Push(state);
+    Push(grade);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 // Auction House
 void Eluna::OnAdd(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
-#ifdef AZEROTHCORE
-    Player* owner = eObjectAccessor()FindPlayer(entry->owner);
-#else
     Player* owner = eObjectAccessor()FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
-#endif
-
 #ifdef TRINITY
     Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
     uint32 expiretime = entry->expire_time;
 #elif AZEROTHCORE
-    Item* item = eAuctionMgr->GetAItem(entry->item_guid);
+    Item* item = eAuctionMgr->GetAItem(entry->item_guidlow);
     uint32 expiretime = entry->expire_time;
 #else
     Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
     uint32 expiretime = entry->expireTime;
 #endif
 
+
     if (!owner || !item)
         return;
 
     START_HOOK(AUCTION_EVENT_ON_ADD);
-    HookPush(entry->Id);
-    HookPush(owner);
-    HookPush(item);
-    HookPush(expiretime);
-    HookPush(entry->buyout);
-    HookPush(entry->startbid);
-    HookPush(entry->bid);
-    HookPush(entry->bidder);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnRemove(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
-#ifdef AZEROTHCORE
-    Player* owner = eObjectAccessor()FindPlayer(entry->owner);
-#else
     Player* owner = eObjectAccessor()FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
-#endif
-
 #ifdef TRINITY
     Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
     uint32 expiretime = entry->expire_time;
 #elif AZEROTHCORE
-    Item* item = eAuctionMgr->GetAItem(entry->item_guid);
+    Item* item = eAuctionMgr->GetAItem(entry->item_guidlow);
     uint32 expiretime = entry->expire_time;
 #else
     Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
@@ -190,30 +177,25 @@ void Eluna::OnRemove(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
         return;
 
     START_HOOK(AUCTION_EVENT_ON_REMOVE);
-    HookPush(entry->Id);
-    HookPush(owner);
-    HookPush(item);
-    HookPush(expiretime);
-    HookPush(entry->buyout);
-    HookPush(entry->startbid);
-    HookPush(entry->bid);
-    HookPush(entry->bidder);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
-#ifdef AZEROTHCORE
-    Player* owner = eObjectAccessor()FindPlayer(entry->owner);
-#else
     Player* owner = eObjectAccessor()FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
-#endif
-
 #ifdef TRINITY
     Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
     uint32 expiretime = entry->expire_time;
 #elif AZEROTHCORE
-    Item* item = eAuctionMgr->GetAItem(entry->item_guid);
+    Item* item = eAuctionMgr->GetAItem(entry->item_guidlow);
     uint32 expiretime = entry->expire_time;
 #else
     Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
@@ -225,30 +207,25 @@ void Eluna::OnSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
         return;
 
     START_HOOK(AUCTION_EVENT_ON_SUCCESSFUL);
-    HookPush(entry->Id);
-    HookPush(owner);
-    HookPush(item);
-    HookPush(expiretime);
-    HookPush(entry->buyout);
-    HookPush(entry->startbid);
-    HookPush(entry->bid);
-    HookPush(entry->bidder);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnExpire(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
 {
-#ifdef AZEROTHCORE
-    Player* owner = eObjectAccessor()FindPlayer(entry->owner);
-#else
     Player* owner = eObjectAccessor()FindPlayer(MAKE_NEW_GUID(entry->owner, 0, HIGHGUID_PLAYER));
-#endif
-
 #ifdef TRINITY
     Item* item = eAuctionMgr->GetAItem(entry->itemGUIDLow);
     uint32 expiretime = entry->expire_time;
 #elif AZEROTHCORE
-    Item* item = eAuctionMgr->GetAItem(entry->item_guid);
+    Item* item = eAuctionMgr->GetAItem(entry->item_guidlow);
     uint32 expiretime = entry->expire_time;
 #else
     Item* item = eAuctionMgr->GetAItem(entry->itemGuidLow);
@@ -260,21 +237,21 @@ void Eluna::OnExpire(AuctionHouseObject* /*ah*/, AuctionEntry* entry)
         return;
 
     START_HOOK(AUCTION_EVENT_ON_EXPIRE);
-    HookPush(entry->Id);
-    HookPush(owner);
-    HookPush(item);
-    HookPush(expiretime);
-    HookPush(entry->buyout);
-    HookPush(entry->startbid);
-    HookPush(entry->bid);
-    HookPush(entry->bidder);
+    Push(entry->Id);
+    Push(owner);
+    Push(item);
+    Push(expiretime);
+    Push(entry->buyout);
+    Push(entry->startbid);
+    Push(entry->bid);
+    Push(entry->bidder);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnOpenStateChange(bool open)
 {
     START_HOOK(WORLD_EVENT_ON_OPEN_STATE_CHANGE);
-    HookPush(open);
+    Push(open);
     CallAllFunctions(ServerEventBindings, key);
 }
 
@@ -285,9 +262,9 @@ void Eluna::OnConfigLoad(bool reload, bool isBefore)
 #endif
 {
     START_HOOK(WORLD_EVENT_ON_CONFIG_LOAD);
-    HookPush(reload);
+    Push(reload);
 #ifdef AZEROTHCORE
-    HookPush(isBefore);
+    Push(isBefore);
 #endif
     CallAllFunctions(ServerEventBindings, key);
 }
@@ -295,8 +272,8 @@ void Eluna::OnConfigLoad(bool reload, bool isBefore)
 void Eluna::OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask)
 {
     START_HOOK(WORLD_EVENT_ON_SHUTDOWN_INIT);
-    HookPush(code);
-    HookPush(mask);
+    Push(code);
+    Push(mask);
     CallAllFunctions(ServerEventBindings, key);
 }
 
@@ -309,7 +286,7 @@ void Eluna::OnShutdownCancel()
 void Eluna::OnWorldUpdate(uint32 diff)
 {
     START_HOOK(WORLD_EVENT_ON_UPDATE);
-    HookPush(diff);
+    Push(diff);
     CallAllFunctions(ServerEventBindings, key);
 }
 
@@ -329,66 +306,66 @@ void Eluna::OnShutdown()
 void Eluna::OnCreate(Map* map)
 {
     START_HOOK(MAP_EVENT_ON_CREATE);
-    HookPush(map);
+    Push(map);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnDestroy(Map* map)
 {
     START_HOOK(MAP_EVENT_ON_DESTROY);
-    HookPush(map);
+    Push(map);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnPlayerEnter(Map* map, Player* player)
 {
     START_HOOK(MAP_EVENT_ON_PLAYER_ENTER);
-    HookPush(map);
-    HookPush(player);
+    Push(map);
+    Push(player);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnPlayerLeave(Map* map, Player* player)
 {
     START_HOOK(MAP_EVENT_ON_PLAYER_LEAVE);
-    HookPush(map);
-    HookPush(player);
+    Push(map);
+    Push(player);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
     START_HOOK(MAP_EVENT_ON_UPDATE);
-    HookPush(map);
-    HookPush(diff);
+    Push(map);
+    Push(diff);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnRemove(GameObject* gameobject)
 {
     START_HOOK(WORLD_EVENT_ON_DELETE_GAMEOBJECT);
-    HookPush(gameobject);
+    Push(gameobject);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnRemove(Creature* creature)
 {
     START_HOOK(WORLD_EVENT_ON_DELETE_CREATURE);
-    HookPush(creature);
+    Push(creature);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnFreeInstanceId(uint32 instanceId)
 {
     START_HOOK(ON_FREE_INSTANCE);
-    HookPush(instanceId);
+    Push(instanceId);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnScoredCreatureDied(Map* map, Creature* creature)
 {
     START_HOOK(ON_SCORED_CREATURE_DIED);
-    HookPush(map);
-    HookPush(creature);
+    Push(map);
+    Push(creature);
     CallAllFunctions(ServerEventBindings, key);
 }

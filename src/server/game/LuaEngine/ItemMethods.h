@@ -19,7 +19,7 @@ namespace LuaItem
      */
     int IsSoulBound(Eluna* E, Item* item)
     {
-        E->Push(item->IsSoulBound());
+        Eluna::Push(E->L, item->IsSoulBound());
         return 1;
     }
 
@@ -31,7 +31,7 @@ namespace LuaItem
      */
     int IsBoundAccountWide(Eluna* E, Item* item)
     {
-        E->Push(item->IsBoundAccountWide());
+        Eluna::Push(E->L, item->IsBoundAccountWide());
         return 1;
     }
 #endif
@@ -43,7 +43,7 @@ namespace LuaItem
      */
     int IsBoundByEnchant(Eluna* E, Item* item)
     {
-        E->Push(item->IsBoundByEnchant());
+        Eluna::Push(E->L, item->IsBoundByEnchant());
         return 1;
     }
 
@@ -57,7 +57,7 @@ namespace LuaItem
     {
         Player* player = Eluna::CHECKOBJ<Player>(E->L, 2);
 
-        E->Push(item->IsBindedNotWith(player));
+        Eluna::Push(E->L, item->IsBindedNotWith(player));
         return 1;
     }
 
@@ -68,7 +68,7 @@ namespace LuaItem
      */
     int IsLocked(Eluna* E, Item* item)
     {
-        E->Push(item->IsLocked());
+        Eluna::Push(E->L, item->IsLocked());
         return 1;
     }
 
@@ -79,7 +79,7 @@ namespace LuaItem
      */
     int IsBag(Eluna* E, Item* item)
     {
-        E->Push(item->IsBag());
+        Eluna::Push(E->L, item->IsBag());
         return 1;
     }
 
@@ -91,7 +91,7 @@ namespace LuaItem
      */
     int IsCurrencyToken(Eluna* E, Item* item)
     {
-        E->Push(item->IsCurrencyToken());
+        Eluna::Push(E->L, item->IsCurrencyToken());
         return 1;
     }
 #endif
@@ -103,7 +103,7 @@ namespace LuaItem
      */
     int IsNotEmptyBag(Eluna* E, Item* item)
     {
-        E->Push(item->IsNotEmptyBag());
+        Eluna::Push(E->L, item->IsNotEmptyBag());
         return 1;
     }
 
@@ -114,7 +114,7 @@ namespace LuaItem
      */
     int IsBroken(Eluna* E, Item* item)
     {
-        E->Push(item->IsBroken());
+        Eluna::Push(E->L, item->IsBroken());
         return 1;
     }
 
@@ -126,10 +126,10 @@ namespace LuaItem
     int CanBeTraded(Eluna* E, Item* item)
     {
 #if (defined(TBC) || defined(CLASSIC))
-        E->Push(item->CanBeTraded());
+        Eluna::Push(E->L, item->CanBeTraded());
 #else
         bool mail = Eluna::CHECKVAL<bool>(E->L, 2, false);
-        E->Push(item->CanBeTraded(mail));
+        Eluna::Push(E->L, item->CanBeTraded(mail));
 #endif
         return 1;
     }
@@ -141,7 +141,7 @@ namespace LuaItem
      */
     int IsInTrade(Eluna* E, Item* item)
     {
-        E->Push(item->IsInTrade());
+        Eluna::Push(E->L, item->IsInTrade());
         return 1;
     }
 
@@ -152,7 +152,7 @@ namespace LuaItem
      */
     int IsInBag(Eluna* E, Item* item)
     {
-        E->Push(item->IsInBag());
+        Eluna::Push(E->L, item->IsInBag());
         return 1;
     }
 
@@ -163,7 +163,7 @@ namespace LuaItem
      */
     int IsEquipped(Eluna* E, Item* item)
     {
-        E->Push(item->IsEquipped());
+        Eluna::Push(E->L, item->IsEquipped());
         return 1;
     }
 
@@ -177,9 +177,9 @@ namespace LuaItem
     {
         uint32 quest = Eluna::CHECKVAL<uint32>(E->L, 2);
 #if defined TRINITY || AZEROTHCORE
-        E->Push(item->hasQuest(quest));
+        Eluna::Push(E->L, item->hasQuest(quest));
 #else
-        E->Push(item->HasQuest(quest));
+        Eluna::Push(E->L, item->HasQuest(quest));
 #endif
         return 1;
     }
@@ -191,11 +191,11 @@ namespace LuaItem
      */
     int IsPotion(Eluna* E, Item* item)
     {
-        E->Push(item->IsPotion());
+        Eluna::Push(E->L, item->IsPotion());
         return 1;
     }
 
-#if defined(WOTLK)
+#if defined CLASSIC || defined(TBC) || defined(WOTLK)
     /**
      * Returns 'true' if the [Item] is a weapon vellum, 'false' otherwise
      *
@@ -203,7 +203,7 @@ namespace LuaItem
      */
     int IsWeaponVellum(Eluna* E, Item* item)
     {
-        E->Push(item->IsWeaponVellum());
+        Eluna::Push(E->L, item->IsWeaponVellum());
         return 1;
     }
 
@@ -214,7 +214,7 @@ namespace LuaItem
      */
     int IsArmorVellum(Eluna* E, Item* item)
     {
-        E->Push(item->IsArmorVellum());
+        Eluna::Push(E->L, item->IsArmorVellum());
         return 1;
     }
 #endif
@@ -226,13 +226,13 @@ namespace LuaItem
      */
     int IsConjuredConsumable(Eluna* E, Item* item)
     {
-        E->Push(item->IsConjuredConsumable());
+        Eluna::Push(E->L, item->IsConjuredConsumable());
         return 1;
     }
 
     /*int IsRefundExpired(Eluna* E, Item* item)// TODO: Implement core support
     {
-        E->Push(item->IsRefundExpired());
+        Eluna::Push(E->L, item->IsRefundExpired());
         return 1;
     }*/
 
@@ -307,22 +307,22 @@ namespace LuaItem
             item->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT) << ":" <<
 #endif
             item->GetItemRandomPropertyId() << ":" << item->GetItemSuffixFactor() << ":" <<
-#if defined(TRINITY) || CMANGOS
+#ifdef TRINITY
             (uint32)item->GetOwner()->GetLevel() << "|h[" << name << "]|h|r";
 #else
             (uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
 #endif
 
-        E->Push(oss.str());
+        Eluna::Push(E->L, oss.str());
         return 1;
     }
 
     int GetOwnerGUID(Eluna* E, Item* item)
     {
 #if defined TRINITY || AZEROTHCORE
-        E->Push(item->GetOwnerGUID());
+        Eluna::Push(E->L, item->GetOwnerGUID());
 #else
-        E->Push(item->GetOwnerGuid());
+        Eluna::Push(E->L, item->GetOwnerGuid());
 #endif
         return 1;
     }
@@ -334,7 +334,7 @@ namespace LuaItem
      */
     int GetOwner(Eluna* E, Item* item)
     {
-        E->Push(item->GetOwner());
+        Eluna::Push(E->L, item->GetOwner());
         return 1;
     }
 
@@ -345,7 +345,7 @@ namespace LuaItem
      */
     int GetCount(Eluna* E, Item* item)
     {
-        E->Push(item->GetCount());
+        Eluna::Push(E->L, item->GetCount());
         return 1;
     }
 
@@ -356,7 +356,7 @@ namespace LuaItem
      */
     int GetMaxStackCount(Eluna* E, Item* item)
     {
-        E->Push(item->GetMaxStackCount());
+        Eluna::Push(E->L, item->GetMaxStackCount());
         return 1;
     }
 
@@ -367,7 +367,7 @@ namespace LuaItem
      */
     int GetSlot(Eluna* E, Item* item)
     {
-        E->Push(item->GetSlot());
+        Eluna::Push(E->L, item->GetSlot());
         return 1;
     }
 
@@ -378,7 +378,7 @@ namespace LuaItem
      */
     int GetBagSlot(Eluna* E, Item* item)
     {
-        E->Push(item->GetBagSlot());
+        Eluna::Push(E->L, item->GetBagSlot());
         return 1;
     }
 
@@ -395,7 +395,7 @@ namespace LuaItem
         if (enchant_slot >= MAX_INSPECTED_ENCHANTMENT_SLOT)
             return luaL_argerror(E->L, 2, "valid EnchantmentSlot expected");
 
-        E->Push(item->GetEnchantmentId(EnchantmentSlot(enchant_slot)));
+        Eluna::Push(E->L, item->GetEnchantmentId(EnchantmentSlot(enchant_slot)));
         return 1;
     }
 
@@ -411,7 +411,7 @@ namespace LuaItem
         if (index >= MAX_ITEM_PROTO_SPELLS)
             return luaL_argerror(E->L, 2, "valid SpellIndex expected");
 
-        E->Push(item->GetTemplate()->Spells[index].SpellId);
+        Eluna::Push(E->L, item->GetTemplate()->Spells[index].SpellId);
         return 1;
     }
 
@@ -427,7 +427,7 @@ namespace LuaItem
         if (index >= MAX_ITEM_PROTO_SPELLS)
             return luaL_argerror(E->L, 2, "valid SpellIndex expected");
 
-        E->Push(item->GetTemplate()->Spells[index].SpellTrigger);
+        Eluna::Push(E->L, item->GetTemplate()->Spells[index].SpellTrigger);
         return 1;
     }
 
@@ -438,7 +438,7 @@ namespace LuaItem
      */
     int GetClass(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->Class);
+        Eluna::Push(E->L, item->GetTemplate()->Class);
         return 1;
     }
 
@@ -449,7 +449,7 @@ namespace LuaItem
      */
     int GetSubClass(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->SubClass);
+        Eluna::Push(E->L, item->GetTemplate()->SubClass);
         return 1;
     }
 
@@ -460,7 +460,7 @@ namespace LuaItem
      */
     int GetName(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->Name1);
+        Eluna::Push(E->L, item->GetTemplate()->Name1);
         return 1;
     }
 
@@ -471,7 +471,7 @@ namespace LuaItem
      */
     int GetDisplayId(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->DisplayInfoID);
+        Eluna::Push(E->L, item->GetTemplate()->DisplayInfoID);
         return 1;
     }
 
@@ -482,7 +482,7 @@ namespace LuaItem
      */
     int GetQuality(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->Quality);
+        Eluna::Push(E->L, item->GetTemplate()->Quality);
         return 1;
     }
 
@@ -493,7 +493,7 @@ namespace LuaItem
      */
     int GetBuyCount(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->BuyCount);
+        Eluna::Push(E->L, item->GetTemplate()->BuyCount);
         return 1;
     }
 
@@ -504,7 +504,7 @@ namespace LuaItem
      */
     int GetBuyPrice(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->BuyPrice);
+        Eluna::Push(E->L, item->GetTemplate()->BuyPrice);
         return 1;
     }
 
@@ -515,7 +515,7 @@ namespace LuaItem
      */
     int GetSellPrice(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->SellPrice);
+        Eluna::Push(E->L, item->GetTemplate()->SellPrice);
         return 1;
     }
 
@@ -526,7 +526,7 @@ namespace LuaItem
      */
     int GetInventoryType(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->InventoryType);
+        Eluna::Push(E->L, item->GetTemplate()->InventoryType);
         return 1;
     }
 
@@ -537,7 +537,7 @@ namespace LuaItem
      */
     int GetAllowableClass(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->AllowableClass);
+        Eluna::Push(E->L, item->GetTemplate()->AllowableClass);
         return 1;
     }
 
@@ -548,7 +548,7 @@ namespace LuaItem
      */
     int GetAllowableRace(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->AllowableRace);
+        Eluna::Push(E->L, item->GetTemplate()->AllowableRace);
         return 1;
     }
 
@@ -559,7 +559,7 @@ namespace LuaItem
      */
     int GetItemLevel(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->ItemLevel);
+        Eluna::Push(E->L, item->GetTemplate()->ItemLevel);
         return 1;
     }
 
@@ -570,14 +570,14 @@ namespace LuaItem
      */
     int GetRequiredLevel(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->RequiredLevel);
+        Eluna::Push(E->L, item->GetTemplate()->RequiredLevel);
         return 1;
     }
 
 #ifdef WOTLK
     int GetStatsCount(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->StatsCount);
+        Eluna::Push(E->L, item->GetTemplate()->StatsCount);
         return 1;
     }
 #endif
@@ -589,14 +589,14 @@ namespace LuaItem
      */
     int GetRandomProperty(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->RandomProperty);
+        Eluna::Push(E->L, item->GetTemplate()->RandomProperty);
         return 1;
     }
 
 #ifndef CLASSIC
     int GetRandomSuffix(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->RandomSuffix);
+        Eluna::Push(E->L, item->GetTemplate()->RandomSuffix);
         return 1;
     }
 #endif
@@ -608,7 +608,7 @@ namespace LuaItem
      */
     int GetItemSet(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->ItemSet);
+        Eluna::Push(E->L, item->GetTemplate()->ItemSet);
         return 1;
     }
 
@@ -620,9 +620,9 @@ namespace LuaItem
     int GetBagSize(Eluna* E, Item* item)
     {
         if (Bag* bag = item->ToBag())
-            E->Push(bag->GetBagSize());
+            Eluna::Push(E->L, bag->GetBagSize());
         else
-            E->Push(0);
+            Eluna::Push(E->L, 0);
         return 1;
     }
 
@@ -681,14 +681,14 @@ namespace LuaItem
         Player* owner = item->GetOwner();
         if (!owner)
         {
-            E->Push(false);
+            Eluna::Push(E->L, false);
             return 1;
         }
 
         uint32 enchant = Eluna::CHECKVAL<uint32>(E->L, 2);
         if (!sSpellItemEnchantmentStore.LookupEntry(enchant))
         {
-            E->Push(false);
+            Eluna::Push(E->L, false);
             return 1;
         }
 
@@ -699,7 +699,7 @@ namespace LuaItem
         owner->ApplyEnchantment(item, slot, false);
         item->SetEnchantment(slot, enchant, 0, 0);
         owner->ApplyEnchantment(item, slot, true);
-        E->Push(true);
+        Eluna::Push(E->L, true);
         return 1;
     }
 
@@ -715,7 +715,7 @@ namespace LuaItem
         Player* owner = item->GetOwner();
         if (!owner)
         {
-            E->Push(false);
+            Eluna::Push(E->L, false);
             return 1;
         }
 
@@ -725,13 +725,13 @@ namespace LuaItem
 
         if (!item->GetEnchantmentId(slot))
         {
-            E->Push(false);
+            Eluna::Push(E->L, false);
             return 1;
         }
 
         owner->ApplyEnchantment(item, slot, false);
         item->ClearEnchantment(slot);
-        E->Push(true);
+        Eluna::Push(E->L, true);
         return 1;
     }
 
@@ -740,8 +740,11 @@ namespace LuaItem
      */
     int SaveToDB(Eluna* /*E*/, Item* item)
     {
-#if defined TRINITY || defined AZEROTHCORE
+#if defined TRINITY
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
+        item->SaveToDB(trans);
+#elif defined AZEROTHCORE
+        SQLTransaction trans = SQLTransaction(NULL);
         item->SaveToDB(trans);
 #else
         item->SaveToDB();
@@ -751,8 +754,8 @@ namespace LuaItem
 
     int GetDisenchantId(Eluna* E, Item* item)
     {
-        E->Push(item->GetTemplate()->DisenchantID);
+        Eluna::Push(E->L, item->GetTemplate()->DisenchantID);
         return 1;
     }
-};
+};    
 #endif

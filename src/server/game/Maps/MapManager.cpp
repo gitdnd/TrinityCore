@@ -374,3 +374,37 @@ void MapManager::FreeInstanceId(uint32 instanceId)
     }
 #endif
 }
+
+void MapManager::ReloadEluna(int32 mapId)
+{
+    // Reloads the global Eluna state
+    if(mapId == -1)
+        sWorld->GetEluna()->_ReloadEluna();
+
+    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
+    {
+        Map* map = itr->second;
+        if (mapId >= 0 && uint32(mapId) == itr->first)
+        {
+            if (map->GetEluna())
+                map->GetEluna()->_ReloadEluna();
+        }
+        else // all case
+        {
+            if (map->GetEluna())
+                map->GetEluna()->_ReloadEluna();
+        }
+        // Only if each instance gets a state.
+        /*
+        if (!map->Instanceable())
+            continue;
+
+        MapInstanced::InstancedMaps& maps = ((MapInstanced*)map)->GetInstancedMaps();
+        for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
+        {
+            if (mitr->second->GetEluna())
+                mitr->second->GetEluna()->_ReloadEluna();
+        }*/
+    }
+
+}

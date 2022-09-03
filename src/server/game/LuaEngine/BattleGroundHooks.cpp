@@ -13,8 +13,6 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
-    if (!IsEnabled())\
-        return;\
     auto key = EventKey<BGEvents>(EVENT);\
     if (!BGEventBindings->HasBindingsFor(key))\
         return;
@@ -22,9 +20,9 @@ using namespace Hooks;
 void Eluna::OnBGStart(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
 {
     START_HOOK(BG_EVENT_ON_START);
-    HookPush(bg);
-    HookPush(bgId);
-    HookPush(instanceId);
+    Push(bg);
+    Push(bgId);
+    Push(instanceId);
     CallAllFunctions(BGEventBindings, key);
 }
 
@@ -35,27 +33,27 @@ void Eluna::OnBGEnd(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId
 #endif
 {
     START_HOOK(BG_EVENT_ON_END);
-    HookPush(bg);
-    HookPush(bgId);
-    HookPush(instanceId);
-    HookPush(winner);
+    Push(bg);
+    Push(bgId);
+    Push(instanceId);
+    Push(winner);
     CallAllFunctions(BGEventBindings, key);
 }
 
 void Eluna::OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
 {
     START_HOOK(BG_EVENT_ON_CREATE);
-    HookPush(bg);
-    HookPush(bgId);
-    HookPush(instanceId);
+    Push(bg);
+    Push(bgId);
+    Push(instanceId);
     CallAllFunctions(BGEventBindings, key);
 }
 
 void Eluna::OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
 {
     START_HOOK(BG_EVENT_ON_PRE_DESTROY);
-    HookPush(bg);
-    HookPush(bgId);
-    HookPush(instanceId);
+    Push(bg);
+    Push(bgId);
+    Push(instanceId);
     CallAllFunctions(BGEventBindings, key);
 }

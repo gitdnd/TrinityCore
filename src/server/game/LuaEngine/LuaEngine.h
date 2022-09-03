@@ -8,32 +8,16 @@
 #define _LUA_ENGINE_H
 
 #include "Common.h"
-#ifndef CMANGOS
 #include "SharedDefines.h"
 #include "DBCEnums.h"
 
 #include "Group.h"
 #include "Item.h"
-#else
-#include "Globals/SharedDefines.h"
-#include "Server/DBCEnums.h"
-#include "Groups/Group.h"
-#include "Entities/Item.h"
-#endif
 #ifndef TRINITY
-#ifndef CMANGOS
 #include "Player.h"
-#else
-#include "Entities/Player.h"
 #endif
-#endif
-#ifndef CMANGOS
 #include "Weather.h"
 #include "World.h"
-#else
-#include "Weather/Weather.h"
-#include "World/World.h"
-#endif
 #include "Hooks.h"
 #include "ElunaUtility.h"
 #include <mutex>
@@ -93,9 +77,6 @@ class Spell;
 class SpellCastTargets;
 #if defined(TRINITY) || AZEROTHCORE
 class TempSummon;
-#elif defined CMANGOS
-class TemporarySpawn;
-typedef TemporarySpawn TempSummon;
 #else
 class TemporarySummon;
 typedef TemporarySummon TempSummon;
@@ -135,35 +116,26 @@ struct LuaScript
     int32 mapId;
 };
 
-#define ELUNA_STATE_PTR "Eluna State Ptr"
+#define ELUNA_OBJECT_STORE  "Eluna Object Store"
+#define ELUNA_STATE_PTR     "Eluna State Ptr"
 
-#if defined(TRINITY)
-#define ELUNA_GAME_API TC_GAME_API
-#elif defined(AZEROTHCORE)
-#define ELUNA_GAME_API AC_GAME_API
-#else
-#define ELUNA_GAME_API
+#ifndef TRINITY
+#define TC_GAME_API
 #endif
-
-class ELUNA_GAME_API Eluna
+class TC_GAME_API Eluna
 {
 public:
     typedef std::list<LuaScript> ScriptList;
-    typedef std::recursive_mutex LockType;
 
-    Eluna(int32 mapId);
+    typedef std::recursive_mutex LockType;
+    Eluna(int32 MapId);
     ~Eluna();
 
     // Prevent copy
     Eluna(Eluna const&) = delete;
     Eluna& operator=(const Eluna&) = delete;
-
-    void ReloadEluna() { reload = true; }
-
 private:
-
-    // Indicates that the lua state should be reloaded
-    bool reload = false;
+    int32 boundMapId;
 
     // A counter for lua event stacks that occur (see event_level).
     // This is used to determine whether an object belongs to the current call stack or not.
@@ -191,17 +163,13 @@ private:
     void InvalidateObjects();
     bool ExecuteCall(int params, int res);
 
-    // Use ReloadEluna() to make eluna reload
-    // This is called on world update to reload eluna
-    void _ReloadEluna();
-
     static int StackTrace(lua_State *_L);
     static void Report(lua_State* _L);
 
     // Some helpers for hooks to call event handlers.
     // The bodies of the templates are in HookHelpers.h, so if you want to use them you need to #include "HookHelpers.h".
     template<typename K1, typename K2> int SetupStack(BindingMap<K1>* bindings1, BindingMap<K2>* bindings2, const K1& key1, const K2& key2, int number_of_arguments);
-                                       int CallOneFunction(int number_of_functions, int number_of_arguments, int number_of_results);
+                                       int CallOneFunction(int number_of_functions, int number_of_arguments, int number_of_results);          
                                        void CleanUpStack(int number_of_arguments);
     template<typename T>               void ReplaceArgument(T value, uint8 index);
     template<typename K1, typename K2> void CallAllFunctions(BindingMap<K1>* bindings1, BindingMap<K2>* bindings2, const K1& key1, const K2& key2);
@@ -223,26 +191,23 @@ private:
     }
 
     // Non-static pushes, to be used in hooks.
-    // They up the pushed value counter for hook helper functions.
-    void HookPush()                                 { Push(); ++push_counter; }
-    void HookPush(const long long value)            { Push(value); ++push_counter; }
-    void HookPush(const unsigned long long value)   { Push(value); ++push_counter; }
-    void HookPush(const long value)                 { Push(value); ++push_counter; }
-    void HookPush(const unsigned long value)        { Push(value); ++push_counter; }
-    void HookPush(const int value)                  { Push(value); ++push_counter; }
-    void HookPush(const unsigned int value)         { Push(value); ++push_counter; }
-    void HookPush(const bool value)                 { Push(value); ++push_counter; }
-    void HookPush(const float value)                { Push(value); ++push_counter; }
-    void HookPush(const double value)               { Push(value); ++push_counter; }
-    void HookPush(const std::string& value)         { Push(value); ++push_counter; }
-    void HookPush(const char* value)                { Push(value); ++push_counter; }
-    void HookPush(ObjectGuid const value)           { Push(value); ++push_counter; }
+    // These just call the correct static version with the main thread's Lua state.
+    void Push()                                 { Push(L); ++push_counter; }
+    void Push(const long long value)            { Push(L, value); ++push_counter; }
+    void Push(const unsigned long long value)   { Push(L, value); ++push_counter; }
+    void Push(const long value)                 { Push(L, value); ++push_counter; }
+    void Push(const unsigned long value)        { Push(L, value); ++push_counter; }
+    void Push(const int value)                  { Push(L, value); ++push_counter; }
+    void Push(const unsigned int value)         { Push(L, value); ++push_counter; }
+    void Push(const bool value)                 { Push(L, value); ++push_counter; }
+    void Push(const float value)                { Push(L, value); ++push_counter; }
+    void Push(const double value)               { Push(L, value); ++push_counter; }
+    void Push(const std::string& value)         { Push(L, value); ++push_counter; }
+    void Push(const char* value)                { Push(L, value); ++push_counter; }
     template<typename T>
-    void HookPush(T const* ptr)                     { Push(ptr); ++push_counter; }
+    void Push(T const* ptr)                     { Push(L, ptr); ++push_counter; }
 
-    int32 boundMapId;
 public:
-
     lua_State* L;
     EventMgr* eventMgr;
 
@@ -278,29 +243,28 @@ public:
         return E;
     }
 
-    // can be used by anything, including methods.
-    void Push(); // nil
-    void Push(const long long);
-    void Push(const unsigned long long);
-    void Push(const long);
-    void Push(const unsigned long);
-    void Push(const int);
-    void Push(const unsigned int);
-    void Push(const bool);
-    void Push(const float);
-    void Push(const double);
-    void Push(const std::string&);
-    void Push(const char*);
-    void Push(Object const* obj);
-    void Push(WorldObject const* obj);
-    void Push(Unit const* unit);
-    void Push(Pet const* pet);
-    void Push(TempSummon const* summon);
-    void Push(ObjectGuid const guid);
+    // Static pushes, can be used by anything, including methods.
+    static void Push(lua_State* luastate); // nil
+    static void Push(lua_State* luastate, const long long);
+    static void Push(lua_State* luastate, const unsigned long long);
+    static void Push(lua_State* luastate, const long);
+    static void Push(lua_State* luastate, const unsigned long);
+    static void Push(lua_State* luastate, const int);
+    static void Push(lua_State* luastate, const unsigned int);
+    static void Push(lua_State* luastate, const bool);
+    static void Push(lua_State* luastate, const float);
+    static void Push(lua_State* luastate, const double);
+    static void Push(lua_State* luastate, const std::string&);
+    static void Push(lua_State* luastate, const char*);
+    static void Push(lua_State* luastate, Object const* obj);
+    static void Push(lua_State* luastate, WorldObject const* obj);
+    static void Push(lua_State* luastate, Unit const* unit);
+    static void Push(lua_State* luastate, Pet const* pet);
+    static void Push(lua_State* luastate, TempSummon const* summon);
     template<typename T>
-    void Push(T const* ptr)
+    static void Push(lua_State* luastate, T const* ptr)
     {
-        ElunaTemplate<T>::Push(this, ptr);
+        ElunaTemplate<T>::Push(luastate, ptr);
     }
 
     /*
@@ -327,11 +291,10 @@ public:
      */
     void PushInstanceData(lua_State* L, ElunaInstanceAI* ai, bool incrementCounter = true);
 
+    //void RunScripts();
     void RunScripts();
-    bool IsEnabled() const { return enabled; }
     bool HasLuaState() const { return L != NULL; }
-    uint64 GetCallstackId() const { return callstackid; }
-    int Register(lua_State* L, uint8 reg, uint32 entry, ObjectGuid guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);
+    int Register(lua_State* L, uint8 reg, uint32 entry, uint64 guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);
     void UpdateEluna(uint32 diff);
 
     // Checks
@@ -356,7 +319,7 @@ public:
     void OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* obj);
     bool OnCommand(Player* player, const char* text);
     void OnWorldUpdate(uint32 diff);
-    void OnLootItem(Player* pPlayer, Item* pItem, uint32 count, ObjectGuid guid);
+    void OnLootItem(Player* pPlayer, Item* pItem, uint32 count, uint64 guid);
     void OnLootMoney(Player* pPlayer, uint32 amount);
     void OnFirstLogin(Player* pPlayer);
     void OnEquip(Player* pPlayer, Item* pItem, uint8 bag, uint8 slot);
@@ -461,7 +424,7 @@ public:
     bool OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, Channel* pChannel);
     bool OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, Player* pReceiver);
     void OnEmote(Player* pPlayer, uint32 emote);
-    void OnTextEmote(Player* pPlayer, uint32 textEmote, uint32 emoteNum, ObjectGuid guid);
+    void OnTextEmote(Player* pPlayer, uint32 textEmote, uint32 emoteNum, uint64 guid);
     void OnSpellCast(Player* pPlayer, Spell* pSpell, bool skipCheck);
     void OnLogin(Player* pPlayer);
     void OnLogout(Player* pPlayer);
@@ -510,12 +473,12 @@ public:
     void OnBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
 
     /* Group */
-    void OnAddMember(Group* group, ObjectGuid guid);
-    void OnInviteMember(Group* group, ObjectGuid guid);
-    void OnRemoveMember(Group* group, ObjectGuid guid, uint8 method);
-    void OnChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid);
+    void OnAddMember(Group* group, uint64 guid);
+    void OnInviteMember(Group* group, uint64 guid);
+    void OnRemoveMember(Group* group, uint64 guid, uint8 method);
+    void OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
     void OnDisband(Group* group);
-    void OnCreate(Group* group, ObjectGuid leaderGuid, GroupType groupType);
+    void OnCreate(Group* group, uint64 leaderGuid, GroupType groupType);
 
     /* Map */
     void OnCreate(Map* map);
@@ -564,10 +527,11 @@ public:
 #endif
     void OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
+
+    void _ReloadEluna();
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);
 template<> WorldObject* Eluna::CHECKOBJ<WorldObject>(lua_State* L, int narg, bool error);
 template<> ElunaObject* Eluna::CHECKOBJ<ElunaObject>(lua_State* L, int narg, bool error);
-
 #endif

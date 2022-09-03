@@ -14,15 +14,11 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT, ENTRY) \
-    if (!IsEnabled())\
-        return;\
     auto key = EntryKey<ItemEvents>(EVENT, ENTRY);\
     if (!ItemEventBindings->HasBindingsFor(key))\
         return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, ENTRY, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto key = EntryKey<ItemEvents>(EVENT, ENTRY);\
     if (!ItemEventBindings->HasBindingsFor(key))\
         return RETVAL;
@@ -30,19 +26,19 @@ using namespace Hooks;
 void Eluna::OnDummyEffect(WorldObject* pCaster, uint32 spellId, SpellEffIndex effIndex, Item* pTarget)
 {
     START_HOOK(ITEM_EVENT_ON_DUMMY_EFFECT, pTarget->GetEntry());
-    HookPush(pCaster);
-    HookPush(spellId);
-    HookPush(effIndex);
-    HookPush(pTarget);
+    Push(pCaster);
+    Push(spellId);
+    Push(effIndex);
+    Push(pTarget);
     CallAllFunctions(ItemEventBindings, key);
 }
 
 bool Eluna::OnQuestAccept(Player* pPlayer, Item* pItem, Quest const* pQuest)
 {
     START_HOOK_WITH_RETVAL(ITEM_EVENT_ON_QUEST_ACCEPT, pItem->GetEntry(), false);
-    HookPush(pPlayer);
-    HookPush(pItem);
-    HookPush(pQuest);
+    Push(pPlayer);
+    Push(pItem);
+    Push(pQuest);
     return CallAllFunctionsBool(ItemEventBindings, key);
 }
 
@@ -69,7 +65,7 @@ bool Eluna::OnUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets)
     // This is a hack fix to stop spell casting visual bug when a spell is not cast on use
     WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, 18);
     data << uint8(59); // EQUIP_ERR_NONE / EQUIP_ERR_CANT_BE_DISENCHANTED
-    data << guid;
+    data << ObjectGuid(guid);
     data << ObjectGuid(uint64(0));
     data << uint8(0);
 #ifdef CMANGOS
@@ -83,32 +79,32 @@ bool Eluna::OnUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets)
 bool Eluna::OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets)
 {
     START_HOOK_WITH_RETVAL(ITEM_EVENT_ON_USE, pItem->GetEntry(), true);
-    HookPush(pPlayer);
-    HookPush(pItem);
+    Push(pPlayer);
+    Push(pItem);
 #if defined TRINITY || AZEROTHCORE
     if (GameObject* target = targets.GetGOTarget())
-        HookPush(target);
+        Push(target);
     else if (Item* target = targets.GetItemTarget())
-        HookPush(target);
+        Push(target);
     else if (Corpse* target = targets.GetCorpseTarget())
-        HookPush(target);
+        Push(target);
     else if (Unit* target = targets.GetUnitTarget())
-        HookPush(target);
+        Push(target);
     else if (WorldObject* target = targets.GetObjectTarget())
-        HookPush(target);
+        Push(target);
     else
-        HookPush();
+        Push();
 #else
     if (GameObject* target = targets.getGOTarget())
-        HookPush(target);
+        Push(target);
     else if (Item* target = targets.getItemTarget())
-        HookPush(target);
+        Push(target);
     else if (Corpse* target = pPlayer->GetMap()->GetCorpse(targets.getCorpseTargetGuid()))
-        HookPush(target);
+        Push(target);
     else if (Unit* target = targets.getUnitTarget())
-        HookPush(target);
+        Push(target);
     else
-        HookPush();
+        Push();
 #endif
 
     return CallAllFunctionsBool(ItemEventBindings, key, true);
@@ -117,15 +113,15 @@ bool Eluna::OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targ
 bool Eluna::OnExpire(Player* pPlayer, ItemTemplate const* pProto)
 {
     START_HOOK_WITH_RETVAL(ITEM_EVENT_ON_EXPIRE, pProto->ItemId, false);
-    HookPush(pPlayer);
-    HookPush(pProto->ItemId);
+    Push(pPlayer);
+    Push(pProto->ItemId);
     return CallAllFunctionsBool(ItemEventBindings, key);
 }
 
 bool Eluna::OnRemove(Player* pPlayer, Item* pItem)
 {
     START_HOOK_WITH_RETVAL(ITEM_EVENT_ON_REMOVE, pItem->GetEntry(), false);
-    HookPush(pPlayer);
-    HookPush(pItem);
+    Push(pPlayer);
+    Push(pItem);
     return CallAllFunctionsBool(ItemEventBindings, key);
 }

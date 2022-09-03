@@ -22,7 +22,7 @@ int Eluna::SetupStack(BindingMap<K1>* bindings1, BindingMap<K2>* bindings2, cons
     ASSERT(key1.event_id == key2.event_id);
     // Stack: [arguments]
 
-    HookPush(key1.event_id);
+    Push(key1.event_id);
     this->push_counter = 0;
     ++number_of_arguments;
     // Stack: [arguments], event_id
@@ -52,7 +52,7 @@ void Eluna::ReplaceArgument(T value, uint8 index)
     ASSERT(index < lua_gettop(L) && index > 0);
     // Stack: event_id, [arguments], [functions], [results]
 
-    Push(value);
+    Eluna::Push(L, value);
     // Stack: event_id, [arguments], [functions], [results], value
 
     lua_replace(L, index + 1);

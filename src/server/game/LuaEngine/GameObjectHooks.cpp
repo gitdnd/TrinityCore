@@ -15,15 +15,11 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT, ENTRY) \
-    if (!IsEnabled())\
-        return;\
     auto key = EntryKey<GameObjectEvents>(EVENT, ENTRY);\
     if (!GameObjectEventBindings->HasBindingsFor(key))\
         return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, ENTRY, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto key = EntryKey<GameObjectEvents>(EVENT, ENTRY);\
     if (!GameObjectEventBindings->HasBindingsFor(key))\
         return RETVAL;
@@ -31,10 +27,10 @@ using namespace Hooks;
 void Eluna::OnDummyEffect(WorldObject* pCaster, uint32 spellId, SpellEffIndex effIndex, GameObject* pTarget)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_DUMMY_EFFECT, pTarget->GetEntry());
-    HookPush(pCaster);
-    HookPush(spellId);
-    HookPush(effIndex);
-    HookPush(pTarget);
+    Push(pCaster);
+    Push(spellId);
+    Push(effIndex);
+    Push(pTarget);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
@@ -42,35 +38,35 @@ void Eluna::UpdateAI(GameObject* pGameObject, uint32 diff)
 {
     pGameObject->elunaEvents->Update(diff);
     START_HOOK(GAMEOBJECT_EVENT_ON_AIUPDATE, pGameObject->GetEntry());
-    HookPush(pGameObject);
-    HookPush(diff);
+    Push(pGameObject);
+    Push(diff);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 bool Eluna::OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest)
 {
     START_HOOK_WITH_RETVAL(GAMEOBJECT_EVENT_ON_QUEST_ACCEPT, pGameObject->GetEntry(), false);
-    HookPush(pPlayer);
-    HookPush(pGameObject);
-    HookPush(pQuest);
+    Push(pPlayer);
+    Push(pGameObject);
+    Push(pQuest);
     return CallAllFunctionsBool(GameObjectEventBindings, key);
 }
 
 bool Eluna::OnQuestReward(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest, uint32 opt)
 {
     START_HOOK_WITH_RETVAL(GAMEOBJECT_EVENT_ON_QUEST_REWARD, pGameObject->GetEntry(), false);
-    HookPush(pPlayer);
-    HookPush(pGameObject);
-    HookPush(pQuest);
-    HookPush(opt);
+    Push(pPlayer);
+    Push(pGameObject);
+    Push(pQuest);
+    Push(opt);
     return CallAllFunctionsBool(GameObjectEventBindings, key);
 }
 
 void Eluna::GetDialogStatus(const Player* pPlayer, const GameObject* pGameObject)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_DIALOG_STATUS, pGameObject->GetEntry());
-    HookPush(pPlayer);
-    HookPush(pGameObject);
+    Push(pPlayer);
+    Push(pGameObject);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
@@ -79,16 +75,16 @@ void Eluna::GetDialogStatus(const Player* pPlayer, const GameObject* pGameObject
 void Eluna::OnDestroyed(GameObject* pGameObject, WorldObject* attacker)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_DESTROYED, pGameObject->GetEntry());
-    HookPush(pGameObject);
-    HookPush(attacker);
+    Push(pGameObject);
+    Push(attacker);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 void Eluna::OnDamaged(GameObject* pGameObject, WorldObject* attacker)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_DAMAGED, pGameObject->GetEntry());
-    HookPush(pGameObject);
-    HookPush(attacker);
+    Push(pGameObject);
+    Push(attacker);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 #endif
@@ -97,44 +93,44 @@ void Eluna::OnDamaged(GameObject* pGameObject, WorldObject* attacker)
 void Eluna::OnLootStateChanged(GameObject* pGameObject, uint32 state)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_LOOT_STATE_CHANGE, pGameObject->GetEntry());
-    HookPush(pGameObject);
-    HookPush(state);
+    Push(pGameObject);
+    Push(state);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 void Eluna::OnGameObjectStateChanged(GameObject* pGameObject, uint32 state)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_GO_STATE_CHANGED, pGameObject->GetEntry());
-    HookPush(pGameObject);
-    HookPush(state);
+    Push(pGameObject);
+    Push(state);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 void Eluna::OnSpawn(GameObject* pGameObject)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_SPAWN, pGameObject->GetEntry());
-    HookPush(pGameObject);
+    Push(pGameObject);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 void Eluna::OnAddToWorld(GameObject* pGameObject)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_ADD, pGameObject->GetEntry());
-    HookPush(pGameObject);
+    Push(pGameObject);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 void Eluna::OnRemoveFromWorld(GameObject* pGameObject)
 {
     START_HOOK(GAMEOBJECT_EVENT_ON_REMOVE, pGameObject->GetEntry());
-    HookPush(pGameObject);
+    Push(pGameObject);
     CallAllFunctions(GameObjectEventBindings, key);
 }
 
 bool Eluna::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
 {
     START_HOOK_WITH_RETVAL(GAMEOBJECT_EVENT_ON_USE, pGameObject->GetEntry(), false);
-    HookPush(pGameObject);
-    HookPush(pPlayer);
+    Push(pGameObject);
+    Push(pPlayer);
     return CallAllFunctionsBool(GameObjectEventBindings, key);
 }
