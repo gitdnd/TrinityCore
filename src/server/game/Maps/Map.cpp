@@ -4791,7 +4791,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 areaLightId, uint32 overrid
 
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (Player* player = itr->GetSource())
-                if (player->GetZoneId() == zoneId)
+                //if (player->GetZoneId() == zoneId)
                     player->SendDirectMessage(overrideLight.GetRawPacket());
     }
 }
