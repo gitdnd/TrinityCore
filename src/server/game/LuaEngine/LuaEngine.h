@@ -112,10 +112,12 @@ struct LuaScript
     std::string filename;
     std::string filepath;
     std::string modulepath;
+    std::string filedata;
+    int32 mapId;
 };
 
+#define ELUNA_OBJECT_STORE  "Eluna Object Store"
 #define ELUNA_STATE_PTR     "Eluna State Ptr"
-#define LOCK_ELUNA Eluna::Guard __guard(Eluna::GetLock())
 
 #ifndef TRINITY
 #define TC_GAME_API
@@ -126,21 +128,14 @@ public:
     typedef std::list<LuaScript> ScriptList;
 
     typedef std::recursive_mutex LockType;
-    typedef std::lock_guard<LockType> Guard;
+    Eluna(int32 MapId);
+    ~Eluna();
 
+    // Prevent copy
+    Eluna(Eluna const&) = delete;
+    Eluna& operator=(const Eluna&) = delete;
 private:
-    static bool reload;
-    static bool initialized;
-    static LockType lock;
-
-    // Lua script locations
-    static ScriptList lua_scripts;
-    static ScriptList lua_extensions;
-
-    // Lua script folder path
-    static std::string lua_folderpath;
-    // lua path variable for require() function
-    static std::string lua_requirepath;
+    int32 boundMapId;
 
     // A counter for lua event stacks that occur (see event_level).
     // This is used to determine whether an object belongs to the current call stack or not.
@@ -161,26 +156,12 @@ private:
     // Map from map ID -> Lua table ref
     std::unordered_map<uint32, int> continentDataRefs;
 
-    Eluna();
-    ~Eluna();
-
-    // Prevent copy
-    Eluna(Eluna const&) = delete;
-    Eluna& operator=(const Eluna&) = delete;
-
     void OpenLua();
     void CloseLua();
     void DestroyBindStores();
     void CreateBindStores();
     void InvalidateObjects();
     bool ExecuteCall(int params, int res);
-
-    // Use ReloadEluna() to make eluna reload
-    // This is called on world update to reload eluna
-    static void _ReloadEluna();
-    static void LoadScriptPaths();
-    static void GetScripts(std::string path);
-    static void AddScriptPath(std::string filename, const std::string& fullpath);
 
     static int StackTrace(lua_State *_L);
     static void Report(lua_State* _L);
@@ -227,8 +208,6 @@ private:
     void Push(T const* ptr)                     { Push(L, ptr); ++push_counter; }
 
 public:
-    static Eluna* GEluna;
-
     lua_State* L;
     EventMgr* eventMgr;
 
@@ -252,12 +231,6 @@ public:
 
     BindingMap< UniqueObjectKey<Hooks::CreatureEvents> >*  CreatureUniqueBindings;
 
-    static void Initialize();
-    static void Uninitialize();
-    // This function is used to make eluna reload
-    static void ReloadEluna() { LOCK_ELUNA; reload = true; }
-    static LockType& GetLock() { return lock; };
-    static bool IsInitialized() { return initialized; }
     // Never returns nullptr
     static Eluna* GetEluna(lua_State* L)
     {
@@ -318,11 +291,9 @@ public:
      */
     void PushInstanceData(lua_State* L, ElunaInstanceAI* ai, bool incrementCounter = true);
 
+    //void RunScripts();
     void RunScripts();
-    bool ShouldReload() const { return reload; }
-    bool IsEnabled() const { return enabled && IsInitialized(); }
     bool HasLuaState() const { return L != NULL; }
-    uint64 GetCallstackId() const { return callstackid; }
     int Register(lua_State* L, uint8 reg, uint32 entry, uint64 guid, uint32 instanceId, uint32 event_id, int functionRef, uint32 shots);
 
     // Checks
@@ -553,11 +524,13 @@ public:
 #endif
     void OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
     void OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId);
+
+    void _ReloadEluna();
+
+    int32 GetBoundMapId() const { return boundMapId; }
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(lua_State* L, int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(lua_State* L, int narg, bool error);
 template<> WorldObject* Eluna::CHECKOBJ<WorldObject>(lua_State* L, int narg, bool error);
 template<> ElunaObject* Eluna::CHECKOBJ<ElunaObject>(lua_State* L, int narg, bool error);
-
-#define sEluna Eluna::GEluna
 #endif

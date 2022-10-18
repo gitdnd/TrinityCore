@@ -264,7 +264,7 @@ extern int main(int argc, char** argv)
         sOutdoorPvPMgr->Die();                     // unload it before MapManager
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
 #ifdef ELUNA
-        Eluna::Uninitialize();
+        //Eluna::Uninitialize();
 #endif
     });
 

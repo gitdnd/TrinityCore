@@ -18,6 +18,7 @@
 #include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
@@ -46,6 +47,7 @@
 #include "VMapFactory.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaLoader.h"
 #endif
 #include "Weather.h"
 #include "WeatherMgr.h"
@@ -77,6 +79,9 @@ Map::~Map()
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
+    //eluna->Uninitialize();
+    delete eluna;
+    eluna = nullptr;
 
     // Delete all waiting spawns, else there will be a memory leak
     // This doesn't delete from database.
@@ -276,7 +281,15 @@ m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transpo
 i_gridExpiry(expiry),
 i_scriptLock(false), _respawnCheckTimer(0)
 {
+    // lua state begins uninitialized
+    eluna = nullptr;
+
     m_parentMap = (_parent ? _parent : this);
+
+    if (sElunaLoader->ShouldMapLoadEluna(id))
+        if(IsParent()) // We are the parent map load eluna
+            eluna = new Eluna(id);
+
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)
@@ -3531,10 +3544,13 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
 #ifdef ELUNA
-    if (Creature* creature = obj->ToCreature())
-        sEluna->OnRemove(creature);
-    else if (GameObject* gameobject = obj->ToGameObject())
-        sEluna->OnRemove(gameobject);
+    if (GetEluna())
+    {
+        if (Creature* creature = obj->ToCreature())
+            GetEluna()->OnRemove(creature);
+        else if (GameObject* gameobject = obj->ToGameObject())
+            GetEluna()->OnRemove(gameobject);
+    }
 #endif
 
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
@@ -3976,9 +3992,12 @@ void InstanceMap::CreateInstanceData(bool load)
     bool isElunaAI = false;
 
 #ifdef ELUNA
-    i_data = sEluna->GetInstanceData(this);
-    if (i_data)
-        isElunaAI = true;
+    if (GetEluna())
+    {
+        i_data = GetEluna()->GetInstanceData(this);
+        if (i_data)
+            isElunaAI = true;
+    }
 #endif
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID

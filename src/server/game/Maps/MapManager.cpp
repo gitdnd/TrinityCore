@@ -52,7 +52,7 @@ void MapManager::Initialize()
     Map::InitStateMachine();
 
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
-#if ELUNA
+/*#if ELUNA
     if (num_threads > 1)
     {
         // Force 1 thread for Eluna as lua is single threaded. By default thread count is 1
@@ -60,7 +60,7 @@ void MapManager::Initialize()
         TC_LOG_ERROR("maps", "Map update threads set to %i, when Eluna only allows 1, changing to 1", num_threads);
         num_threads = 1;
     }
-#endif
+#endif*/
     // Start mtmaps if needed.
     if (num_threads > 0)
         m_updater.activate(num_threads);
@@ -372,7 +372,47 @@ void MapManager::FreeInstanceId(uint32 instanceId)
     _nextInstanceId = std::min(instanceId, _nextInstanceId);
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
-    sEluna->OnFreeInstanceId(instanceId);
-    sEluna->FreeInstanceId(instanceId);
+    sWorld->GetEluna()->OnFreeInstanceId(instanceId);
+    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
+    {
+        Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
+        if (iMap)
+            if(iMap->GetEluna())
+                iMap->GetEluna()->FreeInstanceId(instanceId);
+    }
 #endif
+}
+
+void MapManager::ReloadEluna(int32 mapId)
+{
+    // Reloads the global Eluna state
+    if(mapId == -1)
+        sWorld->GetEluna()->_ReloadEluna();
+
+    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
+    {
+        Map* map = itr->second;
+        if (mapId >= 0 && uint32(mapId) == itr->first)
+        {
+            if (map->GetEluna())
+                map->GetEluna()->_ReloadEluna();
+        }
+        else // all case
+        {
+            if (map->GetEluna())
+                map->GetEluna()->_ReloadEluna();
+        }
+        // Only if each instance gets a state.
+        /*
+        if (!map->Instanceable())
+            continue;
+
+        MapInstanced::InstancedMaps& maps = ((MapInstanced*)map)->GetInstancedMaps();
+        for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
+        {
+            if (mitr->second->GetEluna())
+                mitr->second->GetEluna()->_ReloadEluna();
+        }*/
+    }
+
 }

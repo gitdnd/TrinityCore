@@ -431,7 +431,9 @@ Unit::~Unit()
 void Unit::Update(uint32 p_time)
 {
 #ifdef ELUNA
-    elunaEvents->Update(p_time);
+    // only update events if you are on a Lua state enabled map
+    if(elunaEvents && GetMap()->GetEluna())
+        elunaEvents->Update(p_time);
 #endif
 
     // WARNING! Order of execution here is important, do not change.
@@ -13633,7 +13635,7 @@ std::string Unit::GetDebugInfo() const
     return sstr.str();
 }
 
-void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto)
+void Unit::OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* /*cleanDamage*/, DamageEffectType damagetype, SpellSchoolMask /*damageSchoolMask*/, SpellInfo const* spellProto)
 {
     if (GetTypeId() != TYPEID_PLAYER)
         return;

@@ -15,20 +15,14 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
-    if (!IsEnabled())\
-        return;\
     auto key = EventKey<ServerEvents>(EVENT);\
     if (!ServerEventBindings->HasBindingsFor(key))\
-        return;\
-    LOCK_ELUNA
+        return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto key = EventKey<ServerEvents>(EVENT);\
     if (!ServerEventBindings->HasBindingsFor(key))\
-        return RETVAL;\
-    LOCK_ELUNA
+        return RETVAL;
 
 bool Eluna::OnAddonMessage(Player* sender, uint32 type, std::string& msg, Player* receiver, Guild* guild, Group* group, Channel* channel)
 {
@@ -66,7 +60,6 @@ bool Eluna::OnAddonMessage(Player* sender, uint32 type, std::string& msg, Player
 
 void Eluna::OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* obj)
 {
-    LOCK_ELUNA;
     ASSERT(!event_level);
 
     // Get function
@@ -292,12 +285,6 @@ void Eluna::OnShutdownCancel()
 
 void Eluna::OnWorldUpdate(uint32 diff)
 {
-    {
-        LOCK_ELUNA;
-        if (ShouldReload())
-            _ReloadEluna();
-    }
-
     eventMgr->globalProcessor->Update(diff);
 
     START_HOOK(WORLD_EVENT_ON_UPDATE);
@@ -350,9 +337,11 @@ void Eluna::OnPlayerLeave(Map* map, Player* player)
 
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
+    // only update the globalProcessor if the map being updated is the parent map
+    if(map->IsParent())
+        eventMgr->globalProcessor->Update(diff);
+
     START_HOOK(MAP_EVENT_ON_UPDATE);
-    // enable this for multithread
-    // eventMgr->globalProcessor->Update(diff);
     Push(map);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);

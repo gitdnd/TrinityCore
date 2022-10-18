@@ -247,8 +247,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     sScriptMgr->OnPacketSend(this, *packet);
 
 #ifdef ELUNA
-    if (!sEluna->OnPacketSend(this, *packet))
-        return;
+    //if (!Eluna::GEluna->OnPacketSend(this, *packet))
+        //return;
 #endif
 
     TC_LOG_TRACE("network.opcode", "S->C: %s %s", GetPlayerInfo().c_str(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())).c_str());
@@ -282,11 +282,6 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
-    if (diff > 200)
-    {
-        TC_LOG_ERROR("network", "Update diff over 100ms: %u", diff);
-    }
-
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
@@ -327,7 +322,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 {
                     sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                    if (!sEluna->OnPacketReceive(this, *packet))
+                    if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
                         break;
 #endif
                     opHandle->Call(this, *packet);
@@ -350,7 +345,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     // not expected _player or must checked in packet hanlder
                     sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                    if (!sEluna->OnPacketReceive(this, *packet))
+                    if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
                         break;
 #endif
                     opHandle->Call(this, *packet);
@@ -371,10 +366,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     }
 
                     sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                    if (!sEluna->OnPacketReceive(this, *packet))
+
+                    if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
                         break;
-#endif
+
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
                 }
@@ -401,7 +396,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                 sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                if (!sEluna->OnPacketReceive(this, *packet))
+                if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
                     break;
 #endif
                 opHandle->Call(this, *packet);

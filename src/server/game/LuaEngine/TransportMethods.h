@@ -5,46 +5,46 @@
 
 namespace LuaTransport
 {
-    int EnableMovement(lua_State* L, Transport* obj)
+    int EnableMovement(Eluna* E, Transport* obj)
     {
-        bool state = Eluna::CHECKVAL<bool>(L, 2);
+        bool state = Eluna::CHECKVAL<bool>(E->L, 2);
         obj->EnableMovement(state);
         return 0;
     }
 
-    int AddPassenger(lua_State* L, Transport* obj)
+    int AddPassenger(Eluna* E, Transport* obj)
     {
-        WorldObject* worldObj = Eluna::CHECKOBJ<WorldObject>(L, 2);
+        WorldObject* worldObj = Eluna::CHECKOBJ<WorldObject>(E->L, 2);
         obj->AddPassenger(worldObj);
         return 0;
     }
 
-    int GetPassengers(lua_State* L, Transport* obj)
+    int GetPassengers(Eluna* E, Transport* obj)
     {
         auto list = obj->GetPassengers();
-        lua_createtable(L, list.size(), 0);
-        int tbl = lua_gettop(L);
+        lua_createtable(E->L, list.size(), 0);
+        int tbl = lua_gettop(E->L);
         uint32 i = 0;
 
         for (auto it = list.begin(); it != list.end(); ++it)
         {
-            Eluna::Push(L, *it);
-            lua_rawseti(L, tbl, ++i);
+            Eluna::Push(E->L, *it);
+            lua_rawseti(E->L, tbl, ++i);
         }
 
-        lua_settop(L, tbl);
+        lua_settop(E->L, tbl);
         return 1;
     }
 
-    int SummonPassenger(lua_State* L, Transport* obj)
+    int SummonPassenger(Eluna* E, Transport* obj)
     {
-        auto entry = Eluna::CHECKVAL<uint32>(L, 2);
-        auto x = Eluna::CHECKVAL<int32>(L, 3);
-        auto y = Eluna::CHECKVAL<int32>(L, 4);
-        auto z = Eluna::CHECKVAL<int32>(L, 5);
-        auto o = Eluna::CHECKVAL<int32>(L, 6);
-        auto summonType = Eluna::CHECKVAL<uint32>(L, 7);
-        Eluna::Push(L, obj->SummonPassenger(entry, Position(x, y, z, o), (TempSummonType)summonType));
+        auto entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        auto x = Eluna::CHECKVAL<int32>(E->L, 3);
+        auto y = Eluna::CHECKVAL<int32>(E->L, 4);
+        auto z = Eluna::CHECKVAL<int32>(E->L, 5);
+        auto o = Eluna::CHECKVAL<int32>(E->L, 6);
+        auto summonType = Eluna::CHECKVAL<uint32>(E->L, 7);
+        Eluna::Push(E->L, obj->SummonPassenger(entry, Position(x, y, z, o), (TempSummonType)summonType));
         return 1;
     }
 };

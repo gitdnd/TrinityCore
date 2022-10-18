@@ -292,7 +292,8 @@ void Creature::AddToWorld()
             GetZoneScript()->OnCreatureCreate(this);
 
 #ifdef ELUNA
-        sEluna->OnAddToWorld(this);
+        if (GetMap()->GetEluna())
+            GetMap()->GetEluna()->OnAddToWorld(this);
 #endif
     }
 }
@@ -302,7 +303,8 @@ void Creature::RemoveFromWorld()
     if (IsInWorld())
     {
 #ifdef ELUNA
-        sEluna->OnRemoveFromWorld(this);
+        if (GetMap()->GetEluna())
+            GetMap()->GetEluna()->OnRemoveFromWorld(this);
 #endif
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
@@ -2033,9 +2035,12 @@ void Creature::setDeathState(DeathState s)
         Unit::setDeathState(CORPSE);
 
         auto map = GetMap();
-        if (map->IsDungeon() || map->IsRaid())
+        if (map->GetEluna())
         {
-            sEluna->OnScoredCreatureDied(map, this);
+            if (map->IsDungeon() || map->IsRaid())
+            {
+                map->GetEluna()->OnScoredCreatureDied(map, this);
+            }
         }
     }
     else if (s == JUST_RESPAWNED)
@@ -3485,9 +3490,9 @@ void Creature::UpdateDungeonScaling()
         if (dungeonLevel < 50)
             dungeonLevelMod *= 0.5;
         else if (dungeonLevel < 60)
-            dungeonLevelMod *= 0.65;
+            dungeonLevelMod *= 0.65f;
         else if (dungeonLevel < 75)
-            dungeonLevelMod *= 0.8;
+            dungeonLevelMod *= 0.8f;
         else if (dungeonLevel > 250)
             dungeonLevelMod *= (float(std::pow(dungeonLevel, 2)) / 500000.0f) + 0.88f;
 
@@ -3496,7 +3501,7 @@ void Creature::UpdateDungeonScaling()
         // FIXME(Harry): Come up with a better scaling system
         float dungeonDamageLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
         if (dungeonLevel < 50)
-            dungeonDamageLevelMod *= 0.5;
+            dungeonDamageLevelMod *= 0.5f;
         else if (dungeonLevel > 250)
             dungeonDamageLevelMod *= (float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f;
 

@@ -14,24 +14,18 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT, CREATURE) \
-    if (!IsEnabled())\
-        return;\
     auto entry_key = EntryKey<CreatureEvents>(EVENT, CREATURE->GetEntry());\
     auto unique_key = UniqueObjectKey<CreatureEvents>(EVENT, CREATURE->GET_GUID(), CREATURE->GetInstanceId());\
     if (!CreatureEventBindings->HasBindingsFor(entry_key))\
         if (!CreatureUniqueBindings->HasBindingsFor(unique_key))\
-            return;\
-    LOCK_ELUNA
+            return;
 
 #define START_HOOK_WITH_RETVAL(EVENT, CREATURE, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto entry_key = EntryKey<CreatureEvents>(EVENT, CREATURE->GetEntry());\
     auto unique_key = UniqueObjectKey<CreatureEvents>(EVENT, CREATURE->GET_GUID(), CREATURE->GetInstanceId());\
     if (!CreatureEventBindings->HasBindingsFor(entry_key))\
         if (!CreatureUniqueBindings->HasBindingsFor(unique_key))\
-            return RETVAL;\
-    LOCK_ELUNA
+            return RETVAL;
 
 void Eluna::OnDummyEffect(WorldObject* pCaster, uint32 spellId, SpellEffIndex effIndex, Creature* pTarget)
 {

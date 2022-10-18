@@ -38,7 +38,7 @@ extern "C"
 #include "BattleGroundMethods.h"
 #include "TransportMethods.h"
 
-luaL_Reg GlobalMethods[] =
+ElunaGlobal::ElunaRegister GlobalMethods[] =
 {
     // Hooks
     { "RegisterPacketEvent", &LuaGlobalFunctions::RegisterPacketEvent },
@@ -144,6 +144,7 @@ luaL_Reg GlobalMethods[] =
     { "CreateUint64", &LuaGlobalFunctions::CreateULongLong },
     { "StartGameEvent", &LuaGlobalFunctions::StartGameEvent },
     { "StopGameEvent", &LuaGlobalFunctions::StopGameEvent },
+    { "GetElunaMapId", &LuaGlobalFunctions::GetElunaMapId },
 
     { NULL, NULL }
 };

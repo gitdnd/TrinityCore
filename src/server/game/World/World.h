@@ -35,6 +35,9 @@
 #include <map>
 #include <unordered_map>
 
+#ifdef ELUNA
+class Eluna;
+#endif
 class Player;
 class WorldPacket;
 class WorldSession;
@@ -652,6 +655,9 @@ struct CharacterInfo
 /// The World
 class TC_GAME_API World
 {
+#ifdef ELUNA
+    friend class Eluna;
+#endif
     public:
         static World* instance();
 
@@ -741,6 +747,7 @@ class TC_GAME_API World
         void SendGMText(uint32 string_id, ...);
         void SendGMText(char const* text);
         void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
+        void SendServerGMMessage(ServerMessageType type, const char* text = "", Player* player = nullptr);
         void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
@@ -856,6 +863,11 @@ class TC_GAME_API World
         void TriggerGuidAlert();
         bool IsGuidWarning() { return _guidWarn; }
         bool IsGuidAlert() { return _guidAlert; }
+
+#ifdef ELUNA
+        Eluna* GetEluna() const { return eluna; }
+        Eluna* eluna;
+#endif
 
     protected:
         void _UpdateGameTime();

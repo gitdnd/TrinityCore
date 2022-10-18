@@ -14,20 +14,14 @@
 using namespace Hooks;
 
 #define START_HOOK(BINDINGS, EVENT, ENTRY) \
-    if (!IsEnabled())\
-        return;\
     auto key = EntryKey<GossipEvents>(EVENT, ENTRY);\
     if (!BINDINGS->HasBindingsFor(key))\
-        return;\
-    LOCK_ELUNA
+        return;
 
 #define START_HOOK_WITH_RETVAL(BINDINGS, EVENT, ENTRY, RETVAL) \
-    if (!IsEnabled())\
-        return RETVAL;\
     auto key = EntryKey<GossipEvents>(EVENT, ENTRY);\
     if (!BINDINGS->HasBindingsFor(key))\
-        return RETVAL;\
-    LOCK_ELUNA
+        return RETVAL;
 
 bool Eluna::OnGossipHello(Player* pPlayer, GameObject* pGameObject)
 {
