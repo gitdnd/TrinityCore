@@ -568,6 +568,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
 #ifdef ELUNA
         ElunaEventProcessor* elunaEvents;
+        
+        Eluna* GetEluna() const;
 #endif
 
         std::string GetDebugInfo() const override;
