@@ -57,6 +57,7 @@ class WorldPacket;
 class ZoneScript;
 #ifdef ELUNA
 class ElunaEventProcessor;
+class Eluna;
 #endif
 struct FactionTemplateEntry;
 struct PositionFullTerrainStatus;
