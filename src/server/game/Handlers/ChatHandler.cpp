@@ -294,7 +294,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
 
 #ifdef ELUNA
-            if (!sWorld->GetEluna()->OnChat(sender, type, lang, msg))
+            if (!sender->GetEluna()->OnChat(sender, type, lang, msg))
                 return;
 #endif
             chatSpy << "[SAY] " << msg.c_str();
@@ -335,7 +335,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
 
 #ifdef ELUNA
-            if (!sWorld->GetEluna()->OnChat(sender, type, lang, msg))
+            if (!sender->GetEluna()->OnChat(sender, type, lang, msg))
                 return;
 #endif
             if (lang != LANG_ADDON)
