@@ -3602,6 +3602,16 @@ std::string WorldObject::GetDebugInfo() const
     return sstr.str();
 }
 
+#ifdef ELUNA
+Eluna* WorldObject::GetEluna() const
+{
+    if (IsInWorld())
+        return GetMap()->GetEluna();
+
+    return nullptr;
+}
+#endif
+
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>&, uint32, float) const;
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::deque<GameObject*>&, uint32, float) const;
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::vector<GameObject*>&, uint32, float) const;
