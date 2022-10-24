@@ -788,6 +788,8 @@ ElunaRegister<Player> PlayerMethods[] =
     { "IsInstanceBound", &LuaPlayer::IsInstanceBound },
     { "GetTalentLevel", &LuaPlayer::GetTalentLevel },
     { "ScrapItem", &LuaPlayer::ScrapItem },
+    { "GetPortalLocation", &LuaPlayer::GetPortalLocation },
+    { "SetPortalLocation", &LuaPlayer::SetPortalLocation },
 
     { NULL, NULL }
 };

@@ -2228,6 +2228,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         float GetMagicFind() { return magicFind; }
         void SetMagicFind(float amount) { magicFind = amount; }
+
+        WorldLocation GetPortalLocation() { return _portalLocation; }
+        void SetPortalLocation(WorldLocation loc) { _portalLocation = loc; }
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -2565,6 +2569,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 talent_level;
         bool m_canTeleport;
         float magicFind;
+
+        WorldLocation _portalLocation;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

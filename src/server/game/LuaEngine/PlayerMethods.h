@@ -4470,5 +4470,27 @@ namespace LuaPlayer
 
         return 0;
     }
+
+    int SetPortalLocation(Eluna* E, Player* player)
+    {
+        uint32 mapId = Eluna::CHECKVAL<uint32>(E->L, 2);
+        float x = Eluna::CHECKVAL<float>(E->L, 3);
+        float y = Eluna::CHECKVAL<float>(E->L, 4);
+        float z = Eluna::CHECKVAL<float>(E->L, 5);
+        float o = Eluna::CHECKVAL<float>(E->L, 6);
+        player->SetPortalLocation(WorldLocation(mapId, x, y, z, o));
+        return 0;
+    }
+
+    int GetPortalLocation(Eluna* E, Player* player)
+    {
+        WorldLocation loc = player->GetPortalLocation();
+        Eluna::Push(E->L, loc.GetMapId());
+        Eluna::Push(E->L, loc.GetPositionX());
+        Eluna::Push(E->L, loc.GetPositionY());
+        Eluna::Push(E->L, loc.GetPositionZ());
+        Eluna::Push(E->L, loc.GetOrientation());
+        return 5;
+    }
 };
 #endif
