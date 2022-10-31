@@ -375,6 +375,9 @@ void MapManager::FreeInstanceId(uint32 instanceId)
     sWorld->GetEluna()->OnFreeInstanceId(instanceId);
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
+        if (!itr->second || !itr->second->Instanceable())
+            continue;
+
         Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
         if (iMap)
             if(iMap->GetEluna())
