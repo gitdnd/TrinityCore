@@ -353,10 +353,10 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
         switch (GetClass())
         {
-            case CLASS_HUNTER:
-                val2 = level * 2.0f + GetStat(STAT_AGILITY) - 10.0f;
-                break;
             case CLASS_ADVENTURER:
+            case CLASS_HUNTER:
+                val2 = level * 3.0f + GetStat(STAT_AGILITY) - 10.0f;
+                break;
             case CLASS_ROGUE:
                 val2 = level + GetStat(STAT_AGILITY) - 10.0f;
                 break;
@@ -465,12 +465,12 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     //add dynamic flat mods
     if (ranged)
     {
-        if ((GetClassMask() & CLASSMASK_WAND_USERS) == 0)
-        {
+        //if ((GetClassMask() & CLASSMASK_WAND_USERS) == 0)
+        //{
             AuraEffectList const& mRAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT);
             for (AuraEffect const* aurEff : mRAPbyStat)
                 attPowerMod += CalculatePct(GetStat(Stats(aurEff->GetMiscValue())), aurEff->GetAmount());
-        }
+        //}
     }
     else
     {
