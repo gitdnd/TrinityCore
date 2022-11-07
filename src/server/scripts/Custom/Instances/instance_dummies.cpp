@@ -122,6 +122,26 @@ public:
     }
 };
 
+class instance_arathor : public InstanceMapScript
+{
+public:
+    instance_arathor() : InstanceMapScript("instance_arathor", 759) { }
+
+    struct instance_arathor_InstanceMapScript : public InstanceScript
+    {
+        instance_arathor_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders("AR");
+            SetBossNumber(3);
+        }
+    };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_arathor_InstanceMapScript(map);
+    }
+};
+
 void AddSC_Instance_Dummies()
 {
     new instance_kara_crypts();
@@ -130,4 +150,5 @@ void AddSC_Instance_Dummies()
     new instance_valour_keep();
     new instance_worlds_end();
     new instance_stromgarde();
+    new instance_arathor();
 }
