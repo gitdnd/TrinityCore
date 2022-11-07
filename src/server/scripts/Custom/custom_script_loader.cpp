@@ -20,6 +20,7 @@
 void AddSC_GOMove_commandscript();
 void AddSC_FallOfDalaran();
 void AddSC_DragonIsles();
+void AddSC_WorldsEnd();
 void AddSC_chromie_script();
 void AddSC_Spells_Custom_Items();
 void AddSC_Spells_Custom_Talents();
@@ -34,6 +35,7 @@ void AddCustomScripts()
     AddSC_GOMove_commandscript();
     AddSC_FallOfDalaran();
     AddSC_DragonIsles();
+    AddSC_WorldsEnd();
     AddSC_chromie_script();
     AddSC_Spells_Custom_Items();
     AddSC_Spells_Custom_Talents();
