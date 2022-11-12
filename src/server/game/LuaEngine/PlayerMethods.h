@@ -8,6 +8,7 @@
 #define PLAYERMETHODS_H
 #include <Achievements\AchievementMgr.h>
 #include <DungeonFinding\LFGMgr.h>
+#include <Server/Packets/MiscPackets.h>
 
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
@@ -4491,6 +4492,23 @@ namespace LuaPlayer
         Eluna::Push(E->L, loc.GetPositionZ());
         Eluna::Push(E->L, loc.GetOrientation());
         return 5;
+    }
+
+    int SetOverrideLight(Eluna* E, Player* player)
+    {
+        uint32 areaLightId = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 overrideLightId = Eluna::CHECKVAL<uint32>(E->L, 3);
+        uint32 transitionMilliseconds = Eluna::CHECKVAL<uint32>(E->L, 4);
+
+        WorldPackets::Misc::OverrideLight overrideLight;
+        overrideLight.AreaLightID = areaLightId;
+        overrideLight.OverrideLightID = overrideLightId;
+        overrideLight.TransitionMilliseconds = transitionMilliseconds;
+        overrideLight.Write();
+
+        player->SendDirectMessage(overrideLight.GetRawPacket());
+        
+        return 0;
     }
 };
 #endif

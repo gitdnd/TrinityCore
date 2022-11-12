@@ -790,6 +790,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "ScrapItem", &LuaPlayer::ScrapItem },
     { "GetPortalLocation", &LuaPlayer::GetPortalLocation },
     { "SetPortalLocation", &LuaPlayer::SetPortalLocation },
+    { "SetOverrideLight", &LuaPlayer::SetOverrideLight },
 
     { NULL, NULL }
 };
