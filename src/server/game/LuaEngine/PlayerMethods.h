@@ -4457,13 +4457,13 @@ namespace LuaPlayer
                         if (gemProto->DisenchantID == 0)
                             continue;
 
-                        player->AutoStoreLoot(gemProto->DisenchantID, LootTemplates_Disenchant, true, false, false);
+                        player->AutoStoreLootNonPersonal(gemProto->DisenchantID, LootTemplates_Disenchant, true, false, false);
                     }
 
                 }
 
                 if(item->GetTemplate()->DisenchantID > 0)
-                    player->AutoStoreLoot(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, true, false, false);
+                    player->AutoStoreLootNonPersonal(item->GetTemplate()->DisenchantID, LootTemplates_Disenchant, true, false, false);
 
                 player->DestroyItemCount(item->GetEntry(), 1, true);
             }
