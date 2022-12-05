@@ -70,8 +70,10 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPackets::Guild::GuildDeclineInv
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_DECLINE [%s]", GetPlayerInfo().c_str());
 
+    if (GetPlayer()->GetGuildId())
+        return;
+
     GetPlayer()->SetGuildIdInvited(0);
-    GetPlayer()->SetInGuild(0);
 }
 
 void WorldSession::HandleGuildInfoOpcode(WorldPackets::Guild::GuildGetInfo& /*packet*/)
