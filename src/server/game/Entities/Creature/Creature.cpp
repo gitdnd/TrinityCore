@@ -2734,7 +2734,7 @@ CreatureMovementData const& Creature::GetMovementTemplate() const
     if (CreatureMovementData const* movementOverride = sObjectMgr->GetCreatureMovementOverride(m_spawnId))
         return *movementOverride;
     if (_movementDataOverride)
-        return const_cast<const CreatureMovementData*>(_movementDataOverride);
+        return *const_cast<const CreatureMovementData*>(_movementDataOverride);
 
     return GetCreatureTemplate()->Movement;
 }
