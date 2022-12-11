@@ -905,6 +905,8 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "ClearLoot", &LuaCreature::ClearLoot },
     { "AnimateAndSetFlyMode", &LuaCreature::AnimateAndSetFlyMode },
     { "AnimateAndSetLandMode", &LuaCreature::AnimateAndSetLandMode },
+    { "SetMovementDataOverride", &LuaCreature::SetMovementDataOverride },
+    { "ResetMovementDataOverride", &LuaCreature::ResetMovementDataOverride },
 
     { "RemoveQuest", &LuaCreature::RemoveQuest },
     { "AddQuest", &LuaCreature::AddQuest },
