@@ -366,8 +366,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void ApplyScaledResistances();
         void ApplyScaledArmor();
         void UpdateDungeonScaling();
-
-        void SetMovementDataOverride(CreatureMovementData* data) { _movementDataOverride = data; }
     protected:
         bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 entry, CreatureData const* data = nullptr, uint32 vehId = 0);
         bool InitEntry(uint32 entry, CreatureData const* data = nullptr);
@@ -451,8 +449,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Regenerate health
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
-
-        CreatureMovementData* _movementDataOverride;
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

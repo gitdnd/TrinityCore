@@ -1524,34 +1524,6 @@ auto const& threatlist = creature->getThreatManager().getThreatList();
         return 0;
     }
 
-    int SetMovementDataOverride(Eluna* E, Creature* creature)
-    {
-        int ground = Eluna::CHECKVAL<int>(E->L, 2);
-        bool swim = Eluna::CHECKVAL<bool>(E->L, 3);
-        int flight = Eluna::CHECKVAL<int>(E->L, 4);
-        bool rooted = Eluna::CHECKVAL<bool>(E->L, 5);
-        int chase = Eluna::CHECKVAL<int>(E->L, 6);
-        int random = Eluna::CHECKVAL<int>(E->L, 7);
-
-        CreatureMovementData movement = CreatureMovementData();
-        movement.Ground = static_cast<CreatureGroundMovementType>(ground);
-        movement.Swim = swim;
-        movement.Flight = static_cast<CreatureFlightMovementType>(flight);
-        movement.Rooted = rooted;
-        movement.Chase = static_cast<CreatureChaseMovementType>(chase);
-        movement.Random = static_cast<CreatureRandomMovementType>(random);
-
-        creature->SetMovementDataOverride(&movement);
-
-        return 0;
-    }
-
-    int ResetMovementDataOverride(Eluna* E, Creature* creature)
-    {
-        creature->SetMovementDataOverride(nullptr);
-        return 0;
-    }
-
     int SendMirrorToPlayer(Eluna* E, Creature* creature)
     {
         uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
