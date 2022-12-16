@@ -1012,7 +1012,7 @@ public:
             if (!damageInfo || !damageInfo->GetDamage())
                 return;
 
-            int32 healamount = ((float)damageInfo->GetDamage() * ((float)GetSpellInfo()->_effects[EFFECT_0].BasePoints / 100.f)) + 0.5f;
+            int32 healamount = ((float)damageInfo->GetDamage() * ((float)GetSpellInfo()->Effects[EFFECT_0].BasePoints / 100.f)) + 0.5f;
             if (healamount > 0)
             {
                 Unit* actor = eventInfo.GetActor();
