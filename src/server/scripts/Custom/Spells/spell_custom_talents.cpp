@@ -958,6 +958,116 @@ public:
     }
 };
 
+// 180413 - Defiance
+class hot_defiance : public SpellScriptLoader
+{
+public:
+    hot_defiance() : SpellScriptLoader("hot_defiance") { }
+
+    class hot_defiance_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_defiance_AuraScript);
+
+        void HandleDummyTick(AuraEffect const* aurEff)
+        {
+            Unit* target = GetTarget();
+            if (target->HealthBelowPct(50))
+            {
+                if (!target->HasAura(180414))
+                    target->CastSpell(target, 180414, true);
+            }
+            else
+            {
+                if (target->HasAura(180414))
+                    target->RemoveAurasDueToSpell(180414);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(hot_defiance_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_defiance_AuraScript();
+    }
+};
+
+// 180415,  180417, 180418- Life Leech, Life Leech, Vampiric Aspect
+class hot_life_leech : public SpellScriptLoader
+{
+public:
+    hot_life_leech() : SpellScriptLoader("hot_life_leech") { }
+
+    class hot_life_leech_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_life_leech_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetDamage())
+                return;
+
+            int32 healamount = ((float)damageInfo->GetDamage() * ((float)GetSpellInfo()->_effects[EFFECT_0].BasePoints / 100.f)) + 0.5f;
+            if (healamount > 0)
+            {
+                Unit* actor = eventInfo.GetActor();
+                CastSpellExtraArgs args(aurEff);
+                args.AddSpellMod(SPELLVALUE_BASE_POINT0, healamount);
+                actor->CastSpell(actor, 180416, args);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_life_leech_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_life_leech_AuraScript();
+    }
+};
+
+// 180426 - Enfeeble
+class hot_enfeeble : public SpellScriptLoader
+{
+public:
+    hot_enfeeble() : SpellScriptLoader("hot_enfeeble") { }
+
+    class hot_enfeeble_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_enfeeble_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo)
+                return;
+
+            if (damageInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+                if (Unit* victim = damageInfo->GetVictim())
+                    eventInfo.GetActor()->CastSpell(victim, 180427);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_enfeeble_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_enfeeble_AuraScript();
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -990,4 +1100,7 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_frostfire_bolt_combo_spender);
     RegisterSpellScript(spell_ice_barrier_combo_spender);
     new spell_from_the_ashes_proc_engulf();
+    new hot_defiance();
+    new hot_life_leech();
+    new hot_enfeeble();
 }

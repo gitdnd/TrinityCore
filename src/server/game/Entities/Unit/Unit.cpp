@@ -6749,6 +6749,13 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 }
                 break;
             }
+            // 180406: Pound of Flesh
+            case 10000:
+            {
+                if (victim->GetHealth() <= victim->CountPctFromMaxHealth(50))
+                    AddPct(DoneTotalMod, (*i)->GetAmount());
+                break;
+            }
         }
     }
 
