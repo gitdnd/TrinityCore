@@ -448,6 +448,8 @@ ElunaRegister<Unit> UnitMethods[] =
     { "GetCanSeePhaseOne", &LuaUnit::GetCanSeePhaseOne },
     { "SetCanSeeUniquePhase", &LuaUnit::SetCanSeeUniquePhase },
     { "GetCanSeeUniquePhase", &LuaUnit::GetCanSeeUniquePhase },
+    { "RemoveMotion", &LuaUnit::RemoveMotion },
+    { "ClearMotion", &LuaUnit::ClearMotion },
 
     { NULL, NULL }
 };

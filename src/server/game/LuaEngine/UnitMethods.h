@@ -3144,5 +3144,21 @@ namespace LuaUnit
         Eluna::Push(E->L, unit->CanSeeUniquePhase());
         return 1;
     }
+
+    int RemoveMotion(Eluna* E, Unit* unit)
+    {
+        int moveType = Eluna::CHECKVAL<int>(E->L, 2);
+        int moveSlot = Eluna::CHECKVAL<int>(E->L, 3, 0);
+
+
+        unit->GetMotionMaster()->Remove((MovementGeneratorType)moveType, (MovementSlot)moveSlot);
+        return 0;
+    }
+
+    int ClearMotion(Eluna* /*E*/, Unit* unit)
+    {
+        unit->GetMotionMaster()->Clear();
+        return 0;
+    }
 };
 #endif
