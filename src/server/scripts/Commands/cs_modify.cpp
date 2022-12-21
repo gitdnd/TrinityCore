@@ -48,6 +48,8 @@ public:
             { "fly",      rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_FLY,      false, &HandleModifyFlyCommand,    "" },
             { "walk",     rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_WALK,     false, &HandleModifySpeedCommand,  "" },
             { "swim",     rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_SWIM,     false, &HandleModifySwimCommand,   "" },
+            { "turn",     rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_SWIM,     false, &HandleModifyTurnCommand,   "" },
+            { "pitch",     rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_SWIM,     false, &HandleModifyPitchCommand,   "" },
             { "",         rbac::RBAC_PERM_COMMAND_MODIFY_SPEED,          false, &HandleModifyASpeedCommand, "" },
         };
         static std::vector<ChatCommand> modifyCommandTable =
@@ -422,12 +424,12 @@ public:
 
         speed = (float)atof((char*)args);
 
-        if (speed > maximumBound || speed < minimumBound)
+        /*if (speed > maximumBound || speed < minimumBound)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
-        }
+        }*/
 
         if (!target)
         {
@@ -520,6 +522,34 @@ public:
         {
             NotifyModification(handler, target, LANG_YOU_CHANGE_FLY_SPEED, LANG_YOURS_FLY_SPEED_CHANGED, flySpeed);
             target->SetSpeedRate(MOVE_FLIGHT, flySpeed);
+            return true;
+        }
+        return false;
+    }
+
+    //Edit Player Backwards Walk Speed
+    static bool HandleModifyTurnCommand(ChatHandler* handler, char const* args)
+    {
+        float backSpeed;
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (CheckModifySpeed(handler, args, target, backSpeed, 0.1f, 50.0f))
+        {
+            NotifyModification(handler, target, LANG_YOU_CHANGE_BACK_SPEED, LANG_YOURS_BACK_SPEED_CHANGED, backSpeed);
+            target->SetSpeedRate(MOVE_TURN_RATE, backSpeed);
+            return true;
+        }
+        return false;
+    }
+
+    //Edit Player Backwards Walk Speed
+    static bool HandleModifyPitchCommand(ChatHandler* handler, char const* args)
+    {
+        float backSpeed;
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (CheckModifySpeed(handler, args, target, backSpeed, 0.1f, 50.0f))
+        {
+            NotifyModification(handler, target, LANG_YOU_CHANGE_BACK_SPEED, LANG_YOURS_BACK_SPEED_CHANGED, backSpeed);
+            target->SetSpeedRate(MOVE_PITCH_RATE, backSpeed);
             return true;
         }
         return false;
@@ -859,6 +889,7 @@ public:
             return false;
 
         target->SetDisplayId(display_id);
+        handler->PSendSysMessage("You morphed %s into %u", target->GetName().c_str(), display_id);
 
         return true;
     }

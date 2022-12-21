@@ -1120,7 +1120,7 @@ public:
         if (!*args)
             return false;
 
-        Creature* creature = handler->getSelectedCreature();
+        Unit* creature = handler->getSelectedUnit();
         if (!creature)
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);

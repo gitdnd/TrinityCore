@@ -1751,11 +1751,21 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     // check GM mode and GM invisibility - only for player casts (npc casts are controlled by AI) and negative spells
     if (unitTarget != caster && (caster->GetAffectingPlayer() || !IsPositive()) && unitTarget->GetTypeId() == TYPEID_PLAYER)
     {
-        if (!unitTarget->ToPlayer()->IsVisible())
-            return SPELL_FAILED_BM_OR_INVISGOD;
+        bool skipCheck = false;
+        if (const Player* p_caster = caster->ToPlayer())
+        {
+            if (p_caster->GetSession()->GetSecurity() >= SEC_CONSOLE)
+                skipCheck = true;
+        }
 
-        if (unitTarget->ToPlayer()->IsGameMaster())
-            return SPELL_FAILED_BM_OR_INVISGOD;
+        if (!skipCheck)
+        {
+            if (!unitTarget->ToPlayer()->IsVisible())
+                return SPELL_FAILED_BM_OR_INVISGOD;
+
+            if (unitTarget->ToPlayer()->IsGameMaster())
+                return SPELL_FAILED_BM_OR_INVISGOD;
+        }
     }
 
     // not allow casting on flying player
