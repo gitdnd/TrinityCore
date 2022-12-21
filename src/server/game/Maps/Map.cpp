@@ -286,6 +286,9 @@ i_scriptLock(false), _respawnCheckTimer(0)
 
     m_parentMap = (_parent ? _parent : this);
 
+    if (IsParent() || !Instanceable())
+        dungeonLevel = 0;
+
     if (sElunaLoader->ShouldMapLoadEluna(id))
         if(IsParent()) // We are the parent map load eluna
             eluna = new Eluna(id);
