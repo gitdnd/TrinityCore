@@ -287,10 +287,10 @@ i_scriptLock(false), _respawnCheckTimer(0)
     m_parentMap = (_parent ? _parent : this);
 
     if (IsParent() || i_mapEntry->IsWorldMap() || id == 765)
-        dungeonLevel = 0;
+        i_dungeonLevel = 0;
 
-    if (dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
-        dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
+    if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
+        i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
 
     if (sElunaLoader->ShouldMapLoadEluna(id))
         if(IsParent()) // We are the parent map load eluna
