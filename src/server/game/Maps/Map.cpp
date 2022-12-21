@@ -286,7 +286,7 @@ i_scriptLock(false), _respawnCheckTimer(0)
 
     m_parentMap = (_parent ? _parent : this);
 
-    if (IsParent() || i_mapEntry->IsWorldMap() || id == 765)
+    if (IsParent() || !Instanceable())
         i_dungeonLevel = 0;
 
     if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
