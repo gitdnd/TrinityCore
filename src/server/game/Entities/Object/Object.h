@@ -199,6 +199,9 @@ class TC_GAME_API Object
 
         virtual std::string GetDebugInfo() const;
 
+        UpdateMask GetChangesMask() { return _changesMask; }
+        void AddToObjectUpdateIfNeeded();
+
     protected:
         Object();
 
@@ -231,8 +234,7 @@ class TC_GAME_API Object
         uint16 _fieldNotifyFlags;
 
         virtual bool AddToObjectUpdate() = 0;
-        virtual void RemoveFromObjectUpdate() = 0;
-        void AddToObjectUpdateIfNeeded();
+        virtual void RemoveFromObjectUpdate() = 0
 
         bool m_objectUpdated;
 

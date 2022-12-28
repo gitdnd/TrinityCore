@@ -126,6 +126,8 @@ class spell_gen_subclass : public AuraScript
             //plrCaster->SetClass(subClass); // Debug
             plrCaster->SetSubClass(subClass);
             sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), subClass);
+            plrCaster->GetChangesMask().SetBit(UNIT_FIELD_BYTES_0);
+            plrCaster->AddToObjectUpdateIfNeeded();
         }
     }
 
@@ -136,6 +138,8 @@ class spell_gen_subclass : public AuraScript
         {
             plrCaster->SetSubClass(0);
             sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), plrCaster->GetClass());
+            plrCaster->GetChangesMask().SetBit(UNIT_FIELD_BYTES_0);
+            plrCaster->AddToObjectUpdateIfNeeded();
         }
     }
 
