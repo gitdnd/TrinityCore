@@ -173,4 +173,5 @@ void AddSC_Spells_Custom_Generic()
     RegisterAuraScript(spell_gen_between_cast_periodic);
     RegisterSpellScript(spell_generate_combopoint_all);
     RegisterAuraScript(spell_gen_fly_in_hub);
+    RegisterAuraScript(spell_gen_subclass);
 }
