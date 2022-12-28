@@ -56,9 +56,9 @@ void WhoListStorageMgr::Update()
 
         // Level is sent as a uint8 in the WHO frame
         uint32 avgLvl = floor(itr->second->GetAverageItemLevel());
-
+        uint32 sclass = itr->second->GetSubClass() ? itr->second->GetSubClass() : itr->second->GetClass();
         _whoListStorage.emplace_back(itr->second->GetGUID(), itr->second->GetTeam(), itr->second->GetSession()->GetSecurity(), avgLvl,
-            itr->second->GetClass(), itr->second->GetRace(), itr->second->GetZoneId(), itr->second->GetNativeGender(), itr->second->IsVisible(),
+            sclass, itr->second->GetRace(), itr->second->GetZoneId(), itr->second->GetNativeGender(), itr->second->IsVisible(),
             widePlayerName, wideGuildName, playerName, guildName);
     }
 }
