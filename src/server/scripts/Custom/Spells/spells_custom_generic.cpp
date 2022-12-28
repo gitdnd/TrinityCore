@@ -123,6 +123,7 @@ class spell_gen_subclass : public AuraScript
         Player* plrCaster = GetCaster()->ToPlayer();
         if (plrCaster && subClass > 0)
         {
+            plrCaster->SetClass(subClass); // Debug
             plrCaster->SetSubClass(subClass);
             sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), subClass);
         }
