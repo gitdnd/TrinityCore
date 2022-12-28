@@ -2233,6 +2233,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         WorldLocation GetPortalLocation() { return _portalLocation; }
         void SetPortalLocation(WorldLocation loc) { _portalLocation = loc; }
 
+        uint8 GetSubClass() const { return subClass; }
+        void SetSubClass(uint8 sclass) { subClass = sclass; }
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -2572,6 +2575,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         float magicFind;
 
         WorldLocation _portalLocation;
+        uint8 subClass;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

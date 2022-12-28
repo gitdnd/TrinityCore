@@ -7,6 +7,7 @@
 #include "SpellScript.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
+#include "CharacterCache.h"
 
 class spell_gen_between_cast_periodic : public AuraScript
 {
@@ -109,6 +110,61 @@ class spell_gen_fly_in_hub : public AuraScript
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(spell_gen_fly_in_hub::HandleApplyEffect, EFFECT_2, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+class spell_gen_subclass : public AuraScript
+{
+    PrepareAuraScript(spell_gen_subclass);
+
+    void HandleApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        uint8 subClass = GetClassForSpell(aurEff->GetSpellInfo()->Id);
+        Player* plrCaster = GetCaster()->ToPlayer();
+        if (plrCaster && subClass > 0)
+        {
+            plrCaster->SetSubClass(subClass);
+            sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), subClass);
+        }
+    }
+
+    void HandleRemoveEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Player* plrCaster = GetCaster()->ToPlayer();
+        if (plrCaster)
+        {
+            plrCaster->SetSubClass(0);
+            sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), plrCaster->GetClass());
+        }
+    }
+
+    uint8 GetClassForSpell(uint32 id)
+    {
+        switch (id)
+        {
+        case 181000:
+            return 1;
+            break;
+        case 181001:
+            return 2;
+            break;
+        case 181002:
+            return 3;
+            break;
+        case 181003:
+            return 4;
+            break;
+        case 181004:
+            return 5;
+            break;
+        }
+        return 0;
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_subclass::HandleApplyEffect, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectApplyFn(spell_gen_subclass::HandleRemoveEffect, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 

@@ -176,6 +176,16 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
     itr->second.ArenaTeamId[slot] = arenaTeamId;
 }
 
+void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass)
+{
+    auto itr = _characterCacheStore.find(guid);
+    if (itr == _characterCacheStore.end())
+        return;
+
+    itr->second.Class = subClass;
+    WorldPackets::Misc::InvalidatePlayer packet(guid);
+    sWorld->SendGlobalMessage(packet.Write());
+}
 /*
 Getters
 */
