@@ -2908,6 +2908,18 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                     else if (m_originalCaster && (m_originalCaster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, hitInfo.AuraSpellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION)))
                         hitInfo.AuraDuration = int32(hitInfo.AuraDuration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
 
+                    // HoT: Damage over time duration increase spells                  
+                    Unit::AuraApplicationMap auras = m_originalCaster->GetAppliedAuras();
+                    for (auto i : auras)
+                    {
+                        AuraApplication * app = i.second;
+                        Aura const* aura = app->GetBase();
+                        
+                        uint32 auraId = aura->GetId();
+                        if (auraId == 180434 || auraId == 180435 || auraId == 180437)
+                            hitInfo.AuraDuration = hitInfo.AuraDuration + ((float)hitInfo.AuraDuration * ((float)aura->GetSpellInfo()->Effects[EFFECT_0].BasePoints / 100.f));
+                    }
+
                     if (hitInfo.AuraDuration != hitInfo.HitAura->GetMaxDuration())
                     {
                         hitInfo.HitAura->SetMaxDuration(hitInfo.AuraDuration);

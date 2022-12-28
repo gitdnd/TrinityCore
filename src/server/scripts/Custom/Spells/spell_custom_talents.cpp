@@ -1068,6 +1068,234 @@ public:
     }
 };
 
+// 180430 - One with the Shadow
+class hot_one_with_the_shadow : public SpellScriptLoader
+{
+public:
+    hot_one_with_the_shadow() : SpellScriptLoader("hot_one_with_the_shadow") { }
+
+    class hot_one_with_the_shadow_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_one_with_the_shadow_AuraScript);
+
+        void HandleDummyTick(AuraEffect const* aurEff)
+        {
+            Unit* target = GetTarget();
+            if (target->HasStealthAura())
+            {
+                if (!target->HasAura(180431))
+                    target->CastSpell(target, 180431, true);
+            }
+            else
+            {
+                if (target->HasAura(180431))
+                    target->RemoveAurasDueToSpell(180431);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(hot_one_with_the_shadow_AuraScript::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_one_with_the_shadow_AuraScript();
+    }
+};
+
+// 180432 - Violent Bastion
+class hot_violent_bastion : public SpellScriptLoader
+{
+public:
+    hot_violent_bastion() : SpellScriptLoader("hot_violent_bastion") { }
+
+    class hot_violent_bastion_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_violent_bastion_AuraScript);
+
+        void HandleDummyTick(AuraEffect const* aurEff)
+        {
+            Unit* target = GetTarget();
+            if (Player* target_player = target->ToPlayer())
+            {
+                if (Item* offweapon = target_player->GetShield())
+                {
+                    if (!target->HasAura(180433))
+                        target->CastSpell(target, 180433, true);
+                }
+                else
+                {
+                    if (target->HasAura(180433))
+                        target->RemoveAurasDueToSpell(180433);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(hot_violent_bastion_AuraScript::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_violent_bastion_AuraScript();
+    }
+};
+
+// 180440 - Blood Siphon
+class hot_blood_siphon : public SpellScriptLoader
+{
+public:
+    hot_blood_siphon() : SpellScriptLoader("hot_blood_siphon") { }
+
+    class hot_blood_siphon_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_blood_siphon_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            actor->CastSpell(actor, 180441, true);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_blood_siphon_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_blood_siphon_AuraScript();
+    }
+};
+
+// 180442 - Soul Siphon, 180461 - Soul Drinker
+class hot_soul_siphon : public SpellScriptLoader
+{
+public:
+    hot_soul_siphon() : SpellScriptLoader("hot_soul_siphon") { }
+
+    class hot_soul_siphon_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_soul_siphon_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            actor->CastSpell(actor, 180443, true);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_soul_siphon_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_soul_siphon_AuraScript();
+    }
+};
+
+// 180444 - Mana on Kill
+class hot_mana_on_kill : public SpellScriptLoader
+{
+public:
+    hot_mana_on_kill() : SpellScriptLoader("hot_mana_on_kill") { }
+
+    class hot_mana_on_kill_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_mana_on_kill_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            actor->CastSpell(actor, 180445, true);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_mana_on_kill_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_mana_on_kill_AuraScript();
+    }
+};
+
+// 180446 - Life on Kill
+class hot_life_on_kill : public SpellScriptLoader
+{
+public:
+    hot_life_on_kill() : SpellScriptLoader("hot_life_on_kill") { }
+
+    class hot_life_on_kill_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_life_on_kill_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            actor->CastSpell(actor, 180447, true);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_life_on_kill_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_life_on_kill_AuraScript();
+    }
+};
+
+// 180465 - Blood Drinker
+class hot_blood_drinker : public SpellScriptLoader
+{
+public:
+    hot_blood_drinker() : SpellScriptLoader("hot_blood_drinker") { }
+
+    class hot_blood_drinker_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_blood_drinker_AuraScript);
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            actor->CastSpell(actor, 180466, true);
+        }
+
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(hot_blood_drinker_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_blood_drinker_AuraScript();
+    }
+};
+
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -1103,4 +1331,11 @@ void AddSC_Spells_Custom_Talents()
     new hot_defiance();
     new hot_life_leech();
     new hot_enfeeble();
+    new hot_one_with_the_shadow();
+    new hot_violent_bastion();
+    new hot_blood_siphon();
+    new hot_soul_siphon();
+    new hot_mana_on_kill();
+    new hot_life_on_kill();
+    new hot_blood_drinker();
 }

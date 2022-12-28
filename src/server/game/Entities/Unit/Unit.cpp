@@ -6756,6 +6756,14 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             }
+            // Instant effect, Spellslinger
+            case 10001:
+            {
+                const SpellCastTimesEntry * casttime = spellProto->CastTimeEntry;
+                if (damagetype != DOT && (casttime == nullptr || casttime == sSpellCastTimesStore.LookupEntry(1)))
+                    AddPct(DoneTotalMod, (*i)->GetAmount());
+                break;
+            }
         }
     }
 
@@ -7526,6 +7534,14 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
             case 7871: // Glyph of Lesser Healing Wave
             {
                 if (victim->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 0, 0x00000400, 0))
+                    AddPct(DoneTotalMod, aurEff->GetAmount());
+                break;
+            }
+            // Instant Effect, Spellslinger
+            case 10002:
+            {
+                const SpellCastTimesEntry * casttime = spellProto->CastTimeEntry;
+                if (casttime == nullptr || casttime == sSpellCastTimesStore.LookupEntry(1))
                     AddPct(DoneTotalMod, aurEff->GetAmount());
                 break;
             }
