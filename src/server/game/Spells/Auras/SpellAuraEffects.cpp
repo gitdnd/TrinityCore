@@ -5833,40 +5833,8 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
         return;
     Player* pT = target->ToPlayer();
     uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
-    auto spell = sSpellMgr->GetSpellInfo(triggerSpellId);
-    if (apply)
-    {
-        if (pT->HasSpell(triggerSpellId))
-            return;
+    pT->ToggleTempSpell(triggerSpellId, GetId(), apply);
 
-        pT->AddTemporarySpell(triggerSpellId);
-        if (!pT->HasGemSpell(triggerSpellId))
-        {
-            pT->SendSpellLearn(triggerSpellId);
-            pT->AddGemSpell(triggerSpellId, GetSpellInfo()->Id);
-        }
-        else
-        {
-            if (pT->GetSpellHistory()->HasCooldown(spell))
-                return; // Don't clear the cooldown
-
-            pT->SendCooldownClear(triggerSpellId);
-        }
-
-    }
-    else
-    {
-        ChatHandler(pT->GetSession()).PSendSysMessage("Unlearned: %s", spell->SpellName[LOCALE_enUS]);
-        pT->RemoveTemporarySpell(triggerSpellId);
-        pT->RemoveOwnedAura(triggerSpellId, pT->GetGUID());
-        if (spell->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
-        {
-            pT->RemoveGemSpell(triggerSpellId);
-            pT->SendSpellRemoval(triggerSpellId);
-        }
-        else
-            pT->SendFakeCooldown(triggerSpellId, DAY * IN_MILLISECONDS);
-    }
 }
 
 void AuraEffect::HandleDamageSchoolBonus(AuraApplication const* aurApp, uint8 mode, bool apply) const

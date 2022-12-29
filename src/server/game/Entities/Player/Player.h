@@ -2236,6 +2236,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetSubClass() const { return subClass; }
         void SetSubClass(uint8 sclass) { subClass = sclass; }
 
+        void ToggleTempSpell(uint32 spell, uint32 aura, bool apply = true);
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

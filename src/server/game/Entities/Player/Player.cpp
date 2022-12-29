@@ -27875,3 +27875,44 @@ void Player::ApplyVirtualItemLegendayEffects(Item* item)
         }
     }
 }
+
+void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
+{
+    auto spellInfo = sSpellMgr->GetSpellInfo(spell);
+    if (spellInfo)
+        return;
+
+    if (apply)
+    {
+        if (HasSpell(spell))
+            return;
+
+        AddTemporarySpell(spell);
+        if (!HasGemSpell(spell))
+        {
+            SendSpellLearn(spell);
+            AddGemSpell(spell, aura);
+        }
+        else
+        {
+            if (GetSpellHistory()->HasCooldown(spell))
+                return; // Don't clear the cooldown
+
+            SendCooldownClear(spell);
+        }
+
+    }
+    else
+    {
+        ChatHandler(GetSession()).PSendSysMessage("Unlearned: %s", spellInfo->SpellName[LOCALE_enUS]);
+        RemoveTemporarySpell(spell);
+        RemoveOwnedAura(spell, GetGUID());
+        if (spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
+        {
+            RemoveGemSpell(spell);
+            SendSpellRemoval(spell);
+        }
+        else
+            SendFakeCooldown(spell, DAY * IN_MILLISECONDS);
+    }
+}

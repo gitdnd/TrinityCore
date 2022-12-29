@@ -482,6 +482,42 @@ class spell_item_change_race_character : public SpellScript
     }
 };
 
+class spell_item_metamorph_gem : public AuraScript
+{
+    PrepareAuraScript(spell_item_metamorph_gem);
+
+    void HandleApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* pCaster = GetCaster()->ToPlayer())
+        {
+            pCaster->ToggleTempSpell(47241, GetId(), true);
+            pCaster->ToggleTempSpell(50581, GetId(), true);
+            pCaster->ToggleTempSpell(59671, GetId(), true);
+            pCaster->ToggleTempSpell(54785, GetId(), true);
+            pCaster->ToggleTempSpell(50589, GetId(), true);
+        }
+
+    }
+
+    void HandleRemoveEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* pCaster = GetCaster()->ToPlayer())
+        {
+            pCaster->ToggleTempSpell(47241, GetId(), false);
+            pCaster->ToggleTempSpell(50581, GetId(), false);
+            pCaster->ToggleTempSpell(59671, GetId(), false);
+            pCaster->ToggleTempSpell(54785, GetId(), false);
+            pCaster->ToggleTempSpell(50589, GetId(), false);
+        }
+    }
+
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_metamorph_gem::HandleApplyEffect, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectRemove += AuraEffectApplyFn(spell_item_metamorph_gem::HandleRemoveEffect, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
 
 void AddSC_Spells_Custom_Items()
 {
@@ -496,4 +532,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_customize_character);
     RegisterSpellScript(spell_item_faction_change_character);
     RegisterSpellScript(spell_item_change_race_character);
+    RegisterAuraScript(spell_item_metamorph_gem);
 }
