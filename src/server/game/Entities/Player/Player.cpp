@@ -27879,7 +27879,7 @@ void Player::ApplyVirtualItemLegendayEffects(Item* item)
 void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
 {
     auto spellInfo = sSpellMgr->GetSpellInfo(spell);
-    if (spellInfo)
+    if (!spellInfo)
         return;
 
     if (apply)
