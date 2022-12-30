@@ -1488,6 +1488,10 @@ void Creature::UpdateLevelDependantStats()
             dungeonLevelMod = dungeonLevelMod * 0.5;
         else if (dungeonLevel > 250)
             dungeonLevelMod = dungeonLevelMod * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
+        if (dungeonLevel >= 270)
+            dungeonLevelMod = dungeonLevelMod * 1.25;
+        else if (dungeonLevel > 200)
+            dungeonLevelMod = dungeonLevelMod * 1.1;
 
         basedamage = uint32(basedamage * dungeonLevelMod);
     }
