@@ -27919,3 +27919,23 @@ void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
             SendFakeCooldown(spell, DAY * IN_MILLISECONDS);
     }
 }
+
+uint8 Player::GetActiveSubClass()
+{
+    if(HasAura(SUBCLASS_SPELL_WARDEN))
+        return CLASS_SUB_WARDEN;
+
+    if (HasAura(SUBCLASS_SPELL_HISTORIAN))
+        return CLASS_SUB_HISTORIAN;
+
+    if (HasAura(SUBCLASS_SPELL_WEAVER))
+        return CLASS_SUB_WEAVER;
+
+    if (HasAura(SUBCLASS_SPELL_WATCHER))
+        return CLASS_SUB_WATCHER;
+
+    if (HasAura(SUBCLASS_SPELL_RANGER))
+        return CLASS_SUB_RANGER;
+
+    return 0;
+}

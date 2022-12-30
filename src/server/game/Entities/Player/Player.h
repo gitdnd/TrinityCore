@@ -2238,6 +2238,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void ToggleTempSpell(uint32 spell, uint32 aura, bool apply = true);
 
+        uint8 GetActiveSubClass();
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

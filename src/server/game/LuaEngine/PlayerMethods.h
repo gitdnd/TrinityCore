@@ -4510,5 +4510,11 @@ namespace LuaPlayer
         
         return 0;
     }
+
+    int GetSubClass(Eluna* E, Player* player)
+    {
+        Eluna::Push(E->L, player->GetSubClass());
+        return 1;
+    }
 };
 #endif
