@@ -61,6 +61,7 @@ enum GuildMemberData
 {
     GUILD_MEMBER_DATA_ZONEID,
     GUILD_MEMBER_DATA_LEVEL,
+    GUILD_MEMBER_DATA_CLASS,
 };
 
 enum GuildDefaultRanks
@@ -295,6 +296,7 @@ class TC_GAME_API Guild
                 void SetOfficerNote(std::string const& officerNote);
                 void SetZoneID(uint32 id) { m_zoneId = id; }
                 void SetLevel(uint32 var) { m_level = var; }
+                void SetClass(uint8 _class) { m_class = _class; }
 
                 void AddFlag(uint8 var) { m_flags |= var; }
                 void RemFlag(uint8 var) { m_flags &= ~var; }

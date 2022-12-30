@@ -8,6 +8,7 @@
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
 #include "CharacterCache.h"
+#include "Guild.h"
 
 class spell_gen_between_cast_periodic : public AuraScript
 {
@@ -128,6 +129,8 @@ class spell_gen_subclass : public AuraScript
             sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), subClass);
             plrCaster->GetChangesMask().SetBit(UNIT_FIELD_BYTES_0);
             plrCaster->AddToObjectUpdateIfNeeded();
+            if (Guild* guild = plrCaster->GetGuild())
+                guild->UpdateMemberData(plrCaster, GUILD_MEMBER_DATA_CLASS, subClass);
         }
     }
 
@@ -140,6 +143,8 @@ class spell_gen_subclass : public AuraScript
             sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), plrCaster->GetClass());
             plrCaster->GetChangesMask().SetBit(UNIT_FIELD_BYTES_0);
             plrCaster->AddToObjectUpdateIfNeeded();
+            if (Guild* guild = plrCaster->GetGuild())
+                guild->UpdateMemberData(plrCaster, GUILD_MEMBER_DATA_CLASS, plrCaster->GetClass());
         }
     }
 
