@@ -25547,7 +25547,7 @@ uint32 Player::CalculateTalentsPoints()
 {
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel()-9;
 
-    if (GetClass() == CLASS_ADVENTURER)
+    if (GetClass() == CLASS_TIMEWALKER)
     {
         // Give a talent every 5 item levels
         //float ilevel = std::min(300.0f, GetAverageItemLevel());
@@ -25955,7 +25955,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                                 spentPointsInRow += (rank + 1);
 
     // not have required min points spent in talent tree
-    if (GetClass() != CLASS_ADVENTURER)
+    if (GetClass() != CLASS_TIMEWALKER)
     {
         if (spentPoints < (talentInfo->Row * MAX_TALENT_RANK))
             return;

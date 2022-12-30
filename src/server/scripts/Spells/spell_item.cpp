@@ -977,7 +977,7 @@ class spell_item_flask_of_the_north : public SpellScript
                 possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_SP);
                 possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_AP);
                 break;
-            case CLASS_ADVENTURER:
+            case CLASS_TIMEWALKER:
                 possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_SP);
                 possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_AP);
                 possibleSpells.push_back(SPELL_FLASK_OF_THE_NORTH_STR);

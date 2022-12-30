@@ -136,7 +136,12 @@ enum Classes
     CLASS_WARLOCK       = 9, // TITLE Warlock
     //CLASS_UNK           = 10,
     CLASS_DRUID         = 11, // TITLE Druid
-    CLASS_ADVENTURER    = 12
+    CLASS_TIMEWALKER    = 12,
+    CLASS_SUB_WARDEN    = 13, // Subclass of Timewalker
+    CLASS_SUB_HISTORIAN = 14, // Subclass of Timewalker
+    CLASS_SUB_WEAVER    = 15, // Subclass of Timewalker
+    CLASS_SUB_WATCHER   = 16, // Subclass of Timewalker
+    CLASS_SUB_RANGER    = 17  // Subclass of Timewalker
 };
 
 // max+1 for player class
@@ -146,7 +151,7 @@ enum Classes
     ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_HUNTER-1))| \
     (1<<(CLASS_ROGUE-1))  |(1<<(CLASS_PRIEST-1)) |(1<<(CLASS_SHAMAN-1))| \
     (1<<(CLASS_MAGE-1))   |(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_DRUID-1)) | \
-    (1<<(CLASS_DEATH_KNIGHT-1)) |(1<<(CLASS_ADVENTURER-1)))    
+    (1<<(CLASS_DEATH_KNIGHT-1)) |(1<<(CLASS_TIMEWALKER-1)))    
 
 #define MAX_TALENT_TREES 3
 
@@ -195,7 +200,7 @@ enum UnitClass
 
 #define CLASSMASK_ALL_CREATURES ((1<<(UNIT_CLASS_WARRIOR-1)) | (1<<(UNIT_CLASS_PALADIN-1)) | (1<<(UNIT_CLASS_ROGUE-1)) | (1<<(UNIT_CLASS_MAGE-1)))
 
-#define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_ADVENTURER-1)))
+#define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_TIMEWALKER-1)))
 
 #define PLAYER_MAX_BATTLEGROUND_QUEUES 2
 
@@ -3600,7 +3605,7 @@ enum SpellFamilyNames
     SPELLFAMILY_DEATHKNIGHT = 15, // TITLE Death Knight
     // 16 - unused
     SPELLFAMILY_PET         = 17,  // TITLE Pet
-    SPELLFAMILY_ADVENTURER  = 18
+    SPELLFAMILY_TIMEWALKER  = 18
 };
 
 enum TradeStatus
