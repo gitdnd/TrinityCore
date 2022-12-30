@@ -25,6 +25,7 @@ public:
             { "circlerlaser", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleCirclerLaserCommand, "" },
             { "clone", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleClonePlayerCommand, "" },
             { "clearinventory", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleClearInventory, "" },
+            { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
         };
         return tbsBullshitCommandTable;
     }
@@ -62,15 +63,41 @@ public:
             numberOfClones = atoi(args);
         Player* target = handler->getSelectedPlayerOrSelf();
         Player* player = handler->GetSession()->GetPlayer();
+        uint32 targetDisplay = target->GetDisplayId();
+        uint32 faction = player->GetFaction();
+        uint32 iLvl = player->GetAverageItemLevel();
         for (uint32 i = 0; i < numberOfClones; ++i)
         {
-            if (Creature* clone = player->SummonCreature(82002, player->GetRandomNearPosition(5.f), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
+            if (TempSummon* clone = player->GetMap()->SummonCreature(82002, player->GetRandomNearPosition(5.f), sSummonPropertiesStore.LookupEntry(1021), 10 * MINUTE * IN_MILLISECONDS, player, 0, 0, iLvl))
             {
+                clone->SetDisplayId(targetDisplay);
+                clone->SetFaction(faction);
                 target->CastSpell(clone, 45204, true);
-                clone->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, player->GetFollowAngle());
+                clone->GetMotionMaster()->Clear();
+                clone->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, player->GetAbsoluteAngle(clone));
             }
 
         }
+        return true;
+    }
+
+    static bool HandleKnockbackCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* pSpeedX = strtok((char*)args, " ");
+        if (!pSpeedX)
+            return false;
+
+        char* pSpeedY = strtok(nullptr, " ");
+        if (!pSpeedY)
+            return false;
+
+        float speedX = atof(pSpeedX);
+        float speedY = atof(pSpeedY);
+
+        handler->getSelectedUnit()->KnockbackFrom(handler->GetSession()->GetPlayer()->GetPositionX(), handler->GetSession()->GetPlayer()->GetPositionY(), speedX, speedY);
         return true;
     }
 };
