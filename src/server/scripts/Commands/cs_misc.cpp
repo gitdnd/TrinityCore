@@ -118,8 +118,6 @@ public:
             { "unstuck",          rbac::RBAC_PERM_COMMAND_UNSTUCK,           true, &HandleUnstuckCommand,          "" },
             { "wchange",          rbac::RBAC_PERM_COMMAND_WCHANGE,          false, &HandleChangeWeather,           "" },
             { "mailbox",          rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleMailBoxCommand,          "" },
-            { "tbtest",           rbac::RBAC_PERM_COMMAND_MAILBOX,          false, &HandleTbsTestCommand,          "" },
-            { "clearinventory",   rbac::RBAC_PERM_COMMAND_ADDITEM,          false, &HandleClearInventory,          "" },
         };
         return commandTable;
     }
@@ -2706,33 +2704,6 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
 
         handler->GetSession()->SendShowMailBox(player->GetGUID());
-        return true;
-    }
-
-    static bool HandleTbsTestCommand(ChatHandler* handler, char const* args)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        char* radius_str = strtok((char*)args, " ");
-        char* step_str = args ? strtok(nullptr, " ") : "8";
-        float radius= atof(radius_str);
-        uint8 step = atoi(step_str);
-        if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
-        {
-            if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_MANUAL_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
-            {
-
-                master->CastSpell(slave, 82000, true);
-                slave->GetMotionMaster()->MoveCirclePath(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), radius, false, step);
-            }
-        }
-        return true;
-    }
-
-    static bool HandleClearInventory(ChatHandler* handler, char const* args)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        player->ClearInventory();
-        handler->PSendSysMessage("Inventory cleared.");
         return true;
     }
 };

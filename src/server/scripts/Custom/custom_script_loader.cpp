@@ -27,6 +27,7 @@ void AddSC_Spells_Custom_Talents();
 void AddSC_Spells_Custom_Generic();
 void AddSC_NPCS_Custom_Pets();
 void AddSC_Instance_Dummies();
+void AddSC_TbsBullshit_commandscript();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -42,4 +43,5 @@ void AddCustomScripts()
     AddSC_Spells_Custom_Generic();
     AddSC_NPCS_Custom_Pets();
     AddSC_Instance_Dummies();
+    AddSC_TbsBullshit_commandscript();
 }
