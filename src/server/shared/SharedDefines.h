@@ -155,6 +155,15 @@ enum Classes
 
 #define MAX_TALENT_TREES 3
 
+enum CharacterSubClassSpells: uint32
+{
+    SUBCLASS_SPELL_WARDEN = 181000,
+    SUBCLASS_SPELL_HISTORIAN = 181001,
+    SUBCLASS_SPELL_WEAVER = 181002,
+    SUBCLASS_SPELL_WATCHER = 181003,
+    SUBCLASS_SPELL_RANGER = 181004
+};
+
 enum PlayerSpecializations
 {
     SPEC_WARRIOR_ARMS = 0,

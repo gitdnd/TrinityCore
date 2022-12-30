@@ -152,23 +152,23 @@ class spell_gen_subclass : public AuraScript
     {
         switch (id)
         {
-        case 181000:
-            return 1;
+        case SUBCLASS_SPELL_WARDEN:
+            return CLASS_SUB_WARDEN;
             break;
-        case 181001:
-            return 2;
+        case SUBCLASS_SPELL_HISTORIAN:
+            return CLASS_SUB_HISTORIAN;
             break;
-        case 181002:
-            return 3;
+        case SUBCLASS_SPELL_WEAVER:
+            return CLASS_SUB_WEAVER;
             break;
-        case 181003:
-            return 4;
+        case SUBCLASS_SPELL_WATCHER:
+            return CLASS_SUB_WATCHER;
             break;
-        case 181004:
-            return 5;
+        case SUBCLASS_SPELL_RANGER:
+            return CLASS_SUB_RANGER;
             break;
         }
-        return 9; // Debug means something gone wrong.
+        return CLASS_WARLOCK; // Debug means something gone wrong.
     }
 
     void Register() override
