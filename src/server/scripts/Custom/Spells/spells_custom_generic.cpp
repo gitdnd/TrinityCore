@@ -168,7 +168,7 @@ class spell_gen_subclass : public AuraScript
             return 5;
             break;
         }
-        return 0;
+        return 9; // Debug means something gone wrong.
     }
 
     void Register() override
