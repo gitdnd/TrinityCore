@@ -1912,7 +1912,8 @@ public:
             if (totalmail >= 1)
                handler->PSendSysMessage(LANG_PINFO_CHR_MAILS, readmail, totalmail);
         }
-
+        if (target && target->GetSubClass())
+            handler->PSendSysMessage("Subclass: %s", GetClassName(target->GetSubClass(), locale));
         return true;
     }
 
