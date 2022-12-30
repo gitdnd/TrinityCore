@@ -2240,6 +2240,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint8 GetActiveSubClass();
 
+        int32 GetSpellPowerForSchool(SpellSchools school) { return GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + school) - GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + school); }
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

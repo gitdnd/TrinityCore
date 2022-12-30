@@ -1010,7 +1010,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 }
                 case 31216: // Mirror Image
                 {
-                    SetBonusDamage(int32(GetOwner()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
+                    if (Player* plrOwner = GetOwner()->ToPlayer())
+                        SetBonusDamage(plrOwner->GetSpellPowerForSchool(SPELL_SCHOOL_FROST) * 0.33f);
+                    else
+                        SetBonusDamage(int32(GetOwner()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
                     SetDisplayId(GetOwner()->GetDisplayId());
                     if (!pInfo)
                     {
