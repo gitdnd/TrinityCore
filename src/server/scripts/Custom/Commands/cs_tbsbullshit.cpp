@@ -10,6 +10,7 @@
 #include "RBAC.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
+#include "TemporarySummon.h"
 
 class tbsbullshit_commandscript : public CommandScript
 {
@@ -73,6 +74,7 @@ public:
                 clone->SetDisplayId(targetDisplay);
                 clone->SetFaction(faction);
                 target->CastSpell(clone, 45204, true);
+                ((Minion*)clone)->SetFollowAngle(player->GetAbsoluteAngle(clone));
                 clone->GetMotionMaster()->Clear();
                 clone->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, player->GetAbsoluteAngle(clone));
             }

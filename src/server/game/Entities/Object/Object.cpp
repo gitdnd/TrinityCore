@@ -495,7 +495,7 @@ void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* targe
             ((updateType == UPDATETYPE_VALUES ? _changesMask.GetBit(index) : m_uint32Values[index]) && (flags[index] & visibleFlag)))
         {
             updateMask.SetBit(index);
-            if (IsPlayer() && index == UNIT_FIELD_BYTES_0)
+            /*if (IsPlayer() && index == UNIT_FIELD_BYTES_0)
             {
                 const Player* pThis = ToPlayer();
                 uint8 const sendClass =  pThis->GetSubClass();
@@ -504,8 +504,8 @@ void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* targe
                 fieldbytes |= uint32(uint32(sendClass ? sendClass : pThis->GetClass()) << (UNIT_BYTES_0_OFFSET_CLASS * 8));
                 fieldBuffer << fieldbytes;
             }
-            else
-                fieldBuffer << m_uint32Values[index];
+            else*/
+            fieldBuffer << m_uint32Values[index];
         }
     }
 

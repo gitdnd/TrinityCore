@@ -50,7 +50,12 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
     data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
     data << uint8(nameData->Race);
     data << uint8(nameData->Sex);
-    data << uint8(nameData->Class);
+    if (player == GetPlayer())
+    {
+        data << player->GetClass();
+    }
+    else
+        data << uint8(nameData->Class);
 
     if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {

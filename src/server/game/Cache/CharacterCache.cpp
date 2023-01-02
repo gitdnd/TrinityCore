@@ -189,7 +189,7 @@ void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subCl
     itr->second.Class = subClass;
     WorldPackets::Misc::InvalidatePlayer packet(guid);
     sWorld->SendGlobalMessage(packet.Write());
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
+    /*WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
     data << guid.WriteAsPacked();
 
     data << uint8(0);                               // name known
@@ -207,8 +207,8 @@ void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subCl
             data << names->name[i];
     }
     else*/
-    data << uint8(0);                           // Name is not declined
-    sWorld->SendGlobalMessage(&data);
+    //data << uint8(0);                           // Name is not declined
+    //sWorld->SendGlobalMessage(&data);
 }
 /*
 Getters
