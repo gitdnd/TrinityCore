@@ -123,6 +123,7 @@ struct VirtualModifier
         nameOverride = "";
         magicFind = 0.f;
         statPoolPctModifier = 0.f;
+        subclass = 0;
     }
 
     /**
@@ -150,6 +151,7 @@ struct VirtualModifier
     std::string nameOverride;
     float magicFind;
     float statPoolPctModifier;
+    uint8 subclass;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
@@ -459,11 +461,16 @@ private:
          * Returns the stat groups for the given armor subclass.
          */
         std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
+        /**
+         * Returns the stat groups for the given player subclass.
+         */
+        std::vector<StatGroup> const& GetPlayerSubclassStatGroups(uint8 subclass) const;
     private:
         std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
         std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
         std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
         std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
+        std::vector<StatGroup> subclass_stat_groups[MAX_CLASSES+MAX_SUBCLASSES];
     };
 
     static StatGroupData const premadeStatGroupData;

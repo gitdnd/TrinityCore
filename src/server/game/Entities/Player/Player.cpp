@@ -27920,7 +27920,7 @@ void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
     }
 }
 
-uint8 Player::GetActiveSubClass()
+uint8 Player::GetActiveSubClass() const
 {
     if(HasAura(SUBCLASS_SPELL_WARDEN))
         return CLASS_SUB_WARDEN;
