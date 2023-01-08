@@ -25871,6 +25871,15 @@ void Player::CompletedAchievement(AchievementEntry const* entry)
     m_achievementMgr->CompletedAchievement(entry);
 }
 
+void Player::CompletedAchievement(uint32 id)
+{
+    auto achievement = AchievementGlobalMgr::instance()->GetAchievement(id);
+    if (achievement)
+    {
+        CompletedAchievement(achievement);
+    }
+}
+
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();

@@ -2158,6 +2158,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
         void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);
         void CompletedAchievement(AchievementEntry const* entry);
+        void CompletedAchievement(uint32 id);
 
         bool HasTitle(uint32 bitIndex) const;
         bool HasTitle(CharTitlesEntry const* title) const;
@@ -2180,7 +2181,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
             UpdateCachedItemLevel();
         }
 
-        std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const;
+        std::vector<std::pair<uint8, uint32>> GetItemLevelPayload() const;
 
         bool isDebugAreaTriggers;
 
