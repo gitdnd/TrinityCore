@@ -961,7 +961,7 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
         display = modifier.displayId;
 
     // randomize sheath position if the item is a 1h sword, axe or dagger
-    if (output->Class == ITEM_CLASS_WEAPON && (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD))
+    if (output->Class == ITEM_CLASS_WEAPON && (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || output->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
     {
         // 50% chance for back sheath
         if (urand(0, 1, generator) < 1)
