@@ -78,7 +78,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called at creature aggro either by MoveInLOS or Attack Start
     void JustEngagedWith(Unit* target) override
     {
-        if (me->GetCreatureTemplate()->rank == 3)
+        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
         {
 
             auto map = me->GetMap();
@@ -132,7 +132,7 @@ struct ElunaCreatureAI : ScriptedAI
     //Called at creature death
     void JustDied(Unit* killer) override
     {
-        if (me->GetCreatureTemplate()->rank == 3)
+        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
         {
             auto map = me->GetMap();
 
@@ -201,7 +201,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        if (me->GetCreatureTemplate()->rank == 3)
+        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
         {
             auto map = me->GetMap();
 
