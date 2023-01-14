@@ -960,6 +960,14 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     if (modifier.displayId)
         display = modifier.displayId;
 
+    // randomize sheath position if the item is a 1h sword, axe or dagger
+    if (output->Class == ITEM_CLASS_WEAPON && (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD))
+    {
+        // 50% chance for back sheath
+        if (urand(0, 1, generator) < 1)
+            output->Sheath = 1;
+    }
+
     // If an item is flagged as static display, use the static display
     else if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
         display = output->DisplayInfoID;
