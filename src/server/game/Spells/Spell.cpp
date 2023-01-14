@@ -4835,7 +4835,10 @@ void Spell::TakePower()
     Powers powerType = Powers(m_spellInfo->PowerType);
 
     if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+    {
         powerType = POWER_HEALTH;
+        m_powerCost *= 1.5;
+    }
 
     bool hit = true;
     if (unitCaster->GetTypeId() == TYPEID_PLAYER)

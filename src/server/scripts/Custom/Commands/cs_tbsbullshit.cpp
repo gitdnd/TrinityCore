@@ -75,8 +75,6 @@ public:
                 clone->SetFaction(faction);
                 target->CastSpell(clone, 45204, true);
                 ((Minion*)clone)->SetFollowAngle(player->GetAbsoluteAngle(clone));
-                clone->GetMotionMaster()->Clear();
-                clone->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, player->GetAbsoluteAngle(clone));
             }
 
         }
