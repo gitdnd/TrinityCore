@@ -2940,6 +2940,19 @@ class spell_gen_profession_research : public SpellScript
             {
                 SpellInfo const* discoveredSpellInfo = sSpellMgr->GetSpellInfo(discoveredSpellId);
                 caster->AddItem(discoveredSpellInfo->Effects[EFFECT_0].ItemType, 1);
+                // Achievements for discovery all of a category
+                if (HasDiscoveredAllSpells(GetSpellInfo()->Id, caster))
+                {
+                    int id = 0;
+                    if (spellId == SPELL_CRAFTING_BRAWN_DISCOVERY)
+                        id = 50082;
+                    else if (spellId == SPELL_CRAFTING_CUNNING_DISCOVERY)
+                        id = 50083;
+                    else if (spellId == SPELL_CRAFTING_WISDOM_DISCOVERY)
+                        id = 50084;
+                    if (id > 0)
+                        caster->CompletedAchievement(id);
+                }
             }
         }
     }

@@ -4115,6 +4115,9 @@ void ObjectMgr::LoadVirtualItemTemplates()
             mod.spellSeed = itemTemplate->spellSeed;
             mod.statValueSeed = itemTemplate->statValueSeed;
             mod.statGroupSeed = itemTemplate->statGroupSeed;
+            // by default we want to use the already generated stat group on regeneration
+            // this is because there's possible permutations based on subclass
+            mod.statgroup = itemTemplate->statGroup;
             mod.setSeed = itemTemplate->setSeed;
             mod.legendarySeed = itemTemplate->legendarySeed;
             mod.magicFind = itemTemplate->generatedMagicFind;

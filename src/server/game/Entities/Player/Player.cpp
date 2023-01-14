@@ -25871,6 +25871,15 @@ void Player::CompletedAchievement(AchievementEntry const* entry)
     m_achievementMgr->CompletedAchievement(entry);
 }
 
+void Player::CompletedAchievement(uint32 id)
+{
+    auto achievement = AchievementGlobalMgr::instance()->GetAchievement(id);
+    if (achievement)
+    {
+        CompletedAchievement(achievement);
+    }
+}
+
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 {
     uint32 CurTalentPoints = GetFreeTalentPoints();
@@ -27920,7 +27929,7 @@ void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
     }
 }
 
-uint8 Player::GetActiveSubClass()
+uint8 Player::GetActiveSubClass() const
 {
     if(HasAura(SUBCLASS_SPELL_WARDEN))
         return CLASS_SUB_WARDEN;

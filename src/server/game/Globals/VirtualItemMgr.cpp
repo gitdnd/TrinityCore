@@ -320,6 +320,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     std::mt19937 generator;
     generator.seed(modifier.statGroupSeed);
     StatGroup statgroupid;
+    StatGroup statgroupbiasid;
 
     // grab available armor type stat groups
     std::vector<StatGroup> const& statgroups = premadeStatGroupData.GetArmorSubclassStatGroups(output);
@@ -332,6 +333,19 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
         statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
     else // all weapons currently generate entirely random.
         statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
+
+    // if the player has a subclass, roll for bias statgroup
+    if (modifier.subclass > 0)
+    {
+        // grab available subclass stat groups
+        std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerSubclassStatGroups(modifier.subclass);
+        statgroupbiasid = substatgroups[urand(0, substatgroups.size() - 1, generator)];
+
+        // 25% chance of bias, might want to make this into a config later on
+        uint32 chance = 25;
+        if (urand(1, 100, generator) <= chance)
+            statgroupid = statgroupbiasid;
+    }
 
     // if the modifier is not set to random (default value), override selected stat group
     if (modifier.statgroup != STAT_GROUP_RANDOM)
@@ -1426,6 +1440,11 @@ std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetArmorSubclassSta
     return armor_type_stat_groups[output->SubClass];
 }
 
+std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetPlayerSubclassStatGroups(uint8 subclass) const
+{
+    return subclass_stat_groups[subclass];
+}
+
 uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
 {
     switch (output->Quality)
@@ -2209,6 +2228,25 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         STAT_GROUP_INT_DPS,
         STAT_GROUP_STR_DPS,
         STAT_GROUP_STR_TANK
+    };
+
+    //subclass stat groups
+    subclass_stat_groups[CLASS_SUB_WARDEN] = {
+        STAT_GROUP_AGI_TANK,
+        STAT_GROUP_STR_TANK
+    };
+    subclass_stat_groups[CLASS_SUB_HISTORIAN] = {
+        STAT_GROUP_HEALING
+    };
+    subclass_stat_groups[CLASS_SUB_WEAVER] = {
+        STAT_GROUP_INT_DPS
+    };
+    subclass_stat_groups[CLASS_SUB_WATCHER] = {
+        STAT_GROUP_AGI_DPS,
+        STAT_GROUP_STR_DPS
+    };
+    subclass_stat_groups[CLASS_SUB_RANGER] = {
+        STAT_GROUP_AGI_DPS
     };
 }
 
