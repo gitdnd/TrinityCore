@@ -4519,7 +4519,7 @@ namespace LuaPlayer
 
     int IsDeveloper(Eluna* E, Player* player)
     {
-        Eluna::Push(E->L, player->GetSession()->GetSecurity() >= SEC_CONSOLE);
+        Eluna::Push(E->L, player->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR);
         return 1;
     }
 };
