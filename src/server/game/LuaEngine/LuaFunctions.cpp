@@ -794,6 +794,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SetPortalLocation", &LuaPlayer::SetPortalLocation },
     { "SetOverrideLight", &LuaPlayer::SetOverrideLight },
     { "GetSubClass", &LuaPlayer::GetSubClass },
+    { "IsDeveloper", &LuaPlayer::IsDeveloper },
 
     { NULL, NULL }
 };

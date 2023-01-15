@@ -4516,5 +4516,11 @@ namespace LuaPlayer
         Eluna::Push(E->L, player->GetSubClass());
         return 1;
     }
+
+    int IsDeveloper(Eluna* E, Player* player)
+    {
+        Eluna::Push(E->L, player->GetSession()->GetSecurity() >= SEC_CONSOLE);
+        return 1;
+    }
 };
 #endif
