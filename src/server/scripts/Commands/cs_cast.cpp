@@ -186,7 +186,17 @@ public:
         if (!CheckSpellExistsAndIsValid(handler, spellId))
             return false;
 
-        target->CastSpell(target, spellId, false);
+        char* triggeredStr = strtok(nullptr, " ");
+        if (triggeredStr)
+        {
+            int l = strlen(triggeredStr);
+            if (strncmp(triggeredStr, "triggered", l) != 0)
+                return false;
+        }
+
+        TriggerCastFlags triggered = (triggeredStr != nullptr) ? TRIGGERED_FULL_DEBUG_MASK : TRIGGERED_NONE;
+
+        target->CastSpell(target, spellId, triggered);
 
         return true;
     }
