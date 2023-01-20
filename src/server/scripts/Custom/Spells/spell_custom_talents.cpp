@@ -1728,10 +1728,10 @@ public:
 
                             if (ssd && ssv)
                             {
-                                if (ssd->StatID[i] < 0)
+                                if (ssd->StatMod[i] < 0)
                                     continue;
-                                statType = ssd->StatID[i];
-                                val = (ssv->getssdMultiplier(itemplate->ScalingStatValue) * ssd->Bonus[i]) / 10000;
+                                statType = ssd->StatMod[i];
+                                val = (ssv->getssdMultiplier(itemplate->ScalingStatValue) * ssd->Modifier[i]) / 10000;
                             }
                             else
                             {
