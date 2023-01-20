@@ -1914,7 +1914,34 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     // check spell specific stack rules
     if (m_spellInfo->IsAuraExclusiveBySpecificWith(existingSpellInfo)
         || (sameCaster && m_spellInfo->IsAuraExclusiveBySpecificPerCasterWith(existingSpellInfo)))
-        return false;
+    {
+        // HoT: Hex Lord
+        if (sameCaster && existingSpellInfo->GetSpellSpecific() == SPELL_SPECIFIC_CURSE)
+        {
+            Unit* caster = existingAura->GetCaster();
+            WorldObject* target = existingAura->GetOwner();
+            if (!caster || !target)
+                return false;
+
+            if (!caster->HasAura(180469))
+                return false;
+
+            uint8 curses = 0;
+            Unit::AuraApplicationMap auras = target->ToUnit()->GetAppliedAuras();
+            for (auto i : auras)
+            {
+                AuraApplication* app = i.second;
+                Aura const* aura = app->GetBase();
+                if (aura->GetCasterGUID() == GetCasterGUID() && aura->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_CURSE)
+                    ++curses;
+            }
+
+            if (curses > 2)
+                return false;
+        }
+        else
+            return false;
+    }
 
     // check spell group stack rules
     switch (sSpellMgr->CheckSpellGroupStackRules(m_spellInfo, existingSpellInfo))

@@ -2919,6 +2919,11 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                             uint32 auraId = aura->GetId();
                             if (auraId == 180434 || auraId == 180435 || auraId == 180437)
                                 hitInfo.AuraDuration = hitInfo.AuraDuration + ((float)hitInfo.AuraDuration * ((float)aura->GetSpellInfo()->Effects[EFFECT_0].BasePoints / 100.f));
+
+                        // Curse Duration
+                        if (hitInfo.AuraSpellInfo->Dispel == DISPEL_CURSE)
+                            if (auraId == 180480 || auraId == 180481)
+                                hitInfo.AuraDuration = hitInfo.AuraDuration + ((float)hitInfo.AuraDuration * ((float)aura->GetSpellInfo()->Effects[EFFECT_0].BasePoints / 100.f));
                         }
                     }
 
@@ -4836,10 +4841,18 @@ void Spell::TakePower()
 
     Powers powerType = Powers(m_spellInfo->PowerType);
 
+    // HoT: Blood Magic
     if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
     {
         powerType = POWER_HEALTH;
         m_powerCost *= 1.5;
+    }
+
+    // HoT: Blood for the Blood God
+    if (powerType == POWER_MANA && unitCaster->HasAura(180470) && GetSpellInfo()->HasOnlyDamageEffects())
+    {
+        powerType = POWER_HEALTH;
+        m_powerCost *= 2;
     }
 
     bool hit = true;
@@ -8338,7 +8351,13 @@ void Spell::TriggerGlobalCooldown()
 
     // gcd modifier auras are applied only to own spells and only players have such mods
     if (Player* modOwner = m_caster->GetSpellModOwner())
+    {
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_GLOBAL_COOLDOWN, gcd, this);
+ 
+        // HoT: Elune's Grace
+        if (modOwner->HasAura(180496))
+            gcd *= 0.97f;
+    }
 
     // Apply haste rating
     if (m_spellInfo->StartRecoveryCategory == 133 && m_spellInfo->StartRecoveryTime == 1500 &&

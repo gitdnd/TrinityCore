@@ -5374,6 +5374,10 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         return;
     }
 
+    // HoT: Nathrezim Pact
+    if (target->HasAura(180482) && target != caster)
+        return;
+
     // heal for caster damage (must be alive)
     if (target != caster && GetSpellInfo()->HasAttribute(SPELL_ATTR2_HEALTH_FUNNEL) && (!caster || !caster->IsAlive()))
         return;
@@ -5395,6 +5399,26 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         // dynobj auras must always have a caster
         if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
             damage = ASSERT_NOTNULL(caster)->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), { }, GetBase()->GetStackAmount());
+    }
+
+    // HoT: Increased Healing over time spells
+    if (caster)
+    {
+        Unit::AuraApplicationMap auras = caster->GetAppliedAuras();
+        for (auto i : auras)
+        {
+            AuraApplication* app = i.second;
+
+            switch (app->GetBase()->GetId())
+            {
+            case 180516:
+            case 180517:
+                damage *= 1.f + ((float)app->GetBase()->GetEffect(0)->GetAmount() / 100.f);
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT);
