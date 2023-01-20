@@ -768,10 +768,10 @@ class spell_point_blank_periodic_aura : public AuraScript
         if (target == caster)
             return;
 
-        float distance = caster->GetDistance(target);
-        int32 amount = ((20.0f - distance) * 0.5f);
-        amount = std::max(-10, amount);
-        amount = std::min(10, amount);
+        float distance = caster->GetExactDist(target);
+        int32 amount = ((100.0f - (distance * 5)) * 0.5f);
+        amount = std::max(-50, amount);
+        amount = std::min(50, amount);
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
@@ -805,9 +805,9 @@ class spell_dead_eye_periodic_aura : public AuraScript
             return;
 
         float distance = caster->GetDistance(target);
-        int32 amount = ((20.0f - distance) * 0.5f) * -1;
-        amount = std::max(-10, amount);
-        amount = std::min(10, amount);
+        int32 amount = ((100.0f - (distance * 5)) * 0.5f) * -1;
+        amount = std::max(-50, amount);
+        amount = std::min(50, amount);
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
