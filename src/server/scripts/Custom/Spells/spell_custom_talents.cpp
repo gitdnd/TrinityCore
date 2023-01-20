@@ -776,6 +776,7 @@ class spell_point_blank_periodic_aura : public AuraScript
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
         args.AddSpellBP0(amount);
+        caster->RemoveAura(180156);
         caster->CastSpell(caster, 180156, args);
     }
 
@@ -812,6 +813,7 @@ class spell_dead_eye_periodic_aura : public AuraScript
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
         args.AddSpellBP0(amount);
+        caster->RemoveAura(180158);
         caster->CastSpell(caster, 180158, args);
     }
 
