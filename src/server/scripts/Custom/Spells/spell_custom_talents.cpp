@@ -804,7 +804,7 @@ class spell_dead_eye_periodic_aura : public AuraScript
         if (target == caster)
             return;
 
-        float distance = caster->GetDistance(target);
+        float distance = caster->GetExactDist(target);
         int32 amount = ((100.0f - (distance * 5)) * 0.5f) * -1;
         amount = std::max(-50, amount);
         amount = std::min(50, amount);
