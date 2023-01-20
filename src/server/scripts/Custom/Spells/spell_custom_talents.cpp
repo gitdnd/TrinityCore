@@ -769,7 +769,7 @@ class spell_point_blank_periodic_aura : public AuraScript
             return;
 
         float distance = caster->GetExactDist(target);
-        int32 amount = ((100.0f - (distance * 5)) * 0.5f);
+        int32 amount = ((100.0f - (distance * 5.0f)) * 0.5f);
         amount = std::max(-50, amount);
         amount = std::min(50, amount);
 
@@ -805,7 +805,7 @@ class spell_dead_eye_periodic_aura : public AuraScript
             return;
 
         float distance = caster->GetExactDist(target);
-        int32 amount = ((100.0f - (distance * 5)) * 0.5f) * -1;
+        int32 amount = ((100.0f - (distance * 5.0f )) * 0.5f) * -1;
         amount = std::max(-50, amount);
         amount = std::min(50, amount);
 
