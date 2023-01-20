@@ -6,6 +6,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Item.h"
+#include <Chat.h>
 
 class spell_talent_combulstibolt_aura : public AuraScript
 {
@@ -770,8 +771,18 @@ class spell_point_blank_periodic_aura : public AuraScript
 
         float distance = caster->GetExactDist(target);
         int32 amount = ((100.0f - (distance * 5.0f)) * 0.5f);
+        int32 backup = amount;
         amount = std::max(-50, amount);
         amount = std::min(50, amount);
+
+        // Debug
+        std::string msg = "Dist = ";
+        msg += std::to_string(distance);
+        msg += ", amount = ";
+        msg += std::to_string(amount);
+        msg += ", backup = ";
+        msg += std::to_string(backup);
+        ChatHandler(caster->GetSession()).SendSysMessage(msg.c_str());
 
         CastSpellExtraArgs args(aurEff);
         args.OriginalCaster = GetCasterGUID();
