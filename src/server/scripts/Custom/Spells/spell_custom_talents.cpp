@@ -1907,8 +1907,8 @@ void AddSC_Spells_Custom_Talents()
     new hot_mana_on_kill();
     new hot_life_on_kill();
     new hot_blood_drinker();
-    RegisterSpellScript(spell_gen_shield_sup_dummy);
-    RegisterSpellScript(spell_gen_shield_sup);
+    RegisterAuraScript(spell_gen_shield_sup_dummy);
+    RegisterAuraScript(spell_gen_shield_sup);
     new hot_blind_on_hit();
     new hot_maligant_deterioration();
     new hot_nathrezim_pact();
