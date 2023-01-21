@@ -1704,7 +1704,9 @@ public:
 
             if (!target->HasAura(180521))
             {
-                if (target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) == nullptr && target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) == nullptr)
+                if (target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) == nullptr &&
+                    target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) == nullptr &&
+                    target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED) == nullptr)
                 {
                     float agility = target->GetStat(STAT_AGILITY);
                     int32 attackspeedbonus = (agility / 100.f);
@@ -1784,12 +1786,15 @@ public:
                         target->CastSpell(target, 180523, args3);
 
                         gloves_save = gloves;
+                        agility_save = target->GetStat(STAT_AGILITY);
                     }
                 }
             }
             else
             {
-                if (target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) != nullptr || target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) != nullptr)
+                if (target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) != nullptr ||
+                    target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) != nullptr ||
+                    target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED) != nullptr)
                 {
                     RemoveEffect(target);
                     return;
