@@ -12336,7 +12336,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
                 // World chat
                 if (channel->GetChannelId() == 26)
                 {
-                    std::string str = "I just crafted: ";
+                    std::string str = "I just found: ";
                     std::ostringstream oss;
                     oss << "|c" << std::hex << ItemQualityColors[ITEM_QUALITY_LEGENDARY] << std::dec <<
                         "|Hitem:" << pItem->GetEntry() << ":0:" <<
@@ -12345,7 +12345,6 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
                     str += oss.str();
                     str += "!";
                     channel->ChatSpySay(GetGUID(), str, LANG_UNIVERSAL);
-                    sWorld->SendGMText(str.c_str());
                     break;
                 }
             }
