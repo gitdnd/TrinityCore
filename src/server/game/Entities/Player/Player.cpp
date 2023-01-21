@@ -12341,7 +12341,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
                     str += ":::::::0:80::::|h[";
                     str += pItem->GetTemplate()->Name1;
                     str += "]|h|r!";
-                    channel->ChatSpySay(GetGUID(), str, LANG_UNIVERSAL);
+                    channel->ChatSpySay(GetGUID(), str.c_str(), LANG_UNIVERSAL);
                     break;
                 }
             }
