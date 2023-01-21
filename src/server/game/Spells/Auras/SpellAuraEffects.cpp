@@ -4092,7 +4092,7 @@ void AuraEffect::HandleAuraModRangedAttackPower(AuraApplication const* aurApp, u
     if ((target->GetClassMask() & CLASSMASK_WAND_USERS) != 0 && target->ToPlayer());
     {
         Item* item = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_ITEM_START, SLOT_RANGED);
-        if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WAND)
+        if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
         {
             return;
         }
@@ -4128,7 +4128,7 @@ void AuraEffect::HandleAuraModRangedAttackPowerPercent(AuraApplication const* au
     if ((target->GetClassMask() & CLASSMASK_WAND_USERS) != 0 && target->ToPlayer());
     {
         Item* item = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_ITEM_START, SLOT_RANGED);
-        if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WAND)
+        if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
         {
             return;
         }
