@@ -12328,8 +12328,8 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
 
         ApplyVirtualItemLegendayEffects(pItem);
 
-        // Broadcast to world chat
-        if (quality == ITEM_QUALITY_LEGENDARY)
+        // Broadcast to world chat if not a GM
+        if (quality == ITEM_QUALITY_LEGENDARY && GetSession()->GetSecurity() < SEC_GAMEMASTER)
         {
             for (Channel* channel : GetJoinedChannels())
             {
