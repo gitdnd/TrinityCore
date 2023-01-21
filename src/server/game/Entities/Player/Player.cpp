@@ -12285,10 +12285,10 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
+        uint32 quality = pItem->GetTemplate()->Quality;
         if (modifier.isCrafted)
         {
             // /FIXME Hardcoded achievement IDs is easier, need to improve later
-            uint32 quality = pItem->GetTemplate()->Quality;
             uint32 achievementId = 0;
             if (quality == ITEM_QUALITY_RARE)
                 achievementId = 50074;
@@ -12327,6 +12327,25 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         }
 
         ApplyVirtualItemLegendayEffects(pItem);
+
+        // Broadcast to world chat
+        if (quality == ITEM_QUALITY_LEGENDARY)
+        {
+            for (Channel* channel : GetJoinedChannels())
+            {
+                // World chat
+                if (channel->GetChannelId() == 26)
+                {
+                    std::string str = "I just crafted: |cff8000|Hitem:";
+                    str += pItem->GetEntry();
+                    str += ":::::::0:80::::|h[";
+                    str += pItem->GetTemplate()->Name1;
+                    str += "]|h|r!";
+                    channel->ChatSpySay(GetGUID(), str, LANG_UNIVERSAL);
+                    break;
+                }
+            }
+        }
     }
     return pItem;
 }
