@@ -743,7 +743,7 @@ class TC_GAME_API World
         void LoadConfigSettings(bool reload = false);
 
         void SendWorldText(uint32 string_id, ...);
-        void SendGlobalText(char const* text, WorldSession* self);
+        void SendGlobalText(char const* text, WorldSession* self, ChatMsg msg = CHAT_MSG_SYSTEM);
         void SendGMText(uint32 string_id, ...);
         void SendGMText(char const* text);
         void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
