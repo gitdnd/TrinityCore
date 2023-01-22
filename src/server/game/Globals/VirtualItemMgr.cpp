@@ -1175,10 +1175,6 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             socketCount = 2;
     }
 
-    // if we don't have any sockets, skip and move on.
-    if (socketCount <= 0)
-        return;
-
     // set socket colors
     std::vector<SocketColor> const& socketcolors = premadeStatGroupData.GetStatGroupSockets(reRoll ? STAT_GROUP_ALL : output->statGroup, generator);
     if (!socketcolors.empty())
@@ -2051,7 +2047,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 
     output->legendaryId = selectedLegendary->legendaryId;
 
-    if (selectedLegendary->statGroupOverride >= 0);
+    if (selectedLegendary->statGroupOverride && selectedLegendary->statGroupOverride >= 0 && selectedLegendary->statGroupOverride < STAT_GROUP_COUNT);
         output->statGroup = StatGroup(selectedLegendary->statGroupOverride);
 
     for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
