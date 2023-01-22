@@ -12331,7 +12331,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         // Broadcast to world chat if not a GM
         if (quality == ITEM_QUALITY_LEGENDARY && GetSession()->GetSecurity() < SEC_GAMEMASTER)
         {
-            for (Channel* channel : GetJoinedChannels())
+            /*for (Channel* channel : GetJoinedChannels())
             {
                 // World chat
                 if (channel->GetChannelId() == 26)
@@ -12347,7 +12347,13 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
                     channel->ChatSpySay(GetGUID(), str, LANG_UNIVERSAL);
                     break;
                 }
-            }
+            }*/
+            std::ostringstream oss;
+            oss << GetName() << " has found " <<
+                "|c" << std::hex << ItemQualityColors[ITEM_QUALITY_LEGENDARY] << std::dec <<
+                "|Hitem:" << pItem->GetEntry() << ":0:" <<
+                "0:0:0:0:" << "0:0:0:0|h[" << pItem->GetTemplate()->Name1 << "]|h|r" << "!";
+            sWorld->SendGlobalText(oss.str().c_str(), nullptr);
         }
     }
     return pItem;
