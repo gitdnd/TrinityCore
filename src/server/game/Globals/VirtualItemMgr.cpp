@@ -348,6 +348,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     }
 
     // override stat group if the item is flagged as a specific type
+    /*
     if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WARDEN) != 0)
         statgroupid = STAT_GROUP_STR_TANK;
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_HISTORIAN) != 0)
@@ -357,7 +358,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WATCHER) != 0)
         statgroupid = STAT_GROUP_STR_DPS;
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_RANGER) != 0)
-        statgroupid = STAT_GROUP_AGI_DPS;
+        statgroupid = STAT_GROUP_AGI_DPS;*/
 
     // if the modifier is not set to random (default value), override selected stat group
     if (modifier.statgroup != STAT_GROUP_RANDOM)
