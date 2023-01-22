@@ -2047,8 +2047,8 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 
     output->legendaryId = selectedLegendary->legendaryId;
 
-    /*if (selectedLegendary->statGroupOverride && selectedLegendary->statGroupOverride >= 0 && selectedLegendary->statGroupOverride < STAT_GROUP_COUNT)
-        output->statGroup = StatGroup(selectedLegendary->statGroupOverride);*/
+    if (selectedLegendary->statGroupOverride != -1)
+        output->statGroup = static_cast<StatGroup>(selectedLegendary->statGroupOverride);
 
     for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
     {
