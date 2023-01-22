@@ -227,8 +227,11 @@ enum ItemFlagsCustom
     ITEM_FLAGS_CU_FOLLOW_LOOT_RULES     = 0x0004,    // Item will always follow group/master/need before greed looting rules
     // VirtualItem
     ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE     = 0x0008,   // Item is used as a base for virtual item that is generated when adding this item to player
-
-
+    ITEM_FLAGS_CU_VIRT_CLASS_WARDEN     = 0x0010,
+    ITEM_FLAGS_CU_VIRT_CLASS_HISTORIAN  = 0x0020,
+    ITEM_FLAGS_CU_VIRT_CLASS_WEAVER     = 0x0040,
+    ITEM_FLAGS_CU_VIRT_CLASS_WATCHER    = 0x0080,
+    ITEM_FLAGS_CU_VIRT_CLASS_RANGER     = 0x0100
 };
 
 enum VirtualItemFlags
