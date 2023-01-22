@@ -12332,7 +12332,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         if (quality == ITEM_QUALITY_LEGENDARY && GetSession()->GetSecurity() < SEC_GAMEMASTER)
         {
             std::ostringstream oss;
-            oss << GetName() << " has found " <<
+            oss << GetName() << " has obtained " <<
                 "|c" << std::hex << ItemQualityColors[ITEM_QUALITY_LEGENDARY] << std::dec <<
                 "|Hitem:" << pItem->GetEntry() << ":0:" <<
                 "0:0:0:0:" << "0:0:0:0|h[" << pItem->GetTemplate()->Name1 << "]|h|r" << "!";
