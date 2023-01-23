@@ -1301,7 +1301,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
     uint32 chanceRng = urand(1, 100, generator);
 
-    if (set.setId > 0 && chanceRng <= qualityChance)
+    if (set.setId > 0 && (chanceRng <= qualityChance || modifier.generateSet == true))
     {
         output->ItemSet = set.setId;
 

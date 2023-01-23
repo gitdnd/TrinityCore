@@ -124,6 +124,7 @@ struct VirtualModifier
         magicFind = 0.f;
         statPoolPctModifier = 0.f;
         subclass = 0;
+        generateSet = false;
     }
 
     /**
@@ -152,6 +153,7 @@ struct VirtualModifier
     float magicFind;
     float statPoolPctModifier;
     uint8 subclass;
+    bool generateSet;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
