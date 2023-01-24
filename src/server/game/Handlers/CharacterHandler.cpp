@@ -1148,11 +1148,14 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
         return;
     }
 
-    ResponseCodes res = ObjectMgr::CheckPlayerName(renameInfo->Name, GetSessionDbcLocale(), true);
-    if (res != CHAR_NAME_SUCCESS)
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
     {
-        SendCharRename(res, renameInfo.get());
-        return;
+        ResponseCodes res = ObjectMgr::CheckPlayerName(renameInfo->Name, GetSessionDbcLocale(), true);
+        if (res != CHAR_NAME_SUCCESS)
+        {
+            SendCharRename(res, renameInfo.get());
+            return;
+        }
     }
 
     // check name limitations

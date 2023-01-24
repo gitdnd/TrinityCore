@@ -2909,7 +2909,8 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                         hitInfo.AuraDuration = int32(hitInfo.AuraDuration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
 
                     // HoT: Damage over time duration increase spells
-                    if (m_originalCaster) {
+                    if (m_originalCaster)
+                    {
                         Unit::AuraApplicationMap auras = m_originalCaster->GetAppliedAuras();
                         for (auto i : auras)
                         {
