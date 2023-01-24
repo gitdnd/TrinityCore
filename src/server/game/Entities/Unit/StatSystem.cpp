@@ -562,6 +562,13 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bo
     float weaponMinDamage = GetWeaponDamageRange(attType, MINDAMAGE);
     float weaponMaxDamage = GetWeaponDamageRange(attType, MAXDAMAGE);
 
+    // HoT: Shield Supperiority (unused, implemented under a different ID)
+    if (HasAura(180519))
+    {
+        weaponMinDamage += GetShieldBlockValue();
+        weaponMaxDamage += GetShieldBlockValue();
+    }
+
     // check if player is druid and in cat or bear forms
     if (IsInFeralForm())
     {

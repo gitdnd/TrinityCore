@@ -1027,6 +1027,10 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
                     critPctDamageMod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellInfo->GetSchoolMask()) - 1.0f) * 100;
 
+                    // HoT: Ambush
+                    if (HasAura(180486) && victim->HealthBelowPct(50))
+                        critPctDamageMod += 10.f;
+
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_PERCENT_VERSUS
                     critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
 
@@ -1041,6 +1045,14 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     // double blocked amount if block is critical
                     if (victim->isBlockCritical())
                         damageInfo->blocked += damageInfo->blocked;
+
+                    // HoT: Nathrezim Pact
+                    if (victim->HasAura(180482))
+                        damageInfo->blocked = damageInfo->blocked / 2;
+                    // HoT: Shield Supperiosity (unused)
+                    if(victim->HasAura(180519))
+                        damageInfo->blocked = (float)damageInfo->blocked * 0.25f;
+
                     if (damage <= int32(damageInfo->blocked))
                     {
                         damageInfo->blocked = uint32(damage);
@@ -1254,6 +1266,10 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
                 // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
                 mod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, damageInfo->Damages[i].DamageSchoolMask) - 1.0f) * 100;
 
+                // HoT: Ambush
+                if (HasAura(180486) && victim->HealthBelowPct(50))
+                    mod += 10.f;
+
                 uint32 crTypeMask = damageInfo->Target->GetCreatureTypeMask();
 
                 // Increase crit damage from SPELL_AURA_MOD_CRIT_PERCENT_VERSUS
@@ -1291,6 +1307,13 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
             // double blocked amount if block is critical
             if (damageInfo->Target->isBlockCritical())
                 damageInfo->Blocked *= 2;
+
+            // HoT: Nathrezim Pact
+            if (victim->HasAura(180482))
+                damageInfo->Blocked = damageInfo->Blocked / 2;
+            // HoT: Shield Supperiosity (unused)
+            if (victim->HasAura(180519))
+                damageInfo->Blocked = (float)damageInfo->Blocked * 0.25f;
 
             uint32 remainingBlock = damageInfo->Blocked;
             uint8  fullBlockMask = 0;
@@ -2949,6 +2972,16 @@ void Unit::_UpdateAutoRepeatSpell()
         // we want to shoot
         Spell* spell = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
         spell->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
+
+        // HoT: Barrage
+        if (autoRepeatSpellInfo->Id == 75 && HasAura(180529))
+        {
+            Spell* bonusProjectile = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
+            bonusProjectile->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
+
+            Spell* bonusProjectile2 = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
+            bonusProjectile2->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
+        }
 
         // all went good, reset attack
         resetAttackTimer(RANGED_ATTACK);
@@ -6764,6 +6797,24 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             }
+            // Maligant Deterioration
+            case 10002:
+            {
+                if (damagetype == DOT)
+                {
+                    float SpellHastePercent = GetFloatValue(UNIT_MOD_CAST_SPEED);
+                    if(frand(0.f, 1.f) <= SpellHastePercent)
+                        AddPct(DoneTotalMod, 2);
+                }
+                break;
+            }
+            // Shield Supperiosity (unused)
+            case 10004:
+            {
+                if (spellProto->EquippedItemClass == 4 && spellProto->EquippedItemSubClassMask == 64)
+                    AddPct(DoneTotalMod, 10);
+                break;
+            }
         }
     }
 
@@ -7241,6 +7292,10 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                 return true;
             return false;
         });
+
+        // HoT: Ambush
+        if (caster->HasAura(180486) && HealthAbovePct(50))
+            crit_chance += 10.f;
     }
 
     return std::max(crit_chance, 0.0f);
@@ -7269,7 +7324,13 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
         crit_mod += (caster->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellProto->GetSchoolMask()) - 1.0f) * 100;
 
         if (victim)
+        {
             crit_mod += caster->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, victim->GetCreatureTypeMask());
+
+            // HoT: Ambush
+            if (caster->HasAura(180486) && victim->HealthBelowPct(50))
+                crit_mod += 10.f;
+        }
 
         if (crit_bonus != 0)
             AddPct(crit_bonus, crit_mod);
@@ -7962,6 +8023,13 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
                     int32 bonus = -(*i)->GetBase()->GetEffect(0)->GetAmount();
                     AddPct(DoneTotalMod, bonus);
                 }
+                break;
+            }
+            // Barrage
+            case 10005:
+            {
+                if (attType == RANGED_ATTACK && HasAura(180529))
+                    AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             }
         }

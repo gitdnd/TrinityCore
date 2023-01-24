@@ -124,6 +124,7 @@ struct VirtualModifier
         magicFind = 0.f;
         statPoolPctModifier = 0.f;
         subclass = 0;
+        generateSet = false;
     }
 
     /**
@@ -152,6 +153,7 @@ struct VirtualModifier
     float magicFind;
     float statPoolPctModifier;
     uint8 subclass;
+    bool generateSet;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
@@ -246,11 +248,11 @@ struct legendaryItemInfo
     _Spell legendarySpells[MAX_LEGENDARY_SPELLS];
     float primaryStatModifier;
     float secondaryStatModifier;
-    uint8 socketMod;
+    int8 socketMod;
     bool generatePrismatic;
-    uint8 primaryStatCountMod;
-    uint8 secondaryStatCountMod;
-    uint8 statGroupOverride;
+    int8 primaryStatCountMod;
+    int8 secondaryStatCountMod;
+    int8 statGroupOverride;
 };
 
 typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;

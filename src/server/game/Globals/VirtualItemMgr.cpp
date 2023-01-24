@@ -347,6 +347,18 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
             statgroupid = statgroupbiasid;
     }
 
+    // override stat group if the item is flagged as a specific type
+    if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WARDEN) != 0)
+        statgroupid = STAT_GROUP_STR_TANK;
+    else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_HISTORIAN) != 0)
+        statgroupid = STAT_GROUP_HEALING;
+    else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WEAVER) != 0)
+        statgroupid = STAT_GROUP_INT_DPS;
+    else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WATCHER) != 0)
+        statgroupid = STAT_GROUP_STR_DPS;
+    else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_RANGER) != 0)
+        statgroupid = STAT_GROUP_AGI_DPS;
+
     // if the modifier is not set to random (default value), override selected stat group
     if (modifier.statgroup != STAT_GROUP_RANDOM)
         statgroupid = modifier.statgroup;
@@ -595,11 +607,12 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
     if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
     {
-        if (leg->primaryStatCountMod)
-            primaryStatSlots = leg->primaryStatCountMod;
+        // Primary stat count modifier can both add and subtract
+        if (leg->primaryStatCountMod && leg->primaryStatCountMod != 0)
+            primaryStatSlots += leg->primaryStatCountMod;
 
-        if (leg->secondaryStatCountMod)
-            secondaryStatSlots = leg->secondaryStatCountMod;
+        if (leg->secondaryStatCountMod && leg->secondaryStatCountMod != 0)
+            secondaryStatSlots += leg->secondaryStatCountMod;
     }
 
     // multiply the pool size by the base amounts of stat slots
@@ -1155,8 +1168,8 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
     if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
     {
-        if (leg->socketMod)
-            socketCount = leg->socketMod;
+        if (leg->socketMod && leg->socketMod != 0)
+            socketCount += leg->socketMod;
 
         if (leg->generatePrismatic && socketCount >= 3)
             socketCount = 2;
@@ -1288,7 +1301,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
     uint32 chanceRng = urand(1, 100, generator);
 
-    if (set.setId > 0 && chanceRng <= qualityChance)
+    if (set.setId > 0 && (chanceRng <= qualityChance || modifier.generateSet == true))
     {
         output->ItemSet = set.setId;
 
@@ -1946,11 +1959,11 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.itemStatGroup = fields[6].GetInt8();
         legTemp.primaryStatModifier = fields[7].GetFloat();
         legTemp.secondaryStatModifier = fields[8].GetFloat();
-        legTemp.socketMod = fields[9].GetUInt8();
+        legTemp.socketMod = fields[9].GetInt8();
         legTemp.generatePrismatic = fields[10].GetBool();
-        legTemp.primaryStatCountMod = fields[11].GetUInt8();
-        legTemp.secondaryStatCountMod = fields[12].GetUInt8();
-        legTemp.statGroupOverride = fields[13].GetUInt8();
+        legTemp.primaryStatCountMod = fields[11].GetInt8();
+        legTemp.secondaryStatCountMod = fields[12].GetInt8();
+        legTemp.statGroupOverride = fields[13].GetInt8();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
@@ -2033,7 +2046,9 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     std::advance(selectedLegendary, urand(0, uint32(std::size(legList)) - 1, generator));
 
     output->legendaryId = selectedLegendary->legendaryId;
-    output->statGroup = StatGroup(selectedLegendary->statGroupOverride);
+
+    if (selectedLegendary->statGroupOverride != -1)
+        output->statGroup = static_cast<StatGroup>(selectedLegendary->statGroupOverride);
 
     for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
     {

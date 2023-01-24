@@ -1312,6 +1312,10 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
     if (!unitCaster)
         return;
 
+    // HoT: Nathrezim Pact
+    if (unitTarget->HasAura(180482) && unitTarget != unitCaster)
+        return;
+
     int32 addhealth = damage;
 
     // FIXME(Harry): This should be configurable
@@ -1452,6 +1456,10 @@ void Spell::EffectHealthLeech(SpellEffIndex effIndex)
 
     if (!unitTarget || !unitTarget->IsAlive() || damage < 0)
         return;
+
+    // HoT: Nathrezim Pact
+    if (unitTarget->HasAura(180482))
+        damage *= 2;
 
     if (unitCaster)
     {

@@ -2821,7 +2821,7 @@ void World::SendGMText(char const* text)
 }
 
 /// DEPRECATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
-void World::SendGlobalText(char const* text, WorldSession* self)
+void World::SendGlobalText(char const* text, WorldSession* self, ChatMsg msg)
 {
     WorldPacket data;
 
@@ -2831,7 +2831,7 @@ void World::SendGlobalText(char const* text, WorldSession* self)
 
     while (char* line = ChatHandler::LineFromMessage(pos))
     {
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        ChatHandler::BuildChatPacket(data, msg, LANG_UNIVERSAL, nullptr, nullptr, line);
         SendGlobalMessage(&data, self);
     }
 

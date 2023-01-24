@@ -4089,8 +4089,14 @@ void AuraEffect::HandleAuraModRangedAttackPower(AuraApplication const* aurApp, u
 
     Unit* target = aurApp->GetTarget();
 
-    if ((target->GetClassMask() & CLASSMASK_WAND_USERS) != 0)
-        return;
+    if ((target->GetClassMask() & CLASSMASK_WAND_USERS) != 0 && target->ToPlayer())
+    {
+        Item* item = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+        if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+        {
+            return;
+        }
+    }
 
     target->HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(GetAmount()), apply);
 }
@@ -4119,8 +4125,14 @@ void AuraEffect::HandleAuraModRangedAttackPowerPercent(AuraApplication const* au
 
     Unit* target = aurApp->GetTarget();
 
-    if ((target->GetClassMask() & CLASSMASK_WAND_USERS) != 0)
-        return;
+    if ((target->GetClassMask() & CLASSMASK_WAND_USERS) != 0 && target->ToPlayer())
+    {
+        Item* item = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+        if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+        {
+            return;
+        }
+    }
 
     //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
     if (apply)
@@ -5374,6 +5386,10 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         return;
     }
 
+    // HoT: Nathrezim Pact
+    if (target->HasAura(180482) && target != caster)
+        return;
+
     // heal for caster damage (must be alive)
     if (target != caster && GetSpellInfo()->HasAttribute(SPELL_ATTR2_HEALTH_FUNNEL) && (!caster || !caster->IsAlive()))
         return;
@@ -5395,6 +5411,26 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         // dynobj auras must always have a caster
         if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
             damage = ASSERT_NOTNULL(caster)->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), { }, GetBase()->GetStackAmount());
+    }
+
+    // HoT: Increased Healing over time spells
+    if (caster)
+    {
+        Unit::AuraApplicationMap auras = caster->GetAppliedAuras();
+        for (auto i : auras)
+        {
+            AuraApplication* app = i.second;
+
+            switch (app->GetBase()->GetId())
+            {
+            case 180516:
+            case 180517:
+                damage *= 1.f + ((float)app->GetBase()->GetEffect(0)->GetAmount() / 100.f);
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT);

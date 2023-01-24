@@ -5444,13 +5444,26 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 uint32 Player::GetShieldBlockValue() const
 {
     // Talent: Primed: Allows you to block with a two-handed melee weapon
-    float blockValue = 0.f; 
+    float blockValue = 0.f;
+    bool hasTwoHand = false;
     if (HasSpell(180160) && IsTwoHandUsed())
     {
         blockValue = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->GetItemLevel() * 0.93f;
+        hasTwoHand = true;
     }
 
     float value = std::max(0.f, (blockValue + m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
+
+    // Talent: Shield Superiority: While you have a Shield equipped ... you gain $s1% more block value from your equipped shield...
+    if (!hasTwoHand && HasAura(93999))
+    {
+        AuraEffect const* shieldSuperiority = GetAuraEffect(81001, EFFECT_0);
+        if (shieldSuperiority)
+        {
+            value *= (1.f + (shieldSuperiority->GetAmount() / 100.f));
+        }
+    }
+
     return uint32(value);
 }
 
@@ -7831,7 +7844,47 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, bool appl
         return;
 
     if (CanModifyStats() && (GetWeaponDamageRange(attType, MAXDAMAGE) || proto->Delay))
+    {
         UpdateDamagePhysical(attType);
+    }
+}
+
+uint32 Player::GetEquippedShieldBaseBlockValue()
+{
+    uint32 baseBV = 0;
+    Item* offHand = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    
+    if (!offHand || offHand->GetTemplate()->InventoryType != INVTYPE_SHIELD) // if no off-hand equipped or it is not a shield
+        return baseBV;
+    ItemTemplate const* shieldEntry = offHand->GetTemplate(); // Grab entry for equipped shield so we can find block value
+
+    baseBV = shieldEntry->Block;
+
+    return baseBV;
+}
+
+void Player::UpdateShieldSuperiority()
+{
+    if (!HasAura(93998)) // Do nothing if player does not have Shield Superiority Dummy active/learned
+        return;
+
+    uint32 baseBV = GetEquippedShieldBaseBlockValue();
+    Item* offHand = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    if (Item* weapon = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) // If a main-hand item is equipped then remove the active aura
+        RemoveAura(93999);
+    else if (!offHand || offHand->GetTemplate()->InventoryType != INVTYPE_SHIELD) // if no off-hand equipped or it is not a shield
+        RemoveAura(93999);
+    else
+    {
+        if (!HasAura(93999))
+            AddAura(93999, this);
+
+        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, baseBV * 1.25);
+        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, baseBV * 1.55);
+        UpdateDamagePhysical(BASE_ATTACK);
+    }
+
+    UpdateShieldBlockValue();
 }
 
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
@@ -12232,10 +12285,10 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
+        uint32 quality = pItem->GetTemplate()->Quality;
         if (modifier.isCrafted)
         {
             // /FIXME Hardcoded achievement IDs is easier, need to improve later
-            uint32 quality = pItem->GetTemplate()->Quality;
             uint32 achievementId = 0;
             if (quality == ITEM_QUALITY_RARE)
                 achievementId = 50074;
@@ -12274,6 +12327,17 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         }
 
         ApplyVirtualItemLegendayEffects(pItem);
+
+        // Broadcast to world chat if not a GM
+        if (quality == ITEM_QUALITY_LEGENDARY && GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        {
+            std::ostringstream oss;
+            oss << GetName() << " has obtained " <<
+                "|c" << std::hex << ItemQualityColors[ITEM_QUALITY_LEGENDARY] << std::dec <<
+                "|Hitem:" << pItem->GetEntry() << ":0:" <<
+                "0:0:0:0:" << "0:0:0:0|h[" << pItem->GetTemplate()->Name1 << "]|h|r" << "!";
+            sWorld->SendGlobalText(oss.str().c_str(), nullptr, CHAT_MSG_LOOT);
+        }
     }
     return pItem;
 }
@@ -12482,7 +12546,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         if (slot == EQUIPMENT_SLOT_MAINHAND)
             UpdateExpertise(BASE_ATTACK);
-
         else if (slot == EQUIPMENT_SLOT_OFFHAND)
             UpdateExpertise(OFF_ATTACK);
 
@@ -12531,7 +12594,10 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     }
 
     if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
+    {
         CheckTitanGripPenalty();
+        UpdateShieldSuperiority();
+    }
 
     // only for full equip instead adding to stack
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
@@ -12562,7 +12628,10 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         }
 
         if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
+        {
             CheckTitanGripPenalty();
+            UpdateShieldSuperiority();
+        }
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
@@ -12761,7 +12830,11 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
             {
                 SetVisibleItemSlot(slot, nullptr);
                 if (slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND)
+                {
                     CheckTitanGripPenalty();
+                    UpdateShieldSuperiority();
+                    UpdateDamagePhysical(BASE_ATTACK);
+                }
             }
         }
         else if (Bag* pBag = GetBagByPos(bag))

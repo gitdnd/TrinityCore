@@ -1300,7 +1300,7 @@ public:
 
         VirtualModifier modifier;
 
-        //item id, seed, ilevel, quality
+        //item id, seed, ilevel, quality, generateSet
         char const* seedStr = strtok(nullptr, " ");
         if (seedStr)
         {
@@ -1317,9 +1317,15 @@ public:
                 if (qualityStr)
                 {
                     modifier.quality = atoi(qualityStr);
+
+                    char const* setStr = strtok(nullptr, " ");
+                    if (setStr)
+                    {
+                        modifier.generateSet = (atoi(setStr) == 1);
+                    }
                 }
             }
-            handler->PSendSysMessage("ItemId = %d, seed = %d, ilevel = %d, quality = %d", itemId, modifier.seed, modifier.ilevel, (int)modifier.quality);
+            handler->PSendSysMessage("ItemId = %d, seed = %d, ilevel = %d, quality = %d, setOverride = %d", itemId, modifier.seed, modifier.ilevel, (int)modifier.quality, int(modifier.generateSet));
         }
 
         Item* item = playerTarget->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
