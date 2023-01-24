@@ -388,11 +388,14 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     }
 
     // check name limitations
-    ResponseCodes res = ObjectMgr::CheckPlayerName(createInfo->Name, GetSessionDbcLocale(), true);
-    if (res != CHAR_NAME_SUCCESS)
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
     {
-        SendCharCreate(res);
-        return;
+        ResponseCodes res = ObjectMgr::CheckPlayerName(createInfo->Name, GetSessionDbcLocale(), true);
+        if (res != CHAR_NAME_SUCCESS)
+        {
+            SendCharCreate(res);
+            return;
+        }
     }
 
     if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME) && sObjectMgr->IsReservedName(createInfo->Name))
@@ -1461,11 +1464,14 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
         return;
     }
 
-    ResponseCodes res = ObjectMgr::CheckPlayerName(customizeInfo->Name, GetSessionDbcLocale(), true);
-    if (res != CHAR_NAME_SUCCESS)
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
     {
-        SendCharCustomize(res, customizeInfo.get());
-        return;
+        ResponseCodes res = ObjectMgr::CheckPlayerName(customizeInfo->Name, GetSessionDbcLocale(), true);
+        if (res != CHAR_NAME_SUCCESS)
+        {
+            SendCharCustomize(res, customizeInfo.get());
+            return;
+        }
     }
 
     // check name limitations
@@ -1743,11 +1749,14 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         return;
     }
 
-    ResponseCodes res = ObjectMgr::CheckPlayerName(factionChangeInfo->Name, GetSessionDbcLocale(), true);
-    if (res != CHAR_NAME_SUCCESS)
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
     {
-        SendCharFactionChange(res, factionChangeInfo.get());
-        return;
+        ResponseCodes res = ObjectMgr::CheckPlayerName(factionChangeInfo->Name, GetSessionDbcLocale(), true);
+        if (res != CHAR_NAME_SUCCESS)
+        {
+            SendCharFactionChange(res, factionChangeInfo.get());
+            return;
+        }
     }
 
     // check name limitations
