@@ -4558,9 +4558,12 @@ namespace LuaPlayer
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
-                item->AddToObjectUpdate();
                 if (item->IsEquipped())
+                {
+                    ItemPosCountVec dest;
+                    player->MoveItemToInventory(dest, item, true);
                     player->EquipItem(item->GetSlot(), item, true);
+                }
             }
         }
         // Learnt new starter talent
@@ -4584,9 +4587,12 @@ namespace LuaPlayer
                 if (item)
                 {
                     item->SetEntry(itemId);
-                    item->AddToObjectUpdate();
                     if (item->IsEquipped())
+                    {
+                        ItemPosCountVec dest;
+                        player->MoveItemToInventory(dest, item, true);
                         player->EquipItem(item->GetSlot(), item, true);
+                    }
                 }
             }
         }
