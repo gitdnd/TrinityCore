@@ -4530,18 +4530,60 @@ namespace LuaPlayer
         // Reset
         if (talent == 0) {
             // Find any possible tabard
-            // Add Initiate's
+            if (Item* item = player->GetItemByEntry(82094))
+            {
+                // Timewalker Tabard
+                item->SetEntry(82093);
+                item->SendUpdateToPlayer(player);
+            }
+            else if (Item* item = player->GetItemByEntry(82095))
+            {
+                // Timewalker Tabard
+                item->SetEntry(82093);
+                item->SendUpdateToPlayer(player);
+            }
+            if (Item* item = player->GetItemByEntry(82096))
+            {
+                // Timewalker Tabard
+                item->SetEntry(82093);
+                item->SendUpdateToPlayer(player);
+            }
+            if (Item* item = player->GetItemByEntry(82097))
+            {
+                // Timewalker Tabard
+                item->SetEntry(82093);
+                item->SendUpdateToPlayer(player);
+            }
+            if (Item* item = player->GetItemByEntry(82098))
+            {
+                // Timewalker Tabard
+                item->SetEntry(82093);
+                item->SendUpdateToPlayer(player);
+            }
         }
         // Learnt new starter talent
         else
         {
-            // Timewalker Tabard
-            Item* item = player->GetItemByEntry(82093);
-            if (item)
+            auto itemId = 0;
+            if (talent == 180000) // Warden
+                itemId = 82094;
+            else if (talent == 180001) // Historian
+                itemId = 82098;
+            else if (talent == 180002) // Weaver
+                itemId = 82095;
+            else if (talent == 180003) // Watcher
+                itemId = 82097;
+            else if (talent == 180004) // Ranger
+                itemId = 82096;
+            if (itemId > 0)
             {
-                uint8 slot = item->GetSlot();
-                // Weaver Tabard
-                item->SetEntry(82095);
+                // Timewalker Tabard
+                Item* item = player->GetItemByEntry(82093);
+                if (item)
+                {
+                    item->SetEntry(itemId);
+                    item->SendUpdateToPlayer(player);
+                }
             }
         }
         return 0;
