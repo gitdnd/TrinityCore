@@ -4537,7 +4537,7 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->EquipItem(item->GetSlot(), item, true);
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                     item->SendUpdateToPlayer(player);
                 }
             }
@@ -4548,7 +4548,7 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->EquipItem(item->GetSlot(), item, true);
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                     item->SendUpdateToPlayer(player);
                 }
             }
@@ -4559,7 +4559,7 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->EquipItem(item->GetSlot(), item, true);
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                     item->SendUpdateToPlayer(player);
                 }
             }
@@ -4570,7 +4570,7 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->EquipItem(item->GetSlot(), item, true);
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                     item->SendUpdateToPlayer(player);
                 }
             }
@@ -4581,7 +4581,7 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->EquipItem(item->GetSlot(), item, true);
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                     item->SendUpdateToPlayer(player);
                 }
             }
@@ -4610,7 +4610,7 @@ namespace LuaPlayer
                     if (item->IsEquipped())
                     {
                         player->EquipItem(item->GetSlot(), item, true);
-                        player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                        player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                         item->SendUpdateToPlayer(player);
                     }
                 }
