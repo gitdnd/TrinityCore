@@ -4522,5 +4522,28 @@ namespace LuaPlayer
         Eluna::Push(E->L, player->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR);
         return 1;
     }
+
+    int UpdateTimewalkerTabard(Eluna* E, Player* player)
+    {
+        uint32 talent = Eluna::CHECKVAL<uint32>(E->L, 2);
+
+        // Reset
+        if (talent == 0) {
+            // Find any possible tabard
+            // Add Initiate's
+            return;
+        }
+
+        // Timewalker Tabard
+        Item* item = player->GetItemByEntry(82093);
+        if (item)
+        {
+            uint8 slot = item->GetSlot();
+            // Weaver Tabard
+            item->SetEntry(82095);
+        }
+
+        return 0;
+    }
 };
 #endif

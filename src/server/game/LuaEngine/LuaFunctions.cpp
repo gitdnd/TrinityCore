@@ -795,6 +795,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SetOverrideLight", &LuaPlayer::SetOverrideLight },
     { "GetSubClass", &LuaPlayer::GetSubClass },
     { "IsDeveloper", &LuaPlayer::IsDeveloper },
+    { "UpdateTimewalkerTabard", &LuaPlayer::UpdateTimewalkerTabard },
 
     { NULL, NULL }
 };
