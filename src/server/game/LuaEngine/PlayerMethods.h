@@ -4531,18 +4531,19 @@ namespace LuaPlayer
         if (talent == 0) {
             // Find any possible tabard
             // Add Initiate's
-            return;
         }
-
-        // Timewalker Tabard
-        Item* item = player->GetItemByEntry(82093);
-        if (item)
+        // Learnt new starter talent
+        else
         {
-            uint8 slot = item->GetSlot();
-            // Weaver Tabard
-            item->SetEntry(82095);
+            // Timewalker Tabard
+            Item* item = player->GetItemByEntry(82093);
+            if (item)
+            {
+                uint8 slot = item->GetSlot();
+                // Weaver Tabard
+                item->SetEntry(82095);
+            }
         }
-
         return 0;
     }
 };
