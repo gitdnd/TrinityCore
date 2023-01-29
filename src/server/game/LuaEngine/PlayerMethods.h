@@ -4560,9 +4560,7 @@ namespace LuaPlayer
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    ItemPosCountVec dest;
-                    player->MoveItemToInventory(dest, item, false);
-                    player->EquipItem(item->GetSlot(), item, true);
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
                 }
             }
         }
@@ -4589,9 +4587,7 @@ namespace LuaPlayer
                     item->SetEntry(itemId);
                     if (item->IsEquipped())
                     {
-                        ItemPosCountVec dest;
-                        player->MoveItemToInventory(dest, item, false);
-                        player->EquipItem(item->GetSlot(), item, true);
+                        player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
                     }
                 }
             }
