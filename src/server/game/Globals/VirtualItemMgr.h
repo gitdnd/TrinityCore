@@ -221,9 +221,9 @@ constexpr uint8 HONED_SPELL_SLOT = MAX_GENERATED_SPELLS + MAX_LEGENDARY_SPELLS;
 
 struct itemSetInfo
 {
-    itemSetInfo() { setId = 0, displayOverride = 0; }
-    itemSetInfo(uint32 sId, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, int32 minQual, int32 maxQual, uint32 dispOverride) : setId(sId),
-        itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), minQuality(minQual), maxQuality(maxQual), displayOverride(dispOverride) {}
+    itemSetInfo() { setId = 0, displayOverride = 0, flavorOverride = ""; }
+    itemSetInfo(uint32 sId, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, int32 minQual, int32 maxQual, uint32 dispOverride, std::string flavOverride) : setId(sId),
+        itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), minQuality(minQual), maxQuality(maxQual), displayOverride(dispOverride), flavorOverride(flavOverride) {}
     uint32 setId;
     int32 itemClass;
     int32 subClass;
@@ -234,6 +234,7 @@ struct itemSetInfo
     int32 minQuality;
     int32 maxQuality;
     uint32 displayOverride;
+    std::string flavorOverride;
 };
 
 struct legendaryItemInfo

@@ -185,8 +185,9 @@ void VirtualItemMgr::LoadSetsFromDB()
         int32 minQuality = fields[7].GetInt32();
         int32 maxQuality = fields[8].GetInt32();
         uint32 displayOverride = fields[9].GetUInt32();
+        std::string flavorOverride = fields[10].GetString();
 
-        availableItemSets.push_back(itemSetInfo(setId, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, minQuality, maxQuality, displayOverride));
+        availableItemSets.push_back(itemSetInfo(setId, itemClass, subClass, inventoryType, statGroup, minItemLevel, maxItemLevel, minQuality, maxQuality, displayOverride, flavorOverride));
         ++count;
     } while (result->NextRow());
 
@@ -1307,6 +1308,9 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
         if (set.displayOverride)
             modifier.displayId = set.displayOverride;
+
+        if (!set.flavorOverride.empty())
+            output->Description = set.flavorOverride;
     }
 }
 
