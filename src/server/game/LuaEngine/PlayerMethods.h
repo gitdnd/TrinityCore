@@ -4599,9 +4599,7 @@ namespace LuaPlayer
                     item->SetEntry(itemId);
                     if (item->IsEquipped())
                     {
-                        //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                        player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
-                        player->EquipNewItem(EQUIPMENT_SLOT_TABARD, itemId, true);
+                        player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
                     }
                 }
             }
