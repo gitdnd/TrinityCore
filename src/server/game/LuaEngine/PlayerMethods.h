@@ -4561,8 +4561,8 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     ItemPosCountVec dest;
-                    player->MoveItemToInventory(dest, item, true);
-                    player->EquipItem(item->GetSlot(), item, false);
+                    player->MoveItemToInventory(dest, item, false);
+                    player->EquipItem(item->GetSlot(), item, true);
                 }
             }
         }
@@ -4590,8 +4590,8 @@ namespace LuaPlayer
                     if (item->IsEquipped())
                     {
                         ItemPosCountVec dest;
-                        player->MoveItemToInventory(dest, item, true);
-                        player->EquipItem(item->GetSlot(), item, false);
+                        player->MoveItemToInventory(dest, item, false);
+                        player->EquipItem(item->GetSlot(), item, true);
                     }
                 }
             }
