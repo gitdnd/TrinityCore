@@ -4534,25 +4534,37 @@ namespace LuaPlayer
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
-                item->SendUpdateToPlayer(player);
+                if (item->IsEquipped())
+                {
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                }
             }
             else if (Item* item = player->GetItemByEntry(82095))
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
-                item->SendUpdateToPlayer(player);
+                if (item->IsEquipped())
+                {
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                }
             }
             if (Item* item = player->GetItemByEntry(82096))
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
-                item->SendUpdateToPlayer(player);
+                if (item->IsEquipped())
+                {
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                }
             }
             if (Item* item = player->GetItemByEntry(82097))
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
-                item->SendUpdateToPlayer(player);
+                if (item->IsEquipped())
+                {
+                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetTemplate()->DisplayInfoID);
+                }
             }
             if (Item* item = player->GetItemByEntry(82098))
             {
