@@ -4536,7 +4536,9 @@ namespace LuaPlayer
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
+                    player->EquipNewItem(EQUIPMENT_SLOT_TABARD, 82093, true);
                 }
             }
             else if (Item* item = player->GetItemByEntry(82095)) // Weaver
@@ -4545,7 +4547,9 @@ namespace LuaPlayer
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
+                    player->EquipNewItem(EQUIPMENT_SLOT_TABARD, 82093, true);
                 }
             }
             if (Item* item = player->GetItemByEntry(82096)) // Ranger
@@ -4554,7 +4558,9 @@ namespace LuaPlayer
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
+                    player->EquipNewItem(EQUIPMENT_SLOT_TABARD, 82093, true);
                 }
             }
             if (Item* item = player->GetItemByEntry(82097)) // Watcher
@@ -4563,7 +4569,9 @@ namespace LuaPlayer
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
+                    player->EquipNewItem(EQUIPMENT_SLOT_TABARD, 82093, true);
                 }
             }
             if (Item* item = player->GetItemByEntry(82098)) // Historian
@@ -4572,7 +4580,9 @@ namespace LuaPlayer
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
+                    player->EquipNewItem(EQUIPMENT_SLOT_TABARD, 82093, true);
                 }
             }
         }
@@ -4599,7 +4609,9 @@ namespace LuaPlayer
                     item->SetEntry(itemId);
                     if (item->IsEquipped())
                     {
-                        player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                        //player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                        player->RemoveItem(INVENTORY_SLOT_BAG_0, item->GetSlot(), true);
+                        player->EquipNewItem(EQUIPMENT_SLOT_TABARD, itemId, true);
                     }
                 }
             }
