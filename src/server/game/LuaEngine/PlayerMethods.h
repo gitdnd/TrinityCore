@@ -4530,59 +4530,49 @@ namespace LuaPlayer
         // Reset
         if (talent == 0) {
             // Find any possible tabard
-            if (Item* item = player->GetItemByEntry(82094))
+            if (Item* item = player->GetItemByEntry(82094)) // Warden
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->EquipItem(item->GetSlot(), item, true);
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                    item->SendUpdateToPlayer(player);
                 }
             }
-            else if (Item* item = player->GetItemByEntry(82095))
+            else if (Item* item = player->GetItemByEntry(82095)) // Weaver
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->EquipItem(item->GetSlot(), item, true);
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                    item->SendUpdateToPlayer(player);
                 }
             }
-            if (Item* item = player->GetItemByEntry(82096))
+            if (Item* item = player->GetItemByEntry(82096)) // Ranger
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->EquipItem(item->GetSlot(), item, true);
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                    item->SendUpdateToPlayer(player);
                 }
             }
-            if (Item* item = player->GetItemByEntry(82097))
+            if (Item* item = player->GetItemByEntry(82097)) // Watcher
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->EquipItem(item->GetSlot(), item, true);
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                    item->SendUpdateToPlayer(player);
                 }
             }
-            if (Item* item = player->GetItemByEntry(82098))
+            if (Item* item = player->GetItemByEntry(82098)) // Historian
             {
                 // Timewalker Tabard
                 item->SetEntry(82093);
                 if (item->IsEquipped())
                 {
-                    player->EquipItem(item->GetSlot(), item, true);
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                    item->SendUpdateToPlayer(player);
                 }
             }
         }
@@ -4609,9 +4599,7 @@ namespace LuaPlayer
                     item->SetEntry(itemId);
                     if (item->IsEquipped())
                     {
-                        player->EquipItem(item->GetSlot(), item, true);
                         player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
-                        item->SendUpdateToPlayer(player);
                     }
                 }
             }
