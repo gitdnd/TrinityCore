@@ -4537,6 +4537,8 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    WorldPacket response = item->GetTemplate()->BuildQueryData(LOCALE_enUS);
+                    sWorld->SendGlobalMessage(&response);
                 }
             }
             else if (Item* item = player->GetItemByEntry(82095)) // Weaver
@@ -4546,6 +4548,8 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    WorldPacket response = item->GetTemplate()->BuildQueryData(LOCALE_enUS);
+                    sWorld->SendGlobalMessage(&response);
                 }
             }
             if (Item* item = player->GetItemByEntry(82096)) // Ranger
@@ -4555,6 +4559,8 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    WorldPacket response = item->GetTemplate()->BuildQueryData(LOCALE_enUS);
+                    sWorld->SendGlobalMessage(&response);
                 }
             }
             if (Item* item = player->GetItemByEntry(82097)) // Watcher
@@ -4564,6 +4570,8 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    WorldPacket response = item->GetTemplate()->BuildQueryData(LOCALE_enUS);
+                    sWorld->SendGlobalMessage(&response);
                 }
             }
             if (Item* item = player->GetItemByEntry(82098)) // Historian
@@ -4573,6 +4581,8 @@ namespace LuaPlayer
                 if (item->IsEquipped())
                 {
                     player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                    WorldPacket response = item->GetTemplate()->BuildQueryData(LOCALE_enUS);
+                    sWorld->SendGlobalMessage(&response);
                 }
             }
         }
@@ -4600,6 +4610,8 @@ namespace LuaPlayer
                     if (item->IsEquipped())
                     {
                         player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (item->GetSlot() * 2), item->GetEntry());
+                        WorldPacket response = item->GetTemplate()->BuildQueryData(LOCALE_enUS);
+                        sWorld->SendGlobalMessage(&response);
                     }
                 }
             }
