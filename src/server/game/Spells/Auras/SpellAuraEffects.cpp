@@ -5159,9 +5159,13 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
 
     // Talent: Perpetuity: Increase the damage dealt by your damage over time effects by 5%
     if (caster && caster->HasSpell(180131))
-    {
         AddPct(damage, 5);
-    }
+    // 180900 Damage over Time
+    if (caster && caster->HasAura(180900))
+        AddPct(damage, 2 * caster->GetAuraCount(180900));
+    // 180901 Degenerate
+    if (caster && caster->HasAura(180901))
+        AddPct(damage, 6);
 
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
