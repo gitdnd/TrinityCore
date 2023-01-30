@@ -2210,6 +2210,160 @@ public:
     }
 };
 
+class spell_firebrand_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_firebrand_weapon);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
+        caster->CastSpell(damageInfo->GetVictim(), 93020, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_firebrand_weapon::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+class spell_combustibolt : public AuraScript
+{
+    PrepareAuraScript(spell_combustibolt);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
+        caster->CastSpell(damageInfo->GetVictim(), 93028, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_combustibolt::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+class spell_soothing_flame : public AuraScript
+{
+    PrepareAuraScript(spell_soothing_flame);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(healInfo->GetHeal() * bp / 300);
+        caster->CastSpell(healInfo->GetTarget(), 93031, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_soothing_flame::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+class spell_burnout : public AuraScript
+{
+    PrepareAuraScript(spell_burnout);
+
+    uint32 _absorbPct = 0;
+    uint32 _dot = 0;
+
+    enum Spell
+    {
+        BURNOUT_DOT = 93038
+    };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ BURNOUT_DOT });
+    }
+
+    bool Load() override
+    {
+        _absorbPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        _dot = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
+
+    void Absorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        SpellInfo const* spellInfo = dmgInfo.GetSpellInfo();
+        int32 dmg = dmgInfo.GetDamage();
+
+        if (!spellInfo)
+            absorbAmount = CalculatePct(dmg, _absorbPct);
+        else if (spellInfo->Id == BURNOUT_DOT) // Do not proc off self)
+            absorbAmount = 0;
+        else
+            absorbAmount = CalculatePct(dmg, _absorbPct);
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+
+        if (!spellInfo)
+            return eventInfo.GetDamageInfo() && eventInfo.GetProcTarget();
+        else if (spellInfo->Id == BURNOUT_DOT) // Do not proc off self)
+            return false;
+        else
+            return eventInfo.GetDamageInfo() && eventInfo.GetProcTarget();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = GetTarget();
+        SpellInfo const* burnoutDot = sSpellMgr->AssertSpellInfo(BURNOUT_DOT);
+
+        ASSERT(burnoutDot->GetMaxTicks() > 0);
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), _dot) / burnoutDot->GetMaxTicks());
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(amount);
+        victim->CastSpell(victim, BURNOUT_DOT, args);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_burnout::CalculateAmount, EFFECT_1, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_burnout::Absorb, EFFECT_1);
+        DoCheckProc += AuraCheckProcFn(spell_burnout::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_burnout::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2268,5 +2422,8 @@ void AddSC_Spells_Custom_Talents()
     new hot_flurry_effect();
     new hot_shield_armorvalue();
     new hot_dazzling_light();
-
+    RegisterAuraScript(spell_firebrand_weapon);
+    RegisterAuraScript(spell_combustibolt);
+    RegisterAuraScript(spell_soothing_flame);
+    RegisterAuraScript(spell_burnout);
 }
