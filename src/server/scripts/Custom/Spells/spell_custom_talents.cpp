@@ -973,14 +973,14 @@ public:
         void HandleDummyTick(AuraEffect const* aurEff)
         {
             Unit* target = GetTarget();
-            if (target->HealthBelowPct(50))
+            if (target && target->HealthBelowPct(50))
             {
                 if (!target->HasAura(180414))
                     target->CastSpell(target, 180414, true);
             }
             else
             {
-                if (target->HasAura(180414))
+                if (target && target->HasAura(180414))
                     target->RemoveAurasDueToSpell(180414);
             }
         }
@@ -1018,9 +1018,12 @@ public:
             if (healamount > 0)
             {
                 Unit* actor = eventInfo.GetActor();
-                CastSpellExtraArgs args(aurEff);
-                args.AddSpellMod(SPELLVALUE_BASE_POINT0, healamount);
-                actor->CastSpell(actor, 180416, args);
+                if (actor)
+                {
+                    CastSpellExtraArgs args(aurEff);
+                    args.AddSpellMod(SPELLVALUE_BASE_POINT0, healamount);
+                    actor->CastSpell(actor, 180416, args);
+                }
             }
         }
 
@@ -1083,6 +1086,8 @@ public:
         void HandleDummyTick(AuraEffect const* aurEff)
         {
             Unit* target = GetTarget();
+            if (!target)
+                return;
             if (target->HasStealthAura())
             {
                 if (!target->HasAura(180431))
@@ -1120,6 +1125,8 @@ public:
         void HandleDummyTick(AuraEffect const* aurEff)
         {
             Unit* target = GetTarget();
+            if (!target)
+                return;
             if (Player* target_player = target->ToPlayer())
             {
                 if (Item* offweapon = target_player->GetShield())
@@ -1162,7 +1169,8 @@ public:
             PreventDefaultAction();
 
             Unit* actor = eventInfo.GetActor();
-            actor->CastSpell(actor, 180441, true);
+            if (actor)
+                actor->CastSpell(actor, 180441, true);
         }
 
         void Register() override
@@ -1192,7 +1200,8 @@ public:
             PreventDefaultAction();
 
             Unit* actor = eventInfo.GetActor();
-            actor->CastSpell(actor, 180443, true);
+            if (actor)
+                actor->CastSpell(actor, 180443, true);
         }
 
         void Register() override
@@ -1222,7 +1231,8 @@ public:
             PreventDefaultAction();
 
             Unit* actor = eventInfo.GetActor();
-            actor->CastSpell(actor, 180445, true);
+            if (actor)
+                actor->CastSpell(actor, 180445, true);
         }
 
         void Register() override
@@ -1252,7 +1262,8 @@ public:
             PreventDefaultAction();
 
             Unit* actor = eventInfo.GetActor();
-            actor->CastSpell(actor, 180447, true);
+            if (actor)
+                actor->CastSpell(actor, 180447, true);
         }
 
         void Register() override
@@ -1282,7 +1293,8 @@ public:
             PreventDefaultAction();
 
             Unit* actor = eventInfo.GetActor();
-            actor->CastSpell(actor, 180466, true);
+            if (actor)
+                actor->CastSpell(actor, 180466, true);
         }
 
         void Register() override
@@ -1344,6 +1356,8 @@ class spell_gen_shield_sup : public AuraScript
 
     void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (!GetCaster())
+            return;
         Player* caster = GetCaster()->ToPlayer();
         if (!caster)
             return;
@@ -1353,6 +1367,8 @@ class spell_gen_shield_sup : public AuraScript
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (!GetCaster())
+            return;
         Player* caster = GetCaster()->ToPlayer();
         if (!caster)
             return;
@@ -1433,7 +1449,7 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (!target->HasAura(180479))
+            if (target && !target->HasAura(180479))
             {
                 CastSpellExtraArgs args;
                 args.AddSpellBP0((int32)(target->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL)) / -2);
@@ -1444,7 +1460,7 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (target->HasAura(180479))
+            if (target && target->HasAura(180479))
                 target->RemoveAurasDueToSpell(180479);
         }
 
@@ -1482,9 +1498,12 @@ public:
             if (healamount > 0)
             {
                 Unit* actor = eventInfo.GetActor();
-                CastSpellExtraArgs args(aurEff);
-                args.AddSpellMod(SPELLVALUE_BASE_POINT0, healamount);
-                actor->CastSpell(actor, 180483, args);
+                if (actor)
+                {
+                    CastSpellExtraArgs args(aurEff);
+                    args.AddSpellMod(SPELLVALUE_BASE_POINT0, healamount);
+                    actor->CastSpell(actor, 180483, args);
+                }
             }
         }
 
@@ -1513,6 +1532,8 @@ public:
         void HandleDummyTick(AuraEffect const* aurEff)
         {
             Unit* target = GetTarget();
+            if (!target)
+                return;
 
             if (!target->HasAura(180504))
             {
@@ -1520,7 +1541,7 @@ public:
                 {
                     Unit* unit = *itr;
                     ++itr;
-                    if (unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
+                    if (unit && unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
                     {
                         target->AddAura(180504, target);
                         break;
@@ -1534,7 +1555,7 @@ public:
                 {
                     Unit* unit = *itr;
                     ++itr;
-                    if (unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
+                    if (unit && unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
                     {
                         hasguardian = true;
                         break;
@@ -1549,6 +1570,8 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
+            if (!target)
+                return;
             if (target->HasAura(180504))
                 target->RemoveAurasDueToSpell(180504);
         }
@@ -1579,7 +1602,8 @@ public:
         void HandleDummyTick(AuraEffect const* aurEff)
         {
             Unit* target = GetTarget();
-
+            if (!target)
+                return;
             if (!target->HasAura(180506))
             {
                 bool hasguardian = false;
@@ -1587,7 +1611,7 @@ public:
                 {
                     Unit* unit = *itr;
                     ++itr;
-                    if (unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
+                    if (unit && unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
                     {
                         hasguardian = true;
                         break;
@@ -1603,7 +1627,7 @@ public:
                 {
                     Unit* unit = *itr;
                     ++itr;
-                    if (unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
+                    if (unit && unit->GetTypeId() == TYPEID_UNIT && unit->IsGuardian())
                     {
                         target->RemoveAurasDueToSpell(180506);
                         break;
@@ -1615,6 +1639,8 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
+            if (!target)
+                return;
             if (target->HasAura(180506))
                 target->RemoveAurasDueToSpell(180506);
         }
@@ -1644,8 +1670,11 @@ public:
 
         void HandleDummyTick(AuraEffect const* aurEff)
         {
+            if (!GetTarget())
+                return;
             Player* target = GetTarget()->ToPlayer();
-
+            if (!target)
+                return;
             if (!target->HasAura(180519))
             {
                 if (target->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) == nullptr)
@@ -1662,7 +1691,7 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            if (target->HasAura(180519))
+            if (target && target->HasAura(180519))
                 target->RemoveAurasDueToSpell(180519);
         }
 
@@ -1691,6 +1720,8 @@ public:
 
         void RemoveEffect(Unit* target)
         {
+            if (!target)
+                return;
             target->RemoveAurasDueToSpell(180521);
             target->RemoveAurasDueToSpell(180522);
             target->RemoveAurasDueToSpell(180523);
@@ -1700,7 +1731,11 @@ public:
 
         void HandleDummyTick(AuraEffect const* aurEff)
         {
+            if (!GetTarget())
+                return;
             Player* target = GetTarget()->ToPlayer();
+            if (!target)
+                return;
 
             if (!target->HasAura(180521))
             {
@@ -1818,6 +1853,8 @@ public:
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
+            if (!target)
+                return;
             if (target->HasAura(180521))
                 RemoveEffect(target);
         }
@@ -1861,7 +1898,8 @@ public:
                 return;
 
             Unit* actor = eventInfo.GetActor();
-            actor->CastSpell(eventInfo.GetActionTarget(), 180525, true);
+            if (actor)
+                actor->CastSpell(eventInfo.GetActionTarget(), 180525, true);
         }
 
         void Register() override
@@ -1877,6 +1915,300 @@ public:
     }
 };
 
+// 180530 - Precise Technique
+class hot_precise_technique : public SpellScriptLoader
+{
+public:
+    hot_precise_technique() : SpellScriptLoader("hot_precise_technique") { }
+
+    class hot_precise_technique_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_precise_technique_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (!target)
+                return;
+            target->ToPlayer()->UpdateAllWeaponDependentCritAuras();
+            target->ToPlayer()->UpdateAllSpellCritChances();
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            if (!target)
+                return;
+            target->ToPlayer()->UpdateAllWeaponDependentCritAuras();
+            target->ToPlayer()->UpdateAllSpellCritChances();
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(hot_precise_technique_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(hot_precise_technique_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_precise_technique_AuraScript();
+    }
+};
+
+// 180535 - Thrash
+class hot_thrash : public SpellScriptLoader
+{
+public:
+    hot_thrash() : SpellScriptLoader("hot_thrash") { }
+
+    class hot_thrash_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_thrash_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            uint32 ProcChance = 15;
+            return (urand(1, 100) <= ProcChance);
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            if (actor)
+            {
+                actor->CastSpell(eventInfo.GetActionTarget(), 180536, true);
+                actor->CastSpell(eventInfo.GetActionTarget(), 180537, true);
+            }
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(hot_thrash_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(hot_thrash_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_thrash_AuraScript();
+    }
+};
+
+// 180540 - Flurry
+class hot_flurry : public SpellScriptLoader
+{
+public:
+    hot_flurry() : SpellScriptLoader("hot_flurry") { }
+
+    class hot_flurry_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_flurry_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return (eventInfo.GetHitMask() & PROC_HIT_CRITICAL);
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            Unit* actor = eventInfo.GetActor();
+            if (actor)
+                actor->CastSpell(actor, 180541);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(hot_flurry_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(hot_flurry_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_flurry_AuraScript();
+    }
+};
+
+// 180541 - Flurry
+class hot_flurry_effect : public SpellScriptLoader
+{
+public:
+    hot_flurry_effect() : SpellScriptLoader("hot_flurry_effect") { }
+
+    class hot_flurry_effect_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_flurry_effect_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return true;
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            if (charges > 1)
+                charges--;
+            else
+                Remove();
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(hot_flurry_effect_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(hot_flurry_effect_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        }
+
+        uint8 charges = 3;
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_flurry_effect_AuraScript();
+    }
+};
+
+// 180572 - Dazzling Light
+class hot_dazzling_light : public SpellScriptLoader
+{
+public:
+    hot_dazzling_light() : SpellScriptLoader("hot_dazzling_light") { }
+
+    class hot_dazzling_light_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_dazzling_light_AuraScript);
+
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return (eventInfo.GetHitMask() & PROC_HIT_CRITICAL);
+        }
+
+        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            HealInfo* hinfo = eventInfo.GetHealInfo();
+            Unit* victim = eventInfo.GetProcTarget();
+            Unit* actor = eventInfo.GetActor();
+            if (!hinfo || !victim || !actor)
+                return;
+
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(((float)hinfo->GetHeal() * 0.12f) / 6.f);
+            actor->CastSpell(victim, 180573, args);
+        }
+
+        void Register() override
+        {
+            DoCheckProc += AuraCheckProcFn(hot_dazzling_light_AuraScript::CheckProc);
+            OnEffectProc += AuraEffectProcFn(hot_dazzling_light_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_dazzling_light_AuraScript();
+    }
+};
+
+// 180565, 180566 - Shield Defenses, Bulwark
+class hot_shield_armorvalue : public SpellScriptLoader
+{
+public:
+    hot_shield_armorvalue() : SpellScriptLoader("hot_shield_armorvalue") { }
+
+    class hot_shield_armorvalue_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(hot_shield_armorvalue_AuraScript);
+
+        void ApplyStatEffect(Player* target, Item* shield, int32 amount)
+        {
+            if (!target || !shield)
+                return;
+
+            ItemTemplate const* proto = shield->GetTemplate();
+            ScalingStatDistributionEntry const* ssd = target->GetScalingStatDistributionFor(*proto);
+            ScalingStatValuesEntry const* ssv = target->GetScalingStatValuesFor(*proto);
+
+            uint32 armor = proto->Armor;
+            if (ssv)
+            {
+                if (uint32 ssvarmor = ssv->getArmorMod(proto->ScalingStatValue))
+                    armor = ssvarmor;
+            }
+            else if (armor && proto->ArmorDamageModifier)
+                armor -= uint32(proto->ArmorDamageModifier);
+
+            armor = (float)armor * ((float)amount / 100.f);
+
+            if (armor)
+                target->HandleStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(armor), true);
+
+            shield_save = shield;
+            armor_save = armor;
+            stat_effect = true;
+        }
+
+        void HandleDummyTick(AuraEffect const* aurEff)
+        {
+            if (!GetTarget())
+                return;
+            Player* target = GetTarget()->ToPlayer();
+            if (!target)
+                return;
+            if (!stat_effect)
+            {
+                if (Item* shield = target->GetShield())
+                    ApplyStatEffect(target, shield, aurEff->GetAmount());
+            }
+            else
+            {
+                Item* shield = target->GetShield();
+                if ((shield == nullptr) || (shield_save != shield))
+                {
+                    target->HandleStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor_save, false);
+                    shield_save = nullptr;
+                    armor_save = 0;
+                    stat_effect = false;
+                }
+            }
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (stat_effect)
+            {
+                Unit* target = GetTarget();
+                if (target)
+                    target->HandleStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor_save, false);
+                shield_save = nullptr;
+                armor_save = 0;
+                stat_effect = false;
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(hot_shield_armorvalue_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            AfterEffectRemove += AuraEffectRemoveFn(hot_shield_armorvalue_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+
+        Item* shield_save = nullptr;
+        uint32 armor_save = 0;
+        bool stat_effect = false;
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new hot_shield_armorvalue_AuraScript();
+    }
+};
 
 void AddSC_Spells_Custom_Talents()
 {
@@ -1930,4 +2262,11 @@ void AddSC_Spells_Custom_Talents()
     new hot_shield_supperiosity();
     new hot_fists_of_fury();
     new hot_wild_quiver();
+    new hot_precise_technique();
+    new hot_thrash();
+    new hot_flurry();
+    new hot_flurry_effect();
+    new hot_shield_armorvalue();
+    new hot_dazzling_light();
+
 }

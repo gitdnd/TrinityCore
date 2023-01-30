@@ -6815,6 +6815,20 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, 10);
                 break;
             }
+            // Intimidating Presence
+            case 10006:
+            {
+                if (GetHealthPct() > victim->GetHealthPct())
+                    AddPct(DoneTotalMod, (*i)->GetAmount());
+                break;
+            }
+            // Direct damage bonus spells
+            case 10007:
+            {
+                if (damagetype == DIRECT_DAMAGE)
+                    AddPct(DoneTotalMod, (*i)->GetAmount());
+                break;
+            }
         }
     }
 
@@ -6992,6 +7006,23 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
                     AddPct(TakenTotalMod, std::max(mod, float((*i)->GetAmount())));
                 }
                 break;
+        }
+        switch ((*i)->GetSpellInfo()->Id)
+        {
+            // Area Effect bonus spells
+            case 180546:
+            {
+                if (spellProto->IsAffectingArea())
+                    AddPct(TakenTotalMod, (*i)->GetAmount());
+                break;
+            }
+            // Demoralizing Presence
+            case 180555:
+            {
+                if (caster->GetHealthPct() < GetHealthPct())
+                    AddPct(TakenTotalMod, (*i)->GetAmount());
+                break;
+            }
         }
     }
 
