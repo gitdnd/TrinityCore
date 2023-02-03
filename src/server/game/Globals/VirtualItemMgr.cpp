@@ -782,7 +782,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             // if the stat selected is magic find, we want to apply it directly and not push it to the selected stat array
             if (secondarystatgroup[i] == ITEM_MOD_MAGICFIND)
             {
-                uint32 magicFindId = VirtualModifier::GetMagicFindId(output, statPoints);
+                uint32 magicFindId = VirtualModifier::GetMagicFindId(statPoints);
                 if (magicFindId > 0)
                 {
                     uint32 slot = 0;
@@ -1790,13 +1790,13 @@ uint32 VirtualModifier::GetSetChance(VirtualItemTemplate* output)
     return 0;
 }
 
-uint32 VirtualModifier::GetMagicFindId(VirtualItemTemplate* output, uint32 statPoints)
+uint32 VirtualModifier::GetMagicFindId(uint32 statPoints)
 {
     struct {
         uint32 value;
         uint32 id;
     } list[] = {
-        {0, 450100},
+        {1, 450100},
         {10, 450101},
         {15, 450102},
         {20, 450103},
@@ -1818,8 +1818,9 @@ uint32 VirtualModifier::GetMagicFindId(VirtualItemTemplate* output, uint32 statP
         {100, 450119},
     };
 
-    for (int i = 0; i < sizeof(list) && statPoints >= list[i].value; i++)
-        return list[i].id;
+    for (int i = (sizeof(list) / sizeof(list[0])) - 1; i != -1; i--)
+        if (statPoints >= list[i].value)
+            return list[i].id;
 
     return 0;
 }
