@@ -1478,6 +1478,7 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HASTE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HasteRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_CRIT_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.CritRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.HealthRegen", 0.4f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_MAGICFIND] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.MagicFind", 0.3f);
 
     m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_HEAD] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Head", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_SLOTWEIGHT_CHEST] = sConfigMgr->GetFloatDefault("ItemGenerator.SlotWeight.Chest", 1.0f);

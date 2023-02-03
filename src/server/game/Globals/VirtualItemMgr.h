@@ -182,6 +182,8 @@ struct VirtualModifier
     static uint32 GetSecondaryStatSlots(VirtualItemTemplate* item);
 
     static uint32 GetSetChance(VirtualItemTemplate* item);
+
+    static uint32 GetMagicFindId(VirtualItemTemplate* item, uint32 statPoints);
 };
 
 struct displayInfo

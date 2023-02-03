@@ -576,6 +576,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     std::vector<ItemModType> primarystatgroup = premadeStatGroupData.GetStatGroupPrimaryStats(statgroupid, generator);
     std::vector<ItemModType> secondarystatgroup = premadeStatGroupData.GetStatGroupSecondaryStats(statgroupid, generator);
 
+    // override to add MagicFind to rings/trinkets only
+    if (output->Class == ITEM_CLASS_ARMOR && (output->InventoryType == INVTYPE_NECK || output->InventoryType == INVTYPE_FINGER))
+        secondarystatgroup.push_back(ITEM_MOD_MAGICFIND);
+
     // shuffle vectors so we can pick top values without using any rand calls
     std::shuffle(std::begin(primarystatgroup), std::end(primarystatgroup), generator);
     std::shuffle(std::begin(secondarystatgroup), std::end(secondarystatgroup), generator);
@@ -773,6 +777,25 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                     default:
                         break;
                 }
+            }
+
+            // if the stat selected is magic find, we want to apply it directly and not push it to the selected stat array
+            if (secondarystatgroup[i] == ITEM_MOD_MAGICFIND)
+            {
+                uint32 magicFindId = VirtualModifier::GetMagicFindId(output, statPoints);
+                if (magicFindId > 0)
+                {
+                    uint32 slot = 0;
+                    output->Spells[slot].SpellId = magicFindId;
+                    output->Spells[slot].SpellTrigger = 1; // onEquip
+                    // are these needed?
+                    /* output->Spells[slot].SpellCharges = 0;
+                    output->Spells[slot].SpellPPMRate = 0;
+                    output->Spells[slot].SpellCooldown = 0;
+                    output->Spells[slot].SpellCategory = 0;
+                    output->Spells[slot].SpellCategoryCooldown = 0; */
+                }
+                continue;
             }
 
             if (i < secondaryStatSlots && secondaryStatSlots > 0)
@@ -1285,7 +1308,8 @@ void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_RANGED_ATTACK_POWER,
-        ITEM_MOD_ARMOR_PENETRATION_RATING
+        ITEM_MOD_ARMOR_PENETRATION_RATING,
+        ITEM_MOD_MAGICFIND
     };
 }
 
@@ -1636,6 +1660,8 @@ float VirtualModifier::GetStatRate(ItemModType stat)
         /* Other / Unused */
         case ITEM_MOD_HEALTH_REGEN:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_HEALTH_REGEN);
+        case ITEM_MOD_MAGICFIND:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_MAGICFIND);
         default:
             return 1.0f;
     }
@@ -1761,6 +1787,40 @@ uint32 VirtualModifier::GetSetChance(VirtualItemTemplate* output)
         default:
             return 0;
     }
+    return 0;
+}
+
+uint32 VirtualModifier::GetMagicFindId(VirtualItemTemplate* output, uint32 statPoints)
+{
+    struct {
+        uint32 value;
+        uint32 id;
+    } list[] = {
+        {0, 450100},
+        {10, 450101},
+        {15, 450102},
+        {20, 450103},
+        {25, 450104},
+        {30, 450105},
+        {35, 450106},
+        {40, 450107},
+        {45, 450108},
+        {50, 450109},
+        {55, 450110},
+        {60, 450111},
+        {65, 450112},
+        {70, 450113},
+        {75, 450114},
+        {80, 450115},
+        {85, 450116},
+        {90, 450117},
+        {95, 450118},
+        {100, 450119},
+    };
+
+    for (int i = 0; i < sizeof(list) && statPoints >= list[i].value; i++)
+        return list[i].id;
+
     return 0;
 }
 
