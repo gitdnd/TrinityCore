@@ -1311,8 +1311,7 @@ void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_RANGED_ATTACK_POWER,
-        ITEM_MOD_ARMOR_PENETRATION_RATING,
-        ITEM_MOD_MAGICFIND
+        ITEM_MOD_ARMOR_PENETRATION_RATING
     };
 }
 
