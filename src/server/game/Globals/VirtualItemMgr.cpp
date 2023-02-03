@@ -779,27 +779,30 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                 }
             }
 
-            // if the stat selected is magic find, we want to apply it directly and not push it to the selected stat array
-            if (secondarystatgroup[i] == ITEM_MOD_MAGICFIND)
-            {
-                uint32 magicFindId = VirtualModifier::GetMagicFindId(statPoints);
-                if (magicFindId > 0)
-                {
-                    uint32 slot = 0;
-                    output->Spells[slot].SpellId = magicFindId;
-                    output->Spells[slot].SpellTrigger = 1; // onEquip
-                    // are these needed?
-                    /* output->Spells[slot].SpellCharges = 0;
-                    output->Spells[slot].SpellPPMRate = 0;
-                    output->Spells[slot].SpellCooldown = 0;
-                    output->Spells[slot].SpellCategory = 0;
-                    output->Spells[slot].SpellCategoryCooldown = 0; */
-                }
-                continue;
-            }
-
             if (i < secondaryStatSlots && secondaryStatSlots > 0)
+            {
+                // if the stat selected is magic find, we want to apply it directly and not push it to the selected stat array
+                if (secondarystatgroup[i] == ITEM_MOD_MAGICFIND)
+                {
+                    uint32 magicFindId = VirtualModifier::GetMagicFindId(statPoints);
+                    if (magicFindId > 0)
+                    {
+                        uint32 slot = 0;
+                        output->Spells[slot].SpellId = magicFindId;
+                        output->Spells[slot].SpellTrigger = 1; // onEquip
+                        // are these needed?
+                        /* output->Spells[slot].SpellCharges = 0;
+                        output->Spells[slot].SpellPPMRate = 0;
+                        output->Spells[slot].SpellCooldown = 0;
+                        output->Spells[slot].SpellCategory = 0;
+                        output->Spells[slot].SpellCategoryCooldown = 0; */
+                    }
+                    continue;
+                }
+
+                // push stat back to the selected stat vector
                 selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
+            }
         }
     }
 
