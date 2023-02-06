@@ -11045,7 +11045,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         player = creature->GetLootRecipient();
 
     // Exploit fix
-    if (creature && creature->IsPet() && creature->GetOwnerGUID().IsPlayer())
+    if (creature && creature->IsPet() && creature->GetOwnerGUID().IsPlayer() && creature->GetMapId() != 768) // Timeways
         isRewardAllowed = false;
 
     // Reward player, his pets, and group/raid members
