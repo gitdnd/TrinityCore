@@ -302,7 +302,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         {
             bool disabled = false;
 
-            switch (Player::TeamForRace(createInfo->Race))
+            switch (Player::TeamForRaceNoOverride(createInfo->Race))
             {
                 case ALLIANCE:
                     disabled = (mask & (1 << 0)) != 0;
@@ -484,7 +484,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             if (result)
             {
-                uint32 team = Player::TeamForRace(createInfo->Race);
+                uint32 team = Player::TeamForRaceNoOverride(createInfo->Race);
                 uint32 freeDeathKnightSlots = sWorld->getIntConfig(CONFIG_DEATH_KNIGHTS_PER_REALM);
 
                 Field* field = result->Fetch();
@@ -519,7 +519,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                 {
                     uint32 accTeam = 0;
                     if (accRace > 0)
-                        accTeam = Player::TeamForRace(accRace);
+                        accTeam = Player::TeamForRaceNoOverride(accRace);
 
                     if (accTeam != team)
                     {
@@ -1718,8 +1718,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         return;
     }
 
-    uint32 newTeam = Player::TeamForRace(factionChangeInfo->Race);
-    if (factionChangeInfo->FactionChange == (Player::TeamForRace(oldRace) == newTeam))
+    uint32 newTeam = Player::TeamForRaceNoOverride(factionChangeInfo->Race);
+    if (factionChangeInfo->FactionChange == (Player::TeamForRaceNoOverride(oldRace) == newTeam))
     {
         SendCharFactionChange(factionChangeInfo->FactionChange ? CHAR_CREATE_CHARACTER_SWAP_FACTION : CHAR_CREATE_CHARACTER_RACE_ONLY, factionChangeInfo.get());
         return;

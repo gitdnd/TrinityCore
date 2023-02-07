@@ -211,8 +211,8 @@ void VirtualItemMgr::LoadSetsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     GenerateQuality(output, modifier);
-    GenerateLegendaryItemEffect(output, modifier);
     GenerateStatGroup(output, modifier);
+    GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output);

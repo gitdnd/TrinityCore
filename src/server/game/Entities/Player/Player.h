@@ -1770,9 +1770,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void CheckAreaExploreAndOutdoor(void);
 
         static uint32 TeamForRace(uint8 race);
+        static uint32 TeamForRaceNoOverride(uint8 race);
         uint32 GetTeam() const { return m_team; }
         TeamId GetTeamId() const { return m_team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
         void SetFactionForRace(uint8 race);
+        void SetFactionForRaceNoOverride(uint8 race);
 
         void InitDisplayIds();
 

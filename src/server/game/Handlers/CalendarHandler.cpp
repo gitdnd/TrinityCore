@@ -541,7 +541,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
             if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(guid))
             {
                 inviteeGuid = guid;
-                inviteeTeam = Player::TeamForRace(characterInfo->Race);
+                inviteeTeam = Player::TeamForRaceNoOverride(characterInfo->Race);
                 inviteeGuildId = characterInfo->GuildId;
             }
         }
