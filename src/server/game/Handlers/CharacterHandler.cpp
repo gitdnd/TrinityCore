@@ -842,11 +842,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     if (!pCurrChar->GetMap()->AddPlayerToMap(pCurrChar))
     {
-        AreaTrigger const* at = sObjectMgr->GetGoBackTrigger(pCurrChar->GetMapId());
+        /*AreaTrigger const* at = sObjectMgr->GetGoBackTrigger(pCurrChar->GetMapId());
         if (at)
             pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
         else
-            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
+            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());*/
+        pCurrChar->TeleportTo(765, 32.594799f, 492.442993f, 714.216003f, 4.318130f);
     }
 
     ObjectAccessor::AddObject(pCurrChar);
@@ -1944,13 +1945,13 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             uint16 zoneId = 0;
             if (newTeam == ALLIANCE)
             {
-                loc.WorldRelocate(0, -8867.68f, 673.373f, 97.9034f, 0.0f);
-                zoneId = 1519;
+                loc.WorldRelocate(765, 32.594799f, 492.442993f, 714.216003f, 4.318130f);
+                zoneId = 8000;
             }
             else
             {
-                loc.WorldRelocate(1, 1633.33f, -4439.11f, 15.7588f, 0.0f);
-                zoneId = 1637;
+                loc.WorldRelocate(765, 32.594799f, 492.442993f, 714.216003f, 4.318130f);
+                zoneId = 8000;
             }
 
             stmt->setUInt16(1, loc.GetMapId());
