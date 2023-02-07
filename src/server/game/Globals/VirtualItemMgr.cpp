@@ -15,26 +15,13 @@
 
 bool SelectSkipDebug(int32 a, int32 b, std::string label)
 {
-    std::stringstream ss;
-    ss << label << a << " " << b << " ";
     if (a >= 0)
     {
-        ss << "a >= 0 ";
         if (a == b)
-        {
-            ss << "a == b";
-            sWorld->SendGMText(ss.str().c_str());
             return false;
-        }
-        else
-            ss << "a != b";
     }
     else
-    {
-        sWorld->SendGMText(ss.str().c_str());
         return false;
-    }
-    sWorld->SendGMText(ss.str().c_str());
     return true;
 }
 
