@@ -70,7 +70,7 @@ public:
         uint32 faction = player->GetFaction();
         uint32 iLvl = player->GetAverageItemLevel();
 
-        if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && numberOfClones > 10)
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && numberOfClones > 10)
             numberOfClones = 10;
         //@todo check current amount of summoned clones and limit.
 
