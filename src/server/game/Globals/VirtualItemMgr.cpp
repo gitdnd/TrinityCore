@@ -34,6 +34,7 @@ bool SelectSkipDebug(int32 a, int32 b, std::string label)
         sWorld->SendGMText(ss.str().c_str());
         return false;
     }
+    sWorld->SendGMText(ss.str().c_str());
     return true;
 }
 
