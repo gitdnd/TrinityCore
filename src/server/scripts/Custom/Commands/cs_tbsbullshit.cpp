@@ -11,6 +11,7 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 #include "TemporarySummon.h"
+#include "World.h"
 
 class tbsbullshit_commandscript : public CommandScript
 {
@@ -27,6 +28,7 @@ public:
             { "clone", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleClonePlayerCommand, "" },
             { "clearinventory", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleClearInventory, "" },
             { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
+            { "cheatspells", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleToggleCheatSpells, "" },
         };
         return tbsBullshitCommandTable;
     }
@@ -67,6 +69,11 @@ public:
         uint32 targetDisplay = target->GetDisplayId();
         uint32 faction = player->GetFaction();
         uint32 iLvl = player->GetAverageItemLevel();
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && numberOfClones > 10)
+            numberOfClones = 10;
+        //@todo check current amount of summoned clones and limit.
+
         for (uint32 i = 0; i < numberOfClones; ++i)
         {
             if (TempSummon* clone = player->GetMap()->SummonCreature(82002, player->GetRandomNearPosition(5.f), sSummonPropertiesStore.LookupEntry(1021), 10 * MINUTE * IN_MILLISECONDS, player, 0, 0, iLvl))
@@ -98,6 +105,16 @@ public:
         float speedY = atof(pSpeedY);
 
         handler->getSelectedUnit()->KnockbackFrom(handler->GetSession()->GetPlayer()->GetPositionX(), handler->GetSession()->GetPlayer()->GetPositionY(), speedX, speedY);
+        return true;
+    }
+
+    static bool HandleToggleCheatSpells(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if(handler->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR)
+            player = handler->getSelectedPlayerOrSelf();
+        player->ToggleFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+        handler->PSendSysMessage("Cheat spells %s on %s.", player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS) ? "enabled" : "disabled", player->GetName().c_str());
         return true;
     }
 };
