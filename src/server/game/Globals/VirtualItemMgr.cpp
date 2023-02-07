@@ -28,6 +28,7 @@ bool SelectSkipDebug(int32 a, int32 b, std::string label)
         else
             ss << "a != b";
     }
+    sWorld->SendGMText(ss.str().c_str());
     return true;
 }
 
