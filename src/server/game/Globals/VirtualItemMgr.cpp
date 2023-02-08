@@ -801,7 +801,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                     {
                         uint32 slot = 0;
                         output->Spells[slot].SpellId = magicFindId;
-                        output->Spells[slot].SpellTrigger = 1; // onEquip
+                        output->Spells[slot].SpellTrigger = ITEM_SPELLTRIGGER_ON_EQUIP; // onEquip
                         // are these needed?
                         /* output->Spells[slot].SpellCharges = 0;
                         output->Spells[slot].SpellPPMRate = 0;
