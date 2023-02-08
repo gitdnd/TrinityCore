@@ -5907,11 +5907,14 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
 
     Player* target = aurApp->GetTarget()->ToPlayer();
 
-    float amount = target->GetMagicFind();
+    uint32 amount = target->GetMagicFind();
     amount = apply ? amount + GetAmount() : amount - GetAmount();
 
     if (amount > sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON))
         amount = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
+
+    if (amount < 0)
+        amount = 0;
 
     target->SetMagicFind(amount);
 }

@@ -1251,7 +1251,7 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
 
     // decide quality
     uint32 quality = output->Quality;
-    float magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
+    uint32 magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
 
     output->generatedMagicFind = magicFind;
     

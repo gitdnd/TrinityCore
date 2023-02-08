@@ -4092,7 +4092,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
 
         itemTemplate->legendaryId = fields[i++].GetUInt32();
 
-        itemTemplate->generatedMagicFind = fields[i++].GetFloat();
+        itemTemplate->generatedMagicFind = fields[i++].GetUInt32();
         itemTemplate->honePct = fields[i++].GetFloat();
 
         itemTemplate->MaxDurability = round(float((itemTemplate->ItemLevel * (itemTemplate->Quality / 10.f)) + 25));;

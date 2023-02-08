@@ -1345,7 +1345,7 @@ void Item::SaveVirtualItemInfo()
         stmt->setUInt32(i++, itemTemplate->customFlags);
         stmt->setUInt8(i++, itemTemplate->Sheath);
         stmt->setUInt32(i++, itemTemplate->legendaryId);
-        stmt->setFloat(i++, itemTemplate->generatedMagicFind);
+        stmt->setUInt32(i++, itemTemplate->generatedMagicFind);
         stmt->setFloat(i++, itemTemplate->honePct);
 
         trans->Append(stmt);
