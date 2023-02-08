@@ -5913,7 +5913,8 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
     if (amount > sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON))
         amount = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
 
-    if (amount < 0)
+    // dirty hackfix
+    if (amount > 400)
         amount = 0;
 
     target->SetMagicFind(amount);
