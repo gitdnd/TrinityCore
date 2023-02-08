@@ -402,7 +402,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
 
         if (!allow)
+        {
+            recvPacket.rfinish();
+            Spell::SendCastResult(caster->ToPlayer(), spellInfo, castCount, SPELL_FAILED_SPELL_UNAVAILABLE);
             return;
+        }
     }
 
     // can't use our own spells when we're in possession of another unit,
