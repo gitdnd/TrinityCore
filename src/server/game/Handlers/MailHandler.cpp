@@ -168,7 +168,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     {
         if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(receiverGuid))
         {
-            receiverTeam = Player::TeamForRace(characterInfo->Race);
+            receiverTeam = Player::TeamForRaceNoOverride(characterInfo->Race);
             receiverLevel = characterInfo->Level;
             receiverAccountId = characterInfo->AccountId;
         }

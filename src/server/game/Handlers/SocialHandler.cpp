@@ -51,7 +51,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recvData)
     {
         if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(friendGuid))
         {
-            uint32 team = Player::TeamForRace(characterInfo->Race);
+            uint32 team = Player::TeamForRaceNoOverride(characterInfo->Race);
             uint32 friendAccountId = characterInfo->AccountId;
 
             if (HasPermission(rbac::RBAC_PERM_ALLOW_GM_FRIEND) || AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realm.Id.Realm)))

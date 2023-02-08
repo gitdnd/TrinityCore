@@ -13,6 +13,18 @@
 #define SelectSkip(a,b) if( a >= 0 && a != b) continue
 #define SelectMinMaxSkip(min,max,value) if((min >= 0 && min > value) || (max >= 0 && max < value )) continue
 
+bool SelectSkipDebug(int32 a, int32 b, std::string label)
+{
+    if (a >= 0)
+    {
+        if (a == b)
+            return false;
+    }
+    else
+        return false;
+    return true;
+}
+
 VirtualItemMgr& VirtualItemMgr::instance()
 {
     static VirtualItemMgr obj;
@@ -199,8 +211,8 @@ void VirtualItemMgr::LoadSetsFromDB()
 void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier)
 {
     GenerateQuality(output, modifier);
-    GenerateLegendaryItemEffect(output, modifier);
     GenerateStatGroup(output, modifier);
+    GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output);
@@ -2094,10 +2106,14 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     for (auto const& itr : _LegendaryTemplateStore)
     {
         SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, output->ItemLevel);
-        SelectSkip(itr.second.itemClass, output->Class);
-        SelectSkip(itr.second.itemSubClass, output->SubClass);
-        SelectSkip(itr.second.itemInventoryType, output->InventoryType);
-        SelectSkip(itr.second.itemStatGroup, output->statGroup);
+        if (SelectSkipDebug(itr.second.itemClass, output->Class, "[Class]"))
+            continue;
+        if (SelectSkipDebug(itr.second.itemSubClass, output->SubClass, "[SubClass]"))
+            continue;
+        if (SelectSkipDebug(itr.second.itemInventoryType, output->InventoryType, "[InventoryType]"))
+            continue;
+        if (SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
+            continue;
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
             if (itr.second.legendarySpells[i].SpellId != 0 && itr.second.legendarySpells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse)

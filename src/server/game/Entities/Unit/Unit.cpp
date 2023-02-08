@@ -12440,7 +12440,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                             return 8571;
                     }
                 }
-                else if (Player::TeamForRace(GetRace()) == ALLIANCE)
+                else if (Player::TeamForRaceNoOverride(GetRace()) == ALLIANCE)
                     return 892;
                 else
                     return 8571;
@@ -12518,16 +12518,16 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
                             return 2289;
                     }
                 }
-                else if (Player::TeamForRace(GetRace()) == ALLIANCE)
+                else if (Player::TeamForRaceNoOverride(GetRace()) == ALLIANCE)
                     return 2281;
                 else
                     return 2289;
             case FORM_FLIGHT:
-                if (Player::TeamForRace(GetRace()) == ALLIANCE)
+                if (Player::TeamForRaceNoOverride(GetRace()) == ALLIANCE)
                     return 20857;
                 return 20872;
             case FORM_FLIGHT_EPIC:
-                if (Player::TeamForRace(GetRace()) == ALLIANCE)
+                if (Player::TeamForRaceNoOverride(GetRace()) == ALLIANCE)
                     return 21243;
                 return 21244;
             default:
@@ -12544,13 +12544,13 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
             return formEntry->modelID_A;
         else
         {
-            if (Player::TeamForRace(GetRace()) == ALLIANCE)
+            if (Player::TeamForRaceNoOverride(GetRace()) == ALLIANCE)
                 modelid = formEntry->modelID_A;
             else
                 modelid = formEntry->modelID_H;
 
             // If the player is horde but there are no values for the horde modelid - take the alliance modelid
-            if (!modelid && Player::TeamForRace(GetRace()) == HORDE)
+            if (!modelid && Player::TeamForRaceNoOverride(GetRace()) == HORDE)
                 modelid = formEntry->modelID_A;
         }
     }
