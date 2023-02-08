@@ -7019,7 +7019,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
             // Demoralizing Presence
             case 180555:
             {
-                if (caster->GetHealthPct() < GetHealthPct())
+                if (caster && caster->GetHealthPct() < GetHealthPct())
                     AddPct(TakenTotalMod, (*i)->GetAmount());
                 break;
             }
