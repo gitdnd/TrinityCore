@@ -2152,7 +2152,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     int32 dodge_chance = int32(GetUnitDodgeChance(attType, victim) * 100.0f);
     int32 block_chance = int32(GetUnitBlockChance(attType, victim) * 100.0f);
     int32 parry_chance = int32(GetUnitParryChance(attType, victim) * 100.0f);
-
+    bool preciseTechnique = HasAura(SPELL_PRECISE_TECHNIQUE);
     // melee attack table implementation
     // outcome priority:
     //   1. >    2. >    3. >       4. >    5. >   6. >       7. >  8.
@@ -2176,7 +2176,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
 
     // 1. MISS
     tmp = miss_chance;
-    if (tmp > 0 && roll < (sum += tmp))
+    if (!preciseTechnique && tmp > 0 && roll < (sum += tmp))
         return MELEE_HIT_MISS;
 
     // always crit against a sitting target (except 0 crit chance)
@@ -2193,7 +2193,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     }
 
     // 3. PARRY
-    if (canParryOrBlock)
+    if (canParryOrBlock && !preciseTechnique)
     {
         tmp = parry_chance;
         if (tmp > 0                                         // check if unit _can_ parry

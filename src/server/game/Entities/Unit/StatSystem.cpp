@@ -665,8 +665,8 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
 
     // HoT: Precise Technique
-    if (HasAura(180530))
-        value *= 0.5f;
+    if (HasAura(SPELL_PRECISE_TECHNIQUE))
+        value -= 50.f;
 
     if (sWorld->getBoolConfig(CONFIG_STATS_LIMITS_ENABLE))
          value = value > sWorld->getFloatConfig(CONFIG_STATS_LIMITS_CRIT) ? sWorld->getFloatConfig(CONFIG_STATS_LIMITS_CRIT) : value;
@@ -857,8 +857,8 @@ void Player::UpdateSpellCritChance(uint32 school)
     crit += GetRatingBonusValue(CR_CRIT_SPELL);
 
     // HoT: Precise Technique
-    if (HasAura(180530))
-        crit *= 0.5f;
+    if (HasAura(SPELL_PRECISE_TECHNIQUE))
+        crit -= 50.f;
 
     // Store crit value
     SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + school, crit);
