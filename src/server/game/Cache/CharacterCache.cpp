@@ -176,7 +176,7 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
     itr->second.ArenaTeamId[slot] = arenaTeamId;
 }
 
-void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass)
+void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass, WorldSession* self)
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
@@ -188,7 +188,7 @@ void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subCl
 
     itr->second.Class = subClass;
     WorldPackets::Misc::InvalidatePlayer packet(guid);
-    sWorld->SendGlobalMessage(packet.Write());
+    sWorld->SendGlobalMessage(packet.Write(), self);
     /*WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
     data << guid.WriteAsPacked();
 

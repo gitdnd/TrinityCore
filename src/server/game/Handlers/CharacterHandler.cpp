@@ -1040,7 +1040,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     // do we have a subclass from logging in?
     if (subClass)
     {
-        sCharacterCache->UpdateCharacterSubClass(pCurrChar->GetGUID(), subClass);
+        sCharacterCache->UpdateCharacterSubClass(pCurrChar->GetGUID(), subClass, GetSession());
         if (Guild* guild = pCurrChar->GetGuild())
             guild->UpdateMemberData(pCurrChar, GUILD_MEMBER_DATA_CLASS, subClass);
     }

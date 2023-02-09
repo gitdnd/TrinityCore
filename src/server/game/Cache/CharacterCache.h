@@ -52,7 +52,7 @@ class TC_GAME_API CharacterCache
         void UpdateCharacterAccountId(ObjectGuid const& guid, uint32 accountId);
         void UpdateCharacterGuildId(ObjectGuid const& guid, ObjectGuid::LowType guildId);
         void UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 slot, uint32 arenaTeamId);
-        void UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass);
+        void UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass, WorldSession * self);
 
         bool HasCharacterCacheEntry(ObjectGuid const& guid) const;
         CharacterCacheEntry const* GetCharacterCacheByGuid(ObjectGuid const& guid) const;
