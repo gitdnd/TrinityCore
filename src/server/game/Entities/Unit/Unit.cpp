@@ -1206,6 +1206,12 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         uint32 damage = 0;
         uint8 itemDamagesMask = (GetTypeId() == TYPEID_PLAYER) ? (1 << i) : 0;
         damage += CalculateDamage(damageInfo->AttackType, false, addPctMods, itemDamagesMask);
+        if (Player* plr = ToPlayer())
+        {
+            if (HasAura(SPELL_FIST_OF_FURY) && (damageInfo->AttackType == BASE_ATTACK || damageInfo->AttackType == OFF_ATTACK))
+                if(!plr->GetWeaponForAttack(BASE_ATTACK, true) && !plr->GetWeaponForAttack(OFF_ATTACK, true))
+                    damage *= 3;
+        }
         // Add melee damage bonus
         damage = MeleeDamageBonusDone(damageInfo->Target, damage, damageInfo->AttackType, nullptr, schoolMask);
         damage = damageInfo->Target->MeleeDamageBonusTaken(this, damage, damageInfo->AttackType, nullptr, schoolMask);

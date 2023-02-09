@@ -3900,6 +3900,7 @@ enum CustomSpells : uint32
     SPELL_ICY_HOT = 180206,
     SPELL_BLOOD_FOR_THE_BLOOD_GOD = 180470,
     SPELL_PRECISE_TECHNIQUE = 180530,
+    SPELL_FIST_OF_FURY = 180521,
 };
 
 namespace Trinity
