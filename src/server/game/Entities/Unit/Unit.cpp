@@ -8065,7 +8065,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
             // Barrage
             case 10005:
             {
-                if (attType == RANGED_ATTACK && HasAura(180529))
+                if (attType == RANGED_ATTACK && HasAura(180529) && (!spellProto || spellProto->Id == 75))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             }
