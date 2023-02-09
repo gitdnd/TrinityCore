@@ -4251,6 +4251,9 @@ void Spell::SendSpellStart()
     if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
         powerType = POWER_HEALTH;
 
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && powerType == POWER_MANA && GetSpellInfo()->HasDamageEffects())
+        powerType = POWER_HEALTH;
+
     //TC_LOG_DEBUG("spells", "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_2;
@@ -4322,6 +4325,9 @@ void Spell::SendSpellGo()
     Powers powerType = m_spellInfo->PowerType;
 
     if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+        powerType = POWER_HEALTH;
+
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && powerType == POWER_MANA && GetSpellInfo()->HasDamageEffects())
         powerType = POWER_HEALTH;
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
@@ -4841,18 +4847,21 @@ void Spell::TakePower()
 
     Powers powerType = Powers(m_spellInfo->PowerType);
 
+    bool bloodMagic = false;
     // HoT: Blood Magic
     if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
     {
         powerType = POWER_HEALTH;
         m_powerCost *= 1.5;
+        bloodMagic = true;
     }
 
     // HoT: Blood for the Blood God
-    if (powerType == POWER_MANA && unitCaster->HasAura(180470) && GetSpellInfo()->HasOnlyDamageEffects())
+    if (powerType == POWER_MANA && unitCaster->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && GetSpellInfo()->HasDamageEffects())
     {
         powerType = POWER_HEALTH;
         m_powerCost *= 2;
+        bloodMagic = true;
     }
 
     bool hit = true;
@@ -4886,7 +4895,7 @@ void Spell::TakePower()
     // health as power used
     if (powerType == POWER_HEALTH)
     {
-        if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && (unitCaster->GetHealth() - m_powerCost) <= 0)
+        if (bloodMagic && (unitCaster->GetHealth() - m_powerCost) <= 0)
             unitCaster->Kill(unitCaster, unitCaster, true);
         else
             unitCaster->ModifyHealth(-(int32)m_powerCost);

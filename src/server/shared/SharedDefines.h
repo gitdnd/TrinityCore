@@ -3898,6 +3898,7 @@ enum CustomSpells : uint32
 {
     SPELL_BLOOD_MAGIC = 450000,
     SPELL_ICY_HOT = 180206,
+    SPELL_BLOOD_FOR_THE_BLOOD_GOD = 180470,
 };
 
 namespace Trinity
