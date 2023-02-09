@@ -51,32 +51,21 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recvData)
     {
         if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(friendGuid))
         {
-            uint32 team = Player::TeamForRaceNoOverride(characterInfo->Race);
-            uint32 friendAccountId = characterInfo->AccountId;
-
-            if (HasPermission(rbac::RBAC_PERM_ALLOW_GM_FRIEND) || AccountMgr::IsPlayerAccount(AccountMgr::GetSecurity(friendAccountId, realm.Id.Realm)))
+            if (friendGuid == GetPlayer()->GetGUID())
+                friendResult = FRIEND_SELF;
+            else if (GetPlayer()->GetSocial()->HasFriend(friendGuid))
+                friendResult = FRIEND_ALREADY;
+            else
             {
-                if (friendGuid)
-                {
-                    if (friendGuid == GetPlayer()->GetGUID())
-                        friendResult = FRIEND_SELF;
-                    else if (GetPlayer()->GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_ADD_FRIEND))
-                        friendResult = FRIEND_ENEMY;
-                    else if (GetPlayer()->GetSocial()->HasFriend(friendGuid))
-                        friendResult = FRIEND_ALREADY;
-                    else
-                    {
-                        Player* pFriend = ObjectAccessor::FindPlayer(friendGuid);
-                        if (pFriend && pFriend->IsVisibleGloballyFor(GetPlayer()))
-                            friendResult = FRIEND_ADDED_ONLINE;
-                        else
-                            friendResult = FRIEND_ADDED_OFFLINE;
-                        if (GetPlayer()->GetSocial()->AddToSocialList(friendGuid, SOCIAL_FLAG_FRIEND))
-                            GetPlayer()->GetSocial()->SetFriendNote(friendGuid, friendNote);
-                        else
-                            friendResult = FRIEND_LIST_FULL;
-                    }
-                }
+                Player* pFriend = ObjectAccessor::FindPlayer(friendGuid);
+                if (pFriend && pFriend->IsVisibleGloballyFor(GetPlayer()))
+                    friendResult = FRIEND_ADDED_ONLINE;
+                else
+                    friendResult = FRIEND_ADDED_OFFLINE;
+                if (GetPlayer()->GetSocial()->AddToSocialList(friendGuid, SOCIAL_FLAG_FRIEND))
+                    GetPlayer()->GetSocial()->SetFriendNote(friendGuid, friendNote);
+                else
+                    friendResult = FRIEND_LIST_FULL;
             }
         }
     }
