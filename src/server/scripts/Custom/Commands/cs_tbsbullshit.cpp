@@ -121,7 +121,7 @@ public:
 
     static bool HandleDebugStatPrint(ChatHandler* handler, char const* args)
     {
-        Player* player = handler->GetSession()->GetPlayer();
+        Player* player = handler->getSelectedPlayerOrSelf();
         handler->PSendSysMessage("Magic Find %u", player->GetMagicFind());
         for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         {
