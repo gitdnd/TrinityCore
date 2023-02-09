@@ -29,6 +29,7 @@ public:
             { "clearinventory", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleClearInventory, "" },
             { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
             { "cheatspells", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleToggleCheatSpells, "" },
+            { "debugstats", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
         };
         return tbsBullshitCommandTable;
     }
@@ -115,6 +116,17 @@ public:
             player = handler->getSelectedPlayerOrSelf();
         player->ToggleFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
         handler->PSendSysMessage("Cheat spells %s on %s.", player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS) ? "enabled" : "disabled", player->GetName().c_str());
+        return true;
+    }
+
+    static bool HandleDebugStatPrint(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        handler->PSendSysMessage("Magic Find %u", player->GetMagicFind());
+        for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            handler->PSendSysMessage("Bonus Spell School Damage Pct %u, %f", i, player->GetBonusSchoolModifierPct(SpellSchools(i)));
+        }
         return true;
     }
 };
