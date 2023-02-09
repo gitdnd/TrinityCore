@@ -1357,6 +1357,7 @@ class spell_gen_shield_sup : public AuraScript
         if (!caster)
             return;
 
+        caster->RemoveAura(93999);
         caster->UpdateShieldBlockValue();
         caster->UpdateDamagePhysical(BASE_ATTACK);
     }
