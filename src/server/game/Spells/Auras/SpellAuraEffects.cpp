@@ -5906,15 +5906,13 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
         return;
 
     Player* target = aurApp->GetTarget()->ToPlayer();
-
-    uint32 amount = target->GetMagicFind();
-    amount = apply ? amount + GetAmount() : amount - GetAmount();
+    uint32 amount = 0;
+    Unit::AuraEffectList const& mF = target->GetAuraEffectsByType(SPELL_AURA_MAGIC_FIND);
+    for (Unit::AuraEffectList::const_iterator i = mF.begin(); i != mF.end(); ++i)
+        amount += (*i)->GetAmount();
 
     if (amount > sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON))
         amount = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
-
-    if (amount < 0)
-        amount = 0;
 
     target->SetMagicFind(amount);
 }
