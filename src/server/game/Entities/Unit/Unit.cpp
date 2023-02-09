@@ -2980,7 +2980,7 @@ void Unit::_UpdateAutoRepeatSpell()
         spell->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
 
         // HoT: Barrage
-        if (autoRepeatSpellInfo->Id == 75 && HasAura(180529))
+        if (autoRepeatSpellInfo->Id == 75 && HasAura(SPELL_BARRAGE_TALENT))
         {
             Spell* bonusProjectile = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
             bonusProjectile->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
@@ -8065,7 +8065,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
             // Barrage
             case 10005:
             {
-                if (attType == RANGED_ATTACK && HasAura(180529) && (!spellProto || spellProto->Id == 75))
+                if (attType == RANGED_ATTACK && HasAura(SPELL_BARRAGE_TALENT) && (!spellProto || spellProto->Id == 75))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             }
