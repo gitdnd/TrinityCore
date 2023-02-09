@@ -978,7 +978,7 @@ bool SpellInfo::HasDamageEffects() const
         }
     }
 
-    return true;
+    return damageEffectFound;
 }
 
 bool SpellInfo::IsExplicitDiscovery() const
