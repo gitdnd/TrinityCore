@@ -372,7 +372,7 @@ void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
     _nextInstanceId = std::min(instanceId, _nextInstanceId);
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
-    //sWorld->GetEluna()->OnFreeInstanceId(instanceId);
+    sWorld->GetEluna()->OnFreeInstanceId(instanceId);
     if (calledMap)
         if (Eluna* e = calledMap->GetEluna())
             e->FreeInstanceId(instanceId);
