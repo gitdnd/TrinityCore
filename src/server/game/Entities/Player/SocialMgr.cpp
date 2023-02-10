@@ -223,10 +223,6 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid const& friendGUID, Frie
         target->GetSession()->GetSecurity() > AccountTypes(sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST)))
         return;
 
-    // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
-    if (target->GetTeam() != player->GetTeam() && !player->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
-        return;
-
     if (target->IsVisibleGloballyFor(player))
     {
         if (target->isDND())
@@ -243,7 +239,7 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid const& friendGUID, Frie
 
         friendInfo.Area = target->GetZoneId();
         friendInfo.Level = target->GetLevel();
-        friendInfo.Class = target->GetClass();
+        friendInfo.Class = target->GetSubClass() ? target->GetSubClass() : target->GetClass();
     }
 }
 
@@ -300,9 +296,6 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket const* pack
 
             WorldSession* session = target->GetSession();
             if (!session->HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && player->GetSession()->GetSecurity() > gmSecLevel)
-                continue;
-
-            if (target->GetTeam() != player->GetTeam() && !session->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
                 continue;
 
             if (player->IsVisibleGloballyFor(target))
