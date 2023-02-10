@@ -2987,6 +2987,9 @@ void Unit::_UpdateAutoRepeatSpell()
 
             Spell* bonusProjectile2 = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
             bonusProjectile2->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
+
+            Spell* bonusProjectile3 = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
+            bonusProjectile3->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
         }
 
         // all went good, reset attack
