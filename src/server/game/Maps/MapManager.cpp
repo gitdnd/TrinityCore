@@ -378,8 +378,11 @@ void MapManager::FreeInstanceId(uint32 instanceId)
         if (!itr->second || !itr->second->Instanceable())
             continue;
 
-        if (Eluna* e = itr->second->GetEluna())
-            e->FreeInstanceId(instanceId);
+        if (itr->second->GetInstanceId() == instanceId)
+        {
+            if (Eluna* e = itr->second->GetEluna())
+                e->FreeInstanceId(instanceId);
+        }
         //Only needed if per instance map eluna.
         /*Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
         if (iMap)
