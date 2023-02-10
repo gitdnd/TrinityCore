@@ -626,10 +626,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     {
         // Primary stat count modifier can both add and subtract
         if (leg->primaryStatCountMod && leg->primaryStatCountMod != 0)
-            primaryStatSlots += leg->primaryStatCountMod;
+            primaryStatSlots = leg->primaryStatCountMod;
 
         if (leg->secondaryStatCountMod && leg->secondaryStatCountMod != 0)
-            secondaryStatSlots += leg->secondaryStatCountMod;
+            secondaryStatSlots = leg->secondaryStatCountMod;
     }
 
     // multiply the pool size by the base amounts of stat slots
@@ -830,6 +830,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
         setStats = std::max(setStats, uint32(i + 1));
     }
+    if (setStats > MAX_ITEM_PROTO_STATS)
+        setStats = MAX_ITEM_PROTO_STATS;
     output->StatsCount = setStats;
 }
 

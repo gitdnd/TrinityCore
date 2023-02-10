@@ -1206,6 +1206,12 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         uint32 damage = 0;
         uint8 itemDamagesMask = (GetTypeId() == TYPEID_PLAYER) ? (1 << i) : 0;
         damage += CalculateDamage(damageInfo->AttackType, false, addPctMods, itemDamagesMask);
+        if (Player* plr = ToPlayer())
+        {
+            if (HasAura(SPELL_FIST_OF_FURY) && (damageInfo->AttackType == BASE_ATTACK || damageInfo->AttackType == OFF_ATTACK))
+                if(!plr->GetWeaponForAttack(BASE_ATTACK, true) && !plr->GetWeaponForAttack(OFF_ATTACK, true))
+                    damage *= 3;
+        }
         // Add melee damage bonus
         damage = MeleeDamageBonusDone(damageInfo->Target, damage, damageInfo->AttackType, nullptr, schoolMask);
         damage = damageInfo->Target->MeleeDamageBonusTaken(this, damage, damageInfo->AttackType, nullptr, schoolMask);
@@ -2152,7 +2158,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     int32 dodge_chance = int32(GetUnitDodgeChance(attType, victim) * 100.0f);
     int32 block_chance = int32(GetUnitBlockChance(attType, victim) * 100.0f);
     int32 parry_chance = int32(GetUnitParryChance(attType, victim) * 100.0f);
-
+    bool preciseTechnique = HasAura(SPELL_PRECISE_TECHNIQUE);
     // melee attack table implementation
     // outcome priority:
     //   1. >    2. >    3. >       4. >    5. >   6. >       7. >  8.
@@ -2176,7 +2182,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
 
     // 1. MISS
     tmp = miss_chance;
-    if (tmp > 0 && roll < (sum += tmp))
+    if (!preciseTechnique && tmp > 0 && roll < (sum += tmp))
         return MELEE_HIT_MISS;
 
     // always crit against a sitting target (except 0 crit chance)
@@ -2193,7 +2199,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     }
 
     // 3. PARRY
-    if (canParryOrBlock)
+    if (canParryOrBlock && !preciseTechnique)
     {
         tmp = parry_chance;
         if (tmp > 0                                         // check if unit _can_ parry
@@ -2974,7 +2980,7 @@ void Unit::_UpdateAutoRepeatSpell()
         spell->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
 
         // HoT: Barrage
-        if (autoRepeatSpellInfo->Id == 75 && HasAura(180529))
+        if (autoRepeatSpellInfo->Id == 75 && HasAura(SPELL_BARRAGE_TALENT))
         {
             Spell* bonusProjectile = new Spell(this, autoRepeatSpellInfo, TRIGGERED_FULL_MASK);
             bonusProjectile->prepare(m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_targets);
@@ -8059,7 +8065,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
             // Barrage
             case 10005:
             {
-                if (attType == RANGED_ATTACK && HasAura(180529))
+                if (attType == RANGED_ATTACK && HasAura(SPELL_BARRAGE_TALENT) && (!spellProto || spellProto->Id == 75))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             }

@@ -1314,22 +1314,6 @@ class spell_gen_shield_sup_dummy : public AuraScript
 {
     PrepareAuraScript(spell_gen_shield_sup_dummy);
 
-    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Player* caster = GetCaster()->ToPlayer();
-        if (!caster)
-            return;
-
-        Item const* mainHand = caster->GetWeaponForAttack(BASE_ATTACK, true);
-        if (mainHand)
-            return;
-
-        Item* offHand = caster->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-        if (!offHand || offHand->GetTemplate()->InventoryType != INVTYPE_SHIELD)
-            return;
-
-        caster->AddAura(93999, caster);
-    }
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
@@ -1337,14 +1321,13 @@ class spell_gen_shield_sup_dummy : public AuraScript
         if (!caster)
             return;
 
-        caster->RemoveAura(93999);
+        //caster->RemoveAura(93999);
         caster->UpdateShieldBlockValue();
         caster->UpdateDamagePhysical(BASE_ATTACK);
     }
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_gen_shield_sup_dummy::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_gen_shield_sup_dummy::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -1369,16 +1352,14 @@ class spell_gen_shield_sup : public AuraScript
     {
         if (!GetCaster())
             return;
+
         Player* caster = GetCaster()->ToPlayer();
         if (!caster)
             return;
 
-        Item const* mainHand = caster->GetWeaponForAttack(BASE_ATTACK, true);
-        if (!mainHand)
-        {
-            caster->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, BASE_MINDAMAGE);
-            caster->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, BASE_MAXDAMAGE);
-        }
+        caster->RemoveAura(93999);
+        caster->UpdateShieldBlockValue();
+        caster->UpdateDamagePhysical(BASE_ATTACK);
     }
 
     void Register() override

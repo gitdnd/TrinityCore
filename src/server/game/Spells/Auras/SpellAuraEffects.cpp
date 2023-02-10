@@ -4089,14 +4089,14 @@ void AuraEffect::HandleAuraModRangedAttackPower(AuraApplication const* aurApp, u
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->ToPlayer())
+    /*if (target->ToPlayer())
     {
         Item* item = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
         if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
         {
             return;
         }
-    }
+    }*/
 
     target->HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(GetAmount()), apply);
 }
@@ -4125,14 +4125,14 @@ void AuraEffect::HandleAuraModRangedAttackPowerPercent(AuraApplication const* au
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->ToPlayer())
+    /*if (target->ToPlayer())
     {
         Item* item = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
         if (item && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
         {
             return;
         }
-    }
+    }*/
 
     //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
     if (apply)
@@ -5906,16 +5906,13 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
         return;
 
     Player* target = aurApp->GetTarget()->ToPlayer();
-
-    uint32 amount = target->GetMagicFind();
-    amount = apply ? amount + GetAmount() : amount - GetAmount();
+    uint32 amount = 0;
+    Unit::AuraEffectList const& mF = target->GetAuraEffectsByType(SPELL_AURA_MAGIC_FIND);
+    for (Unit::AuraEffectList::const_iterator i = mF.begin(); i != mF.end(); ++i)
+        amount += (*i)->GetAmount();
 
     if (amount > sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON))
         amount = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
-
-    // dirty hackfix
-    if (amount > 400)
-        amount = 0;
 
     target->SetMagicFind(amount);
 }

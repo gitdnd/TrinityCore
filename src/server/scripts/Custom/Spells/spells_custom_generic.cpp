@@ -126,7 +126,7 @@ class spell_gen_subclass : public AuraScript
         {
             //plrCaster->SetClass(subClass); // Debug
             plrCaster->SetSubClass(subClass);
-            sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), subClass);
+            sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), subClass, plrCaster->GetSession());
             if (Guild* guild = plrCaster->GetGuild())
                 guild->UpdateMemberData(plrCaster, GUILD_MEMBER_DATA_CLASS, subClass);
         }
@@ -138,7 +138,7 @@ class spell_gen_subclass : public AuraScript
         if (plrCaster)
         {
             plrCaster->SetSubClass(0);
-            sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), plrCaster->GetClass());
+            sCharacterCache->UpdateCharacterSubClass(plrCaster->GetGUID(), plrCaster->GetClass(), plrCaster->GetSession());
             if (Guild* guild = plrCaster->GetGuild())
                 guild->UpdateMemberData(plrCaster, GUILD_MEMBER_DATA_CLASS, plrCaster->GetClass());
         }

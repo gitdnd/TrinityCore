@@ -943,6 +943,44 @@ bool SpellInfo::HasOnlyDamageEffects() const
     return true;
 }
 
+bool SpellInfo::HasDamageEffects() const
+{
+    bool damageEffectFound = false;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (Effects[i].IsEffect())
+        {
+            /*
+            * Too many false positives
+            if (Effects[i].TriggerSpell)
+            {
+                if (const SpellInfo* trigger = sSpellMgr->GetSpellInfo(Effects[i].TriggerSpell))
+                    damageEffectFound = trigger->HasDamageEffects();
+                if (damageEffectFound)
+                    break;
+            }*/
+            switch (Effects[i].Effect)
+            {
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            {
+                damageEffectFound = true;
+                break;
+            }
+            default:
+                continue;
+            }
+        }
+    }
+
+    return damageEffectFound;
+}
+
 bool SpellInfo::IsExplicitDiscovery() const
 {
     return ((Effects[0].Effect == SPELL_EFFECT_CREATE_RANDOM_ITEM
