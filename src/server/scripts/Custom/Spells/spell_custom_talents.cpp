@@ -1020,6 +1020,8 @@ public:
                 Unit* actor = eventInfo.GetActor();
                 if (actor)
                 {
+                    if (actor->HasAura(180482))
+                        healamount *= 2;
                     CastSpellExtraArgs args(aurEff);
                     args.AddSpellMod(SPELLVALUE_BASE_POINT0, healamount);
                     actor->CastSpell(actor, 180416, args);
@@ -1474,8 +1476,8 @@ public:
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
             if (!damageInfo || !damageInfo->GetDamage())
                 return;
-
-            int32 healamount = ((float)damageInfo->GetDamage() * (5.f / 100.f)) + 0.5f;
+            //@todo: decide if talent should affect itself.
+            int32 healamount = ((float)damageInfo->GetDamage() * (10.f / 100.f)) + 0.5f;
             if (healamount > 0)
             {
                 Unit* actor = eventInfo.GetActor();
