@@ -14,7 +14,7 @@ void ElunaInstanceAI::Initialize()
     //ASSERT(!instance->GetEluna()->HasInstanceData(instance));
     if (instance->GetEluna()->HasInstanceData(instance))
     {
-        ELUNA_LOG_ERROR("Error in ElunaInstanceAI::Initialize(), called while having instance data map %u (%s).", instance->GetEntry(), instance->GetMapName());
+        ELUNA_LOG_ERROR("Error in ElunaInstanceAI::Initialize(), called while having instance data map %u (%s).", instance->GetEntry()->MapID, instance->GetMapName());
         return;
     }
     // Create a new table for instance data.
