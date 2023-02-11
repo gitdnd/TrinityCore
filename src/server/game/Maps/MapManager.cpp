@@ -366,26 +366,32 @@ uint32 MapManager::GenerateInstanceId()
     return newInstanceId;
 }
 
-void MapManager::FreeInstanceId(uint32 instanceId)
+void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
 {
     // If freed instance id is lower than the next id available for new instances, use the freed one instead
     _nextInstanceId = std::min(instanceId, _nextInstanceId);
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
     sWorld->GetEluna()->OnFreeInstanceId(instanceId);
-    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
+    if (calledMap)
+        if (Eluna* e = calledMap->GetEluna())
+            e->FreeInstanceId(instanceId);
+    /*for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         if (!itr->second || !itr->second->Instanceable())
             continue;
 
-        if (Eluna* e = itr->second->GetEluna())
-            e->FreeInstanceId(instanceId);
+        if (itr->second->GetInstanceId() == instanceId)
+        {
+            if (Eluna* e = itr->second->GetEluna())
+                e->FreeInstanceId(instanceId);
+        }
         //Only needed if per instance map eluna.
         /*Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
         if (iMap)
             if(iMap->GetEluna())
                 iMap->GetEluna()->FreeInstanceId(instanceId);*/
-    }
+    //}*/
 #endif
 }
 

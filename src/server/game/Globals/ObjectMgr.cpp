@@ -11104,3 +11104,49 @@ std::string ObjectMgr::GetSpellGemDesc(uint32 id) const
     return "";
 }
 
+TalentNodeInfo const* ObjectMgr::GetTalentNode(uint32 entry) const
+{
+    return Trinity::Containers::MapGetValuePtr(_talentNodeStore, entry);
+}
+
+void ObjectMgr::LoadTalentNodes()
+{
+    QueryResult result = WorldDatabase.Query("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info");
+    if (!result)
+    {
+        //@todo Error.
+        return;
+    }
+    _talentNodeStore.reserve(result->GetRowCount());
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+        TalentNodeInfo& nodeInfo = _talentNodeStore[entry];
+        nodeInfo.Index = entry;
+        nodeInfo.spellId = fields[1].GetUInt32();
+        nodeInfo.xOffset = fields[2].GetFloat();
+        nodeInfo.yOffset = fields[3].GetFloat();
+        nodeInfo.Mutex = fields[4].GetUInt32();
+        nodeInfo.buttonType = fields[5].GetUInt32();
+        nodeInfo.flagMask = fields[6].GetUInt32();
+        //@todo Validation.
+        
+    } while (result->NextRow());
+    for (auto& itr : _talentNodeStore)
+    {
+        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", itr.first);
+        if (linkQuery)
+        {
+            Field* fields = result->Fetch();
+            uint32 entry = fields[0].GetUInt32();
+            if (!GetTalentNode(entry))
+            {
+                //@todo Error
+                continue;
+            }
+            itr.second.links.push_back(entry);
+        }
+    }
+}

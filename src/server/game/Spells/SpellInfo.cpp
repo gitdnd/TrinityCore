@@ -946,6 +946,8 @@ bool SpellInfo::HasOnlyDamageEffects() const
 bool SpellInfo::HasDamageEffects() const
 {
     bool damageEffectFound = false;
+    if (HasAura(SPELL_AURA_PERIODIC_DAMAGE))
+        return true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (Effects[i].IsEffect())

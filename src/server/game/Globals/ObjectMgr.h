@@ -938,6 +938,19 @@ enum QueryDataGroup
     QUERY_DATA_ALL              = 0xFF
 };
 
+struct TalentNodeInfo
+{
+    uint32 Index;
+    uint32 spellId;
+    float xOffset;
+    float yOffset;
+    uint32 Mutex;
+    uint32 buttonType;
+    uint32 flagMask;
+    std::vector<uint32> links;
+};
+typedef std::unordered_map<uint32, TalentNodeInfo> TalentNodeContainer;
+
 class PlayerDumpReader;
 
 class TC_GAME_API ObjectMgr
@@ -1577,6 +1590,9 @@ class TC_GAME_API ObjectMgr
             return &itr->second;
         }
 
+        TalentNodeInfo const* GetTalentNode(uint32 entry) const;
+        TalentNodeContainer const& GetTalentNodeStore() const { return _talentNodeStore; }
+        void LoadTalentNodes();
     private:
         // first free id for selected id type
         uint32 _auctionId;
@@ -1739,6 +1755,7 @@ class TC_GAME_API ObjectMgr
 
         PlayerTotemModelMap _playerTotemModel;
         VehicleSeatAddonContainer _vehicleSeatAddonStore;
+        TalentNodeContainer _talentNodeStore;
 };
 
 #define sObjectMgr ObjectMgr::instance()
