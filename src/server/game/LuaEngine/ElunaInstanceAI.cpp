@@ -15,7 +15,9 @@ void ElunaInstanceAI::Initialize()
     if (instance->GetEluna()->HasInstanceData(instance))
     {
         ELUNA_LOG_ERROR("Error in ElunaInstanceAI::Initialize(), called while having instance data map %u (%s).", instance->GetEntry()->MapID, instance->GetMapName());
-        return;
+        //return;
+        // This might break things.
+        instance->GetEluna()->FreeInstanceId(instance->GetInstanceId());
     }
     // Create a new table for instance data.
     lua_State* L = instance->GetEluna()->L;
