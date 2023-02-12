@@ -373,25 +373,25 @@ void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
     sWorld->GetEluna()->OnFreeInstanceId(instanceId);
-    if (calledMap)
-        if (Eluna* e = calledMap->GetEluna())
-            e->FreeInstanceId(instanceId);
-    /*for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
+    //if (calledMap)
+        //if (Eluna* e = calledMap->GetEluna())
+            //e->FreeInstanceId(instanceId);
+    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         if (!itr->second || !itr->second->Instanceable())
             continue;
 
-        if (itr->second->GetInstanceId() == instanceId)
-        {
+        //if (itr->second->GetInstanceId() == instanceId)
+        //{
             if (Eluna* e = itr->second->GetEluna())
                 e->FreeInstanceId(instanceId);
-        }
+        //}
         //Only needed if per instance map eluna.
         /*Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
         if (iMap)
             if(iMap->GetEluna())
                 iMap->GetEluna()->FreeInstanceId(instanceId);*/
-    //}*/
+    }
 #endif
 }
 
