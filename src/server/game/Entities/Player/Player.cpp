@@ -28027,7 +28027,7 @@ void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
             RemoveGemSpell(spell);
             SendSpellRemoval(spell);
         }
-        else
+        else if (!GetSpellHistory()->HasCooldown(spell))
             SendFakeCooldown(spell, DAY * IN_MILLISECONDS);
     }
 }
