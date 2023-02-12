@@ -11851,7 +11851,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest
     if (!pItem)
         return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_ITEM_NOT_FOUND;
 
-    if (GetSession()->CanUseBank())
+    if (!GetSession()->CanUseBank())
         return EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK;
 
     uint32 count = pItem->GetCount();
