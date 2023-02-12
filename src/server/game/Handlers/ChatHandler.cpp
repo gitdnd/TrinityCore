@@ -419,7 +419,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
 #endif
             if (lang != LANG_ADDON)
-                chatSpy << "[GROUP] " << sender->GetName().c_str() << " " << msg.c_str();
+                chatSpy << "[GROUP] " << msg.c_str();
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, nullptr, msg);
             group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
@@ -589,7 +589,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (sender->GetEluna() != nullptr && !sender->GetEluna()->OnChat(sender, type, lang, msg, chn))
                     return;
 #endif
-                if (lang != LANG_ADDON)
+                if (lang != LANG_ADDON && chn->GetName() != "WorldChat" && chn->GetName() != "ChatLog")
                     chatSpy << "[CHANNEL] [" << chn->GetName() << "] " << msg.c_str();
                 chn->Say(sender->GetGUID(), msg, lang);
             }
