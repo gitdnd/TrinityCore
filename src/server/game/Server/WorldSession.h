@@ -565,6 +565,8 @@ class TC_GAME_API WorldSession
         time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
         void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
+        bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
+
     public:                                                 // opcodes handlers
 
         void Handle_NULL(WorldPacket& recvPacket);          // not used
@@ -1139,8 +1141,7 @@ class TC_GAME_API WorldSession
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
 
-        bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
-
+ 
         // logging helper
         void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char *reason);
         void LogUnprocessedTail(WorldPacket* packet);
