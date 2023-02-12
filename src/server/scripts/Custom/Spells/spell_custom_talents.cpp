@@ -1949,12 +1949,6 @@ public:
     {
         PrepareAuraScript(hot_thrash_AuraScript);
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            uint32 ProcChance = 15;
-            return (urand(1, 100) <= ProcChance);
-        }
-
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
@@ -1969,7 +1963,6 @@ public:
 
         void Register() override
         {
-            DoCheckProc += AuraCheckProcFn(hot_thrash_AuraScript::CheckProc);
             OnEffectProc += AuraEffectProcFn(hot_thrash_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
         }
     };
