@@ -28013,6 +28013,8 @@ void Player::ToggleTempSpell(uint32 spell, uint32 aura, bool apply)
 
             SendCooldownClear(spell);
         }
+        if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
+            CastSpell(this, spell, true);
 
     }
     else
