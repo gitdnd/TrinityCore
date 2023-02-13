@@ -1921,18 +1921,6 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                 Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
             }
 
-            if (!HasPermission(rbac::RBAC_PERM_TWO_SIDE_ADD_FRIEND))
-            {
-                // Delete Friend List
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_GUID);
-                stmt->setUInt32(0, lowGuid);
-                trans->Append(stmt);
-
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_FRIEND);
-                stmt->setUInt32(0, lowGuid);
-                trans->Append(stmt);
-            }
-
             // Reset homebind and position
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
             stmt->setUInt32(0, lowGuid);
