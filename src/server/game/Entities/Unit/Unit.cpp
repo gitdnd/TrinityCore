@@ -6813,7 +6813,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 {
                     float SpellHastePercent = GetFloatValue(UNIT_MOD_CAST_SPEED);
                     if(frand(0.f, 1.f) <= SpellHastePercent)
-                        AddPct(DoneTotalMod, 2);
+                        AddPct(DoneTotalMod, 100.f);
                 }
                 break;
             }
