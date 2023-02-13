@@ -11850,9 +11850,9 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest
 {
     if (!pItem)
         return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_ITEM_NOT_FOUND;
-
-    if (!GetSession()->CanUseBank())
-        return EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK;
+    //@todo: Fix exploit of being able to equip items from your bank. This currently causes items to be 'lost'/mailed to you on relog.
+    //if (!GetSession()->CanUseBank())
+        //return EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK;
 
     uint32 count = pItem->GetCount();
 
