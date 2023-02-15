@@ -4802,8 +4802,8 @@ void Spell::EffectDurabilityDamage(SpellEffIndex effIndex)
     // -1 means all player equipped items and -2 all items
     if (slot < 0)
     {
-        unitTarget->ToPlayer()->DurabilityPointsLossAll(damage, (slot < -1));
-        ExecuteLogEffectDurabilityDamage(effIndex, unitTarget, -1, -1);
+        //unitTarget->ToPlayer()->DurabilityPointsLossAll(damage, (slot < -1));
+        //ExecuteLogEffectDurabilityDamage(effIndex, unitTarget, -1, -1);
         return;
     }
 
@@ -4813,8 +4813,8 @@ void Spell::EffectDurabilityDamage(SpellEffIndex effIndex)
 
     if (Item* item = unitTarget->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
     {
-        unitTarget->ToPlayer()->DurabilityPointsLoss(item, damage);
-        ExecuteLogEffectDurabilityDamage(effIndex, unitTarget, item->GetEntry(), slot);
+        //unitTarget->ToPlayer()->DurabilityPointsLoss(item, damage);
+        //ExecuteLogEffectDurabilityDamage(effIndex, unitTarget, item->GetEntry(), slot);
     }
 }
 
@@ -4846,8 +4846,8 @@ void Spell::EffectDurabilityDamagePCT(SpellEffIndex effIndex)
     if (damage <= 0)
         return;
 
-    if (Item* item = unitTarget->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-        unitTarget->ToPlayer()->DurabilityLoss(item, float(damage) / 100.0f);
+    //if (Item* item = unitTarget->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        //unitTarget->ToPlayer()->DurabilityLoss(item, float(damage) / 100.0f);
 }
 
 void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
