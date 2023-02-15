@@ -945,7 +945,7 @@ bool SpellInfo::HasOnlyDamageEffects() const
 
 bool SpellInfo::HasDamageEffects() const
 {
-    if (Id == 53201 || Id == 53007) // Damage done by triggered spells so needs hacked.
+    if (Id == 53201 || Id == 53007 || Id == 48156) // Damage done by triggered spells so needs hacked.
         return true;
 
     bool damageEffectFound = false;
