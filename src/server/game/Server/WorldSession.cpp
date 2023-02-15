@@ -538,7 +538,7 @@ void WorldSession::LogoutPlayer(bool save)
             _player->RepopAtGraveyard(true);
             _player->SetPendingBind(0, 0);
         }
-        else if (_player->GetMapId() != 765 && GetSecurity() < SEC_ADMINISTRATOR)
+        else if (_player->GetMapId() != 765 && GetSecurity() < SEC_ADMINISTRATOR && _player->IsAlive())
             _player->TeleportTo(_player->GetStartPosition());
 
         //drop a flag if player is carrying it
