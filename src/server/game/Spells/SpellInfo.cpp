@@ -949,7 +949,7 @@ bool SpellInfo::HasDamageEffects() const
         return true;
 
     bool damageEffectFound = false;
-    if (HasAura(SPELL_AURA_PERIODIC_DAMAGE))
+    if (HasAura(SPELL_AURA_PERIODIC_DAMAGE) || HasAura(SPELL_AURA_PERIODIC_LEECH))
         return true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
