@@ -192,6 +192,15 @@ class spell_item_floating_cult_thesis : public SpellScript
             ChatHandler(caster->GetSession()).PSendSysMessage("Your party must have only two players to use this.");
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         }
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (itr->GetSource() && itr->GetSource()->GetDistance2d(caster) > 50.0f)
+            {
+                ChatHandler(caster->GetSession()).PSendSysMessage("Your friend must be nearby.");
+                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            }
+        }
+
         return SPELL_CAST_OK;
     }
 
@@ -208,6 +217,7 @@ class spell_item_floating_cult_thesis : public SpellScript
         {
             if (itr->GetSource() && itr->GetSource()->GetDistance2d(caster) < 50.0f)
             {
+                itr->GetSource()->ResetInstances(INSTANCE_RESET_ALL, false);
                 itr->GetSource()->TeleportTo(769, 12163.0f, 15235.968f, 857.5f, 1.6f);
             }
         }
