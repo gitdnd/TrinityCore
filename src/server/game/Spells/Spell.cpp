@@ -2917,7 +2917,7 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                             Aura const* aura = app->GetBase();
 
                             uint32 auraId = aura->GetId();
-                            if ((auraId == 180434 || auraId == 180435 || auraId == 180437) && GetSpellInfo()->HasDamageEffects())
+                            if ((auraId == 180434 || auraId == 180435 || auraId == 180437) && GetSpellInfo()->HasAura(SPELL_AURA_PERIODIC_DAMAGE))
                                 hitInfo.AuraDuration = hitInfo.AuraDuration + ((float)hitInfo.AuraDuration * ((float)aura->GetSpellInfo()->Effects[EFFECT_0].BasePoints / 100.f));
 
                         // Curse Duration
