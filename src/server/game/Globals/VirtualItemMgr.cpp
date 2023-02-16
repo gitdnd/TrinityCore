@@ -1035,6 +1035,16 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     generator.seed(modifier.spellSeed);
 
     std::list<itemSpellInfo> spells;
+    bool hasExistingOnUse = false;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (output->Spells[i].SpellId != 0 && output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
+        {
+            hasExistingOnUse = true;
+            break;
+        }
+    }
 
     for (itemSpellInfo const &someSpells : availableSpells)
     {
@@ -1050,6 +1060,9 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
             if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
                 continue;
         }
+
+        if (hasExistingOnUse && someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+            continue;
 
         spells.push_back(someSpells);
     }
