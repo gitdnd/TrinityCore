@@ -2110,7 +2110,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
             continue;
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
-            if (itr.second.legendarySpells[i].SpellId != 0 && itr.second.legendarySpells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse)
+            if (itr.second.legendarySpells[i].SpellId > 0 && itr.second.legendarySpells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse)
                 continue;
         }
         legList.push_back(itr.second);
