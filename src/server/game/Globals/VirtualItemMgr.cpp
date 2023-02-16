@@ -1029,7 +1029,7 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     output->DisplayInfoID = display;
 }
 
-itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier& modifier, int8 dontUseType)
+itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
     std::mt19937 generator;
     generator.seed(modifier.spellSeed);
@@ -1061,9 +1061,6 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
         }
 
         if (someSpells.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && hasExistingOnUse) // Don't stack two on use effects.
-            continue;
-
-        if (dontUseType != -1 && someSpells.SpellTrigger == dontUseType)
             continue;
 
         spells.push_back(someSpells);
@@ -1122,27 +1119,21 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
             numOfSpell = 1;
     }
 
-    if (numOfSpell > MAX_GENERATED_SPELLS)
-        numOfSpell = MAX_GENERATED_SPELLS;
+    if (!numOfSpell)
+        return;
 
-    int8 dontUseType = -1;
+    itemSpellInfo spell = GenerateSpell(output, modifier);
 
-    for (uint8 i = 0; i < numOfSpell; ++i)
-    {
-        itemSpellInfo spell = GenerateSpell(output, modifier, dontUseType);
+    if (spell.spellId == 0)
+        return;
 
-        if (spell.spellId == 0)
-            continue;
-
-        output->Spells[i].SpellId = spell.spellId;
-        output->Spells[i].SpellTrigger = spell.SpellTrigger;
-        output->Spells[i].SpellCharges = spell.SpellCharges;
-        output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
-        output->Spells[i].SpellCooldown = spell.SpellCooldown;
-        output->Spells[i].SpellCategory = spell.SpellCategory;
-        output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
-        dontUseType = spell.SpellTrigger;
-    }
+    output->Spells[i].SpellId = spell.spellId;
+    output->Spells[i].SpellTrigger = spell.SpellTrigger;
+    output->Spells[i].SpellCharges = spell.SpellCharges;
+    output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
+    output->Spells[i].SpellCooldown = spell.SpellCooldown;
+    output->Spells[i].SpellCategory = spell.SpellCategory;
+    output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
 }
 
 void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier, bool reRoll)

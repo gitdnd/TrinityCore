@@ -354,7 +354,7 @@ public:
     /**
      * Returns a randomly generated item spell depending on item type, subclass and quality
      */
-    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier& modifier, int8 dontUseType);
+    itemSpellInfo GenerateSpell(VirtualItemTemplate* item, VirtualModifier& modifier);
 
     /**
      * Returns a randomly generated item set depending on item type, subclass and quality
