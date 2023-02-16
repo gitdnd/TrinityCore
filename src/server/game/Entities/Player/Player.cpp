@@ -8059,6 +8059,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         {
             RemoveAurasDueToSpell(m_titanGripPenaltySpellId);
             SetCanTitanGrip(false);
+            AutoUnequipOffhandIfNeed();
         }
 
         // wrong triggering type
