@@ -2090,7 +2090,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     bool hasExistingOnUse = false;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-        if (output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
+        if (output->Spells[i].SpellId != 0 && output->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE) // Don't stack two on use effects.
         {
             hasExistingOnUse = true;
             break;
