@@ -1127,13 +1127,13 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
     if (spell.spellId == 0)
         return;
 
-    output->Spells[i].SpellId = spell.spellId;
-    output->Spells[i].SpellTrigger = spell.SpellTrigger;
-    output->Spells[i].SpellCharges = spell.SpellCharges;
-    output->Spells[i].SpellPPMRate = spell.SpellPPMRate;
-    output->Spells[i].SpellCooldown = spell.SpellCooldown;
-    output->Spells[i].SpellCategory = spell.SpellCategory;
-    output->Spells[i].SpellCategoryCooldown = spell.SpellCategoryCooldown;
+    output->Spells[0].SpellId = spell.spellId;
+    output->Spells[0].SpellTrigger = spell.SpellTrigger;
+    output->Spells[0].SpellCharges = spell.SpellCharges;
+    output->Spells[0].SpellPPMRate = spell.SpellPPMRate;
+    output->Spells[0].SpellCooldown = spell.SpellCooldown;
+    output->Spells[0].SpellCategory = spell.SpellCategory;
+    output->Spells[0].SpellCategoryCooldown = spell.SpellCategoryCooldown;
 }
 
 void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier, bool reRoll)
