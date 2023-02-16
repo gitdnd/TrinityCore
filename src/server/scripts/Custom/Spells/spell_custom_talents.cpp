@@ -2339,7 +2339,7 @@ class spell_burnout : public AuraScript
         OnEffectProc += AuraEffectProcFn(spell_burnout::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
-
+//
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
