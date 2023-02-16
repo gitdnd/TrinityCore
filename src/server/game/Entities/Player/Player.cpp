@@ -8055,6 +8055,12 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         if (spellData.SpellId <= 0)
             continue;
 
+        if (!apply && spellData.SpellId == 46917 && m_canTitanGrip)
+        {
+            RemoveAurasDueToSpell(m_titanGripPenaltySpellId);
+            SetCanTitanGrip(false);
+        }
+
         // wrong triggering type
         if (apply && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
             continue;
