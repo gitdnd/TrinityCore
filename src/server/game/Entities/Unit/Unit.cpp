@@ -6799,7 +6799,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 break;
             }
             // Instant effect, Spellslinger
-            case 10002:
+            case 10001:
             {
                 const SpellCastTimesEntry * casttime = spellProto->CastTimeEntry;
                 if (damagetype != DOT && (casttime == nullptr || casttime == sSpellCastTimesStore.LookupEntry(1)))
@@ -6807,7 +6807,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 break;
             }
             // Maligant Deterioration
-            case 10001:
+            case 10002:
             {
                 if (damagetype == DOT)
                 {
@@ -6840,24 +6840,21 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             }
         }
     }
-
+    if (spellProto->Id == 42914)
+    {
+        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+        {
+            // Glyph of Ice Lance
+            if (owner->HasAura(56377) && victim->GetLevel() > owner->GetLevel())
+                DoneTotalMod *= 4.0f;
+            else
+                DoneTotalMod *= 3.0f;
+        }
+    }
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
     {
         case SPELLFAMILY_MAGE:
-            // Ice Lance
-            if (spellProto->SpellIconID == 186)
-            {
-                if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
-                {
-                    // Glyph of Ice Lance
-                    if (owner->HasAura(56377) && victim->GetLevel() > owner->GetLevel())
-                        DoneTotalMod *= 4.0f;
-                    else
-                        DoneTotalMod *= 3.0f;
-                }
-            }
-
             // Torment the weak
             if (spellProto->SpellFamilyFlags[0] & 0x20600021 || spellProto->SpellFamilyFlags[1] & 0x9000)
             {
@@ -7639,7 +7636,7 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
                 break;
             }
             // Instant Effect, Spellslinger
-            case 10002:
+            case 10001:
             {
                 const SpellCastTimesEntry * casttime = spellProto->CastTimeEntry;
                 if (casttime == nullptr || casttime == sSpellCastTimesStore.LookupEntry(1))
