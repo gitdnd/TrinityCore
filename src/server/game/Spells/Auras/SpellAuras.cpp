@@ -1568,6 +1568,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     // mods at aura remove
     else
     {
+        switch (GetId())
+        {
+        case 66: // Invisibility
+            if (removeMode != AURA_REMOVE_BY_EXPIRE)
+                break;
+            target->CastSpell(target, 32612, GetEffect(1));
+            target->CombatStop();
+            break;
+        default:
+            break;
+        }
         switch (GetSpellInfo()->SpellFamilyName)
         {
             case SPELLFAMILY_GENERIC:
@@ -1577,19 +1588,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Remove the immunity shield marker on Avenging Wrath removal if Forbearance is not present
                         if (target->HasAura(61988) && !target->HasAura(25771))
                             target->RemoveAura(61988);
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case SPELLFAMILY_MAGE:
-                switch (GetId())
-                {
-                    case 66: // Invisibility
-                        if (removeMode != AURA_REMOVE_BY_EXPIRE)
-                            break;
-                        target->CastSpell(target, 32612, GetEffect(1));
-                        target->CombatStop();
                         break;
                     default:
                         break;
