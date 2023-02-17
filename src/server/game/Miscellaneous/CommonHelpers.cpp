@@ -291,8 +291,19 @@ bool Trinity::Helpers::Entity::IsPlayerRangedAttacker(Player const* who)
 {
     if (!who)
         return false;
-
-    switch (who->GetClass())
+    switch (who->GetSubClass())
+    {
+    case CLASS_SUB_WARDEN:
+    case CLASS_SUB_WATCHER:
+        return false;
+    case CLASS_SUB_HISTORIAN:
+    case CLASS_SUB_WEAVER:
+    case CLASS_SUB_RANGER:
+        return true;
+    default:
+        return false;
+    }
+    /*switch (who->GetClass())
     {
         case CLASS_WARRIOR:
         case CLASS_PALADIN:
@@ -320,5 +331,5 @@ bool Trinity::Helpers::Entity::IsPlayerRangedAttacker(Player const* who)
             return (Trinity::Helpers::Entity::GetPlayerSpecialization(who) == SPEC_SHAMAN_ELEMENTAL);
         case CLASS_DRUID:
             return (Trinity::Helpers::Entity::GetPlayerSpecialization(who) == SPEC_DRUID_BALANCE);
-    }
+    }*/
 }
