@@ -69,8 +69,11 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         return;
     std::string upperCase = channelName;
     Utf8ToUpperOnlyLatin(upperCase);
-    //if (upperCase == "WORLD" || upperCase == "WORLDCHAT")
-        //channelId = 26;
+    if (upperCase == "WORLD" || upperCase == "WORLDCHAT")
+    {
+        channelName = "WorldChat";
+        channelId = 26;
+    }
     ChatHandler(this).PSendSysMessage("%s, (%s), %u", channelName, upperCase, channelId);
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
@@ -78,6 +81,8 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         { // system channel
             if (Channel* channel = cMgr->GetSystemChannel(channelId, zone))
                 channel->JoinChannel(GetPlayer());
+            else
+                ChatHandler(this).PSendSysMessage("Didn't find system channel.");
         }
         else
         { // custom channel
