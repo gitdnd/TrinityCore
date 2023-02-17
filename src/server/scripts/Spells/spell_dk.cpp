@@ -475,7 +475,7 @@ class spell_dk_blood_boil : public SpellScriptLoader
 
             bool Load() override
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCaster()->GetClass() == CLASS_DEATH_KNIGHT;
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
             }
 
             void HandleAfterHit()
