@@ -6840,24 +6840,21 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             }
         }
     }
-
+    if (spellProto->Id == 42914)
+    {
+        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+        {
+            // Glyph of Ice Lance
+            if (owner->HasAura(56377) && victim->GetLevel() > owner->GetLevel())
+                DoneTotalMod *= 4.0f;
+            else
+                DoneTotalMod *= 3.0f;
+        }
+    }
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
     {
         case SPELLFAMILY_MAGE:
-            // Ice Lance
-            if (spellProto->SpellIconID == 186)
-            {
-                if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
-                {
-                    // Glyph of Ice Lance
-                    if (owner->HasAura(56377) && victim->GetLevel() > owner->GetLevel())
-                        DoneTotalMod *= 4.0f;
-                    else
-                        DoneTotalMod *= 3.0f;
-                }
-            }
-
             // Torment the weak
             if (spellProto->SpellFamilyFlags[0] & 0x20600021 || spellProto->SpellFamilyFlags[1] & 0x9000)
             {
