@@ -6799,7 +6799,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 break;
             }
             // Instant effect, Spellslinger
-            case 10002:
+            case 10001:
             {
                 const SpellCastTimesEntry * casttime = spellProto->CastTimeEntry;
                 if (damagetype != DOT && (casttime == nullptr || casttime == sSpellCastTimesStore.LookupEntry(1)))
@@ -6807,7 +6807,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 break;
             }
             // Maligant Deterioration
-            case 10001:
+            case 10002:
             {
                 if (damagetype == DOT)
                 {
@@ -7639,7 +7639,7 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
                 break;
             }
             // Instant Effect, Spellslinger
-            case 10002:
+            case 10001:
             {
                 const SpellCastTimesEntry * casttime = spellProto->CastTimeEntry;
                 if (casttime == nullptr || casttime == sSpellCastTimesStore.LookupEntry(1))
