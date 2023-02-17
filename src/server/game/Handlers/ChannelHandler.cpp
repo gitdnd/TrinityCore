@@ -86,6 +86,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         }
         else
         { // custom channel
+            ChatHandler(this).PSendSysMessage("Creating custom channel?");
             if (channelName.length() > MAX_CHANNEL_NAME_STR)
             {
                 TC_LOG_ERROR("network", "Player %s tried to create a channel with a name more than " SZFMTD " characters long - blocked", GetPlayer()->GetGUID().ToString().c_str(), MAX_CHANNEL_NAME_STR);
