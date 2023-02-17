@@ -586,37 +586,25 @@ class spell_item_deathbringers_will : public SpellScriptLoader
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
-                static std::vector<uint32> const triggeredSpells[MAX_CLASSES] =
+                static std::vector<uint32> const triggeredSpells[5] =
                 {
-                    //CLASS_NONE
-                    { },
-                    //CLASS_WARRIOR
+                    //Timewalker
+                    { Strength, Agility, AttackPower, Critical, Haste},
+                    //CLASS_SUB_WARDEN
                     { Strength, Critical, Haste },
-                    //CLASS_PALADIN
-                    { Strength, Critical, Haste },
-                    //CLASS_HUNTER
-                    { Agility, Critical, AttackPower },
-                    //CLASS_ROGUE
-                    { Agility, Haste, AttackPower },
-                    //CLASS_PRIEST
-                    { },
-                    //CLASS_DEATH_KNIGHT
-                    { Strength, Critical, Haste },
-                    //CLASS_SHAMAN
-                    { Agility, Haste, AttackPower },
-                    //CLASS_MAGE
-                    { },
-                    //CLASS_WARLOCK
-                    { },
-                    //CLASS_UNK
-                    { },
-                    //CLASS_DRUID
-                    { Strength, Agility, Haste }
+                    //CLASS_SUB_HISTORIAN
+                    { Critical, Haste },
+                    //CLASS_SUB_WEAVER
+                    { Critical, Haste },
+                    //CLASS_SUB_WATCHER
+                    { Agility, Strength, Critical, Haste, AttackPower },
+                    //CLASS_SUB_RANGER
+                   { Agility, Critical, Haste, AttackPower },
                 };
 
                 PreventDefaultAction();
-                Unit* caster = eventInfo.GetActor();
-                std::vector<uint32> const& randomSpells = triggeredSpells[caster->GetClass()];
+                Player* caster = eventInfo.GetActor()->ToPlayer();
+                std::vector<uint32> const& randomSpells = triggeredSpells[caster->GetSubClass()];
                 if (randomSpells.empty())
                     return;
 
