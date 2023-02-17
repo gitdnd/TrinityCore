@@ -5390,7 +5390,7 @@ void Player::UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchant
                     amount += enchantmentEntry->amount[i];
                     break;
                 case ITEM_ENCHANTMENT_TYPE_TOTEM:
-                    if (GetClass() == CLASS_SHAMAN)
+                    //if (GetClass() == CLASS_SHAMAN)
                         amount += enchantmentEntry->amount[i] * item->GetTemplate()->Delay / 1000.0f;
                     break;
                 default:
