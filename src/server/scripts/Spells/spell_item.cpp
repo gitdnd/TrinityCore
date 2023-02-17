@@ -613,7 +613,7 @@ class spell_item_deathbringers_will : public SpellScriptLoader
                     //CLASS_DRUID
                     { Strength, Agility, Haste },
                     // Timewalker
-                    { Strength, Agility, AttackPower, Critical, Haste},
+                    { Strength, Agility, AttackPower, Critical, Haste}
                 };
 
                 PreventDefaultAction();
