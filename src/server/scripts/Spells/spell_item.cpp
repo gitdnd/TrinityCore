@@ -586,7 +586,7 @@ class spell_item_deathbringers_will : public SpellScriptLoader
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
-                static std::vector<uint32> const triggeredSpells[MAX_CLASSES] =
+                static std::vector<uint32> const triggeredSpells[MAX_CLASSES + MAX_SUBCLASSES] =
                 {
                     //CLASS_NONE
                     { },
