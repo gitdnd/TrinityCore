@@ -135,9 +135,14 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     }
 
     recvData.read_skip<uint32>();                          // for 0..uint8 (always 3) { uint8 (always 0) }
-
+    
     std::string comment;
     recvData >> comment;
+    if (_player->GetQuestStatus(60007) != QUEST_STATUS_COMPLETE)
+    {
+        SendNotification("You cannot que for a dungeon without completing 'Power Shards and Jewelcrafting'.");
+        return;
+    }
     TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
 

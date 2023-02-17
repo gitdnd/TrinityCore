@@ -464,6 +464,8 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
                         joinData.result = LFG_JOIN_USING_BG_SYSTEM;
                     else if (plrg->HasAura(9454)) // check Freeze debuff
                         joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
+                    else if(plrg->GetQuestStatus(60007) != QUEST_STATUS_COMPLETE)
+                        joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
                     ++memberCount;
                     players.insert(plrg->GetGUID());
                 }
