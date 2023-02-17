@@ -3351,8 +3351,8 @@ class spell_item_refocus : public SpellScript
     {
         Player* caster = GetCaster()->ToPlayer();
 
-        if (!caster || caster->GetClass() != CLASS_HUNTER)
-            return;
+        //if (!caster || caster->GetClass() != CLASS_HUNTER)
+            //return;
 
         if (caster->GetSpellHistory()->HasCooldown(SPELL_AIMED_SHOT))
             caster->GetSpellHistory()->ResetCooldown(SPELL_AIMED_SHOT, true);
