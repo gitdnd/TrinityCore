@@ -808,7 +808,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     {
         if (GetOwner()->GetClass() == CLASS_WARLOCK
             || GetOwner()->GetClass() == CLASS_SHAMAN        // Fire Elemental
-            || GetOwner()->GetClass() == CLASS_DEATH_KNIGHT) // Risen Ghoul
+            || GetOwner()->GetClass() == CLASS_DEATH_KNIGHT  // Risen Ghoul
+            || GetOwner()->GetClass() == CLASS_TIMEWALKER)
         {
             petType = SUMMON_PET;
         }

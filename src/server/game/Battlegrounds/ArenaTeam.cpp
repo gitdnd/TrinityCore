@@ -103,7 +103,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     Player* player = ObjectAccessor::FindPlayer(playerGuid);
     if (player)
     {
-        playerClass = player->GetClass();
+        playerClass = player->GetSubClass() ? player->GetSubClass() : player->GetClass();
         playerName = player->GetName();
     }
     else
