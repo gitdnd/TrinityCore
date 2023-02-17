@@ -604,7 +604,7 @@ class spell_item_deathbringers_will : public SpellScriptLoader
 
                 PreventDefaultAction();
                 Player* caster = eventInfo.GetActor()->ToPlayer();
-                std::vector<uint32> const& randomSpells = triggeredSpells[caster->GetSubClass()];
+                std::vector<uint32> const& randomSpells = triggeredSpells[caster->GetSubOrClass() - CLASS_TIMEWALKER];
                 if (randomSpells.empty())
                     return;
 

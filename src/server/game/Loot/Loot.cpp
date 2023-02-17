@@ -300,7 +300,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     modifier.magicFind = lootOwner->GetMagicFind();
 
-    modifier.subclass = lootOwner->GetActiveSubClass();
+    modifier.subclass = lootOwner->GetSubClass();
 
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 
