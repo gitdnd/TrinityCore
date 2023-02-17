@@ -486,7 +486,12 @@ bool Aura::CanPeriodicTickCrit(Unit const* caster) const
     // Rupture - since 3.3.3 can crit
     if (GetSpellInfo()->SpellIconID == 500 && GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE)
         return true;
-
+    //@todo: Remove this hack when spell family is corrected.
+    if (GetId() == 48300 || GetId() == 48160 || GetId() == 48125)
+    {
+        if (caster->HasAura(15473))
+            return true;
+    }
     return false;
 }
 
@@ -913,7 +918,12 @@ void Aura::RefreshDuration(bool withMods)
         // Calculate duration of periodics affected by haste.
         if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
             duration = int32(duration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
-
+        //@todo: Remove this hack when spell family is fixed
+        if (GetId() == 48300 || GetId() == 48160)
+        {
+            if (caster->HasAura(15473))
+                duration = int32(duration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+        }
         SetMaxDuration(duration);
         SetDuration(duration);
     }
@@ -1740,11 +1750,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                 }
-                break;
-            case SPELLFAMILY_ROGUE:
-                // Remove Vanish on stealth remove
-                if (GetId() == 1784)
-                    target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x0000800, 0, 0, target->GetGUID());
                 break;
             case SPELLFAMILY_PALADIN:
                 // Remove the immunity shield marker on Forbearance removal if AW marker is not present
