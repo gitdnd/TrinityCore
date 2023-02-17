@@ -138,7 +138,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     
     std::string comment;
     recvData >> comment;
-    if (_player->GetQuestStatus(60007) != QUEST_STATUS_COMPLETE)
+    if (_player->GetQuestStatus(60007) != QUEST_STATUS_REWARDED)
     {
         SendNotification("You cannot que for a dungeon without completing 'Power Shards and Jewelcrafting'.");
         return;
