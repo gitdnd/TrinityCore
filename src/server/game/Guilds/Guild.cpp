@@ -544,7 +544,7 @@ void Guild::Member::SetStats(Player* player)
     if (level > 300)
         level = 300;
     m_level     = level;
-    m_class     = player->GetClass();
+    m_class     = player->GetSubOrClass();
     m_gender    = player->GetNativeGender();
     m_zoneId    = player->GetZoneId();
     m_accountId = player->GetSession()->GetAccountId();
