@@ -17,6 +17,7 @@
 
 #include "WorldSession.h"
 #include "Channel.h"
+#include "Chat.h"
 #include "ChannelMgr.h"
 #include "DBCStores.h"
 #include "Log.h"
@@ -70,7 +71,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     Utf8ToUpperOnlyLatin(upperCase);
     if (upperCase == "WORLD" || upperCase == "WORLDCHAT")
         channelId = 26;
-
+    ChatHandler(this).PSendSysMessage("%s, (%s), %u", channelName, upperCase, channelId);
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
         if (channelId)
