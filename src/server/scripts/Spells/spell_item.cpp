@@ -586,7 +586,7 @@ class spell_item_deathbringers_will : public SpellScriptLoader
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
-                static std::vector<uint32> const triggeredSpells[5] =
+                static std::vector<uint32> const triggeredSpells[6] =
                 {
                     //Timewalker
                     { Strength, Agility, AttackPower, Critical, Haste},
