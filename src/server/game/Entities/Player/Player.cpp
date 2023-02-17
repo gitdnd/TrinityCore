@@ -7796,7 +7796,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         _ApplyWeaponDamage(slot, proto, apply);
 
     // Druids get feral AP bonus from weapon dps (also use DPS from ScalingStatValue)
-    if (GetClass() == CLASS_DRUID)
+    if (GetClass() == CLASS_DRUID) //@todo: Should this be enabled?
     {
         int32 dpsMod = 0;
         int32 feral_bonus = 0;
