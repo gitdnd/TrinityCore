@@ -3151,7 +3151,7 @@ void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
             str += " - " + reason;
 
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
-
+        ObjectAccessor::SaveAllPlayers();
         SendServerMessage(msgid, str.c_str(), player);
         TC_LOG_DEBUG("misc", "Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
     }
