@@ -23,6 +23,7 @@
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
 #include <cctype>
+#include "Util.h"
 
 static size_t const MAX_CHANNEL_PASS_STR = 31;
 static size_t const MAX_CHANNEL_NAME_STR = 31;
@@ -65,6 +66,10 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     if (!DisallowHyperlinksAndMaybeKick(channelName))
         return;
+    std::string upperCase = channelName;
+    Utf8ToUpperOnlyLatin(upperCase);
+    if (upperCase == "WORLD" || upperCase == "WORLDCHAT")
+        channelId = 26;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
