@@ -265,8 +265,8 @@ bool Trinity::Helpers::Entity::IsPlayerHealer(Player const* who)
 {
     if (!who)
         return false;
-
-    switch (who->GetClass())
+    return who->GetSubClass() == CLASS_SUB_HISTORIAN;
+    /*switch (who->GetClass())
     {
         case CLASS_WARRIOR:
         case CLASS_HUNTER:
@@ -284,7 +284,7 @@ bool Trinity::Helpers::Entity::IsPlayerHealer(Player const* who)
             return (Trinity::Helpers::Entity::GetPlayerSpecialization(who) == SPEC_SHAMAN_RESTORATION);
         case CLASS_DRUID:
             return (Trinity::Helpers::Entity::GetPlayerSpecialization(who) == SPEC_DRUID_RESTORATION);
-    }
+    }*/
 }
 
 bool Trinity::Helpers::Entity::IsPlayerRangedAttacker(Player const* who)
