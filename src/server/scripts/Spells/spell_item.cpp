@@ -586,7 +586,7 @@ class spell_item_deathbringers_will : public SpellScriptLoader
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
-                static std::vector<uint32> const triggeredSpells[MAX_CLASSES] =
+                static std::vector<uint32> const triggeredSpells[MAX_CLASSES + MAX_SUBCLASSES] =
                 {
                     //CLASS_NONE
                     { },
@@ -612,13 +612,23 @@ class spell_item_deathbringers_will : public SpellScriptLoader
                     { },
                     //CLASS_DRUID
                     { Strength, Agility, Haste },
-                    // Timewalker
-                    { Strength, Agility, AttackPower, Critical, Haste}
+                    //Timewalker
+                    { Strength, Agility, AttackPower, Critical, Haste},
+                    //CLASS_SUB_WARDEN
+                    { Strength, Critical, Haste },
+                    //CLASS_SUB_HISTORIAN
+                    { Critical, Haste },
+                    //CLASS_SUB_WEAVER
+                    { Critical, Haste },
+                    //CLASS_SUB_WATCHER
+                    { Agility, Strength, Critical, Haste, AttackPower },
+                    //CLASS_SUB_RANGER
+                   { Agility, Critical, Haste, AttackPower },
                 };
 
                 PreventDefaultAction();
-                Unit* caster = eventInfo.GetActor();
-                std::vector<uint32> const& randomSpells = triggeredSpells[caster->GetClass()];
+                Player* caster = eventInfo.GetActor()->ToPlayer();
+                std::vector<uint32> const& randomSpells = triggeredSpells[caster->GetSubOrClass()];
                 if (randomSpells.empty())
                     return;
 
