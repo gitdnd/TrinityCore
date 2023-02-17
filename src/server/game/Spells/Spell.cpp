@@ -2906,7 +2906,7 @@ void Spell::DoSpellEffectHit(Unit* unit, uint8 effIndex, TargetInfo& hitInfo)
                     // and duration of auras affected by SPELL_AURA_PERIODIC_HASTE
                     else if (m_originalCaster && (m_originalCaster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, hitInfo.AuraSpellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION)))
                         hitInfo.AuraDuration = int32(hitInfo.AuraDuration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
-                    else if (m_originalCaster && (GetSpellInfo()->Id == 48300 || GetSpellInfo()->Id == 48160)  //@todo: Remove this hack when spell family is fixed
+                    else if (m_originalCaster && (GetSpellInfo()->Id == 48300 || GetSpellInfo()->Id == 48160))  //@todo: Remove this hack when spell family is fixed
                     {
                         if (m_originalCaster->HasAura(15473))
                             hitInfo.AuraDuration = int32(hitInfo.AuraDuration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
