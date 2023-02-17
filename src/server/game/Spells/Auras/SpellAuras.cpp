@@ -1576,9 +1576,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             target->CastSpell(target, 32612, GetEffect(1));
             target->CombatStop();
             break;
+        case 1784:
+            target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x0000800, 0, 0, target->GetGUID());
+            break;
         default:
             break;
         }
+            
         switch (GetSpellInfo()->SpellFamilyName)
         {
             case SPELLFAMILY_GENERIC:
