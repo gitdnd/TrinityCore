@@ -4122,6 +4122,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
             mod.legendarySeed = itemTemplate->legendarySeed;
             mod.magicFind = itemTemplate->generatedMagicFind;
             mod.statPoolPctModifier = itemTemplate->honePct;
+            mod.ilevel = itemTemplate->ItemLevel;
             sVirtualItemMgr.RegenerateItemInfo(itemTemplate, mod);
             itemTemplate->customFlags &= ~VIRTUAL_ITEM_FLAG_REGENERATE;
             // toDoL Implement some way of saving when not loaded.
