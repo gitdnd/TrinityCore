@@ -4618,5 +4618,11 @@ namespace LuaPlayer
         }
         return 0;
     }
+
+    int GetMagicFind(Eluna* E, Player* player)
+    {
+        Eluna::Push(E->L, player->GetMagicFind());
+        return 1;
+    }
 };
 #endif
