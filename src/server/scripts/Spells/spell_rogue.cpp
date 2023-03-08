@@ -548,10 +548,10 @@ class spell_rog_preparation : public SpellScriptLoader
                 caster->GetSpellHistory()->ResetCooldowns([caster](SpellHistory::CooldownStorageType::iterator itr) -> bool
                 {
                     SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || SPELLFAMILY_CLASSLESS)
+                    if (spellInfo->SpellFamilyName != SPELLFAMILY_CLASSLESS)
                         return false;
 
-                    return (spellInfo->Id == 36554 || spellInfo->Id == 14177 || spellInfo->Id == 26889 || spellInfo->Id == 26669 || spellInfo->Id == 11305);
+                    return ((spellInfo->Id == 36554) || (spellInfo->Id == 14177) || (spellInfo->Id == 26889) || (spellInfo->Id == 26669) || (spellInfo->Id == 11305));
 
                     /*return (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||  // Cold Blood, Shadowstep
                         spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT) ||       // Vanish, Evasion, Sprint
