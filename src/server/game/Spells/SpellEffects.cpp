@@ -3316,6 +3316,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     case 47498: //Devastate
     {
         unitCaster->CastSpell(unitTarget, 58567, true);
+        if (Aura* aur = unitTarget->GetAura(58567, unitCaster->GetGUID()))
+                    fixed_bonus += (aur->GetStackAmount() - 1) * CalculateDamage(m_spellInfo->Effects[EFFECT_2].CalcValue()); // subtract 1 so fixed bonus is not applied twice
         break;
     }
     case 694: // Mocking Blow
