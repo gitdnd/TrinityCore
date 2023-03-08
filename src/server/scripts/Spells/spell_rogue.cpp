@@ -548,7 +548,7 @@ class spell_rog_preparation : public SpellScriptLoader
                 caster->GetSpellHistory()->ResetCooldowns([caster](SpellHistory::CooldownStorageType::iterator itr) -> bool
                 {
                     SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || spellInfo->SpellFamilyName != SPELLFAMILY_CLASSLESS)
+                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE || SPELLFAMILY_CLASSLESS)
                         return false;
 
                     return (spellInfo->Id == 36554 || spellInfo->Id == 14177 || spellInfo->Id == 26889 || spellInfo->Id == 26669 || spellInfo->Id == 11305);
