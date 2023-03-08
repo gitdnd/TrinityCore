@@ -23700,7 +23700,7 @@ void Player::ResetSpells(bool myClassOnly)
                 continue;
 
             // skip other spell families
-            if (spellInfo->SpellFamilyName != family)
+            if (spellInfo->SpellFamilyName != family) // Making note -Itswicky
                 continue;
 
             // skip spells with first rank learned as talent (and all talents then also)

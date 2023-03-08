@@ -1064,7 +1064,7 @@ TC_API_EXPORT EnumText EnumUtils<SpellFamilyNames>::ToString(SpellFamilyNames va
         case SPELLFAMILY_HUNTER: return { "SPELLFAMILY_HUNTER", "Hunter", "" };
         case SPELLFAMILY_PALADIN: return { "SPELLFAMILY_PALADIN", "Paladin", "" };
         case SPELLFAMILY_SHAMAN: return { "SPELLFAMILY_SHAMAN", "Shaman", "" };
-        case SPELLFAMILY_UNK2: return { "SPELLFAMILY_UNK2", "Unk2 (Silence resistance?)", "" };
+        case SPELLFAMILY_CLASSLESS: return { "SPELLFAMILY_CLASSLESS", "Classless", "" };
         case SPELLFAMILY_POTION: return { "SPELLFAMILY_POTION", "Potion", "" };
         case SPELLFAMILY_DEATHKNIGHT: return { "SPELLFAMILY_DEATHKNIGHT", "Death Knight", "" };
         case SPELLFAMILY_PET: return { "SPELLFAMILY_PET", "Pet", "" };
@@ -1091,7 +1091,7 @@ TC_API_EXPORT SpellFamilyNames EnumUtils<SpellFamilyNames>::FromIndex(size_t ind
         case 8: return SPELLFAMILY_HUNTER;
         case 9: return SPELLFAMILY_PALADIN;
         case 10: return SPELLFAMILY_SHAMAN;
-        case 11: return SPELLFAMILY_UNK2;
+        case 11: return SPELLFAMILY_CLASSLESS;
         case 12: return SPELLFAMILY_POTION;
         case 13: return SPELLFAMILY_DEATHKNIGHT;
         case 14: return SPELLFAMILY_PET;

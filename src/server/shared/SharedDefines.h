@@ -3610,7 +3610,7 @@ enum SpellFamilyNames
     SPELLFAMILY_HUNTER      = 9,  // TITLE Hunter
     SPELLFAMILY_PALADIN     = 10, // TITLE Paladin
     SPELLFAMILY_SHAMAN      = 11, // TITLE Shaman
-    SPELLFAMILY_UNK2        = 12, // TITLE Unk2 (Silence resistance?)
+    SPELLFAMILY_CLASSLESS   = 12, // TITLE Unk2 (Silence resistance?)
     SPELLFAMILY_POTION      = 13, // TITLE Potion
     // 14 - unused
     SPELLFAMILY_DEATHKNIGHT = 15, // TITLE Death Knight

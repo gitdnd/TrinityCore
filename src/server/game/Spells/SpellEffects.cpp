@@ -410,7 +410,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         }
 
         bool apply_direct_bonus = true;
-        switch (m_spellInfo->SpellFamilyName)
+        switch (m_spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_GENERIC:
             {
@@ -1400,7 +1400,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
             unitTarget->RemoveAura(targetAura->GetId(), targetAura->GetCasterGUID());
     }
     // Death Pact - return pct of max health to caster
-    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
+    else if (m_spellInfo->Id == 48743) // Updated to check spell Id instead of family flag -Itswicky
         addhealth = unitCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(unitCaster->CountPctFromMaxHealth(damage)), HEAL, effIndex, { });
     else
         addhealth = unitCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, effIndex, { });
@@ -2464,7 +2464,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
 
     // On success dispel
     // Devour Magic
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->GetCategory() == SPELLCATEGORY_DEVOUR_MAGIC)
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->GetCategory() == SPELLCATEGORY_DEVOUR_MAGIC) // Will need to edit if we end up using this spell or pet -Itswicky
     {
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
         args.AddSpellMod(SPELLVALUE_BASE_POINT0, m_spellInfo->Effects[EFFECT_1].CalcValue());
@@ -2788,8 +2788,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
-    if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[0] & 0x400000)
-        || m_spellInfo->Id == 10399)
+    if ( m_spellInfo->Id == 10399) // Removed check for family flags since we didn't use them -Itswicky
     {
         uint32 spell_id = 0;
 
@@ -2869,10 +2868,10 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     if (m_spellInfo->Id == 38615)
         duration = 1800;                                    // 30 mins
     // other rogue family enchantments always 1 hour (some have spell damage=0, but some have wrong data in EffBasePoints)
-    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
+    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE) // I don't know if we use Rogue Poisons, but if so we may need to update this -Itswicky
         duration = 3600;                                    // 1 hour
     // shaman family enchantments
-    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
+    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS && m_spellInfo->SpellFamilyFlags[0] & 0x20000000) // Updated to point to shaman weapon enhancements+ -Itswicky
         duration = 1800;                                    // 30 mins
     // other cases with this SpellVisual already selected
     else if (m_spellInfo->SpellVisual[0] == 215)
@@ -3191,7 +3190,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     }
 
     /*
-    switch (m_spellInfo->SpellFamilyName)
+    switch (m_spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
 
         case SPELLFAMILY_ROGUE:
@@ -3586,7 +3585,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
 
     /// @todo we must implement hunter pet summon at login there (spell 6962)
     /// @todo: move this to scripts
-    switch (m_spellInfo->SpellFamilyName)
+    switch (m_spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_GENERIC:
         {

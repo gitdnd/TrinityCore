@@ -2036,10 +2036,9 @@ void Spell::prepareDataForTriggerSystem()
     }
 
     // Hunter trap spells - activation proc for Lock and Load, Entrapment and Misdirection
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
-        (m_spellInfo->SpellFamilyFlags[0] & 0x18 ||         // Freezing and Frost Trap, Freezing Arrow
-            m_spellInfo->Id == 57879 ||                     // Snake Trap - done this way to avoid double proc
-            m_spellInfo->SpellFamilyFlags[2] & 0x00024000)) // Explosive and Immolation Trap
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS &&
+        (m_spellInfo->SpellFamilyFlags[0] & 0x200000 ||         // Freezing and Frost Trap, Freezing Arrow
+            m_spellInfo->Id == 57879))                   // Snake Trap - done this way to avoid double proc
     {
         m_procAttacker |= PROC_FLAG_DONE_TRAP_ACTIVATION;
 
@@ -2049,7 +2048,7 @@ void Spell::prepareDataForTriggerSystem()
     }
 
     // Hellfire Effect - trigger as DOT
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags[0] & 0x00000040)
+    if (m_spellInfo->Id == 47822) // Change proc to max rank id, as we don't use lower ranks -Itswicky
     {
         m_procAttacker = PROC_FLAG_DONE_PERIODIC;
         m_procVictim   = PROC_FLAG_TAKEN_PERIODIC;
@@ -5708,7 +5707,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 if (!unitCaster)
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
+                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS) // Updated to our family flag in case we use -Itswicky
                 {
                     // Warbringer - can't be handled in proc system - should be done before checkcast root check and charge effect process
                     if (strict && unitCaster->IsScriptOverriden(m_spellInfo, 6953))
@@ -6914,7 +6913,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                             else
                             {
                                 // Conjure Food/Water/Refreshment spells
-                                if (m_spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || (!(m_spellInfo->SpellFamilyFlags[0] & 0x40000000)))
+                                if (m_spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || (!(m_spellInfo->SpellFamilyFlags[0] & 0x40000000))) // We may need to edit this if Conjure spells don't work correctly -Itswicky
                                     return SPELL_FAILED_TOO_MANY_OF_ITEM;
                                 else if (!(target->ToPlayer()->HasItemCount(m_spellInfo->Effects[i].ItemType)))
                                 {
@@ -7806,7 +7805,7 @@ void Spell::HandleLaunchPhase()
             usesAmmo = false;
 
         // Do not consume ammo for the triggered AoE ticks of Volley (Hunter spell)
-        if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->IsTargetingArea())
+        if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS && m_spellInfo->IsTargetingArea()) // -Itswicky
             usesAmmo = false;
 
         if (usesAmmo)

@@ -1860,7 +1860,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                             continue;
 
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-                        if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
+                        if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139) // Checks familyflags. Noting it here -Itswicky
                             Rage_val += target->CalculateSpellDamage(spellInfo, EFFECT_0) * 10;
                     }
                 }
@@ -2088,7 +2088,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                         model_id = modelid;
 
                     // Polymorph (sheep)
-                    if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_MAGE && GetSpellInfo()->SpellIconID == 82 && GetSpellInfo()->SpellVisual[0] == 12978)
+                    if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_MAGE && GetSpellInfo()->SpellIconID == 82 && GetSpellInfo()->SpellVisual[0] == 12978) // Checks familyflags. Noting it here -Itswicky
                         if (Unit* caster = GetCaster())
                             if (caster->HasAura(52648))         // Glyph of the Penguin
                                 model_id = 26452;
@@ -4498,7 +4498,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     caster->CastSpell(target, finalSpelId, this);
             }
 
-            switch (m_spellInfo->SpellFamilyName)
+            switch (m_spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
             {
                 case SPELLFAMILY_GENERIC:
                     switch (GetId())
@@ -4542,7 +4542,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             break;
                     }
                     break;
-                case SPELLFAMILY_DEATHKNIGHT:
+                case SPELLFAMILY_CLASSLESS:
                     // Summon Gargoyle (Dismiss Gargoyle at remove)
                     if (GetId() == 61777)
                         target->CastSpell(target, GetAmount(), true);
@@ -4555,7 +4555,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
     // AT APPLY & REMOVE
 
-    switch (m_spellInfo->SpellFamilyName)
+    switch (m_spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_GENERIC:
         {
@@ -4750,7 +4750,7 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
             return;
 
         // If this is Drain Soul, check for Glyph of Drain Soul
-        if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && (GetSpellInfo()->SpellFamilyFlags[0] & 0x00004000))
+        if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && (GetSpellInfo()->SpellFamilyFlags[0] & 0x00004000)) // Checks familyflags. Noting it here -Itswicky
         {
             // Glyph of Drain Soul - chance to create an additional Soul Shard
             if (AuraEffect* aur = caster->GetAuraEffect(58070, 0))
@@ -5178,7 +5178,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
             damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), { }, GetBase()->GetStackAmount());
 
-        switch (GetSpellInfo()->SpellFamilyName)
+        switch (GetSpellInfo()->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_GENERIC:
             {
@@ -5551,7 +5551,7 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
     }
 
     // Drain Mana - Mana Feed effect
-    if (caster->GetGuardianPet() && m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags[0] & 0x00000010)
+    /*if (caster->GetGuardianPet() && m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags[0] & 0x00000010)
     {
         int32 manaFeedVal = 0;
         if (AuraEffect const* aurEff = GetBase()->GetEffect(EFFECT_1))
@@ -5565,7 +5565,7 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
             args.AddSpellMod(SPELLVALUE_BASE_POINT0, feedAmount);
             caster->CastSpell(caster, 32554, args);
         }
-    }
+    }*/ // HoT comment out - Itswicky
 }
 
 void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
@@ -5830,7 +5830,7 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
     Unit* target = aurApp->GetTarget();
 
     // Currently only Prayer of Mending
-    if (!(GetSpellInfo()->SpellFamilyName == SPELLFAMILY_PRIEST && GetSpellInfo()->SpellFamilyFlags[1] & 0x20))
+    if (!(GetSpellInfo()->SpellFamilyName == SPELLFAMILY_PRIEST && GetSpellInfo()->SpellFamilyFlags[1] & 0x20) || (GetSpellInfo()->Id != 48113))
     {
         TC_LOG_DEBUG("spells.aura.effect", "AuraEffect::HandleRaidProcFromChargeWithValueAuraProc: received not handled spell: %u", GetId());
         return;

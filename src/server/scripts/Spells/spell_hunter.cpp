@@ -1231,7 +1231,7 @@ class spell_hun_readiness : public SpellScriptLoader
                 return GetCaster()->GetTypeId() == TYPEID_PLAYER;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void HandleDummy(SpellEffIndex /*effIndex*/) // Checks familyflags. Noting it here -Itswicky
             {
                 // immediately finishes the cooldown on your other Hunter abilities except Bestial Wrath
                 GetCaster()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
@@ -1239,12 +1239,15 @@ class spell_hun_readiness : public SpellScriptLoader
                     SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
 
                     ///! If spellId in cooldown map isn't valid, the above will return a null pointer.
-                    if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
+                    /*if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
                         spellInfo->Id != SPELL_HUNTER_READINESS &&
                         spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH &&
                         spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU &&
                         spellInfo->GetRecoveryTime() > 0)
+                        return true;*/
+                    if (spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS && ((spellInfo->SpellFamilyFlags[0] & 0x8) || spellInfo->SpellFamilyFlags[0] & 0x200000))
                         return true;
+
                     return false;
                 }, true);
             }

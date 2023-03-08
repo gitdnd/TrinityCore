@@ -320,7 +320,7 @@ namespace Trinity
     class AbsorbAuraOrderPred
     {
         public:
-            AbsorbAuraOrderPred() { }
+            AbsorbAuraOrderPred() { } // Checks familyflags. Noting it here -Itswicky
             bool operator() (AuraEffect* aurEffA, AuraEffect* aurEffB) const
             {
                 SpellInfo const* spellProtoA = aurEffA->GetSpellInfo();
@@ -328,11 +328,13 @@ namespace Trinity
 
                 // Wards
                 if ((spellProtoA->SpellFamilyName == SPELLFAMILY_MAGE) ||
-                    (spellProtoA->SpellFamilyName == SPELLFAMILY_WARLOCK))
+                    (spellProtoA->SpellFamilyName == SPELLFAMILY_WARLOCK) ||
+                    (spellProtoB->SpellFamilyName == SPELLFAMILY_CLASSLESS))
                     if (spellProtoA->GetCategory() == 56)
                         return true;
                 if ((spellProtoB->SpellFamilyName == SPELLFAMILY_MAGE) ||
-                    (spellProtoB->SpellFamilyName == SPELLFAMILY_WARLOCK))
+                    (spellProtoB->SpellFamilyName == SPELLFAMILY_WARLOCK) ||
+                    (spellProtoB->SpellFamilyName == SPELLFAMILY_CLASSLESS))
                     if (spellProtoB->GetCategory() == 56)
                         return false;
 

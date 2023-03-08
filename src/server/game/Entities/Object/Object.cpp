@@ -2393,7 +2393,7 @@ int32 WorldObject::ModSpellDuration(SpellInfo const* spellInfo, WorldObject cons
     // Glyphs which increase duration of selfcast buffs
     if (unitTarget == this)
     {
-        switch (spellInfo->SpellFamilyName)
+        switch (spellInfo->SpellFamilyName) // Will need to update if we choose to use these effects -Itswicky
         {
             case SPELLFAMILY_DRUID:
                 if (spellInfo->SpellFamilyFlags[0] & 0x100)

@@ -1753,7 +1753,7 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
         victimResistance = 0.0f;
 
     // Chaos Bolt exception, ignore all target resistances (unknown attribute?)
-    if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && spellInfo->SpellIconID == 3178)
+    if (spellInfo && spellInfo->Id == 59172) // Check Id instead of family -Itswicky
         victimResistance = 0.0f;
 
     victimResistance = std::max(victimResistance, 0.0f);
@@ -6535,7 +6535,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     switch (spellProto->SpellFamilyName)
     {
         case SPELLFAMILY_DEATHKNIGHT:
-            // Impurity (dummy effect)
+            // Impurity (dummy effect) This refers to a blizzlike talent to add AP scaling do DK abilities. Noting it here -Itswicky
             if (GetTypeId() == TYPEID_PLAYER)
             {
                 PlayerSpellMap const& playerSpells = ToPlayer()->GetSpellMap();
@@ -6708,7 +6708,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 {
                     Aura const* aura = itr->second->GetBase();
                     SpellInfo const* spell = aura->GetSpellInfo();
-                    if (spell->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spell->SpellFamilyFlags[1] & 0x0004071B || spell->SpellFamilyFlags[0] & 0x8044C402))
+                    if (spell->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spell->SpellFamilyFlags[1] & 0x0004071B || spell->SpellFamilyFlags[0] & 0x8044C402)) // Calls familyflags. Noting it here -Itswicky
                         continue;
                     modPercent += stepPercent * aura->GetStackAmount();
                     if (modPercent >= maxPercent)
@@ -6852,7 +6852,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
         }
     }
     // Custom scripted damage
-    switch (spellProto->SpellFamilyName)
+    switch (spellProto->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_MAGE:
             // Torment the weak
@@ -6905,7 +6905,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             }
             break;
-        case SPELLFAMILY_PALADIN:
+        case SPELLFAMILY_PALADIN: 
             // Judgement of Vengeance/Judgement of Corruption
             if ((spellProto->SpellFamilyFlags[1] & 0x400000) && spellProto->SpellIconID == 2292)
             {
@@ -6925,7 +6925,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, 10 * stacks);
             }
             break;
-        case SPELLFAMILY_DRUID:
+        case SPELLFAMILY_DRUID: // Calls familyflags. Noting it here -Itswicky
             // Thorns
             if (spellProto->SpellFamilyFlags[0] & 0x100)
             {
@@ -6934,7 +6934,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, aurEff->GetAmount());
             }
             break;
-        case SPELLFAMILY_WARLOCK:
+        case SPELLFAMILY_WARLOCK: // Calls familyflags. Noting it here -Itswicky
             // Fire and Brimstone
             if (spellProto->SpellFamilyFlags[1] & 0x00020040)
             {
@@ -6971,6 +6971,10 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 196, 0))
                     if (victim->GetDiseasesByCaster(owner->GetGUID()) > 0)
                         AddPct(DoneTotalMod, aurEff->GetAmount());
+            break;
+        case SPELLFAMILY_CLASSLESS:
+            if (spellProto->Id == 47855 && !victim->HealthAbovePct(25))
+                DoneTotalMod *= 4;
             break;
     }
 
@@ -7209,7 +7213,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                     }
                 }
                 // Custom crit by class
-                switch (spellInfo->SpellFamilyName)
+                switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
                 {
                     case SPELLFAMILY_MAGE:
                         // Glyph of Fire Blast
@@ -7268,6 +7272,28 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                             break;
                         }
                         break;
+                    case SPELLFAMILY_CLASSLESS:
+                        // Shiv-applied poisons can't crit
+                        if (caster->FindCurrentSpellBySpellId(5938))
+                            crit_chance = 0.0f;
+
+                        // Exorcism
+                        else if (spellInfo->GetCategory() == 19)
+                        {
+                            if (GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
+                                return 100.0f;
+                            break;
+                        }
+
+                        // Lava Burst
+                        else if (spellInfo->SpellFamilyFlags[1] & 0x00001000)
+                        {
+                            if (GetAura(49233, caster->GetGUID()))
+                                if (GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)
+                                    return 100.0f;
+                            break;
+                        }
+                        break;
                 }
 
                 // Spell crit suppression
@@ -7284,7 +7310,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
             // Custom crit by class
             if (caster)
             {
-                switch (spellInfo->SpellFamilyName)
+                switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
                 {
                     case SPELLFAMILY_DRUID:
                         // Rend and Tear - bonus crit chance for Ferocious Bite on bleeding targets
@@ -7457,7 +7483,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     }
 
     // Custom scripted damage
-    switch (spellProto->SpellFamilyName)
+    switch (spellProto->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_DEATHKNIGHT:
             // Impurity (dummy effect)
@@ -7620,9 +7646,9 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
                     if (aura->GetCasterGUID() != GetGUID())
                         continue;
 
-                    SpellInfo const* m_spell = aura->GetSpellInfo();
-                    if (m_spell->SpellFamilyName != SPELLFAMILY_DRUID ||
-                        !(m_spell->SpellFamilyFlags[1] & 0x00000010 || m_spell->SpellFamilyFlags[0] & 0x50))
+                    SpellInfo const* m_spell = aura->GetSpellInfo(); // Check for any HoT effect. Currently unused -Itswicky
+                    if (m_spell->SpellFamilyName != SPELLFAMILY_CLASSLESS ||
+                        !(m_spell->SpellFamilyFlags[1] & 0x00000100))
                         continue;
                     modPercent += stepPercent * aura->GetStackAmount();
                 }
@@ -7665,7 +7691,7 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
         AddPct(TakenTotalMod, maxval);
 
     // Nourish cast
-    if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[1] & 0x2000000)
+    if (spellProto->Id == 50464) // Change check to id -Itswicky
     {
         // Rejuvenation, Regrowth, Lifebloom, or Wild Growth
         if (GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x50, 0x4000010, 0))
@@ -8075,7 +8101,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // Custom scripted damage
     if (spellProto)
     {
-        switch (spellProto->SpellFamilyName)
+        switch (spellProto->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_DEATHKNIGHT:
                 // Glacier Rot
@@ -8132,7 +8158,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask();
 
         // Shred, Maul - "Effects which increase Bleed damage also increase Shred damage"
-        if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800)
+        if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800) // Checks familyflags. Noting it here -Itswicky
             mechanicMask |= (1 << MECHANIC_BLEED);
 
         if (mechanicMask)
