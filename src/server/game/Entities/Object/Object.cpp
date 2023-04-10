@@ -1196,6 +1196,21 @@ float WorldObject::GetDistance2d(float x, float y) const
     return d > 0.0f ? d : 0.0f;
 }
 
+float WorldObject::GetRawDistance(const WorldObject* obj, bool is3D) const
+{
+    float dx = GetPositionX() - obj->GetPositionX();
+    float dy = GetPositionY() - obj->GetPositionY();
+    float distsq = dx * dx + dy * dy;
+
+    if (is3D)
+    {
+        float dz = GetPositionZ() - obj->GetPositionZ();
+        distsq += dz * dz;
+    }
+
+    return distsq;
+}
+
 bool WorldObject::IsSelfOrInSameMap(WorldObject const* obj) const
 {
     if (this == obj)
@@ -3280,6 +3295,11 @@ void WorldObject::GetContactPoint(WorldObject const* obj, float& x, float& y, fl
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, distance2d, GetAbsoluteAngle(obj));
+}
+
+float WorldObject::GetObjectSize() const
+{
+    return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? GetFloatValue(UNIT_FIELD_COMBATREACH) : DEFAULT_PLAYER_BOUNDING_RADIUS * GetObjectScale();
 }
 
 void WorldObject::MovePosition(Position &pos, float dist, float angle)
