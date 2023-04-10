@@ -664,8 +664,8 @@ void MotionMaster::MoveEncircle(Unit* target)
     float angleReduction = 1.0f;
 
     if (instanced) {
-        radiusReduction = 3.0f;
-        angleReduction = 3.0f;
+        radiusReduction = 2.0f;
+        angleReduction = 2.0f;
     }
 
     if (!instanced && target->getAttackers().size() > 10) {

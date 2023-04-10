@@ -4612,10 +4612,9 @@ bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float sta
      */
     bool isWaterNext = IsInWater(source->GetPhaseMask(), destX, destY, destZ);
     Creature const* creature = unit->ToCreature();
-    // TODO(Harry): Reimplement this
-    //bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
+    bool cannotEnterWater = isWaterNext && (creature && !creature->CanSwim());
     bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
-    if (/*cannotEnterWater ||*/ cannotWalkOrFly)
+    if (cannotEnterWater || cannotWalkOrFly)
     {
         return false;
     }
