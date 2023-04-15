@@ -389,5 +389,11 @@ namespace LuaMap
         Eluna::Push(E->L, map->GetCappedDungeonLevel());
         return 1;
     }
+
+    int UpdateDungeonLevel(Eluna* /*E*/, Map* map)
+    {
+        map->UpdateDungeonLevel();
+        return 0;
+    }
 };
 #endif

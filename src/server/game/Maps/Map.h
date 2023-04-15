@@ -461,6 +461,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         int GetDungeonLevel() const { return i_dungeonLevel; }
         int GetCappedDungeonLevel() const;
         void SetDungeonLevel(int value);
+        void UpdateDungeonLevel();
         bool Instanceable() const;
         bool IsDungeon() const;
         bool IsNonRaidDungeon() const;

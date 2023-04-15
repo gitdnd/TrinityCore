@@ -5053,3 +5053,25 @@ void Map::SetDungeonLevel(int value)
     }
 
 }
+
+void Map::UpdateDungeonLevel()
+{
+    const PlayerList &players = GetPlayers();
+    auto count = 0;
+    auto level = 0.0f;
+    for (auto itr = players.begin(); itr != players.end(); ++itr)
+    {
+        auto plr = itr->GetSource();
+        if (plr)
+        {
+            level += plr->GetCappedItemLevel();
+            ++count;
+        }
+    }
+    if (count >= 1)
+    {
+        auto newLevel = std::floor(level / count);
+        if (newLevel != GetCappedDungeonLevel())
+            SetDungeonLevel(newLevel);
+    }
+}
