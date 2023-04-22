@@ -88,7 +88,8 @@ enum AchievementFlags
     ACHIEVEMENT_FLAG_AVERAGE               = 0x00000040,    // Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)
     ACHIEVEMENT_FLAG_BAR                   = 0x00000080,    // Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
     ACHIEVEMENT_FLAG_REALM_FIRST_REACH     = 0x00000100,    //
-    ACHIEVEMENT_FLAG_REALM_FIRST_KILL      = 0x00000200     //
+    ACHIEVEMENT_FLAG_REALM_FIRST_KILL      = 0x00000200,    //
+    ACHIEVEMENT_FLAG_LOCAL_ANNOUNCE        = 0x00000400     // Only broadcast to the player that earns, ignore nearby players and guild
 };
 
 #define MAX_CRITERIA_REQUIREMENTS 2
