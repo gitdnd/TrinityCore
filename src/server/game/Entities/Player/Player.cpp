@@ -5139,6 +5139,7 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
         // If in Floating Cult
         if (!ignore_overrides)
         {
+            // Floating cult
             if (GetMap() && GetMap()->GetId() == 769)
             {
                 mapId = 769;
@@ -5155,6 +5156,15 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
                 y = 65.37f;
                 z = -27.5f;
                 o = 1.54559f;
+            }
+            // Icecrown Glacier
+            else if (GetMap() && GetMap()->GetId() == 772)
+            {
+                mapId = 772;
+                x = GetPositionX();
+                y = GetPositionY();
+                z = GetPositionZ();
+                o = GetOrientation();
             }
         }
            
