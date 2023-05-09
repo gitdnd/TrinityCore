@@ -340,7 +340,7 @@ void Eluna::OnUpdate(Map* map, uint32 diff)
     // only update the globalProcessor if the map being updated is the parent map
     if(map->IsParent())
         eventMgr->globalProcessor->Update(diff);
-
+    GetQueryProcessor().ProcessReadyCallbacks();
     START_HOOK(MAP_EVENT_ON_UPDATE);
     Push(map);
     Push(diff);

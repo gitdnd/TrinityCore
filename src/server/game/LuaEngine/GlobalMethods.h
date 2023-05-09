@@ -3190,5 +3190,101 @@ namespace LuaGlobalFunctions
         Eluna::Push(E->L, E->GetBoundMapId());
         return 1;
     }
+    
+    int WorldDBQueryAsync(Eluna* E)
+    {
+        const char* query = Eluna::CHECKVAL<const char*>(E->L, 1);
+        luaL_checktype(E->L, 2, LUA_TFUNCTION);
+        lua_pushvalue(E->L, 2);
+        int funcRef = luaL_ref(E->L, LUA_REGISTRYINDEX);
+        if (funcRef == LUA_REFNIL || funcRef == LUA_NOREF)
+        {
+            luaL_argerror(E->L, 2, "unable to make a ref to function");
+            return 0;
+        }
+
+        E->GetQueryProcessor().AddCallback(WorldDatabase.AsyncQuery(query).WithCallback([E, funcRef](QueryResult result)
+        {
+            ElunaQuery* eq = result ? new ElunaQuery(result) : nullptr;
+
+            //LOCK_ELUNA;
+
+            // Get function
+            lua_rawgeti(E->L, LUA_REGISTRYINDEX, funcRef);
+
+            // Push parameters
+            Eluna::Push(E->L, eq);
+
+            // Call function
+            E->ExecuteCall(1, 0);
+
+            luaL_unref(E->L, LUA_REGISTRYINDEX, funcRef);
+            }));
+        return 0;
+    }
+
+    int LoginDBQueryAsync(Eluna* E)
+    {
+        const char* query = Eluna::CHECKVAL<const char*>(E->L, 1);
+        luaL_checktype(E->L, 2, LUA_TFUNCTION);
+        lua_pushvalue(E->L, 2);
+        int funcRef = luaL_ref(E->L, LUA_REGISTRYINDEX);
+        if (funcRef == LUA_REFNIL || funcRef == LUA_NOREF)
+        {
+            luaL_argerror(E->L, 2, "unable to make a ref to function");
+            return 0;
+        }
+
+        E->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(query).WithCallback([E, funcRef](QueryResult result)
+            {
+                ElunaQuery* eq = result ? new ElunaQuery(result) : nullptr;
+
+                //LOCK_ELUNA;
+
+                // Get function
+                lua_rawgeti(E->L, LUA_REGISTRYINDEX, funcRef);
+
+                // Push parameters
+                Eluna::Push(E->L, eq);
+
+                // Call function
+                E->ExecuteCall(1, 0);
+
+                luaL_unref(E->L, LUA_REGISTRYINDEX, funcRef);
+            }));
+        return 0;
+    }
+
+    int CharacterDBQueryAsync(Eluna* E)
+    {
+        const char* query = Eluna::CHECKVAL<const char*>(E->L, 1);
+        luaL_checktype(E->L, 2, LUA_TFUNCTION);
+        lua_pushvalue(E->L, 2);
+        int funcRef = luaL_ref(E->L, LUA_REGISTRYINDEX);
+        if (funcRef == LUA_REFNIL || funcRef == LUA_NOREF)
+        {
+            luaL_argerror(E->L, 2, "unable to make a ref to function");
+            return 0;
+        }
+
+        E->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([E, funcRef](QueryResult result)
+            {
+                ElunaQuery* eq = result ? new ElunaQuery(result) : nullptr;
+
+                //LOCK_ELUNA;
+
+                // Get function
+                lua_rawgeti(E->L, LUA_REGISTRYINDEX, funcRef);
+
+                // Push parameters
+                Eluna::Push(E->L, eq);
+
+                // Call function
+                E->ExecuteCall(1, 0);
+
+                luaL_unref(E->L, LUA_REGISTRYINDEX, funcRef);
+            }));
+        return 0;
+    }
 }
 #endif

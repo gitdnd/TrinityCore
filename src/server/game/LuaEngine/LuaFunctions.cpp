@@ -145,6 +145,10 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "StartGameEvent", &LuaGlobalFunctions::StartGameEvent },
     { "StopGameEvent", &LuaGlobalFunctions::StopGameEvent },
     { "GetElunaMapId", &LuaGlobalFunctions::GetElunaMapId },
+    { "WorldDBQueryAsync", &LuaGlobalFunctions::WorldDBQueryAsync },
+    { "CharacterDBQueryAsync", &LuaGlobalFunctions::CharacterDBQueryAsync },
+    { "LoginDBQueryAsync", &LuaGlobalFunctions::LoginDBQueryAsync },
+
 
     { NULL, NULL }
 };
