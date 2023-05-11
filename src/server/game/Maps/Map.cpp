@@ -293,7 +293,7 @@ i_scriptLock(false), _respawnCheckTimer(0)
         i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
 
     if (sElunaLoader->ShouldMapLoadEluna(id))
-        if(!IsParent()) // We are not the parent map, so we should load a Lua state
+        if(!IsParent() || !Instanceable() && IsParent())
             eluna = new Eluna(id);
 
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
