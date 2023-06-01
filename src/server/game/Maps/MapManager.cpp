@@ -410,7 +410,7 @@ void MapManager::ReloadEluna(int32 mapId)
             bool shouldReload = false;
             if (mapId >= 0 && uint32(mapId) == itr->first)
                 shouldReload = true;
-            else // all case
+            else if(mapId <= -1)// all case
                 shouldReload = true;
 
             if (!shouldReload)
