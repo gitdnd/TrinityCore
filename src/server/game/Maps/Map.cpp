@@ -5062,7 +5062,7 @@ void Map::UpdateDungeonLevel()
     for (auto itr = players.begin(); itr != players.end(); ++itr)
     {
         auto plr = itr->GetSource();
-        if (plr)
+        if (plr && !plr->IsGameMaster())
         {
             level += plr->GetCappedItemLevel();
             ++count;
