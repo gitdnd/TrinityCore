@@ -3563,4 +3563,10 @@ void Creature::UpdateDungeonScaling()
     UpdateAttackPowerAndDamage(true);
     ApplyScaledResistances();
     ApplyScaledArmor();
+
+    for (Unit* controlledUnit : m_Controlled)
+    {
+        if (Creature* controlledCreature = controlledUnit->ToCreature())
+            controlledCreature->UpdateDungeonScaling();
+    }
 }
