@@ -321,6 +321,8 @@ void Map::InitVisibilityDistance()
     //init visibility for continents
     m_VisibleDistance = World::GetMaxVisibleDistanceOnContinents();
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodOnContinents();
+    if (GetId() == 767)
+        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
 }
 
 // Template specialization of utility methods
@@ -3816,6 +3818,8 @@ void InstanceMap::InitVisibilityDistance()
     //init visibility distance for instances
     m_VisibleDistance = World::GetMaxVisibleDistanceInInstances();
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodInInstances();
+    if (GetId() == 767)
+        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
 }
 
 /*
@@ -4324,6 +4328,8 @@ void BattlegroundMap::InitVisibilityDistance()
     //init visibility distance for BG/Arenas
     m_VisibleDistance = World::GetMaxVisibleDistanceInBGArenas();
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodInBGArenas();
+    if (GetId() == 767)
+        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
 }
 
 Map::EnterState BattlegroundMap::CannotEnter(Player* player)
