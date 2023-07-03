@@ -141,13 +141,26 @@ enum Classes
     CLASS_SUB_HISTORIAN = 14, // Subclass of Timewalker
     CLASS_SUB_WEAVER    = 15, // Subclass of Timewalker
     CLASS_SUB_WATCHER   = 16, // Subclass of Timewalker
-    CLASS_SUB_RANGER    = 17  // Subclass of Timewalker
+    CLASS_SUB_RANGER    = 17, // Subclass of Timewalker
+    CLASS_SUB_SAVAGE    = 18  // Subclass of Timewalker
 };
+
+enum LootPreference
+{
+    PREF_NONE       = 0,
+    PREF_TANK       = 1,
+    PREF_HEALER     = 2,
+    PREF_DPS_INT    = 3,
+    PREF_DPS_STR    = 4,
+    PREF_DPS_AGI    = 5
+};
+
+#define MAX_PREF          6
 
 // max+1 for player class
 #define MAX_CLASSES       13
 
-#define MAX_SUBCLASSES    5
+#define MAX_SUBCLASSES    6
 
 #define CLASSMASK_ALL_PLAYABLE \
     ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_HUNTER-1))| \
@@ -159,11 +172,21 @@ enum Classes
 
 enum CharacterSubClassSpells: uint32
 {
-    SUBCLASS_SPELL_WARDEN = 181000,
-    SUBCLASS_SPELL_HISTORIAN = 181001,
-    SUBCLASS_SPELL_WEAVER = 181002,
-    SUBCLASS_SPELL_WATCHER = 181003,
-    SUBCLASS_SPELL_RANGER = 181004
+    SUBCLASS_SPELL_WARDEN = 95000,
+    SUBCLASS_SPELL_HISTORIAN = 95001,
+    SUBCLASS_SPELL_WEAVER = 95002,
+    SUBCLASS_SPELL_SAVAGE = 95003,
+    SUBCLASS_SPELL_RANGER = 95004,
+    SUBCLASS_SPELL_WATCHER = 95005
+};
+
+enum CharacterLootPreferenceSpells : uint32
+{
+    LOOT_PREF_SPELL_TANK = 95006,
+    LOOT_PREF_SPELL_HEALER = 95007,
+    LOOT_PREF_SPELL_DPS_INT = 95008,
+    LOOT_PREF_SPELL_DPS_STR = 95009,
+    LOOT_PREF_SPELL_DPS_AGI = 95010
 };
 
 enum PlayerSpecializations
