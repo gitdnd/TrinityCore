@@ -133,7 +133,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    uint32 cost = items_count ? 30 * items_count : 30;  // price hardcoded in client
+    uint32 cost = 0;  // make sending mail free
 
     uint32 reqmoney = cost + money;
 
