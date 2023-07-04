@@ -3996,7 +3996,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
     uint32 oldMSTime = getMSTime();
 
     CharacterDatabase.DirectExecute("DELETE FROM item_template_virtual WHERE entry NOT IN ( SELECT itemEntry FROM item_instance WHERE itemEntry IS NOT NULL )");
-    QueryResult result = CharacterDatabase.Query("SELECT entry, base_entry, name, inventoryType, Quality, displayId, ItemLevel, StatsCount, "
+    QueryResult result = CharacterDatabase.Query("SELECT entry, base_entry, name, inventoryType, Quality, Flags, displayId, ItemLevel, StatsCount, "
         "stat_type1, stat_value1, stat_type2, stat_value2, stat_type3, stat_value3, stat_type4, stat_value4, stat_type5, stat_value5, "
         "stat_type6, stat_value6, stat_type7, stat_value7, stat_type8, stat_value8, stat_type9, stat_value9, stat_type10, stat_value10, "
         "dmg_min1, dmg_max1, dmg_type1, delay, armor, bonding, description, block, itemset, socket1, socket2, socket3, DisenchantID, "
@@ -4041,6 +4041,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
             itemTemplate->InventoryType = inventoryType;
 
         itemTemplate->Quality = uint32(fields[i++].GetUInt8());
+        itemTemplate->Flags = fields[i++].GetUInt32();
         itemTemplate->DisplayInfoID = fields[i++].GetUInt32();
         itemTemplate->ItemLevel = uint32(fields[i++].GetUInt16());
         itemTemplate->StatsCount = uint32(fields[i++].GetUInt8());
