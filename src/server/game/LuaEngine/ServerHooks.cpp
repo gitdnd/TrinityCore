@@ -344,6 +344,8 @@ void Eluna::OnUpdate(Map* map, uint32 diff)
     Push(map);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
+    if (reloadEluna && !GetQueryProcessor().HasPendingCallbacks())
+        _ReloadEluna();
 }
 
 void Eluna::OnRemove(GameObject* gameobject)

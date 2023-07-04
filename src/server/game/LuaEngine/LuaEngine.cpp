@@ -58,6 +58,7 @@ void Eluna::_ReloadEluna()
 
     // Run scripts from laoded paths
     RunScripts();
+    reloadEluna = false;
 }
 
 Eluna::Eluna(int32 MapId) :
@@ -83,7 +84,8 @@ PlayerGossipBindings(NULL),
 MapEventBindings(NULL),
 InstanceEventBindings(NULL),
 CreatureUniqueBindings(NULL),
-boundMapId(MapId)
+boundMapId(MapId),
+reloadEluna(false)
 {
     OpenLua();
     eventMgr = new EventMgr(this);

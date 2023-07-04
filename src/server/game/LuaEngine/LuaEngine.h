@@ -135,6 +135,7 @@ public:
     Eluna(Eluna const&) = delete;
     Eluna& operator=(const Eluna&) = delete;
     bool ExecuteCall(int params, int res);
+    bool reloadEluna;
 private:
     int32 boundMapId;
 
