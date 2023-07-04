@@ -123,7 +123,7 @@ struct VirtualModifier
         nameOverride = "";
         magicFind = 0;
         statPoolPctModifier = 0.f;
-        subclass = 0;
+        lootPreference = 0;
         generateSet = false;
     }
 
@@ -152,7 +152,7 @@ struct VirtualModifier
     std::string nameOverride;
     uint32 magicFind;
     float statPoolPctModifier;
-    uint8 subclass;
+    uint8 lootPreference;
     bool generateSet;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
@@ -171,6 +171,12 @@ struct VirtualModifier
      * Returns the armor modifier.
      */
     static float GetTypeSlotArmorModifier(VirtualItemTemplate* item);
+
+    /**
+     * Fethces the stat modifier for the armor subclass based on stat group selected.
+     * Returns the stat modifier.
+     */
+    static float GetArmorTypeStatGroupModifier(VirtualItemTemplate* item);
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given stat type.
@@ -463,19 +469,14 @@ private:
          */
         std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator) const;
         /**
-         * Returns the stat groups for the given armor subclass.
+         * Returns the stat groups for the given players' loot preference.
          */
-        std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
-        /**
-         * Returns the stat groups for the given player subclass.
-         */
-        std::vector<StatGroup> const& GetPlayerSubclassStatGroups(uint8 subclass) const;
+        std::vector<StatGroup> const& GetPlayerLootPreference(uint8 lootPreference) const;
     private:
         std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
         std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
         std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
-        std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
-        std::vector<StatGroup> subclass_stat_groups[MAX_CLASSES+MAX_SUBCLASSES];
+        std::vector<StatGroup> preference_stat_groups[MAX_PREF];
     };
 
     static StatGroupData const premadeStatGroupData;

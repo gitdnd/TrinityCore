@@ -28069,5 +28069,28 @@ uint8 Player::GetActiveSubClass() const
     if (HasAura(SUBCLASS_SPELL_RANGER))
         return CLASS_SUB_RANGER;
 
+    if (HasAura(SUBCLASS_SPELL_SAVAGE))
+        return CLASS_SUB_SAVAGE;
+
+    return 0;
+}
+
+uint8 Player::GetActiveLootPreference() const
+{
+    if (HasAura(LOOT_PREF_SPELL_TANK))
+        return PREF_TANK;
+
+    if (HasAura(LOOT_PREF_SPELL_HEALER))
+        return PREF_HEALER;
+
+    if (HasAura(LOOT_PREF_SPELL_DPS_INT))
+        return PREF_DPS_INT;
+
+    if (HasAura(LOOT_PREF_SPELL_DPS_STR))
+        return PREF_DPS_STR;
+
+    if (HasAura(LOOT_PREF_SPELL_DPS_AGI))
+        return PREF_DPS_AGI;
+
     return 0;
 }

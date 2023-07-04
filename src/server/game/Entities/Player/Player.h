@@ -2244,6 +2244,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ToggleTempSpell(uint32 spell, uint32 aura, bool apply = true);
 
         uint8 GetActiveSubClass() const;
+        uint8 GetActiveLootPreference() const;
         uint8 GetSubOrClass() const { return subClass ? subClass : GetClass(); }
         
         int32 GetSpellPowerForSchool(SpellSchools school) { return GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + school) - GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + school); }

@@ -180,7 +180,7 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                             int dungeonLevel = member->GetMap()->GetDungeonLevel();
                             int playerLevel = std::floor(member->GetCappedItemLevel());
                             modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
-                            modifier.subclass = member->GetActiveSubClass();
+                            modifier.lootPreference = member->GetActiveLootPreference();
 
                             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;
@@ -300,7 +300,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     modifier.magicFind = lootOwner->GetMagicFind();
 
-    modifier.subclass = lootOwner->GetSubClass();
+    modifier.lootPreference = lootOwner->GetActiveLootPreference();
 
     tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 

@@ -335,23 +335,14 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     StatGroup statgroupid;
     StatGroup statgroupbiasid;
 
-    // grab available armor type stat groups
-    std::vector<StatGroup> const& statgroups = premadeStatGroupData.GetArmorSubclassStatGroups(output);
+    // select a random stat group
+    statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
 
-    bool isJewelry = output->InventoryType == INVTYPE_TRINKET || output->InventoryType == INVTYPE_NECK || output->InventoryType == INVTYPE_FINGER;
-    bool isCloak = output->InventoryType == INVTYPE_CLOAK;
-
-    // armor has predefined stat groups, except some slots like trinkets, rings, cloaks etc.
-    if (!statgroups.empty() && output->Class == ITEM_CLASS_ARMOR && !isCloak && !isJewelry)
-        statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
-    else // all weapons currently generate entirely random.
-        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
-
-    // if the player has a subclass, roll for bias statgroup
-    if (modifier.subclass > 0)
+    // if the player has a loot preference, roll for bias statgroup
+    if (modifier.lootPreference > 0)
     {
-        // grab available subclass stat groups
-        std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerSubclassStatGroups(modifier.subclass);
+        // grab available loot preference stat groups
+        std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerLootPreference(modifier.lootPreference);
         statgroupbiasid = substatgroups[urand(0, substatgroups.size() - 1, generator)];
 
         // 25% chance of bias, might want to make this into a config later on
@@ -671,6 +662,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
         // divide per-stat pool by predefined blizzlike value
         pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
+
+        // for armor specifically we want to modify the pool size depending on the selected stat group and armor type
+        // does not apply to rings, trinkets, cloaks and shields
+        if (output->Class == ITEM_CLASS_ARMOR && (output->InventoryType != INVTYPE_SHIELD || output->InventoryType != INVTYPE_TRINKET || output->InventoryType != INVTYPE_FINGER || output->InventoryType != INVTYPE_NECK || output->InventoryType != INVTYPE_CLOAK))
+            pool *= VirtualModifier::GetArmorTypeStatGroupModifier(output);
 
         // generate primary stat values  for all stats in group
         for (uint32 i = 0; i < primarystatgroup.size(); ++i)
@@ -1492,14 +1488,9 @@ std::vector<SocketColor> const& VirtualItemMgr::StatGroupData::GetStatGroupSocke
     return stat_group_sockets[group];
 }
 
-std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
+std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetPlayerLootPreference(uint8 preference) const
 {
-    return armor_type_stat_groups[output->SubClass];
-}
-
-std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetPlayerSubclassStatGroups(uint8 subclass) const
-{
-    return subclass_stat_groups[subclass];
+    return preference_stat_groups[preference];
 }
 
 uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
@@ -1777,6 +1768,99 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
     }
     return 1.0f;
 }
+
+float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output)
+{
+    switch (output->statGroup)
+    {
+        case STAT_GROUP_STR_TANK:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 0.8f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 1.0f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_AGI_TANK:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 0.8f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.9f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_HEALING:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.7f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_INT_DPS:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.7f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_STR_DPS:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.8f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_AGI_DPS:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.8f;
+                default:
+                    return 1.0f;
+            }
+        default:
+            return 1.0f;
+    }
+    return 1.0f;
+}
+
 
 uint32 VirtualModifier::GetSetChance(VirtualItemTemplate* output)
 {
@@ -2309,46 +2393,22 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         SOCKET_COLOR_RED,
         SOCKET_COLOR_BLUE
     };
-    // type stat groups
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_CLOTH] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_INT_DPS
-    };
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_LEATHER] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_INT_DPS,
-        STAT_GROUP_AGI_DPS,
-        STAT_GROUP_AGI_TANK
-    };
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_MAIL] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_STR_DPS,
-        STAT_GROUP_STR_TANK,
-        STAT_GROUP_AGI_DPS
-    };
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_PLATE] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_INT_DPS,
-        STAT_GROUP_STR_DPS,
-        STAT_GROUP_STR_TANK
-    };
 
-    //subclass stat groups
-    subclass_stat_groups[CLASS_SUB_WARDEN] = {
+    //preference stat groups
+    preference_stat_groups[PREF_TANK] = {
         STAT_GROUP_AGI_TANK,
         STAT_GROUP_STR_TANK
     };
-    subclass_stat_groups[CLASS_SUB_HISTORIAN] = {
+    preference_stat_groups[PREF_HEALER] = {
         STAT_GROUP_HEALING
     };
-    subclass_stat_groups[CLASS_SUB_WEAVER] = {
+    preference_stat_groups[PREF_DPS_INT] = {
         STAT_GROUP_INT_DPS
     };
-    subclass_stat_groups[CLASS_SUB_WATCHER] = {
-        STAT_GROUP_AGI_DPS,
+    preference_stat_groups[PREF_DPS_STR] = {
         STAT_GROUP_STR_DPS
     };
-    subclass_stat_groups[CLASS_SUB_RANGER] = {
+    preference_stat_groups[PREF_DPS_AGI] = {
         STAT_GROUP_AGI_DPS
     };
 }
