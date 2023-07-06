@@ -179,8 +179,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                         {
                             static VirtualModifier modifier = VirtualModifier();
 
-                            int dungeonLevel = member->GetMap()->GetCappedDungeonLevel();
-                            int playerLevel = member->GetCappedGroupOrPlayerItemLevel();
+                            int dungeonLevel = member->GetMap()->GetDungeonLevel();
+                            int playerLevel = std::floor(member->GetCappedItemLevel());
 
                             // is this calculation what we really want? really need to double check this logic
                             modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
