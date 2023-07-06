@@ -149,7 +149,7 @@ void Loot::clear()
 }
 
 // Inserts the item into the loot (called by LootTemplate processors)
-void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool canBePersonal)
+void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 {
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
     if (!proto)
@@ -177,18 +177,20 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         ItemTemplate const* personalProto;
                         if (VirtualItemMgr::IsVirtualTemplate(proto))
                         {
-                            // make a copy of the modifier
-                            // this is needed to ensure each generation gets its own unique modifier object
-                            static VirtualModifier modifier_copy;
-                            memcpy(&modifier_copy, &modifier, sizeof(modifier));
+                            static VirtualModifier modifier = VirtualModifier();
 
-                            int dungeonLevel = member->GetMap()->GetDungeonLevel();
-                            int playerLevel = std::floor(member->GetCappedItemLevel());
-                            modifier_copy.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
-                            modifier_copy.lootPreference = member->GetActiveLootPreference();
-                            modifier_copy.magicFind = member->GetMagicFind();
+                            int dungeonLevel = member->GetMap()->GetCappedDungeonLevel();
+                            int playerLevel = member->GetCappedGroupOrPlayerItemLevel();
 
-                            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier_copy))
+                            // is this calculation what we really want? really need to double check this logic
+                            modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
+                            modifier.lootPreference = member->GetActiveLootPreference();
+                            modifier.magicFind = member->GetMagicFind();
+
+                            if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                                modifier.vLvlMod = inst->vLvlMod;
+
+                            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;
                         }
                         else
@@ -235,18 +237,23 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
         // VirtualItem
         if (VirtualItemMgr::IsVirtualTemplate(proto))
         {
-            // make a copy of the modifier
-            // this is needed to ensure each generation gets its own unique modifier object
-            static VirtualModifier modifier_copy;
-            memcpy(&modifier_copy, &modifier, sizeof(modifier));
+            static VirtualModifier modifier = VirtualModifier();
 
             if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
             {
-                modifier_copy.lootPreference = player->GetActiveLootPreference();
-                modifier_copy.magicFind = player->GetMagicFind();
+                int dungeonLevel = player->GetMap()->GetCappedDungeonLevel();
+                int playerLevel = player->GetCappedGroupOrPlayerItemLevel();
+
+                // is this calculation what we really want? really need to double check this logic
+                modifier.plrAvgLvl = player->GetMap()->GetDungeonLevel() >= 20 ? dungeonLevel : playerLevel;
+                modifier.lootPreference = player->GetActiveLootPreference();
+                modifier.magicFind = player->GetMagicFind();
+
+                if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
+                    modifier.vLvlMod = inst->vLvlMod;
             }
 
-            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier_copy))
+            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                 proto = newProto;
         }
 
@@ -309,15 +316,9 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    VirtualModifier modifier = VirtualModifier();
     Group* group = lootOwner->GetGroup();
 
-    if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(lootOwner->GetMapId()))
-        modifier.vLvlMod = inst->vLvlMod;
-
-    modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetCappedDungeonLevel() : lootOwner->GetCappedGroupOrPlayerItemLevel();
-
-    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
     if (!personal && group)
