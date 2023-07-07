@@ -380,6 +380,10 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     // always bind on pickup
     output->Bonding = BIND_WHEN_PICKED_UP;
 
+    // if item is a legendary or higher, flag as BoA
+    if(output->Quality >= ITEM_QUALITY_LEGENDARY)
+        output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
+
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
     // if ilevel is not set, use the players average item level +/- 5 item levels.

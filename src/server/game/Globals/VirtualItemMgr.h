@@ -95,6 +95,7 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 generatedMagicFind;
     float honePct;
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
+    inline bool HasFlag(ItemFlags flag) const { return (Flags & flag) != 0; }
 };
 
 struct VirtualModifier
