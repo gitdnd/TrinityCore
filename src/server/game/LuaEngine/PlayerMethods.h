@@ -4315,13 +4315,13 @@ namespace LuaPlayer
 
     int UpdateTalentPassives(Eluna* /*E*/, Player* player)
     {
-        player->UpdateArmorPassives();
+        //player->UpdateArmorPassives();
         return 0;
     }
 
     int RemoveTalentPassives(Eluna* /*E*/, Player* player)
     {
-        player->RemoveArmorPassives();
+        //player->RemoveArmorPassives();
         return 0;
     }
 

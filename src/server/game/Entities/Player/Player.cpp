@@ -4039,7 +4039,8 @@ bool Player::ResetTalents(bool no_cost)
     }
     */
 
-    RemoveArmorPassives();
+    // No longer used, should be removed
+    // RemoveArmorPassives();
 
     return true;
 }
@@ -12475,7 +12476,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem, true);
 
-        UpdateArmorPassives();
+        // No longer used, should be removed
+        // UpdateArmorPassives();
 
         return pItem;
     }
@@ -12516,7 +12518,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem2, true);
 
-        UpdateArmorPassives();
+        // No longer used, should be removed
+        // UpdateArmorPassives();
 
         return pItem2;
     }
@@ -12634,7 +12637,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         if (GetMap()->GetEluna())
             GetMap()->GetEluna()->OnEquip(this, pItem2, bag, slot);
 #endif
-        UpdateArmorPassives();
+        // No longer used, should be removed
+        // UpdateArmorPassives();
         return pItem2;
     }
 
@@ -12652,7 +12656,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     if (GetMap()->GetEluna())
         GetMap()->GetEluna()->OnEquip(this, pItem, bag, slot);
 #endif
-    UpdateArmorPassives();
+    // No longer used, should be removed
+    // UpdateArmorPassives();
     return pItem;
 }
 
@@ -26126,7 +26131,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (GetMap()->GetEluna())
         GetMap()->GetEluna()->OnLearnTalents(this, talentId, talentRank, spellid);
 #endif
-    UpdateArmorPassives();
+    // No longer used, should be removed
+    // UpdateArmorPassives();
 }
 
 void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank)
@@ -26866,7 +26872,8 @@ void Player::ActivateSpec(uint8 spec)
     if (spec > GetSpecsCount())
         return;
 
-    RemoveArmorPassives();
+    // No longer used, should be removed
+    // RemoveArmorPassives();
 
     if (IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
@@ -27029,7 +27036,8 @@ void Player::ActivateSpec(uint8 spec)
         aurEff->HandleShapeshiftBoosts(this, false);
         aurEff->HandleShapeshiftBoosts(this, true);
     }
-    UpdateArmorPassives();
+    // No longer used, should be removed
+    // UpdateArmorPassives();
 }
 
 void Player::LoadActions(PreparedQueryResult result)
@@ -27826,6 +27834,7 @@ uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
     return count;
 }
 
+// No longer used, should be removed
 void Player::UpdateArmorPassives()
 {
 #define CHECK_TALENT(a,b,c,d) if (HasSpell(a)) \
@@ -27871,6 +27880,7 @@ void Player::UpdateArmorPassives()
 #undef CHECK_TALENT
 }
 
+// No longer used, should be removed
 void Player::RemoveArmorPassives()
 {
     uint32 spells[5] = { SUBCLASS_SPELL_WARDEN, SUBCLASS_SPELL_HISTORIAN, SUBCLASS_SPELL_WEAVER, SUBCLASS_SPELL_WATCHER, SUBCLASS_SPELL_RANGER };

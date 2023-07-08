@@ -163,6 +163,9 @@ class spell_gen_subclass : public AuraScript
         case SUBCLASS_SPELL_RANGER:
             return CLASS_SUB_RANGER;
             break;
+        case SUBCLASS_SPELL_SAVAGE:
+            return CLASS_SUB_SAVAGE;
+            break;
         }
         return CLASS_WARLOCK; // Debug means something gone wrong.
     }
