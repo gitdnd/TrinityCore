@@ -2337,7 +2337,7 @@ void World::SetInitialWorldSettings()
     {
         sMapMgr->DoForAllMaps([](Map* map)
         {
-            if (!map->Instanceable())
+            if (sElunaLoader->ShouldMapLoadEluna(map->GetId()))
             {
                 TC_LOG_INFO("server.loading", "Pre-loading base map data for map %u", map->GetId());
                 map->LoadAllCells();
