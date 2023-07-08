@@ -4039,7 +4039,8 @@ bool Player::ResetTalents(bool no_cost)
     }
     */
 
-    RemoveArmorPassives();
+    // No longer used, should be removed
+    // RemoveArmorPassives();
 
     return true;
 }
@@ -26871,7 +26872,8 @@ void Player::ActivateSpec(uint8 spec)
     if (spec > GetSpecsCount())
         return;
 
-    RemoveArmorPassives();
+    // No longer used, should be removed
+    // RemoveArmorPassives();
 
     if (IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
@@ -27878,6 +27880,7 @@ void Player::UpdateArmorPassives()
 #undef CHECK_TALENT
 }
 
+// No longer used, should be removed
 void Player::RemoveArmorPassives()
 {
     uint32 spells[5] = { SUBCLASS_SPELL_WARDEN, SUBCLASS_SPELL_HISTORIAN, SUBCLASS_SPELL_WEAVER, SUBCLASS_SPELL_WATCHER, SUBCLASS_SPELL_RANGER };
