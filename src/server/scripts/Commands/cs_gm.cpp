@@ -302,7 +302,6 @@ public:
             _player->SetGameMaster(true);
             handler->GetSession()->SendNotification(LANG_GM_ON);
             _player->UpdateTriggerVisibility();
-            _player->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER, true);
 #ifdef _DEBUG_VMAPS
             VMAP::IVMapManager* vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
             vMapManager->processCommand("stoplog");
@@ -315,7 +314,6 @@ public:
             _player->SetGameMaster(false);
             handler->GetSession()->SendNotification(LANG_GM_OFF);
             _player->UpdateTriggerVisibility();
-            _player->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER, false);
 #ifdef _DEBUG_VMAPS
             VMAP::IVMapManager* vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
             vMapManager->processCommand("startlog");
