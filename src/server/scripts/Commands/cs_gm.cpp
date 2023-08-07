@@ -81,6 +81,7 @@ public:
             {
                 session->GetPlayer()->SetGMChat(true);
                 session->SendNotification(LANG_GM_CHAT_ON);
+                session->GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER, true);
                 return true;
             }
 
@@ -88,6 +89,7 @@ public:
             {
                 session->GetPlayer()->SetGMChat(false);
                 session->SendNotification(LANG_GM_CHAT_OFF);
+                session->GetPlayer()->ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER, false);
                 return true;
             }
         }
