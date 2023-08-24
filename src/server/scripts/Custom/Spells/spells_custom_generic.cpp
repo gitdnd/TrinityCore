@@ -46,6 +46,42 @@ class spell_gen_between_cast_periodic : public AuraScript
     }
 };
 
+class spell_gen_between_cast_periodic_nozcheck : public AuraScript
+{
+    PrepareAuraScript(spell_gen_between_cast_periodic_nozcheck);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (!GetCaster())
+            return;
+        std::list<Player*> targets;
+        Trinity::AnyPlayerInObjectRangeCheck check(GetCaster(), 100.f, false);
+        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(GetCaster(), targets, check);
+        Cell::VisitWorldObjects(GetCaster(), searcher, 100.f);
+        for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+        {
+            Player* player = (*iter);
+            if (player->GetGUID() == GetCasterGUID() || player->isDead())
+                continue;
+
+            // Check of player is between the caster and the target
+            if (player->IsInBetween(GetCaster(), GetTarget(), 2.f))
+                player->CastSpell(player, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_between_cast_periodic_nozcheck::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 static uint32 comboAuras[6] = { 180054, 180055, 180056, 180057, 180058, 180059 };
 
 class spell_generate_combopoint_all : public SpellScript
@@ -180,6 +216,7 @@ class spell_gen_subclass : public AuraScript
 void AddSC_Spells_Custom_Generic()
 {
     RegisterAuraScript(spell_gen_between_cast_periodic);
+    RegisterAuraScript(spell_gen_between_cast_periodic_nozcheck);
     RegisterSpellScript(spell_generate_combopoint_all);
     RegisterAuraScript(spell_gen_fly_in_hub);
     RegisterAuraScript(spell_gen_subclass);
