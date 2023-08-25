@@ -28106,3 +28106,132 @@ uint8 Player::GetActiveLootPreference() const
 
     return 0;
 }
+
+void Player::ResetCustomTalents()
+{
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+        // should we check triggerspells?
+        RemoveAura(nodeInfo->spellId);
+    }
+    SetFreeTalentPoints(m_usedTalentCount);
+    m_usedTalentCount = 0;
+    customTalents[GetCurrentTalentLoadout()].clear();
+}
+
+void Player::LearnCustomTalent(uint32 id)
+{
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+
+    if (!nodeInfo) // No.
+        return;
+
+    if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
+        aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+    else
+        CastSpell(this, nodeInfo->spellId, true);
+
+    SetFreeTalentPoints(GetFreeTalentPoints() - 1);
+    m_usedTalentCount += 1;
+}
+
+uint32 Player::GetTalentStackCount(uint32 spellId)
+{
+    uint32 count = 0;
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+
+        if (nodeInfo->spellId == spellId)
+            count += 1;
+    }
+    return count;
+}
+
+void Player::LoadCustomTalentLoadout()
+{
+
+}
+
+void Player::LoadCustomTalents()
+{
+
+}
+
+bool Player::CanLearnCustomTalent(uint32 id)
+{
+    //@todo provide reason for ui feedback?
+    if (GetFreeTalentPoints() <= 0)
+        return false;
+
+    if (!IsAlive())
+        return false;
+
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+
+    if (!nodeInfo) // No.
+        return false;
+
+    if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+        return false;
+
+    if ((nodeInfo->flagMask & 1))
+        return false;
+
+    if (!(nodeInfo->flagMask & 4))
+    {
+        bool foundLink = false;
+        for (auto itr = nodeInfo->links.begin(); itr != nodeInfo->links.end(); ++itr)
+        {
+            foundLink = HasCustomTalent(*itr);
+            if (foundLink)
+                break;
+        }
+
+        if (!foundLink)
+            return false;
+    }
+    else
+    {
+        if (HasTalentWithMask(4))
+            return false;
+    }
+
+    return true;
+}
+
+bool Player::HasCustomTalent(uint32 id)
+{
+    return std::find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id) != customTalents[GetCurrentTalentLoadout()].end();
+}
+
+bool Player::HasTalentWithMask(uint32 mask)
+{
+    bool foundMask = false;
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+
+        foundMask = (nodeInfo->flagMask & mask);
+        if (foundMask)
+            break;
+    }
+
+    return foundMask;
+}
