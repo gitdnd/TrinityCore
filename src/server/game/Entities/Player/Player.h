@@ -736,6 +736,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 33,
     PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS     = 34,
     PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS      = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS          = 36,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -2253,9 +2254,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetTalentLoadout(uint32 val) { if (val > MAX_CUSTOM_TALENT_LOADOUTS) return;  ResetCustomTalents(); currentTalentLoadout = val; LoadCustomTalentLoadout(); }
         void ResetCustomTalents();
         void LearnCustomTalent(uint32 id);
+        void UnlearnCustomTalent(uint32 id);
         uint32 GetTalentStackCount(uint32 spellId);
         void LoadCustomTalentLoadout();
-        void LoadCustomTalents();
+        void LoadCustomTalents(PreparedQueryResult result);
         bool CanLearnCustomTalent(uint32 id);
         bool HasCustomTalent(uint32 id);
         bool HasTalentWithMask(uint32 mask);

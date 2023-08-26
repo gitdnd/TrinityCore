@@ -28132,13 +28132,46 @@ void Player::LearnCustomTalent(uint32 id)
     if (!nodeInfo) // No.
         return;
 
+    customTalents[GetCurrentTalentLoadout()].push_back(id);
+
     if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
         aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
     else
         CastSpell(this, nodeInfo->spellId, true);
 
+ 
     SetFreeTalentPoints(GetFreeTalentPoints() - 1);
     m_usedTalentCount += 1;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_CUSTOM_TALENT);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(1, id);
+    stmt->setUInt32(2, GetCurrentTalentLoadout());
+    CharacterDatabase.Execute(stmt);
+}
+void Player::UnlearnCustomTalent(uint32 id)
+{
+    if (!HasCustomTalent(id) || !IsAlive())
+        return;
+
+    customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
+
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+    if (Aura* aur = GetAura(nodeInfo->spellId, GetGUID()))
+        if (aur->GetStackAmount() > 1)
+            aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+        else
+            aur->Remove();
+
+
+    SetFreeTalentPoints(GetFreeTalentPoints() + 1);
+    m_usedTalentCount -= 1;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_BY_LOADOUT);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(1, id);
+    stmt->setUInt32(2, GetCurrentTalentLoadout());
+    CharacterDatabase.Execute(stmt);
 }
 
 uint32 Player::GetTalentStackCount(uint32 spellId)
@@ -28161,12 +28194,34 @@ uint32 Player::GetTalentStackCount(uint32 spellId)
 
 void Player::LoadCustomTalentLoadout()
 {
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
 
+        if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
+            aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+        else
+            CastSpell(this, nodeInfo->spellId, true);
+    }
 }
 
-void Player::LoadCustomTalents()
+void Player::LoadCustomTalents(PreparedQueryResult result)
 {
+    if (result)
+    {
+        do
+        {
+            if ((*result)[1].GetUInt32() > MAX_CUSTOM_TALENT_LOADOUTS)
+                continue;
 
+            customTalents[(*result)[1].GetUInt32()].push_back((*result)[0].GetUInt32());
+        } while (result->NextRow());
+    }
 }
 
 bool Player::CanLearnCustomTalent(uint32 id)
@@ -28176,6 +28231,9 @@ bool Player::CanLearnCustomTalent(uint32 id)
         return false;
 
     if (!IsAlive())
+        return false;
+
+    if (HasCustomTalent(id))
         return false;
 
     const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
