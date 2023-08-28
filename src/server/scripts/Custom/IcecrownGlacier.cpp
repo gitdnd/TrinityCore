@@ -20,15 +20,18 @@ class spell_icespike_glacier : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        GetCaster()->Say("hit", LANG_UNIVERSAL); // debug
- 
         auto target = GetHitUnit();
         if (!target)
             return;
 
-        GetCaster()->Say("acquired target", LANG_UNIVERSAL); // debug
-
         target->CastSpell(target, 90522, true);
+
+        auto player = target->ToPlayer();
+        if (!player)
+            return;
+
+        player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
+        player->SetClientControl(player, 0);
     }
 
     void Register() override
