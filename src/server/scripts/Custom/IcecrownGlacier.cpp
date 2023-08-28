@@ -40,7 +40,43 @@ class spell_icespike_glacier : public SpellScript
     }
 };
 
+class spell_aura_icespike_glacier : public SpellScriptLoader
+{
+public:
+    spell_aura_icespike_glacier() : SpellScriptLoader("spell_aura_icespike_glacier") { }
+
+    class spell_aura_icespike_glacier_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_aura_icespike_glacier_AuraScript);
+
+    private:
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            auto caster = GetCaster();
+            if (!caster)
+                return;
+
+            if (auto player = caster->ToPlayer())
+            {
+                player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
+                player->SetClientControl(player, 1);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_aura_icespike_glacier_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_aura_icespike_glacier_AuraScript();
+    }
+};
+
 void AddSC_IcecrownGlacier()
 {
     RegisterSpellScript(spell_icespike_glacier);
+    new spell_aura_icespike_glacier();
 }
