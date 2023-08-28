@@ -21,6 +21,7 @@ void AddSC_GOMove_commandscript();
 void AddSC_FallOfDalaran();
 void AddSC_DragonIsles();
 void AddSC_WorldsEnd();
+void AddSC_IcecrownGlacier();
 void AddSC_chromie_script();
 void AddSC_Spells_Custom_Items();
 void AddSC_Spells_Custom_Talents();
