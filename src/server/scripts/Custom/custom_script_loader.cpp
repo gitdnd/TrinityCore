@@ -37,6 +37,7 @@ void AddCustomScripts()
     AddSC_FallOfDalaran();
     AddSC_DragonIsles();
     AddSC_WorldsEnd();
+    AddSC_IcecrownGlacier();
     AddSC_chromie_script();
     AddSC_Spells_Custom_Items();
     AddSC_Spells_Custom_Talents();
