@@ -21,7 +21,7 @@ class spell_icespike_glacier : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         GetCaster()->Say("hit", LANG_UNIVERSAL); // debug
-
+ 
         auto target = GetHitUnit();
         if (!target)
             return;
@@ -33,7 +33,7 @@ class spell_icespike_glacier : public SpellScript
 
     void Register() override
     {
-        OnEffectHit += SpellEffectFn(spell_icespike_glacier::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectHitTarget += SpellEffectFn(spell_icespike_glacier::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
