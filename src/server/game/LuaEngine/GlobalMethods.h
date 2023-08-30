@@ -3286,5 +3286,60 @@ namespace LuaGlobalFunctions
             }));
         return 0;
     }
+
+    int GetCustomTalentStorage(Eluna* E)
+    {
+        lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+        for (auto const& itr : sObjectMgr->GetTalentNodeStore())
+        {
+            Eluna::Push(E->L, itr.second.Index);
+            Eluna::Push(E->L, itr.second.spellId);
+            Eluna::Push(E->L, itr.second.xOffset);
+            Eluna::Push(E->L, itr.second.yOffset);
+            Eluna::Push(E->L, itr.second.Mutex);
+            Eluna::Push(E->L, itr.second.buttonType);
+            Eluna::Push(E->L, itr.second.flagMask);
+            lua_createtable(E->L, itr.second.links.size(), 0);
+            int tbl2 = lua_gettop(E->L);
+            uint32 i2 = 0;
+            for (auto const& itr2 : itr.second.links)
+            {
+                Eluna::Push(E->L, itr2);
+                lua_rawseti(E->L, tbl2, ++i2);
+            }
+            lua_settop(E->L, tbl2);
+            lua_rawseti(E->L, tbl, ++i);
+        }
+        lua_settop(E->L, tbl);
+        return 1;
+    }
+
+    int GetCustomTalent(Eluna* E)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        TalentNodeInfo const* nodeInfo = sObjectMgr->GetTalentNode(entry);
+        if (!nodeInfo)
+            return luaL_argerror(E->L, 2, "valid talent node index expected");
+
+        Eluna::Push(E->L, nodeInfo->Index);
+        Eluna::Push(E->L, nodeInfo->spellId);
+        Eluna::Push(E->L, nodeInfo->xOffset);
+        Eluna::Push(E->L, nodeInfo->yOffset);
+        Eluna::Push(E->L, nodeInfo->Mutex);
+        Eluna::Push(E->L, nodeInfo->buttonType);
+        Eluna::Push(E->L, nodeInfo->flagMask);
+        lua_createtable(E->L, nodeInfo->links.size(), 0);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+        for (auto const& itr : nodeInfo->links)
+        {
+            Eluna::Push(E->L, itr);
+            lua_rawseti(E->L, tbl, ++i);
+        }
+        lua_settop(E->L, tbl);
+        return 1;
+    }
 }
 #endif
