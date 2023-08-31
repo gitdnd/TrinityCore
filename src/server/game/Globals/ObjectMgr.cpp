@@ -11113,6 +11113,7 @@ TalentNodeInfo const* ObjectMgr::GetTalentNode(uint32 entry) const
 
 void ObjectMgr::LoadTalentNodes()
 {
+    //@todo: asynch load?
     QueryResult result = WorldDatabase.Query("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info");
     if (!result)
     {
@@ -11133,22 +11134,19 @@ void ObjectMgr::LoadTalentNodes()
         nodeInfo.Mutex = fields[4].GetUInt32();
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
-        //@todo Validation.
-        
-    } while (result->NextRow());
-    for (auto& itr : _talentNodeStore)
-    {
-        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", itr.first);
-        if (linkQuery)
+        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
+        do
         {
             Field* fields = result->Fetch();
             uint32 entry = fields[0].GetUInt32();
-            if (!GetTalentNode(entry))
-            {
+            //if (!GetTalentNode(entry))
+            //{
                 //@todo Error
-                continue;
-            }
-            itr.second.links.push_back(entry);
-        }
-    }
+                //continue;
+            //}
+            nodeInfo.links.push_back(entry);
+        } while (linkQuery->NextRow());
+        //@todo Validation.
+        
+    } while (result->NextRow());
 }
