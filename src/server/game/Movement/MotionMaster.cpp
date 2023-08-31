@@ -890,7 +890,7 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
 
     GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, id);
     movement->Priority = MOTION_PRIORITY_HIGHEST;
-    movement->BaseUnitState = hasOrientation ? UNIT_STATE_CANNOT_TURN : UNIT_STATE_JUMPING;
+    movement->BaseUnitState = UNIT_STATE_JUMPING;
     Add(movement);
 }
 
