@@ -148,8 +148,6 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "WorldDBQueryAsync", &LuaGlobalFunctions::WorldDBQueryAsync },
     { "CharacterDBQueryAsync", &LuaGlobalFunctions::CharacterDBQueryAsync },
     { "LoginDBQueryAsync", &LuaGlobalFunctions::LoginDBQueryAsync },
-    { "GetCustomTalentStorage", &LuaGlobalFunctions::GetCustomTalentStorage },
-    { "GetCustomTalent", &LuaGlobalFunctions::GetCustomTalent },
 
 
     { NULL, NULL }
