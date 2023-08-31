@@ -328,7 +328,6 @@ Player::Player(WorldSession* session): Unit(true)
     m_lastPotionId = 0;
 
     m_activeSpec = 0;
-    currentTalentLoadout = 0;
     m_specsCount = 1;
 
     for (uint8 i = 0; i < MAX_TALENT_SPECS; ++i)
@@ -18491,8 +18490,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     //_LoadMail();
 
     m_specsCount = fields[64].GetUInt8();
-    //m_activeSpec = fields[65].GetUInt8();
-    currentTalentLoadout = fields[65].GetUInt8();
+    m_activeSpec = fields[65].GetUInt8();
+
     // sanity check
     if (m_specsCount > MAX_TALENT_SPECS || m_activeSpec > MAX_TALENT_SPEC || m_specsCount < MIN_TALENT_SPECS)
     {
@@ -18503,7 +18502,6 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     UpdateDisplayPower();
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
-    LoadCustomTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
     _LoadSpells(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELLS));
 
     _LoadGlyphs(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_GLYPHS));
@@ -20183,8 +20181,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt32(index++, GetSession()->GetLatency());
 
         stmt->setUInt8(index++, m_specsCount);
-        //stmt->setUInt8(index++, m_activeSpec);
-        stmt->setUInt8(index++, currentTalentLoadout);
+        stmt->setUInt8(index++, m_activeSpec);
 
         ss.str("");
         for (uint32 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
@@ -20309,8 +20306,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt32(index++, GetSession()->GetLatency());
 
         stmt->setUInt8(index++, m_specsCount);
-        //stmt->setUInt8(index++, m_activeSpec);
-        stmt->setUInt8(index++, currentTalentLoadout);
+        stmt->setUInt8(index++, m_activeSpec);
 
         ss.str("");
         for (uint32 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
@@ -20424,8 +20420,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction& trans)
             case ACTIONBUTTON_NEW:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
                 stmt->setUInt32(0, GetGUID().GetCounter());
-                //stmt->setUInt8(1, m_activeSpec);
-                stmt->setUInt8(1, currentTalentLoadout);
+                stmt->setUInt8(1, m_activeSpec);
                 stmt->setUInt8(2, itr->first);
                 stmt->setUInt32(3, itr->second.GetAction());
                 stmt->setUInt8(4, uint8(itr->second.GetType()));
@@ -20440,8 +20435,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction& trans)
                 stmt->setUInt8(1, uint8(itr->second.GetType()));
                 stmt->setUInt32(2,  GetGUID().GetCounter());
                 stmt->setUInt8(3, itr->first);
-                //stmt->setUInt8(4, m_activeSpec);
-                stmt->setUInt8(4, currentTalentLoadout);
+                stmt->setUInt8(4, m_activeSpec);
                 trans->Append(stmt);
 
                 itr->second.uState = ACTIONBUTTON_UNCHANGED;
@@ -20451,8 +20445,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION_BY_BUTTON_SPEC);
                 stmt->setUInt32(0, GetGUID().GetCounter());
                 stmt->setUInt8(1, itr->first);
-                //stmt->setUInt8(2, m_activeSpec);
-                stmt->setUInt8(2, currentTalentLoadout);
+                stmt->setUInt8(2, m_activeSpec);
                 trans->Append(stmt);
 
                 m_actionButtons.erase(itr++);
@@ -27020,8 +27013,7 @@ void Player::ActivateSpec(uint8 spec)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
         stmt->setUInt32(0, GetGUID().GetCounter());
-        //stmt->setUInt8(1, m_activeSpec);
-        stmt->setUInt8(1, currentTalentLoadout);
+        stmt->setUInt8(1, m_activeSpec);
 
         WorldSession* mySess = GetSession();
         mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
@@ -28115,7 +28107,7 @@ uint8 Player::GetActiveLootPreference() const
     return 0;
 }
 
-void Player::DeactivateTalentLoadout()
+void Player::ResetCustomTalents()
 {
     for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
     {
@@ -28128,11 +28120,6 @@ void Player::DeactivateTalentLoadout()
         // should we check triggerspells?
         RemoveAura(nodeInfo->spellId);
     }
-}
-
-void Player::ResetCustomTalents()
-{
-    DeactivateTalentLoadout();
     SetFreeTalentPoints(m_usedTalentCount);
     m_usedTalentCount = 0;
     customTalents[GetCurrentTalentLoadout()].clear();
@@ -28162,7 +28149,6 @@ void Player::LearnCustomTalent(uint32 id)
     stmt->setUInt32(2, GetCurrentTalentLoadout());
     CharacterDatabase.Execute(stmt);
 }
-
 void Player::UnlearnCustomTalent(uint32 id)
 {
     if (!HasCustomTalent(id) || !IsAlive())
@@ -28236,7 +28222,6 @@ void Player::LoadCustomTalents(PreparedQueryResult result)
             customTalents[(*result)[1].GetUInt32()].push_back((*result)[0].GetUInt32());
         } while (result->NextRow());
     }
-    LoadCustomTalentLoadout();
 }
 
 bool Player::CanLearnCustomTalent(uint32 id)
@@ -28307,31 +28292,4 @@ bool Player::HasTalentWithMask(uint32 mask)
     }
 
     return foundMask;
-}
-
-void Player::SetTalentLoadout(uint32 val)
-{
-    if (val > MAX_CUSTOM_TALENT_LOADOUTS)
-        return;
-
-    DeactivateTalentLoadout();
-    currentTalentLoadout = val;
-    LoadCustomTalentLoadout();
-
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
-        stmt->setUInt32(0, GetGUID().GetCounter());
-        //stmt->setUInt8(1, m_activeSpec);
-        stmt->setUInt8(1, currentTalentLoadout);
-
-        WorldSession* mySess = GetSession();
-        mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
-            .WithPreparedCallback([mySess](PreparedQueryResult result)
-                {
-                    // safe callback, we can't pass this pointer directly
-                    // in case player logs out before db response (player would be deleted in that case)
-                    if (Player* thisPlayer = mySess->GetPlayer())
-                        thisPlayer->LoadActions(result);
-                }));
-    }
 }

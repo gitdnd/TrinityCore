@@ -4624,57 +4624,5 @@ namespace LuaPlayer
         Eluna::Push(E->L, player->GetMagicFind());
         return 1;
     }
-
-    int LearnCustomTalent(Eluna* E, Player* player)
-    {
-        uint32 node = Eluna::CHECKVAL<uint32>(E->L, 2);
-        player->LearnCustomTalent(node);
-        return 0;
-    }
-
-    int UnlearnCustomTalent(Eluna* E, Player* player)
-    {
-        uint32 node = Eluna::CHECKVAL<uint32>(E->L, 2);
-        player->UnlearnCustomTalent(node);
-        return 0;
-    }
-
-    int ResetCustomTalent(Eluna* E, Player* player)
-    {
-        player->ResetCustomTalents();
-        return 0;
-    }
-
-    int SetTalentLoadout(Eluna* E, Player* player)
-    {
-        uint32 loadout = Eluna::CHECKVAL<uint32>(E->L, 2);
-        player->SetTalentLoadout(loadout);
-        return 0;
-    }
-
-    int GetCustomTalents(Eluna* E, Player* player)
-    {
-        const std::vector<uint32> talents = player->GetCustomTalents();
-        lua_createtable(E->L, talents.size(), 0);
-        int tbl = lua_gettop(E->L);
-        uint32 i = 0;
-        for (auto itr = talents.begin(); itr != talents.end(); ++itr)
-        {
-            Eluna::Push(E->L, *itr);
-            lua_rawseti(E->L, tbl, ++i);
-        }
-        lua_settop(E->L, tbl);
-        // Dreams:
-        //Eluna::Push(E->L, player->GetCustomTalents());
-        return 1;
-    }
-
-    int CanLearnCustomTalent(Eluna* E, Player* player)
-    {
-        uint32 id = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Eluna::Push(E->L, player->CanLearnCustomTalent(id));
-        return 1;
-    }
-
 };
 #endif
