@@ -11135,17 +11135,20 @@ void ObjectMgr::LoadTalentNodes()
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
         QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
-        do
+        if (linkQuery)
         {
-            Field* fields = result->Fetch();
-            uint32 entry = fields[0].GetUInt32();
-            //if (!GetTalentNode(entry))
-            //{
-                //@todo Error
-                //continue;
-            //}
-            nodeInfo.links.push_back(entry);
-        } while (linkQuery->NextRow());
+            do
+            {
+                Field* nodeFields = linkQuery->Fetch();
+                uint32 nodeEntry = nodeFields[0].GetUInt32();
+                //if (!GetTalentNode(entry))
+                //{
+                    //@todo Error
+                    //continue;
+                //}
+                nodeInfo.links.push_back(nodeEntry);
+            } while (linkQuery->NextRow());
+        }
         //@todo Validation.
         
     } while (result->NextRow());
