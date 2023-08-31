@@ -71,7 +71,7 @@ class spell_gen_between_cast_periodic_nozcheck : public AuraScript
                 continue;
 
             // Check of player is between the caster and the target
-            if (player->IsInBetween(GetCaster(), GetTarget(), 2.f))
+            if (player->IsInBetween(GetCaster(), GetTarget(), 5.f))
                 player->CastSpell(player, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
     }
