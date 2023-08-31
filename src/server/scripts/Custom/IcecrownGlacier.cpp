@@ -27,9 +27,6 @@ class spell_icespike_glacier : public SpellScript
         // Ice Spike Visual
         target->CastSpell(target, 90522, true);
 
-        // Freeze Animation
-        target->CastSpell(target, 63354, true);
-
         auto player = target->ToPlayer();
         if (!player)
             return;
@@ -59,9 +56,6 @@ public:
             auto caster = GetCaster();
             if (!caster)
                 return;
-
-            // Freeze Animation
-            caster->RemoveAura(63354);
 
             if (auto player = caster->ToPlayer())
             {

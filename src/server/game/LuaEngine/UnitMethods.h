@@ -2318,8 +2318,7 @@ namespace LuaUnit
 #if (defined(CMANGOS) || defined(MANGOS)) && defined(WOTLK)
         unit->GetMotionMaster()->MoveJump(x, y, z, zSpeed, maxHeight, id);
 #else
-        Position pos(x, y, z, o);
-        unit->GetMotionMaster()->MoveJump(pos, zSpeed, maxHeight, id, hasOrientation);
+        unit->GetMotionMaster()->MoveJump(x, y, z, o, zSpeed, maxHeight, id, hasOrientation);
 #endif
         return 0;
     }
