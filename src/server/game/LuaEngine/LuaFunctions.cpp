@@ -800,6 +800,12 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetSubClass", &LuaPlayer::GetSubClass },
     { "IsDeveloper", &LuaPlayer::IsDeveloper },
     { "UpdateTimewalkerTabard", &LuaPlayer::UpdateTimewalkerTabard },
+    { "LearnCustomTalent", &LuaPlayer::LearnCustomTalent },
+    { "UnlearnCustomTalent", &LuaPlayer::UnlearnCustomTalent },
+    { "ResetCustomTalent", &LuaPlayer::ResetCustomTalent },
+    { "SetTalentLoadout", &LuaPlayer::SetTalentLoadout },
+    { "GetCustomTalents", &LuaPlayer::GetCustomTalents },
+    { "CanLearnCustomTalent", &LuaPlayer::CanLearnCustomTalent },
     { "GetMagicFind", &LuaPlayer::GetMagicFind },
 
     { NULL, NULL }

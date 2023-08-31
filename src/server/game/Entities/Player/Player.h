@@ -2251,8 +2251,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         int32 GetSpellPowerForSchool(SpellSchools school) { return GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + school) - GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + school); }
 
         uint32 GetCurrentTalentLoadout() { return currentTalentLoadout; }
-        void SetTalentLoadout(uint32 val) { if (val > MAX_CUSTOM_TALENT_LOADOUTS) return;  ResetCustomTalents(); currentTalentLoadout = val; LoadCustomTalentLoadout(); }
+        void SetTalentLoadout(uint32 val);
         void ResetCustomTalents();
+        void DeactivateTalentLoadout();
         void LearnCustomTalent(uint32 id);
         void UnlearnCustomTalent(uint32 id);
         uint32 GetTalentStackCount(uint32 spellId);
@@ -2261,6 +2262,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool CanLearnCustomTalent(uint32 id);
         bool HasCustomTalent(uint32 id);
         bool HasTalentWithMask(uint32 mask);
+        std::vector<uint32> GetCustomTalents() { return customTalents[GetCurrentTalentLoadout()]; }
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
