@@ -2301,6 +2301,8 @@ namespace LuaUnit
      * @param float zSpeed : start velocity
      * @param float maxHeight : maximum height
      * @param uint32 id = 0 : unique movement Id
+     * @param bool hasOrientation = false : whether to force a orientation during the jump
+     * @param float o = 0 : orientation to use if hasOrientation is true
      */
     int MoveJump(Eluna* E, Unit* unit)
     {
@@ -2310,12 +2312,14 @@ namespace LuaUnit
         float zSpeed = Eluna::CHECKVAL<float>(E->L, 5);
         float maxHeight = Eluna::CHECKVAL<float>(E->L, 6);
         uint32 id = Eluna::CHECKVAL<uint32>(E->L, 7, 0);
+        bool hasOrientation = Eluna::CHECKVAL<bool>(E->L, 8, false);
+        float o = Eluna::CHECKVAL<float>(E->L, 9, 0);
 
 #if (defined(CMANGOS) || defined(MANGOS)) && defined(WOTLK)
         unit->GetMotionMaster()->MoveJump(x, y, z, zSpeed, maxHeight, id);
 #else
-        Position pos(x, y, z);
-        unit->GetMotionMaster()->MoveJump(pos, zSpeed, maxHeight, id);
+        Position pos(x, y, z, o);
+        unit->GetMotionMaster()->MoveJump(pos, zSpeed, maxHeight, id, hasOrientation);
 #endif
         return 0;
     }
