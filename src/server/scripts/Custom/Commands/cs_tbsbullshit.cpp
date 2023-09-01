@@ -30,6 +30,7 @@ public:
             { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
             { "cheatspells", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleToggleCheatSpells, "" },
             { "debugstats", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
+            { "settalentloadout", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
         };
         return tbsBullshitCommandTable;
     }
@@ -128,6 +129,19 @@ public:
             handler->PSendSysMessage("Bonus Spell School Damage Pct %u, %f", i, player->GetBonusSchoolModifierPct(SpellSchools(i)));
         }
         return true;
+    }
+
+    static bool HandleDebugSetTalentLoadout(ChatHandler* handler, char const* args)
+    {
+        uint32 loadout = 1;
+        if (*args)
+            loadout = atoi(args);
+
+        if (loadout >= MAX_CUSTOM_TALENT_LOADOUTS)
+            loadout = MAX_CUSTOM_TALENT_LOADOUTS;
+
+        Player * p = handler->getSelectedPlayerOrSelf();
+        p->SetTalentLoadout(loadout);
     }
 };
 
