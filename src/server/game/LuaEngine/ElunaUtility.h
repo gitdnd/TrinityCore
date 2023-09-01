@@ -49,10 +49,12 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
 {
     //if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
     //{
-        std::ostringstream str;
+        /*std::ostringstream str;
         str << "DiscordScriptError.exe";
         str << " \"" << Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...) << "\" &";
-        std::system(str.str().c_str());
+        std::system(str.str().c_str());*/
+        spawnl(P_NOWAITO, "DiscordScriptError.exe",
+            "child.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), NULL);
     //}
     //std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");
     //ShellExecute(NULL, "open", "C:\\HoT\\Development\\Server\\DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
