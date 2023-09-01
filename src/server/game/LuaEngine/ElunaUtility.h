@@ -53,7 +53,8 @@ inline void sendWebhook(Format&& fmt, Args&&... args)
         str << "DiscordScriptError.exe";
         str << " \"" << Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...) << "\" &";
         std::system(str.str().c_str());*/
-        spawnl(P_NOWAITO, "DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), NULL);
+        std::string fargs = Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        spawnl(P_NOWAITO, "DiscordScriptError.exe", fargs.c_str(), NULL);
     //}
     //std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");
     //ShellExecute(NULL, "open", "C:\\HoT\\Development\\Server\\DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
