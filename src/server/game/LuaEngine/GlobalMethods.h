@@ -3289,7 +3289,45 @@ namespace LuaGlobalFunctions
 
     int GetCustomTalentStorage(Eluna* E)
     {
-        lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
+        lua_newtable(E->L);
+        for (auto const& itr : sObjectMgr->GetTalentNodeStore())
+        {
+            // use index as subtable key
+            lua_pushnumber(E->L, itr.second.Index);
+
+            // create subtable
+            lua_newtable(E->L);
+
+            // push key 1 and value, n...
+            lua_pushnumber(E->L, 1);
+            lua_pushnumber(E->L, itr.second.spellId);
+
+            lua_pushnumber(E->L, 2);
+            lua_pushnumber(E->L, itr.second.xOffset);
+
+            lua_pushnumber(E->L, 3);
+            lua_pushnumber(E->L, itr.second.yOffset);
+
+            lua_pushnumber(E->L, 4);
+            lua_pushnumber(E->L, itr.second.Mutex);
+
+            lua_pushnumber(E->L, 5);
+            lua_pushnumber(E->L, itr.second.buttonType);
+
+            lua_pushnumber(E->L, 6);
+            lua_pushnumber(E->L, itr.second.flagMask);
+
+            lua_pushnumber(E->L, 7);
+            lua_pushstring(E->L, itr.second.link_str.c_str());
+
+            // set the subtable
+            lua_settable(E->L, -15);
+
+            // set the main table
+            lua_settable(E->L, -3);
+        }
+
+        /*lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
         int tbl = lua_gettop(E->L);
         uint32 i = 0;
         for (auto const& itr : sObjectMgr->GetTalentNodeStore())
@@ -3302,7 +3340,7 @@ namespace LuaGlobalFunctions
             Eluna::Push(E->L, itr.second.buttonType);
             Eluna::Push(E->L, itr.second.flagMask);
             Eluna::Push(E->L, itr.second.link_str.c_str());
-            /*lua_createtable(E->L, itr.second.links.size(), 0);
+            lua_createtable(E->L, itr.second.links.size(), 0);
             int tbl2 = lua_gettop(E->L);
             uint32 i2 = 0;
             for (auto const& itr2 : itr.second.links)
@@ -3310,10 +3348,10 @@ namespace LuaGlobalFunctions
                 Eluna::Push(E->L, itr2);
                 lua_rawseti(E->L, tbl2, ++i2);
             }
-            lua_settop(E->L, tbl2);*/
+            lua_settop(E->L, tbl2);
             lua_rawseti(E->L, tbl, ++i);
         }
-        lua_settop(E->L, tbl);
+        lua_settop(E->L, tbl);*/
         return 1;
     }
 
