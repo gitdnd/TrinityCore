@@ -3294,16 +3294,16 @@ namespace LuaGlobalFunctions
         for (auto const& itr : sObjectMgr->GetTalentNodeStore())
         {
             // use index as subtable key
-            lua_pushnumber(L, itr.second.Index);
+            Eluna::Push(E->L, itr.second.Index);
             lua_settable(L, -2);
             lua_newtable(L);
-            lua_pushnumber(L, itr.second.spellId);
-            lua_pushnumber(L, itr.second.xOffset);
-            lua_pushnumber(L, itr.second.yOffset);
-            lua_pushnumber(L, itr.second.Mutex);
-            lua_pushnumber(L, itr.second.buttonType);
-            lua_pushnumber(L, itr.second.flagMask);
-            lua_pushstring(L, itr.second.link_str.c_str());
+            Eluna::Push(E->L, itr.second.spellId);
+            Eluna::Push(E->L, itr.second.xOffset);
+            Eluna::Push(E->L, itr.second.yOffset);
+            Eluna::Push(E->L, itr.second.Mutex);
+            Eluna::Push(E->L, itr.second.buttonType);
+            Eluna::Push(E->L, itr.second.flagMask);
+            Eluna::Push(E->L, itr.second.link_str.c_str());
             lua_settable(L, -9);
         }
 
