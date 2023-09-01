@@ -3289,64 +3289,48 @@ namespace LuaGlobalFunctions
 
     int GetCustomTalentStorage(Eluna* E)
     {
-        lua_newtable(E->L);
+        lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
+
+        int maintable = lua_gettop(E->L);
+        int maintable_index = 0;
+
         for (auto const& itr : sObjectMgr->GetTalentNodeStore())
         {
-            // use index as subtable key
+            lua_createtable(E->L, 8, 0); // 8 being the number of values in the inner table
+            int subtable = lua_gettop(E->L);
+
+            // Push each value with correct method
+            // and set them to table with rawseti to correct index
             lua_pushnumber(E->L, itr.second.Index);
+            lua_rawseti(E->L, subtable, 1);
 
-            // create subtable
-            lua_newtable(E->L);
-
-            // push key 1 and value, n...
             lua_pushnumber(E->L, itr.second.spellId);
+            lua_rawseti(E->L, subtable, 2);
+
             lua_pushnumber(E->L, itr.second.xOffset);
+            lua_rawseti(E->L, subtable, 3);
+
             lua_pushnumber(E->L, itr.second.yOffset);
+            lua_rawseti(E->L, subtable, 4);
+
             lua_pushnumber(E->L, itr.second.Mutex);
+            lua_rawseti(E->L, subtable, 5);
+
             lua_pushnumber(E->L, itr.second.buttonType);
+            lua_rawseti(E->L, subtable, 6);
+
             lua_pushnumber(E->L, itr.second.flagMask);
+            lua_rawseti(E->L, subtable, 7);
+
             lua_pushstring(E->L, itr.second.link_str.c_str());
+            lua_rawseti(E->L, subtable, 8);
 
-            lua_rawseti(E->L, -8, 7);
-            lua_rawseti(E->L, -7, 6);
-            lua_rawseti(E->L, -6, 5);
-            lua_rawseti(E->L, -5, 4);
-            lua_rawseti(E->L, -4, 3);
-            lua_rawseti(E->L, -3, 2);
-            lua_rawseti(E->L, -2, 1);
-
-            // set the subtable
-            lua_settable(E->L, -5);
-
-            // set the main table
-            lua_settable(E->L, -3);
+            // Push the table itself to maintable
+            lua_rawseti(E->L, maintable, ++maintable_index);
         }
 
-        /*lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
-        int tbl = lua_gettop(E->L);
-        uint32 i = 0;
-        for (auto const& itr : sObjectMgr->GetTalentNodeStore())
-        {
-            Eluna::Push(E->L, itr.second.Index);
-            Eluna::Push(E->L, itr.second.spellId);
-            Eluna::Push(E->L, itr.second.xOffset);
-            Eluna::Push(E->L, itr.second.yOffset);
-            Eluna::Push(E->L, itr.second.Mutex);
-            Eluna::Push(E->L, itr.second.buttonType);
-            Eluna::Push(E->L, itr.second.flagMask);
-            Eluna::Push(E->L, itr.second.link_str.c_str());
-            lua_createtable(E->L, itr.second.links.size(), 0);
-            int tbl2 = lua_gettop(E->L);
-            uint32 i2 = 0;
-            for (auto const& itr2 : itr.second.links)
-            {
-                Eluna::Push(E->L, itr2);
-                lua_rawseti(E->L, tbl2, ++i2);
-            }
-            lua_settop(E->L, tbl2);
-            lua_rawseti(E->L, tbl, ++i);
-        }
-        lua_settop(E->L, tbl);*/
+        lua_settop(E->L, maintable); // make the maintable to be the top of the stack
+        // We could also just push it here to the stack as the last step
         return 1;
     }
 
