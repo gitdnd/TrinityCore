@@ -3292,41 +3292,38 @@ namespace LuaGlobalFunctions
         lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
 
         int maintable = lua_gettop(E->L);
-        int maintable_index = 0;
+        //int maintable_index = 0;
 
         for (auto const& itr : sObjectMgr->GetTalentNodeStore())
         {
-            lua_createtable(E->L, 8, 0); // 8 being the number of values in the inner table
+            lua_createtable(E->L, 7, 0); // 8 being the number of values in the inner table
             int subtable = lua_gettop(E->L);
 
             // Push each value with correct method
             // and set them to table with rawseti to correct index
-            lua_pushnumber(E->L, itr.second.Index);
+            lua_pushnumber(E->L, itr.second.spellId);
             lua_rawseti(E->L, subtable, 1);
 
-            lua_pushnumber(E->L, itr.second.spellId);
+            lua_pushnumber(E->L, itr.second.xOffset);
             lua_rawseti(E->L, subtable, 2);
 
-            lua_pushnumber(E->L, itr.second.xOffset);
+            lua_pushnumber(E->L, itr.second.yOffset);
             lua_rawseti(E->L, subtable, 3);
 
-            lua_pushnumber(E->L, itr.second.yOffset);
+            lua_pushnumber(E->L, itr.second.Mutex);
             lua_rawseti(E->L, subtable, 4);
 
-            lua_pushnumber(E->L, itr.second.Mutex);
+            lua_pushnumber(E->L, itr.second.buttonType);
             lua_rawseti(E->L, subtable, 5);
 
-            lua_pushnumber(E->L, itr.second.buttonType);
+            lua_pushnumber(E->L, itr.second.flagMask);
             lua_rawseti(E->L, subtable, 6);
 
-            lua_pushnumber(E->L, itr.second.flagMask);
+            lua_pushstring(E->L, itr.second.link_str.c_str());
             lua_rawseti(E->L, subtable, 7);
 
-            lua_pushstring(E->L, itr.second.link_str.c_str());
-            lua_rawseti(E->L, subtable, 8);
-
             // Push the table itself to maintable
-            lua_rawseti(E->L, maintable, ++maintable_index);
+            lua_rawseti(E->L, maintable, itr.second.Index);
         }
 
         lua_settop(E->L, maintable); // make the maintable to be the top of the stack
