@@ -3301,7 +3301,8 @@ namespace LuaGlobalFunctions
             Eluna::Push(E->L, itr.second.Mutex);
             Eluna::Push(E->L, itr.second.buttonType);
             Eluna::Push(E->L, itr.second.flagMask);
-            lua_createtable(E->L, itr.second.links.size(), 0);
+            Eluna::Push(E->L, itr.second.link_str);
+            /*lua_createtable(E->L, itr.second.links.size(), 0);
             int tbl2 = lua_gettop(E->L);
             uint32 i2 = 0;
             for (auto const& itr2 : itr.second.links)
@@ -3309,7 +3310,7 @@ namespace LuaGlobalFunctions
                 Eluna::Push(E->L, itr2);
                 lua_rawseti(E->L, tbl2, ++i2);
             }
-            lua_settop(E->L, tbl2);
+            lua_settop(E->L, tbl2);*/
             lua_rawseti(E->L, tbl, ++i);
         }
         lua_settop(E->L, tbl);

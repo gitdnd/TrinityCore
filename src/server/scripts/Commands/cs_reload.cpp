@@ -1248,11 +1248,7 @@ public:
     {
         if (!*args)
         {
-            if (handler->GetSession())
-            {
-                sElunaLoader->LoadScripts();
-                sMapMgr->ReloadEluna(handler->GetSession()->GetPlayer()->GetMapId());
-            }
+            sMapMgr->ReloadEluna(handler->GetSession() ? handler->GetSession()->GetPlayer()->GetMapId() : -1);
         }
         else if (args == "all")
         {

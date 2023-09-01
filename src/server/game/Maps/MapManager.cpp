@@ -408,9 +408,9 @@ void MapManager::ReloadEluna(int32 mapId)
         if (map->GetEluna())
         {
             bool shouldReload = false;
-            if (mapId >= 0 && uint32(mapId) == itr->first)
+            if (mapId <= -1)// all case
                 shouldReload = true;
-            else if(mapId <= -1)// all case
+            else if (mapId >= 0 && uint32(mapId) == itr->first)
                 shouldReload = true;
 
             if (!shouldReload)

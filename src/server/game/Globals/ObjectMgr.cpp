@@ -11134,11 +11134,19 @@ void ObjectMgr::LoadTalentNodes()
         nodeInfo.Mutex = fields[4].GetUInt32();
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
+        nodeInfo.link_str = "";
         QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
         if (linkQuery)
         {
+            std::stringstream ss;
+            bool firstLink = true;
             do
             {
+                if (!firstLink)
+                    ss << ",";
+                else
+                    firstLink = false;
+
                 Field* nodeFields = linkQuery->Fetch();
                 uint32 nodeEntry = nodeFields[0].GetUInt32();
                 //if (!GetTalentNode(entry))
@@ -11146,8 +11154,10 @@ void ObjectMgr::LoadTalentNodes()
                     //@todo Error
                     //continue;
                 //}
+                ss << nodeEntry;
                 nodeInfo.links.push_back(nodeEntry);
             } while (linkQuery->NextRow());
+            nodeInfo.link_str = ss.str().c_str();
         }
         //@todo Validation.
         
