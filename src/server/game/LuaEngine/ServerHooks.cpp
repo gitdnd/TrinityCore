@@ -293,11 +293,14 @@ void Eluna::OnWorldUpdate(uint32 diff)
     CallAllFunctions(ServerEventBindings, key);
     if (reloadEluna)
     {
+        eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] WorldUpdate reloadEluna: True");
         if(!GetQueryProcessor().HasPendingCallbacks())
             _ReloadEluna();
         else
             eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Delayed reloading state for Map: %i", boundMapId).c_str());
     }
+    else
+        eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] WorldUpdate reloadEluna: False");
 }
 
 void Eluna::OnStartup()
@@ -354,11 +357,14 @@ void Eluna::OnUpdate(Map* map, uint32 diff)
     CallAllFunctions(ServerEventBindings, key);
     if (reloadEluna)
     {
+        eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] MapUpdate reloadEluna: True");
         if (!GetQueryProcessor().HasPendingCallbacks())
             _ReloadEluna();
         else
             eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Delayed reloading state for Map: %i", boundMapId).c_str());
     }
+    else
+        eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] MapUpdate reloadEluna: False");
 }
 
 void Eluna::OnRemove(GameObject* gameobject)

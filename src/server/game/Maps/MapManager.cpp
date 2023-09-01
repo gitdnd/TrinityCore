@@ -416,9 +416,7 @@ void MapManager::ReloadEluna(int32 mapId)
 
             sWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] ReloadEluna Map Called: %u, %s", itr->first, shouldReload ? "yes" : "no").c_str());
 
-            if (!shouldReload)
-                continue;
-            map->GetEluna()->reloadEluna = true;
+            map->GetEluna()->reloadEluna = shouldReload;
             // Only if each instance gets a state.
 
             if (!map->Instanceable())
