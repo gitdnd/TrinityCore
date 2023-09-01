@@ -348,13 +348,18 @@ void Eluna::OnPlayerLeave(Map* map, Player* player)
 
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] OnUpdate");
     eventMgr->globalProcessor->Update(diff);
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] Post Processor Update");
     GetQueryProcessor().ProcessReadyCallbacks();
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] Post Query Update");
 
     START_HOOK(MAP_EVENT_ON_UPDATE);
     Push(map);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
+    eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] Post Update Push");
+
     if (reloadEluna)
     {
         eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] MapUpdate reloadEluna: True");
