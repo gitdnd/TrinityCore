@@ -3304,7 +3304,7 @@ namespace LuaGlobalFunctions
             lua_pushnumber(L, itr.second.buttonType);
             lua_pushnumber(L, itr.second.flagMask);
             lua_pushstring(L, itr.second.link_str.c_str());
-            lua_settable(L, -10);
+            lua_settable(L, -9);
         }
 
         /*lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
