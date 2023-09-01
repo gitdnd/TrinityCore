@@ -3301,7 +3301,7 @@ namespace LuaGlobalFunctions
             Eluna::Push(E->L, itr.second.Mutex);
             Eluna::Push(E->L, itr.second.buttonType);
             Eluna::Push(E->L, itr.second.flagMask);
-            Eluna::Push(E->L, itr.second.link_str);
+            Eluna::Push(E->L, itr.second.link_str.c_str());
             /*lua_createtable(E->L, itr.second.links.size(), 0);
             int tbl2 = lua_gettop(E->L);
             uint32 i2 = 0;
