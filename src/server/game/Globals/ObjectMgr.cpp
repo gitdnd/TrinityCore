@@ -11159,6 +11159,16 @@ void ObjectMgr::LoadTalentNodes()
             } while (linkQuery->NextRow());
             nodeInfo.link_str = ss.str().c_str();
         }
+        QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
+        if (parentLinkQuery)
+        {
+            do
+            {
+                Field* parentNodeFields = parentLinkQuery->Fetch();
+                uint32 parentNodeEntry = parentNodeFields[0].GetUInt32();
+                nodeInfo.parent_links.push_back(parentNodeEntry);
+            } while (parentLinkQuery->NextRow());
+        }
         //@todo Validation.
         
     } while (result->NextRow());

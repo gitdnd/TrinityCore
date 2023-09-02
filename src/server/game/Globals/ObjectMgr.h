@@ -949,6 +949,7 @@ struct TalentNodeInfo
     uint32 flagMask;
     std::string link_str;
     std::vector<uint32> links;
+    std::vector<uint32> parent_links;
 };
 typedef std::unordered_map<uint32, TalentNodeInfo> TalentNodeContainer;
 
