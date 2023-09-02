@@ -405,23 +405,22 @@ void MapManager::ReloadEluna(int32 mapId)
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         Map* map = itr->second;
-        
-        if (map->GetEluna())
+        bool shouldReload = false;
+
+        if (mapId <= -1)// all case
+            shouldReload = true;
+        else if (mapId >= 0 && uint32(mapId) == itr->first)
+            shouldReload = true;
+
+        if (shouldReload)
         {
-            bool shouldReload = false;
-            if (mapId <= -1)// all case
-                shouldReload = true;
-            else if (mapId >= 0 && uint32(mapId) == itr->first)
-                shouldReload = true;
-
-            sWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] ReloadEluna Map Called: %u, %s", itr->first, shouldReload ? "yes" : "no").c_str());
-
-            map->GetEluna()->reloadEluna = shouldReload;
-            // Only if each instance gets a state.
+            if (map->GetEluna())
+                map->GetEluna()->reloadEluna = true;
 
             if (!map->Instanceable())
                 continue;
 
+            // Only if each instance gets a state.
             MapInstanced::InstancedMaps& maps = ((MapInstanced*)map)->GetInstancedMaps();
             for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
             {
