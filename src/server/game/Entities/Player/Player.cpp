@@ -28243,28 +28243,28 @@ void Player::LoadCustomTalents(PreparedQueryResult result)
     LoadCustomTalentLoadout();
 }
 
-bool Player::CanLearnCustomTalent(uint32 id)
+uint8 Player::CanLearnCustomTalent(uint32 id)
 {
     //@todo provide reason for ui feedback?
     if (GetFreeTalentPoints() <= 0)
-        return false;
+        return TALENT_RRESPONSE_NOT_ENOUGH_POINTS;
 
     if (!IsAlive())
-        return false;
+        return TALENT_RESPONSE_NOT_ALIVE;
 
     if (HasCustomTalent(id))
-        return false;
+        return TALENT_RESPONSE_ALREADY_LEARNED;
 
     const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
 
     if (!nodeInfo) // No.
-        return false;
+        return TALENT_RESPONSE_NO_NODE_INFO;
 
     if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
-        return false;
+        return TALENT_RESPONSE_SPELL_NOT_FOUND;
 
     if ((nodeInfo->flagMask & 1))
-        return false;
+        return TALENT_RESPONSE_TALENT_HIDDEN;
 
     if (!(nodeInfo->flagMask & 4) && !nodeInfo->parent_links.empty())
     {
@@ -28287,15 +28287,15 @@ bool Player::CanLearnCustomTalent(uint32 id)
         }
 
         if (!foundLink)
-            return false;
+            return TALENT_RESPONSE_NO_LINK;
     }
     else
     {
         if (HasTalentWithMask(4))
-            return false;
+            return TALENT_RESPONSE_SPELL_NOT_FOUND;
     }
 
-    return true;
+    return TALENT_REPONSE_OKAY;
 }
 
 bool Player::HasCustomTalent(uint32 id)
