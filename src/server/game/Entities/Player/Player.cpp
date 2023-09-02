@@ -28262,7 +28262,7 @@ bool Player::CanLearnCustomTalent(uint32 id)
     if ((nodeInfo->flagMask & 1))
         return false;
 
-    if (!(nodeInfo->flagMask & 4))
+    if (!(nodeInfo->flagMask & 4) && !nodeInfo->parent_links.empty())
     {
         bool foundLink = false;
         for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
