@@ -28138,7 +28138,7 @@ void Player::ResetCustomTalents()
     customTalents[GetCurrentTalentLoadout()].clear();
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT);
     stmt->setUInt32(0, GetGUID().GetCounter());
-    stmt->setUInt32(2, GetCurrentTalentLoadout());
+    stmt->setUInt32(1, GetCurrentTalentLoadout());
     CharacterDatabase.Execute(stmt);
 }
 
