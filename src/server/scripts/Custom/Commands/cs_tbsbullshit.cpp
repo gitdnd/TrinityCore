@@ -30,7 +30,7 @@ public:
             { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
             { "cheatspells", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleToggleCheatSpells, "" },
             { "debugstats", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
-            { "settalentloadout", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
+            { "settalentloadout", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugSetTalentLoadout, "" },
             { "learncustomtalent", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugLearnTalent, "" },
         };
         return tbsBullshitCommandTable;
@@ -170,6 +170,8 @@ public:
                 p->LearnCustomTalent(nodeEntry);
                 handler->PSendSysMessage("Learned node %u", nodeEntry);
             }
+            else
+                handler->PSendSysMessage("Invalid node %u", nodeEntry);
         }
         return true;
     }
