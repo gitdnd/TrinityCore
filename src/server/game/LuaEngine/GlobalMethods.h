@@ -3292,7 +3292,6 @@ namespace LuaGlobalFunctions
         lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
 
         int maintable = lua_gettop(E->L);
-        //int maintable_index = 0;
 
         for (auto const& itr : sObjectMgr->GetTalentNodeStore())
         {
@@ -3310,16 +3309,24 @@ namespace LuaGlobalFunctions
             lua_pushnumber(E->L, itr.second.yOffset);
             lua_rawseti(E->L, subtable, 3);
 
-            lua_pushnumber(E->L, itr.second.Mutex);
+            // Create links subtable
+            lua_createtable(E->L, itr.second.links.size(), 0);
+            int linktable = lua_gettop(E->L);
+            uint32 i = 0;
+            for (auto const& itrr : itr.second.links)
+            {
+                lua_pushnumber(E->L, itrr);
+                lua_rawseti(E->L, linktable, ++i);
+            }
             lua_rawseti(E->L, subtable, 4);
 
-            lua_pushnumber(E->L, itr.second.buttonType);
+            lua_pushnumber(E->L, itr.second.Mutex);
             lua_rawseti(E->L, subtable, 5);
 
-            lua_pushnumber(E->L, itr.second.flagMask);
+            lua_pushnumber(E->L, itr.second.buttonType);
             lua_rawseti(E->L, subtable, 6);
 
-            lua_pushstring(E->L, itr.second.link_str.c_str());
+            lua_pushnumber(E->L, itr.second.flagMask);
             lua_rawseti(E->L, subtable, 7);
 
             // Push the table itself to maintable
