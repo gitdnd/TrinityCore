@@ -28275,6 +28275,16 @@ bool Player::CanLearnCustomTalent(uint32 id)
             if (foundLink)
                 break;
         }
+        
+        if (!foundLink)
+        {
+            for (auto itr = nodeInfo->links.begin(); itr != nodeInfo->links.end(); ++itr)
+            {
+                foundLink = HasCustomTalent(*itr);
+                if (foundLink)
+                    break;
+            }
+        }
 
         if (!foundLink)
             return false;
