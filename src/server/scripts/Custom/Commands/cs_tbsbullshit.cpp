@@ -151,10 +151,11 @@ public:
         if (!args)
             return false;
 
-        Player* p = handler->GetSession()->GetPlayer();
+        Player* p = handler->getSelectedPlayerOrSelf();
 
-        if (args == "all")
+        if (std::string((char*)args) == "all")
         {
+            p = handler->GetSession()->GetPlayer(); // we are not supporting learn all on remote players.
             for (auto const& itr : sObjectMgr->GetTalentNodeStore())
             {
                 p->LearnCustomTalent(itr.first);

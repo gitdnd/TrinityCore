@@ -1251,7 +1251,7 @@ public:
             sElunaLoader->LoadScripts();
             sMapMgr->ReloadEluna(handler->GetSession() ? handler->GetSession()->GetPlayer()->GetMapId() : -1);
         }
-        else if (args == "all")
+        else if (std::string((char*)args) == "all")
         {
             sElunaLoader->LoadScripts();
             sMapMgr->ReloadEluna(-1);
