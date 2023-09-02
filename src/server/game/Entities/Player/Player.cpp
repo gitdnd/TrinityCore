@@ -28139,6 +28139,7 @@ void Player::ResetCustomTalents()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT);
     stmt->setUInt32(0, GetGUID().GetCounter());
     stmt->setUInt32(2, GetCurrentTalentLoadout());
+    CharacterDatabase.Execute(stmt);
 }
 
 void Player::LearnCustomTalent(uint32 id)
