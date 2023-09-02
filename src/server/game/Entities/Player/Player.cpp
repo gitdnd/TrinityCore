@@ -28133,9 +28133,12 @@ void Player::DeactivateTalentLoadout()
 void Player::ResetCustomTalents()
 {
     DeactivateTalentLoadout();
-    SetFreeTalentPoints(m_usedTalentCount);
-    m_usedTalentCount = 0;
+    m_usedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    InitTalentForLevel();
     customTalents[GetCurrentTalentLoadout()].clear();
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(2, GetCurrentTalentLoadout());
 }
 
 void Player::LearnCustomTalent(uint32 id)
@@ -28317,6 +28320,8 @@ void Player::SetTalentLoadout(uint32 val)
     DeactivateTalentLoadout();
     currentTalentLoadout = val;
     LoadCustomTalentLoadout();
+    m_usedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    InitTalentForLevel();
 
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);

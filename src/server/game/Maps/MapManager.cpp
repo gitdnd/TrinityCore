@@ -397,7 +397,6 @@ void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
 
 void MapManager::ReloadEluna(int32 mapId)
 {
-    sWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] ReloadEluna Called: %i", mapId).c_str());
     // Reloads the global Eluna state
     if(mapId == -1)
         sWorld->GetEluna()->reloadEluna = true;

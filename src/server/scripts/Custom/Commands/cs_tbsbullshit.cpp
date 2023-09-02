@@ -31,6 +31,7 @@ public:
             { "cheatspells", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleToggleCheatSpells, "" },
             { "debugstats", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
             { "settalentloadout", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
+            { "learncustomtalent", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugLearnTalent, "" },
         };
         return tbsBullshitCommandTable;
     }
@@ -142,6 +143,35 @@ public:
 
         Player * p = handler->getSelectedPlayerOrSelf();
         p->SetTalentLoadout(loadout);
+        return true;
+    }
+
+    static bool HandleDebugLearnTalent(ChatHandler* handler, char const* args)
+    {
+        if (!args)
+            return false;
+
+        Player* p = handler->GetSession()->GetPlayer();
+
+        if (args == "all")
+        {
+            for (auto const& itr : sObjectMgr->GetTalentNodeStore())
+            {
+                p->LearnCustomTalent(itr.first);
+                handler->PSendSysMessage("Learned node %u", itr.first);
+            }
+
+        }
+        else
+        {
+            uint32 nodeEntry = atoi(args);
+            if (sObjectMgr->GetTalentNode(nodeEntry))
+            {
+                p->LearnCustomTalent(nodeEntry);
+                handler->PSendSysMessage("Learned node %u", nodeEntry);
+            }
+        }
+        return true;
     }
 };
 

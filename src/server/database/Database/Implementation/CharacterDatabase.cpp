@@ -637,6 +637,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_NUM_TALENTS_FREE, "SELECT COUNT(*) FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CUSTOM_TALENTS, "SELECT node_index, loadout FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_CUSTOM_TALENTS, "DELETE FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT, "DELETE FROM player_talents WHERE guid = ? AND loadout = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_BY_LOADOUT, "DELETE FROM player_talents WHERE guid = ? AND node_index = ? AND loadout = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_CHAR_CUSTOM_TALENT, "INSERT INTO player_talents (guid, node_index, loadout) VALUES (?, ?, ?)", CONNECTION_ASYNC);
 }
