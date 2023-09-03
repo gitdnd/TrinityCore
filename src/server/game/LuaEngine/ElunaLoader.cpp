@@ -219,7 +219,6 @@ std::vector<unsigned char> ConvertToBytecode(const char* luaScript)
             auto& bytecode = *static_cast<std::vector<unsigned char>*>(data);
             const unsigned char* pBytes = static_cast<const unsigned char*>(p);
             bytecode.insert(bytecode.end(), pBytes, pBytes + size);
-            return 0;
             }, &bytecode);
     }
     else
