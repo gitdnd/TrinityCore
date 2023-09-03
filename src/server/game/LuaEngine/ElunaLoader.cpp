@@ -204,7 +204,7 @@ bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
     return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
 }
 
-std::vector<unsigned char> ConvertToBytecode(const char* luaScript)
+std::vector<unsigned char> ElunaLoader::ConvertToBytecode(const char* luaScript)
 {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);

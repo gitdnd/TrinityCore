@@ -27,6 +27,7 @@ public:
     void AddScriptPath(std::string filename, const std::string& fullpath, int32 mapId);
     void CombineLists();
     bool ShouldMapLoadEluna(uint32 mapId);
+    std::vector<unsigned char> ConvertToBytecode(const char* luaScript);
 
     // Lua script folder path
     std::string lua_folderpath;
