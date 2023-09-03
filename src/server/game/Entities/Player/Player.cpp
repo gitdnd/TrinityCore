@@ -28258,10 +28258,18 @@ uint8 Player::CanLearnCustomTalent(uint32 id)
     const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
 
     if (!nodeInfo) // No.
+    {
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+            ChatHandler(GetSession()).PSendSysMessage("Invalid node id %u", nodeInfo->nodeInfo);
         return TALENT_RESPONSE_NO_NODE_INFO;
+    }
 
     if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+    {
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+            ChatHandler(GetSession()).PSendSysMessage("Invalid spell id %u", nodeInfo->spellId);
         return TALENT_RESPONSE_SPELL_NOT_FOUND;
+    }
 
     if ((nodeInfo->flagMask & 1))
         return TALENT_RESPONSE_TALENT_HIDDEN;
