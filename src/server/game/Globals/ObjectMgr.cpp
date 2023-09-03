@@ -11233,3 +11233,19 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
         } while (parentLinkQuery->NextRow());
     }
 }
+
+void ObjectMgr::DeleteTalentNodeEntry(uint32 node)
+{
+    auto size = _talentNodeStore.size();
+    for (TalentNodeContainer::iterator& itr = _talentNodeStore.begin(); itr != _talentNodeStore.end();)
+    {
+        if (itr->first == node)
+        {
+            _talentNodeStore.erase(itr++);
+            _talentNodeStore.rehash(size - 1);
+            break;
+        }
+        else
+            ++itr;
+    }
+}

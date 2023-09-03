@@ -3289,11 +3289,11 @@ namespace LuaGlobalFunctions
 
     int GetCustomTalentStorage(Eluna* E)
     {
-        lua_createtable(E->L, sObjectMgr->GetTalentNodeStore().size(), 0);
+        lua_createtable(E->L, eObjectMgr->GetTalentNodeStore().size(), 0);
 
         int maintable = lua_gettop(E->L);
 
-        for (auto const& itr : sObjectMgr->GetTalentNodeStore())
+        for (auto const& itr : eObjectMgr->GetTalentNodeStore())
         {
             lua_createtable(E->L, 7, 0); // 8 being the number of values in the inner table
             int subtable = lua_gettop(E->L);
@@ -3341,7 +3341,7 @@ namespace LuaGlobalFunctions
     int GetCustomTalent(Eluna* E)
     {
         uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
-        TalentNodeInfo const* nodeInfo = sObjectMgr->GetTalentNode(entry);
+        TalentNodeInfo const* nodeInfo = eObjectMgr->GetTalentNode(entry);
         if (!nodeInfo)
             return luaL_argerror(E->L, 2, "valid talent node index expected");
 
@@ -3367,7 +3367,14 @@ namespace LuaGlobalFunctions
     int LoadCustomTalentNode(Eluna* E)
     {
         uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
-        sObjectMgr->LoadTalentNodeEntry(entry);
+        eObjectMgr->LoadTalentNodeEntry(entry);
+        return 0;
+    }
+
+    int DeleteTalentNodeBecauseFoeisAMadMan(Eluna* E)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        eObjectMgr->DeleteTalentNodeEntry(entry);
         return 0;
     }
 }

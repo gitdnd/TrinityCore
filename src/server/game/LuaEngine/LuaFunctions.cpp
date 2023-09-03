@@ -151,6 +151,7 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "GetCustomTalentStorage", &LuaGlobalFunctions::GetCustomTalentStorage },
     { "GetCustomTalent", &LuaGlobalFunctions::GetCustomTalent },
     { "LoadCustomTalentNode", &LuaGlobalFunctions::LoadCustomTalentNode },
+    { "DeleteCustomTalentNode", &LuaGlobalFunctions::DeleteTalentNodeBecauseFoeisAMadMan },
 
 
     { NULL, NULL }
