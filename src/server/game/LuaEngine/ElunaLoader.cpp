@@ -173,7 +173,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filepath = fullpath;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
     script.filedata = content;
-    script.bytecode = ConvertToBytecode(content.c_str());
+    //script.bytecode = ConvertToBytecode(content.c_str());
     script.mapId = mapId;
 
     if (extension)
@@ -204,7 +204,7 @@ bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
     return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
 }
 
-std::vector<unsigned char> ConvertToBytecode(const char* luaScript)
+std::vector<unsigned char> ElunaLoader::ConvertToBytecode(const char* luaScript)
 {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
@@ -216,9 +216,9 @@ std::vector<unsigned char> ConvertToBytecode(const char* luaScript)
     if (result == LUA_OK)
     {
         result = lua_dump(L, [](lua_State*, const void* p, size_t size, void* data) {
-            auto& bytecode = *static_cast<std::vector<unsigned char>*>(data);
-            const unsigned char* pBytes = static_cast<const unsigned char*>(p);
-            bytecode.insert(bytecode.end(), pBytes, pBytes + size);
+            std::string* bytecode = static_cast<std::string*>(data);
+            bytecode->assign(static_cast<const char*>(p), size);
+            return 0;
             }, &bytecode);
     }
     else
