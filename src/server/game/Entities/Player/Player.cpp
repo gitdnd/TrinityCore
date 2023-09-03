@@ -28274,23 +28274,30 @@ uint8 Player::CanLearnCustomTalent(uint32 id)
     if ((nodeInfo->flagMask & 1))
         return TALENT_RESPONSE_TALENT_HIDDEN;
 
-    if (!(nodeInfo->flagMask & 4) && !nodeInfo->parent_links.empty())
+    if (!(nodeInfo->flagMask & 4))
     {
         bool foundLink = false;
-        for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
+
+        if (!nodeInfo->parent_links.empty())
         {
-            foundLink = HasCustomTalent(*itr);
-            if (foundLink)
-                break;
-        }
-        
-        if (!foundLink)
-        {
-            for (auto itr = nodeInfo->links.begin(); itr != nodeInfo->links.end(); ++itr)
+            for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
             {
                 foundLink = HasCustomTalent(*itr);
                 if (foundLink)
                     break;
+            }
+        }
+        
+        if (!foundLink)
+        {
+            if (!nodeInfo->links.empty())
+            {
+                for (auto itr = nodeInfo->links.begin(); itr != nodeInfo->links.end(); ++itr)
+                {
+                    foundLink = HasCustomTalent(*itr);
+                    if (foundLink)
+                        break;
+                }
             }
         }
 
