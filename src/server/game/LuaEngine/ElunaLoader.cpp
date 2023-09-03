@@ -173,7 +173,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filepath = fullpath;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
     script.filedata = content;
-    script.bytecode = ConvertToBytecode(content.c_str());
+    //script.bytecode = ConvertToBytecode(content.c_str());
     script.mapId = mapId;
 
     if (extension)
