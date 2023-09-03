@@ -5972,6 +5972,9 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
 
     float honeChance = 100 - ((vItem->honePct / m_spellInfo->Effects[effIndex].MiscValue) * 100);
 
+    if (honeChance <= 5.f)
+        honeChance = 5.f;
+
     if (!roll_chance_f(honeChance))
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Your honing has failed and the item has been damaged.");
