@@ -11196,6 +11196,7 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
     nodeInfo.buttonType = fields[5].GetUInt32();
     nodeInfo.flagMask = fields[6].GetUInt32();
     nodeInfo.link_str = "";
+    nodeInfo.links.clear();
     QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
     if (linkQuery)
     {
@@ -11220,6 +11221,7 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
         } while (linkQuery->NextRow());
         nodeInfo.link_str = ss.str().c_str();
     }
+    nodeInfo.parent_links.clear();
     QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
     if (parentLinkQuery)
     {
