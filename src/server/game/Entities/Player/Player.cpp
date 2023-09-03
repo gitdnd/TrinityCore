@@ -28340,7 +28340,7 @@ bool Player::HasTalentWithMask(uint32 mask)
 
 void Player::SetTalentLoadout(uint32 val)
 {
-    if (val > MAX_CUSTOM_TALENT_LOADOUTS)
+    if (val >= MAX_CUSTOM_TALENT_LOADOUTS)
         return;
 
     DeactivateTalentLoadout();

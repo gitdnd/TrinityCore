@@ -139,7 +139,7 @@ public:
             loadout = atoi(args);
 
         if (loadout >= MAX_CUSTOM_TALENT_LOADOUTS)
-            loadout = MAX_CUSTOM_TALENT_LOADOUTS;
+            loadout = MAX_CUSTOM_TALENT_LOADOUTS - 1;
 
         Player * p = handler->getSelectedPlayerOrSelf();
         p->SetTalentLoadout(loadout);
