@@ -28300,7 +28300,7 @@ uint8 Player::CanLearnCustomTalent(uint32 id)
     else
     {
         if (HasTalentWithMask(4))
-            return TALENT_RESPONSE_SPELL_NOT_FOUND;
+            return TALENT_RESPONSE_ALREADY_HAVE_STARTER_NODE;
     }
 
     return TALENT_REPONSE_OKAY;
