@@ -5979,6 +5979,7 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Your honing has failed and the item has been damaged.");
         player->DurabilityLoss(itemTarget, float(5) / 100.0f);
+        player->PlayDirectSound(13092); // Item break sound
         return;
     }
  
