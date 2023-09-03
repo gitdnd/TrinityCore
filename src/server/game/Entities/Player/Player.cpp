@@ -28260,7 +28260,7 @@ uint8 Player::CanLearnCustomTalent(uint32 id)
     if (!nodeInfo) // No.
     {
         if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
-            ChatHandler(GetSession()).PSendSysMessage("Invalid node id %u", nodeInfo->nodeInfo);
+            ChatHandler(GetSession()).PSendSysMessage("Invalid node id %u", id);
         return TALENT_RESPONSE_NO_NODE_INFO;
     }
 
