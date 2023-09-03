@@ -13,6 +13,12 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 ElunaLoader::ElunaLoader()
 {
 }
@@ -167,6 +173,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filepath = fullpath;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
     script.filedata = content;
+    script.bytecode = ConvertToBytecode(content.c_str());
     script.mapId = mapId;
 
     if (extension)
@@ -195,4 +202,31 @@ bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
         return true;
 
     return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
+}
+
+std::vector<unsigned char> ConvertToBytecode(const char* luaScript)
+{
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+
+    int result = luaL_loadstring(L, luaScript);
+
+    std::vector<unsigned char> bytecode;
+
+    if (result == LUA_OK)
+    {
+        result = lua_dump(L, [](lua_State*, const void* p, size_t size, void* data) {
+            std::string* bytecode = static_cast<std::string*>(data);
+            bytecode->assign(static_cast<const char*>(p), size);
+            return 0;
+            }, &bytecode);
+    }
+    else
+    {
+        //output error goes here
+    }
+
+    lua_close(L);
+
+    return bytecode;
 }
