@@ -150,6 +150,7 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "LoginDBQueryAsync", &LuaGlobalFunctions::LoginDBQueryAsync },
     { "GetCustomTalentStorage", &LuaGlobalFunctions::GetCustomTalentStorage },
     { "GetCustomTalent", &LuaGlobalFunctions::GetCustomTalent },
+    { "LoadCustomTalentNode", &LuaGlobalFunctions::LoadCustomTalentNode },
 
 
     { NULL, NULL }

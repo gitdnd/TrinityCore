@@ -1595,6 +1595,7 @@ class TC_GAME_API ObjectMgr
         TalentNodeInfo const* GetTalentNode(uint32 entry) const;
         TalentNodeContainer const& GetTalentNodeStore() const { return _talentNodeStore; }
         void LoadTalentNodes();
+        void LoadTalentNodeEntry(uint32 node);
     private:
         // first free id for selected id type
         uint32 _auctionId;

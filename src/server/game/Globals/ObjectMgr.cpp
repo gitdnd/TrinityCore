@@ -11173,3 +11173,61 @@ void ObjectMgr::LoadTalentNodes()
         
     } while (result->NextRow());
 }
+
+void ObjectMgr::LoadTalentNodeEntry(uint32 node)
+{
+    QueryResult result = WorldDatabase.PQuery("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info where `index` = %u", node);
+    if (!result)
+    {
+        //@todo Error.
+        return;
+    }
+
+    if (!GetTalentNode(node))
+        _talentNodeStore.rehash(_talentNodeStore.size() + 1);
+
+    TalentNodeInfo& nodeInfo = _talentNodeStore[node];
+    Field* fields = result->Fetch();
+    nodeInfo.Index = node;
+    nodeInfo.spellId = fields[1].GetUInt32();
+    nodeInfo.xOffset = fields[2].GetFloat();
+    nodeInfo.yOffset = fields[3].GetFloat();
+    nodeInfo.Mutex = fields[4].GetUInt32();
+    nodeInfo.buttonType = fields[5].GetUInt32();
+    nodeInfo.flagMask = fields[6].GetUInt32();
+    nodeInfo.link_str = "";
+    QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
+    if (linkQuery)
+    {
+        std::stringstream ss;
+        bool firstLink = true;
+        do
+        {
+            if (!firstLink)
+                ss << ",";
+            else
+                firstLink = false;
+
+            Field* nodeFields = linkQuery->Fetch();
+            uint32 nodeEntry = nodeFields[0].GetUInt32();
+            //if (!GetTalentNode(entry))
+            //{
+                //@todo Error
+                //continue;
+            //}
+            ss << nodeEntry;
+            nodeInfo.links.push_back(nodeEntry);
+        } while (linkQuery->NextRow());
+        nodeInfo.link_str = ss.str().c_str();
+    }
+    QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
+    if (parentLinkQuery)
+    {
+        do
+        {
+            Field* parentNodeFields = parentLinkQuery->Fetch();
+            uint32 parentNodeEntry = parentNodeFields[0].GetUInt32();
+            nodeInfo.parent_links.push_back(parentNodeEntry);
+        } while (parentLinkQuery->NextRow());
+    }
+}

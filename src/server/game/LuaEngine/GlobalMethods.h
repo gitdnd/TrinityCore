@@ -3363,5 +3363,12 @@ namespace LuaGlobalFunctions
         lua_settop(E->L, tbl);
         return 1;
     }
+
+    int LoadCustomTalentNode(Eluna* E)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        sObjectMgr->LoadTalentNodeEntry(entry);
+        return 0;
+    }
 }
 #endif
