@@ -3340,7 +3340,7 @@ namespace LuaGlobalFunctions
 
     int GetCustomTalent(Eluna* E)
     {
-        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
         TalentNodeInfo const* nodeInfo = eObjectMgr->GetTalentNode(entry);
         if (!nodeInfo)
             return luaL_argerror(E->L, 2, "valid talent node index expected");
@@ -3366,14 +3366,14 @@ namespace LuaGlobalFunctions
 
     int LoadCustomTalentNode(Eluna* E)
     {
-        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
         eObjectMgr->LoadTalentNodeEntry(entry);
         return 0;
     }
 
     int DeleteTalentNodeBecauseFoeisAMadMan(Eluna* E)
     {
-        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
         eObjectMgr->DeleteTalentNodeEntry(entry);
         return 0;
     }
