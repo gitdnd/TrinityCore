@@ -72,7 +72,7 @@ void ElunaLoader::LoadScripts()
     }
 }
 
-bool ElunaLoader::CompileScript(LuaScript luaScript, BytecodeBuffer& buffer)
+bool ElunaLoader::CompileScript(LuaScript luaScript)
 {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
@@ -86,6 +86,8 @@ bool ElunaLoader::CompileScript(LuaScript luaScript, BytecodeBuffer& buffer)
         //RetrieveLoadError(err, filename);
         return false;
     }
+
+    BytecodeBuffer buffer;
 
     // Everything's OK so far, the script has been loaded, now we need to start dumping it to bytecode.
     err = lua_dump(L, (lua_Writer)LoadBytecodeChunk, &buffer);
@@ -213,8 +215,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filepath = fullpath;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
     script.filedata = content;
-    //script.bytecode = ConvertToBytecode(content.c_str());
-    CompileLua(script, fullpath);
+    CompileScript(script);
     script.mapId = mapId;
 
     if (extension)
