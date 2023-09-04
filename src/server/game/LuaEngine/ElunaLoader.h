@@ -37,6 +37,7 @@ public:
     bool ShouldMapLoadEluna(uint32 mapId);
     bool CompileScript(const char* filename, BytecodeBuffer& buffer);
     static int LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer);
+    void CompileLua(LuaScript luaScript, std::string fullpath);
 
     // Lua script folder path
     std::string lua_folderpath;
