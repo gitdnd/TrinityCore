@@ -21,7 +21,6 @@ private:
     ~ElunaLoader();
 
 public:
-    typedef std::vector<uint8> BytecodeBuffer;
     typedef std::unordered_map<std::string, BytecodeBuffer> ScriptBytecodeMap;
 
     ElunaLoader(ElunaLoader const&) = delete;

@@ -105,6 +105,7 @@ template<typename K> class BindingMap;
 template<typename T> struct EventKey;
 template<typename T> struct EntryKey;
 template<typename T> struct UniqueObjectKey;
+typedef std::vector<uint8> BytecodeBuffer;
 
 struct LuaScript
 {
@@ -113,7 +114,7 @@ struct LuaScript
     std::string filepath;
     std::string modulepath;
     std::string filedata;
-    std::vector<unsigned char> bytecode;
+    BytecodeBuffer bytecode;
     int32 mapId;
 };
 
