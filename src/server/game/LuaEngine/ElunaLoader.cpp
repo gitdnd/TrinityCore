@@ -226,6 +226,8 @@ void ElunaLoader::CompileLua(LuaScript luaScript, std::string fullpath)
         luaScript.bytecode = bytecode;
         if(bytecode.empty() || result != LUA_OK)
             ELUNA_LOG_INFO("[Eluna]: Error loading bytecode result %u", result);
+
+        ELUNA_LOG_INFO("[Eluna]: %s", reinterpret_cast<const char*>(luaScript.bytecode.data()));
     }
     else
     {
