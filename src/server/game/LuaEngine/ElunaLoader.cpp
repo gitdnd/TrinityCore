@@ -13,6 +13,13 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 
+extern "C"
+{
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+};
+
 ElunaLoader::ElunaLoader()
 {
 }
@@ -64,6 +71,44 @@ void ElunaLoader::LoadScripts()
     {
         requiredMaps.emplace_back(atoi(*itr));
     }
+}
+
+bool ElunaLoader::CompileScript(const char* filename, BytecodeBuffer& buffer)
+{
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+
+    /* Attempt to load the file */
+    int err = luaL_loadfile(L, filename);
+
+    // If something bad happened, try to find an error.
+    if (err != LUA_OK)
+    {
+        //RetrieveLoadError(err, filename);
+        return false;
+    }
+
+    // Everything's OK so far, the script has been loaded, now we need to start dumping it to bytecode.
+    err = lua_dump(L, (lua_Writer)LoadBytecodeChunk, &buffer);
+    if (err
+        || buffer.empty())
+    {
+        printf("ERROR: Failed to dump the Lua script `%s` to bytecode.\n", filename);
+        return false;
+    }
+
+    lua_close(L);
+
+    // Compiled!
+    return true;
+}
+
+int ElunaLoader::LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer)
+{
+    for (size_t i = 0; i < len; i++)
+        buffer->push_back(bytes[i]);
+
+    return 0;
 }
 
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
