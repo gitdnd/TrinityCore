@@ -214,7 +214,7 @@ void ElunaLoader::CompileLua(LuaScript luaScript, std::string fullpath)
 
     if (result == LUA_OK)
     {
-        std::ofstream outputFile(fullpath + ".luac", std::ios::binary);
+        std::ofstream outputFile(fullpath + ".luac", std::ios::trunc);
 
         result = lua_dump(L, [](lua_State*, const void* p, size_t size, void* data) {
             auto& outputFile = *static_cast<std::ofstream*>(data);
@@ -222,6 +222,8 @@ void ElunaLoader::CompileLua(LuaScript luaScript, std::string fullpath)
             outputFile.write(reinterpret_cast<const char*>(pBytes), size);
             return 0;
             }, &outputFile);
+
+        outputFile.close();
     }
     else
     {
