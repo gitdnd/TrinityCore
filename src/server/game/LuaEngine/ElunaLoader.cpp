@@ -214,16 +214,16 @@ void ElunaLoader::CompileLua(LuaScript luaScript, std::string fullpath)
 
     if (result == LUA_OK)
     {
-        std::ofstream outputFile(fullpath + ".luac", std::ios::trunc);
-
+        //std::ofstream outputFile(fullpath + ".luac", std::ios::trunc);
+        std::vector<unsigned char> bytecode;
         result = lua_dump(L, [](lua_State*, const void* p, size_t size, void* data) {
-            auto& outputFile = *static_cast<std::ofstream*>(data);
+            auto& bytecode = *static_cast<std::vector<unsigned char>*>(data);
             const unsigned char* pBytes = static_cast<const unsigned char*>(p);
-            outputFile.write(reinterpret_cast<const char*>(pBytes), size);
+            bytecode.push_back(reinterpret_cast<const char>(pBytes));
             return 0;
-            }, &outputFile);
+            }, &bytecode);
 
-        outputFile.close();
+        luaScript.bytecode = bytecode;
     }
     else
     {
