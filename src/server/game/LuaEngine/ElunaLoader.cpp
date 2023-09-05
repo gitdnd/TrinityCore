@@ -72,40 +72,6 @@ void ElunaLoader::LoadScripts()
     }
 }
 
-bool ElunaLoader::CompileScript(LuaScript luaScript)
-{
-    lua_State* L = luaL_newstate();
-    luaL_openlibs(L);
-
-    /* Attempt to load the file */
-    int err = luaL_loadstring(L, luaScript.filedata.c_str());
-
-    // If something bad happened, try to find an error.
-    if (err != LUA_OK)
-    {
-        ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`, error `%i`.", luaScript.filename.c_str(), err);
-        return false;
-    }
-
-    BytecodeBuffer buffer;
-
-    // Everything's OK so far, the script has been loaded, now we need to start dumping it to bytecode.
-    err = lua_dump(L, (lua_Writer)LoadBytecodeChunk, &buffer);
-    if (err
-        || buffer.empty())
-    {
-        ELUNA_LOG_ERROR("[Eluna]: Failed to dump the Lua script `%s` to bytecode.", luaScript.filename.c_str());
-        return false;
-    }
-
-    lua_close(L);
-
-    luaScript.bytecode = buffer;
-
-    // Compiled!
-    return true;
-}
-
 int ElunaLoader::LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer)
 {
     for (size_t i = 0; i < len; i++)
@@ -217,9 +183,35 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filedata = content;
     script.mapId = mapId;
 
-    // if script isn't compiled properly, return
-    if (!CompileScript(script))
+    // Open a new Lua state and compile bytecode
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+
+    // Attempt to load the file
+    int err = luaL_loadstring(L, content.c_str());
+
+    // If something bad happened, try to find an error.
+    if (err != LUA_OK)
+    {
+        ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`, error `%i`.", script.filename.c_str(), err);
         return;
+    }
+
+    ByteBuffer buffer;
+
+    // Everything's OK so far, the script has been loaded, now we need to start dumping it to bytecode.
+    err = lua_dump(L, (lua_Writer)LoadBytecodeChunk, &buffer);
+    if (err || buffer.empty())
+    {
+        ELUNA_LOG_ERROR("[Eluna]: Failed to dump the Lua script `%s` to bytecode.", script.filename.c_str());
+        return;
+    }
+
+    // close Lua state
+    lua_close(L);
+
+    // Write buffer to bytecode
+    script.bytecode = buffer;
 
     if (extension)
         lua_extensions.push_back(script);
