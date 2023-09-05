@@ -260,7 +260,7 @@ void Eluna::RunScripts()
         }
         lua_pop(L, 1);
         // Stack: package, modules
-        int result = luaL_loadbuffer(L, reinterpret_cast<const char*>(&it->bytecode[0]), it->bytecode.size(), nullptr);
+        int result = luaL_loadbuffer(L, reinterpret_cast<const char*>(&it->bytecode[0]), it->bytecode.size(), it->filename.c_str());
         if (result != LUA_OK) {
             // Stack: package, modules, errmsg
             ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());

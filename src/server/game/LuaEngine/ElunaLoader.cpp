@@ -83,7 +83,7 @@ bool ElunaLoader::CompileScript(LuaScript luaScript)
     // If something bad happened, try to find an error.
     if (err != LUA_OK)
     {
-        //RetrieveLoadError(err, filename);
+        ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`, error `%i`.", luaScript.filename.c_str(), err);
         return false;
     }
 
@@ -94,7 +94,7 @@ bool ElunaLoader::CompileScript(LuaScript luaScript)
     if (err
         || buffer.empty())
     {
-        printf("ERROR: Failed to dump the Lua script `%s` to bytecode.\n", luaScript.filename.c_str());
+        ELUNA_LOG_ERROR("[Eluna]: Failed to dump the Lua script `%s` to bytecode.", luaScript.filename.c_str());
         return false;
     }
 
@@ -215,8 +215,11 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filepath = fullpath;
     script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
     script.filedata = content;
-    CompileScript(script);
     script.mapId = mapId;
+
+    // if script isn't compiled properly, return
+    if (!CompileScript(script))
+        return;
 
     if (extension)
         lua_extensions.push_back(script);
