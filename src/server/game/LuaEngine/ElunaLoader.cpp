@@ -194,6 +194,8 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     if (err != LUA_OK)
     {
         ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`, error `%i`.", script.filename.c_str(), err);
+        // close Lua state
+        lua_close(L);
         return;
     }
 
@@ -204,6 +206,8 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     if (err || buffer.empty())
     {
         ELUNA_LOG_ERROR("[Eluna]: Failed to dump the Lua script `%s` to bytecode.", script.filename.c_str());
+        // close Lua state
+        lua_close(L);
         return;
     }
 
