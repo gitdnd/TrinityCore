@@ -213,6 +213,9 @@ void ElunaLoader::AddScriptPath(lua_State* L, std::string filename, const std::s
     // Write buffer to bytecode
     script.bytecode = buffer;
 
+    // pop the loaded function from the stack
+    lua_pop(L, 1);
+
     if (extension)
         lua_extensions.push_back(script);
     else
