@@ -72,7 +72,7 @@ void ElunaLoader::LoadScripts()
     }
 }
 
-int ElunaLoader::LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer)
+int ElunaLoader::LoadBytecodeChunk(uint8* bytes, size_t len, BytecodeBuffer* buffer)
 {
     for (size_t i = 0; i < len; i++)
         buffer->push_back(bytes[i]);
@@ -188,8 +188,8 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     luaL_openlibs(L);
 
     // Attempt to load the file
-    int err = luaL_loadstring(L, content.c_str());
-
+    // int err = luaL_loadstring(L, content.c_str());
+    int err = luaL_loadfile(L, fullpath.c_str());
     // If something bad happened, try to find an error.
     if (err != LUA_OK)
     {
@@ -197,7 +197,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
         return;
     }
 
-    ByteBuffer buffer;
+    BytecodeBuffer buffer;
 
     // Everything's OK so far, the script has been loaded, now we need to start dumping it to bytecode.
     err = lua_dump(L, (lua_Writer)LoadBytecodeChunk, &buffer);

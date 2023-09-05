@@ -7,6 +7,9 @@
 
 #ifndef _ELUNALOADER_H
 #define _ELUNALOADER_H
+
+#include "ElunaUtility.h"
+
 extern "C"
 {
 #include "lua.h"
@@ -21,9 +24,6 @@ private:
     ~ElunaLoader();
 
 public:
-    typedef std::vector<uint8> BytecodeBuffer;
-    typedef std::unordered_map<std::string, BytecodeBuffer> ScriptBytecodeMap;
-
     ElunaLoader(ElunaLoader const&) = delete;
     ElunaLoader(ElunaLoader&&) = delete;
 
@@ -36,7 +36,7 @@ public:
     void CombineLists();
     bool ShouldMapLoadEluna(uint32 mapId);
     bool CompileScript(LuaScript luaScript);
-    static int LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer);
+    static int LoadBytecodeChunk(uint8* bytes, size_t len, BytecodeBuffer* buffer);
 
     // Lua script folder path
     std::string lua_folderpath;
