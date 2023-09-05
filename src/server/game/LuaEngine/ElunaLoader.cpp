@@ -193,12 +193,12 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     // If something bad happened, try to find an error.
     if (err != LUA_OK)
     {
-        ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`, error `%i`.", script.filename.c_str(), err);
+        ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`.", script.filename.c_str());
         // close Lua state
         lua_close(L);
         return;
     }
-
+    ELUNA_LOG_DEBUG("[Eluna]: Loaded Lua script `%s`", script.filename.c_str());
     BytecodeBuffer buffer;
 
     // Everything's OK so far, the script has been loaded, now we need to start dumping it to bytecode.
@@ -210,6 +210,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
         lua_close(L);
         return;
     }
+    ELUNA_LOG_ERROR("[Eluna]: Dumped Lua script `%s` to bytecode.", script.filename.c_str());
 
     // close Lua state
     lua_close(L);
