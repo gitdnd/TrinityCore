@@ -260,14 +260,17 @@ void Eluna::RunScripts()
         }
         lua_pop(L, 1);
         // Stack: package, modules
-        int result = luaL_loadbuffer(L, reinterpret_cast<const char*>(&it->bytecode[0]), it->bytecode.size(), it->filename.c_str());
-        if (result != LUA_OK) {
+
+        if (luaL_loadbuffer(L, reinterpret_cast<const char*>(&it->bytecode[0]), it->bytecode.size(), it->filename.c_str()))
+        {
             // Stack: package, modules, errmsg
             ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
             Report(L);
             // Stack: package, modules
             continue;
         }
+        // Stack: package, modules, filefunc
+
         /*if (luaL_loadbuffer(L, it->filedata.c_str(), it->filedata.size(), it->filename.c_str()))
         {
             // Stack: package, modules, errmsg
@@ -277,22 +280,6 @@ void Eluna::RunScripts()
             continue;
         }*/
         // Stack: package, modules, filefunc
-
-        // Try calling the script's entry point
-        int err = lua_pcall(L,
-            0,	// no arguments
-            0,	// 0 returned values
-            0);	// no error handler
-
-        if (err == LUA_OK)
-        {
-            lua_setfield(L, modules, it->filename.c_str());
-
-            // successfully loaded and ran file
-            ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->filepath.c_str());
-            ++count;
-            continue;
-        }
 
         if (ExecuteCall(0, 1))
         {
