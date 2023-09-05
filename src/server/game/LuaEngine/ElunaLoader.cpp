@@ -72,7 +72,7 @@ void ElunaLoader::LoadScripts()
     }
 }
 
-int ElunaLoader::LoadBytecodeChunk(uint8* bytes, size_t len, BytecodeBuffer* buffer)
+int ElunaLoader::LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer)
 {
     for (size_t i = 0; i < len; i++)
         buffer->push_back(bytes[i]);

@@ -36,7 +36,7 @@ public:
     void CombineLists();
     bool ShouldMapLoadEluna(uint32 mapId);
     bool CompileScript(LuaScript luaScript);
-    static int LoadBytecodeChunk(uint8* bytes, size_t len, BytecodeBuffer* buffer);
+    static int LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer);
 
     // Lua script folder path
     std::string lua_folderpath;
