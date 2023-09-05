@@ -278,6 +278,22 @@ void Eluna::RunScripts()
         }*/
         // Stack: package, modules, filefunc
 
+        // Try calling the script's entry point
+        int err = lua_pcall(L,
+            0,	// no arguments
+            0,	// 0 returned values
+            0);	// no error handler
+
+        if (err == LUA_OK)
+        {
+            lua_setfield(L, modules, it->filename.c_str());
+
+            // successfully loaded and ran file
+            ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->filepath.c_str());
+            ++count;
+            continue;
+        }
+
         if (ExecuteCall(0, 1))
         {
             // Stack: package, modules, result
