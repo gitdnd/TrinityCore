@@ -188,7 +188,6 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     luaL_openlibs(L);
 
     // Attempt to load the file
-    // int err = luaL_loadstring(L, content.c_str());
     int err = luaL_loadbuffer(L, script.filedata.c_str(), script.filedata.size(), script.filename.c_str());
     // If something bad happened, try to find an error.
     if (err != LUA_OK)
@@ -210,7 +209,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
         lua_close(L);
         return;
     }
-    ELUNA_LOG_ERROR("[Eluna]: Dumped Lua script `%s` to bytecode.", script.filename.c_str());
+    ELUNA_LOG_DEBUG("[Eluna]: Dumped Lua script `%s` to bytecode.", script.filename.c_str());
 
     // close Lua state
     lua_close(L);
