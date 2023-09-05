@@ -85,6 +85,10 @@ void ElunaLoader::ReadFiles(std::string path)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 
+    // Open a new Lua state to compile bytecode in
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+
     boost::filesystem::path someDir(path);
     boost::filesystem::directory_iterator end_iter;
 
@@ -142,13 +146,16 @@ void ElunaLoader::ReadFiles(std::string path)
 
                 // was file, try add
                 std::string filename = dir_iter->path().filename().generic_string();
-                AddScriptPath(filename, fullpath, mapId);
+                AddScriptPath(L, filename, fullpath, mapId);
             }
         }
     }
+
+    // close Lua state
+    lua_close(L);
 }
 
-void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpath, int32 mapId)
+void ElunaLoader::AddScriptPath(lua_State* L, std::string filename, const std::string& fullpath, int32 mapId)
 {
     ELUNA_LOG_DEBUG("[Eluna]: AddScriptPath Checking file `%s`", fullpath.c_str());
 
@@ -183,18 +190,12 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     script.filedata = content;
     script.mapId = mapId;
 
-    // Open a new Lua state and compile bytecode
-    lua_State* L = luaL_newstate();
-    luaL_openlibs(L);
-
     // Attempt to load the file
     int err = luaL_loadbuffer(L, script.filedata.c_str(), script.filedata.size(), script.filename.c_str());
     // If something bad happened, try to find an error.
     if (err != LUA_OK)
     {
         ELUNA_LOG_ERROR("[Eluna]: Failed to load the Lua script `%s`.", script.filename.c_str());
-        // close Lua state
-        lua_close(L);
         return;
     }
     ELUNA_LOG_DEBUG("[Eluna]: Loaded Lua script `%s`", script.filename.c_str());
@@ -205,14 +206,9 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
     if (err || buffer.empty())
     {
         ELUNA_LOG_ERROR("[Eluna]: Failed to dump the Lua script `%s` to bytecode.", script.filename.c_str());
-        // close Lua state
-        lua_close(L);
         return;
     }
     ELUNA_LOG_DEBUG("[Eluna]: Dumped Lua script `%s` to bytecode.", script.filename.c_str());
-
-    // close Lua state
-    lua_close(L);
 
     // Write buffer to bytecode
     script.bytecode = buffer;
