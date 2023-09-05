@@ -189,7 +189,7 @@ void ElunaLoader::AddScriptPath(std::string filename, const std::string& fullpat
 
     // Attempt to load the file
     // int err = luaL_loadstring(L, content.c_str());
-    int err = luaL_loadfile(L, fullpath.c_str());
+    int err = luaL_loadfile(L, script.filepath.c_str());
     // If something bad happened, try to find an error.
     if (err != LUA_OK)
     {
