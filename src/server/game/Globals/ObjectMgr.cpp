@@ -11134,7 +11134,6 @@ void ObjectMgr::LoadTalentNodes()
         nodeInfo.Mutex = fields[4].GetUInt32();
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
-        nodeInfo.link_str = "";
         QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
         if (linkQuery)
         {
@@ -11155,9 +11154,9 @@ void ObjectMgr::LoadTalentNodes()
                     //continue;
                 //}
                 ss << nodeEntry;
-                nodeInfo.links.push_back(nodeEntry);
+                nodeInfo.child_links.push_back(nodeEntry);
             } while (linkQuery->NextRow());
-            nodeInfo.link_str = ss.str().c_str();
+            nodeInfo.all_links.insert(nodeInfo.all_links.end(), nodeInfo.child_links.begin(), nodeInfo.child_links.end());
         }
         QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
         if (parentLinkQuery)
@@ -11166,7 +11165,7 @@ void ObjectMgr::LoadTalentNodes()
             {
                 Field* parentNodeFields = parentLinkQuery->Fetch();
                 uint32 parentNodeEntry = parentNodeFields[0].GetUInt32();
-                nodeInfo.parent_links.push_back(parentNodeEntry);
+                nodeInfo.all_links.push_back(parentNodeEntry);
             } while (parentLinkQuery->NextRow());
         }
         //@todo Validation.
@@ -11195,8 +11194,8 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
     nodeInfo.Mutex = fields[4].GetUInt32();
     nodeInfo.buttonType = fields[5].GetUInt32();
     nodeInfo.flagMask = fields[6].GetUInt32();
-    nodeInfo.link_str = "";
-    nodeInfo.links.clear();
+    nodeInfo.child_links.clear();
+    nodeInfo.all_links.clear();
     QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
     if (linkQuery)
     {
@@ -11217,11 +11216,10 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
                 //continue;
             //}
             ss << nodeEntry;
-            nodeInfo.links.push_back(nodeEntry);
+            nodeInfo.child_links.push_back(nodeEntry);
         } while (linkQuery->NextRow());
-        nodeInfo.link_str = ss.str().c_str();
+        nodeInfo.all_links.insert(nodeInfo.all_links.end(), nodeInfo.child_links.begin(), nodeInfo.child_links.end());
     }
-    nodeInfo.parent_links.clear();
     QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
     if (parentLinkQuery)
     {
@@ -11229,7 +11227,7 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
         {
             Field* parentNodeFields = parentLinkQuery->Fetch();
             uint32 parentNodeEntry = parentNodeFields[0].GetUInt32();
-            nodeInfo.parent_links.push_back(parentNodeEntry);
+            nodeInfo.all_links.push_back(parentNodeEntry);
         } while (parentLinkQuery->NextRow());
     }
 }

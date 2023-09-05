@@ -28278,26 +28278,13 @@ uint8 Player::CanLearnCustomTalent(uint32 id)
     {
         bool foundLink = false;
 
-        if (!nodeInfo->parent_links.empty())
+        if (!nodeInfo->all_links.empty())
         {
-            for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
+            for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
             {
                 foundLink = HasCustomTalent(*itr);
                 if (foundLink)
                     break;
-            }
-        }
-        
-        if (!foundLink)
-        {
-            if (!nodeInfo->links.empty())
-            {
-                for (auto itr = nodeInfo->links.begin(); itr != nodeInfo->links.end(); ++itr)
-                {
-                    foundLink = HasCustomTalent(*itr);
-                    if (foundLink)
-                        break;
-                }
             }
         }
 

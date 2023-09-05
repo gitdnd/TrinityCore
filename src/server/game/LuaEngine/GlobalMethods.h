@@ -3310,10 +3310,10 @@ namespace LuaGlobalFunctions
             lua_rawseti(E->L, subtable, 3);
 
             // Create links subtable
-            lua_createtable(E->L, itr.second.links.size(), 0);
+            lua_createtable(E->L, itr.second.child_links.size(), 0);
             int linktable = lua_gettop(E->L);
             uint32 i = 0;
-            for (auto const& itrr : itr.second.links)
+            for (auto const& itrr : itr.second.child_links)
             {
                 lua_pushnumber(E->L, itrr);
                 lua_rawseti(E->L, linktable, ++i);
@@ -3343,7 +3343,7 @@ namespace LuaGlobalFunctions
         uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
         TalentNodeInfo const* nodeInfo = eObjectMgr->GetTalentNode(entry);
         if (!nodeInfo)
-            return luaL_argerror(E->L, 2, "valid talent node index expected");
+            return luaL_argerror(E->L, 1, "valid talent node index expected");
 
         Eluna::Push(E->L, nodeInfo->Index);
         Eluna::Push(E->L, nodeInfo->spellId);
@@ -3352,10 +3352,10 @@ namespace LuaGlobalFunctions
         Eluna::Push(E->L, nodeInfo->Mutex);
         Eluna::Push(E->L, nodeInfo->buttonType);
         Eluna::Push(E->L, nodeInfo->flagMask);
-        lua_createtable(E->L, nodeInfo->links.size(), 0);
+        lua_createtable(E->L, nodeInfo->child_links.size(), 0);
         int tbl = lua_gettop(E->L);
         uint32 i = 0;
-        for (auto const& itr : nodeInfo->links)
+        for (auto const& itr : nodeInfo->child_links)
         {
             Eluna::Push(E->L, itr);
             lua_rawseti(E->L, tbl, ++i);
