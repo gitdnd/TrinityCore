@@ -45,6 +45,7 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
+    uint32 oldMSTime = ElunaUtil::GetCurrTime();
     eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %i", boundMapId).c_str());
 
     // Remove all timed events
@@ -59,6 +60,8 @@ void Eluna::_ReloadEluna()
     // Run scripts from laoded paths
     RunScripts();
     reloadEluna = false;
+
+    ELUNA_LOG_INFO("[Eluna]: Fully reloaded Eluna in %u ms for map state %i", ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 }
 
 Eluna::Eluna(int32 MapId) :
