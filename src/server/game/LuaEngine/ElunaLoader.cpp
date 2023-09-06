@@ -80,58 +80,18 @@ int ElunaLoader::LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, Bytec
     return 0;
 }
 
-void ProcessScript(LuaScript& luaScript) {
-    // Load and execute the Lua file
-    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript checking file `%s`", luaScript.filepath.c_str());
-
-    // split file name
-    std::size_t extDot = luaScript.filename.find_last_of('.');
-    if (extDot == std::string::npos)
-        return;
-    std::string ext = luaScript.filename.substr(extDot);
-    luaScript.filename = luaScript.filename.substr(0, extDot);
-
-    // check extension and add path to scripts to load
-    if (ext != ".lua" && ext != ".dll" && ext != ".so" && ext != ".ext")
-        return;
-    bool extension = ext == ".ext";
-
-    // open file
-    std::ifstream file(luaScript.filepath, std::ios::in | std::ios::binary);
-    if (!file.is_open())
-        return;
-
-    // read contents
-    std::string content{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
-
-    // close file
-    file.close();
-
-    luaScript.fileext = ext;
-    luaScript.modulepath = luaScript.filepath.substr(0, luaScript.filepath.length() - luaScript.filename.length() - ext.length());
-    luaScript.filedata = content;
-
-    // if compilation fails, we don't add the script 
-    if (!sElunaLoader->CompileScript(luaScript))
-        return;
-
-    if (extension)
-        sElunaLoader->lua_extensions.push_back(luaScript);
-    else
-        sElunaLoader->lua_scripts.push_back(luaScript);
-    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript processed `%s` successfully", luaScript.filepath.c_str());
-}
-
-
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
 void ElunaLoader::ReadFiles(std::string path)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 
     // Open a new Lua state to compile bytecode in
+    lua_State* L = luaL_newstate();
+    luaL_openlibs(L);
+
     boost::filesystem::path someDir(path);
     boost::filesystem::directory_iterator end_iter;
-    std::vector<std::thread> threads;
+
     if (boost::filesystem::exists(someDir) && boost::filesystem::is_directory(someDir))
     {
         lua_requirepath +=
@@ -185,28 +145,18 @@ void ElunaLoader::ReadFiles(std::string path)
                     mapId = -1;
 
                 // was file, try add
-                
                 std::string filename = dir_iter->path().filename().generic_string();
-                LuaScript script;
-                script.filename = filename;
-                script.filepath = fullpath;
-                script.mapId = mapId;
-                threads.emplace_back(ProcessScript, &script);
-
-                //threads.emplace_back(ProcessScript, &script);
+                ProcessScript(L, filename, fullpath, mapId);
             }
         }
     }
 
-    for (std::thread& thread : threads) {
-        thread.join();
-    }
+    // close Lua state
+    lua_close(L);
 }
 
-bool ElunaLoader::CompileScript(LuaScript& script)
+bool ElunaLoader::CompileScript(lua_State* L, LuaScript& script)
 {
-    lua_State* L = luaL_newstate();
-    luaL_openlibs(L);
     // Attempt to load the file
     int err = luaL_loadbuffer(L, script.filedata.c_str(), script.filedata.size(), script.filename.c_str());
 
@@ -231,8 +181,55 @@ bool ElunaLoader::CompileScript(LuaScript& script)
     // Write buffer to bytecode
     script.bytecode = buffer;
 
-    lua_close(L);
+    // pop the loaded function from the stack
+    lua_pop(L, 1);
     return true;
+}
+
+void ElunaLoader::ProcessScript(lua_State* L, std::string filename, const std::string& fullpath, int32 mapId)
+{
+    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript checking file `%s`", fullpath.c_str());
+
+    // split file name
+    std::size_t extDot = filename.find_last_of('.');
+    if (extDot == std::string::npos)
+        return;
+    std::string ext = filename.substr(extDot);
+    filename = filename.substr(0, extDot);
+
+    // check extension and add path to scripts to load
+    if (ext != ".lua" && ext != ".dll" && ext != ".so" && ext != ".ext")
+        return;
+    bool extension = ext == ".ext";
+
+    // open file
+    std::ifstream file(fullpath, std::ios::in | std::ios::binary);
+    if (!file.is_open())
+        return;
+
+    // read contents
+    std::string content{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+
+    // close file
+    file.close();
+
+    LuaScript script;
+    script.fileext = ext;
+    script.filename = filename;
+    script.filepath = fullpath;
+    script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
+    script.filedata = content;
+    script.mapId = mapId;
+
+    // if compilation fails, we don't add the script 
+    if (!CompileScript(L, script))
+        return;
+
+    if (extension)
+        lua_extensions.push_back(script);
+    else
+        lua_scripts.push_back(script);
+    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript processed `%s` successfully", fullpath.c_str());
 }
 
 static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second)
