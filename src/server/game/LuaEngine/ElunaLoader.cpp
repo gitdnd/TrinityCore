@@ -11,6 +11,7 @@
 #include "ElunaIncludes.h"
 #include <filesystem>
 #include <fstream>
+#include <thread>
 #include <boost/filesystem.hpp>
 
 extern "C" {
