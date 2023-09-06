@@ -192,7 +192,7 @@ void ElunaLoader::ReadFiles(std::string path)
                 script.filename = filename;
                 script.filepath = fullpath;
                 script.mapId = mapId;
-                threads.emplace_back(ProcessScript, &script);
+                threads.emplace_back(ProcessScript, std::ref(script));
 
                 //threads.emplace_back(ProcessScript, &script);
             }
