@@ -32,7 +32,7 @@ public:
     static ElunaLoader* instance();
     void LoadScripts();
     void ReadFiles(std::string path);
-    //void ProcessScript(std::string filename, const std::string& fullpath, int32 mapId)
+    //void ProcessScript(LuaScript& script);
     void CombineLists();
     bool ShouldMapLoadEluna(uint32 mapId);
     bool CompileScript(LuaScript& script);
