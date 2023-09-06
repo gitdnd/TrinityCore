@@ -239,8 +239,8 @@ static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second
 
 void ElunaLoader::CombineLists()
 {
-    lua_extensions.sort(ScriptPathComparator);
-    lua_scripts.sort(ScriptPathComparator);
+    //lua_extensions.sort(ScriptPathComparator);
+    //lua_scripts.sort(ScriptPathComparator);
     combined_scripts.insert(combined_scripts.end(), lua_extensions.begin(), lua_extensions.end());
     combined_scripts.insert(combined_scripts.end(), lua_scripts.begin(), lua_scripts.end());
 }
