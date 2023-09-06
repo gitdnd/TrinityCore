@@ -295,9 +295,10 @@ void Eluna::RunScripts()
     // Stack: package, modules
     lua_pop(L, 2);
 
-    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %i", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 
     OnLuaStateOpen();
+
+    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %i", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 }
 
 void Eluna::InvalidateObjects()
