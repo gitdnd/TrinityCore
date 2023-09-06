@@ -81,16 +81,16 @@ int ElunaLoader::LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, Bytec
     return 0;
 }
 
-void ProcessScript(LuaScript& luaScript) {
-    // Load and execute the Lua file
-    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript checking file `%s`", luaScript.filepath.c_str());
+void ProcessScript(std::string filename, const std::string& fullpath, int32 mapId)
+{
+    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript checking file `%s`", fullpath.c_str());
 
     // split file name
-    std::size_t extDot = luaScript.filename.find_last_of('.');
+    std::size_t extDot = filename.find_last_of('.');
     if (extDot == std::string::npos)
         return;
-    std::string ext = luaScript.filename.substr(extDot);
-    luaScript.filename = luaScript.filename.substr(0, extDot);
+    std::string ext = filename.substr(extDot);
+    filename = filename.substr(0, extDot);
 
     // check extension and add path to scripts to load
     if (ext != ".lua" && ext != ".dll" && ext != ".so" && ext != ".ext")
@@ -98,7 +98,7 @@ void ProcessScript(LuaScript& luaScript) {
     bool extension = ext == ".ext";
 
     // open file
-    std::ifstream file(luaScript.filepath, std::ios::in | std::ios::binary);
+    std::ifstream file(fullpath, std::ios::in | std::ios::binary);
     if (!file.is_open())
         return;
 
@@ -108,19 +108,23 @@ void ProcessScript(LuaScript& luaScript) {
     // close file
     file.close();
 
-    luaScript.fileext = ext;
-    luaScript.modulepath = luaScript.filepath.substr(0, luaScript.filepath.length() - luaScript.filename.length() - ext.length());
-    luaScript.filedata = content;
+    LuaScript script;
+    script.fileext = ext;
+    script.filename = filename;
+    script.filepath = fullpath;
+    script.modulepath = fullpath.substr(0, fullpath.length() - filename.length() - ext.length());
+    script.filedata = content;
+    script.mapId = mapId;
 
     // if compilation fails, we don't add the script 
-    if (!sElunaLoader->CompileScript(luaScript))
+    if (!sElunaLoader->CompileScript(script))
         return;
 
     if (extension)
-        sElunaLoader->lua_extensions.push_back(luaScript);
+        sElunaLoader->lua_extensions.push_back(script);
     else
-        sElunaLoader->lua_scripts.push_back(luaScript);
-    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript processed `%s` successfully", luaScript.filepath.c_str());
+        sElunaLoader->lua_scripts.push_back(script);
+    ELUNA_LOG_DEBUG("[Eluna]: ProcessScript processed `%s` successfully", fullpath.c_str());
 }
 
 
@@ -192,7 +196,8 @@ void ElunaLoader::ReadFiles(std::string path)
                 script.filename = filename;
                 script.filepath = fullpath;
                 script.mapId = mapId;
-                threads.emplace_back(ProcessScript, std::ref(script));
+                
+                threads.emplace_back(ProcessScript, std::ref(filename), std::ref(fullpath), std::ref(mapId));
 
                 //threads.emplace_back(ProcessScript, &script);
             }
