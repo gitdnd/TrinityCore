@@ -32,10 +32,10 @@ public:
     static ElunaLoader* instance();
     void LoadScripts();
     void ReadFiles(std::string path);
-    void ProcessScript(lua_State* L, std::string filename, const std::string& fullpath, int32 mapId);
+    //void ProcessScript(LuaScript& script);
     void CombineLists();
     bool ShouldMapLoadEluna(uint32 mapId);
-    bool CompileScript(lua_State* L, LuaScript& script);
+    bool CompileScript(LuaScript& script);
     static int LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer);
 
     // Lua script folder path
