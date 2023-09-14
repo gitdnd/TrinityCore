@@ -1370,7 +1370,8 @@ void Player::Update(uint32 p_time)
 
     //we should execute delayed teleports only for alive(!) players
     //because we don't want player's ghost teleported from graveyard
-    if (IsHasDelayedTeleport() && IsAlive())
+    // Icecrown Glacier: Allow delayed teleport while dead
+    if (IsHasDelayedTeleport() && (IsAlive() || GetMapId() == 772))
         TeleportTo(m_teleport_dest, m_teleport_options);
 
 }
