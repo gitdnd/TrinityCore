@@ -104,6 +104,7 @@ struct VirtualModifier
     {
         ilevel = 0;
         quality = MAX_ITEM_QUALITY;
+        minQuality = 0;
         statpool = -1;
         statgroup = STAT_GROUP_RANDOM;
         seed = 0;
@@ -133,6 +134,7 @@ struct VirtualModifier
      */
     uint32 ilevel;
     uint8 quality;
+    uint8 minQuality;
     int16 statpool;
     StatGroup statgroup;
     uint32 seed;
