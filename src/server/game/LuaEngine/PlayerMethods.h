@@ -3432,12 +3432,29 @@ namespace LuaPlayer
         uint32 itemCount = Eluna::CHECKVAL<uint32>(E->L, 3, 1);
         uint32 displayId = Eluna::CHECKVAL<uint32>(E->L, 4, 0);
         const char* name = Eluna::CHECKVAL<const char*>(E->L, 5, "");
-        uint8 quality = Eluna::CHECKVAL<uint8>(E->L, 6, 1);
+        int8 quality = Eluna::CHECKVAL<int8>(E->L, 6, -1);
+        int8 minQuality = Eluna::CHECKVAL<int8>(E->L, 7, -1);
+        int8 statGroup = Eluna::CHECKVAL<int8>(E->L, 8, -1);
+        bool isCrafted = Eluna::CHECKVAL<bool>(E->L, 9, false);
 
         VirtualModifier modifier;
-        modifier.displayId = displayId;
-        modifier.nameOverride = name;
-        modifier.quality = quality;
+
+        if(displayId > 0)
+            modifier.displayId = displayId;
+
+        if(strlen(name) > 0)
+            modifier.nameOverride = name;
+
+        if(quality > -1)
+            modifier.quality = uint8(quality);
+
+        if (minQuality > -1)
+            modifier.minQuality = uint8(minQuality);
+
+        if (statGroup > -1)
+            modifier.statgroup = StatGroup(statGroup);
+
+        modifier.isCrafted = isCrafted;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
