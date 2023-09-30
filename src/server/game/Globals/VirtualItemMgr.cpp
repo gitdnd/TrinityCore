@@ -1246,10 +1246,6 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     // get initial quality from the template item
     uint32 quality = output->Quality;
 
-    // if the minQuality modifier is greater than the template quality, then set the base quality to the modifier
-    if (modifier.minQuality > quality)
-        quality = modifier.minQuality;
-
     uint32 magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
 
     output->generatedMagicFind = magicFind;
@@ -1291,6 +1287,10 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     }
 
     quality = std::max(output->Quality, quality); // dont generate quality below original
+
+    // if the minQuality modifier is greater than the determined quality, then set the quality to the minQuality
+    if (modifier.minQuality > quality && modifier.minQuality < MAX_ITEM_QUALITY)
+        quality = modifier.minQuality;
 
     // If the quality modifier is set, discard generated quality and force specific quality
     if (modifier.quality < MAX_ITEM_QUALITY)
