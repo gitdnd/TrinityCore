@@ -215,7 +215,8 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
-    UpdateDisenchantId(output);
+    //UpdateDisenchantId(output);
+    UpdateDisenchantIdNew(output);
     GenerateSockets(output, modifier);
     //GenerateSpells(output, modifier);
     GenerateItemStats(output, modifier);
@@ -293,7 +294,8 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateItemName(output, modifier);
 
     // Set the correct disenchant ID based on ilevel and quality
-    UpdateDisenchantId(output);
+    //UpdateDisenchantId(output);
+    UpdateDisenchantIdNew(output);
 
     // Generate the items sockets based on type and quality
     GenerateSockets(output, modifier);
@@ -1941,6 +1943,28 @@ VirtualItemTemplate* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 }
 
 // Others
+
+void VirtualItemMgr::UpdateDisenchantIdNew(VirtualItemTemplate* output)
+{
+    uint32 quality = output->Quality;
+    struct {
+        uint32 quality;
+        uint32 id;
+    } list[] = {
+        {1, 60030},
+        {2, 60031},
+        {3, 60032},
+        {4, 60033},
+        {5, 60034},
+    };
+
+    for (int i = (sizeof(list) / sizeof(list[0])) - 1; i != -1; i--)
+        if (quality >= list[i].quality)
+        {
+            output->DisenchantID = list[i].id;
+            break;
+        }
+}
 
 void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output)
 {
