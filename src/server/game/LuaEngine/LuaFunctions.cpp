@@ -811,6 +811,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetCustomTalents", &LuaPlayer::GetCustomTalents },
     { "CanLearnCustomTalent", &LuaPlayer::CanLearnCustomTalent },
     { "GetMagicFind", &LuaPlayer::GetMagicFind },
+    { "SendItemQueryPacket", &LuaPlayer::SendItemQueryPacket },
 
     { NULL, NULL }
 };

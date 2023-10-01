@@ -4693,5 +4693,16 @@ namespace LuaPlayer
         return 1;
     }
 
+    int SendItemQueryPacket(Eluna* E, Player* player)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        if (const ItemTemplate* item_template = sObjectMgr->GetItemTemplate(entry))
+        {
+            WorldPacket response = item_template->BuildQueryData(LOCALE_enUS);
+            player->SendDirectMessage(&response);
+        }
+        return 0;
+    }
+
 };
 #endif
