@@ -184,23 +184,23 @@ class spell_gen_subclass : public AuraScript
     {
         switch (id)
         {
-        case SUBCLASS_SPELL_WARDEN:
+        case 95012:
             return CLASS_SUB_WARDEN;
             break;
-        case SUBCLASS_SPELL_HISTORIAN:
+        case 95013:
             return CLASS_SUB_HISTORIAN;
             break;
-        case SUBCLASS_SPELL_WEAVER:
+        case 95014:
             return CLASS_SUB_WEAVER;
             break;
-        case SUBCLASS_SPELL_WATCHER:
-            return CLASS_SUB_WATCHER;
+        case 95015:
+            return CLASS_SUB_SAVAGE;
             break;
-        case SUBCLASS_SPELL_RANGER:
+        case 95016:
             return CLASS_SUB_RANGER;
             break;
-        case SUBCLASS_SPELL_SAVAGE:
-            return CLASS_SUB_SAVAGE;
+        case 95017:
+            return CLASS_SUB_WATCHER;
             break;
         }
         return CLASS_WARLOCK; // Debug means something gone wrong.
