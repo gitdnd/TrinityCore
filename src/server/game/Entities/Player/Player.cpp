@@ -21893,6 +21893,9 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
                 // special case (skip > 10sec spell casts for instant cast setting)
                 if (op == SPELLMOD_CASTING_TIME && mod->value <= -100 && basevalue >= T(10000))
                     return;
+                // Hackfix nature's grasp
+                else if (op == SPELLMOD_CASTING_TIME && mod->value <= -100)
+                    Player::RemoveAura(spellId);
 
                 totalmul += CalculatePct(1.0f, mod->value);
                 break;
