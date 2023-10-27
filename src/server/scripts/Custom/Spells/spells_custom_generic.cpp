@@ -208,8 +208,8 @@ class spell_gen_subclass : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_gen_subclass::HandleApplyEffect, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectApplyFn(spell_gen_subclass::HandleRemoveEffect, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_gen_subclass::HandleApplyEffect, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectApplyFn(spell_gen_subclass::HandleRemoveEffect, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
