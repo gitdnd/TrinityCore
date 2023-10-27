@@ -21925,9 +21925,9 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         calculateSpellMod(chargedMod);
 
     // Hackfix nature's grasp
-    if (op == SPELLMOD_CASTING_TIME && mod->value <= -100)
+    if (op == SPELLMOD_CASTING_TIME && HasAura(17116))
     {
-        auto aura = this->GetAura(spellId);
+        auto aura = GetAura(spellId);
         if (aura)
             aura->Remove();
     }
