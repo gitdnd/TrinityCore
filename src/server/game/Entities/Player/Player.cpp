@@ -21924,14 +21924,6 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
     if (chargedMod)
         calculateSpellMod(chargedMod);
 
-    // Hackfix nature's grasp
-    if (op == SPELLMOD_CASTING_TIME && HasAura(17116))
-    {
-        auto aura = GetAura(spellId);
-        if (aura)
-            aura->Remove();
-    }
-
     basevalue = T(float(basevalue + totalflat) * totalmul);
 }
 
