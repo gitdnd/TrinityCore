@@ -2245,7 +2245,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ToggleTempSpell(uint32 spell, uint32 aura, bool apply = true);
 
         uint8 GetActiveSubClass() const;
-        uint8 GetActiveLootPreference() const;
+        uint8 GetActiveLootPreference() const { return lootPreference; }
+        void SetLootPreference(uint8 preference) { lootPreference = preference; }
         uint8 GetSubOrClass() const { return subClass ? subClass : GetClass(); }
         
         int32 GetSpellPowerForSchool(SpellSchools school) { return GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + school) - GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + school); }
@@ -2606,6 +2607,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         std::vector<uint32> customTalents[MAX_CUSTOM_TALENT_LOADOUTS];
         uint32 currentTalentLoadout;
+        uint8 lootPreference;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

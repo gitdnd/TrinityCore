@@ -420,6 +420,7 @@ Player::Player(WorldSession* session): Unit(true)
     _averageItemLevel = 1;
     m_canTeleport = false;
     subClass = 0;
+    lootPreference = 0;
 }
 
 Player::~Player()
@@ -18502,6 +18503,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
         m_activeSpec = 0;
     }
 
+    lootPreference = fields[66].GetUInt8();
+
     UpdateDisplayPower();
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
     LoadCustomTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
@@ -20347,6 +20350,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
 
         stmt->setUInt32(index++, GetTalentLevel());
+        stmt->setUInt8(index++, GetActiveLootPreference());
 
         // Index
         stmt->setUInt32(index++, GetGUID().GetCounter());
@@ -28092,26 +28096,6 @@ uint8 Player::GetActiveSubClass() const
 
     if (HasAura(SUBCLASS_SPELL_SAVAGE))
         return CLASS_SUB_SAVAGE;
-
-    return 0;
-}
-
-uint8 Player::GetActiveLootPreference() const
-{
-    if (HasAura(LOOT_PREF_SPELL_TANK))
-        return PREF_TANK;
-
-    if (HasAura(LOOT_PREF_SPELL_HEALER))
-        return PREF_HEALER;
-
-    if (HasAura(LOOT_PREF_SPELL_DPS_INT))
-        return PREF_DPS_INT;
-
-    if (HasAura(LOOT_PREF_SPELL_DPS_STR))
-        return PREF_DPS_STR;
-
-    if (HasAura(LOOT_PREF_SPELL_DPS_AGI))
-        return PREF_DPS_AGI;
 
     return 0;
 }

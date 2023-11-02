@@ -4698,11 +4698,22 @@ namespace LuaPlayer
         uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
         if (const ItemTemplate* item_template = sObjectMgr->GetItemTemplate(entry))
         {
-            WorldPacket response = item_template->BuildQueryData(LOCALE_enUS);
-            player->SendDirectMessage(&response);
+            player->SendDirectMessage(&item_template->QueryData[static_cast<uint32>(LOCALE_enUS)]);
         }
         return 0;
     }
 
+    int SetLootPreference(Eluna* E, Player* player)
+    {
+        uint8 preference = Eluna::CHECKVAL<uint8>(E->L, 2);
+        player->SetLootPreference(preference);
+        return 0;
+    }
+
+    int GetLootPreference(Eluna* E, Player* player)
+    {
+        Eluna::Push(E->L, player->GetActiveLootPreference());
+        return 1;
+    }
 };
 #endif
