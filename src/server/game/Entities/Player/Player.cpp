@@ -17989,6 +17989,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     SetLevel(fields[6].GetUInt8(), false);
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
+    lootPreference = fields[74].GetUInt8();
     //if (talent_level == 0)
     //    talent_level = 1;
 
@@ -18502,8 +18503,6 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
             GetName().c_str(), GetGUID().ToString().c_str(), uint32(m_specsCount), uint32(m_activeSpec));
         m_activeSpec = 0;
     }
-
-    lootPreference = fields[66].GetUInt8();
 
     UpdateDisplayPower();
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
