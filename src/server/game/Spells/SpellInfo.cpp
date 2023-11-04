@@ -2157,14 +2157,14 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_CURSE;
 
         // Collection of all the seal family flags. No other paladin spell has any of those.
-        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166 || Id == 97001 || Id == 97011 || Id == 97021 || Id == 97031 || Id == 97041 || Id == 97051 || Id == 97061 || Id == 97071 || Id == 97081 || Id == 97091 ) 
+        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166 || Id == 97001 || Id == 97011 || Id == 97021 || Id == 97031 || Id == 97041 || Id == 97051 || Id == 97061 || Id == 97071 || Id == 97081 || Id == 97091 || Id == 97101)
             return SPELL_SPECIFIC_SEAL;
 
         if (Id == 10278 || Id == 1044 || Id == 62124 || Id == 6940 || Id == 1038)
             return SPELL_SPECIFIC_HAND;
 
         // only paladin auras have this (for palaldin class family)
-        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943)
+        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943 || Id == 96001 || Id == 96011 || Id == 96021 || Id == 96031 || Id == 96041 || Id == 96051 || Id == 96061 || Id == 96071 || Id == 96081 || Id == 96091 || Id == 96101)
             return SPELL_SPECIFIC_AURA;
 
         switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
