@@ -26,6 +26,7 @@ void AddSC_chromie_script();
 void AddSC_Spells_Custom_Items();
 void AddSC_Spells_Custom_Talents();
 void AddSC_Spells_Custom_Generic();
+void AddSC_Spells_Custom_Class_scripts();
 void AddSC_NPCS_Custom_Pets();
 void AddSC_Instance_Dummies();
 void AddSC_TbsBullshit_commandscript();
@@ -43,6 +44,7 @@ void AddCustomScripts()
     AddSC_Spells_Custom_Items();
     AddSC_Spells_Custom_Talents();
     AddSC_Spells_Custom_Generic();
+    AddSC_Spells_Custom_Class_scripts();
     AddSC_NPCS_Custom_Pets();
     AddSC_Instance_Dummies();
     AddSC_TbsBullshit_commandscript();
