@@ -740,41 +740,6 @@ class spell_class_seal_of_bloodgrip_passive : public AuraScript
 };
 
 
-// 700051 Serrated Shot - Bleed
-class spell_class_serrated_shot_bleed : public AuraScript
-{
-    PrepareAuraScript(spell_class_serrated_shot_bleed);
-
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            canBeRecalculated = false;
-
-            // $0.2 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS) bonus per tick
-            float rap = caster->GetTotalAttackPowerValue(RANGED_ATTACK);
-            int32 rws = caster->GetAttackTime(RANGED_ATTACK);
-            float rwbMin = 0.f;
-            float rwbMax = 0.f;
-            for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-            {
-                rwbMin += caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE, i);
-                rwbMax += caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE, i);
-            }
-
-            float rwb = ((rwbMin + rwbMax) / 2 + rap * rws / 14000) * 0.2f;
-            amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), rwb));
-
-        }
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_class_serrated_shot_bleed::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-    }
-};
-
-
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
@@ -791,5 +756,4 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_seal_of_windfury);
     RegisterSpellScript(spell_class_seal_of_bloodgrip);
     RegisterSpellScript(spell_class_seal_of_bloodgrip_passive);
-    RegisterSpellScript(spell_class_serrated_shot_bleed);
 };
