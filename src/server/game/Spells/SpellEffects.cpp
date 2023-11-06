@@ -1735,9 +1735,12 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         return;
 
     Powers power = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    // Allow secondary powers to always be restored if they have a value
+    /*
     if (unitTarget->GetTypeId() == TYPEID_PLAYER && unitTarget->GetPowerType() != power && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION
         && !m_spellInfo->HasAttribute(SPELL_ATTR7_CAN_RESTORE_SECONDARY_POWER))
         return;
+    */
 
     if (unitTarget->GetMaxPower(power) == 0)
         return;
