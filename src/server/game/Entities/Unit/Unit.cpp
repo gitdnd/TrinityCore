@@ -1027,9 +1027,14 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
                     critPctDamageMod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellInfo->GetSchoolMask()) - 1.0f) * 100;
 
-                    // HoT: Ambush
-                    if (HasAura(180486) && victim->HealthBelowPct(50))
-                        critPctDamageMod += 10.f;
+                    // Ambush --Itswicky
+                    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
+                        if (damageInfo->attacker->HasAura(93173) && victim->HealthBelowPct(50))
+                        {
+                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93173, 1);
+                            float bonus = aurEff->GetAmount();
+                            critPctDamageMod += bonus;
+                        }
 
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_PERCENT_VERSUS
                     critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
@@ -1272,9 +1277,13 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
                 // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
                 mod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, damageInfo->Damages[i].DamageSchoolMask) - 1.0f) * 100;
 
-                // HoT: Ambush
-                if (HasAura(180486) && victim->HealthBelowPct(50))
-                    mod += 10.f;
+                // Ambush --Itswicky
+                if (damageInfo->Attacker->HasAura(93173) && victim->HealthBelowPct(50))
+                {
+                    AuraEffect const* aurEff = damageInfo->Attacker->GetAuraEffect(93173, 1);
+                    float bonus = aurEff->GetAmount();
+                    mod += bonus;
+                }
 
                 uint32 crTypeMask = damageInfo->Target->GetCreatureTypeMask();
 
@@ -7346,6 +7355,14 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
             return 0.f;
     }
 
+    // Ambush --Itswicky
+    if (caster->HasAura(93173) && HealthAbovePct(50))
+    {
+        AuraEffect const* aurEff = caster->GetAuraEffect(93173, 0);
+        float bonus = aurEff->GetAmount();
+        crit_chance += bonus;
+    }        
+
     // for this types the bonus was already added in GetUnitCriticalChance, do not add twice
     if (caster && spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellInfo->DmgClass != SPELL_DAMAGE_CLASS_RANGED)
     {
@@ -7355,10 +7372,6 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                 return true;
             return false;
         });
-
-        // HoT: Ambush
-        if (caster->HasAura(180486) && HealthAbovePct(50))
-            crit_chance += 10.f;
     }
 
     return std::max(crit_chance, 0.0f);
@@ -7387,13 +7400,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
         crit_mod += (caster->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellProto->GetSchoolMask()) - 1.0f) * 100;
 
         if (victim)
-        {
             crit_mod += caster->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, victim->GetCreatureTypeMask());
-
-            // HoT: Ambush
-            if (caster->HasAura(180486) && victim->HealthBelowPct(50))
-                crit_mod += 10.f;
-        }
 
         if (crit_bonus != 0)
             AddPct(crit_bonus, crit_mod);
