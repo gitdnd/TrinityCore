@@ -3464,9 +3464,16 @@ namespace LuaPlayer
 
         if (itemCount == 0 || dest.empty())
             return 1;
+
         Item* item = player->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
         if (item)
+        {
+            if (isCrafted)
+                item->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
+
             player->SendNewItem(item, itemCount, true, false);
+        }
+
         Eluna::Push(E->L, item);
         return 1;
     }

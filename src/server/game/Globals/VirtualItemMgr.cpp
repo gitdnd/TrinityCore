@@ -413,10 +413,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
     ilevel += irand(-3, 3, generator);
 
-    // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
-    if (modifier.isCrafted && !modifier.ilevel && ilevel >= output->ItemLevel)
-        ilevel = output->ItemLevel;
-
     // If ilevel modifier is set, override all ilevel generation
     if (modifier.ilevel)
         ilevel = modifier.ilevel;
