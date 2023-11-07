@@ -249,7 +249,7 @@ class spell_hun_chimera_shot : public SpellScriptLoader
                             continue;
 
                         // Search only Serpent Sting, Viper Sting, Scorpid Sting auras
-                        uint32 Id = GetSpellInfo()->Id;
+                        uint32 Id = aura->GetSpellInfo()->Id;
                         if (Id != 49001 && Id != 3034 && Id != 3043)
                             continue;
                         if (AuraEffect const* aurEff = aura->GetEffect(EFFECT_0))
