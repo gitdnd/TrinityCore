@@ -4148,6 +4148,8 @@ void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, u
 
         if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
             pet->UpdateAttackPowerAndDamage();
+
+        target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
     }
 }
 
