@@ -4713,7 +4713,10 @@ namespace LuaPlayer
     int SetLootPreference(Eluna* E, Player* player)
     {
         uint8 preference = Eluna::CHECKVAL<uint8>(E->L, 2);
+
+        preference = preference < MAX_PREF ? preference : 0;
         player->SetLootPreference(preference);
+
         return 0;
     }
 
