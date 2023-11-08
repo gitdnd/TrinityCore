@@ -626,14 +626,15 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     }
 
     // multiply the pool size by the base amounts of stat slots
-    pool *= (float)(primaryStatSlots + secondaryStatSlots);
+    // Disabled for now because it feels bad
+    // pool *= (float)(primaryStatSlots + secondaryStatSlots);
 
     // randomly select between -1 and +1 additional stat slots
     // this does not apply to trinkets
     if (output->Class != ITEM_CLASS_ARMOR && output->InventoryType != INVTYPE_TRINKET)
     {
         std::uniform_int_distribution<int> dist(-1, 1);
-        int primarySlotMod = dist(generator);
+        int primarySlotMod = 0; //dist(generator);
         int secondarySlotMod = dist(generator);
 
         // check whether or not the amount of stats exceeds the size of our stat group
@@ -660,7 +661,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     if (primaryStatSlots + secondaryStatSlots > 0)
     {
         // divide the pool by the modified amount of stat slots
-        pool /= (float)(primaryStatSlots + secondaryStatSlots);
+        // Disabled for now because it feels bad
+        // pool /= (float)(primaryStatSlots + secondaryStatSlots);
 
         // divide per-stat pool by predefined blizzlike value
         pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
