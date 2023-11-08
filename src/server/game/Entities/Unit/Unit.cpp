@@ -7765,6 +7765,10 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask) const
             if ((*i)->GetMiscValue() & schoolMask)
                 advertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
     }
+
+    if (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask))
+        advertisedBenefit = static_cast<int32>(advertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
+
     return advertisedBenefit;
 }
 
