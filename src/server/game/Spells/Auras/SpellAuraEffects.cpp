@@ -386,7 +386,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleModRatingPercent,                          //320 SPELL_AURA_MOD_RATING_PERCENT
     &AuraEffect::HandleNoImmediateEffect,                         //321 SPELL_AURA_CAST_WHILE_MOVING implemented in multiple places in Spell.cpp
     &AuraEffect::HandleMagicFind,                                 //322 SPELL_AURA_MAGIC_FIND
-
+    &AuraEffect::HandleAuraModSpellPowerPercent,                  //323 SPELL_AURA_MOD_SPELL_POWER_PCT
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
@@ -4120,6 +4120,34 @@ void AuraEffect::HandleAuraModAttackPowerPercent(AuraApplication const* aurApp, 
     {
         float amount = target->GetTotalAuraMultiplier(SPELL_AURA_MOD_ATTACK_POWER_PCT);
         target->SetStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, amount);
+    }
+}
+
+void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
+        target->UpdateAllDamageDoneMods();
+
+    // Magic damage modifiers implemented in Unit::SpellBaseDamageBonusDone
+    // This information for client side use only
+    if (target->GetTypeId() == TYPEID_PLAYER)
+    {
+        uint16 baseField = GetAmount() >= 0 ? PLAYER_FIELD_MOD_DAMAGE_DONE_POS : PLAYER_FIELD_MOD_DAMAGE_DONE_NEG;
+        for (uint16 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
+            if (GetMiscValue() & (1 << i))
+            {
+                int32 currentSP = target->GetInt32Value(baseField + i);
+                int32 bonusSP = (currentSP * (GetAmount() / 100));
+                target->ApplyModInt32Value(baseField + i, bonusSP, apply);
+            }                
+
+        if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
+            pet->UpdateAttackPowerAndDamage();
     }
 }
 

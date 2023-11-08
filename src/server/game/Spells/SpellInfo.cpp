@@ -3839,6 +3839,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_SPEED_SLOW_ALL:
             case SPELL_AURA_MELEE_SLOW:
             case SPELL_AURA_MOD_ATTACK_POWER_PCT:
+            case SPELL_AURA_MOD_SPELL_POWER_PCT:
                 if (!_isPositiveTarget(spellInfo, effIndex) || bp < 0)
                     return false;
                 break;
