@@ -6729,6 +6729,25 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 AddPct(DoneTotalMod, modPercent);
                 break;
             }
+            case 666: // Fester --Itswicky
+            {
+                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                int32 totalBonus = 0;
+
+                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
+                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
+                {
+                    Aura const* aura = itr->second->GetBase();
+                    SpellInfo const* spell = aura->GetSpellInfo();
+
+                    if (spell->GetDispelMask() != DISPEL_DISEASE)
+                        continue;
+
+                    totalBonus += bonus * aura->GetStackAmount();
+                }
+                AddPct(DoneTotalMod, totalBonus);
+                break;
+            }
             case 6916: // Death's Embrace
             case 6925:
             case 6927:
