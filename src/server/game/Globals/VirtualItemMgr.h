@@ -128,6 +128,7 @@ struct VirtualModifier
         statPoolPctModifier = 0.f;
         lootPreference = 0;
         generateSet = false;
+        lowYield = false;
     }
 
     /**
@@ -158,6 +159,7 @@ struct VirtualModifier
     float statPoolPctModifier;
     uint8 lootPreference;
     bool generateSet;
+    bool lowYield;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
@@ -443,8 +445,7 @@ public:
     void GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
     void GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
-    void UpdateDisenchantId(VirtualItemTemplate* output);
-    void UpdateDisenchantIdNew(VirtualItemTemplate* output);
+    void UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
     void InitSeedGen(VirtualModifier& modifier);
 
     void LoadLegendaryTemplate();

@@ -215,8 +215,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
-    //UpdateDisenchantId(output);
-    UpdateDisenchantIdNew(output);
+    UpdateDisenchantId(output, modifier);
     GenerateSockets(output, modifier);
     //GenerateSpells(output, modifier);
     GenerateItemStats(output, modifier);
@@ -294,8 +293,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateItemName(output, modifier);
 
     // Set the correct disenchant ID based on ilevel and quality
-    //UpdateDisenchantId(output);
-    UpdateDisenchantIdNew(output);
+    UpdateDisenchantId(output, modifier);
 
     // Generate the items sockets based on type and quality
     GenerateSockets(output, modifier);
@@ -1916,154 +1914,32 @@ VirtualItemTemplate* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 
 // Others
 
-void VirtualItemMgr::UpdateDisenchantIdNew(VirtualItemTemplate* output)
+void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
     uint32 quality = output->Quality;
+    uint32 id = 0;
+
     struct {
         uint32 quality;
         uint32 id;
-    } list[] = {
-        {1, 60030},
-        {2, 60031},
-        {3, 60032},
-        {4, 60033},
-        {5, 60034},
+        uint32 lowId;
+    }
+    list[] = {
+        {1, 60030, 60025},
+        {2, 60031, 60026},
+        {3, 60032, 60027},
+        {4, 60033, 60028},
+        {5, 60034, 60029},
     };
 
     for (int i = (sizeof(list) / sizeof(list[0])) - 1; i != -1; i--)
         if (quality >= list[i].quality)
         {
-            output->DisenchantID = list[i].id;
+            id = modifier.lowYield ? list[i].lowId : list[i].id;
             break;
         }
-}
 
-void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output)
-{
-    uint32 ilevel = output->ItemLevel;
-    uint32 quality = output->Quality;
-    // Different disenchant loot pools depending on ilevel and quality
-    // Range 60000-60029
-    if (ilevel <= 50)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60000;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60001;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60002;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60003;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60004;
-                break;
-        }
-    }
-    else if (ilevel > 50 && ilevel <= 100)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60005;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60006;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60007;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60008;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60009;
-                break;
-        }
-    }
-    else if (ilevel > 100 && ilevel <= 150)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60010;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60011;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60012;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60013;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60014;
-                break;
-        }
-    }
-    else if (ilevel > 150 && ilevel <= 200)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60015;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60016;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60017;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60018;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60019;
-                break;
-        }
-    }
-    else if (ilevel > 200 && ilevel <= 250)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60020;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60021;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60022;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60023;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60024;
-                break;
-        }
-    }
-    else if (ilevel > 250)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60025;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60026;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60027;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60028;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60029;
-                break;
-        }
-    }
+    output->DisenchantID = id;
 }
 
 bool VirtualItemMgr::IsVirtualTemplate(ItemTemplate const* base)

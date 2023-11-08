@@ -184,6 +184,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 
                             // is this calculation what we really want? really need to double check this logic
                             modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
+                            modifier.lowYield = playerLevel - 50 > dungeonLevel ? true : false;
+
                             modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
 
@@ -250,6 +252,7 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 {
                     modifier.vLvlMod = inst->vLvlMod;
                     modifier.plrAvgLvl = player->GetMap()->GetCappedDungeonLevel();
+                    modifier.lowYield = player->GetCappedItemLevel() - 50 > player->GetMap()->GetCappedDungeonLevel() ? true : false;
                 }
             }
 
