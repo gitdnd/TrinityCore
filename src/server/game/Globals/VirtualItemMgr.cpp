@@ -675,39 +675,17 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             {
                 switch (statgroupid)
                 {
-                    case STAT_GROUP_STR_DPS:
-                        statPoints *= 1.5f;
+                    case STAT_GROUP_HEALING:
+                        statPoints *= 0.8f;
+                        break;
+                    case STAT_GROUP_INT_DPS:
+                        statPoints *= 0.9f;
                         break;
                     case STAT_GROUP_STR_TANK:
-                        statPoints *= 1.73f;
+                        statPoints *= 1.6f;
                         break;
-                    case STAT_GROUP_AGI_DPS:
                     case STAT_GROUP_AGI_TANK:
-                        statPoints *= 1.32f;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (primarystatgroup[i] == ITEM_MOD_STRENGTH)
-            {
-                switch (statgroupid)
-                {
-                    case STAT_GROUP_STR_DPS:
-                    case STAT_GROUP_STR_TANK:
-                        statPoints *= 1.32f;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (primarystatgroup[i] == ITEM_MOD_AGILITY)
-            {
-                switch (statgroupid)
-                {
-                    case STAT_GROUP_AGI_DPS:
-                    case STAT_GROUP_AGI_TANK:
-                        statPoints *= 1.32f;
+                        statPoints *= 1.4f;
                         break;
                     default:
                         break;
@@ -774,12 +752,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                         uint32 slot = 0;
                         output->Spells[slot].SpellId = magicFindId;
                         output->Spells[slot].SpellTrigger = ITEM_SPELLTRIGGER_ON_EQUIP; // onEquip
-                        // are these needed?
-                        /* output->Spells[slot].SpellCharges = 0;
-                        output->Spells[slot].SpellPPMRate = 0;
-                        output->Spells[slot].SpellCooldown = 0;
-                        output->Spells[slot].SpellCategory = 0;
-                        output->Spells[slot].SpellCategoryCooldown = 0; */
                     }
                     continue;
                 }
