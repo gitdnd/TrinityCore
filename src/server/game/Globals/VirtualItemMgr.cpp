@@ -615,15 +615,19 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondaryStatSlots = 1;
     }
 
+    // Allow legendaries to override the default stat slot count
     if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
     {
-        // Primary stat count modifier can both add and subtract
         if (leg->primaryStatCountMod && leg->primaryStatCountMod != 0)
             primaryStatSlots = leg->primaryStatCountMod;
 
         if (leg->secondaryStatCountMod && leg->secondaryStatCountMod != 0)
             secondaryStatSlots = leg->secondaryStatCountMod;
     }
+
+    // make sure we're not going out of bounds with our stat slot count
+    primaryStatSlots = primaryStatSlots > primarystatgroup.size() ? primarystatgroup.size() : primaryStatSlots;
+    secondaryStatSlots = secondaryStatSlots > secondarystatgroup.size() ? secondarystatgroup.size() : secondaryStatSlots;
 
     //Random hone percent in future?
     //output->honePct = modifier.statPoolPctModifier;
