@@ -338,7 +338,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     StatGroup statgroupbiasid;
 
     // select a random stat group
-    statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
+    statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 3, generator));
 
     // if the player has a loot preference, roll for bias statgroup
     if (modifier.lootPreference > 0 && modifier.lootPreference < MAX_PREF)
@@ -1468,7 +1468,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
 std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL, generator));
 
     ASSERT(group < STAT_GROUP_COUNT);
 
@@ -1478,7 +1478,7 @@ std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupPrima
 std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL, generator));
 
     ASSERT(group < STAT_GROUP_COUNT);
 
@@ -1488,7 +1488,7 @@ std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecon
 std::vector<SocketColor> const& VirtualItemMgr::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL, generator));
 
     ASSERT(group < STAT_GROUP_COUNT);
 
@@ -2378,21 +2378,70 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_STRENGTH
     };
     stat_group_secondary_stats[STAT_GROUP_ALL] = {
-        ITEM_MOD_DEFENSE_SKILL_RATING,
-        ITEM_MOD_DODGE_RATING,
-        ITEM_MOD_PARRY_RATING,
+        // generic
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_MANA_REGENERATION,
         ITEM_MOD_SPELL_POWER,
-        ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ARMOR_PENETRATION_RATING,
+        // tank
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
         ITEM_MOD_BLOCK_RATING,
         ITEM_MOD_BLOCK_VALUE
     };
     stat_group_sockets[STAT_GROUP_ALL] = {
+        SOCKET_COLOR_YELLOW,
+        SOCKET_COLOR_RED,
+        SOCKET_COLOR_BLUE
+    };
+
+    // Stat group for all stats, used for special effects like legendary effect
+    // Uses stat groups that aren't 
+    stat_group_primary_stats[STAT_GROUP_ALL_EXTENDED] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_ALL_EXTENDED] = {
+        // generic
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ARMOR_PENETRATION_RATING,
+        // tank
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE,
+        // melee
+        ITEM_MOD_CRIT_MELEE_RATING,
+        ITEM_MOD_HASTE_MELEE_RATING,
+        ITEM_MOD_HIT_MELEE_RATING,
+        // ranged
+        ITEM_MOD_CRIT_RANGED_RATING,
+        ITEM_MOD_HASTE_RANGED_RATING,
+        ITEM_MOD_HIT_RANGED_RATING,
+        // caster
+        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_HASTE_SPELL_RATING,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_SPELL_RATING,
+        //ITEM_MOD_SPELL_HEALING_DONE,
+        //ITEM_MOD_SPELL_DAMAGE_DONE
+    };
+    stat_group_sockets[STAT_GROUP_ALL_EXTENDED] = {
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_RED,
         SOCKET_COLOR_BLUE
