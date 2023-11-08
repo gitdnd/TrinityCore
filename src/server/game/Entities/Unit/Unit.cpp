@@ -6731,7 +6731,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             }
             case 666: // Fester --Itswicky
             {
-                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                int32 bonus = (*i)->GetAmount();
                 int32 totalBonus = 0;
 
                 AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
