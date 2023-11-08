@@ -2261,6 +2261,42 @@ class spell_soothing_flame : public AuraScript
     }
 };
 
+class spell_battle_rouse : public AuraScript
+{
+    PrepareAuraScript(spell_battle_rouse);
+
+    enum Spell
+    {
+        BATTLE_ROUSE_TRIGGER = 94009
+    };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ BATTLE_ROUSE_TRIGGER });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = GetTarget();
+        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), bp));
+
+        if (amount >= 1)
+        {
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(amount);
+            victim->CastSpell(victim, BATTLE_ROUSE_TRIGGER, args);
+        }        
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_battle_rouse::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 class spell_burnout : public AuraScript
 {
     PrepareAuraScript(spell_burnout);
@@ -2402,4 +2438,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_combustibolt);
     RegisterAuraScript(spell_soothing_flame);
     RegisterAuraScript(spell_burnout);
+    RegisterAuraScript(spell_battle_rouse);
 }
