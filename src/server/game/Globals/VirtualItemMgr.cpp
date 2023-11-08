@@ -338,7 +338,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     StatGroup statgroupbiasid;
 
     // select a random stat group
-    statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 3, generator));
+    statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL - 1, generator));
 
     // if the player has a loot preference, roll for bias statgroup
     if (modifier.lootPreference > 0 && modifier.lootPreference < MAX_PREF)
