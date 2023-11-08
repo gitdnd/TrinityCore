@@ -4137,15 +4137,6 @@ void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, u
     // This information for client side use only
     if (target->GetTypeId() == TYPEID_PLAYER)
     {
-        uint16 baseField = GetAmount() >= 0 ? PLAYER_FIELD_MOD_DAMAGE_DONE_POS : PLAYER_FIELD_MOD_DAMAGE_DONE_NEG;
-        for (uint16 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-            if (GetMiscValue() & (1 << i))
-            {
-                int32 currentSP = target->GetInt32Value(baseField + i);
-                int32 bonusSP = (currentSP * (GetAmount() / 100));
-                target->ApplyModInt32Value(baseField + i, bonusSP, apply);
-            }                
-
         if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
             pet->UpdateAttackPowerAndDamage();
 

@@ -7110,7 +7110,7 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask) const
     }
 
     if (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask))
-        DoneAdvertisedBenefit *= (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100);
+        DoneAdvertisedBenefit *= (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100));
 
     return DoneAdvertisedBenefit;
 }
