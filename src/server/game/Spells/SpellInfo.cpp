@@ -2142,7 +2142,7 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT;
 
         // only hunter aspects have this (but not all aspects in hunter family)
-        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 49071)
+        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 49071 || Id == 13165)
             return SPELL_SPECIFIC_ASPECT;
 
         // Judgement of Wisdom, Judgement of Light, Judgement of Justice
