@@ -548,7 +548,8 @@ m_caster((info->HasAttribute(SPELL_ATTR6_CAST_BY_CHARMER) && caster->GetCharmerO
         // wand case
         if (m_attackType == RANGED_ATTACK)
             if (Item* pItem = playerCaster->GetWeaponForAttack(RANGED_ATTACK))
-                if(pItem && pItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                //if(pItem && pItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                if(GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_NORMAL)
                     m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
     }
 
