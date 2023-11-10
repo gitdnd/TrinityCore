@@ -3825,6 +3825,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
             case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
             case SPELL_AURA_MOD_INCREASE_SWIM_SPEED:
+            case SPELL_AURA_MOD_SPELL_POWER_BY_MANA:
                 if (bp < 0 || bpScalePerLevel < 0) //TODO: What if both are 0? Should it be a buff or debuff?
                     return false;
                 break;

@@ -387,6 +387,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //321 SPELL_AURA_CAST_WHILE_MOVING implemented in multiple places in Spell.cpp
     &AuraEffect::HandleMagicFind,                                 //322 SPELL_AURA_MAGIC_FIND
     &AuraEffect::HandleAuraModSpellPowerPercent,                  //323 SPELL_AURA_MOD_SPELL_POWER_PCT
+    &AuraEffect::HandleAuraModSpellPowerbyMana,                   //324 SPELL_AURA_MOD_SPELL_POWER_BY_MANA
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 const* baseAmount, Unit* caster):
@@ -4123,27 +4124,6 @@ void AuraEffect::HandleAuraModAttackPowerPercent(AuraApplication const* aurApp, 
     }
 }
 
-void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const
-{
-    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
-        return;
-
-    Unit* target = aurApp->GetTarget();
-
-    if (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
-        target->UpdateAllDamageDoneMods();
-
-    // Magic damage modifiers implemented in Unit::SpellBaseDamageBonusDone
-    // This information for client side use only
-    if (target->GetTypeId() == TYPEID_PLAYER)
-    {
-        if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
-            pet->UpdateAttackPowerAndDamage();
-
-        target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
-    }
-}
-
 void AuraEffect::HandleAuraModRangedAttackPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
     if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
@@ -5942,6 +5922,45 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
         amount = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
 
     target->SetMagicFind(amount);
+}
+
+void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
+        target->UpdateAllDamageDoneMods();
+
+    // Magic damage modifiers implemented in Unit::SpellBaseDamageBonusDone
+    // This information for client side use only
+    if (target->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
+            pet->UpdateAttackPowerAndDamage();
+
+        target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
+    }
+}
+
+void AuraEffect::HandleAuraModSpellPowerbyMana(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    // Magic damage modifiers implemented in Unit::SpellBaseDamageBonusDone
+    // This information for client side use only
+    if (target->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
+            pet->UpdateAttackPowerAndDamage();
+
+        target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
+    }
 }
 
 template TC_GAME_API void AuraEffect::GetTargetList(std::list<Unit*>&) const;

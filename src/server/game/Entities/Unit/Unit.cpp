@@ -7126,10 +7126,17 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask) const
 
         // ... and attack power
         DoneAdvertisedBenefit += static_cast<int32>(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER, schoolMask)));
-    }
 
-    if (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask))
-        DoneAdvertisedBenefit = static_cast<int32>(DoneAdvertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
+        // Damage bonus from mana
+        int32 manaMod = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_BY_MANA);
+        if (manaMod)
+            DoneAdvertisedBenefit += static_cast<int32>(ToPlayer()->GetMaxPower(POWER_MANA) * (manaMod / 100.0f));
+
+        // Damage bonus from percent scaling
+        int32 scalingMod = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask);
+        if (scalingMod)
+            DoneAdvertisedBenefit = static_cast<int32>(DoneAdvertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
+    }
 
     return DoneAdvertisedBenefit;
 }
@@ -7783,6 +7790,16 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask) const
         for (AuraEffectList::const_iterator i = mHealingDonebyAP.begin(); i != mHealingDonebyAP.end(); ++i)
             if ((*i)->GetMiscValue() & schoolMask)
                 advertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
+
+        // Damage bonus from mana
+        int32 manaMod = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_BY_MANA);
+        if (manaMod)
+            advertisedBenefit += static_cast<int32>(ToPlayer()->GetMaxPower(POWER_MANA) * (manaMod / 100.0f));
+
+        // Damage bonus from percent scaling
+        int32 scalingMod = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask);
+        if (scalingMod)
+            advertisedBenefit = static_cast<int32>(advertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
     }
 
     if (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask))
