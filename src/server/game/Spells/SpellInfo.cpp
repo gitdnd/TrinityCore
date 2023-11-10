@@ -2592,14 +2592,14 @@ void SpellInfo::_LoadSpellDiminishInfo()
             case SPELLFAMILY_DRUID:
             {
                 // Faerie Fire - limit to 40 seconds in PvP (3.1)
-                if (Id == Id == 770)
+                if (Id == 770)
                     return 40 * IN_MILLISECONDS;
                 break;
             }
             case SPELLFAMILY_HUNTER:
             {
                 // Wyvern Sting
-                if (Id == Id == 49012)
+                if (Id == 49012)
                     return 6 * IN_MILLISECONDS;
                 // Hunter's Mark
                 if ((SpellFamilyFlags[0] & 0x4000))
