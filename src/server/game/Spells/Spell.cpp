@@ -4253,10 +4253,7 @@ void Spell::SendSpellStart()
 
     Powers powerType = m_spellInfo->PowerType;
 
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
-        powerType = POWER_HEALTH;
-
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && powerType == POWER_MANA && GetSpellInfo()->HasDamageEffects())
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_TWINKET_OF_BL00D_MAGK))
         powerType = POWER_HEALTH;
 
     //TC_LOG_DEBUG("spells", "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
@@ -4329,10 +4326,7 @@ void Spell::SendSpellGo()
 
     Powers powerType = m_spellInfo->PowerType;
 
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
-        powerType = POWER_HEALTH;
-
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && powerType == POWER_MANA && GetSpellInfo()->HasDamageEffects())
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_TWINKET_OF_BL00D_MAGK))
         powerType = POWER_HEALTH;
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
@@ -4854,18 +4848,13 @@ void Spell::TakePower()
 
     bool bloodMagic = false;
     // HoT: Blood Magic
-    if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+    if (unitCaster->HasAura(SPELL_TWINKET_OF_BL00D_MAGK))
     {
-        powerType = POWER_HEALTH;
-        m_powerCost *= 1.5;
-        bloodMagic = true;
-    }
-
-    // HoT: Blood for the Blood God
-    if (powerType == POWER_MANA && unitCaster->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && GetSpellInfo()->HasDamageEffects())
-    {
-        powerType = POWER_HEALTH;
-        m_powerCost *= 2;
+        if (powerType == POWER_MANA)
+            m_powerCost *= 2.f;
+        else if (powerType == POWER_FOCUS)
+            m_powerCost *= 100.f;
+        powerType = POWER_HEALTH;        
         bloodMagic = true;
     }
 

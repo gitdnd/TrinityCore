@@ -3926,6 +3926,7 @@ enum CustomSpells : uint32
     SPELL_PRECISE_TECHNIQUE = 180530,
     SPELL_FIST_OF_FURY = 180521,
     SPELL_BARRAGE_TALENT = 180529,
+    SPELL_TWINKET_OF_BL00D_MAGK = 450045
 };
 
 enum CustomTalentErrorResponses : uint8
