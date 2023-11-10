@@ -1977,6 +1977,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.primaryStatCountMod = fields[11].GetInt8();
         legTemp.secondaryStatCountMod = fields[12].GetInt8();
         legTemp.statGroupOverride = fields[13].GetInt8();
+        legTemp.limitCatagory = fields[14].GetUInt32();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
