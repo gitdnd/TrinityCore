@@ -4097,6 +4097,9 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->honePct = fields[i++].GetFloat();
 
         itemTemplate->MaxDurability = round(float((itemTemplate->ItemLevel * (itemTemplate->Quality / 10.f)) + 25));;
+
+        if (legendaryItemInfo const* leg = sVirtualItemMgr.GetLegendaryItemInfo(itemTemplate->legendaryId))
+            itemTemplate->ItemLimitCategory = leg->limitCatagory;
         //itemTemplate->UpdateDisplay();
 
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))

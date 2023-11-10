@@ -319,6 +319,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a display ID for the item based on type
     GenerateItemDisplay(output, modifier);
 
+    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+        output->ItemLimitCategory = leg->limitCatagory;
+
     delete store[entry];
     store[entry] = output;
 

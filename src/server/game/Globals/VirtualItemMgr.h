@@ -268,6 +268,12 @@ struct legendaryItemInfo
     int8 primaryStatCountMod;
     int8 secondaryStatCountMod;
     int8 statGroupOverride;
+    uint32 limitCatagory;
+    /*
+    @Todo:
+    float damageScaleModifier;
+    int8 damageTypeOverride; //Pending multiple damage type: damageTypeOverride[MAX_ITEM_PROTO_DAMAGES]
+    */
 };
 
 typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;
