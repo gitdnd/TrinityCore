@@ -1549,7 +1549,8 @@ public:
         {
             if (doneBy)
                 _damageTimes[doneBy->GetGUID()] = GameTime::GetGameTime();
-            damage = 0;
+            if (me->GetHealthPct() < 15.0f || me->GetHealth() - damage <= 0)
+                damage = 0;
         }
 
         void UpdateAI(uint32 diff) override
