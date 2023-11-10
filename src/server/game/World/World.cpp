@@ -1866,10 +1866,27 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Spell Gem Desc...");
     sObjectMgr->LoadSpellGemDescriptors();
 
+    // VirtualItem
+    TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
+    sVirtualItemMgr.LoadNamesFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Displays...");
+    sVirtualItemMgr.LoadDisplaysFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Spells...");
+    sVirtualItemMgr.LoadSpellsFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Sets...");
+    sVirtualItemMgr.LoadSetsFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Legendarys...");
+    sVirtualItemMgr.LoadLegendaryTemplate();
+
+    sVirtualItemMgr.GenerateVirtualLevelLookupArray();
+
     TC_LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
 
-    // VirtualItem
     TC_LOG_INFO("server.loading", "Loading Virtual Items...");                 // must be after LoadItemTemplates
     sObjectMgr->LoadVirtualItemTemplates();
 
@@ -2195,24 +2212,6 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
-
-    // VirtualItem
-    TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
-    sVirtualItemMgr.LoadNamesFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Displays...");
-    sVirtualItemMgr.LoadDisplaysFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Spells...");
-    sVirtualItemMgr.LoadSpellsFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Sets...");
-    sVirtualItemMgr.LoadSetsFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Legendarys...");
-    sVirtualItemMgr.LoadLegendaryTemplate();
-
-    sVirtualItemMgr.GenerateVirtualLevelLookupArray();
 
     TC_LOG_INFO("server.loading", "Loading Petitions...");
     sPetitionMgr->LoadPetitions();
