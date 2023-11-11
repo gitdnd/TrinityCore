@@ -28153,7 +28153,7 @@ void Player::LearnCustomTalent(uint32 id)
     if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
         aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
     else
-        CastSpell(this, nodeInfo->spellId, true);
+        LearnSpell(nodeInfo->spellId, false);
 
  
     SetFreeTalentPoints(GetFreeTalentPoints() - 1);
@@ -28178,7 +28178,7 @@ void Player::UnlearnCustomTalent(uint32 id)
         if (aur->GetStackAmount() > 1)
             aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
         else
-            aur->Remove();
+            RemoveSpell(nodeInfo->spellId);
 
 
     SetFreeTalentPoints(GetFreeTalentPoints() + 1);
