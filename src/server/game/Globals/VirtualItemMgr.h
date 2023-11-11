@@ -451,7 +451,7 @@ public:
     void GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
     void GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
-    void UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
+    void UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier);
     void InitSeedGen(VirtualModifier& modifier);
 
     void LoadLegendaryTemplate();
