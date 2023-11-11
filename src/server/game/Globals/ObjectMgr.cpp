@@ -8551,6 +8551,8 @@ uint32 ObjectMgr::GetBaseXP(uint8 level)
 
 uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
+    if (level == 0)
+        level = 1;
     // ((ilevel ^ 1.35) / 2) * 1000
     return (std::pow(level, 1.5) * 0.5) * 1000;
     /*if (level < _playerXPperLevel.size())
