@@ -2611,21 +2611,29 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 
     while (newXP >= nextLvlXP && talent_level < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
     {
-        newXP -= nextLvlXP;
+        int oldLevel = talent_level;
+        int numLevels = 0;
+
+        while (newXP >= nextLvlXP)
+        {
+            ++numLevels;
+            newXP -= nextLvlXP;
+            nextLvlXP = sObjectMgr->GetXPForLevel(talent_level + numLevels);
+        }
 
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+        if ((talent_level + numLevels) <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
-            ++talent_level;
+            talent_level += numLevels;
             CastSpell(this, 90299, true); // Talent level up visual
             SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
             InitTalentForLevel();
             ChatHandler(GetSession()).SendSysMessage(("Your talent level has increased to " + std::to_string(talent_level) + ".").c_str());
-            ChatHandler(GetSession()).SendSysMessage("You have gained 1 talent point.");
-            if(GetMap()->GetEluna())
-                GetMap()->GetEluna()->OnLevelChanged(this, talent_level - 1);
+            ChatHandler(GetSession()).SendSysMessage(("You have gained " + std::to_string(numLevels) + " talent point.").c_str());
+            if (GetMap()->GetEluna())
+                GetMap()->GetEluna()->OnLevelChanged(this, oldLevel);
         }
 
         //level = GetLevel();
