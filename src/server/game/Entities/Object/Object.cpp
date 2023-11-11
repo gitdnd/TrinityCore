@@ -2638,6 +2638,14 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
             return SPELL_MISS_BLOCK;
     }
 
+    // 93179 - Whirling Barrier --itswicky
+    if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(93179) && victim->ToPlayer()->IsUsingStaff())
+    {
+        int blockChance = victim->GetUnitBlockChance(BASE_ATTACK, victim);
+        if (roll_chance_i(blockChance))
+            return SPELL_MISS_BLOCK;
+    }
+
     if (spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT) || IsUnit() && ToUnit()->HasAura(SPELL_PRECISE_TECHNIQUE))
         return SPELL_MISS_NONE;
 

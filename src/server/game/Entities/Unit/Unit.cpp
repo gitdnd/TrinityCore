@@ -2717,6 +2717,12 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
                 skillBonus = 0.04f * skillDiff;
             }
+            // Whirling Barrier --itswicky
+            else if (playerVictim->HasAura(93179) && playerVictim->IsUsingStaff())
+            {
+                chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
+                skillBonus = 0.04f * skillDiff;
+            }
         }
     }
     else
@@ -12295,8 +12301,8 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
     //calculate miss chance
     float missChance = victim->GetUnitMissChance();
 
-    // melee attacks while dual wielding have +19% chance to miss
-    if (!spellId && haveOffhandWeapon())
+    // melee attacks while dual wielding have +19% chance to miss - Except with Unrelenting Assault --itswicky
+    if (!spellId && haveOffhandWeapon() && !ToPlayer()->HasAura(93178))
         missChance += 19.0f;
 
     // bonus from skills is 0.04%

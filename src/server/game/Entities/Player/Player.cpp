@@ -5480,6 +5480,14 @@ uint32 Player::GetShieldBlockValue() const
         }
     }
 
+    if (HasAura(93179) && IsUsingStaff())
+    {
+        float weaponDPS = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->getDPS();
+        AuraEffect const* whirlingBarrier = GetAuraEffect(93179, EFFECT_0);
+
+        value += (weaponDPS * (whirlingBarrier->GetAmount() / 100.f));
+    }
+
     return uint32(value);
 }
 
