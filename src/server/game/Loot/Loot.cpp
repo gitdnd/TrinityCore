@@ -177,7 +177,7 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                         ItemTemplate const* personalProto;
                         if (VirtualItemMgr::IsVirtualTemplate(proto))
                         {
-                            static VirtualModifier modifier = VirtualModifier();
+                            VirtualModifier modifier = VirtualModifier();
 
                             uint32 dungeonLevel = uint32(member->GetMap()->GetDungeonLevel());
                             uint32 playerLevel = uint32(member->GetCappedItemLevel());
@@ -239,7 +239,7 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
         // VirtualItem
         if (VirtualItemMgr::IsVirtualTemplate(proto))
         {
-            static VirtualModifier modifier = VirtualModifier();
+            VirtualModifier modifier = VirtualModifier();
 
             if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
             {
@@ -251,8 +251,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
                 {
                     modifier.vLvlMod = inst->vLvlMod;
-                    modifier.plrAvgLvl = player->GetMap()->GetCappedDungeonLevel();
-                    //modifier.lowYield = player->GetCappedItemLevel() - 50 > player->GetMap()->GetCappedDungeonLevel() ? true : false;
+                    modifier.plrAvgLvl = uint32(player->GetMap()->GetCappedDungeonLevel());
+                    modifier.lowYield = uint32(player->GetCappedItemLevel()) - 50 > player->GetMap()->GetCappedDungeonLevel() ? true : false;
                 }
             }
 
