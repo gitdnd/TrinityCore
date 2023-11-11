@@ -2611,33 +2611,25 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 
     while (newXP >= nextLvlXP && talent_level < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
     {
-        uint32 oldLevel = talent_level;
-        uint32 numLevels = 0;
-
-        while (newXP >= nextLvlXP)
-        {
-            ++numLevels;
-            newXP -= nextLvlXP;
-            nextLvlXP = sObjectMgr->GetXPForLevel(talent_level + numLevels);
-        }
+        newXP -= nextLvlXP;
 
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if ((talent_level + numLevels) <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+        if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
-            talent_level += numLevels;
+            ++talent_level;
             CastSpell(this, 90299, true); // Talent level up visual
             SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
             InitTalentForLevel();
             ChatHandler(GetSession()).SendSysMessage(("Your talent level has increased to " + std::to_string(talent_level) + ".").c_str());
-            ChatHandler(GetSession()).SendSysMessage(("You have gained " + std::to_string(numLevels) + " talent point" + (numLevels > 1 ? "s" : "") + ".").c_str());
+            ChatHandler(GetSession()).SendSysMessage("You have gained 1 talent point.");
             if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->OnLevelChanged(this, oldLevel);
+                GetMap()->GetEluna()->OnLevelChanged(this, talent_level - 1);
         }
 
         //level = GetLevel();
-        //nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+        nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     }
 
     SetXP(newXP);
@@ -5486,14 +5478,6 @@ uint32 Player::GetShieldBlockValue() const
         {
             value *= (1.f + (shieldSuperiority->GetAmount() / 100.f));
         }
-    }
-
-    if (HasAura(93179) && IsUsingStaff())
-    {
-        float weaponDPS = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->getDPS();
-        AuraEffect const* whirlingBarrier = GetAuraEffect(93179, EFFECT_0);
-
-        value += (weaponDPS * (whirlingBarrier->GetAmount() / 100.f));
     }
 
     return uint32(value);
@@ -12667,8 +12651,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     {
         CheckTitanGripPenalty();
         UpdateShieldSuperiority();
-        if (HasAura(93179))
-            UpdateShieldBlockValue();
     }
 
     // only for full equip instead adding to stack
@@ -12704,8 +12686,6 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         {
             CheckTitanGripPenalty();
             UpdateShieldSuperiority();
-            if (HasAura(93179))
-                UpdateShieldBlockValue();
         }
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
@@ -12909,9 +12889,6 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     CheckTitanGripPenalty();
                     UpdateShieldSuperiority();
                     UpdateDamagePhysical(BASE_ATTACK);
-
-                    if (HasAura(93179))
-                        UpdateShieldBlockValue();
                 }
             }
         }
@@ -28133,9 +28110,7 @@ void Player::DeactivateTalentLoadout()
             continue;
         }
         // should we check triggerspells?
-        //RemoveSpell(nodeInfo->spellId);
-        RemoveTemporarySpell(nodeInfo->spellId);
-        RemoveOwnedAura(nodeInfo->spellId, GetGUID());
+        RemoveAura(nodeInfo->spellId);
     }
 }
 
@@ -28163,13 +28138,7 @@ void Player::LearnCustomTalent(uint32 id)
     if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
         aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
     else
-    {
-        //LearnSpell(nodeInfo->spellId, false);
-        AddTemporarySpell(nodeInfo->spellId);
-        if(const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
-            if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
-                CastSpell(this, nodeInfo->spellId, true);
-    }
+        CastSpell(this, nodeInfo->spellId, true);
 
  
     SetFreeTalentPoints(GetFreeTalentPoints() - 1);
@@ -28194,11 +28163,7 @@ void Player::UnlearnCustomTalent(uint32 id)
         if (aur->GetStackAmount() > 1)
             aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
         else
-        {
-            //RemoveSpell(nodeInfo->spellId);
-            RemoveTemporarySpell(nodeInfo->spellId);
-            RemoveOwnedAura(nodeInfo->spellId, GetGUID());
-        }
+            aur->Remove();
 
 
     SetFreeTalentPoints(GetFreeTalentPoints() + 1);
