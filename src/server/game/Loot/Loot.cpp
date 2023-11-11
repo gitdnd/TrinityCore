@@ -179,14 +179,14 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                         {
                             static VirtualModifier modifier = VirtualModifier();
 
-                            int dungeonLevel = member->GetMap()->GetDungeonLevel();
-                            int playerLevel = std::floor(member->GetCappedItemLevel());
+                            uint32 dungeonLevel = uint32(member->GetMap()->GetDungeonLevel());
+                            uint32 playerLevel = uint32(member->GetCappedItemLevel());
 
                             // is this calculation what we really want? really need to double check this logic
                             modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
-                            //modifier.lowYield = playerLevel - 50 > dungeonLevel ? true : false;
+                            modifier.lowYield = playerLevel - 50 > dungeonLevel ? true : false;
 
-                            //modifier.lootPreference = member->GetActiveLootPreference();
+                            modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
 
                             if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
@@ -243,8 +243,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 
             if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
             {
-                modifier.plrAvgLvl = std::floor(player->GetCappedItemLevel());
-                //modifier.lootPreference = player->GetActiveLootPreference();
+                modifier.plrAvgLvl = uint32(player->GetCappedItemLevel());
+                modifier.lootPreference = player->GetActiveLootPreference();
                 modifier.magicFind = player->GetMagicFind();
 
                 // if player is in dungeon, override avg level and apply vLvl mod
