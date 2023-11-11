@@ -28125,7 +28125,7 @@ void Player::DeactivateTalentLoadout()
             continue;
         }
         // should we check triggerspells?
-        RemoveAura(nodeInfo->spellId);
+        RemoveSpell(nodeInfo->spellId);
     }
 }
 
