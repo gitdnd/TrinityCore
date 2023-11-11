@@ -12659,6 +12659,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     {
         CheckTitanGripPenalty();
         UpdateShieldSuperiority();
+        if (HasAura(93179))
+            UpdateShieldBlockValue();
     }
 
     // only for full equip instead adding to stack
@@ -12694,6 +12696,8 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         {
             CheckTitanGripPenalty();
             UpdateShieldSuperiority();
+            if (HasAura(93179))
+                UpdateShieldBlockValue();
         }
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
@@ -12897,6 +12901,9 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     CheckTitanGripPenalty();
                     UpdateShieldSuperiority();
                     UpdateDamagePhysical(BASE_ATTACK);
+
+                    if (HasAura(93179))
+                        UpdateShieldBlockValue();
                 }
             }
         }

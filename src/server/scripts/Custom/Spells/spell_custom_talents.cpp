@@ -2390,7 +2390,7 @@ class spell_whirling_barrier : public AuraScript
             return;
 
         caster->RemoveSpell(107);
-        caster->UpdateShieldSuperiority();
+        caster->UpdateShieldBlockValue();
     }
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
