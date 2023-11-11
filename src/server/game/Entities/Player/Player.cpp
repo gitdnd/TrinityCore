@@ -2611,8 +2611,8 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 
     while (newXP >= nextLvlXP && talent_level < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
     {
-        int oldLevel = talent_level;
-        int numLevels = 0;
+        uint32 oldLevel = talent_level;
+        uint32 numLevels = 0;
 
         while (newXP >= nextLvlXP)
         {
@@ -2631,13 +2631,13 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
             SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
             InitTalentForLevel();
             ChatHandler(GetSession()).SendSysMessage(("Your talent level has increased to " + std::to_string(talent_level) + ".").c_str());
-            ChatHandler(GetSession()).SendSysMessage(("You have gained " + std::to_string(numLevels) + " talent point.").c_str());
+            ChatHandler(GetSession()).SendSysMessage(("You have gained " + std::to_string(numLevels) + " talent point" + (numLevels > 1 ? "s" : "") + ".").c_str());
             if (GetMap()->GetEluna())
                 GetMap()->GetEluna()->OnLevelChanged(this, oldLevel);
         }
 
         //level = GetLevel();
-        nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
+        //nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     }
 
     SetXP(newXP);
