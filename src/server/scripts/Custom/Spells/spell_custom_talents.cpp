@@ -2375,7 +2375,41 @@ class spell_burnout : public AuraScript
         OnEffectProc += AuraEffectProcFn(spell_burnout::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
-//
+
+// 93179 - Whirling Barrier
+class spell_whirling_barrier : public AuraScript
+{
+    PrepareAuraScript(spell_whirling_barrier);
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (!GetCaster())
+            return;
+        Player* caster = GetCaster()->ToPlayer();
+        if (!caster)
+            return;
+
+        caster->RemoveSpell(107);
+        caster->UpdateShieldSuperiority();
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (!caster)
+            return;
+
+        caster->LearnSpell(107, false);
+        caster->UpdateShieldBlockValue();
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_whirling_barrier::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_whirling_barrier::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2439,4 +2473,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_soothing_flame);
     RegisterAuraScript(spell_burnout);
     RegisterAuraScript(spell_battle_rouse);
+    RegisterAuraScript(spell_whirling_barrier);
 }
