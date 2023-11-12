@@ -2444,13 +2444,23 @@ class spell_druidic_rite : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
 
-        HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
+        int32 triggerBP = 0;
+        SpellInfo const* trigger = eventInfo.GetSpellInfo();
+        if (!trigger)
             return;
+
+        if (trigger->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE)
+            triggerBP = trigger->Effects[EFFECT_0].CalcValue();
+        else if (trigger->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE_PCT)
+        {
+            int32 bp0 = trigger->Effects[EFFECT_0].CalcValue();
+            int32 mana = caster->GetMaxPower(POWER_MANA);
+            triggerBP = (mana / 100) * bp0;
+        }
 
         int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
         CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(healInfo->GetHeal() * bp / 400);
+        args.AddSpellBP0(triggerBP * bp / 400);
         caster->CastSpell(caster, 94011, args);
     }
 
