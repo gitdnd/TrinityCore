@@ -295,7 +295,6 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
     Clock::time_point recTime;
     bool needsCooldownPacket = false;
 
-    ChatHandler(_owner->ToPlayer()->GetSession()).PSendSysMessage("StartCooldown called: %i", categoryCooldown);
     // overwrite time for selected category
     if (onHold)
     {
@@ -313,15 +312,11 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
         // Now we have cooldown data (if found any), time to apply mods
         if (Player* modOwner = _owner->GetSpellModOwner())
         {
-            ChatHandler(modOwner->GetSession()).PSendSysMessage("Aura 107 & 108 Mods checked for cooldown: %i", categoryCooldown);
             if (cooldown >= 0)
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, cooldown, spell);
 
             if (categoryCooldown >= 0 && !spellInfo->HasAttribute(SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS))
-            {
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, categoryCooldown, spell);
-                ChatHandler(modOwner->GetSession()).PSendSysMessage("Category Cooldown after ApplySpellMod: %i", categoryCooldown);
-            }
         }
 
         if (int32 cooldownMod = _owner->GetTotalAuraModifier(SPELL_AURA_MOD_COOLDOWN))

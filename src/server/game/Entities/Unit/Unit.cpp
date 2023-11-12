@@ -7521,7 +7521,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, effIndex, donePctTotal, stack);
 
     // No bonus healing for potion spells
-    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
         return healamount;
 
     float ApCoeffMod = 1.0f;
@@ -7671,7 +7671,7 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
         return 1.0f;
 
     // No bonus healing for potion spells
-    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
         return 1.0f;
 
     float DoneTotalMod = 1.0f;
