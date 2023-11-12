@@ -6772,7 +6772,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     Aura const* aura = itr->second->GetBase();
                     SpellInfo const* spell = aura->GetSpellInfo();
 
-                    if (!(spell->GetDispelMask() & DISPEL_DISEASE))
+                    if (!(spell->GetDispelMask() & (1 << DISPEL_DISEASE)))
                         continue;
                     ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester found disease %f", DoneTotalMod);
                     totalBonus += bonus * aura->GetStackAmount();
