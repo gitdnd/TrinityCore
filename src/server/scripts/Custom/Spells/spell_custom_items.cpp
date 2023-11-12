@@ -529,6 +529,30 @@ class spell_item_metamorph_gem : public AuraScript
     }
 };
 
+class spell_tobenamedlegendary_dodge_thing : public AuraScript
+{
+    PrepareAuraScript(spell_tobenamedlegendary_dodge_thing);
+
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetHitMask() & PROC_HIT_DODGE;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), 7, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_tobenamedlegendary_dodge_thing::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_tobenamedlegendary_dodge_thing::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -543,4 +567,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_faction_change_character);
     RegisterSpellScript(spell_item_change_race_character);
     RegisterAuraScript(spell_item_metamorph_gem);
+    RegisterAuraScript(spell_tobenamedlegendary_dodge_thing);
 }
