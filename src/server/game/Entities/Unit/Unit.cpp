@@ -1216,6 +1216,15 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
             if (HasAura(SPELL_FIST_OF_FURY) && (damageInfo->AttackType == BASE_ATTACK || damageInfo->AttackType == OFF_ATTACK))
                 if(!plr->GetWeaponForAttack(BASE_ATTACK, true) && !plr->GetWeaponForAttack(OFF_ATTACK, true))
                     damage *= 3;
+
+            if (HasAura(SPELL_HEAVY_BLOWS) && (damageInfo->AttackType == BASE_ATTACK))
+            {
+                AuraEffect const* aura = plr->GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
+                int32 chance = aura->GetAmount();
+                if (plr->IsUsingStaff())
+                    if (roll_chance_i(chance))
+                        damage *= 2;
+            }
         }
         // Add melee damage bonus
         damage = MeleeDamageBonusDone(damageInfo->Target, damage, damageInfo->AttackType, nullptr, schoolMask);
@@ -7011,6 +7020,17 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 DoneTotalMod *= 4;
             break;
     }
+
+    if (Unit const* owner = GetOwner())
+        if (Player* player = GetOwner()->ToPlayer())
+            if (HasAura(SPELL_HEAVY_BLOWS))
+            {
+                AuraEffect const* aura = GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
+                int32 chance = aura->GetAmount();
+                if (player->IsUsingStaff())
+                    if (roll_chance_i(chance))
+                        DoneTotalMod *= 2;
+            }
 
     return DoneTotalMod;
 }
