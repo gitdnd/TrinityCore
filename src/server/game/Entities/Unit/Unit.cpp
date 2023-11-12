@@ -6765,7 +6765,6 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             {
                 int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
                 int32 totalBonus = 0;
-                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester first check %f", DoneTotalMod);
                 AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
                 for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
                 {
@@ -6774,7 +6773,6 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
 
                     if (!(spell->GetDispelMask() & (1 << DISPEL_DISEASE)))
                         continue;
-                    ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester found disease %f", DoneTotalMod);
                     totalBonus += bonus * aura->GetStackAmount();
                 }
                 AddPct(DoneTotalMod, totalBonus);
