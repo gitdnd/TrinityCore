@@ -6763,6 +6763,13 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 AddPct(DoneTotalMod, totalBonus);
                 break;
             }
+            case 9999: // Heavy Blow --Itswicky
+            {
+                int32 chance = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                if (roll_chance_i(chance))
+                    DoneTotalMod *= 2;
+                break;
+            }
             case 6916: // Death's Embrace
             case 6925:
             case 6927:
@@ -7019,14 +7026,6 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             if (spellProto->Id == 47855 && !victim->HealthAbovePct(25))
                 DoneTotalMod *= 4;
             break;
-    }
-
-    if (owner->HasAura(SPELL_HEAVY_BLOWS))
-    {
-        AuraEffect* aura = GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
-        int32 chance = aura->GetAmount();
-        if (roll_chance_i(50))
-            DoneTotalMod *= 2;
     }
 
     return DoneTotalMod;
