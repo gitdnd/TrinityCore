@@ -5480,6 +5480,15 @@ uint32 Player::GetShieldBlockValue() const
         }
     }
 
+    // Whirling Barrier --itswicky
+    if (HasAura(93179) && IsUsingStaff())
+    {
+        float weaponDPS = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->getDPS();
+        AuraEffect const* whirlingBarrier = GetAuraEffect(93179, EFFECT_0);
+
+        value += (weaponDPS * (whirlingBarrier->GetAmount() / 100.f));
+    }
+
     return uint32(value);
 }
 
@@ -12651,6 +12660,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     {
         CheckTitanGripPenalty();
         UpdateShieldSuperiority();
+        if (HasAura(93179))
+            UpdateShieldBlockValue();
     }
 
     // only for full equip instead adding to stack
@@ -12686,6 +12697,8 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         {
             CheckTitanGripPenalty();
             UpdateShieldSuperiority();
+            if (HasAura(93179))
+                UpdateShieldBlockValue();
         }
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
@@ -12889,6 +12902,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     CheckTitanGripPenalty();
                     UpdateShieldSuperiority();
                     UpdateDamagePhysical(BASE_ATTACK);
+                    if (HasAura(93179))
+                        UpdateShieldBlockValue();
                 }
             }
         }

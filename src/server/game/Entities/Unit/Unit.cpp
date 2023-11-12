@@ -996,17 +996,20 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             case SPELL_DAMAGE_CLASS_MELEE:
             {
                 // Heavy Blows --Itswicky
-                if (damageInfo->attacker->HasAura(93180))
+                if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
                 {
-                    Player* player = damageInfo->attacker->ToPlayer();
-                    if (player)
-                        if (player->IsUsingStaff())
-                        {
-                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93180, 1);
-                            int32 chance = aurEff->GetAmount();
-                            if (roll_chance_i(chance))
-                                damage += damage;
-                        }
+                    if (damageInfo->attacker->HasAura(93180))
+                    {
+                        Player* player = damageInfo->attacker->ToPlayer();
+                        if (player)
+                            if (player->IsUsingStaff())
+                            {
+                                AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93180, 0);
+                                int32 chance = aurEff->GetAmount();
+                                if (roll_chance_i(chance))
+                                    damage += damage;
+                            }
+                    }
                 }
 
                 // Physical Damage
@@ -6716,28 +6719,6 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
     AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
     {
-        switch ((*i)->GetMiscValue())
-        {
-            case 666: // Fester --Itswicky
-            {
-                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
-                int32 totalBonus = 0;
-                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester first check %f", DoneTotalMod);
-                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
-                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
-                {
-                    Aura const* aura = itr->second->GetBase();
-                    SpellInfo const* spell = aura->GetSpellInfo();
-
-                    if (!(spell->GetDispelMask() & DISPEL_DISEASE))
-                        continue;
-                    ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester found disease %f", DoneTotalMod);
-                    totalBonus += bonus * aura->GetStackAmount();
-                }
-                AddPct(DoneTotalMod, totalBonus);
-                break;
-            }
-        }
         if (!(*i)->IsAffectedOnSpell(spellProto))
             continue;
 
@@ -6780,7 +6761,23 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 AddPct(DoneTotalMod, modPercent);
                 break;
             }
+            case 666: // Fester --Itswicky
+            {
+                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                int32 totalBonus = 0;
+                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
+                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
+                {
+                    Aura const* aura = itr->second->GetBase();
+                    SpellInfo const* spell = aura->GetSpellInfo();
 
+                    if (!(spell->GetDispelMask() & (1 << DISPEL_DISEASE)))
+                        continue;
+                    totalBonus += bonus * aura->GetStackAmount();
+                }
+                AddPct(DoneTotalMod, totalBonus);
+                break;
+            }
             case 6916: // Death's Embrace
             case 6925:
             case 6927:
@@ -7524,7 +7521,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, effIndex, donePctTotal, stack);
 
     // No bonus healing for potion spells
-    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
         return healamount;
 
     float ApCoeffMod = 1.0f;
@@ -7674,7 +7671,7 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
         return 1.0f;
 
     // No bonus healing for potion spells
-    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
         return 1.0f;
 
     float DoneTotalMod = 1.0f;
