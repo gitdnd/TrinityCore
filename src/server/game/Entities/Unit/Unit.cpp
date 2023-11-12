@@ -7025,7 +7025,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
     {
         AuraEffect* aura = GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
         int32 chance = aura->GetAmount();
-        if (roll_chance_i(chance))
+        if (roll_chance_i(50))
             DoneTotalMod *= 2;
     }
 
