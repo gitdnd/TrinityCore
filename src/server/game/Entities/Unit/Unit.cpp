@@ -6719,28 +6719,6 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
     AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
     {
-        switch ((*i)->GetMiscValue())
-        {
-            case 666: // Fester --Itswicky
-            {
-                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
-                int32 totalBonus = 0;
-                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester first check %f", DoneTotalMod);
-                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
-                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
-                {
-                    Aura const* aura = itr->second->GetBase();
-                    SpellInfo const* spell = aura->GetSpellInfo();
-
-                    if (!(spell->GetDispelMask() & DISPEL_DISEASE))
-                        continue;
-                    ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester found disease %f", DoneTotalMod);
-                    totalBonus += bonus * aura->GetStackAmount();
-                }
-                AddPct(DoneTotalMod, totalBonus);
-                break;
-            }
-        }
         if (!(*i)->IsAffectedOnSpell(spellProto))
             continue;
 
@@ -6783,7 +6761,25 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 AddPct(DoneTotalMod, modPercent);
                 break;
             }
+            case 666: // Fester --Itswicky
+            {
+                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                int32 totalBonus = 0;
+                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester first check %f", DoneTotalMod);
+                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
+                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
+                {
+                    Aura const* aura = itr->second->GetBase();
+                    SpellInfo const* spell = aura->GetSpellInfo();
 
+                    if (!(spell->GetDispelMask() & DISPEL_DISEASE))
+                        continue;
+                    ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester found disease %f", DoneTotalMod);
+                    totalBonus += bonus * aura->GetStackAmount();
+                }
+                AddPct(DoneTotalMod, totalBonus);
+                break;
+            }
             case 6916: // Death's Embrace
             case 6925:
             case 6927:
