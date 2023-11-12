@@ -996,17 +996,20 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             case SPELL_DAMAGE_CLASS_MELEE:
             {
                 // Heavy Blows --Itswicky
-                if (damageInfo->attacker->HasAura(93180))
+                if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
                 {
-                    Player* player = damageInfo->attacker->ToPlayer();
-                    if (player)
-                        if (player->IsUsingStaff())
-                        {
-                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93180, 1);
-                            int32 chance = aurEff->GetAmount();
-                            if (roll_chance_i(chance))
-                                damage += damage;
-                        }
+                    if (damageInfo->attacker->HasAura(93180))
+                    {
+                        Player* player = damageInfo->attacker->ToPlayer();
+                        if (player)
+                            if (player->IsUsingStaff())
+                            {
+                                AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93180, 0);
+                                int32 chance = aurEff->GetAmount();
+                                if (roll_chance_i(chance))
+                                    damage += damage;
+                            }
+                    }
                 }
 
                 // Physical Damage
