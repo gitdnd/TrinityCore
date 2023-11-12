@@ -995,6 +995,20 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             case SPELL_DAMAGE_CLASS_RANGED:
             case SPELL_DAMAGE_CLASS_MELEE:
             {
+                // Heavy Blows --Itswicky
+                if (damageInfo->attacker->HasAura(93180))
+                {
+                    Player* player = damageInfo->attacker->ToPlayer();
+                    if (player)
+                        if (player->IsUsingStaff())
+                        {
+                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93180, 1);
+                            int32 chance = aurEff->GetAmount();
+                            if (roll_chance_i(chance))
+                                damage += damage;
+                        }
+                }
+
                 // Physical Damage
                 if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
                 {
@@ -6708,7 +6722,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             {
                 int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
                 int32 totalBonus = 0;
-
+                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester first check %f", DoneTotalMod);
                 AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
                 for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
                 {
@@ -6717,19 +6731,10 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
 
                     if (!(spell->GetDispelMask() & DISPEL_DISEASE))
                         continue;
-
+                    ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Fester found disease %f", DoneTotalMod);
                     totalBonus += bonus * aura->GetStackAmount();
                 }
                 AddPct(DoneTotalMod, totalBonus);
-                break;
-            }
-            case 9999: // Heavy Blow --Itswicky
-            {
-                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Heavy blow before %f", DoneTotalMod);
-                int32 chance = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
-                if (roll_chance_i(chance))
-                    DoneTotalMod *= 2;
-                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Heavy blow after %f chance %i", DoneTotalMod, chance);
                 break;
             }
         }
