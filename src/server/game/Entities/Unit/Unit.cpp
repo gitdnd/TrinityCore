@@ -7021,16 +7021,14 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             break;
     }
 
-    if (Unit const* owner = GetOwner())
-        if (Player* player = GetOwner()->ToPlayer())
-            if (HasAura(SPELL_HEAVY_BLOWS))
-            {
-                AuraEffect const* aura = GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
-                int32 chance = aura->GetAmount();
-                if (player->IsUsingStaff())
-                    if (roll_chance_i(chance))
-                        DoneTotalMod *= 2;
-            }
+    if (GetTypeId() == TYPEID_PLAYER)
+        if (HasAura(SPELL_HEAVY_BLOWS))
+        {
+            AuraEffect const* aura = GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
+            int32 chance = aura->GetAmount();
+            if (roll_chance_i(chance))
+                DoneTotalMod *= 2;
+        }
 
     return DoneTotalMod;
 }
