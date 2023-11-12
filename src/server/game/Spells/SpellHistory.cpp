@@ -16,6 +16,7 @@
  */
 
 #include "SpellHistory.h"
+#include "Chat.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "ObjectMgr.h"
@@ -294,6 +295,7 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
     Clock::time_point recTime;
     bool needsCooldownPacket = false;
 
+    ChatHandler(_owner->ToPlayer()->GetSession()).PSendSysMessage("StartCooldown called.");
     // overwrite time for selected category
     if (onHold)
     {
@@ -311,6 +313,7 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
         // Now we have cooldown data (if found any), time to apply mods
         if (Player* modOwner = _owner->GetSpellModOwner())
         {
+            ChatHandler(modOwner->GetSession()).PSendSysMessage("Aura 107 & 108 Mods checked for cooldown.");
             if (cooldown >= 0)
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, cooldown, spell);
 

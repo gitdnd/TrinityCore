@@ -22774,7 +22774,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
     // no potion used i combat or still in combat
     if (!m_lastPotionId || IsInCombat())
         return;
-
+    ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("UpdatePotionCooldown called.");
     // Call not from spell cast, send cooldown event for item spells if no in combat
     if (!spell)
     {
