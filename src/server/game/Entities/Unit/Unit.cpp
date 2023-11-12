@@ -7022,6 +7022,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
     }
 
     if (GetTypeId() == TYPEID_PLAYER)
+    {
         if (HasAura(SPELL_HEAVY_BLOWS))
         {
             AuraEffect const* aura = GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
@@ -7029,6 +7030,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             if (roll_chance_i(chance))
                 DoneTotalMod *= 2;
         }
+    }
 
     return DoneTotalMod;
 }
