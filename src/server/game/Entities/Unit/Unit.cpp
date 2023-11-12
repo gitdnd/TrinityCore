@@ -6765,9 +6765,11 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             }
             case 9999: // Heavy Blow --Itswicky
             {
+                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Heavy blow before %f", DoneTotalMod);
                 int32 chance = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
                 if (roll_chance_i(chance))
                     DoneTotalMod *= 2;
+                ChatHandler(ToPlayer()->GetSession()).PSendSysMessage("Heavy blow after %f chance %i", DoneTotalMod, chance);
                 break;
             }
             case 6916: // Death's Embrace
