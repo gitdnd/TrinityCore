@@ -18506,7 +18506,6 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     UpdateDisplayPower();
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
-    LoadCustomTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
     _LoadSpells(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELLS));
 
     _LoadGlyphs(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_GLYPHS));
@@ -18656,6 +18655,9 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+
+    LoadCustomTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
+
 
     return true;
 }
@@ -28110,7 +28112,9 @@ void Player::DeactivateTalentLoadout()
             continue;
         }
         // should we check triggerspells?
-        RemoveAura(nodeInfo->spellId);
+        //RemoveSpell(nodeInfo->spellId);
+        RemoveTemporarySpell(nodeInfo->spellId);
+        RemoveOwnedAura(nodeInfo->spellId, GetGUID());
     }
 }
 
@@ -28138,7 +28142,13 @@ void Player::LearnCustomTalent(uint32 id)
     if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
         aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
     else
-        CastSpell(this, nodeInfo->spellId, true);
+    {
+        //LearnSpell(nodeInfo->spellId, false);
+        AddTemporarySpell(nodeInfo->spellId);
+        if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+            if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
+                CastSpell(this, nodeInfo->spellId, true);
+    }
 
  
     SetFreeTalentPoints(GetFreeTalentPoints() - 1);
@@ -28163,7 +28173,11 @@ void Player::UnlearnCustomTalent(uint32 id)
         if (aur->GetStackAmount() > 1)
             aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
         else
-            aur->Remove();
+        {
+            //RemoveSpell(nodeInfo->spellId);
+            RemoveTemporarySpell(nodeInfo->spellId);
+            RemoveOwnedAura(nodeInfo->spellId, GetGUID());
+        }
 
 
     SetFreeTalentPoints(GetFreeTalentPoints() + 1);
@@ -28208,7 +28222,13 @@ void Player::LoadCustomTalentLoadout()
         if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
             aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
         else
-            CastSpell(this, nodeInfo->spellId, true);
+        {
+            //CastSpell(this, nodeInfo->spellId, true);
+            AddTemporarySpell(nodeInfo->spellId);
+            if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+                if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
+                    CastSpell(this, nodeInfo->spellId, true);
+        }
     }
 }
 
