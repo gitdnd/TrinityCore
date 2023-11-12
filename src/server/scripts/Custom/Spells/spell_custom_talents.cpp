@@ -2410,6 +2410,56 @@ class spell_whirling_barrier : public AuraScript
     }
 };
 
+class spell_field_medic : public AuraScript
+{
+    PrepareAuraScript(spell_field_medic);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(healInfo->GetHeal() * bp / 400);
+        caster->CastSpell(caster, 94010, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_field_medic::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_druidic_rite : public AuraScript
+{
+    PrepareAuraScript(spell_druidic_rite);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(healInfo->GetHeal() * bp / 400);
+        caster->CastSpell(caster, 94011, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_druidic_rite::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2474,4 +2524,6 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_burnout);
     RegisterAuraScript(spell_battle_rouse);
     RegisterAuraScript(spell_whirling_barrier);
+    RegisterAuraScript(spell_field_medic);
+    RegisterAuraScript(spell_druidic_rite);
 }
