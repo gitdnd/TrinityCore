@@ -548,7 +548,9 @@ m_caster((info->HasAttribute(SPELL_ATTR6_CAST_BY_CHARMER) && caster->GetCharmerO
         // wand case
         if (m_attackType == RANGED_ATTACK)
             if (Item* pItem = playerCaster->GetWeaponForAttack(RANGED_ATTACK))
-                m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+                //if(pItem && pItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                if(GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_NORMAL)
+                    m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
     }
 
     if (originalCasterGUID)
@@ -2036,10 +2038,9 @@ void Spell::prepareDataForTriggerSystem()
     }
 
     // Hunter trap spells - activation proc for Lock and Load, Entrapment and Misdirection
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
-        (m_spellInfo->SpellFamilyFlags[0] & 0x18 ||         // Freezing and Frost Trap, Freezing Arrow
-            m_spellInfo->Id == 57879 ||                     // Snake Trap - done this way to avoid double proc
-            m_spellInfo->SpellFamilyFlags[2] & 0x00024000)) // Explosive and Immolation Trap
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS &&
+        (m_spellInfo->SpellFamilyFlags[0] & 0x200000 ||         // Freezing and Frost Trap, Freezing Arrow
+            m_spellInfo->Id == 57879))                   // Snake Trap - done this way to avoid double proc
     {
         m_procAttacker |= PROC_FLAG_DONE_TRAP_ACTIVATION;
 
@@ -2049,7 +2050,7 @@ void Spell::prepareDataForTriggerSystem()
     }
 
     // Hellfire Effect - trigger as DOT
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellFamilyFlags[0] & 0x00000040)
+    if (m_spellInfo->Id == 47822) // Change proc to max rank id, as we don't use lower ranks -Itswicky
     {
         m_procAttacker = PROC_FLAG_DONE_PERIODIC;
         m_procVictim   = PROC_FLAG_TAKEN_PERIODIC;
@@ -4252,10 +4253,7 @@ void Spell::SendSpellStart()
 
     Powers powerType = m_spellInfo->PowerType;
 
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
-        powerType = POWER_HEALTH;
-
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && powerType == POWER_MANA && GetSpellInfo()->HasDamageEffects())
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_TWINKET_OF_BL00D_MAGK))
         powerType = POWER_HEALTH;
 
     //TC_LOG_DEBUG("spells", "Sending SMSG_SPELL_START id=%u", m_spellInfo->Id);
@@ -4328,10 +4326,7 @@ void Spell::SendSpellGo()
 
     Powers powerType = m_spellInfo->PowerType;
 
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
-        powerType = POWER_HEALTH;
-
-    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && powerType == POWER_MANA && GetSpellInfo()->HasDamageEffects())
+    if (m_caster->IsUnit() && m_caster->ToUnit()->HasAura(SPELL_TWINKET_OF_BL00D_MAGK))
         powerType = POWER_HEALTH;
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
@@ -4853,18 +4848,13 @@ void Spell::TakePower()
 
     bool bloodMagic = false;
     // HoT: Blood Magic
-    if (unitCaster->HasAura(SPELL_BLOOD_MAGIC) && powerType == POWER_MANA)
+    if (unitCaster->HasAura(SPELL_TWINKET_OF_BL00D_MAGK))
     {
-        powerType = POWER_HEALTH;
-        m_powerCost *= 1.5;
-        bloodMagic = true;
-    }
-
-    // HoT: Blood for the Blood God
-    if (powerType == POWER_MANA && unitCaster->HasAura(SPELL_BLOOD_FOR_THE_BLOOD_GOD) && GetSpellInfo()->HasDamageEffects())
-    {
-        powerType = POWER_HEALTH;
-        m_powerCost *= 2;
+        if (powerType == POWER_MANA)
+            m_powerCost *= 2.f;
+        else if (powerType == POWER_FOCUS)
+            m_powerCost *= 100.f;
+        powerType = POWER_HEALTH;        
         bloodMagic = true;
     }
 
@@ -5708,7 +5698,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 if (!unitCaster)
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR)
+                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS) // Updated to our family flag in case we use -Itswicky
                 {
                     // Warbringer - can't be handled in proc system - should be done before checkcast root check and charge effect process
                     if (strict && unitCaster->IsScriptOverriden(m_spellInfo, 6953))
@@ -6914,7 +6904,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                             else
                             {
                                 // Conjure Food/Water/Refreshment spells
-                                if (m_spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || (!(m_spellInfo->SpellFamilyFlags[0] & 0x40000000)))
+                                if (m_spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || (!(m_spellInfo->SpellFamilyFlags[0] & 0x40000000))) // We may need to edit this if Conjure spells don't work correctly -Itswicky
                                     return SPELL_FAILED_TOO_MANY_OF_ITEM;
                                 else if (!(target->ToPlayer()->HasItemCount(m_spellInfo->Effects[i].ItemType)))
                                 {
@@ -7806,7 +7796,7 @@ void Spell::HandleLaunchPhase()
             usesAmmo = false;
 
         // Do not consume ammo for the triggered AoE ticks of Volley (Hunter spell)
-        if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->IsTargetingArea())
+        if (IsTriggered() && m_spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS && m_spellInfo->IsTargetingArea()) // -Itswicky
             usesAmmo = false;
 
         if (usesAmmo)

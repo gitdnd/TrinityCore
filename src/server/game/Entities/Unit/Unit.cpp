@@ -995,6 +995,23 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             case SPELL_DAMAGE_CLASS_RANGED:
             case SPELL_DAMAGE_CLASS_MELEE:
             {
+                // Heavy Blows --Itswicky
+                if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
+                {
+                    if (damageInfo->attacker->HasAura(93180))
+                    {
+                        Player* player = damageInfo->attacker->ToPlayer();
+                        if (player)
+                            if (player->IsUsingStaff())
+                            {
+                                AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93180, 0);
+                                int32 chance = aurEff->GetAmount();
+                                if (roll_chance_i(chance))
+                                    damage += damage;
+                            }
+                    }
+                }
+
                 // Physical Damage
                 if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
                 {
@@ -1027,9 +1044,14 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
                     critPctDamageMod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellInfo->GetSchoolMask()) - 1.0f) * 100;
 
-                    // HoT: Ambush
-                    if (HasAura(180486) && victim->HealthBelowPct(50))
-                        critPctDamageMod += 10.f;
+                    // Ambush --Itswicky
+                    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
+                        if (damageInfo->attacker->HasAura(93173) && victim->HealthBelowPct(50))
+                        {
+                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93173, 1);
+                            float bonus = aurEff->GetAmount();
+                            critPctDamageMod += bonus;
+                        }
 
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_PERCENT_VERSUS
                     critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
@@ -1211,6 +1233,15 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
             if (HasAura(SPELL_FIST_OF_FURY) && (damageInfo->AttackType == BASE_ATTACK || damageInfo->AttackType == OFF_ATTACK))
                 if(!plr->GetWeaponForAttack(BASE_ATTACK, true) && !plr->GetWeaponForAttack(OFF_ATTACK, true))
                     damage *= 3;
+
+            if (HasAura(SPELL_HEAVY_BLOWS) && (damageInfo->AttackType == BASE_ATTACK))
+            {
+                AuraEffect const* aura = plr->GetAuraEffect(SPELL_HEAVY_BLOWS, EFFECT_0);
+                int32 chance = aura->GetAmount();
+                if (plr->IsUsingStaff())
+                    if (roll_chance_i(chance))
+                        damage *= 2;
+            }
         }
         // Add melee damage bonus
         damage = MeleeDamageBonusDone(damageInfo->Target, damage, damageInfo->AttackType, nullptr, schoolMask);
@@ -1272,9 +1303,13 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
                 // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
                 mod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, damageInfo->Damages[i].DamageSchoolMask) - 1.0f) * 100;
 
-                // HoT: Ambush
-                if (HasAura(180486) && victim->HealthBelowPct(50))
-                    mod += 10.f;
+                // Ambush --Itswicky
+                if (damageInfo->Attacker->HasAura(93173) && victim->HealthBelowPct(50))
+                {
+                    AuraEffect const* aurEff = damageInfo->Attacker->GetAuraEffect(93173, 1);
+                    float bonus = aurEff->GetAmount();
+                    mod += bonus;
+                }
 
                 uint32 crTypeMask = damageInfo->Target->GetCreatureTypeMask();
 
@@ -1753,7 +1788,7 @@ void Unit::HandleEmoteCommand(uint32 emoteId)
         victimResistance = 0.0f;
 
     // Chaos Bolt exception, ignore all target resistances (unknown attribute?)
-    if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && spellInfo->SpellIconID == 3178)
+    if (spellInfo && spellInfo->Id == 59172) // Check Id instead of family -Itswicky
         victimResistance = 0.0f;
 
     victimResistance = std::max(victimResistance, 0.0f);
@@ -2704,6 +2739,12 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
             }
             // Talent: Primed: Allows you to block with a two-handed melee weapon
             else if (playerVictim->HasSpell(180160) && playerVictim->IsTwoHandUsed())
+            {
+                chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
+                skillBonus = 0.04f * skillDiff;
+            }
+            // Whirling Barrier --itswicky
+            else if (playerVictim->HasAura(93179) && playerVictim->IsUsingStaff())
             {
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
                 skillBonus = 0.04f * skillDiff;
@@ -6535,7 +6576,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     switch (spellProto->SpellFamilyName)
     {
         case SPELLFAMILY_DEATHKNIGHT:
-            // Impurity (dummy effect)
+            // Impurity (dummy effect) This refers to a blizzlike talent to add AP scaling do DK abilities. Noting it here -Itswicky
             if (GetTypeId() == TYPEID_PLAYER)
             {
                 PlayerSpellMap const& playerSpells = ToPlayer()->GetSpellMap();
@@ -6708,7 +6749,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 {
                     Aura const* aura = itr->second->GetBase();
                     SpellInfo const* spell = aura->GetSpellInfo();
-                    if (spell->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spell->SpellFamilyFlags[1] & 0x0004071B || spell->SpellFamilyFlags[0] & 0x8044C402))
+                    if (spell->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spell->SpellFamilyFlags[1] & 0x0004071B || spell->SpellFamilyFlags[0] & 0x8044C402)) // Calls familyflags. Noting it here -Itswicky
                         continue;
                     modPercent += stepPercent * aura->GetStackAmount();
                     if (modPercent >= maxPercent)
@@ -6718,6 +6759,23 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     }
                 }
                 AddPct(DoneTotalMod, modPercent);
+                break;
+            }
+            case 666: // Fester --Itswicky
+            {
+                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                int32 totalBonus = 0;
+                AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
+                for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
+                {
+                    Aura const* aura = itr->second->GetBase();
+                    SpellInfo const* spell = aura->GetSpellInfo();
+
+                    if (!(spell->GetDispelMask() & (1 << DISPEL_DISEASE)))
+                        continue;
+                    totalBonus += bonus * aura->GetStackAmount();
+                }
+                AddPct(DoneTotalMod, totalBonus);
                 break;
             }
             case 6916: // Death's Embrace
@@ -6852,7 +6910,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
         }
     }
     // Custom scripted damage
-    switch (spellProto->SpellFamilyName)
+    switch (spellProto->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_MAGE:
             // Torment the weak
@@ -6905,7 +6963,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             }
             break;
-        case SPELLFAMILY_PALADIN:
+        case SPELLFAMILY_PALADIN: 
             // Judgement of Vengeance/Judgement of Corruption
             if ((spellProto->SpellFamilyFlags[1] & 0x400000) && spellProto->SpellIconID == 2292)
             {
@@ -6925,7 +6983,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, 10 * stacks);
             }
             break;
-        case SPELLFAMILY_DRUID:
+        case SPELLFAMILY_DRUID: // Calls familyflags. Noting it here -Itswicky
             // Thorns
             if (spellProto->SpellFamilyFlags[0] & 0x100)
             {
@@ -6934,7 +6992,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                     AddPct(DoneTotalMod, aurEff->GetAmount());
             }
             break;
-        case SPELLFAMILY_WARLOCK:
+        case SPELLFAMILY_WARLOCK: // Calls familyflags. Noting it here -Itswicky
             // Fire and Brimstone
             if (spellProto->SpellFamilyFlags[1] & 0x00020040)
             {
@@ -6971,6 +7029,10 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
                 if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 196, 0))
                     if (victim->GetDiseasesByCaster(owner->GetGUID()) > 0)
                         AddPct(DoneTotalMod, aurEff->GetAmount());
+            break;
+        case SPELLFAMILY_CLASSLESS:
+            if (spellProto->Id == 47855 && !victim->HealthAbovePct(25))
+                DoneTotalMod *= 4;
             break;
     }
 
@@ -7094,6 +7156,16 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask) const
 
         // ... and attack power
         DoneAdvertisedBenefit += static_cast<int32>(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER, schoolMask)));
+
+        // Damage bonus from mana
+        int32 manaMod = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_BY_MANA);
+        if (manaMod)
+            DoneAdvertisedBenefit += static_cast<int32>(ToPlayer()->GetMaxPower(POWER_MANA) * (manaMod / 100.0f));
+
+        // Damage bonus from percent scaling
+        int32 scalingMod = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask);
+        if (scalingMod)
+            DoneAdvertisedBenefit = static_cast<int32>(DoneAdvertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
     }
 
     return DoneAdvertisedBenefit;
@@ -7209,7 +7281,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                     }
                 }
                 // Custom crit by class
-                switch (spellInfo->SpellFamilyName)
+                switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
                 {
                     case SPELLFAMILY_MAGE:
                         // Glyph of Fire Blast
@@ -7268,6 +7340,28 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                             break;
                         }
                         break;
+                    case SPELLFAMILY_CLASSLESS:
+                        // Shiv-applied poisons can't crit
+                        if (caster->FindCurrentSpellBySpellId(5938))
+                            crit_chance = 0.0f;
+
+                        // Exorcism
+                        else if (spellInfo->GetCategory() == 19)
+                        {
+                            if (GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
+                                return 100.0f;
+                            break;
+                        }
+
+                        // Lava Burst
+                        else if (spellInfo->SpellFamilyFlags[1] & 0x00001000)
+                        {
+                            if (GetAura(49233, caster->GetGUID()))
+                                if (GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)
+                                    return 100.0f;
+                            break;
+                        }
+                        break;
                 }
 
                 // Spell crit suppression
@@ -7284,7 +7378,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
             // Custom crit by class
             if (caster)
             {
-                switch (spellInfo->SpellFamilyName)
+                switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
                 {
                     case SPELLFAMILY_DRUID:
                         // Rend and Tear - bonus crit chance for Ferocious Bite on bleeding targets
@@ -7320,6 +7414,14 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
             return 0.f;
     }
 
+    // Ambush --Itswicky
+    if (caster->HasAura(93173) && HealthAbovePct(50))
+    {
+        AuraEffect const* aurEff = caster->GetAuraEffect(93173, 0);
+        float bonus = aurEff->GetAmount();
+        crit_chance += bonus;
+    }        
+
     // for this types the bonus was already added in GetUnitCriticalChance, do not add twice
     if (caster && spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellInfo->DmgClass != SPELL_DAMAGE_CLASS_RANGED)
     {
@@ -7329,10 +7431,6 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                 return true;
             return false;
         });
-
-        // HoT: Ambush
-        if (caster->HasAura(180486) && HealthAbovePct(50))
-            crit_chance += 10.f;
     }
 
     return std::max(crit_chance, 0.0f);
@@ -7352,7 +7450,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
             crit_bonus += damage;
             break;
         default:
-            crit_bonus += damage / 2;                       // for spells is 50%
+            crit_bonus += damage;                       // HoT 100% baseline for spells
             break;
     }
 
@@ -7361,13 +7459,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
         crit_mod += (caster->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellProto->GetSchoolMask()) - 1.0f) * 100;
 
         if (victim)
-        {
             crit_mod += caster->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, victim->GetCreatureTypeMask());
-
-            // HoT: Ambush
-            if (caster->HasAura(180486) && victim->HealthBelowPct(50))
-                crit_mod += 10.f;
-        }
 
         if (crit_bonus != 0)
             AddPct(crit_bonus, crit_mod);
@@ -7429,7 +7521,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, effIndex, donePctTotal, stack);
 
     // No bonus healing for potion spells
-    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
         return healamount;
 
     float ApCoeffMod = 1.0f;
@@ -7457,7 +7549,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     }
 
     // Custom scripted damage
-    switch (spellProto->SpellFamilyName)
+    switch (spellProto->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_DEATHKNIGHT:
             // Impurity (dummy effect)
@@ -7579,7 +7671,7 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
         return 1.0f;
 
     // No bonus healing for potion spells
-    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
         return 1.0f;
 
     float DoneTotalMod = 1.0f;
@@ -7620,9 +7712,9 @@ float Unit::SpellHealingPctDone(Unit* victim, SpellInfo const* spellProto) const
                     if (aura->GetCasterGUID() != GetGUID())
                         continue;
 
-                    SpellInfo const* m_spell = aura->GetSpellInfo();
-                    if (m_spell->SpellFamilyName != SPELLFAMILY_DRUID ||
-                        !(m_spell->SpellFamilyFlags[1] & 0x00000010 || m_spell->SpellFamilyFlags[0] & 0x50))
+                    SpellInfo const* m_spell = aura->GetSpellInfo(); // Check for any HoT effect. Currently unused -Itswicky
+                    if (m_spell->SpellFamilyName != SPELLFAMILY_CLASSLESS ||
+                        !(m_spell->SpellFamilyFlags[1] & 0x00000100))
                         continue;
                     modPercent += stepPercent * aura->GetStackAmount();
                 }
@@ -7665,7 +7757,7 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
         AddPct(TakenTotalMod, maxval);
 
     // Nourish cast
-    if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[1] & 0x2000000)
+    if (spellProto->Id == 50464) // Change check to id -Itswicky
     {
         // Rejuvenation, Regrowth, Lifebloom, or Wild Growth
         if (GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x50, 0x4000010, 0))
@@ -7728,7 +7820,21 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask) const
         for (AuraEffectList::const_iterator i = mHealingDonebyAP.begin(); i != mHealingDonebyAP.end(); ++i)
             if ((*i)->GetMiscValue() & schoolMask)
                 advertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
+
+        // Damage bonus from mana
+        int32 manaMod = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_BY_MANA);
+        if (manaMod)
+            advertisedBenefit += static_cast<int32>(ToPlayer()->GetMaxPower(POWER_MANA) * (manaMod / 100.0f));
+
+        // Damage bonus from percent scaling
+        int32 scalingMod = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask);
+        if (scalingMod)
+            advertisedBenefit = static_cast<int32>(advertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
     }
+
+    if (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask))
+        advertisedBenefit = static_cast<int32>(advertisedBenefit * (1 + (GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask) / 100.0f)));
+
     return advertisedBenefit;
 }
 
@@ -8075,7 +8181,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // Custom scripted damage
     if (spellProto)
     {
-        switch (spellProto->SpellFamilyName)
+        switch (spellProto->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_DEATHKNIGHT:
                 // Glacier Rot
@@ -8132,7 +8238,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask();
 
         // Shred, Maul - "Effects which increase Bleed damage also increase Shred damage"
-        if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800)
+        if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800) // Checks familyflags. Noting it here -Itswicky
             mechanicMask |= (1 << MECHANIC_BLEED);
 
         if (mechanicMask)
@@ -12219,8 +12325,8 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
     //calculate miss chance
     float missChance = victim->GetUnitMissChance();
 
-    // melee attacks while dual wielding have +19% chance to miss
-    if (!spellId && haveOffhandWeapon())
+    // melee attacks while dual wielding have +19% chance to miss - Except with Unrelenting Assault --itswicky
+    if (!spellId && haveOffhandWeapon() && !HasAura(93178))
         missChance += 19.0f;
 
     // bonus from skills is 0.04%
@@ -13675,6 +13781,55 @@ void Unit::Whisper(std::string const& text, Language language, Player* target, b
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, isBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, language, this, target, text, 0, "", locale);
     target->SendDirectMessage(&data);
+}
+
+/**
+ * @brief this method gets the diameter of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ *
+ * If the player is mounted the diameter also takes in consideration the mount size
+ *
+ * @return float The diameter of a unit
+ */
+float Unit::GetCollisionWidth() const
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        return GetObjectSize();
+
+    float scaleMod = GetObjectScale(); // 99% sure about this
+    float objectSize = GetObjectSize();
+    float defaultSize = DEFAULT_PLAYER_BOUNDING_RADIUS * scaleMod;
+
+    //! Dismounting case - use basic default model data
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+
+    if (IsMounted())
+    {
+        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
+        {
+            if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+            {
+                if (G3D::fuzzyGt(mountModelData->CollisionWidth, modelData->CollisionWidth))
+                    modelData = mountModelData;
+            }
+        }
+    }
+
+    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2;
+    // if the objectSize is the default value or the creature is mounted and we have a DBC value, then we can retrieve DBC value instead
+    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize, defaultSize) || IsMounted()) ? collisionWidth : objectSize;
+}
+
+/**
+ * @brief this method gets the radius of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ *
+ * If the player is mounted the radius also takes in consideration the mount size
+ *
+ * @return float The radius of a unit
+ */
+float Unit::GetCollisionRadius() const
+{
+    return GetCollisionWidth() / 2;
 }
 
 void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target)

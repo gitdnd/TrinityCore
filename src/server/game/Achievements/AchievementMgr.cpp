@@ -674,11 +674,15 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         TC_LOG_DEBUG("achievement", "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
     #endif
 
-    if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
+    auto localBroadcast = achievement->Flags & ACHIEVEMENT_FLAG_LOCAL_ANNOUNCE;
+    if (!localBroadcast)
     {
-        Trinity::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->GetNativeGender(), GetPlayer(), achievement->ID);
-        Trinity::LocalizedPacketDo<Trinity::BroadcastTextBuilder> _localizer(_builder);
-        guild->BroadcastWorker(_localizer, GetPlayer());
+        if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
+        {
+            Trinity::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->GetNativeGender(), GetPlayer(), achievement->ID);
+            Trinity::LocalizedPacketDo<Trinity::BroadcastTextBuilder> _localizer(_builder);
+            guild->BroadcastWorker(_localizer, GetPlayer());
+        }
     }
 
     if (achievement->Flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
@@ -699,7 +703,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         sWorld->SendGlobalMessage(&data, nullptr, team == ALLIANCE ? HORDE : ALLIANCE);
     }
     // if player is in world he can tell his friends about new achievement
-    else if (GetPlayer()->IsInWorld())
+    else if (GetPlayer()->IsInWorld() && !localBroadcast)
     {
         Trinity::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->GetNativeGender(), GetPlayer(), achievement->ID);
         Trinity::LocalizedPacketDo<Trinity::BroadcastTextBuilder> _localizer(_builder);
@@ -712,7 +716,10 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     data << uint32(achievement->ID);
     data.AppendPackedTime(GameTime::GetGameTime());
     data << uint32(0);
-    GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
+    if (localBroadcast)
+        GetPlayer()->SendDirectMessage(&data);
+    else
+        GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
 void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const

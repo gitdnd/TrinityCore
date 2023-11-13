@@ -3190,5 +3190,192 @@ namespace LuaGlobalFunctions
         Eluna::Push(E->L, E->GetBoundMapId());
         return 1;
     }
+    
+    int WorldDBQueryAsync(Eluna* E)
+    {
+        const char* query = Eluna::CHECKVAL<const char*>(E->L, 1);
+        luaL_checktype(E->L, 2, LUA_TFUNCTION);
+        lua_pushvalue(E->L, 2);
+        int funcRef = luaL_ref(E->L, LUA_REGISTRYINDEX);
+        if (funcRef == LUA_REFNIL || funcRef == LUA_NOREF)
+        {
+            luaL_argerror(E->L, 2, "unable to make a ref to function");
+            return 0;
+        }
+
+        E->GetQueryProcessor().AddCallback(WorldDatabase.AsyncQuery(query).WithCallback([E, funcRef](QueryResult result)
+        {
+            ElunaQuery* eq = result ? new ElunaQuery(result) : nullptr;
+
+            //LOCK_ELUNA;
+
+            // Get function
+            lua_rawgeti(E->L, LUA_REGISTRYINDEX, funcRef);
+
+            // Push parameters
+            Eluna::Push(E->L, eq);
+
+            // Call function
+            E->ExecuteCall(1, 0);
+
+            luaL_unref(E->L, LUA_REGISTRYINDEX, funcRef);
+            }));
+        return 0;
+    }
+
+    int LoginDBQueryAsync(Eluna* E)
+    {
+        const char* query = Eluna::CHECKVAL<const char*>(E->L, 1);
+        luaL_checktype(E->L, 2, LUA_TFUNCTION);
+        lua_pushvalue(E->L, 2);
+        int funcRef = luaL_ref(E->L, LUA_REGISTRYINDEX);
+        if (funcRef == LUA_REFNIL || funcRef == LUA_NOREF)
+        {
+            luaL_argerror(E->L, 2, "unable to make a ref to function");
+            return 0;
+        }
+
+        E->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(query).WithCallback([E, funcRef](QueryResult result)
+            {
+                ElunaQuery* eq = result ? new ElunaQuery(result) : nullptr;
+
+                //LOCK_ELUNA;
+
+                // Get function
+                lua_rawgeti(E->L, LUA_REGISTRYINDEX, funcRef);
+
+                // Push parameters
+                Eluna::Push(E->L, eq);
+
+                // Call function
+                E->ExecuteCall(1, 0);
+
+                luaL_unref(E->L, LUA_REGISTRYINDEX, funcRef);
+            }));
+        return 0;
+    }
+
+    int CharacterDBQueryAsync(Eluna* E)
+    {
+        const char* query = Eluna::CHECKVAL<const char*>(E->L, 1);
+        luaL_checktype(E->L, 2, LUA_TFUNCTION);
+        lua_pushvalue(E->L, 2);
+        int funcRef = luaL_ref(E->L, LUA_REGISTRYINDEX);
+        if (funcRef == LUA_REFNIL || funcRef == LUA_NOREF)
+        {
+            luaL_argerror(E->L, 2, "unable to make a ref to function");
+            return 0;
+        }
+
+        E->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([E, funcRef](QueryResult result)
+            {
+                ElunaQuery* eq = result ? new ElunaQuery(result) : nullptr;
+
+                //LOCK_ELUNA;
+
+                // Get function
+                lua_rawgeti(E->L, LUA_REGISTRYINDEX, funcRef);
+
+                // Push parameters
+                Eluna::Push(E->L, eq);
+
+                // Call function
+                E->ExecuteCall(1, 0);
+
+                luaL_unref(E->L, LUA_REGISTRYINDEX, funcRef);
+            }));
+        return 0;
+    }
+
+    int GetCustomTalentStorage(Eluna* E)
+    {
+        lua_createtable(E->L, eObjectMgr->GetTalentNodeStore().size(), 0);
+
+        int maintable = lua_gettop(E->L);
+
+        for (auto const& itr : eObjectMgr->GetTalentNodeStore())
+        {
+            lua_createtable(E->L, 7, 0); // 8 being the number of values in the inner table
+            int subtable = lua_gettop(E->L);
+
+            // Push each value with correct method
+            // and set them to table with rawseti to correct index
+            lua_pushnumber(E->L, itr.second.spellId);
+            lua_rawseti(E->L, subtable, 1);
+
+            lua_pushnumber(E->L, itr.second.xOffset);
+            lua_rawseti(E->L, subtable, 2);
+
+            lua_pushnumber(E->L, itr.second.yOffset);
+            lua_rawseti(E->L, subtable, 3);
+
+            // Create links subtable
+            lua_createtable(E->L, itr.second.child_links.size(), 0);
+            int linktable = lua_gettop(E->L);
+            uint32 i = 0;
+            for (auto const& itrr : itr.second.child_links)
+            {
+                lua_pushnumber(E->L, itrr);
+                lua_rawseti(E->L, linktable, ++i);
+            }
+            lua_rawseti(E->L, subtable, 4);
+
+            lua_pushnumber(E->L, itr.second.Mutex);
+            lua_rawseti(E->L, subtable, 5);
+
+            lua_pushnumber(E->L, itr.second.buttonType);
+            lua_rawseti(E->L, subtable, 6);
+
+            lua_pushnumber(E->L, itr.second.flagMask);
+            lua_rawseti(E->L, subtable, 7);
+
+            // Push the table itself to maintable
+            lua_rawseti(E->L, maintable, itr.second.Index);
+        }
+
+        lua_settop(E->L, maintable); // make the maintable to be the top of the stack
+        // We could also just push it here to the stack as the last step
+        return 1;
+    }
+
+    int GetCustomTalent(Eluna* E)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
+        TalentNodeInfo const* nodeInfo = eObjectMgr->GetTalentNode(entry);
+        if (!nodeInfo)
+            return luaL_argerror(E->L, 1, "valid talent node index expected");
+
+        Eluna::Push(E->L, nodeInfo->Index);
+        Eluna::Push(E->L, nodeInfo->spellId);
+        Eluna::Push(E->L, nodeInfo->xOffset);
+        Eluna::Push(E->L, nodeInfo->yOffset);
+        Eluna::Push(E->L, nodeInfo->Mutex);
+        Eluna::Push(E->L, nodeInfo->buttonType);
+        Eluna::Push(E->L, nodeInfo->flagMask);
+        lua_createtable(E->L, nodeInfo->child_links.size(), 0);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+        for (auto const& itr : nodeInfo->child_links)
+        {
+            Eluna::Push(E->L, itr);
+            lua_rawseti(E->L, tbl, ++i);
+        }
+        lua_settop(E->L, tbl);
+        return 1;
+    }
+
+    int LoadCustomTalentNode(Eluna* E)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
+        eObjectMgr->LoadTalentNodeEntry(entry);
+        return 0;
+    }
+
+    int DeleteTalentNodeBecauseFoeisAMadMan(Eluna* E)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 1);
+        eObjectMgr->DeleteTalentNodeEntry(entry);
+        return 0;
+    }
 }
 #endif

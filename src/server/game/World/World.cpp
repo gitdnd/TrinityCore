@@ -726,7 +726,7 @@ void World::LoadConfigSettings(bool reload)
     if (reload)
         sMapMgr->SetGridCleanUpDelay(m_int_configs[CONFIG_INTERVAL_GRIDCLEAN]);
 
-    m_int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetIntDefault("MapUpdateInterval", 100);
+    m_int_configs[CONFIG_INTERVAL_MAPUPDATE] = sConfigMgr->GetIntDefault("MapUpdateInterval", 10);
     if (m_int_configs[CONFIG_INTERVAL_MAPUPDATE] < MIN_MAP_UPDATE_DELAY)
     {
         TC_LOG_ERROR("server.loading", "MapUpdateInterval (%i) must be greater %u. Use this minimal value.", m_int_configs[CONFIG_INTERVAL_MAPUPDATE], MIN_MAP_UPDATE_DELAY);
@@ -1866,10 +1866,27 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Spell Gem Desc...");
     sObjectMgr->LoadSpellGemDescriptors();
 
+    // VirtualItem
+    TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
+    sVirtualItemMgr.LoadNamesFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Displays...");
+    sVirtualItemMgr.LoadDisplaysFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Spells...");
+    sVirtualItemMgr.LoadSpellsFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Sets...");
+    sVirtualItemMgr.LoadSetsFromDB();
+
+    TC_LOG_INFO("server.loading", "Loading Virtual Item Legendarys...");
+    sVirtualItemMgr.LoadLegendaryTemplate();
+
+    sVirtualItemMgr.GenerateVirtualLevelLookupArray();
+
     TC_LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
 
-    // VirtualItem
     TC_LOG_INFO("server.loading", "Loading Virtual Items...");                 // must be after LoadItemTemplates
     sObjectMgr->LoadVirtualItemTemplates();
 
@@ -2196,24 +2213,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
 
-    // VirtualItem
-    TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
-    sVirtualItemMgr.LoadNamesFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Displays...");
-    sVirtualItemMgr.LoadDisplaysFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Spells...");
-    sVirtualItemMgr.LoadSpellsFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Sets...");
-    sVirtualItemMgr.LoadSetsFromDB();
-
-    TC_LOG_INFO("server.loading", "Loading Virtual Item Legendarys...");
-    sVirtualItemMgr.LoadLegendaryTemplate();
-
-    sVirtualItemMgr.GenerateVirtualLevelLookupArray();
-
     TC_LOG_INFO("server.loading", "Loading Petitions...");
     sPetitionMgr->LoadPetitions();
 
@@ -2223,8 +2222,12 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Item loot...");
     sLootItemStorage->LoadStorageFromDB();
 
+    TC_LOG_INFO("server.loading", "Loading Custom talents...");
+    sObjectMgr->LoadTalentNodes();
+
     TC_LOG_INFO("server.loading", "Initialize query data...");
     sObjectMgr->InitializeQueriesData(QUERY_DATA_ALL);
+;
 
     ///- Initialize game time and timers
     TC_LOG_INFO("server.loading", "Initialize game time and timers");
@@ -2337,7 +2340,7 @@ void World::SetInitialWorldSettings()
     {
         sMapMgr->DoForAllMaps([](Map* map)
         {
-            if (!map->Instanceable())
+            if (sElunaLoader->ShouldMapLoadEluna(map->GetId()))
             {
                 TC_LOG_INFO("server.loading", "Pre-loading base map data for map %u", map->GetId());
                 map->LoadAllCells();
@@ -3140,11 +3143,13 @@ void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
 
     ///- Display a message every 12 hours, hours, 5 minutes, minute, 5 seconds and finally seconds
     if (show ||
-        (m_ShutdownTimer < 5* MINUTE && (m_ShutdownTimer % 15) == 0) || // < 5 min; every 15 sec
-        (m_ShutdownTimer < 15 * MINUTE && (m_ShutdownTimer % MINUTE) == 0) || // < 15 min ; every 1 min
+        (m_ShutdownTimer <= 10) ||                                                  // <= 10 sec; every sec
+        (m_ShutdownTimer < 30 && (m_ShutdownTimer % 5) == 0)  ||                    // < 30 sec; every 5 sec 
+        (m_ShutdownTimer < 5 * MINUTE && (m_ShutdownTimer % 15) == 0) ||            // < 5 min; every 15 sec
+        (m_ShutdownTimer < 15 * MINUTE && (m_ShutdownTimer % MINUTE) == 0) ||       // < 15 min ; every 1 min
         (m_ShutdownTimer < 30 * MINUTE && (m_ShutdownTimer % (5 * MINUTE)) == 0) || // < 30 min ; every 5 min
-        (m_ShutdownTimer < 12 * HOUR && (m_ShutdownTimer % HOUR) == 0) || // < 12 h ; every 1 h
-        (m_ShutdownTimer > 12 * HOUR && (m_ShutdownTimer % (12 * HOUR)) == 0)) // > 12 h ; every 12 h
+        (m_ShutdownTimer < 12 * HOUR && (m_ShutdownTimer % HOUR) == 0) ||           // < 12 h ; every 1 h
+        (m_ShutdownTimer > 12 * HOUR && (m_ShutdownTimer % (12 * HOUR)) == 0))      // > 12 h ; every 12 h
     {
         std::string str = secsToTimeString(m_ShutdownTimer, TimeFormat::Numeric);
         if (!reason.empty())

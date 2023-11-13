@@ -30,6 +30,8 @@ public:
             { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
             { "cheatspells", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleToggleCheatSpells, "" },
             { "debugstats", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
+            { "settalentloadout", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugSetTalentLoadout, "" },
+            { "learncustomtalent", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugLearnTalent, "" },
         };
         return tbsBullshitCommandTable;
     }
@@ -126,6 +128,51 @@ public:
         for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         {
             handler->PSendSysMessage("Bonus Spell School Damage Pct %u, %f", i, player->GetBonusSchoolModifierPct(SpellSchools(i)));
+        }
+        return true;
+    }
+
+    static bool HandleDebugSetTalentLoadout(ChatHandler* handler, char const* args)
+    {
+        uint32 loadout = 1;
+        if (*args)
+            loadout = atoi(args);
+
+        if (loadout >= MAX_CUSTOM_TALENT_LOADOUTS)
+            loadout = MAX_CUSTOM_TALENT_LOADOUTS - 1;
+
+        Player * p = handler->getSelectedPlayerOrSelf();
+        p->SetTalentLoadout(loadout);
+        return true;
+    }
+
+    static bool HandleDebugLearnTalent(ChatHandler* handler, char const* args)
+    {
+        if (!args)
+            return false;
+
+        Player* p = handler->getSelectedPlayerOrSelf();
+
+        if (std::string((char*)args) == "all")
+        {
+            p = handler->GetSession()->GetPlayer(); // we are not supporting learn all on remote players.
+            for (auto const& itr : sObjectMgr->GetTalentNodeStore())
+            {
+                p->LearnCustomTalent(itr.first);
+                handler->PSendSysMessage("Learned node %u", itr.first);
+            }
+
+        }
+        else
+        {
+            uint32 nodeEntry = atoi(args);
+            if (sObjectMgr->GetTalentNode(nodeEntry))
+            {
+                p->LearnCustomTalent(nodeEntry);
+                handler->PSendSysMessage("Learned node %u", nodeEntry);
+            }
+            else
+                handler->PSendSysMessage("Invalid node %u", nodeEntry);
         }
         return true;
     }

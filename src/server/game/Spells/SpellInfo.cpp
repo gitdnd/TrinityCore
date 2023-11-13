@@ -1180,7 +1180,7 @@ bool SpellInfo::IsStackableWithRanks() const
     // All stance spells. if any better way, change it.
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        switch (SpellFamilyName)
+        switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_PALADIN:
                 // Paladin aura Spell
@@ -1306,9 +1306,10 @@ bool SpellInfo::IsBreakingStealth() const
 
 bool SpellInfo::IsRangedWeaponSpell() const
 {
-    return (SpellFamilyName == SPELLFAMILY_HUNTER && !(SpellFamilyFlags[1] & 0x10000000)) // for 53352, cannot find better way
+    return ((SpellFamilyName == SPELLFAMILY_HUNTER && !(SpellFamilyFlags[1] & 0x10000000)) // for 53352, cannot find better way
         || (EquippedItemSubClassMask & ITEM_SUBCLASS_MASK_WEAPON_RANGED)
-        || (Attributes & SPELL_ATTR0_REQ_AMMO);
+        || (Attributes & SPELL_ATTR0_REQ_AMMO)
+        || (Id == 53352));
 }
 
 bool SpellInfo::IsAutoRepeatRangedSpell() const
@@ -1933,10 +1934,20 @@ SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
     return SPELL_CAST_OK;
 }
 
-bool SpellInfo::CheckTargetCreatureType(Unit const* target) const
+bool SpellInfo::CheckTargetCreatureType(Unit const* target) const // Checks familyflags. Noting it here -Itswicky
 {
     // Curse of Doom & Exorcism: not find another way to fix spell target check :/
     if (SpellFamilyName == SPELLFAMILY_WARLOCK && GetCategory() == 1179)
+    {
+        // not allow cast at player
+        if (target->GetTypeId() == TYPEID_PLAYER)
+            return false;
+        else
+            return true;
+    }
+
+    // Curse of Doom HoT -Itswicky
+    if (Id == 47867)
     {
         // not allow cast at player
         if (target->GetTypeId() == TYPEID_PLAYER)
@@ -2044,7 +2055,7 @@ void SpellInfo::_LoadAuraState()
             return AURA_STATE_CONFLAGRATE;
 
         // Faerie Fire (druid versions)
-        if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400)
+        if ((SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400) || Id == 770) // -Itswicky
             return AURA_STATE_FAERIE_FIRE;
 
         // Sting (hunter's pet ability)
@@ -2052,7 +2063,7 @@ void SpellInfo::_LoadAuraState()
             return AURA_STATE_FAERIE_FIRE;
 
         // Victorious
-        if (SpellFamilyName == SPELLFAMILY_WARRIOR &&  SpellFamilyFlags[1] & 0x00040000)
+        if (Id == 32216)
             return AURA_STATE_WARRIOR_VICTORY_RUSH;
 
         // Swiftmend state on Regrowth & Rejuvenation
@@ -2131,7 +2142,7 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT;
 
         // only hunter aspects have this (but not all aspects in hunter family)
-        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 49071)
+        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 49071 || Id == 13165)
             return SPELL_SPECIFIC_ASPECT;
 
         // Judgement of Wisdom, Judgement of Light, Judgement of Justice
@@ -2146,17 +2157,17 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_CURSE;
 
         // Collection of all the seal family flags. No other paladin spell has any of those.
-        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166)
+        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166 || Id == 97001 || Id == 97011 || Id == 97021 || Id == 97031 || Id == 97041 || Id == 97051 || Id == 97061 || Id == 97071 || Id == 97081 || Id == 97091 || Id == 97101)
             return SPELL_SPECIFIC_SEAL;
 
         if (Id == 10278 || Id == 1044 || Id == 62124 || Id == 6940 || Id == 1038)
             return SPELL_SPECIFIC_HAND;
 
         // only paladin auras have this (for palaldin class family)
-        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943)
+        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943 || Id == 96001 || Id == 96011 || Id == 96021 || Id == 96031 || Id == 96041 || Id == 96051 || Id == 96061 || Id == 96071 || Id == 96081 || Id == 96091 || Id == 96101)
             return SPELL_SPECIFIC_AURA;
 
-        switch (SpellFamilyName)
+        switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_GENERIC:
             {
@@ -2282,7 +2293,7 @@ void SpellInfo::_LoadSpellDiminishInfo()
             return DIMINISHING_CONTROLLED_STUN;
 
         // Explicit Diminishing Groups
-        switch (SpellFamilyName)
+        switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_GENERIC:
             {
@@ -2427,6 +2438,62 @@ void SpellInfo::_LoadSpellDiminishInfo()
                     return DIMINISHING_LIMITONLY;
                 break;
             }
+            case SPELLFAMILY_CLASSLESS:
+            {
+                // Frost Nova / Freeze (Water Elemental)
+                if (SpellIconID == 193)
+                    return DIMINISHING_CONTROLLED_ROOT;
+                // Dragon's Breath
+                else if (Id == 42950)
+                    return DIMINISHING_DRAGONS_BREATH;
+                // Hamstring - limit duration to 10s in PvP
+                else if (Id == 1715)
+                    return DIMINISHING_LIMITONLY;
+                // Charge Stun (own diminishing)
+                else if (Id == 7922)
+                    return DIMINISHING_CHARGE;
+                // Curses/etc
+                else if ((SpellFamilyFlags[0] & 0x400))
+                    return DIMINISHING_LIMITONLY;
+                // Cyclone
+                else if (Id == 33786)
+                    return DIMINISHING_CYCLONE;
+                // Entangling Roots
+                // Nature's Grasp
+                else if (Id == 53308 || Id == 53312)
+                    return DIMINISHING_CONTROLLED_ROOT;
+                // Faerie Fire
+                else if (Id == 770)
+                    return DIMINISHING_LIMITONLY;
+                // Gouge
+                else if (Id == 1776)
+                    return DIMINISHING_DISORIENT;
+                // Blind
+                else if (Id == 2094)
+                    return DIMINISHING_FEAR;
+                // Cheap Shot
+                else if (Id == 1833)
+                    return DIMINISHING_OPENING_STUN;
+                // Mark
+                else if ((SpellFamilyFlags[0] & 0x4000))
+                    return DIMINISHING_LIMITONLY;
+                // Scatter Shot (own diminishing)
+                else if (Id == 19503)
+                    return DIMINISHING_SCATTER_SHOT;
+                // Wyvern Sting mechanic is MECHANIC_SLEEP but the diminishing is DIMINISHING_DISORIENT
+                else if (Id == 49012)
+                    return DIMINISHING_DISORIENT;
+                // Freezing Arrow
+                else if (Id == 60192)
+                    return DIMINISHING_DISORIENT;
+                // Judgement of Justice - limit duration to 10s in PvP
+                else if (Id == 53407)
+                    return DIMINISHING_LIMITONLY;
+                // Turn Evil
+                else if (Id == 10326)
+                    return DIMINISHING_FEAR;
+                break;
+            }
             default:
                 break;
         }
@@ -2520,42 +2587,42 @@ void SpellInfo::_LoadSpellDiminishInfo()
             return 0;
 
         // Explicit diminishing duration
-        switch (SpellFamilyName)
+        switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_DRUID:
             {
                 // Faerie Fire - limit to 40 seconds in PvP (3.1)
-                if (SpellFamilyFlags[0] & 0x400)
+                if (Id == 770)
                     return 40 * IN_MILLISECONDS;
                 break;
             }
             case SPELLFAMILY_HUNTER:
             {
                 // Wyvern Sting
-                if (SpellFamilyFlags[1] & 0x1000)
+                if (Id == 49012)
                     return 6 * IN_MILLISECONDS;
                 // Hunter's Mark
-                if (SpellFamilyFlags[0] & 0x400)
+                if ((SpellFamilyFlags[0] & 0x4000))
                     return 120 * IN_MILLISECONDS;
                 break;
             }
             case SPELLFAMILY_PALADIN:
             {
                 // Repentance - limit to 6 seconds in PvP
-                if (SpellFamilyFlags[0] & 0x4)
+                if (Id == 20066)
                     return 6 * IN_MILLISECONDS;
                 break;
             }
             case SPELLFAMILY_WARLOCK:
             {
                 // Banish - limit to 6 seconds in PvP
-                if (SpellFamilyFlags[1] & 0x8000000)
+                if (Id == 18647)
                     return 6 * IN_MILLISECONDS;
                 // Curse of Tongues - limit to 12 seconds in PvP
-                else if (SpellFamilyFlags[2] & 0x800)
+                else if (Id == 11719)
                     return 12 * IN_MILLISECONDS;
                 // Curse of Elements - limit to 120 seconds in PvP
-                else if (SpellFamilyFlags[1] & 0x200)
+                else if (Id == 47865)
                     return 120 * IN_MILLISECONDS;
                 break;
             }
@@ -3555,7 +3622,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
     if (spellInfo->Id == 53201)
         return false;
 
-    switch (spellInfo->SpellFamilyName)
+    switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_GENERIC:
             switch (spellInfo->Id)
@@ -3587,6 +3654,11 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             break;
         case SPELLFAMILY_DEATHKNIGHT:
             if (spellInfo->SpellFamilyFlags[2] == 0x00000010) // Ebon Plague
+                return false;
+            break;
+        case SPELLFAMILY_CLASSLESS:
+            // assortment of judgement related spells
+            if (spellInfo->SpellFamilyFlags & flag96(0x208C0000, 0x00000208, 0x00000008))
                 return false;
             break;
         default:
@@ -3753,6 +3825,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
             case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
             case SPELL_AURA_MOD_INCREASE_SWIM_SPEED:
+            case SPELL_AURA_MOD_SPELL_POWER_BY_MANA:
                 if (bp < 0 || bpScalePerLevel < 0) //TODO: What if both are 0? Should it be a buff or debuff?
                     return false;
                 break;
@@ -3767,6 +3840,7 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, uint8 effIndex, std::unor
             case SPELL_AURA_MOD_SPEED_SLOW_ALL:
             case SPELL_AURA_MELEE_SLOW:
             case SPELL_AURA_MOD_ATTACK_POWER_PCT:
+            case SPELL_AURA_MOD_SPELL_POWER_PCT:
                 if (!_isPositiveTarget(spellInfo, effIndex) || bp < 0)
                     return false;
                 break;

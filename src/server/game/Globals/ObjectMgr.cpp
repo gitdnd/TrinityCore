@@ -3996,7 +3996,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
     uint32 oldMSTime = getMSTime();
 
     CharacterDatabase.DirectExecute("DELETE FROM item_template_virtual WHERE entry NOT IN ( SELECT itemEntry FROM item_instance WHERE itemEntry IS NOT NULL )");
-    QueryResult result = CharacterDatabase.Query("SELECT entry, base_entry, name, inventoryType, Quality, displayId, ItemLevel, StatsCount, "
+    QueryResult result = CharacterDatabase.Query("SELECT entry, base_entry, name, inventoryType, Quality, Flags, displayId, ItemLevel, StatsCount, "
         "stat_type1, stat_value1, stat_type2, stat_value2, stat_type3, stat_value3, stat_type4, stat_value4, stat_type5, stat_value5, "
         "stat_type6, stat_value6, stat_type7, stat_value7, stat_type8, stat_value8, stat_type9, stat_value9, stat_type10, stat_value10, "
         "dmg_min1, dmg_max1, dmg_type1, delay, armor, bonding, description, block, itemset, socket1, socket2, socket3, DisenchantID, "
@@ -4041,6 +4041,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
             itemTemplate->InventoryType = inventoryType;
 
         itemTemplate->Quality = uint32(fields[i++].GetUInt8());
+        itemTemplate->Flags = fields[i++].GetUInt32();
         itemTemplate->DisplayInfoID = fields[i++].GetUInt32();
         itemTemplate->ItemLevel = uint32(fields[i++].GetUInt16());
         itemTemplate->StatsCount = uint32(fields[i++].GetUInt8());
@@ -4096,6 +4097,9 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->honePct = fields[i++].GetFloat();
 
         itemTemplate->MaxDurability = round(float((itemTemplate->ItemLevel * (itemTemplate->Quality / 10.f)) + 25));;
+
+        if (legendaryItemInfo const* leg = sVirtualItemMgr.GetLegendaryItemInfo(itemTemplate->legendaryId))
+            itemTemplate->ItemLimitCategory = leg->limitCatagory;
         //itemTemplate->UpdateDisplay();
 
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))
@@ -8547,6 +8551,8 @@ uint32 ObjectMgr::GetBaseXP(uint8 level)
 
 uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
+    if (level == 0)
+        level = 1;
     // ((ilevel ^ 1.35) / 2) * 1000
     return (std::pow(level, 1.5) * 0.5) * 1000;
     /*if (level < _playerXPperLevel.size())
@@ -11112,6 +11118,7 @@ TalentNodeInfo const* ObjectMgr::GetTalentNode(uint32 entry) const
 
 void ObjectMgr::LoadTalentNodes()
 {
+    //@todo: asynch load?
     QueryResult result = WorldDatabase.Query("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info");
     if (!result)
     {
@@ -11132,22 +11139,116 @@ void ObjectMgr::LoadTalentNodes()
         nodeInfo.Mutex = fields[4].GetUInt32();
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
+        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
+        if (linkQuery)
+        {
+            std::stringstream ss;
+            bool firstLink = true;
+            do
+            {
+                if (!firstLink)
+                    ss << ",";
+                else
+                    firstLink = false;
+
+                Field* nodeFields = linkQuery->Fetch();
+                uint32 nodeEntry = nodeFields[0].GetUInt32();
+                //if (!GetTalentNode(entry))
+                //{
+                    //@todo Error
+                    //continue;
+                //}
+                ss << nodeEntry;
+                nodeInfo.child_links.push_back(nodeEntry);
+            } while (linkQuery->NextRow());
+            nodeInfo.all_links.insert(nodeInfo.all_links.end(), nodeInfo.child_links.begin(), nodeInfo.child_links.end());
+        }
+        QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
+        if (parentLinkQuery)
+        {
+            do
+            {
+                Field* parentNodeFields = parentLinkQuery->Fetch();
+                uint32 parentNodeEntry = parentNodeFields[0].GetUInt32();
+                nodeInfo.all_links.push_back(parentNodeEntry);
+            } while (parentLinkQuery->NextRow());
+        }
         //@todo Validation.
         
     } while (result->NextRow());
-    for (auto& itr : _talentNodeStore)
+}
+
+void ObjectMgr::LoadTalentNodeEntry(uint32 node)
+{
+    QueryResult result = WorldDatabase.PQuery("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info where `index` = %u", node);
+    if (!result)
     {
-        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", itr.first);
-        if (linkQuery)
+        //@todo Error.
+        return;
+    }
+
+    if (!GetTalentNode(node))
+        _talentNodeStore.rehash(_talentNodeStore.size() + 1);
+
+    TalentNodeInfo& nodeInfo = _talentNodeStore[node];
+    Field* fields = result->Fetch();
+    nodeInfo.Index = node;
+    nodeInfo.spellId = fields[1].GetUInt32();
+    nodeInfo.xOffset = fields[2].GetFloat();
+    nodeInfo.yOffset = fields[3].GetFloat();
+    nodeInfo.Mutex = fields[4].GetUInt32();
+    nodeInfo.buttonType = fields[5].GetUInt32();
+    nodeInfo.flagMask = fields[6].GetUInt32();
+    nodeInfo.child_links.clear();
+    nodeInfo.all_links.clear();
+    QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
+    if (linkQuery)
+    {
+        std::stringstream ss;
+        bool firstLink = true;
+        do
         {
-            Field* fields = result->Fetch();
-            uint32 entry = fields[0].GetUInt32();
-            if (!GetTalentNode(entry))
-            {
+            if (!firstLink)
+                ss << ",";
+            else
+                firstLink = false;
+
+            Field* nodeFields = linkQuery->Fetch();
+            uint32 nodeEntry = nodeFields[0].GetUInt32();
+            //if (!GetTalentNode(entry))
+            //{
                 //@todo Error
-                continue;
-            }
-            itr.second.links.push_back(entry);
+                //continue;
+            //}
+            ss << nodeEntry;
+            nodeInfo.child_links.push_back(nodeEntry);
+        } while (linkQuery->NextRow());
+        nodeInfo.all_links.insert(nodeInfo.all_links.end(), nodeInfo.child_links.begin(), nodeInfo.child_links.end());
+    }
+    QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
+    if (parentLinkQuery)
+    {
+        do
+        {
+            Field* parentNodeFields = parentLinkQuery->Fetch();
+            uint32 parentNodeEntry = parentNodeFields[0].GetUInt32();
+            nodeInfo.all_links.push_back(parentNodeEntry);
+        } while (parentLinkQuery->NextRow());
+    }
+}
+
+void ObjectMgr::DeleteTalentNodeEntry(uint32 node)
+{
+    auto size = _talentNodeStore.size();
+    for (TalentNodeContainer::iterator& itr = _talentNodeStore.begin(); itr != _talentNodeStore.end();)
+    {
+        if (itr->first == node)
+        {
+            _talentNodeStore.erase(itr++);
+            _talentNodeStore.rehash(size - 1);
+            break;
         }
+        else
+            ++itr;
     }
 }

@@ -736,6 +736,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 33,
     PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS     = 34,
     PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS      = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS          = 36,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1907,7 +1908,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendBGWeekendWorldStates() const;
         void SendBattlefieldWorldStates() const;
 
-        void SendAurasForTarget(Unit* target) const;
+        void SendAurasForTarget(Unit* target, bool force = false) const;
 
         PlayerMenu* PlayerTalkClass;
         std::vector<ItemSetEffect*> ItemSetEff;
@@ -2244,10 +2245,25 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ToggleTempSpell(uint32 spell, uint32 aura, bool apply = true);
 
         uint8 GetActiveSubClass() const;
+        uint8 GetActiveLootPreference() const { return lootPreference; }
+        void SetLootPreference(uint8 preference) { lootPreference = preference; }
         uint8 GetSubOrClass() const { return subClass ? subClass : GetClass(); }
         
         int32 GetSpellPowerForSchool(SpellSchools school) { return GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + school) - GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + school); }
 
+        uint32 GetCurrentTalentLoadout() { return currentTalentLoadout; }
+        void SetTalentLoadout(uint32 val);
+        void ResetCustomTalents();
+        void DeactivateTalentLoadout();
+        void LearnCustomTalent(uint32 id);
+        void UnlearnCustomTalent(uint32 id);
+        uint32 GetTalentStackCount(uint32 spellId);
+        void LoadCustomTalentLoadout();
+        void LoadCustomTalents(PreparedQueryResult result);
+        uint8 CanLearnCustomTalent(uint32 id);
+        bool HasCustomTalent(uint32 id);
+        bool HasTalentWithMask(uint32 mask);
+        std::vector<uint32> GetCustomTalents() { return customTalents[GetCurrentTalentLoadout()]; }
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -2588,6 +2604,10 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         WorldLocation _portalLocation;
         uint8 subClass;
+
+        std::vector<uint32> customTalents[MAX_CUSTOM_TALENT_LOADOUTS];
+        uint32 currentTalentLoadout;
+        uint8 lootPreference;
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

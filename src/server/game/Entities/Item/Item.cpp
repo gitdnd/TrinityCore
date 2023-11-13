@@ -280,8 +280,8 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
         // pass the players' average item level to the item generator
         modifier.plrAvgLvl = uint32(owner->GetAverageItemLevel());
 
-        // set the players' subclass if it exists
-        modifier.subclass = owner->GetActiveSubClass();
+        // set the players' loot preference if it is selected
+        modifier.lootPreference = owner->GetActiveLootPreference();
 
         if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto, modifier))
         {
@@ -1277,6 +1277,7 @@ std::string Item::GetDebugInfo() const
     return sstr.str();
 }
 
+// item_template_virtual - adding this here for search, cause I keep forgetting to update this
 void Item::SaveVirtualItemInfo()
 {
     if (VirtualItemTemplate const* itemTemplate = sVirtualItemMgr.GetVirtualTemplate(GetEntry()))
@@ -1290,6 +1291,7 @@ void Item::SaveVirtualItemInfo()
         stmt->setString(i++, itemTemplate->Name1);
         stmt->setUInt32(i++, itemTemplate->InventoryType);
         stmt->setUInt8(i++, itemTemplate->Quality);
+        stmt->setUInt32(i++, itemTemplate->Flags);
         stmt->setUInt32(i++, itemTemplate->DisplayInfoID);
         stmt->setUInt16(i++, itemTemplate->ItemLevel);
         stmt->setUInt8(i++, itemTemplate->StatsCount);

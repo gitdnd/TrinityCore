@@ -143,6 +143,10 @@ void InstanceSaveManager::DeleteInstanceFromDB(uint32 instanceid)
     stmt->setUInt32(0, instanceid);
     trans->Append(stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_DATA_INSTANCE_BY_INSTANCE);
+    stmt->setUInt32(0, instanceid);
+    trans->Append(stmt);
+
     CharacterDatabase.CommitTransaction(trans);
     // Respawn times should be deleted only when the map gets unloaded
 }

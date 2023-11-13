@@ -45,6 +45,7 @@ extern void RegisterFunctions(Eluna* E);
 
 void Eluna::_ReloadEluna()
 {
+    uint32 oldMSTime = ElunaUtil::GetCurrTime();
     eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Reloading state for Map: %i", boundMapId).c_str());
 
     // Remove all timed events
@@ -58,6 +59,9 @@ void Eluna::_ReloadEluna()
 
     // Run scripts from laoded paths
     RunScripts();
+    reloadEluna = false;
+
+    ELUNA_LOG_INFO("[Eluna]: Fully reloaded Eluna in %u ms for map state %i", ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 }
 
 Eluna::Eluna(int32 MapId) :
@@ -83,7 +87,8 @@ PlayerGossipBindings(NULL),
 MapEventBindings(NULL),
 InstanceEventBindings(NULL),
 CreatureUniqueBindings(NULL),
-boundMapId(MapId)
+boundMapId(MapId),
+reloadEluna(false)
 {
     OpenLua();
     eventMgr = new EventMgr(this);
@@ -259,7 +264,7 @@ void Eluna::RunScripts()
         lua_pop(L, 1);
         // Stack: package, modules
 
-        if (luaL_loadbuffer(L, it->filedata.c_str(), it->filedata.size(), it->filename.c_str()))
+        if (luaL_loadbuffer(L, reinterpret_cast<const char*>(&it->bytecode[0]), it->bytecode.size(), it->filename.c_str()))
         {
             // Stack: package, modules, errmsg
             ELUNA_LOG_ERROR("[Eluna]: Error loading `%s`", it->filepath.c_str());
@@ -290,9 +295,10 @@ void Eluna::RunScripts()
     // Stack: package, modules
     lua_pop(L, 2);
 
-    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %i", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 
     OnLuaStateOpen();
+
+    ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms for map state %i", count, ElunaUtil::GetTimeDiff(oldMSTime), boundMapId);
 }
 
 void Eluna::InvalidateObjects()

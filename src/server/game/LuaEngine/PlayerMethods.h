@@ -3432,12 +3432,29 @@ namespace LuaPlayer
         uint32 itemCount = Eluna::CHECKVAL<uint32>(E->L, 3, 1);
         uint32 displayId = Eluna::CHECKVAL<uint32>(E->L, 4, 0);
         const char* name = Eluna::CHECKVAL<const char*>(E->L, 5, "");
-        uint8 quality = Eluna::CHECKVAL<uint8>(E->L, 6, 1);
+        int8 quality = Eluna::CHECKVAL<int8>(E->L, 6, -1);
+        int8 minQuality = Eluna::CHECKVAL<int8>(E->L, 7, -1);
+        int8 statGroup = Eluna::CHECKVAL<int8>(E->L, 8, -1);
+        bool isCrafted = Eluna::CHECKVAL<bool>(E->L, 9, false);
 
         VirtualModifier modifier;
-        modifier.displayId = displayId;
-        modifier.nameOverride = name;
-        modifier.quality = quality;
+
+        if(displayId > 0)
+            modifier.displayId = displayId;
+
+        if(strlen(name) > 0)
+            modifier.nameOverride = name;
+
+        if(quality > -1)
+            modifier.quality = uint8(quality);
+
+        if (minQuality > -1)
+            modifier.minQuality = uint8(minQuality);
+
+        if (statGroup > -1)
+            modifier.statgroup = StatGroup(statGroup);
+
+        modifier.isCrafted = isCrafted;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
@@ -3447,9 +3464,16 @@ namespace LuaPlayer
 
         if (itemCount == 0 || dest.empty())
             return 1;
+
         Item* item = player->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
         if (item)
+        {
+            if (isCrafted)
+                item->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
+
             player->SendNewItem(item, itemCount, true, false);
+        }
+
         Eluna::Push(E->L, item);
         return 1;
     }
@@ -4315,13 +4339,13 @@ namespace LuaPlayer
 
     int UpdateTalentPassives(Eluna* /*E*/, Player* player)
     {
-        player->UpdateArmorPassives();
+        //player->UpdateArmorPassives();
         return 0;
     }
 
     int RemoveTalentPassives(Eluna* /*E*/, Player* player)
     {
-        player->RemoveArmorPassives();
+        //player->RemoveArmorPassives();
         return 0;
     }
 
@@ -4617,6 +4641,89 @@ namespace LuaPlayer
             }
         }
         return 0;
+    }
+
+    int GetMagicFind(Eluna* E, Player* player)
+    {
+        Eluna::Push(E->L, player->GetMagicFind());
+        return 1;
+    }
+
+    int LearnCustomTalent(Eluna* E, Player* player)
+    {
+        uint32 node = Eluna::CHECKVAL<uint32>(E->L, 2);
+        player->LearnCustomTalent(node);
+        return 0;
+    }
+
+    int UnlearnCustomTalent(Eluna* E, Player* player)
+    {
+        uint32 node = Eluna::CHECKVAL<uint32>(E->L, 2);
+        player->UnlearnCustomTalent(node);
+        return 0;
+    }
+
+    int ResetCustomTalent(Eluna* E, Player* player)
+    {
+        player->ResetCustomTalents();
+        return 0;
+    }
+
+    int SetTalentLoadout(Eluna* E, Player* player)
+    {
+        uint32 loadout = Eluna::CHECKVAL<uint32>(E->L, 2);
+        player->SetTalentLoadout(loadout);
+        return 0;
+    }
+
+    int GetCustomTalents(Eluna* E, Player* player)
+    {
+        const std::vector<uint32> talents = player->GetCustomTalents();
+        lua_createtable(E->L, talents.size(), 0);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+        for (auto itr = talents.begin(); itr != talents.end(); ++itr)
+        {
+            Eluna::Push(E->L, *itr);
+            lua_rawseti(E->L, tbl, ++i);
+        }
+        lua_settop(E->L, tbl);
+        // Dreams:
+        //Eluna::Push(E->L, player->GetCustomTalents());
+        return 1;
+    }
+
+    int CanLearnCustomTalent(Eluna* E, Player* player)
+    {
+        uint32 id = Eluna::CHECKVAL<uint32>(E->L, 2);
+        Eluna::Push(E->L, player->CanLearnCustomTalent(id));
+        return 1;
+    }
+
+    int SendItemQueryPacket(Eluna* E, Player* player)
+    {
+        uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
+        if (const ItemTemplate* item_template = sObjectMgr->GetItemTemplate(entry))
+        {
+            player->SendDirectMessage(&item_template->QueryData[static_cast<uint32>(LOCALE_enUS)]);
+        }
+        return 0;
+    }
+
+    int SetLootPreference(Eluna* E, Player* player)
+    {
+        uint8 preference = Eluna::CHECKVAL<uint8>(E->L, 2);
+
+        preference = preference < MAX_PREF ? preference : 0;
+        player->SetLootPreference(preference);
+
+        return 0;
+    }
+
+    int GetLootPreference(Eluna* E, Player* player)
+    {
+        Eluna::Push(E->L, player->GetActiveLootPreference());
+        return 1;
     }
 };
 #endif

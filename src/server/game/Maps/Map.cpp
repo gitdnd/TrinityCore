@@ -293,7 +293,7 @@ i_scriptLock(false), _respawnCheckTimer(0)
         i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
 
     if (sElunaLoader->ShouldMapLoadEluna(id))
-        if(IsParent()) // We are the parent map load eluna
+        if(!IsParent() || (IsParent() && !Instanceable()))
             eluna = new Eluna(id);
 
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -321,6 +321,8 @@ void Map::InitVisibilityDistance()
     //init visibility for continents
     m_VisibleDistance = World::GetMaxVisibleDistanceOnContinents();
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodOnContinents();
+    if (GetId() == 767)
+        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
 }
 
 // Template specialization of utility methods
@@ -2951,6 +2953,7 @@ void Map::SendInitSelf(Player* player)
 {
     TC_LOG_DEBUG("maps", "Creating player data for himself %s", player->GetGUID().ToString().c_str());
 
+    WorldPacket packet;
     UpdateData data;
 
     // attach to player data current transport data
@@ -2962,13 +2965,23 @@ void Map::SendInitSelf(Player* player)
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
 
+    // build and send self update packet before sending to player his own auras
+    data.BuildPacket(&packet);
+    player->SendDirectMessage(&packet);
+
+    // send to player his own auras (this is needed here for timely initialization of some fields on client)
+    player->SendAurasForTarget(player, true);
+
+    // clean buffers for further work
+    packet.clear();
+    data.Clear();
+
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
             if (player != (*itr) && player->HaveAtClient(*itr))
                 (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
 
-    WorldPacket packet;
     data.BuildPacket(&packet);
     player->SendDirectMessage(&packet);
 }
@@ -3805,6 +3818,8 @@ void InstanceMap::InitVisibilityDistance()
     //init visibility distance for instances
     m_VisibleDistance = World::GetMaxVisibleDistanceInInstances();
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodInInstances();
+    if (GetId() == 767)
+        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
 }
 
 /*
@@ -4313,6 +4328,8 @@ void BattlegroundMap::InitVisibilityDistance()
     //init visibility distance for BG/Arenas
     m_VisibleDistance = World::GetMaxVisibleDistanceInBGArenas();
     m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodInBGArenas();
+    if (GetId() == 767)
+        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
 }
 
 Map::EnterState BattlegroundMap::CannotEnter(Player* player)
@@ -4534,6 +4551,174 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     }
 
     return time_t(0);
+}
+
+/**
+ * @brief Check if a given source can reach a specific point following a path
+ * and normalize the coords. Use this method for long paths, otherwise use the
+ * overloaded method with the start coords when you need to do a quick check on small segments
+ *
+ */
+bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator* path, float& destX, float& destY, float& destZ, bool failOnCollision) const
+{
+    G3D::Vector3 prevPath = path->GetStartPosition();
+    for (auto& vector : path->GetPath())
+    {
+        float x = vector.x;
+        float y = vector.y;
+        float z = vector.z;
+
+        if (!CanReachPositionAndGetValidCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, failOnCollision))
+        {
+            destX = x;
+            destY = y;
+            destZ = z;
+            return false;
+        }
+
+        prevPath = vector;
+    }
+
+    destX = prevPath.x;
+    destY = prevPath.y;
+    destZ = prevPath.z;
+
+    return true;
+}
+
+/**
+ * @brief validate the new destination and set reachable coords
+ * Check if a given unit can reach a specific point on a segment
+ * and set the correct dest coords
+ * NOTE: use this method with small segments.
+ *
+ * @param failOnCollision if true, the methods will return false when a collision occurs
+ *
+ * @return true if the destination is valid, false otherwise
+ *
+ *
+*/
+bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float& destX, float& destY, float& destZ, bool failOnCollision) const
+{
+    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision);
+}
+
+bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision) const
+{
+    if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
+        return false;
+
+    /** If it's not a Unit then we do not have to continue. */
+    Unit const* unit = source->ToUnit();
+    if (!unit)
+        return true;
+
+    /*
+     * Walkable checks
+     */
+    bool isWaterNext = IsInWater(source->GetPhaseMask(), destX, destY, destZ);
+    Creature const* creature = unit->ToCreature();
+    bool cannotEnterWater = isWaterNext && (creature && !creature->CanSwim());
+    bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
+    if (cannotEnterWater || cannotWalkOrFly)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief validate the new destination and set coords
+ * Check if a given unit can face collisions in a specific segment
+ *
+ * @return true if the destination is valid, false otherwise
+ *
+ **/
+bool Map::CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision) const
+{
+    // Prevent invalid coordinates here, position is unchanged
+    if (!Trinity::IsValidMapCoord(startX, startY, startZ) || !Trinity::IsValidMapCoord(destX, destY, destZ))
+    {
+        TC_LOG_FATAL("maps", "Map::CheckCollisionAndGetValidCoords invalid coordinates startX: {}, startY: {}, startZ: {}, destX: {}, destY: {}, destZ: {}", startX, startY, startZ, destX, destY, destZ);
+        return false;
+    }
+
+    bool isWaterNext = IsInWater(source->GetPhaseMask(), destX, destY, destZ);
+
+    PathGenerator path(source);
+
+    // Use a detour raycast to get our first collision point
+    //path.SetUseRaycast(true);
+    bool result = path.CalculatePath(destX, destY, destZ, false);
+
+    Unit const* unit = source->ToUnit();
+    bool notOnGround = path.GetPathType() & PATHFIND_NOT_USING_PATH
+        || isWaterNext || (unit && unit->IsFlying());
+
+    // Check for valid path types before we proceed
+    if (!result || (!notOnGround && path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
+    {
+        return false;
+    }
+
+    G3D::Vector3 endPos = path.GetPath().back();
+    destX = endPos.x;
+    destY = endPos.y;
+    destZ = endPos.z;
+
+    // collision check
+    bool collided = false;
+
+    // check static LOS
+    float halfHeight = source->GetCollisionHeight() * 0.5f;
+
+    // Unit is not on the ground, check for potential collision via vmaps
+    if (notOnGround)
+    {
+        bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
+            startX, startY, startZ + halfHeight,
+            destX, destY, destZ + halfHeight,
+            destX, destY, destZ, -CONTACT_DISTANCE);
+
+        destZ -= halfHeight;
+
+        // Collided with static LOS object, move back to collision point
+        if (col)
+            collided = true;
+    }
+
+    // check dynamic collision
+    bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
+        startX, startY, startZ + halfHeight,
+        destX, destY, destZ + halfHeight,
+        destX, destY, destZ, -CONTACT_DISTANCE);
+
+    destZ -= halfHeight;
+
+    // Collided with a gameobject, move back to collision point
+    if (col)
+        collided = true;
+
+    float groundZ = VMAP_INVALID_HEIGHT_VALUE;
+    source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
+
+    // position has no ground under it (or is too far away)
+    if (groundZ <= INVALID_HEIGHT && unit && !unit->CanFly())
+    {
+        // fall back to gridHeight if any
+        float gridHeight = GetGridHeight(destX, destY);
+        if (gridHeight > INVALID_HEIGHT)
+        {
+            destZ = gridHeight + unit->GetHoverHeight();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return !failOnCollision || !collided;
 }
 
 void Map::LoadCorpseData()
@@ -4873,4 +5058,26 @@ void Map::SetDungeonLevel(int value)
         //sWorld->SendGMText(debug.str().c_str());
     }
 
+}
+
+void Map::UpdateDungeonLevel()
+{
+    const PlayerList &players = GetPlayers();
+    auto count = 0;
+    auto level = 0.0f;
+    for (auto itr = players.begin(); itr != players.end(); ++itr)
+    {
+        auto plr = itr->GetSource();
+        if (plr && !plr->IsGameMaster())
+        {
+            level += plr->GetCappedItemLevel();
+            ++count;
+        }
+    }
+    if (count >= 1)
+    {
+        auto newLevel = std::floor(level / count);
+        if (newLevel != GetCappedDungeonLevel())
+            SetDungeonLevel(newLevel);
+    }
 }

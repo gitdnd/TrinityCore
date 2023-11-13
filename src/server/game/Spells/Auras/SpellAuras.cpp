@@ -484,7 +484,7 @@ bool Aura::CanPeriodicTickCrit(Unit const* caster) const
         return true;
 
     // Rupture - since 3.3.3 can crit
-    if (GetSpellInfo()->SpellIconID == 500 && GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE)
+    if ((GetSpellInfo()->SpellIconID == 500 && GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE) || (GetSpellInfo()->Id == 48672)) // Add check for gem -Itswicky
         return true;
     //@todo: Remove this hack when spell family is corrected.
     if (GetId() == 48300 || GetId() == 48160 || GetId() == 48125)
@@ -1404,7 +1404,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     // mods at aura apply
     if (apply)
     {
-        switch (GetSpellInfo()->SpellFamilyName)
+        switch (GetSpellInfo()->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
@@ -1593,7 +1593,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             break;
         }
             
-        switch (GetSpellInfo()->SpellFamilyName)
+        switch (GetSpellInfo()->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
@@ -1779,11 +1779,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (caster && caster->HasAura(56845))
                         target->CastSpell(target, 61394, true);
                 break;
+            case SPELLFAMILY_CLASSLESS:
+
+                // Remove the immunity shield marker on Forbearance removal if AW marker is not present
+                if (GetId() == 25771 && target->HasAura(61988) && !target->HasAura(61987))
+                    target->RemoveAura(61988);
+                break;
         }
     }
 
     // mods at aura apply or remove
-    switch (GetSpellInfo()->SpellFamilyName)
+    switch (GetSpellInfo()->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
     {
         case SPELLFAMILY_ROGUE:
             // Stealth

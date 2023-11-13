@@ -25,6 +25,7 @@ enum StatGroup
     STAT_GROUP_AGI_DPS,
     STAT_GROUP_AGI_TANK,
     STAT_GROUP_ALL,
+    STAT_GROUP_ALL_EXTENDED,
     STAT_GROUP_COUNT,
     STAT_GROUP_RANDOM = STAT_GROUP_COUNT,
 };
@@ -95,6 +96,7 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 generatedMagicFind;
     float honePct;
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
+    inline bool HasFlag(ItemFlags flag) const { return (Flags & flag) != 0; }
 };
 
 struct VirtualModifier
@@ -103,6 +105,7 @@ struct VirtualModifier
     {
         ilevel = 0;
         quality = MAX_ITEM_QUALITY;
+        minQuality = 0;
         statpool = -1;
         statgroup = STAT_GROUP_RANDOM;
         seed = 0;
@@ -123,8 +126,9 @@ struct VirtualModifier
         nameOverride = "";
         magicFind = 0;
         statPoolPctModifier = 0.f;
-        subclass = 0;
+        lootPreference = 0;
         generateSet = false;
+        lowYield = false;
     }
 
     /**
@@ -132,6 +136,7 @@ struct VirtualModifier
      */
     uint32 ilevel;
     uint8 quality;
+    uint8 minQuality;
     int16 statpool;
     StatGroup statgroup;
     uint32 seed;
@@ -152,8 +157,9 @@ struct VirtualModifier
     std::string nameOverride;
     uint32 magicFind;
     float statPoolPctModifier;
-    uint8 subclass;
+    uint8 lootPreference;
     bool generateSet;
+    bool lowYield;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
@@ -171,6 +177,12 @@ struct VirtualModifier
      * Returns the armor modifier.
      */
     static float GetTypeSlotArmorModifier(VirtualItemTemplate* item);
+
+    /**
+     * Fethces the stat modifier for the armor subclass based on stat group selected.
+     * Returns the stat modifier.
+     */
+    static float GetArmorTypeStatGroupModifier(VirtualItemTemplate* item);
 
     /**
      * Fetches the rate (point*rate = stat_amount) for the given stat type.
@@ -256,6 +268,12 @@ struct legendaryItemInfo
     int8 primaryStatCountMod;
     int8 secondaryStatCountMod;
     int8 statGroupOverride;
+    uint32 limitCatagory;
+    /*
+    @Todo:
+    float damageScaleModifier;
+    int8 damageTypeOverride; //Pending multiple damage type: damageTypeOverride[MAX_ITEM_PROTO_DAMAGES]
+    */
 };
 
 typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;
@@ -433,7 +451,7 @@ public:
     void GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
     void GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
-    void UpdateDisenchantId(VirtualItemTemplate* output);
+    void UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier);
     void InitSeedGen(VirtualModifier& modifier);
 
     void LoadLegendaryTemplate();
@@ -463,19 +481,14 @@ private:
          */
         std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator) const;
         /**
-         * Returns the stat groups for the given armor subclass.
+         * Returns the stat groups for the given players' loot preference.
          */
-        std::vector<StatGroup> const& GetArmorSubclassStatGroups(VirtualItemTemplate* item) const;
-        /**
-         * Returns the stat groups for the given player subclass.
-         */
-        std::vector<StatGroup> const& GetPlayerSubclassStatGroups(uint8 subclass) const;
+        std::vector<StatGroup> const& GetPlayerLootPreference(uint8 lootPreference) const;
     private:
         std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
         std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
         std::vector<SocketColor> stat_group_sockets[STAT_GROUP_COUNT];
-        std::vector<StatGroup> armor_type_stat_groups[MAX_ITEM_SUBCLASS_ARMOR];
-        std::vector<StatGroup> subclass_stat_groups[MAX_CLASSES+MAX_SUBCLASSES];
+        std::vector<StatGroup> preference_stat_groups[MAX_PREF];
     };
 
     static StatGroupData const premadeStatGroupData;

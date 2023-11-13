@@ -328,6 +328,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_lastPotionId = 0;
 
     m_activeSpec = 0;
+    currentTalentLoadout = 0;
     m_specsCount = 1;
 
     for (uint8 i = 0; i < MAX_TALENT_SPECS; ++i)
@@ -419,6 +420,7 @@ Player::Player(WorldSession* session): Unit(true)
     _averageItemLevel = 1;
     m_canTeleport = false;
     subClass = 0;
+    lootPreference = 0;
 }
 
 Player::~Player()
@@ -945,7 +947,7 @@ void Player::HandleDrowning(uint32 time_diff)
                 m_MirrorTimer[FIRE_TIMER] += 1 * IN_MILLISECONDS;
                 // Calculate and deal damage
                 /// @todo Check this formula
-                uint32 damage = urand(600, 700);
+                uint32 damage = urand(3600, 5700);
                 if (m_MirrorTimerFlags & UNDERWATER_INLAVA)
                     EnvironmentalDamage(DAMAGE_LAVA, damage);
                 // need to skip Slime damage in Undercity,
@@ -1369,7 +1371,8 @@ void Player::Update(uint32 p_time)
 
     //we should execute delayed teleports only for alive(!) players
     //because we don't want player's ghost teleported from graveyard
-    if (IsHasDelayedTeleport() && IsAlive())
+    // Icecrown Glacier: Allow delayed teleport while dead
+    if (IsHasDelayedTeleport() && (IsAlive() || GetMapId() == 772))
         TeleportTo(m_teleport_dest, m_teleport_options);
 
 }
@@ -2417,6 +2420,7 @@ void Player::SetGameMaster(bool on)
         SetFaction(FACTION_FRIENDLY);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
 
         if (Pet* pet = GetPet())
             pet->SetFaction(FACTION_FRIENDLY);
@@ -2446,6 +2450,7 @@ void Player::SetGameMaster(bool on)
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
         SetFactionForRace(GetRace());
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
         if(!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
             RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
@@ -2619,7 +2624,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
             InitTalentForLevel();
             ChatHandler(GetSession()).SendSysMessage(("Your talent level has increased to " + std::to_string(talent_level) + ".").c_str());
             ChatHandler(GetSession()).SendSysMessage("You have gained 1 talent point.");
-            if(GetMap()->GetEluna())
+            if (GetMap()->GetEluna())
                 GetMap()->GetEluna()->OnLevelChanged(this, talent_level - 1);
         }
 
@@ -4039,7 +4044,8 @@ bool Player::ResetTalents(bool no_cost)
     }
     */
 
-    RemoveArmorPassives();
+    // No longer used, should be removed
+    // RemoveArmorPassives();
 
     return true;
 }
@@ -5139,6 +5145,7 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
         // If in Floating Cult
         if (!ignore_overrides)
         {
+            // Floating cult
             if (GetMap() && GetMap()->GetId() == 769)
             {
                 mapId = 769;
@@ -5155,6 +5162,15 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
                 y = 65.37f;
                 z = -27.5f;
                 o = 1.54559f;
+            }
+            // Icecrown Glacier
+            else if (GetMap() && GetMap()->GetId() == 772)
+            {
+                mapId = 772;
+                x = GetPositionX();
+                y = GetPositionY();
+                z = GetPositionZ();
+                o = GetOrientation();
             }
         }
            
@@ -5462,6 +5478,15 @@ uint32 Player::GetShieldBlockValue() const
         {
             value *= (1.f + (shieldSuperiority->GetAmount() / 100.f));
         }
+    }
+
+    // Whirling Barrier --itswicky
+    if (HasAura(93179) && IsUsingStaff())
+    {
+        float weaponDPS = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->getDPS();
+        AuraEffect const* whirlingBarrier = GetAuraEffect(93179, EFFECT_0);
+
+        value += (weaponDPS * (whirlingBarrier->GetAmount() / 100.f));
     }
 
     return uint32(value);
@@ -12465,7 +12490,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem, true);
 
-        UpdateArmorPassives();
+        // No longer used, should be removed
+        // UpdateArmorPassives();
 
         return pItem;
     }
@@ -12506,7 +12532,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem2, true);
 
-        UpdateArmorPassives();
+        // No longer used, should be removed
+        // UpdateArmorPassives();
 
         return pItem2;
     }
@@ -12624,7 +12651,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         if (GetMap()->GetEluna())
             GetMap()->GetEluna()->OnEquip(this, pItem2, bag, slot);
 #endif
-        UpdateArmorPassives();
+        // No longer used, should be removed
+        // UpdateArmorPassives();
         return pItem2;
     }
 
@@ -12632,6 +12660,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     {
         CheckTitanGripPenalty();
         UpdateShieldSuperiority();
+        if (HasAura(93179))
+            UpdateShieldBlockValue();
     }
 
     // only for full equip instead adding to stack
@@ -12642,7 +12672,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     if (GetMap()->GetEluna())
         GetMap()->GetEluna()->OnEquip(this, pItem, bag, slot);
 #endif
-    UpdateArmorPassives();
+    // No longer used, should be removed
+    // UpdateArmorPassives();
     return pItem;
 }
 
@@ -12666,6 +12697,8 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         {
             CheckTitanGripPenalty();
             UpdateShieldSuperiority();
+            if (HasAura(93179))
+                UpdateShieldBlockValue();
         }
 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
@@ -12869,6 +12902,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     CheckTitanGripPenalty();
                     UpdateShieldSuperiority();
                     UpdateDamagePhysical(BASE_ATTACK);
+                    if (HasAura(93179))
+                        UpdateShieldBlockValue();
                 }
             }
         }
@@ -17969,6 +18004,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     SetLevel(fields[6].GetUInt8(), false);
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
+    lootPreference = fields[74].GetUInt8();
     //if (talent_level == 0)
     //    talent_level = 1;
 
@@ -18473,8 +18509,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
     //_LoadMail();
 
     m_specsCount = fields[64].GetUInt8();
-    m_activeSpec = fields[65].GetUInt8();
-
+    //m_activeSpec = fields[65].GetUInt8();
+    currentTalentLoadout = fields[65].GetUInt8();
     // sanity check
     if (m_specsCount > MAX_TALENT_SPECS || m_activeSpec > MAX_TALENT_SPEC || m_specsCount < MIN_TALENT_SPECS)
     {
@@ -18634,6 +18670,9 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder* holder)
 
     if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+
+    LoadCustomTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
+
 
     return true;
 }
@@ -20164,7 +20203,8 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt32(index++, GetSession()->GetLatency());
 
         stmt->setUInt8(index++, m_specsCount);
-        stmt->setUInt8(index++, m_activeSpec);
+        //stmt->setUInt8(index++, m_activeSpec);
+        stmt->setUInt8(index++, currentTalentLoadout);
 
         ss.str("");
         for (uint32 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
@@ -20289,7 +20329,8 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt32(index++, GetSession()->GetLatency());
 
         stmt->setUInt8(index++, m_specsCount);
-        stmt->setUInt8(index++, m_activeSpec);
+        //stmt->setUInt8(index++, m_activeSpec);
+        stmt->setUInt8(index++, currentTalentLoadout);
 
         ss.str("");
         for (uint32 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
@@ -20325,6 +20366,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
 
         stmt->setUInt32(index++, GetTalentLevel());
+        stmt->setUInt8(index++, GetActiveLootPreference());
 
         // Index
         stmt->setUInt32(index++, GetGUID().GetCounter());
@@ -20403,7 +20445,8 @@ void Player::_SaveActions(CharacterDatabaseTransaction& trans)
             case ACTIONBUTTON_NEW:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
                 stmt->setUInt32(0, GetGUID().GetCounter());
-                stmt->setUInt8(1, m_activeSpec);
+                //stmt->setUInt8(1, m_activeSpec);
+                stmt->setUInt8(1, currentTalentLoadout);
                 stmt->setUInt8(2, itr->first);
                 stmt->setUInt32(3, itr->second.GetAction());
                 stmt->setUInt8(4, uint8(itr->second.GetType()));
@@ -20418,7 +20461,8 @@ void Player::_SaveActions(CharacterDatabaseTransaction& trans)
                 stmt->setUInt8(1, uint8(itr->second.GetType()));
                 stmt->setUInt32(2,  GetGUID().GetCounter());
                 stmt->setUInt8(3, itr->first);
-                stmt->setUInt8(4, m_activeSpec);
+                //stmt->setUInt8(4, m_activeSpec);
+                stmt->setUInt8(4, currentTalentLoadout);
                 trans->Append(stmt);
 
                 itr->second.uState = ACTIONBUTTON_UNCHANGED;
@@ -20428,7 +20472,8 @@ void Player::_SaveActions(CharacterDatabaseTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION_BY_BUTTON_SPEC);
                 stmt->setUInt32(0, GetGUID().GetCounter());
                 stmt->setUInt8(1, itr->first);
-                stmt->setUInt8(2, m_activeSpec);
+                //stmt->setUInt8(2, m_activeSpec);
+                stmt->setUInt8(2, currentTalentLoadout);
                 trans->Append(stmt);
 
                 m_actionButtons.erase(itr++);
@@ -23536,7 +23581,7 @@ void Player::SendInitialPacketsAfterAddToMap()
         SendDirectMessage(&setCompoundState);
     }
 
-    SendAurasForTarget(this);
+    //SendAurasForTarget(this);
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
     SendQuestGiverStatusMultiple();
@@ -23700,7 +23745,7 @@ void Player::ResetSpells(bool myClassOnly)
                 continue;
 
             // skip other spell families
-            if (spellInfo->SpellFamilyName != family)
+            if (spellInfo->SpellFamilyName != family) // Making note -Itswicky
                 continue;
 
             // skip spells with first rank learned as talent (and all talents then also)
@@ -23930,9 +23975,9 @@ void Player::LearnSkillRewardedSpells(uint32 skillId, uint32 skillValue)
     }
 }
 
-void Player::SendAurasForTarget(Unit* target) const
+void Player::SendAurasForTarget(Unit* target, bool force /*= false*/) const
 {
-    if (!target || target->GetVisibleAuras()->empty())                  // speedup things
+    if (!target || (!force && target->GetVisibleAuras()->empty()))                  // speedup things
         return;
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
@@ -26116,7 +26161,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (GetMap()->GetEluna())
         GetMap()->GetEluna()->OnLearnTalents(this, talentId, talentRank, spellid);
 #endif
-    UpdateArmorPassives();
+    // No longer used, should be removed
+    // UpdateArmorPassives();
 }
 
 void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank)
@@ -26856,7 +26902,8 @@ void Player::ActivateSpec(uint8 spec)
     if (spec > GetSpecsCount())
         return;
 
-    RemoveArmorPassives();
+    // No longer used, should be removed
+    // RemoveArmorPassives();
 
     if (IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
@@ -26994,7 +27041,8 @@ void Player::ActivateSpec(uint8 spec)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
         stmt->setUInt32(0, GetGUID().GetCounter());
-        stmt->setUInt8(1, m_activeSpec);
+        //stmt->setUInt8(1, m_activeSpec);
+        stmt->setUInt8(1, currentTalentLoadout);
 
         WorldSession* mySess = GetSession();
         mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
@@ -27019,7 +27067,8 @@ void Player::ActivateSpec(uint8 spec)
         aurEff->HandleShapeshiftBoosts(this, false);
         aurEff->HandleShapeshiftBoosts(this, true);
     }
-    UpdateArmorPassives();
+    // No longer used, should be removed
+    // UpdateArmorPassives();
 }
 
 void Player::LoadActions(PreparedQueryResult result)
@@ -27816,6 +27865,7 @@ uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
     return count;
 }
 
+// No longer used, should be removed
 void Player::UpdateArmorPassives()
 {
 #define CHECK_TALENT(a,b,c,d) if (HasSpell(a)) \
@@ -27861,6 +27911,7 @@ void Player::UpdateArmorPassives()
 #undef CHECK_TALENT
 }
 
+// No longer used, should be removed
 void Player::RemoveArmorPassives()
 {
     uint32 spells[5] = { SUBCLASS_SPELL_WARDEN, SUBCLASS_SPELL_HISTORIAN, SUBCLASS_SPELL_WEAVER, SUBCLASS_SPELL_WATCHER, SUBCLASS_SPELL_RANGER };
@@ -28059,5 +28110,265 @@ uint8 Player::GetActiveSubClass() const
     if (HasAura(SUBCLASS_SPELL_RANGER))
         return CLASS_SUB_RANGER;
 
+    if (HasAura(SUBCLASS_SPELL_SAVAGE))
+        return CLASS_SUB_SAVAGE;
+
     return 0;
+}
+
+void Player::DeactivateTalentLoadout()
+{
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+        // should we check triggerspells?
+        //RemoveSpell(nodeInfo->spellId);
+        RemoveTemporarySpell(nodeInfo->spellId);
+        RemoveOwnedAura(nodeInfo->spellId, GetGUID());
+    }
+}
+
+void Player::ResetCustomTalents()
+{
+    DeactivateTalentLoadout();
+    m_usedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    InitTalentForLevel();
+    customTalents[GetCurrentTalentLoadout()].clear();
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(1, GetCurrentTalentLoadout());
+    CharacterDatabase.Execute(stmt);
+}
+
+void Player::LearnCustomTalent(uint32 id)
+{
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+
+    if (!nodeInfo) // No.
+        return;
+
+    customTalents[GetCurrentTalentLoadout()].push_back(id);
+
+    if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
+        aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+    else
+    {
+        //LearnSpell(nodeInfo->spellId, false);
+        AddTemporarySpell(nodeInfo->spellId);
+        if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+            if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
+                CastSpell(this, nodeInfo->spellId, true);
+    }
+
+ 
+    SetFreeTalentPoints(GetFreeTalentPoints() - 1);
+    m_usedTalentCount += 1;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_CUSTOM_TALENT);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(1, id);
+    stmt->setUInt32(2, GetCurrentTalentLoadout());
+    CharacterDatabase.Execute(stmt);
+}
+
+void Player::UnlearnCustomTalent(uint32 id)
+{
+    if (!HasCustomTalent(id) || !IsAlive())
+        return;
+
+    customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
+
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+    if (Aura* aur = GetAura(nodeInfo->spellId, GetGUID()))
+        if (aur->GetStackAmount() > 1)
+            aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+        else
+        {
+            //RemoveSpell(nodeInfo->spellId);
+            RemoveTemporarySpell(nodeInfo->spellId);
+            RemoveOwnedAura(nodeInfo->spellId, GetGUID());
+        }
+
+
+    SetFreeTalentPoints(GetFreeTalentPoints() + 1);
+    m_usedTalentCount -= 1;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_BY_LOADOUT);
+    stmt->setUInt32(0, GetGUID().GetCounter());
+    stmt->setUInt32(1, id);
+    stmt->setUInt32(2, GetCurrentTalentLoadout());
+    CharacterDatabase.Execute(stmt);
+}
+
+uint32 Player::GetTalentStackCount(uint32 spellId)
+{
+    uint32 count = 0;
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+
+        if (nodeInfo->spellId == spellId)
+            count += 1;
+    }
+    return count;
+}
+
+void Player::LoadCustomTalentLoadout()
+{
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+
+        if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
+            aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+        else
+        {
+            //CastSpell(this, nodeInfo->spellId, true);
+            AddTemporarySpell(nodeInfo->spellId);
+            if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+                if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
+                    CastSpell(this, nodeInfo->spellId, true);
+        }
+    }
+}
+
+void Player::LoadCustomTalents(PreparedQueryResult result)
+{
+    if (result)
+    {
+        do
+        {
+            if ((*result)[1].GetUInt32() > MAX_CUSTOM_TALENT_LOADOUTS)
+                continue;
+
+            customTalents[(*result)[1].GetUInt32()].push_back((*result)[0].GetUInt32());
+        } while (result->NextRow());
+    }
+    LoadCustomTalentLoadout();
+}
+
+uint8 Player::CanLearnCustomTalent(uint32 id)
+{
+    //@todo provide reason for ui feedback?
+    if (GetFreeTalentPoints() <= 0)
+        return TALENT_RRESPONSE_NOT_ENOUGH_POINTS;
+
+    if (!IsAlive())
+        return TALENT_RESPONSE_NOT_ALIVE;
+
+    if (HasCustomTalent(id))
+        return TALENT_RESPONSE_ALREADY_LEARNED;
+
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+
+    if (!nodeInfo) // No.
+    {
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+            ChatHandler(GetSession()).PSendSysMessage("Invalid node id %u", id);
+        return TALENT_RESPONSE_NO_NODE_INFO;
+    }
+
+    if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+    {
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+            ChatHandler(GetSession()).PSendSysMessage("Invalid spell id %u", nodeInfo->spellId);
+        return TALENT_RESPONSE_SPELL_NOT_FOUND;
+    }
+
+    if ((nodeInfo->flagMask & 1))
+        return TALENT_RESPONSE_TALENT_HIDDEN;
+
+    if (!(nodeInfo->flagMask & 4))
+    {
+        bool foundLink = false;
+
+        if (!nodeInfo->all_links.empty())
+        {
+            for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
+            {
+                foundLink = HasCustomTalent(*itr);
+                if (foundLink)
+                    break;
+            }
+        }
+
+        if (!foundLink)
+            return TALENT_RESPONSE_NO_LINK;
+    }
+    else
+    {
+        if (HasTalentWithMask(4))
+            return TALENT_RESPONSE_ALREADY_HAVE_STARTER_NODE;
+    }
+
+    return TALENT_REPONSE_OKAY;
+}
+
+bool Player::HasCustomTalent(uint32 id)
+{
+    return std::find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id) != customTalents[GetCurrentTalentLoadout()].end();
+}
+
+bool Player::HasTalentWithMask(uint32 mask)
+{
+    bool foundMask = false;
+    for (auto itr = customTalents[GetCurrentTalentLoadout()].begin(); itr != customTalents[GetCurrentTalentLoadout()].end(); ++itr)
+    {
+        const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (!nodeInfo)
+        {
+            //@todo write error & handle.
+            continue;
+        }
+
+        foundMask = (nodeInfo->flagMask & mask);
+        if (foundMask)
+            break;
+    }
+
+    return foundMask;
+}
+
+void Player::SetTalentLoadout(uint32 val)
+{
+    if (val >= MAX_CUSTOM_TALENT_LOADOUTS)
+        return;
+
+    DeactivateTalentLoadout();
+    currentTalentLoadout = val;
+    LoadCustomTalentLoadout();
+    m_usedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    InitTalentForLevel();
+
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
+        stmt->setUInt32(0, GetGUID().GetCounter());
+        //stmt->setUInt8(1, m_activeSpec);
+        stmt->setUInt8(1, currentTalentLoadout);
+
+        WorldSession* mySess = GetSession();
+        mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
+            .WithPreparedCallback([mySess](PreparedQueryResult result)
+                {
+                    // safe callback, we can't pass this pointer directly
+                    // in case player logs out before db response (player would be deleted in that case)
+                    if (Player* thisPlayer = mySess->GetPlayer())
+                        thisPlayer->LoadActions(result);
+                }));
+    }
 }

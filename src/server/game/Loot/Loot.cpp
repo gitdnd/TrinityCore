@@ -149,7 +149,7 @@ void Loot::clear()
 }
 
 // Inserts the item into the loot (called by LootTemplate processors)
-void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool canBePersonal)
+void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 {
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
     if (!proto)
@@ -177,10 +177,20 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
                         ItemTemplate const* personalProto;
                         if (VirtualItemMgr::IsVirtualTemplate(proto))
                         {
-                            int dungeonLevel = member->GetMap()->GetDungeonLevel();
-                            int playerLevel = std::floor(member->GetCappedItemLevel());
+                            VirtualModifier modifier = VirtualModifier();
+
+                            uint32 dungeonLevel = uint32(member->GetMap()->GetDungeonLevel());
+                            uint32 playerLevel = uint32(member->GetCappedItemLevel());
+
+                            // is this calculation what we really want? really need to double check this logic
                             modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
-                            modifier.subclass = member->GetActiveSubClass();
+                            modifier.lowYield = playerLevel - 50 > dungeonLevel ? true : false;
+
+                            modifier.lootPreference = member->GetActiveLootPreference();
+                            modifier.magicFind = member->GetMagicFind();
+
+                            if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                                modifier.vLvlMod = inst->vLvlMod;
 
                             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;
@@ -228,8 +238,28 @@ void Loot::AddItem(LootStoreItem const& item, VirtualModifier modifier, bool can
     {
         // VirtualItem
         if (VirtualItemMgr::IsVirtualTemplate(proto))
+        {
+            VirtualModifier modifier = VirtualModifier();
+
+            if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
+            {
+                modifier.plrAvgLvl = uint32(player->GetCappedItemLevel());
+                modifier.lootPreference = player->GetActiveLootPreference();
+                modifier.magicFind = player->GetMagicFind();
+
+                // if player is in dungeon, override avg level and apply vLvl mod
+                if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
+                {
+                    modifier.vLvlMod = inst->vLvlMod;
+                    modifier.plrAvgLvl = uint32(player->GetMap()->GetCappedDungeonLevel());
+                    modifier.lowYield = uint32(player->GetCappedItemLevel()) - 50 > player->GetMap()->GetCappedDungeonLevel() ? true : false;
+                }
+            }
+
             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                 proto = newProto;
+        }
+
         for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
         {
             LootItem generatedLoot(item);
@@ -289,20 +319,9 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    VirtualModifier modifier = VirtualModifier();
     Group* group = lootOwner->GetGroup();
 
-    if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(lootOwner->GetMapId()))
-        modifier.vLvlMod = inst->vLvlMod;
-
-
-    modifier.plrAvgLvl = lootOwner->GetMap()->GetDungeonLevel() >= 20 ? lootOwner->GetMap()->GetCappedDungeonLevel() : lootOwner->GetCappedGroupOrPlayerItemLevel();
-
-    modifier.magicFind = lootOwner->GetMagicFind();
-
-    modifier.subclass = lootOwner->GetSubClass();
-
-    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, modifier, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store.IsRatesAllowed(), lootMode, 0, canBePersonal);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
     if (!personal && group)

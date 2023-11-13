@@ -2802,7 +2802,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 break;
 
                             // Frostbolt
-                            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x20))
+                            //if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x20))
+                            if (spellInfo->Id == 42842)
                                 break;
 
                             // Frost Fever
@@ -2810,7 +2811,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 break;
 
                             // Haunt
-                            if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && (spellInfo->SpellFamilyFlags[1] & 0x40000))
+                            //if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && (spellInfo->SpellFamilyFlags[1] & 0x40000))
+                            if (spellInfo->Id == 59164)
                                 break;
 
                             setFlag = true;
@@ -2839,7 +2841,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         if (spellInfo->SpellVisual[0] == 3879)
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
 
-        switch (spellInfo->SpellFamilyName)
+        switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_WARRIOR:
                 // Shout / Piercing Howl
@@ -2856,6 +2858,13 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 if (spellInfo->Id == 5729)
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
                 break;
+            case SPELLFAMILY_CLASSLESS:
+                // Shout
+                if (spellInfo->SpellFamilyFlags[0] & 0x100000)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                // Stoneclaw Totem effect
+                if (spellInfo->Id == 5729)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
             default:
                 break;
         }
@@ -4984,7 +4993,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         if (spellInfo->ActiveIconID == 2158)  // flight
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
 
-        switch (spellInfo->SpellFamilyName)
+        switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
         {
             case SPELLFAMILY_PALADIN:
                 // Seals of the Pure should affect Seal of Righteousness

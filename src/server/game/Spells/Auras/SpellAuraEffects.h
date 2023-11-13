@@ -258,6 +258,7 @@ class TC_GAME_API AuraEffect
         void HandleAuraModAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModRangedAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModAttackPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        void HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModRangedAttackPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModRangedAttackPowerOfStatPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModAttackPowerOfStatPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -291,6 +292,7 @@ class TC_GAME_API AuraEffect
         void HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleDamageSchoolBonus(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        void HandleAuraModSpellPowerbyMana(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
         // aura effect periodic tick handlers
         void HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) const;
@@ -320,7 +322,7 @@ namespace Trinity
     class AbsorbAuraOrderPred
     {
         public:
-            AbsorbAuraOrderPred() { }
+            AbsorbAuraOrderPred() { } // Checks familyflags. Noting it here -Itswicky
             bool operator() (AuraEffect* aurEffA, AuraEffect* aurEffB) const
             {
                 SpellInfo const* spellProtoA = aurEffA->GetSpellInfo();
@@ -328,11 +330,13 @@ namespace Trinity
 
                 // Wards
                 if ((spellProtoA->SpellFamilyName == SPELLFAMILY_MAGE) ||
-                    (spellProtoA->SpellFamilyName == SPELLFAMILY_WARLOCK))
+                    (spellProtoA->SpellFamilyName == SPELLFAMILY_WARLOCK) ||
+                    (spellProtoB->SpellFamilyName == SPELLFAMILY_CLASSLESS))
                     if (spellProtoA->GetCategory() == 56)
                         return true;
                 if ((spellProtoB->SpellFamilyName == SPELLFAMILY_MAGE) ||
-                    (spellProtoB->SpellFamilyName == SPELLFAMILY_WARLOCK))
+                    (spellProtoB->SpellFamilyName == SPELLFAMILY_WARLOCK) ||
+                    (spellProtoB->SpellFamilyName == SPELLFAMILY_CLASSLESS))
                     if (spellProtoB->GetCategory() == 56)
                         return false;
 

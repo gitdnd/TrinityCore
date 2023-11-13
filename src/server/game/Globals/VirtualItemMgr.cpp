@@ -215,7 +215,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
-    UpdateDisenchantId(output);
+    UpdateDisenchantId(output, modifier);
     GenerateSockets(output, modifier);
     //GenerateSpells(output, modifier);
     GenerateItemStats(output, modifier);
@@ -293,7 +293,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     GenerateItemName(output, modifier);
 
     // Set the correct disenchant ID based on ilevel and quality
-    UpdateDisenchantId(output);
+    UpdateDisenchantId(output, modifier);
 
     // Generate the items sockets based on type and quality
     GenerateSockets(output, modifier);
@@ -319,6 +319,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // Select a display ID for the item based on type
     GenerateItemDisplay(output, modifier);
 
+    if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
+        output->ItemLimitCategory = leg->limitCatagory;
+
     delete store[entry];
     store[entry] = output;
 
@@ -335,23 +338,14 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     StatGroup statgroupid;
     StatGroup statgroupbiasid;
 
-    // grab available armor type stat groups
-    std::vector<StatGroup> const& statgroups = premadeStatGroupData.GetArmorSubclassStatGroups(output);
+    // select a random stat group
+    statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL - 1, generator));
 
-    bool isJewelry = output->InventoryType == INVTYPE_TRINKET || output->InventoryType == INVTYPE_NECK || output->InventoryType == INVTYPE_FINGER;
-    bool isCloak = output->InventoryType == INVTYPE_CLOAK;
-
-    // armor has predefined stat groups, except some slots like trinkets, rings, cloaks etc.
-    if (!statgroups.empty() && output->Class == ITEM_CLASS_ARMOR && !isCloak && !isJewelry)
-        statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
-    else // all weapons currently generate entirely random.
-        statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 2, generator));
-
-    // if the player has a subclass, roll for bias statgroup
-    if (modifier.subclass > 0)
+    // if the player has a loot preference, roll for bias statgroup
+    if (modifier.lootPreference > 0 && modifier.lootPreference < MAX_PREF)
     {
-        // grab available subclass stat groups
-        std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerSubclassStatGroups(modifier.subclass);
+        // grab available loot preference stat groups
+        std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerLootPreference(modifier.lootPreference);
         statgroupbiasid = substatgroups[urand(0, substatgroups.size() - 1, generator)];
 
         // 25% chance of bias, might want to make this into a config later on
@@ -389,6 +383,10 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     // always bind on pickup
     output->Bonding = BIND_WHEN_PICKED_UP;
 
+    // if item is a legendary or higher, flag as BoA
+    if(output->Quality >= ITEM_QUALITY_LEGENDARY)
+        output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
+
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
     // if ilevel is not set, use the players average item level +/- 5 item levels.
@@ -415,10 +413,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
     ilevel += irand(-3, 3, generator);
-
-    // If not regenerating a item and item level has been set in the DB, cap ilevel at this amount
-    if (modifier.isCrafted && !modifier.ilevel && ilevel >= output->ItemLevel)
-        ilevel = output->ItemLevel;
 
     // If ilevel modifier is set, override all ilevel generation
     if (modifier.ilevel)
@@ -622,9 +616,9 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondaryStatSlots = 1;
     }
 
+    // Allow legendaries to override the default stat slot count
     if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
     {
-        // Primary stat count modifier can both add and subtract
         if (leg->primaryStatCountMod && leg->primaryStatCountMod != 0)
             primaryStatSlots = leg->primaryStatCountMod;
 
@@ -632,30 +626,9 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondaryStatSlots = leg->secondaryStatCountMod;
     }
 
-    // multiply the pool size by the base amounts of stat slots
-    pool *= (float)(primaryStatSlots + secondaryStatSlots);
-
-    // randomly select between -1 and +1 additional stat slots
-    // this does not apply to trinkets
-    if (output->Class != ITEM_CLASS_ARMOR && output->InventoryType != INVTYPE_TRINKET)
-    {
-        std::uniform_int_distribution<int> dist(-1, 1);
-        int primarySlotMod = dist(generator);
-        int secondarySlotMod = dist(generator);
-
-        // check whether or not the amount of stats exceeds the size of our stat group
-        if ((primaryStatSlots + primarySlotMod) > primarystatgroup.size())
-            primaryStatSlots = primarystatgroup.size();
-        else if ((primaryStatSlots + primarySlotMod) < 1) // never generate 0 primary stats
-            primaryStatSlots = 1;
-        else
-            primaryStatSlots += primarySlotMod;
-
-        if ((secondaryStatSlots + secondarySlotMod) > secondarystatgroup.size())
-            secondaryStatSlots = secondarystatgroup.size();
-        else
-            secondaryStatSlots += secondarySlotMod;
-    }
+    // make sure we're not going out of bounds with our stat slot count
+    primaryStatSlots = primaryStatSlots > primarystatgroup.size() ? primarystatgroup.size() : primaryStatSlots;
+    secondaryStatSlots = secondaryStatSlots > secondarystatgroup.size() ? secondarystatgroup.size() : secondaryStatSlots;
 
     //Random hone percent in future?
     //output->honePct = modifier.statPoolPctModifier;
@@ -666,11 +639,13 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     // if we still have any slots to generate stats for, continue
     if (primaryStatSlots + secondaryStatSlots > 0)
     {
-        // divide the pool by the modified amount of stat slots
-        pool /= (float)(primaryStatSlots + secondaryStatSlots);
-
         // divide per-stat pool by predefined blizzlike value
         pool *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_POOLMOD);
+
+        // for armor specifically we want to modify the pool size depending on the selected stat group and armor type
+        // does not apply to rings, trinkets, cloaks and shields
+        if (output->Class == ITEM_CLASS_ARMOR && (output->InventoryType != INVTYPE_SHIELD || output->InventoryType != INVTYPE_TRINKET || output->InventoryType != INVTYPE_FINGER || output->InventoryType != INVTYPE_NECK || output->InventoryType != INVTYPE_CLOAK))
+            pool *= VirtualModifier::GetArmorTypeStatGroupModifier(output);
 
         // generate primary stat values  for all stats in group
         for (uint32 i = 0; i < primarystatgroup.size(); ++i)
@@ -703,39 +678,17 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             {
                 switch (statgroupid)
                 {
-                    case STAT_GROUP_STR_DPS:
-                        statPoints *= 1.5f;
+                    case STAT_GROUP_HEALING:
+                        statPoints *= 0.8f;
+                        break;
+                    case STAT_GROUP_INT_DPS:
+                        statPoints *= 0.9f;
                         break;
                     case STAT_GROUP_STR_TANK:
-                        statPoints *= 1.73f;
+                        statPoints *= 1.6f;
                         break;
-                    case STAT_GROUP_AGI_DPS:
                     case STAT_GROUP_AGI_TANK:
-                        statPoints *= 1.32f;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (primarystatgroup[i] == ITEM_MOD_STRENGTH)
-            {
-                switch (statgroupid)
-                {
-                    case STAT_GROUP_STR_DPS:
-                    case STAT_GROUP_STR_TANK:
-                        statPoints *= 1.32f;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (primarystatgroup[i] == ITEM_MOD_AGILITY)
-            {
-                switch (statgroupid)
-                {
-                    case STAT_GROUP_AGI_DPS:
-                    case STAT_GROUP_AGI_TANK:
-                        statPoints *= 1.32f;
+                        statPoints *= 1.4f;
                         break;
                     default:
                         break;
@@ -802,12 +755,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                         uint32 slot = 0;
                         output->Spells[slot].SpellId = magicFindId;
                         output->Spells[slot].SpellTrigger = ITEM_SPELLTRIGGER_ON_EQUIP; // onEquip
-                        // are these needed?
-                        /* output->Spells[slot].SpellCharges = 0;
-                        output->Spells[slot].SpellPPMRate = 0;
-                        output->Spells[slot].SpellCooldown = 0;
-                        output->Spells[slot].SpellCategory = 0;
-                        output->Spells[slot].SpellCategoryCooldown = 0; */
                     }
                     continue;
                 }
@@ -1144,17 +1091,17 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
-    uint32 socketMod = urand(0, 1, generator);
+    //uint32 socketMod = urand(0, 1, generator);
 
     switch (output->Quality) {
         case ITEM_QUALITY_LEGENDARY:
-            socketCount = 2 + socketMod;
+            socketCount = 3;
             break;
         case ITEM_QUALITY_EPIC:
             socketCount = 2;
             break;
         case ITEM_QUALITY_RARE:
-            socketCount = 1 + socketMod;
+            socketCount = 2;
             break;
         default:
             socketCount = 1;
@@ -1243,8 +1190,9 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     std::mt19937 generator;
     generator.seed(modifier.qualitySeed);
 
-    // decide quality
+    // get initial quality from the template item
     uint32 quality = output->Quality;
+
     uint32 magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
 
     output->generatedMagicFind = magicFind;
@@ -1286,6 +1234,10 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     }
 
     quality = std::max(output->Quality, quality); // dont generate quality below original
+
+    // if the minQuality modifier is greater than the determined quality, then set the quality to the minQuality
+    if (modifier.minQuality > quality && modifier.minQuality < MAX_ITEM_QUALITY)
+        quality = modifier.minQuality;
 
     // If the quality modifier is set, discard generated quality and force specific quality
     if (modifier.quality < MAX_ITEM_QUALITY)
@@ -1465,7 +1417,7 @@ std::vector<std::string> VirtualItemMgr::GetNamesForNameInfo(NameInfo* info) con
 std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupPrimaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL, generator));
 
     ASSERT(group < STAT_GROUP_COUNT);
 
@@ -1475,7 +1427,7 @@ std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupPrima
 std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL, generator));
 
     ASSERT(group < STAT_GROUP_COUNT);
 
@@ -1485,21 +1437,16 @@ std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecon
 std::vector<SocketColor> const& VirtualItemMgr::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator) const
 {
     if (group == STAT_GROUP_RANDOM)
-        group = static_cast<StatGroup>(urand(0, STAT_GROUP_COUNT - 1, generator));
+        group = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL, generator));
 
     ASSERT(group < STAT_GROUP_COUNT);
 
     return stat_group_sockets[group];
 }
 
-std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetArmorSubclassStatGroups(VirtualItemTemplate* output) const
+std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetPlayerLootPreference(uint8 preference) const
 {
-    return armor_type_stat_groups[output->SubClass];
-}
-
-std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetPlayerSubclassStatGroups(uint8 subclass) const
-{
-    return subclass_stat_groups[subclass];
+    return preference_stat_groups[preference];
 }
 
 uint32 VirtualModifier::GetPrimaryStatSlots(VirtualItemTemplate* output)
@@ -1778,6 +1725,99 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
     return 1.0f;
 }
 
+float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output)
+{
+    switch (output->statGroup)
+    {
+        case STAT_GROUP_STR_TANK:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 0.8f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 1.0f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_AGI_TANK:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 0.8f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.9f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_HEALING:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.7f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_INT_DPS:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.7f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_STR_DPS:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.8f;
+                default:
+                    return 1.0f;
+            }
+        case STAT_GROUP_AGI_DPS:
+            switch (output->SubClass)
+            {
+                case ITEM_SUBCLASS_ARMOR_CLOTH:
+                    return 0.7f;
+                case ITEM_SUBCLASS_ARMOR_LEATHER:
+                    return 1.0f;
+                case ITEM_SUBCLASS_ARMOR_MAIL:
+                    return 0.9f;
+                case ITEM_SUBCLASS_ARMOR_PLATE:
+                    return 0.8f;
+                default:
+                    return 1.0f;
+            }
+        default:
+            return 1.0f;
+    }
+    return 1.0f;
+}
+
+
 uint32 VirtualModifier::GetSetChance(VirtualItemTemplate* output)
 {
     switch (output->Quality)
@@ -1849,132 +1889,32 @@ VirtualItemTemplate* VirtualItemMgr::GetVirtualTemplate(uint32 entry)
 
 // Others
 
-void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output)
+void VirtualItemMgr::UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
-    uint32 ilevel = output->ItemLevel;
     uint32 quality = output->Quality;
-    // Different disenchant loot pools depending on ilevel and quality
-    // Range 60000-60029
-    if (ilevel <= 50)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60000;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60001;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60002;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60003;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60004;
-                break;
-        }
+    uint32 id = 0;
+
+    struct {
+        uint32 quality;
+        uint32 id;
+        uint32 lowId;
     }
-    else if (ilevel > 50 && ilevel <= 100)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60005;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60006;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60007;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60008;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60009;
-                break;
+    list[] = {
+        {1, 60030, 60025},
+        {2, 60031, 60026},
+        {3, 60032, 60027},
+        {4, 60033, 60028},
+        {5, 60034, 60029},
+    };
+
+    for (int i = (sizeof(list) / sizeof(list[0])) - 1; i != -1; i--)
+        if (quality >= list[i].quality)
+        {
+            id = modifier.lowYield ? list[i].lowId : list[i].id;
+            break;
         }
-    }
-    else if (ilevel > 100 && ilevel <= 150)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60010;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60011;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60012;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60013;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60014;
-                break;
-        }
-    }
-    else if (ilevel > 150 && ilevel <= 200)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60015;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60016;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60017;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60018;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60019;
-                break;
-        }
-    }
-    else if (ilevel > 200 && ilevel <= 250)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60020;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60021;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60022;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60023;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60024;
-                break;
-        }
-    }
-    else if (ilevel > 250)
-    {
-        switch (quality) {
-            case ITEM_QUALITY_LEGENDARY:
-                output->DisenchantID = 60025;
-                break;
-            case ITEM_QUALITY_EPIC:
-                output->DisenchantID = 60026;
-                break;
-            case ITEM_QUALITY_RARE:
-                output->DisenchantID = 60027;
-                break;
-            case ITEM_QUALITY_UNCOMMON:
-                output->DisenchantID = 60028;
-                break;
-            case ITEM_QUALITY_NORMAL:
-                output->DisenchantID = 60029;
-                break;
-        }
-    }
+
+    output->DisenchantID = id;
 }
 
 bool VirtualItemMgr::IsVirtualTemplate(ItemTemplate const* base)
@@ -2037,6 +1977,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.primaryStatCountMod = fields[11].GetInt8();
         legTemp.secondaryStatCountMod = fields[12].GetInt8();
         legTemp.statGroupOverride = fields[13].GetInt8();
+        legTemp.limitCatagory = fields[14].GetUInt32();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
@@ -2186,7 +2127,6 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
         ITEM_MOD_SPELL_POWER
-        //ITEM_MOD_SPELL_PENETRATION
     };
     stat_group_sockets[STAT_GROUP_INT_DPS] = {
         SOCKET_COLOR_BLUE
@@ -2263,92 +2203,93 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_AGILITY,
         ITEM_MOD_INTELLECT,
         ITEM_MOD_SPIRIT,
-        ITEM_MOD_STRENGTH,
-        ITEM_MOD_DEFENSE_SKILL_RATING,
-        ITEM_MOD_DODGE_RATING,
-        ITEM_MOD_PARRY_RATING,
-        ITEM_MOD_HIT_SPELL_RATING,
-        ITEM_MOD_HASTE_SPELL_RATING,
-        ITEM_MOD_CRIT_SPELL_RATING,
-        ITEM_MOD_MANA_REGENERATION,
-        ITEM_MOD_SPELL_POWER,
-        ITEM_MOD_SPELL_PENETRATION,
-        ITEM_MOD_HIT_RANGED_RATING,
-        ITEM_MOD_CRIT_RANGED_RATING,
-        ITEM_MOD_HASTE_RANGED_RATING,
-        ITEM_MOD_EXPERTISE_RATING,
-        ITEM_MOD_ATTACK_POWER,
-        ITEM_MOD_RANGED_ATTACK_POWER,
-        ITEM_MOD_ARMOR_PENETRATION_RATING
+        ITEM_MOD_STRENGTH
     };
     stat_group_secondary_stats[STAT_GROUP_ALL] = {
-        ITEM_MOD_STAMINA,
-        ITEM_MOD_AGILITY,
-        ITEM_MOD_INTELLECT,
-        ITEM_MOD_SPIRIT,
-        ITEM_MOD_STRENGTH,
+        // generic
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ARMOR_PENETRATION_RATING,
+        // tank
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
-        ITEM_MOD_HIT_SPELL_RATING,
-        ITEM_MOD_HASTE_SPELL_RATING,
-        ITEM_MOD_CRIT_SPELL_RATING,
-        ITEM_MOD_MANA_REGENERATION,
-        ITEM_MOD_SPELL_POWER,
-        ITEM_MOD_SPELL_PENETRATION,
-        ITEM_MOD_HIT_RANGED_RATING,
-        ITEM_MOD_CRIT_RANGED_RATING,
-        ITEM_MOD_HASTE_RANGED_RATING,
-        ITEM_MOD_EXPERTISE_RATING,
-        ITEM_MOD_ATTACK_POWER,
-        ITEM_MOD_RANGED_ATTACK_POWER,
-        ITEM_MOD_ARMOR_PENETRATION_RATING
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE
     };
     stat_group_sockets[STAT_GROUP_ALL] = {
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_RED,
         SOCKET_COLOR_BLUE
     };
-    // type stat groups
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_CLOTH] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_INT_DPS
+
+    // Stat group for all stats, used for special effects like legendary effect
+    // Uses stat groups that aren't 
+    stat_group_primary_stats[STAT_GROUP_ALL_EXTENDED] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_STRENGTH
     };
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_LEATHER] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_INT_DPS,
-        STAT_GROUP_AGI_DPS,
-        STAT_GROUP_AGI_TANK
+    stat_group_secondary_stats[STAT_GROUP_ALL_EXTENDED] = {
+        // generic
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ARMOR_PENETRATION_RATING,
+        // tank
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE,
+        // melee
+        ITEM_MOD_CRIT_MELEE_RATING,
+        ITEM_MOD_HASTE_MELEE_RATING,
+        ITEM_MOD_HIT_MELEE_RATING,
+        // ranged
+        ITEM_MOD_CRIT_RANGED_RATING,
+        ITEM_MOD_HASTE_RANGED_RATING,
+        ITEM_MOD_HIT_RANGED_RATING,
+        // caster
+        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_HASTE_SPELL_RATING,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_SPELL_RATING,
+        //ITEM_MOD_SPELL_HEALING_DONE,
+        //ITEM_MOD_SPELL_DAMAGE_DONE
     };
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_MAIL] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_STR_DPS,
-        STAT_GROUP_STR_TANK,
-        STAT_GROUP_AGI_DPS
-    };
-    armor_type_stat_groups[ITEM_SUBCLASS_ARMOR_PLATE] = {
-        STAT_GROUP_HEALING,
-        STAT_GROUP_INT_DPS,
-        STAT_GROUP_STR_DPS,
-        STAT_GROUP_STR_TANK
+    stat_group_sockets[STAT_GROUP_ALL_EXTENDED] = {
+        SOCKET_COLOR_YELLOW,
+        SOCKET_COLOR_RED,
+        SOCKET_COLOR_BLUE
     };
 
-    //subclass stat groups
-    subclass_stat_groups[CLASS_SUB_WARDEN] = {
+    //preference stat groups
+    preference_stat_groups[PREF_TANK] = {
         STAT_GROUP_AGI_TANK,
         STAT_GROUP_STR_TANK
     };
-    subclass_stat_groups[CLASS_SUB_HISTORIAN] = {
+    preference_stat_groups[PREF_HEALER] = {
         STAT_GROUP_HEALING
     };
-    subclass_stat_groups[CLASS_SUB_WEAVER] = {
+    preference_stat_groups[PREF_DPS_INT] = {
         STAT_GROUP_INT_DPS
     };
-    subclass_stat_groups[CLASS_SUB_WATCHER] = {
-        STAT_GROUP_AGI_DPS,
+    preference_stat_groups[PREF_DPS_STR] = {
         STAT_GROUP_STR_DPS
     };
-    subclass_stat_groups[CLASS_SUB_RANGER] = {
+    preference_stat_groups[PREF_DPS_AGI] = {
         STAT_GROUP_AGI_DPS
     };
 }

@@ -189,6 +189,10 @@ bool LoginQueryHolder::Initialize()
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_TALENTS, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CUSTOM_TALENTS);
+    stmt->setUInt32(0, lowGuid);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS, stmt);
+
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ACCOUNT_DATA);
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA, stmt);
@@ -1029,8 +1033,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
-    if (Aura* aura = pCurrChar->AddAura(54844, pCurrChar))
-        aura->SetDuration(10 * IN_MILLISECONDS);
+    //if (Aura* aura = pCurrChar->AddAura(54844, pCurrChar))
+        //aura->SetDuration(10 * IN_MILLISECONDS);
 
     if (pCurrChar->GetGroup())
         pCurrChar->GetGroup()->UpdateDungeonLevel();

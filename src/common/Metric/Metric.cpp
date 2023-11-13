@@ -87,9 +87,17 @@ void Metric::LoadFromConfigs()
             return;
         }
 
+        std::string apiToken = sConfigMgr->GetStringDefault("Metric.Token", "");
+        if (apiToken.empty())
+        {
+            TC_LOG_ERROR("metric", "'Metric.Token' not specified in configuration file.");
+            return;
+        }
+
         _hostname.assign(tokens[0]);
         _port.assign(tokens[1]);
         _databaseName.assign(tokens[2]);
+        _apiToken.assign(apiToken);
         Connect();
 
         ScheduleSend();
@@ -171,6 +179,7 @@ void Metric::SendBatch()
 
     GetDataStream() << "POST " << "/write?db=" << _databaseName << " HTTP/1.1\r\n";
     GetDataStream() << "Host: " << _hostname << ":" << _port << "\r\n";
+    GetDataStream() << "Authorization: Token " << _apiToken << "\r\n";
     GetDataStream() << "Accept: */*\r\n";
     GetDataStream() << "Content-Type: application/octet-stream\r\n";
     GetDataStream() << "Content-Transfer-Encoding: binary\r\n";

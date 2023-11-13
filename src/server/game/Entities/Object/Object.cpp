@@ -1196,6 +1196,21 @@ float WorldObject::GetDistance2d(float x, float y) const
     return d > 0.0f ? d : 0.0f;
 }
 
+float WorldObject::GetRawDistance(const WorldObject* obj, bool is3D) const
+{
+    float dx = GetPositionX() - obj->GetPositionX();
+    float dy = GetPositionY() - obj->GetPositionY();
+    float distsq = dx * dx + dy * dy;
+
+    if (is3D)
+    {
+        float dz = GetPositionZ() - obj->GetPositionZ();
+        distsq += dz * dz;
+    }
+
+    return distsq;
+}
+
 bool WorldObject::IsSelfOrInSameMap(WorldObject const* obj) const
 {
     if (this == obj)
@@ -2393,7 +2408,7 @@ int32 WorldObject::ModSpellDuration(SpellInfo const* spellInfo, WorldObject cons
     // Glyphs which increase duration of selfcast buffs
     if (unitTarget == this)
     {
-        switch (spellInfo->SpellFamilyName)
+        switch (spellInfo->SpellFamilyName) // Will need to update if we choose to use these effects -Itswicky
         {
             case SPELLFAMILY_DRUID:
                 if (spellInfo->SpellFamilyFlags[0] & 0x100)
@@ -2620,6 +2635,14 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
     if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180128) && victim->ToPlayer()->IsUsingShield())
     {
         if (roll_chance_i(5))
+            return SPELL_MISS_BLOCK;
+    }
+
+    // 93179 - Whirling Barrier --itswicky
+    if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(93179) && victim->ToPlayer()->IsUsingStaff())
+    {
+        int blockChance = victim->GetUnitBlockChance(BASE_ATTACK, victim);
+        if (roll_chance_i(blockChance))
             return SPELL_MISS_BLOCK;
     }
 
@@ -3280,6 +3303,11 @@ void WorldObject::GetContactPoint(WorldObject const* obj, float& x, float& y, fl
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, distance2d, GetAbsoluteAngle(obj));
+}
+
+float WorldObject::GetObjectSize() const
+{
+    return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? GetFloatValue(UNIT_FIELD_COMBATREACH) : DEFAULT_PLAYER_BOUNDING_RADIUS * GetObjectScale();
 }
 
 void WorldObject::MovePosition(Position &pos, float dist, float angle)

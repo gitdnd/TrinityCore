@@ -947,7 +947,8 @@ struct TalentNodeInfo
     uint32 Mutex;
     uint32 buttonType;
     uint32 flagMask;
-    std::vector<uint32> links;
+    std::vector<uint32> child_links;
+    std::vector<uint32> all_links;
 };
 typedef std::unordered_map<uint32, TalentNodeInfo> TalentNodeContainer;
 
@@ -1593,6 +1594,8 @@ class TC_GAME_API ObjectMgr
         TalentNodeInfo const* GetTalentNode(uint32 entry) const;
         TalentNodeContainer const& GetTalentNodeStore() const { return _talentNodeStore; }
         void LoadTalentNodes();
+        void LoadTalentNodeEntry(uint32 node);
+        void DeleteTalentNodeEntry(uint32 node);
     private:
         // first free id for selected id type
         uint32 _auctionId;

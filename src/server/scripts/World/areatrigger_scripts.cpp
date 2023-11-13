@@ -43,6 +43,7 @@ EndContentData */
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "TemporarySummon.h"
+#include "AchievementMgr.h"
 
 /*######
 ## at_coilfang_waterfall
@@ -470,6 +471,9 @@ public:
     bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
     {
         player->ActivateTaxiPathTo(1982);
+        auto achievement = AchievementGlobalMgr::instance()->GetAchievement(50085);
+        if (achievement)
+            player->CompletedAchievement(achievement);
         return true;
     }
 };

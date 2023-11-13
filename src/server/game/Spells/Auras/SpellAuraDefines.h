@@ -400,7 +400,9 @@ enum AuraType : uint32
     SPELL_AURA_MOD_RATING_PERCENT                           = 320,
     SPELL_AURA_CAST_WHILE_MOVING_OVERRIDE                   = 321,
     SPELL_AURA_MAGIC_FIND                                   = 322,
-    TOTAL_AURAS                                             = 323,
+    SPELL_AURA_MOD_SPELL_POWER_PCT                          = 323,
+    SPELL_AURA_MOD_SPELL_POWER_BY_MANA                      = 324,
+    TOTAL_AURAS                                             = 325,
 };
 
 enum AuraObjectType

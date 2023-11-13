@@ -145,6 +145,14 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "StartGameEvent", &LuaGlobalFunctions::StartGameEvent },
     { "StopGameEvent", &LuaGlobalFunctions::StopGameEvent },
     { "GetElunaMapId", &LuaGlobalFunctions::GetElunaMapId },
+    { "WorldDBQueryAsync", &LuaGlobalFunctions::WorldDBQueryAsync },
+    { "CharacterDBQueryAsync", &LuaGlobalFunctions::CharacterDBQueryAsync },
+    { "LoginDBQueryAsync", &LuaGlobalFunctions::LoginDBQueryAsync },
+    { "GetCustomTalentStorage", &LuaGlobalFunctions::GetCustomTalentStorage },
+    { "GetCustomTalent", &LuaGlobalFunctions::GetCustomTalent },
+    { "LoadCustomTalentNode", &LuaGlobalFunctions::LoadCustomTalentNode },
+    { "DeleteCustomTalentNode", &LuaGlobalFunctions::DeleteTalentNodeBecauseFoeisAMadMan },
+
 
     { NULL, NULL }
 };
@@ -796,6 +804,16 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetSubClass", &LuaPlayer::GetSubClass },
     { "IsDeveloper", &LuaPlayer::IsDeveloper },
     { "UpdateTimewalkerTabard", &LuaPlayer::UpdateTimewalkerTabard },
+    { "LearnCustomTalent", &LuaPlayer::LearnCustomTalent },
+    { "UnlearnCustomTalent", &LuaPlayer::UnlearnCustomTalent },
+    { "ResetCustomTalent", &LuaPlayer::ResetCustomTalent },
+    { "SetTalentLoadout", &LuaPlayer::SetTalentLoadout },
+    { "GetCustomTalents", &LuaPlayer::GetCustomTalents },
+    { "CanLearnCustomTalent", &LuaPlayer::CanLearnCustomTalent },
+    { "GetMagicFind", &LuaPlayer::GetMagicFind },
+    { "SendItemQueryPacket", &LuaPlayer::SendItemQueryPacket },
+    { "SetLootPreference", &LuaPlayer::SetLootPreference },
+    { "GetLootPreference", &LuaPlayer::GetLootPreference },
 
     { NULL, NULL }
 };
@@ -1285,6 +1303,7 @@ ElunaRegister<Map> MapMethods[] =
     { "SaveInstanceData", &LuaMap::SaveInstanceData },
     { "GetDungeonLevel", &LuaMap::GetDungeonLevel },
     { "GetCappedDungeonLevel", &LuaMap::GetCappedDungeonLevel },
+    { "UpdateDungeonLevel", &LuaMap::UpdateDungeonLevel },
 
     { NULL, NULL }
 };

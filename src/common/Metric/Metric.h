@@ -75,6 +75,7 @@ private:
     std::string _hostname;
     std::string _port;
     std::string _databaseName;
+    std::string _apiToken;
     std::function<void()> _overallStatusLogger;
     std::string _realmName;
 

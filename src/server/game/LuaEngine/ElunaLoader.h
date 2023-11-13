@@ -7,6 +7,14 @@
 
 #ifndef _ELUNALOADER_H
 #define _ELUNALOADER_H
+
+#include "ElunaUtility.h"
+
+extern "C"
+{
+#include "lua.h"
+};
+
 struct LuaScript;
 
 class ElunaLoader
@@ -24,9 +32,11 @@ public:
     static ElunaLoader* instance();
     void LoadScripts();
     void ReadFiles(std::string path);
-    void AddScriptPath(std::string filename, const std::string& fullpath, int32 mapId);
+    void ProcessScript(lua_State* L, std::string filename, const std::string& fullpath, int32 mapId);
     void CombineLists();
     bool ShouldMapLoadEluna(uint32 mapId);
+    bool CompileScript(lua_State* L, LuaScript& script);
+    static int LoadBytecodeChunk(lua_State* L, uint8* bytes, size_t len, BytecodeBuffer* buffer);
 
     // Lua script folder path
     std::string lua_folderpath;
@@ -35,6 +45,7 @@ public:
 
     //std::vector<LuaScript> Scripts;
     typedef std::list<LuaScript> ScriptList;
+
     ScriptList lua_scripts;
     ScriptList lua_extensions;
     ScriptList combined_scripts;

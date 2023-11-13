@@ -71,12 +71,16 @@ void SystemMgr::LoadScriptWaypoints()
         CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(entry);
         if (!info)
         {
+            WorldDatabase.PExecute("delete from script_waypoint where entry = %u and pointid = %u", entry, id);
             TC_LOG_ERROR("sql.sql", "SystemMgr: DB table script_waypoint has waypoint for non-existant creature entry %u", entry);
             continue;
         }
 
         if (!info->ScriptID)
+        {
+            WorldDatabase.PExecute("delete from script_waypoint where entry = %u and pointid = %u", entry, id);
             TC_LOG_ERROR("sql.sql", "SystemMgr: DB table script_waypoint has waypoint for creature entry %u, but creature does not have ScriptName defined and then useless.", entry);
+        }
 
         WaypointPath& path = _waypointStore[entry];
         path.id = entry;

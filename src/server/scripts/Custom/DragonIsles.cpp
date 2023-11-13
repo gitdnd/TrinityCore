@@ -47,31 +47,10 @@ public:
         }
     };
 
-    /*class spell_vrykul_flag_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_vrykul_flag_SpellScript);
-
-    private:
-        void OnSomething()
-        {
-
-        }
-
-        void Register() override
-        {
-            //OnEffectHitTarget += SpellEffectFn(spell_request_second_mug::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };*/
-
     AuraScript* GetAuraScript() const override
     {
         return new spell_vrykul_flag_AuraScript();
     }
-
-    /*SpellScript* GetSpellScript() const override
-    {
-        return new spell_vrykul_flag_SpellScript();
-    }*/
 };
 
 void AddSC_DragonIsles()

@@ -106,6 +106,7 @@ template<typename T> struct EventKey;
 template<typename T> struct EntryKey;
 template<typename T> struct UniqueObjectKey;
 
+
 struct LuaScript
 {
     std::string fileext;
@@ -113,6 +114,7 @@ struct LuaScript
     std::string filepath;
     std::string modulepath;
     std::string filedata;
+	BytecodeBuffer bytecode;
     int32 mapId;
 };
 
@@ -134,6 +136,8 @@ public:
     // Prevent copy
     Eluna(Eluna const&) = delete;
     Eluna& operator=(const Eluna&) = delete;
+    bool ExecuteCall(int params, int res);
+    bool reloadEluna;
 private:
     int32 boundMapId;
 
@@ -161,7 +165,7 @@ private:
     void DestroyBindStores();
     void CreateBindStores();
     void InvalidateObjects();
-    bool ExecuteCall(int params, int res);
+    
 
     static int StackTrace(lua_State *_L);
     static void Report(lua_State* _L);
@@ -207,9 +211,14 @@ private:
     template<typename T>
     void Push(T const* ptr)                     { Push(L, ptr); ++push_counter; }
 
+    
+
 public:
     lua_State* L;
     EventMgr* eventMgr;
+    QueryCallbackProcessor queryProcessor;
+    QueryCallbackProcessor& GetQueryProcessor() { return queryProcessor; }
+    
 
     BindingMap< EventKey<Hooks::ServerEvents> >*     ServerEventBindings;
     BindingMap< EventKey<Hooks::PlayerEvents> >*     PlayerEventBindings;

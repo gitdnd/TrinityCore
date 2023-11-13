@@ -133,9 +133,16 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    uint32 cost = items_count ? 30 * items_count : 30;  // price hardcoded in client
+    uint32 cost = 0;  // make sending mail free
 
     uint32 reqmoney = cost + money;
+
+    // since money is disabled, error if anyone tries to send money or cod items
+    if (money > 0 || COD > 0)
+    {
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
+        return;
+    }
 
     // Check for overflow
     if (reqmoney < money)

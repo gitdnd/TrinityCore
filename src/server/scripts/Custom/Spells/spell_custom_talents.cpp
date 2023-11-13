@@ -2261,6 +2261,42 @@ class spell_soothing_flame : public AuraScript
     }
 };
 
+class spell_battle_rouse : public AuraScript
+{
+    PrepareAuraScript(spell_battle_rouse);
+
+    enum Spell
+    {
+        BATTLE_ROUSE_TRIGGER = 94009
+    };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ BATTLE_ROUSE_TRIGGER });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = GetTarget();
+        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), bp));
+
+        if (amount >= 1)
+        {
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(amount);
+            victim->CastSpell(victim, BATTLE_ROUSE_TRIGGER, args);
+        }        
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_battle_rouse::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 class spell_burnout : public AuraScript
 {
     PrepareAuraScript(spell_burnout);
@@ -2339,7 +2375,101 @@ class spell_burnout : public AuraScript
         OnEffectProc += AuraEffectProcFn(spell_burnout::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
-//
+
+// 93179 - Whirling Barrier
+class spell_whirling_barrier : public AuraScript
+{
+    PrepareAuraScript(spell_whirling_barrier);
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (!GetCaster())
+            return;
+        Player* caster = GetCaster()->ToPlayer();
+        if (!caster)
+            return;
+
+        caster->RemoveSpell(107);
+        caster->UpdateShieldBlockValue();
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* caster = GetCaster()->ToPlayer();
+        if (!caster)
+            return;
+
+        caster->LearnSpell(107, false);
+        caster->UpdateShieldBlockValue();
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_whirling_barrier::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_whirling_barrier::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_field_medic : public AuraScript
+{
+    PrepareAuraScript(spell_field_medic);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(healInfo->GetHeal() * bp / 400);
+        caster->CastSpell(caster, 94010, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_field_medic::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_druidic_rite : public AuraScript
+{
+    PrepareAuraScript(spell_druidic_rite);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        int32 triggerBP = 0;
+        SpellInfo const* trigger = eventInfo.GetSpellInfo();
+        if (!trigger)
+            return;
+
+        if (trigger->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE)
+            triggerBP = trigger->Effects[EFFECT_0].CalcValue();
+        else if (trigger->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE_PCT)
+        {
+            int32 bp0 = trigger->Effects[EFFECT_0].CalcValue();
+            int32 mana = caster->GetMaxPower(POWER_MANA);
+            triggerBP = (mana / 100) * bp0;
+        }
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(triggerBP * bp / 400);
+        caster->CastSpell(caster, 94011, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_druidic_rite::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2402,4 +2532,8 @@ void AddSC_Spells_Custom_Talents()
     RegisterAuraScript(spell_combustibolt);
     RegisterAuraScript(spell_soothing_flame);
     RegisterAuraScript(spell_burnout);
+    RegisterAuraScript(spell_battle_rouse);
+    RegisterAuraScript(spell_whirling_barrier);
+    RegisterAuraScript(spell_field_medic);
+    RegisterAuraScript(spell_druidic_rite);
 }

@@ -141,13 +141,26 @@ enum Classes
     CLASS_SUB_HISTORIAN = 14, // Subclass of Timewalker
     CLASS_SUB_WEAVER    = 15, // Subclass of Timewalker
     CLASS_SUB_WATCHER   = 16, // Subclass of Timewalker
-    CLASS_SUB_RANGER    = 17  // Subclass of Timewalker
+    CLASS_SUB_RANGER    = 17, // Subclass of Timewalker
+    CLASS_SUB_SAVAGE    = 18  // Subclass of Timewalker
 };
+
+enum LootPreference
+{
+    PREF_NONE       = 0,
+    PREF_TANK       = 1,
+    PREF_HEALER     = 2,
+    PREF_DPS_INT    = 3,
+    PREF_DPS_STR    = 4,
+    PREF_DPS_AGI    = 5
+};
+
+#define MAX_PREF          6
 
 // max+1 for player class
 #define MAX_CLASSES       13
 
-#define MAX_SUBCLASSES    5
+#define MAX_SUBCLASSES    6
 
 #define CLASSMASK_ALL_PLAYABLE \
     ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_HUNTER-1))| \
@@ -159,11 +172,21 @@ enum Classes
 
 enum CharacterSubClassSpells: uint32
 {
-    SUBCLASS_SPELL_WARDEN = 181000,
-    SUBCLASS_SPELL_HISTORIAN = 181001,
-    SUBCLASS_SPELL_WEAVER = 181002,
-    SUBCLASS_SPELL_WATCHER = 181003,
-    SUBCLASS_SPELL_RANGER = 181004
+    SUBCLASS_SPELL_WARDEN = 95000,
+    SUBCLASS_SPELL_HISTORIAN = 95001,
+    SUBCLASS_SPELL_WEAVER = 95002,
+    SUBCLASS_SPELL_SAVAGE = 95003,
+    SUBCLASS_SPELL_RANGER = 95004,
+    SUBCLASS_SPELL_WATCHER = 95005
+};
+
+enum CharacterLootPreferenceSpells : uint32
+{
+    LOOT_PREF_SPELL_TANK = 95006,
+    LOOT_PREF_SPELL_HEALER = 95007,
+    LOOT_PREF_SPELL_DPS_INT = 95008,
+    LOOT_PREF_SPELL_DPS_STR = 95009,
+    LOOT_PREF_SPELL_DPS_AGI = 95010
 };
 
 enum PlayerSpecializations
@@ -716,6 +739,7 @@ enum SpellAttr7 : uint32
 #define MIN_TALENT_SPECS        1
 #define MAX_TALENT_SPECS        2
 #define MAX_GLYPH_SLOT_INDEX    6
+#define MAX_CUSTOM_TALENT_LOADOUTS 3
 
 // Custom values
 enum SpellClickUserTypes
@@ -3610,7 +3634,7 @@ enum SpellFamilyNames
     SPELLFAMILY_HUNTER      = 9,  // TITLE Hunter
     SPELLFAMILY_PALADIN     = 10, // TITLE Paladin
     SPELLFAMILY_SHAMAN      = 11, // TITLE Shaman
-    SPELLFAMILY_UNK2        = 12, // TITLE Unk2 (Silence resistance?)
+    SPELLFAMILY_CLASSLESS   = 12, // TITLE Unk2 (Silence resistance?)
     SPELLFAMILY_POTION      = 13, // TITLE Potion
     // 14 - unused
     SPELLFAMILY_DEATHKNIGHT = 15, // TITLE Death Knight
@@ -3902,6 +3926,22 @@ enum CustomSpells : uint32
     SPELL_PRECISE_TECHNIQUE = 180530,
     SPELL_FIST_OF_FURY = 180521,
     SPELL_BARRAGE_TALENT = 180529,
+    SPELL_TWINKET_OF_BL00D_MAGK = 450045,
+    SPELL_HEAVY_BLOWS  = 93180,
+};
+
+enum CustomTalentErrorResponses : uint8
+{
+    TALENT_REPONSE_OKAY = 0,
+    TALENT_RRESPONSE_NOT_ENOUGH_POINTS = 1,
+    TALENT_RESPONSE_NOT_ALIVE = 2,
+    TALENT_RESPONSE_ALREADY_LEARNED = 3,
+    TALENT_RESPONSE_NO_NODE_INFO = 4,
+    TALENT_RESPONSE_TALENT_HIDDEN = 5,
+    TALENT_RESPONSE_NO_LINK = 6,
+    TALENT_RESPONSE_ALREADY_HAVE_STARTER_NODE = 7,
+    TALENT_RESPONSE_SPELL_NOT_FOUND = 8,
+
 };
 
 namespace Trinity
