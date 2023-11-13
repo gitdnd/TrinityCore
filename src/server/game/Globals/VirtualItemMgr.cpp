@@ -1091,17 +1091,17 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
-    uint32 socketMod = urand(0, 1, generator);
+    //uint32 socketMod = urand(0, 1, generator);
 
     switch (output->Quality) {
         case ITEM_QUALITY_LEGENDARY:
-            socketCount = 2 + socketMod;
+            socketCount = 3;
             break;
         case ITEM_QUALITY_EPIC:
             socketCount = 2;
             break;
         case ITEM_QUALITY_RARE:
-            socketCount = 1 + socketMod;
+            socketCount = 2;
             break;
         default:
             socketCount = 1;
