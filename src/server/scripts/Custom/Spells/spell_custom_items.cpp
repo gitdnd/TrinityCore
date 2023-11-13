@@ -542,8 +542,10 @@ class spell_tobenamedlegendary_dodge_thing : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-
-        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), 7, TRIGGERED_FULL_MASK);
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(eventInfo.GetDamageInfo()->GetDamage() * 0.2);
+        args.TriggerFlags = TRIGGERED_FULL_MASK;
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), 97401, args);
     }
 
     void Register() override
