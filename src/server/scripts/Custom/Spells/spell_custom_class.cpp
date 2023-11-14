@@ -539,7 +539,7 @@ public:
             Unit* target = eventInfo.GetProcTarget();
 
             // get current aura on target, if any. SPELLFAMILY_ROGUE and 0x00000800 probably has to be changed.
-            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
+            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_CLASSLESS, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
             if (!sealDot)
                 return;
 

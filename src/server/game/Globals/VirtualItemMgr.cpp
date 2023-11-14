@@ -15,7 +15,7 @@
 
 bool SelectSkipDebug(int32 a, int32 b, std::string label)
 {
-    if (a >= 0)
+    if (a > -1)
     {
         if (a == b)
             return false;
