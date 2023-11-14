@@ -7415,7 +7415,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
     }
 
     // Ambush --Itswicky
-    if (caster->HasAura(93173) && HealthAbovePct(50))
+    if (caster && caster->HasAura(93173) && HealthAbovePct(50))
     {
         AuraEffect const* aurEff = caster->GetAuraEffect(93173, 0);
         float bonus = aurEff->GetAmount();
