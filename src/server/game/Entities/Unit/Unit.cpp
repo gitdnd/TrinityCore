@@ -998,7 +998,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 // Heavy Blows --Itswicky
                 if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
                 {
-                    if (damageInfo->attacker->HasAura(93180))
+                    if (damageInfo->attacker && damageInfo->attacker->HasAura(93180))
                     {
                         Player* player = damageInfo->attacker->ToPlayer();
                         if (player)
@@ -1045,7 +1045,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     critPctDamageMod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellInfo->GetSchoolMask()) - 1.0f) * 100;
 
                     // Ambush --Itswicky
-                    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
+                    if (damageInfo->attacker && victim && spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
                         if (damageInfo->attacker->HasAura(93173) && victim->HealthBelowPct(50))
                         {
                             AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93173, 1);
@@ -1304,7 +1304,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
                 mod += (GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, damageInfo->Damages[i].DamageSchoolMask) - 1.0f) * 100;
 
                 // Ambush --Itswicky
-                if (damageInfo->Attacker->HasAura(93173) && victim->HealthBelowPct(50))
+                if (damageInfo->Attacker && victim && damageInfo->Attacker->HasAura(93173) && victim->HealthBelowPct(50))
                 {
                     AuraEffect const* aurEff = damageInfo->Attacker->GetAuraEffect(93173, 1);
                     float bonus = aurEff->GetAmount();
@@ -6577,7 +6577,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     {
         case SPELLFAMILY_DEATHKNIGHT:
             // Impurity (dummy effect) This refers to a blizzlike talent to add AP scaling do DK abilities. Noting it here -Itswicky
-            if (GetTypeId() == TYPEID_PLAYER)
+            if (GetTypeId() == TYPEID_PLAYER && ToPlayer())
             {
                 PlayerSpellMap const& playerSpells = ToPlayer()->GetSpellMap();
                 for (auto itr = playerSpells.begin(); itr != playerSpells.end(); ++itr)
@@ -7553,7 +7553,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     {
         case SPELLFAMILY_DEATHKNIGHT:
             // Impurity (dummy effect)
-            if (GetTypeId() == TYPEID_PLAYER)
+            if (GetTypeId() == TYPEID_PLAYER && ToPlayer())
             {
                 PlayerSpellMap const& playerSpells = ToPlayer()->GetSpellMap();
                 for (auto itr = playerSpells.begin(); itr != playerSpells.end(); ++itr)
@@ -8185,7 +8185,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
         {
             case SPELLFAMILY_DEATHKNIGHT:
                 // Glacier Rot
-                if (spellProto->SpellFamilyFlags[0] & 0x2 || spellProto->SpellFamilyFlags[1] & 0x6)
+                if (owner && (spellProto->SpellFamilyFlags[0] & 0x2 || spellProto->SpellFamilyFlags[1] & 0x6))
                     if (AuraEffect* aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 196, 0))
                         if (victim->GetDiseasesByCaster(owner->GetGUID()) > 0)
                             AddPct(DoneTotalMod, aurEff->GetAmount());
