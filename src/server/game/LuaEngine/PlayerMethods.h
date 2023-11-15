@@ -3456,6 +3456,10 @@ namespace LuaPlayer
 
         modifier.isCrafted = isCrafted;
 
+        // if item is a crafted item, flag it as low yield to prevent re-crafting into infinity
+        if (isCrafted)
+            modifier.lowYield = true;
+
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, itemCount, &noSpaceForCount);

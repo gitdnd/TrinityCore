@@ -84,7 +84,7 @@ class spell_class_seal_of_righteousness : public AuraScript
             mws /= 1000.0f;
         }
 
-        int32 bp = std::lroundf(mws * (0.030f * ap + 0.035f * sph));
+        int32 bp = std::lroundf(mws * (0.036f * ap + 0.05f * sph));
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_RIGHTEOUSNESS, args);
@@ -385,7 +385,7 @@ class spell_class_seal_of_flametongue : public AuraScript
             mws /= 1000.0f;
         }
         // Damage calculation of the hit
-        int32 bp = std::lroundf(mws * (0.055f * spf) + (25 * mws));
+        int32 bp = std::lroundf(mws * (0.08f * spf) + (25 * mws));
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_FLAMETONGUE, args);

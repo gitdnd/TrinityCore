@@ -269,9 +269,9 @@ enum SocketColor
     SOCKET_COLOR_RED                            = 2,
     SOCKET_COLOR_YELLOW                         = 4,
     SOCKET_COLOR_BLUE                           = 8,
-    SOCKET_COLOR_ORANGE                         = 16,
-    SOCKET_COLOR_PURPLE                         = 32,
-    SOCKET_COLOR_GREEN                          = 64
+    SOCKET_COLOR_ORANGE                         = 16, // Major in client
+    SOCKET_COLOR_PURPLE                         = 32, // Minor in client
+    SOCKET_COLOR_GREEN                          = 64  // FATIGUE in client
 };
 
 #define SOCKET_COLOR_PRISMATIC (SOCKET_COLOR_BLUE | SOCKET_COLOR_RED| SOCKET_COLOR_YELLOW | SOCKET_COLOR_ORANGE | SOCKET_COLOR_PURPLE | SOCKET_COLOR_GREEN)
