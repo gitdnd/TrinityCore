@@ -347,9 +347,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
 
-        bool IsFreeToMove();
-        static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
-        static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
         CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
         void SetTextRepeatId(uint8 textGroup, uint8 id);
         void ClearTextRepeatGroup(uint8 textGroup);
@@ -389,8 +386,6 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
         float m_wanderDistance;
         uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check
-        uint32 m_backpedalTime;                             // (msecs) remaining time for next move backwards check
-        uint32 m_encircleTime;                              // (msecs) remaining time for next encircle movement check
         uint32 m_combatPulseTime;                           // (msecs) remaining time for next zone-in-combat pulse
         uint32 m_combatPulseDelay;                          // (secs) how often the creature puts the entire zone in combat (only works in dungeons)
 

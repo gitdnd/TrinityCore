@@ -24,7 +24,6 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "Player.h"
-#include "Log.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "UnitAI.h"
@@ -1036,22 +1035,6 @@ namespace Trinity
         private:
             WorldObject const* i_obj;
             float i_range;
-    };
-
-    class AnyUnitFulfillingConditionInRangeCheck
-    {
-    public:
-        AnyUnitFulfillingConditionInRangeCheck(WorldObject const* obj, std::function<bool(Unit*)> functor, float radius)
-            : i_obj(obj), i_functor(functor), i_range(radius) {}
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(Unit* u)
-        {
-            return i_functor(u) && i_obj->GetRawDistance(u, true) <= i_range;
-        }
-    private:
-        WorldObject const* i_obj;
-        std::function<bool(Unit*)> i_functor;
-        float i_range;
     };
 
     // Success at unit in range, range update for next check (this can be use with UnitLastSearcher to find nearest unit)
