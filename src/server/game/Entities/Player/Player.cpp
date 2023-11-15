@@ -12389,7 +12389,7 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         ApplyVirtualItemLegendayEffects(pItem);
 
         // Broadcast to world chat if not a GM
-        if (quality == ITEM_QUALITY_LEGENDARY && GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (quality == ITEM_QUALITY_LEGENDARY && GetSession()->GetSecurity() < SEC_GAMEMASTER && sVirtualItemMgr.GetVirtualTemplate(pItem->GetEntry()))
         {
             std::ostringstream oss;
             oss << GetName() << " has obtained " <<
