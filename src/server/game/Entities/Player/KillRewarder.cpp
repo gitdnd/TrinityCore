@@ -161,8 +161,8 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         if (_group)
         {
             // Nerfs boosting xp by running with low level alts
-            // xp = min(1, groupLevel / playerLevel)
-            xp = std::min(1, (int)std::round(_group->GetDungeonLevel() / player->GetCappedItemLevel()));
+            // xp = xp * min(1, groupLevel / playerLevel)
+            xp = xp * std::min(1, (int)std::round(_group->GetDungeonLevel() / player->GetCappedItemLevel()));
         }
 
         // 4.2.3. Give XP to player.
