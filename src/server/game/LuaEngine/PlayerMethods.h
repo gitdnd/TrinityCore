@@ -3461,8 +3461,10 @@ namespace LuaPlayer
         if (isCrafted)
             modifier.lowYield = true;
 
-        // make sure items are not > 300 
-        modifier.plrAvgLvl = std::min(sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL)+ilevelBonus, uint32(player->GetAverageItemLevel()));
+        // make sure items are not > 300 unless with a catalyst modifier
+        uint32 softcap = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+        if(uint32(player->GetAverageItemLevel()) > softcap)
+            modifier.ilevel = softcap+ilevelBonus;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
