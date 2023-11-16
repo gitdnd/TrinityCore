@@ -13783,6 +13783,55 @@ void Unit::Whisper(std::string const& text, Language language, Player* target, b
     target->SendDirectMessage(&data);
 }
 
+/**
+ * @brief this method gets the diameter of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ *
+ * If the player is mounted the diameter also takes in consideration the mount size
+ *
+ * @return float The diameter of a unit
+ */
+float Unit::GetCollisionWidth() const
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        return GetObjectSize();
+
+    float scaleMod = GetObjectScale(); // 99% sure about this
+    float objectSize = GetObjectSize();
+    float defaultSize = DEFAULT_PLAYER_BOUNDING_RADIUS * scaleMod;
+
+    //! Dismounting case - use basic default model data
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+
+    if (IsMounted())
+    {
+        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
+        {
+            if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+            {
+                if (G3D::fuzzyGt(mountModelData->CollisionWidth, modelData->CollisionWidth))
+                    modelData = mountModelData;
+            }
+        }
+    }
+
+    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2;
+    // if the objectSize is the default value or the creature is mounted and we have a DBC value, then we can retrieve DBC value instead
+    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize, defaultSize) || IsMounted()) ? collisionWidth : objectSize;
+}
+
+/**
+ * @brief this method gets the radius of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ *
+ * If the player is mounted the radius also takes in consideration the mount size
+ *
+ * @return float The radius of a unit
+ */
+float Unit::GetCollisionRadius() const
+{
+    return GetCollisionWidth() / 2;
+}
+
 void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target)
 {
     if (!sObjectMgr->GetBroadcastText(textId))
