@@ -401,7 +401,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
 
     // Mod the virtual item level to allow higher or lower virtual item levels 
-    vLevel += irand(-1, 5, generator);
+    vLevel += irand(-1, 4, generator);
     // Add all vLvl mods before generating a new ilevel
     vLevel += modifier.vLvlMod;
 
@@ -412,7 +412,14 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     ilevel += (int32(output->Quality) * 3);
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
-    ilevel += irand(-3, 3, generator);
+    ilevel += irand(-3, 2, generator);
+
+    // if the item is crafted and the generated item level is > soft cap, set ilevel to soft cap
+    if (modifier.isCrafted && ilevel > sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL))
+        ilevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+
+    // allow ilevel bonuses to add to the top of crafted max level as well (catalysts)
+    ilevel += modifier.ilevelBonus;
 
     // If ilevel modifier is set, override all ilevel generation
     if (modifier.ilevel)

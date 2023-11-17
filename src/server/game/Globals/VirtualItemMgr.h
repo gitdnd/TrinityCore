@@ -129,6 +129,7 @@ struct VirtualModifier
         lootPreference = 0;
         generateSet = false;
         lowYield = false;
+        ilevelBonus = 0;
     }
 
     /**
@@ -160,6 +161,7 @@ struct VirtualModifier
     uint8 lootPreference;
     bool generateSet;
     bool lowYield;
+    uint32 ilevelBonus;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
