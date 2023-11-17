@@ -3446,7 +3446,7 @@ void Creature::ApplyScaledResistances()
     {
         // Set the resistance to 1/3 of the current dungeon level.
         // This is fine for bosses up to ilevel 300
-        float scaledFlatResistances = (float)GetDungeonLevel() * 0.33f;
+        float scaledFlatResistances = (float)GetDungeonLevel() * 0.125f;
 
         if ((GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB) == 0)
         {
