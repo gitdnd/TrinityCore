@@ -5983,6 +5983,15 @@ void Spell::EffectHoneVirtualItem(SpellEffIndex effIndex)
         ChatHandler(player->GetSession()).PSendSysMessage("Your honing has failed and the item has been damaged.");
         player->DurabilityLoss(itemTarget, float(5) / 100.0f);
         player->PlayDirectSound(13092); // Item break sound
+        if (itemTarget->IsBroken())
+        {
+            std::ostringstream oss;
+            oss << player->GetName() << " has broken their " <<
+                "|c" << std::hex << ItemQualityColors[ITEM_QUALITY_LEGENDARY] << std::dec <<
+                "|Hitem:" << itemTarget->GetEntry() << ":0:" <<
+                "0:0:0:0:" << "0:0:0:0|h[" << itemTarget->GetTemplate()->Name1 << "]|h|r" << "!";
+            sWorld->SendGlobalText(oss.str().c_str(), nullptr, CHAT_MSG_LOOT);
+        }
         return;
     }
  
