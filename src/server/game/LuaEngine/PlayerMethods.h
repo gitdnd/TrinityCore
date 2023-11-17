@@ -3436,6 +3436,7 @@ namespace LuaPlayer
         int8 minQuality = Eluna::CHECKVAL<int8>(E->L, 7, -1);
         int8 statGroup = Eluna::CHECKVAL<int8>(E->L, 8, -1);
         bool isCrafted = Eluna::CHECKVAL<bool>(E->L, 9, false);
+        uint32 ilevelBonus = Eluna::CHECKVAL<uint32>(E->L, 10, 0);
 
         VirtualModifier modifier;
 
@@ -3459,6 +3460,11 @@ namespace LuaPlayer
         // if item is a crafted item, flag it as low yield to prevent re-crafting into infinity
         if (isCrafted)
             modifier.lowYield = true;
+
+        // make sure items are not > 300 unless with a catalyst modifier
+        uint32 softcap = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+        if(uint32(player->GetAverageItemLevel()) > softcap)
+            modifier.ilevel = softcap+ilevelBonus;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;

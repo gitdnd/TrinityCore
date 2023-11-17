@@ -183,7 +183,7 @@ class spell_class_seal_of_rockbiter : public AuraScript
 
 
 
-        int32 bp = std::lroundf(ilvl + armor * 0.05f);
+        int32 bp = std::lroundf(ilvl + armor * 0.1f);
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_ROCKBITER, args);
@@ -774,6 +774,35 @@ class spell_class_serrated_shot_bleed : public AuraScript
     }
 };
 
+// 96011 Aura of Steel
+class spell_class_aura_of_steel : public AuraScript
+{
+    PrepareAuraScript(spell_class_aura_of_steel);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            canBeRecalculated = false;
+
+
+            Player* player = GetCaster()->ToPlayer();
+            int32 armor = GetTarget()->GetTotalAuraModValue(UNIT_MOD_ARMOR);
+
+            int32 bp = std::lroundf(armor * 0.05f);
+
+            amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+
+        }
+    }
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_class_aura_of_steel::CalculateAmount, EFFECT_1, SPELL_AURA_DAMAGE_SHIELD);
+    }
+};
+
+
+
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
@@ -791,4 +820,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterAuraScript(spell_class_seal_of_bloodgrip);
     RegisterAuraScript(spell_class_seal_of_bloodgrip_passive);
     RegisterAuraScript(spell_class_serrated_shot_bleed);
+    RegisterAuraScript(spell_class_aura_of_steel);
 };
