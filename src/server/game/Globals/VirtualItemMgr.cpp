@@ -2113,13 +2113,13 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     stat_group_primary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_INTELLECT,
-        ITEM_MOD_SPIRIT
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_SPELL_POWER
     };
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_MANA_REGENERATION,
-        ITEM_MOD_SPELL_POWER
+        ITEM_MOD_MANA_REGENERATION
     };
     stat_group_sockets[STAT_GROUP_HEALING] = {
         SOCKET_COLOR_BLUE
@@ -2127,13 +2127,13 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     // Int DPS Data
     stat_group_primary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_INTELLECT
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPELL_POWER
     };
     stat_group_secondary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_HASTE_RATING,
-        ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_SPELL_POWER
+        ITEM_MOD_CRIT_RATING
     };
     stat_group_sockets[STAT_GROUP_INT_DPS] = {
         SOCKET_COLOR_BLUE
