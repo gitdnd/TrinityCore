@@ -13610,7 +13610,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                                 }
 
                     if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
-                        if (target->IsGameMaster() && m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GM))
+                        if (target->IsGameMaster() && target->m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GM))
                             displayId = cinfo->GetFirstVisibleModel();
                 }
 
