@@ -384,7 +384,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     output->Bonding = BIND_WHEN_PICKED_UP;
 
     // if item is a legendary or higher, flag as BoA
-    if(output->Quality >= ITEM_QUALITY_LEGENDARY)
+    if(output->Quality >= ITEM_QUALITY_LEGENDARY && !output->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
         output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
 
     // decide itemlevel
