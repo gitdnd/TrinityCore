@@ -2417,7 +2417,9 @@ void Player::SetGameMaster(bool on)
     if (on)
     {
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
-        SetFaction(FACTION_FRIENDLY);
+        //SetFaction(FACTION_FRIENDLY);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
@@ -2448,7 +2450,9 @@ void Player::SetGameMaster(bool on)
         SetPhaseMask(newPhase, false);
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
-        SetFactionForRace(GetRace());
+        //SetFactionForRace(GetRace());
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
         if(!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
