@@ -385,7 +385,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // if item is a legendary or higher, flag as BoA
     if(output->Quality >= ITEM_QUALITY_LEGENDARY && !output->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
-        output->Flags &= ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
+        output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
 
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
