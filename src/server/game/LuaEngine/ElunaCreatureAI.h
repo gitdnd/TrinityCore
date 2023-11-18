@@ -93,7 +93,7 @@ struct ElunaCreatureAI : ScriptedAI
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
                 auto player = itr->GetSource();
-                if (player->GetSession())
+                if (player->GetSession() && !player->IsGameMaster())
                 {
                     player->CastSpell(player, 90191); // Dungeon Death
                 }
@@ -146,7 +146,7 @@ struct ElunaCreatureAI : ScriptedAI
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
                 auto player = itr->GetSource();
-                if (player->GetSession())
+                if (player->GetSession() && !player->IsGameMaster())
                 {
                     player->RemoveAurasDueToSpell(90191); // Dungeon Death
                 }
@@ -215,7 +215,7 @@ struct ElunaCreatureAI : ScriptedAI
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
                 auto player = itr->GetSource();
-                if (player->GetSession())
+                if (player->GetSession() && !player->IsGameMaster())
                 {
                     player->RemoveAurasDueToSpell(90191); // Dungeon Death
                 }
