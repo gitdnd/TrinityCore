@@ -283,7 +283,7 @@ i_scriptLock(false), _respawnCheckTimer(0)
 {
     // lua state begins uninitialized
     eluna = nullptr;
-
+    graveyardOverride = WorldLocation();
     m_parentMap = (_parent ? _parent : this);
 
     if (IsParent() || !Instanceable())

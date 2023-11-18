@@ -395,5 +395,15 @@ namespace LuaMap
         map->UpdateDungeonLevel();
         return 0;
     }
+
+    int SetGraveyardOverride(Eluna* E, Map* map)
+    {
+        uint32 mapid = Eluna::CHECKVAL<uint32>(E->L, 2);
+        float x = Eluna::CHECKVAL<float>(E->L, 3);
+        float y = Eluna::CHECKVAL<float>(E->L, 4);
+        float z = Eluna::CHECKVAL<float>(E->L,5);
+        float o = Eluna::CHECKVAL<float>(E->L, 6);
+        map->graveyardOverride = WorldLocation(mapid, x, y, z, o);
+    }
 };
 #endif

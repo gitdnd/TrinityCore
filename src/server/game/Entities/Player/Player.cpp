@@ -5140,41 +5140,54 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
         SetCanSeePhaseOne(true);
         SetCanSeeUniquePhase(false);
 
-        // Default Hub map and coords
         uint32 mapId = 765;
         float x = 56.48f;
         float y = 539.11f;
         float z = 715.5f;
         float o = 4.305573f;
-        // If in Floating Cult
-        if (!ignore_overrides)
+
+        if (GetMap()->graveyardOverride.GetMapId() != MAPID_INVALID)
         {
-            // Floating cult
-            if (GetMap() && GetMap()->GetId() == 769)
+            mapId = GetMap()->graveyardOverride.GetMapId();
+            x = GetMap()->graveyardOverride.GetPositionX();
+            y = GetMap()->graveyardOverride.GetPositionY();
+            z = GetMap()->graveyardOverride.GetPositionZ();
+            o = GetMap()->graveyardOverride.GetOrientation();
+        }
+        else
+        {
+            // Default Hub map and coords
+
+            // If in Floating Cult
+            if (!ignore_overrides)
             {
-                mapId = 769;
-                x = 12325.34f;
-                y = 15392.59f;
-                z = 857.065f;
-                o = 1.561345f;
-            }
-            // If in The Vault
-            else if (GetMap() && GetMap()->GetId() == 35)
-            {
-                mapId = 35;
-                x = -1.115f;
-                y = 65.37f;
-                z = -27.5f;
-                o = 1.54559f;
-            }
-            // Icecrown Glacier
-            else if (GetMap() && GetMap()->GetId() == 772)
-            {
-                mapId = 772;
-                x = GetPositionX();
-                y = GetPositionY();
-                z = GetPositionZ();
-                o = GetOrientation();
+                // Floating cult
+                if (GetMap() && GetMap()->GetId() == 769)
+                {
+                    mapId = 769;
+                    x = 12325.34f;
+                    y = 15392.59f;
+                    z = 857.065f;
+                    o = 1.561345f;
+                }
+                // If in The Vault
+                else if (GetMap() && GetMap()->GetId() == 35)
+                {
+                    mapId = 35;
+                    x = -1.115f;
+                    y = 65.37f;
+                    z = -27.5f;
+                    o = 1.54559f;
+                }
+                // Icecrown Glacier
+                else if (GetMap() && GetMap()->GetId() == 772)
+                {
+                    mapId = 772;
+                    x = GetPositionX();
+                    y = GetPositionY();
+                    z = GetPositionZ();
+                    o = GetOrientation();
+                }
             }
         }
            
