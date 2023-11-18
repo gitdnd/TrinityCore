@@ -702,9 +702,9 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                 }
             }
 
-            // hard coded behavior for weapons with spell power.
+            // hard coded behavior for weapons with spell power, except ranged weapons
             if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-                if(output->Class == ITEM_CLASS_WEAPON && !(output->SubClass & ITEM_SUBCLASS_MASK_WEAPON_RANGED))
+                if(output->Class == ITEM_CLASS_WEAPON && !((1 << output->SubClass) & ITEM_SUBCLASS_MASK_WEAPON_RANGED))
                     statPoints *= 4.0f;
 
             if (i < primaryStatSlots && primaryStatSlots > 0)
