@@ -31,7 +31,8 @@ class spell_gen_between_cast_periodic : public AuraScript
         for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             Player* player = (*iter);
-            if (player->GetGUID() == GetCasterGUID() || player->isDead())
+            //@todo: this should cast from the circle summoners perspective 
+            if (player->GetGUID() == GetCasterGUID() || player->isDead() || player->IsGameMaster())
                 continue;
 
             // Check of player is between the caster and the target, and check player Z is within range of the caster and target Z
@@ -67,7 +68,8 @@ class spell_gen_between_cast_periodic_nozcheck : public AuraScript
         for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             Player* player = (*iter);
-            if (player->GetGUID() == GetCasterGUID() || player->isDead())
+            //@todo: this should cast from the circle summoners perspective 
+            if (player->GetGUID() == GetCasterGUID() || player->isDead() || player->IsGameMaster())
                 continue;
 
             // Check of player is between the caster and the target

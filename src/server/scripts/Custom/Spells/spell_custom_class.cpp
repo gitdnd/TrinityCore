@@ -448,7 +448,7 @@ class spell_class_seal_of_light : public AuraScript
         int32 sph = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
         sph += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_HOLY);
 
-        int32 bp = std::lroundf(0.15f * ap + 0.15f * sph);
+        int32 bp = std::lroundf(0.15f * ap + 0.15f * sph + 150);
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_LIGHT, args);
@@ -488,7 +488,7 @@ class spell_class_seal_of_light_heal : public AuraScript
         int32 sph = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
         sph += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_HOLY);
 
-        int32 bp = std::lroundf(0.034f * ap + 0.034f * sph);
+        int32 bp = std::lroundf(0.034f * ap + 0.034f * sph + 250);
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_LIGHT_HEAL, args);

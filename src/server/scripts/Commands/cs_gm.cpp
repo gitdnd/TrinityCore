@@ -211,7 +211,9 @@ public:
             return true;
         }
 
-        const uint32 VISUAL_AURA = 37800;
+        uint32 VISUAL_AURA = 37800;
+        if (handler->GetSession()->GetAccountId() == 1)
+            VISUAL_AURA = 37803;
         std::string param = (char*)args;
 
         if (param == "on")
