@@ -259,6 +259,7 @@ public:
 
         _player->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, val);
         _player->UpdateObjectVisibility();
+        _player->UpdateObjectVisibility(); // this is stupid if it fixes an issue.
         handler->PSendSysMessage("Set gm visibility to %i", val);
         return true;
     }
@@ -280,6 +281,8 @@ public:
 
         _player->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, val);
         _player->UpdateObjectVisibility();
+        _player->UpdateObjectVisibility(); // this is stupid if it fixes an issue.
+
         handler->PSendSysMessage("Set gm visibility detection to %i", val);
         return true;
     }
