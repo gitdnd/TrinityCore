@@ -127,7 +127,14 @@ enum PaladinSpells
     SPELL_PALADIN_ENDURING_JUDGEMENT             = 40472,
 
     SPELL_PALADIN_GLYPH_OF_HOLY_LIGHT_HEAL       = 54968,
-    SPELL_PALADIN_HOLY_MENDING                   = 64891
+    SPELL_PALADIN_HOLY_MENDING                   = 64891,
+
+    BONUS_HOLY_HEALING                           = 180048,
+    BONUS_FIRE_HEALING                           = 180049,
+    BONUS_NATURE_HEALING                         = 180050,
+    BONUS_FROST_HEALING                          = 180051,
+    BONUS_SHADOW_HEALING                         = 180052,
+    BONUS_ARCANE_HEALING                         = 180052
 };
 
 enum PaladinSpellIcons
@@ -1767,7 +1774,13 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
                     SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_1,
                     SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_2,
                     SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_3,
-                    SPELL_PALADIN_HOLY_LIGHT
+                    SPELL_PALADIN_HOLY_LIGHT,
+                    BONUS_HOLY_HEALING,
+                    BONUS_FIRE_HEALING,
+                    BONUS_NATURE_HEALING,
+                    BONUS_FROST_HEALING,
+                    BONUS_SHADOW_HEALING,
+                    BONUS_ARCANE_HEALING
                 });
             }
 
@@ -1777,8 +1790,6 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
                     return false;
                 if (eventInfo.GetSpellInfo()->Effects->CalcRadius() > 0)
                     return false;
-                if ((eventInfo.GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_HOLY) > 0)
-                    return true;
                 return false;
             }
 
@@ -1794,7 +1805,21 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
                 if (!healInfo || !healInfo->GetHeal())
                     return;
 
-                uint32 healSpellId = procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT)) ? SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_1 : SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_3;
+                uint32 healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_1;
+
+                if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
+                    healSpellId = BONUS_HOLY_HEALING;
+                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
+                    healSpellId = BONUS_FIRE_HEALING;
+                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                    healSpellId = BONUS_NATURE_HEALING;
+                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+                    healSpellId = BONUS_FROST_HEALING;
+                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+                    healSpellId = BONUS_SHADOW_HEALING;
+                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
+                    healSpellId = BONUS_ARCANE_HEALING;
+
                 uint32 heal = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
 
                 Unit* beaconTarget = GetCaster();

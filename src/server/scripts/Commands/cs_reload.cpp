@@ -101,6 +101,7 @@ public:
             { "disables",                      rbac::RBAC_PERM_COMMAND_RELOAD_DISABLES,                         true,  &HandleReloadDisablesCommand,                   "" },
             { "disenchant_loot_template",      rbac::RBAC_PERM_COMMAND_RELOAD_DISENCHANT_LOOT_TEMPLATE,         true,  &HandleReloadLootTemplatesDisenchantCommand,    "" },
             { "eluna",                         rbac::RBAC_PERM_COMMAND_RELOAD_CONFIG,                           true,  &HandleReloadElunaCommand,                      "" },
+            { "luacache",                      rbac::RBAC_PERM_COMMAND_RELOAD_CONFIG,                           true,  &HandleReloadElunaScriptsCommand,               "" },
             { "event_scripts",                 rbac::RBAC_PERM_COMMAND_RELOAD_EVENT_SCRIPTS,                    true,  &HandleReloadEventScriptsCommand,               "" },
             { "fishing_loot_template",         rbac::RBAC_PERM_COMMAND_RELOAD_FISHING_LOOT_TEMPLATE,            true,  &HandleReloadLootTemplatesFishingCommand,       "" },
             { "graveyard_zone",                rbac::RBAC_PERM_COMMAND_RELOAD_GRAVEYARD_ZONE,                   true,  &HandleReloadGameGraveyardZoneCommand,          "" },
@@ -1268,6 +1269,14 @@ public:
                 sMapMgr->ReloadEluna(mapId);
             }
         }
+
+        return true;
+    }
+
+    static bool HandleReloadElunaScriptsCommand(ChatHandler* handler, char const* args)
+    {
+        sElunaLoader->LoadScripts();
+        handler->SendGlobalGMSysMessage("eluna scripts reloaded.");
 
         return true;
     }

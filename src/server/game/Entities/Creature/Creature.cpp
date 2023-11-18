@@ -3537,8 +3537,8 @@ void Creature::UpdateDungeonScaling()
         float dungeonDamageLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
         if (dungeonLevel < 50)
             dungeonDamageLevelMod *= 0.5f;
-        else if (dungeonLevel > 250)
-            dungeonDamageLevelMod *= (float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f;
+        //else if (dungeonLevel > 250)
+            //dungeonDamageLevelMod *= (float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f;
 
         weaponBaseMinDamage *= dungeonDamageLevelMod;
     }

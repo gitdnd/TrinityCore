@@ -2156,7 +2156,7 @@ void Player::Regenerate(Powers power)
 
         // Butchery requires combat for this effect
         if (power != POWER_RUNIC_POWER || IsInCombat())
-            addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * ((power != POWER_ENERGY) ? m_regenTimerCount : m_regenTimer) / (5 * IN_MILLISECONDS);
+            addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * ((power != POWER_ENERGY && power != POWER_FOCUS) ? m_regenTimerCount : m_regenTimer) / (5 * IN_MILLISECONDS);
     }
 
     if (addvalue < 0.0f)
@@ -2417,7 +2417,9 @@ void Player::SetGameMaster(bool on)
     if (on)
     {
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
-        SetFaction(FACTION_FRIENDLY);
+        //SetFaction(FACTION_FRIENDLY);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
@@ -2448,7 +2450,9 @@ void Player::SetGameMaster(bool on)
         SetPhaseMask(newPhase, false);
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
-        SetFactionForRace(GetRace());
+        //SetFactionForRace(GetRace());
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
         if(!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
@@ -5136,41 +5140,54 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
         SetCanSeePhaseOne(true);
         SetCanSeeUniquePhase(false);
 
-        // Default Hub map and coords
         uint32 mapId = 765;
         float x = 56.48f;
         float y = 539.11f;
         float z = 715.5f;
         float o = 4.305573f;
-        // If in Floating Cult
-        if (!ignore_overrides)
+
+        if (GetMap()->graveyardOverride.GetMapId() != MAPID_INVALID)
         {
-            // Floating cult
-            if (GetMap() && GetMap()->GetId() == 769)
+            mapId = GetMap()->graveyardOverride.GetMapId();
+            x = GetMap()->graveyardOverride.GetPositionX();
+            y = GetMap()->graveyardOverride.GetPositionY();
+            z = GetMap()->graveyardOverride.GetPositionZ();
+            o = GetMap()->graveyardOverride.GetOrientation();
+        }
+        else
+        {
+            // Default Hub map and coords
+
+            // If in Floating Cult
+            if (!ignore_overrides)
             {
-                mapId = 769;
-                x = 12325.34f;
-                y = 15392.59f;
-                z = 857.065f;
-                o = 1.561345f;
-            }
-            // If in The Vault
-            else if (GetMap() && GetMap()->GetId() == 35)
-            {
-                mapId = 35;
-                x = -1.115f;
-                y = 65.37f;
-                z = -27.5f;
-                o = 1.54559f;
-            }
-            // Icecrown Glacier
-            else if (GetMap() && GetMap()->GetId() == 772)
-            {
-                mapId = 772;
-                x = GetPositionX();
-                y = GetPositionY();
-                z = GetPositionZ();
-                o = GetOrientation();
+                // Floating cult
+                if (GetMap() && GetMap()->GetId() == 769)
+                {
+                    mapId = 769;
+                    x = 12325.34f;
+                    y = 15392.59f;
+                    z = 857.065f;
+                    o = 1.561345f;
+                }
+                // If in The Vault
+                else if (GetMap() && GetMap()->GetId() == 35)
+                {
+                    mapId = 35;
+                    x = -1.115f;
+                    y = 65.37f;
+                    z = -27.5f;
+                    o = 1.54559f;
+                }
+                // Icecrown Glacier
+                else if (GetMap() && GetMap()->GetId() == 772)
+                {
+                    mapId = 772;
+                    x = GetPositionX();
+                    y = GetPositionY();
+                    z = GetPositionZ();
+                    o = GetOrientation();
+                }
             }
         }
            

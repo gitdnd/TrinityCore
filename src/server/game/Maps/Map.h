@@ -664,6 +664,8 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         Eluna* GetEluna() const { return eluna; }
         Eluna* eluna;
 #endif
+        WorldLocation graveyardOverride;
+
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
