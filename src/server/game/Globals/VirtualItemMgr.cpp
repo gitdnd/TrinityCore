@@ -702,6 +702,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                 }
             }
 
+            // hard coded behavior for weapons with spell power.
+            if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
+                if(output->Class == ITEM_CLASS_WEAPON && !(output->SubClass & ITEM_SUBCLASS_MASK_WEAPON_RANGED))
+                    statPoints *= 4.0f;
+
             if (i < primaryStatSlots && primaryStatSlots > 0)
             {
                 selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
@@ -734,22 +739,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
             // mod stat points based on stat tier
             statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
-
-            // hard coded behavior for weapons with spell power.
-            if (secondarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-            {
-                switch (output->InventoryType)
-                {
-                    case INVTYPE_2HWEAPON:
-                    case INVTYPE_WEAPON:
-                    case INVTYPE_WEAPONMAINHAND:
-                    case INVTYPE_WEAPONOFFHAND:
-                        statPoints *= 4.0f;
-                        break;
-                    default:
-                        break;
-                }
-            }
 
             if (i < secondaryStatSlots && secondaryStatSlots > 0)
             {
