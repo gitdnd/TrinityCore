@@ -1304,6 +1304,7 @@ ElunaRegister<Map> MapMethods[] =
     { "GetDungeonLevel", &LuaMap::GetDungeonLevel },
     { "GetCappedDungeonLevel", &LuaMap::GetCappedDungeonLevel },
     { "UpdateDungeonLevel", &LuaMap::UpdateDungeonLevel },
+    { "SetGraveyardOverride", &LuaMap::SetGraveyardOverride },
 
     { NULL, NULL }
 };

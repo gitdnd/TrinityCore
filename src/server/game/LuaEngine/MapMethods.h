@@ -404,6 +404,7 @@ namespace LuaMap
         float z = Eluna::CHECKVAL<float>(E->L,5);
         float o = Eluna::CHECKVAL<float>(E->L, 6);
         map->graveyardOverride = WorldLocation(mapid, x, y, z, o);
+        return 0;
     }
 };
 #endif
