@@ -1777,8 +1777,6 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
                     return false;
                 if (eventInfo.GetSpellInfo()->Effects->CalcRadius() > 0)
                     return false;
-                if ((eventInfo.GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_HOLY) > 0)
-                    return true;
                 return false;
             }
 
