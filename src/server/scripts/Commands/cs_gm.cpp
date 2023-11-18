@@ -280,8 +280,8 @@ public:
             val = _player->GetSession()->GetSecurity();
 
         _player->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, val);
-        _player->UpdateObjectVisibility();
         _player->UpdateObjectVisibility(); // this is stupid if it fixes an issue.
+        _player->UpdateTriggerVisibility();
 
         handler->PSendSysMessage("Set gm visibility detection to %i", val);
         return true;
