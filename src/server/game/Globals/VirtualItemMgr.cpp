@@ -704,8 +704,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
             // hard coded behavior for weapons with spell power.
             if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-                if(output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED)
+            {
+                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED)
                     statPoints *= 4.0f;
+            }
 
             if (i < primaryStatSlots && primaryStatSlots > 0)
             {
