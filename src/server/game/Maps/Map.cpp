@@ -292,6 +292,12 @@ i_scriptLock(false), _respawnCheckTimer(0)
     if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
         i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
 
+    if(auto iTemp = sObjectMgr->GetInstanceTemplate(id))
+    {
+        if (iTemp->minDungeonLevel > i_dungeonLevel)
+            i_dungeonLevel = iTemp->minDungeonLevel;
+    }
+
     if (sElunaLoader->ShouldMapLoadEluna(id))
         if(!IsParent() || (IsParent() && !Instanceable()))
             eluna = new Eluna(id);
