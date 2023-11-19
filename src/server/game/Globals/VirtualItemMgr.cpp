@@ -608,6 +608,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
     uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
 
+    // since SP is now a primary stat, we need to reduce INT stat groups by -1 to not fill up the tooltips
+    if (secondaryStatSlots > 0 && (statgroupid == STAT_GROUP_INT_DPS || statgroupid == STAT_GROUP_HEALING))
+        secondaryStatSlots = secondaryStatSlots - 1;
+
     // if this is a trinket, randomly select which slot to generate a stat for
     if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
     {
@@ -705,8 +709,10 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             // hard coded behavior for weapons with spell power, except ranged weapons
             // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
             if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-                if(output->Class == ITEM_CLASS_WEAPON && !((1 << output->SubClass) & ITEM_SUBCLASS_MASK_WEAPON_RANGED))
+            {
+                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED)
                     statPoints *= 4.0f;
+            }
 
             if (i < primaryStatSlots && primaryStatSlots > 0)
             {
@@ -2109,7 +2115,9 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_MANA_REGENERATION
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_RATING
     };
     stat_group_sockets[STAT_GROUP_HEALING] = {
         SOCKET_COLOR_BLUE
@@ -2123,7 +2131,8 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     stat_group_secondary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_HASTE_RATING,
-        ITEM_MOD_CRIT_RATING
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_SPELL_PENETRATION
     };
     stat_group_sockets[STAT_GROUP_INT_DPS] = {
         SOCKET_COLOR_BLUE
