@@ -406,5 +406,11 @@ namespace LuaMap
         map->graveyardOverride = WorldLocation(mapid, x, y, z, o);
         return 0;
     }
+
+    int UpscaleMapIfNeeded(Eluna* /*E*/, Map* map)
+    {
+        map->UpscaleMapIfNeeded();
+        return 0;
+    }
 };
 #endif

@@ -292,6 +292,12 @@ i_scriptLock(false), _respawnCheckTimer(0)
     if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
         i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
 
+    if(auto iTemp = sObjectMgr->GetInstanceTemplate(id))
+    {
+        if (iTemp->minDungeonLevel > i_dungeonLevel)
+            i_dungeonLevel = iTemp->minDungeonLevel;
+    }
+
     if (sElunaLoader->ShouldMapLoadEluna(id))
         if(!IsParent() || (IsParent() && !Instanceable()))
             eluna = new Eluna(id);
@@ -5063,21 +5069,38 @@ void Map::SetDungeonLevel(int value)
 void Map::UpdateDungeonLevel()
 {
     const PlayerList &players = GetPlayers();
-    auto count = 0;
     auto level = 0.0f;
     for (auto itr = players.begin(); itr != players.end(); ++itr)
     {
         auto plr = itr->GetSource();
         if (plr && !plr->IsGameMaster())
         {
-            level += plr->GetCappedItemLevel();
-            ++count;
+            level = plr->GetCappedGroupOrPlayerItemLevel();
+            break;
         }
     }
-    if (count >= 1)
+    if (level >= 1)
     {
-        auto newLevel = std::floor(level / count);
-        if (newLevel != GetCappedDungeonLevel())
-            SetDungeonLevel(newLevel);
+        if (level != GetCappedDungeonLevel())
+            SetDungeonLevel(level);
     }
+}
+
+
+void Map::UpscaleMapIfNeeded()
+{
+    const PlayerList& players = GetPlayers();
+    auto level = 0.0f;
+    for (auto itr = players.begin(); itr != players.end(); ++itr)
+    {
+        auto plr = itr->GetSource();
+        if (plr && !plr->IsGameMaster())
+        {
+            level = plr->GetCappedGroupOrPlayerItemLevel();
+            break;
+        }
+    }
+
+    if (level > GetCappedDungeonLevel())
+        SetDungeonLevel(level);
 }

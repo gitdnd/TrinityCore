@@ -141,6 +141,7 @@ public:
 
     void TeleportTo(Player* player) const;
     std::string FormatMessageString(ChatHandler& handler, bool detailed = false) const;
+    std::string FormatMessageString() const;
     std::string FormatMessageString(ChatHandler& handler, char const* szClosedName, char const* szAssignedToName, char const* szUnassignedName, char const* szDeletedName, char const* szCompletedName) const;
 
     void SetChatLog(std::list<uint32> time, std::string const& log);
