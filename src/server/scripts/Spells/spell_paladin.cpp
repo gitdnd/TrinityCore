@@ -29,6 +29,7 @@
 #include "Random.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
+#include "Spell.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 
@@ -1800,7 +1801,7 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
                     return;
 
                 HealInfo* healInfo = eventInfo.GetHealInfo();
-                if (!healInfo || !healInfo->GetHeal())
+                if (!healInfo || !healInfo->GetHeal() || healInfo->GetSpellInfo()->IsAffectingArea())
                     return;
 
                 uint32 healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_1;
