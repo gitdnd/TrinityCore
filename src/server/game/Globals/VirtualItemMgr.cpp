@@ -2115,9 +2115,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_MANA_REGENERATION,
-        ITEM_MOD_SPELL_PENETRATION,
-        ITEM_MOD_HIT_RATING
+        ITEM_MOD_MANA_REGENERATION
     };
     stat_group_sockets[STAT_GROUP_HEALING] = {
         SOCKET_COLOR_BLUE
