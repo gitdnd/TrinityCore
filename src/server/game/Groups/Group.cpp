@@ -2758,7 +2758,7 @@ void Group::UpdateDungeonLevel()
     }
     for (uint32 i : ilvls)
     {
-        if (highestlvl - i > 50) //@todo: config option?
+        if (highestlvl - i > 150) //@todo: config option?
             continue;
 
         averageLevel += i;
