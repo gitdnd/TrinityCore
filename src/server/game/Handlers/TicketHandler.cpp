@@ -118,7 +118,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         sTicketMgr->UpdateLastChange();
 
         sWorld->SendGMText(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName().c_str(), ticket->GetId());
-
+        sWorld->SendGMText(ticket->FormatMessageString().c_str());
         response = GMTICKET_RESPONSE_CREATE_SUCCESS;
     }
 
@@ -143,6 +143,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recvData)
         ticket->SaveToDB(trans);
 
         sWorld->SendGMText(LANG_COMMAND_TICKETUPDATED, GetPlayer()->GetName().c_str(), ticket->GetId());
+        sWorld->SendGMText(ticket->FormatMessageString().c_str());
 
         response = GMTICKET_RESPONSE_UPDATE_SUCCESS;
     }
