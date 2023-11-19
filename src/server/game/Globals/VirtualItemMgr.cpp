@@ -425,6 +425,8 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     // Hard cap of 325 across all items FIXME
     if (ilevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
         ilevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
+
+    output->ItemLevel = ilevel;
 }
 
 void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
@@ -579,7 +581,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     output->Description = "";
 
     // apply other item data
-    output->ItemLevel = ilevel;
+    
      //output->MaxDurability = 0; // Disable any form of durability for now
     output->MaxDurability = round(float((output->ItemLevel * (output->Quality / 10.f)) + 25));
 }
