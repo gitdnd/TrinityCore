@@ -130,12 +130,12 @@ enum PaladinSpells
     SPELL_PALADIN_GLYPH_OF_HOLY_LIGHT_HEAL       = 54968,
     SPELL_PALADIN_HOLY_MENDING                   = 64891,
 
-    BONUS_HOLY_HEALING                           = 180048,
-    BONUS_FIRE_HEALING                           = 180049,
-    BONUS_NATURE_HEALING                         = 180050,
-    BONUS_FROST_HEALING                          = 180051,
-    BONUS_SHADOW_HEALING                         = 180052,
-    BONUS_ARCANE_HEALING                         = 180052
+    BONUS_HOLY_HEALING                           = 97310,
+    BONUS_FIRE_HEALING                           = 97311,
+    BONUS_NATURE_HEALING                         = 97312,
+    BONUS_FROST_HEALING                          = 97313,
+    BONUS_SHADOW_HEALING                         = 97314,
+    BONUS_ARCANE_HEALING                         = 97315
 };
 
 enum PaladinSpellIcons
