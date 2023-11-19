@@ -598,11 +598,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     std::shuffle(std::begin(secondarystatgroup), std::end(secondarystatgroup), generator);
 
     // select stat pool
-    float pool = 0;
+    float pool = 0.f;
     if (modifier.statpool == -1)
-        pool = (float)output->ItemLevel;
+        pool = float(output->ItemLevel);
     else
-        pool = (float)modifier.statpool;
+        pool = float(modifier.statpool);
 
     // get stat pool amount
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
@@ -665,7 +665,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             primaryStatMod += honePct;
 
             // select random pool size value based on upper and lower bounds
-            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+            float statPoints = frand((pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
             statPoints *= primaryStatMod;
             // mod stat points based on stat weight
@@ -702,6 +702,12 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                 }
             }
 
+            // hard coded behavior for weapons with spell power, except ranged weapons
+            // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
+            if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
+                if(output->Class == ITEM_CLASS_WEAPON && !((1 << output->SubClass) & ITEM_SUBCLASS_MASK_WEAPON_RANGED))
+                    statPoints *= 4.0f;
+
             if (i < primaryStatSlots && primaryStatSlots > 0)
             {
                 selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
@@ -719,7 +725,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondayStatMod += honePct;
 
             // select random pool size value based on upper and lower bounds
-            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+            float statPoints = frand((pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
             statPoints *= secondayStatMod;
 
@@ -734,22 +740,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
             // mod stat points based on stat tier
             statPoints *= sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_SECONDARY_MOD);
-
-            // hard coded behavior for weapons with spell power.
-            if (secondarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-            {
-                switch (output->InventoryType)
-                {
-                    case INVTYPE_2HWEAPON:
-                    case INVTYPE_WEAPON:
-                    case INVTYPE_WEAPONMAINHAND:
-                    case INVTYPE_WEAPONOFFHAND:
-                        statPoints *= 4.0f;
-                        break;
-                    default:
-                        break;
-                }
-            }
 
             if (i < secondaryStatSlots && secondaryStatSlots > 0)
             {
@@ -2113,13 +2103,13 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     stat_group_primary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_INTELLECT,
-        ITEM_MOD_SPIRIT
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_SPELL_POWER
     };
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_MANA_REGENERATION,
-        ITEM_MOD_SPELL_POWER
+        ITEM_MOD_MANA_REGENERATION
     };
     stat_group_sockets[STAT_GROUP_HEALING] = {
         SOCKET_COLOR_BLUE
@@ -2127,13 +2117,13 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     // Int DPS Data
     stat_group_primary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_INTELLECT
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPELL_POWER
     };
     stat_group_secondary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_HASTE_RATING,
-        ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_SPELL_POWER
+        ITEM_MOD_CRIT_RATING
     };
     stat_group_sockets[STAT_GROUP_INT_DPS] = {
         SOCKET_COLOR_BLUE
