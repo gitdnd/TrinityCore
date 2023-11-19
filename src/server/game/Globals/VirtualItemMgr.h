@@ -424,6 +424,12 @@ public:
     void GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
 
     /**
+     * Uses passed modifier to generate item level.
+     */
+    void GenerateItemLevel(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
+
+
+    /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
     void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;

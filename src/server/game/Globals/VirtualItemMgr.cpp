@@ -212,6 +212,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
 {
     GenerateQuality(output, modifier);
     GenerateStatGroup(output, modifier);
+    GenerateItemLevel(output, modifier);
     GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
@@ -282,6 +283,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
     // Select a stat group for the item
     GenerateStatGroup(output, modifier);
+
+    // Generate Item Level
+    GenerateItemLevel(output, modifier);
 
     // Generate Legendary (if item is legendary)
     GenerateLegendaryItemEffect(output, modifier);
@@ -375,21 +379,14 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     output->statGroup = statgroupid;
 }
 
-void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
+void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
     std::mt19937 generator;
     generator.seed(modifier.statSeed);
 
-    // always bind on pickup
-    output->Bonding = BIND_WHEN_PICKED_UP;
-
-    // if item is a legendary or higher, flag as BoA
-    if(output->Quality >= ITEM_QUALITY_LEGENDARY && !output->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
-        output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
-
     // decide itemlevel
-    // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
-    // if ilevel is not set, use the players average item level +/- 5 item levels.
+// if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
+// if ilevel is not set, use the players average item level +/- 5 item levels.
     uint32 ilevel = output->ItemLevel;
 
     // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.
@@ -428,6 +425,19 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     // Hard cap of 325 across all items FIXME
     if (ilevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
         ilevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
+}
+
+void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
+{
+    std::mt19937 generator;
+    generator.seed(modifier.statSeed);
+    uint32 ilevel = output->ItemLevel;
+    // always bind on pickup
+    output->Bonding = BIND_WHEN_PICKED_UP;
+
+    // if item is a legendary or higher, flag as BoA
+    if(output->Quality >= ITEM_QUALITY_LEGENDARY && !output->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
+        output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
