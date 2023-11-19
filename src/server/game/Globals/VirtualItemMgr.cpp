@@ -598,11 +598,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     std::shuffle(std::begin(secondarystatgroup), std::end(secondarystatgroup), generator);
 
     // select stat pool
-    float pool = 0;
+    float pool = 0.f;
     if (modifier.statpool == -1)
-        pool = (float)output->ItemLevel;
+        pool = float(output->ItemLevel);
     else
-        pool = (float)modifier.statpool;
+        pool = float(modifier.statpool);
 
     // get stat pool amount
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
@@ -665,7 +665,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             primaryStatMod += honePct;
 
             // select random pool size value based on upper and lower bounds
-            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+            float statPoints = frand((pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
             statPoints *= primaryStatMod;
             // mod stat points based on stat weight
@@ -702,12 +702,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                 }
             }
 
-            // hard coded behavior for weapons with spell power.
+            // hard coded behavior for weapons with spell power, except ranged weapons
+            // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
             if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-            {
-                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED)
+                if(output->Class == ITEM_CLASS_WEAPON && !((1 << output->SubClass) & ITEM_SUBCLASS_MASK_WEAPON_RANGED))
                     statPoints *= 4.0f;
-            }
 
             if (i < primaryStatSlots && primaryStatSlots > 0)
             {
@@ -726,7 +725,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             secondayStatMod += honePct;
 
             // select random pool size value based on upper and lower bounds
-            float statPoints = (float)urand((uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (uint32)(pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
+            float statPoints = frand((pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
 
             statPoints *= secondayStatMod;
 

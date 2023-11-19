@@ -1805,17 +1805,17 @@ class spell_pal_light_s_beacon : public SpellScriptLoader
 
                 uint32 healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HEAL_1;
 
-                if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
+                if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
                     healSpellId = BONUS_HOLY_HEALING;
-                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
                     healSpellId = BONUS_FIRE_HEALING;
-                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
                     healSpellId = BONUS_NATURE_HEALING;
-                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
                     healSpellId = BONUS_FROST_HEALING;
-                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
                     healSpellId = BONUS_SHADOW_HEALING;
-                else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
                     healSpellId = BONUS_ARCANE_HEALING;
 
                 uint32 heal = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
