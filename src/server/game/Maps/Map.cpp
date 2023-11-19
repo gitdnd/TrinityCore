@@ -5069,21 +5069,38 @@ void Map::SetDungeonLevel(int value)
 void Map::UpdateDungeonLevel()
 {
     const PlayerList &players = GetPlayers();
-    auto count = 0;
     auto level = 0.0f;
     for (auto itr = players.begin(); itr != players.end(); ++itr)
     {
         auto plr = itr->GetSource();
         if (plr && !plr->IsGameMaster())
         {
-            level += plr->GetCappedItemLevel();
-            ++count;
+            level = plr->GetCappedGroupOrPlayerItemLevel();
+            break;
         }
     }
-    if (count >= 1)
+    if (level >= 1)
     {
-        auto newLevel = std::floor(level / count);
-        if (newLevel != GetCappedDungeonLevel())
-            SetDungeonLevel(newLevel);
+        if (level != GetCappedDungeonLevel())
+            SetDungeonLevel(level);
     }
+}
+
+
+void Map::UpscaleMapIfNeeded()
+{
+    const PlayerList& players = GetPlayers();
+    auto level = 0.0f;
+    for (auto itr = players.begin(); itr != players.end(); ++itr)
+    {
+        auto plr = itr->GetSource();
+        if (plr && !plr->IsGameMaster())
+        {
+            level = plr->GetCappedGroupOrPlayerItemLevel();
+            break;
+        }
+    }
+
+    if (level > GetCappedDungeonLevel())
+        SetDungeonLevel(level);
 }
