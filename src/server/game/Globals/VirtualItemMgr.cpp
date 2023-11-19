@@ -706,7 +706,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
             if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
             {
-                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED))
+                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED)
                     statPoints *= 4.0f;
             }
 
