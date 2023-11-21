@@ -28389,3 +28389,26 @@ void Player::SetTalentLoadout(uint32 val)
                 }));
     }
 }
+
+float Player::GetAverageItemLevel() const
+{
+    uint32 count = 0;
+    float ilvl = 0;
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        // don't check tabard, ranged, offhand or shirt
+        if (i == EQUIPMENT_SLOT_TABARD ||
+            i == EQUIPMENT_SLOT_RANGED ||
+            i == EQUIPMENT_SLOT_OFFHAND ||
+            i == EQUIPMENT_SLOT_BODY ||
+            // If item in slot and is not equipped
+            (m_items[i] && !m_items[i]->IsEquipped() || !m_items[i]))
+        {
+            continue;
+        }
+
+        ilvl += m_items[i]->GetTemplate()->GetRealItemLevel();
+        count += 1;
+    }
+    return ilvl / count;
+}
