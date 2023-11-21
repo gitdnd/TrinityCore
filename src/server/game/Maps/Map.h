@@ -666,6 +666,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 #endif
         WorldLocation graveyardOverride;
 
+        void UpscaleMapIfNeeded();
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);

@@ -6705,7 +6705,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             return SPELL_FAILED_ITEM_NOT_READY;
 
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            if (proto->Spells[i].SpellCharges)
+            if (proto->Spells[i].SpellCharges && proto->Spells[i].SpellId == GetSpellInfo()->Id)
                 if (m_CastItem->GetSpellCharges(i) == 0)
                     return SPELL_FAILED_NO_CHARGES_REMAIN;
 

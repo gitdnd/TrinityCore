@@ -439,6 +439,8 @@ public:
             return false;
 
         Tokenizer entries(std::string(args), ' ');
+        std::ostringstream oss;
+        oss << "creature template entries ";
 
         for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
         {
@@ -467,14 +469,15 @@ public:
             sObjectMgr->LoadCreatureTemplateCustom(fields);
             if (const CreatureTemplate* reloadCreature = sObjectMgr->GetCreatureTemplate(entry))
             {
+                oss << entry << " ";
                 sObjectMgr->CheckCreatureTemplate(reloadCreature);
                 WorldPacket response = reloadCreature->BuildQueryData(LOCALE_enUS);
                 sWorld->SendGlobalMessage(&response);
             }
         }
-
+        oss << "reloaded.";
         sObjectMgr->InitializeQueriesData(QUERY_DATA_CREATURES);
-        handler->SendGlobalGMSysMessage("Creature template reloaded.");
+        handler->SendGlobalGMSysMessage(oss.str().c_str());
         return true;
     }
 
@@ -1228,7 +1231,8 @@ public:
             return false;
 
         Tokenizer entries(std::string(args), ' ');
-
+        std::ostringstream oss;
+        oss << "item template entries ";
         for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
         {
             uint32 entry = uint32(atoi(*itr));
@@ -1236,12 +1240,14 @@ public:
             sObjectMgr->LoadItemTemplate(entry);
             if (const ItemTemplate* reloadItem = sObjectMgr->GetItemTemplate(entry))
             {
+                oss << entry << " ";
                 WorldPacket response = reloadItem->BuildQueryData(LOCALE_enUS);
                 sWorld->SendGlobalMessage(&response);
             }
             
         }
-        handler->SendGlobalGMSysMessage("item template reloaded.");
+        oss << "reloaded.";
+        handler->SendGlobalGMSysMessage(oss.str().c_str());
         return true;
     }
 

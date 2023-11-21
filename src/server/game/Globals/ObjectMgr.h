@@ -158,6 +158,7 @@ struct InstanceTemplate
     uint32 maxPlayerOverride;
     float mapXPRate;
     uint32 vLvlMod;
+    uint32 minDungeonLevel;
 };
 
 typedef std::unordered_map<uint16, InstanceTemplate> InstanceTemplateContainer;

@@ -373,6 +373,19 @@ public:
             if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
                 return false;
 
+            for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+            {
+                Player::BoundInstancesMap& binds = handler->GetSession()->GetPlayer()->GetBoundInstances(Difficulty(i));
+                for (Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)
+                {
+                    InstanceSave* save = itr->second.save;
+                    if (itr->first != handler->GetSession()->GetPlayer()->GetMapId())
+                        handler->GetSession()->GetPlayer()->UnbindInstance(itr, Difficulty(i));
+                    else
+                        ++itr;
+                }
+            }
+
             std::string chrNameLink = handler->playerLink(targetName);
 
             Map* map = target->GetMap();
