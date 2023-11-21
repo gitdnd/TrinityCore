@@ -385,8 +385,8 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     generator.seed(modifier.statSeed);
 
     // decide itemlevel
-// if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
-// if ilevel is not set, use the players average item level +/- 5 item levels.
+    // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
+    // if ilevel is not set, use the players average item level +/- 5 item levels.
     uint32 ilevel = output->ItemLevel;
 
     // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.

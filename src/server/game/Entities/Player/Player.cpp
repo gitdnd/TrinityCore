@@ -28009,9 +28009,9 @@ bool Player::IsInstanceBound(uint32 mapId)
     return GetBoundInstance(mapId, REGULAR_DIFFICULTY) != nullptr;
 }
 
-float Player::GetCappedItemLevel() const
+float Player::GetCappedItemLevel(uint32 softcapMod) const
 {
-    return std::clamp<float>(_averageItemLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
+    return std::clamp<float>(_averageItemLevel, 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
 }
 
 void Player::ClearInventory()

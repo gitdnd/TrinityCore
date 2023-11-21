@@ -6719,7 +6719,7 @@ void ObjectMgr::LoadInstanceTemplate()
     uint32 oldMSTime = getMSTime();
 
     //                                                0     1       2        4
-    QueryResult result = WorldDatabase.Query("SELECT map, parent, script, allowMount, maxPlayerOverride, mapXPRate, vLvlMod, minDungeonLevel FROM instance_template");
+    QueryResult result = WorldDatabase.Query("SELECT map, parent, script, allowMount, maxPlayerOverride, mapXPRate, vLvlMod, minDungeonLevel, softcapMod FROM instance_template");
 
     if (!result)
     {
@@ -6749,6 +6749,7 @@ void ObjectMgr::LoadInstanceTemplate()
         instanceTemplate.mapXPRate = fields[5].GetFloat();
         instanceTemplate.vLvlMod = fields[6].GetUInt32();
         instanceTemplate.minDungeonLevel = fields[7].GetUInt32();
+        instanceTemplate.softcapMod = fields[8].GetUInt32();
         _instanceTemplateStore[mapID] = instanceTemplate;
 
         ++count;
