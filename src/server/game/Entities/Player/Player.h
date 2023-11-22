@@ -2177,7 +2177,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         Spell* m_spellModTakingSpell;
 
         float GetAverageItemLevel() const;// { return _averageItemLevel; }
-        float GetCappedItemLevel(uint32 softcapMod) const;
+        float GetCappedItemLevel(uint32 softcapMod = 0) const;
         float UpdateCachedItemLevel(bool isLogin = false);
 
         void AddItemLevelToSlotCache(uint8 slot, uint32 ilevel)
