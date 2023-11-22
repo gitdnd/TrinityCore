@@ -176,13 +176,6 @@ public:
         }
         return true;
     }
-
-    static bool HandleAoELootCommand(ChatHandler* handler, char const* /*args*/)
-    {
-        Player* p = handler->GetSession()->GetPlayer();
-
-        return true;
-    }
 };
 
 void AddSC_TbsBullshit_commandscript()
