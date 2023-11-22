@@ -157,7 +157,7 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         xp *= player->GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_PCT);
 
         // HoT Custom, scale xp based on player level
-        xp = std::round(player->GetCappedItemLevel() * (xp / 50.0f));
+        xp = std::round(player->GetCappedItemLevel() * (xp / 66.0f));
 
         if (_group)
         {
