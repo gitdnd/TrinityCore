@@ -1,6 +1,9 @@
 #include "Chat.h"
 #include "GameObject.h"
+#include "CellImpl.h"
+#include "GridNotifiersImpl.h"
 #include "Language.h"
+#include "LootMgr.h"
 #include "Map.h"
 #include "MapManager.h"
 #include "Object.h"
@@ -24,6 +27,7 @@ public:
     {
         static std::vector<ChatCommand> tbsBullshitCommandTable =
         {
+            { "aoeloot", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleAOELootCommand, "" },
             { "circlerlaser", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleCirclerLaserCommand, "" },
             { "clone", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleClonePlayerCommand, "" },
             { "clearinventory", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleClearInventory, "" },
@@ -175,6 +179,26 @@ public:
                 handler->PSendSysMessage("Invalid node %u", nodeEntry);
         }
         return true;
+    }
+
+    static bool HandleAOELootCommand(ChatHandler* handler, char const* args)
+    {
+        float radius = 40.0f;
+        Player* object = handler->GetSession()->GetPlayer();
+
+        // Get Creatures
+        std::list<Creature*> creatureList;
+        Trinity::AnyUnitInObjectRangeCheck go_check(object, radius);
+        Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
+        Cell::VisitGridObjects(object, go_search, radius);
+        for (std::list<Creature*>::const_iterator iter = creatureList.begin(); iter != creatureList.end(); ++iter)
+        {
+            Creature* c = (*iter);
+            if (c->IsAlive())
+                continue;
+
+            object->AutoStoreLootNonPersonal(c->GetCreatureTemplate()->lootid, LootTemplates_Creature, true, false, false);
+        }
     }
 };
 
