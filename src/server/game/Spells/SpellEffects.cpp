@@ -5783,7 +5783,8 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
 
     if (!itemTarget)
         return;
-
+    uint32 dur = itemTarget->GetUInt32Value(ITEM_FIELD_DURABILITY);
+    uint32 maxdur = itemTarget->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
     itemTarget->ToogleStats(false);
 
 
@@ -5829,6 +5830,8 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     WorldPacket response = vItem->BuildQueryData(LOCALE_enUS);
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
+    itemTarget->SetUInt32Value(ITEM_FIELD_MAXDURABILITY, round(float((itemTarget->GetTemplate()->ItemLevel * (itemTarget->GetTemplate()->Quality / 10.f)) + 25)));
+    itemTarget->SetUInt32Value(ITEM_FIELD_DURABILITY, CalculatePct(itemTarget->GetUInt32Value(ITEM_FIELD_MAXDURABILITY),(dur * 100 / maxdur))
     itemTarget->ToogleStats(true);
 }
 
