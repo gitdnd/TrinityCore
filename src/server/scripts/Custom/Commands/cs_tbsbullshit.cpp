@@ -188,15 +188,12 @@ public:
 
         // Get Creatures
         std::list<Creature*> creatureList;
-        Trinity::AnyUnitInObjectRangeCheck go_check(object, radius);
-        Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
+        Trinity::AnyDeadUnitInObjectRangeCheck go_check(object, radius);
+        Trinity::CreatureListSearcher<Trinity::AnyDeadUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
         Cell::VisitGridObjects(object, go_search, radius);
         for (std::list<Creature*>::const_iterator iter = creatureList.begin(); iter != creatureList.end(); ++iter)
         {
             Creature* c = (*iter);
-            if (c->IsAlive())
-                continue;
-
             object->AutoStoreLootNonPersonal(c->GetCreatureTemplate()->lootid, LootTemplates_Creature, true, false, false);
         }
     }

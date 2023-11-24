@@ -1038,6 +1038,24 @@ namespace Trinity
             float i_range;
     };
 
+    class AnyDeadUnitInObjectRangeCheck
+    {
+    public:
+        AnyDeadUnitInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) { }
+
+        bool operator()(Unit* u) const
+        {
+            if (!u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range))
+                return true;
+
+            return false;
+        }
+
+    private:
+        WorldObject const* i_obj;
+        float i_range;
+    };
+
     class AnyUnitFulfillingConditionInRangeCheck
     {
     public:
