@@ -1213,12 +1213,9 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     // get initial quality from the template item
     uint32 quality = output->Quality;
 
+    // if the item already has a magic find value set, we use this when regenerating.
+    // crafted items do not use magic find, the modifier is not set during crafting.
     uint32 magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
-
-    // Cap magic find to the size of the common quality pool for now.
-    if (magicFind > sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON))
-        magicFind = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
-
     output->generatedMagicFind = magicFind;
     
     // these are not percentage chances. They represent areas of a number line made from their sum
