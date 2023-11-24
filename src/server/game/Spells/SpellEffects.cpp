@@ -5831,7 +5831,7 @@ void Spell::EffectVirtualItemQualityUpgrade(SpellEffIndex effIndex)
     sWorld->SendGlobalMessage(&response);
     itemTarget->SaveVirtualItemInfo();
     itemTarget->SetUInt32Value(ITEM_FIELD_MAXDURABILITY, round(float((itemTarget->GetTemplate()->ItemLevel * (itemTarget->GetTemplate()->Quality / 10.f)) + 25)));
-    itemTarget->SetUInt32Value(ITEM_FIELD_DURABILITY, CalculatePct(itemTarget->GetUInt32Value(ITEM_FIELD_MAXDURABILITY),(dur * 100 / maxdur))
+    itemTarget->SetUInt32Value(ITEM_FIELD_DURABILITY, CalculatePct(itemTarget->GetUInt32Value(ITEM_FIELD_MAXDURABILITY), (dur * 100 / maxdur));
     itemTarget->ToogleStats(true);
 }
 
