@@ -182,15 +182,19 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                             uint32 dungeonLevel = uint32(member->GetMap()->GetDungeonLevel());
                             uint32 playerLevel = uint32(member->GetCappedItemLevel());
 
+                            if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                            {
+                                modifier.vLvlMod = inst->vLvlMod;
+                                // if player is in an instance, we want to increase the softcap if there is a softcap modifier
+                                playerLevel = uint32(member->GetCappedItemLevel(inst->softcapMod));
+                            }
+
                             // is this calculation what we really want? really need to double check this logic
                             modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
                             modifier.lowYield = playerLevel - 50 > dungeonLevel ? true : false;
 
                             modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
-
-                            if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
-                                modifier.vLvlMod = inst->vLvlMod;
 
                             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;
@@ -251,8 +255,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
                 {
                     modifier.vLvlMod = inst->vLvlMod;
-                    modifier.plrAvgLvl = uint32(player->GetMap()->GetCappedDungeonLevel());
-                    modifier.lowYield = uint32(player->GetCappedItemLevel()) - 50 > player->GetMap()->GetCappedDungeonLevel() ? true : false;
+                    modifier.plrAvgLvl = uint32(player->GetMap()->GetCappedDungeonLevel(inst->softcapMod));
+                    modifier.lowYield = uint32(player->GetCappedItemLevel(inst->softcapMod)) - 50 > player->GetMap()->GetCappedDungeonLevel(inst->softcapMod) ? true : false;
                 }
             }
 

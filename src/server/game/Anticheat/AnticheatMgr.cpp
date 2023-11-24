@@ -460,13 +460,18 @@ void AnticheatMgr::BuildReport(Player* player,uint8 reportType)
     {
         if (m_Players[key].lastAnnounce + 60 < GameTime::GetGameTime())
         {
-            // display warning at the center of the screen, hacky way?
-            std::string str = "";
-            str = "|cFFFFFC00[AC]|cFF00FFFF[|cFF60FF00" + std::string(player->GetName().c_str()) + "|cFF00FFFF] Possible cheater!";
-            WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
-            data << str;
-            sWorld->SendGlobalGMMessage(&data);
-            sWorld->SendGMText(LANG_GM_BROADCAST, str.c_str());
+            std::ostringstream oss;
+            oss << "|cFFFFFC00[AC]||cFF60FF00" << player->GetName().c_str() << "|cFF00FFFF] Possible cheater\n";
+            oss << "Reports: Speed " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(SPEED_HACK_REPORT);
+            oss << " Jump " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(JUMP_HACK_REPORT);
+            oss << " Teleport to Plane " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(TELEPORT_PLANE_HACK_REPORT);
+            oss << " Teleport " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(TELEPORT_HACK_REPORT);
+            oss << " Fly " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(FLY_HACK_REPORT);
+            oss << " Water Walk " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(WALK_WATER_HACK_REPORT);
+            oss << " Climb " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(CLIMB_HACK_REPORT);
+            oss << " Ignore Control " << m_Players[player->GetGUID().GetCounter()].GetTypeReports(IGNORE_CONTROL_REPORT);
+            oss << "\nTotal reports " << m_Players[key].GetTotalReports();
+            sWorld->SendGMText(LANG_GM_BROADCAST, oss.str().c_str());
             m_Players[key].lastAnnounce = GameTime::GetGameTime();
         }
     }

@@ -385,8 +385,8 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     generator.seed(modifier.statSeed);
 
     // decide itemlevel
-// if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
-// if ilevel is not set, use the players average item level +/- 5 item levels.
+    // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
+    // if ilevel is not set, use the players average item level +/- 5 item levels.
     uint32 ilevel = output->ItemLevel;
 
     // If for whatever reason the players' average item level is less than 20, make sure to set it to 20.
@@ -520,9 +520,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
                 output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageMax = ((0.83f * float(ilevel)) * 1.15f) * (float(output->Delay) / 1000.0f);
                 output->Damage[0].DamageType = 0;
-
-                // fist weapons need to either be main or offhand, special case for this
-                output->InventoryType = urand(0, 1, generator) > 0 ? INVTYPE_WEAPONMAINHAND : INVTYPE_WEAPONOFFHAND;
                 break;
             }
             case ITEM_SUBCLASS_WEAPON_DAGGER:
@@ -553,6 +550,14 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
             }
             default:
                 break;
+        }
+
+        // fist weapons need to either be main or offhand, special case for this
+        if (output->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
+        {
+            uint32 wType = urand(0, 1, generator) > 0 ? INVTYPE_WEAPONMAINHAND : INVTYPE_WEAPONOFFHAND;
+            if (output->InventoryType == INVTYPE_WEAPON)
+                output->InventoryType = wType;
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!

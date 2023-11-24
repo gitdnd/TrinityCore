@@ -5878,7 +5878,10 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
 
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
+ 
     Player* pT = target->ToPlayer();
+    //if(GetId() <= 160424 && GetId() >= 160000)
+        pT->RemoveAura(450002);
     uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
     pT->ToggleTempSpell(triggerSpellId, GetId(), apply);
 

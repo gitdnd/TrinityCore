@@ -5046,9 +5046,9 @@ std::string InstanceMap::GetDebugInfo() const
     return sstr.str();
 }
 
-int Map::GetCappedDungeonLevel() const
+int Map::GetCappedDungeonLevel(uint32 softcapMod) const
 {
-   return std::clamp<int>(i_dungeonLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
+   return std::clamp<int>(i_dungeonLevel, 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
 }
 
 void Map::SetDungeonLevel(int value)

@@ -156,13 +156,14 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
         xp *= player->GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_PCT);
 
-        xp = xp * 1.25; // Flat 25% xp bonus
+        // HoT Custom, scale xp based on player level
+        xp = std::round(player->GetCappedItemLevel() * (xp / 66.0f));
 
         if (_group)
         {
             // Nerfs boosting xp by running with low level alts
-            // xp = xp * min(1, groupLevel / playerLevel)
-            xp = xp * std::min(1, (int)std::round(_group->GetDungeonLevel() / player->GetCappedItemLevel()));
+            // xp = xp * min(1, (groupLevel / playerLevel) + 0.2)
+            xp = xp * std::min(1, (int)std::round((_group->GetDungeonLevel() / player->GetCappedItemLevel()) + 0.2f));
         }
 
         // 4.2.3. Give XP to player.
