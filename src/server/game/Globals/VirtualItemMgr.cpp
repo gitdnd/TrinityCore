@@ -352,8 +352,29 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
         std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerLootPreference(modifier.lootPreference);
         statgroupbiasid = substatgroups[urand(0, substatgroups.size() - 1, generator)];
 
-        // 25% chance of bias, might want to make this into a config later on
-        uint32 chance = 25;
+        // Variable stat group bias depending on generated item quality
+        uint32 chance = 0;
+
+        switch (output->Quality)
+        {
+            case ITEM_QUALITY_NORMAL:
+            case ITEM_QUALITY_UNCOMMON:
+                chance = 25;
+                break;
+            case ITEM_QUALITY_RARE:
+                chance = 40;
+                break;
+            case ITEM_QUALITY_EPIC:
+                chance = 60;
+                break;
+            case ITEM_QUALITY_LEGENDARY:
+                chance = 100;
+                break;
+            default:
+                chance = 0;
+                break;
+        }
+
         if (urand(1, 100, generator) <= chance)
             statgroupid = statgroupbiasid;
     }
