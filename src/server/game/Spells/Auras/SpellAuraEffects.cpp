@@ -5921,8 +5921,8 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
     for (Unit::AuraEffectList::const_iterator i = mF.begin(); i != mF.end(); ++i)
         amount += (*i)->GetAmount();
 
-    if (amount > sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON))
-        amount = sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON);
+    if (amount > sWorld->getIntConfig(CONFIG_MAX_MAGIC_FIND))
+        amount = sWorld->getIntConfig(CONFIG_MAX_MAGIC_FIND);
 
     target->SetMagicFind(amount);
 }
