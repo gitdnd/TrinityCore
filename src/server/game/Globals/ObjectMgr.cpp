@@ -3535,7 +3535,8 @@ void ObjectMgr::LoadItemTemplates()
         if (itemTemplate.RandomSuffix && !sItemRandomSuffixStore.LookupEntry(GetItemEnchantMod(itemTemplate.RandomSuffix)))
         {
             TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has wrong RandomSuffix (%u)", entry, itemTemplate.RandomSuffix);
-            itemTemplate.RandomSuffix = 0;
+            // Don't set RandomSuffix to 0 if it does not exist in the dbc, we use this for additional gem info
+            //itemTemplate.RandomSuffix = 0;
         }
 
         if (itemTemplate.ItemSet && !sItemSetStore.LookupEntry(itemTemplate.ItemSet))
