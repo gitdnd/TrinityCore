@@ -1533,6 +1533,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ITEMGEN_SETCHANCE_EPIC] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Epic", 10);
     m_int_configs[CONFIG_ITEMGEN_SETCHANCE_LEGENDARY] = sConfigMgr->GetIntDefault("ItemGenerator.SetChance.Legendary", 20);
 
+    // Custom stats
+    m_int_configs[CONFIG_MAX_MAGIC_FIND] = sConfigMgr->GetIntDefault("CustomStats.MaxMagicFind", 300);
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
 

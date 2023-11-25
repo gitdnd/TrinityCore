@@ -1213,14 +1213,21 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     // get initial quality from the template item
     uint32 quality = output->Quality;
 
+    // if the item already has a magic find value set, we use this when regenerating.
+    // crafted items do not use magic find, the modifier is not set during crafting.
     uint32 magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
+
+    // Double check that the magicfind rating is correct
+    // There could be persistent MF rating on already applied auras if config gets reloaded
+    if (magicFind > sWorld->getIntConfig(CONFIG_MAX_MAGIC_FIND))
+        magicFind = sWorld->getIntConfig(CONFIG_MAX_MAGIC_FIND);
 
     output->generatedMagicFind = magicFind;
     
     // these are not percentage chances. They represent areas of a number line made from their sum
     static const uint32 chances[MAX_ITEM_QUALITY] = {
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_POOR),
-        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON) - magicFind,
+        sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_COMMON),
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_UNCOMMON),
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_RARE),
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_EPIC),
@@ -1229,31 +1236,33 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
         sWorld->getIntConfig(CONFIG_ITEMGEN_QUALITY_HEIRLOOM),
     };
 
-    float sum = 0;
-    for (auto u : chances)
-    {
-        sum += u;
-    }
+    // TODO: Change all of the int stuff to floats so we don't have to cast stuff all the time.
 
-    if (sum >= 1)
+    // Calculate the total chances by summing up the chances array
+    float totalChances = 0.0f;
+    for (auto chance : chances)
+        totalChances += float(chance);
+
+    if (totalChances > 0)
     {
-        float rand = urand(1.f, sum, generator);
-        sum = 0;
-        for (size_t i = 0; i < MAX_ITEM_QUALITY; ++i)
+        // Generate a random roll in the range [0.0f + magicFind, totalChances)
+        float roll = frand(1.f + float(magicFind), totalChances, generator);
+
+        // Calculate the cumulative probability and determine the rolled item quality
+        float cumulativeProbability = 0.0f;
+        for (uint32 i = 0; i < MAX_ITEM_QUALITY; ++i)
         {
-            if (chances[i] <= 0)
-                continue;
-
-            sum += chances[i];
-            if (sum < rand)
-                continue;
-
-            quality = i;
-            break;
+            cumulativeProbability += float(chances[i]);
+            if (roll <= cumulativeProbability)
+            {
+                quality = i;
+                break;
+            }
         }
     }
 
-    quality = std::max(output->Quality, quality); // dont generate quality below original
+    // If the generated quality is lower than the base item quality, we skip it
+    quality = std::max(output->Quality, quality);
 
     // if the minQuality modifier is greater than the determined quality, then set the quality to the minQuality
     if (modifier.minQuality > quality && modifier.minQuality < MAX_ITEM_QUALITY)
