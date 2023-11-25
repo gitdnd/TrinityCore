@@ -1216,6 +1216,12 @@ void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifie
     // if the item already has a magic find value set, we use this when regenerating.
     // crafted items do not use magic find, the modifier is not set during crafting.
     uint32 magicFind = output->generatedMagicFind != 0 ? output->generatedMagicFind : modifier.magicFind;
+
+    // Double check that the magicfind rating is correct
+    // There could be persistent MF rating on already applied auras if config gets reloaded
+    if (magicFind > sWorld->getIntConfig(CONFIG_MAX_MAGIC_FIND))
+        magicFind = sWorld->getIntConfig(CONFIG_MAX_MAGIC_FIND);
+
     output->generatedMagicFind = magicFind;
     
     // these are not percentage chances. They represent areas of a number line made from their sum
