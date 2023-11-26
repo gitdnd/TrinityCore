@@ -2739,8 +2739,8 @@ void Group::UpdateDungeonLevel()
 {
     float averageLevel = 0.0f;
     uint8 memcount = 0;
-    uint32 highestlvl = 0;
-    std::vector<uint32> ilvls;
+    //uint32 highestlvl = 0;
+    //std::vector<uint32> ilvls;
     for (auto citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!citr->guid)
@@ -2752,18 +2752,18 @@ void Group::UpdateDungeonLevel()
         uint32 ilvl = player->GetAverageItemLevel();
         if (ilvl > highestlvl)
             highestlvl = ilvl;
-        ilvls.push_back(player->GetAverageItemLevel());
-        //averageLevel += player->GetAverageItemLevel();
-        //memcount += 1;
+        //ilvls.push_back(player->GetAverageItemLevel());
+        averageLevel += player->GetAverageItemLevel();
+        memcount += 1;
     }
-    for (uint32 i : ilvls)
+    /*for (uint32 i : ilvls)
     {
         if (highestlvl - i > 150) //@todo: config option?
             continue;
 
         averageLevel += i;
         memcount += 1;
-    }
+    }*/
     if(memcount > 0)
         averageLevel /= memcount;
 
