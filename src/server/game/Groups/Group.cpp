@@ -2750,8 +2750,8 @@ void Group::UpdateDungeonLevel()
         if (!player)
             continue;
         uint32 ilvl = player->GetAverageItemLevel();
-        if (ilvl > highestlvl)
-            highestlvl = ilvl;
+        //if (ilvl > highestlvl)
+            //highestlvl = ilvl;
         //ilvls.push_back(player->GetAverageItemLevel());
         averageLevel += player->GetAverageItemLevel();
         memcount += 1;
