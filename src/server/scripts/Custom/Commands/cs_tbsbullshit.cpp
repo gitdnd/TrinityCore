@@ -196,6 +196,7 @@ public:
             Creature* c = (*iter);
             object->AutoStoreLootNonPersonal(c->GetCreatureTemplate()->lootid, LootTemplates_Creature, true, false, false);
         }
+        return true;
     }
 };
 
