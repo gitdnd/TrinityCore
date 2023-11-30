@@ -2581,6 +2581,14 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* victim, SpellInfo const* sp
             return SPELL_MISS_DEFLECT;
     }
 
+    // 93179 - Whirling Barrier --itswicky
+    if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(93179) && victim->ToPlayer()->IsUsingStaff())
+    {
+        int blockChance = victim->GetUnitBlockChance(BASE_ATTACK, victim);
+        if (roll_chance_i(blockChance))
+            return SPELL_MISS_BLOCK;
+    }
+
     return SPELL_MISS_NONE;
 }
 
@@ -2635,14 +2643,6 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spellIn
     if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(180128) && victim->ToPlayer()->IsUsingShield())
     {
         if (roll_chance_i(5))
-            return SPELL_MISS_BLOCK;
-    }
-
-    // 93179 - Whirling Barrier --itswicky
-    if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(93179) && victim->ToPlayer()->IsUsingStaff())
-    {
-        int blockChance = victim->GetUnitBlockChance(BASE_ATTACK, victim);
-        if (roll_chance_i(blockChance))
             return SPELL_MISS_BLOCK;
     }
 
