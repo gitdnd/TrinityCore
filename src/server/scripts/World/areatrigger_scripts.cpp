@@ -470,6 +470,7 @@ public:
 
     bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
     {
+        player->ClearInCombat();
         player->ActivateTaxiPathTo(1982);
         auto achievement = AchievementGlobalMgr::instance()->GetAchievement(50085);
         if (achievement)
