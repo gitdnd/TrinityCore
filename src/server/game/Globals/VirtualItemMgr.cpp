@@ -458,8 +458,8 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     // always bind on pickup
     output->Bonding = BIND_WHEN_PICKED_UP;
 
-    // if item is a legendary or higher, flag as BoA
-    if(output->Quality >= ITEM_QUALITY_LEGENDARY && !output->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT))
+    // if item is a legendary or higher, flag as BoA. Minimum ilevel 50 to prevent low level farming
+    if(output->Quality >= ITEM_QUALITY_LEGENDARY && !output->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT) && ilevel > 50)
         output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
