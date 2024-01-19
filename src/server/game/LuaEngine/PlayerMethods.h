@@ -4735,7 +4735,7 @@ namespace LuaPlayer
         return 1;
     }
 
-    int QueueGroupWithAffixConfig(Eluna* /*E*/, Player* player)
+    int QueueGroupWithAffixConfig(Eluna* E, Player* player)
     {
         if (player->GetGroup() && player->GetGroup()->GetMembersCount() == 5)
         {
@@ -4744,10 +4744,12 @@ namespace LuaPlayer
             // Random 5 man dungeon
             dungeons.insert(301);
             // TODO: update affixes
-
-            return sLFGMgr->JoinLfg(player, 0, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affixes);
+            int code = sLFGMgr->JoinLfg(player, 0, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affixes);
+            Eluna::Push(E->L, code);
+            return 1;
         }
-        return -1;
+        Eluna::Push(E->L, -1);
+        return 1;
     }
 };
 #endif
