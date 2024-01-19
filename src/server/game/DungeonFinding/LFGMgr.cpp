@@ -396,11 +396,11 @@ void LFGMgr::Update(uint32 diff)
 LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment, LfgGroupType groupType, std::set<uint32> affixes)
 {
     if (!player || !player->GetSession() || dungeons.empty())
-        return;
+        return LFG_JOIN_INTERNAL_ERROR;
 
     // At least 1 role must be selected
     if (!(roles & (PLAYER_ROLE_TANK | PLAYER_ROLE_HEALER | PLAYER_ROLE_DAMAGE)))
-        return;
+        return LFG_JOIN_FAILED;
 
     // Sanitize input roles
     roles &= PLAYER_ROLE_ANY;
