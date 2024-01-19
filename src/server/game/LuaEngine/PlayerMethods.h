@@ -9,6 +9,7 @@
 #include <Achievements\AchievementMgr.h>
 #include <DungeonFinding\LFGMgr.h>
 #include <Server/Packets/MiscPackets.h>
+#include <LFG.h>
 
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
@@ -4732,6 +4733,21 @@ namespace LuaPlayer
     {
         Eluna::Push(E->L, player->GetActiveLootPreference());
         return 1;
+    }
+
+    int QueueGroupWithAffixConfig(Eluna* /*E*/, Player* player)
+    {
+        if (player->GetGroup() && player->GetGroup()->GetMembersCount() == 5)
+        {
+            std::set<uint32> affixes;
+            std::set<uint32> dungeons;
+            // Random 5 man dungeon
+            dungeons.insert(301);
+            // TODO: update affixes
+
+            return sLFGMgr->JoinLfg(player, 0, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affixes);
+        }
+        return -1;
     }
 };
 #endif

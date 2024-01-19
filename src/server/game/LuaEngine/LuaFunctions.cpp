@@ -814,6 +814,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SendItemQueryPacket", &LuaPlayer::SendItemQueryPacket },
     { "SetLootPreference", &LuaPlayer::SetLootPreference },
     { "GetLootPreference", &LuaPlayer::GetLootPreference },
+    { "QueueGroupWithAffixConfig", &LuaPlayer::QueueGroupWithAffixConfig },
 
     { NULL, NULL }
 };

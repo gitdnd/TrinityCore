@@ -393,7 +393,7 @@ void LFGMgr::Update(uint32 diff)
    @param[in]     dungeons Dungeons the player/group is applying for
    @param[in]     comment Player selected comment
 */
-void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment, LfgGroupType groupType)
+LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment, LfgGroupType groupType, std::set<uint32> affixes)
 {
     if (!player || !player->GetSession() || dungeons.empty())
         return;
@@ -534,7 +534,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         if (!dungeons.empty())                             // Only should show lockmap when have no dungeons available
             joinData.lockmap.clear();
         player->GetSession()->SendLfgJoinResult(joinData);
-        return;
+        return joinData.result;
     }
 
     SetComment(guid, comment);
@@ -542,7 +542,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
     if (isRaid)
     {
         TC_LOG_DEBUG("lfg.join", "%s trying to join raid browser and it's disabled.", guid.ToString().c_str());
-        return;
+        return joinData.result;
     }
 
     std::string debugNames = "";
@@ -609,6 +609,8 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
 
     TC_LOG_DEBUG("lfg.join", "%s joined (%s), Members: %s. Dungeons (%u): %s", guid.ToString().c_str(),
         grp ? "group" : "player", debugNames.c_str(), uint32(dungeons.size()), ConcatenateDungeons(dungeons).c_str());
+
+    return joinData.result;
 }
 
 /**
