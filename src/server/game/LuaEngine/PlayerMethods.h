@@ -4739,12 +4739,13 @@ namespace LuaPlayer
     {
         if (player->GetGroup() && player->GetGroup()->GetMembersCount() == 5)
         {
+            uint8 roles = lfg::LfgRoles::PLAYER_ROLE_ANY;
             std::set<uint32> affixes;
             std::set<uint32> dungeons;
             // Random 5 man dungeon
             dungeons.insert(301);
             // TODO: update affixes
-            int code = sLFGMgr->JoinLfg(player, 0, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affixes);
+            int code = sLFGMgr->JoinLfg(player, roles, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affixes);
             Eluna::Push(E->L, code);
             return 1;
         }
