@@ -484,7 +484,10 @@ bool Aura::CanPeriodicTickCrit(Unit const* caster) const
         return true;
 
     // Rupture - since 3.3.3 can crit
-    if ((GetSpellInfo()->SpellIconID == 500 && GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE) || (GetSpellInfo()->Id == 48672)) // Add check for gem -Itswicky
+    //if ((GetSpellInfo()->SpellIconID == 500 && GetSpellInfo()->SpellFamilyName == SPELLFAMILY_ROGUE) || (GetSpellInfo()->Id == 48672)) // Add check for gem -Itswicky
+    if (GetSpellInfo()->Id == 47813 || GetSpellInfo()->Id == 47843 || GetSpellInfo()->Id == 55360 || GetSpellInfo()->Id == 48125
+        || GetSpellInfo()->Id == 47465 || GetSpellInfo()->Id == 48676 || GetSpellInfo()->Id == 55078 || GetSpellInfo()->Id == 48468
+        || GetSpellInfo()->Id == 48463 || GetSpellInfo()->Id == 48672 || GetSpellInfo()->Id == 97044)
         return true;
     //@todo: Remove this hack when spell family is corrected.
     if (GetId() == 48300 || GetId() == 48160 || GetId() == 48125)
