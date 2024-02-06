@@ -334,7 +334,7 @@ class TC_GAME_API Group
         void LinkMember(GroupReference* pRef);
         void DelinkMember(ObjectGuid guid);
 
-        InstanceGroupBind* BindToInstance(InstanceSave* save, bool permanent, bool load = false);
+        InstanceGroupBind* BindToInstance(InstanceSave* save, bool permanent, bool load = false, int affix1 = 0, int affix2 = 0, int affix3 = 0, int affix4 = 0);
         void UnbindInstance(uint32 mapid, uint8 difficulty, bool unload = false);
         InstanceGroupBind* GetBoundInstance(Player* player);
         InstanceGroupBind* GetBoundInstance(Map* aMap);
