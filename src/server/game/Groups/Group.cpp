@@ -2303,7 +2303,7 @@ InstanceGroupBind* Group::GetBoundInstance(Difficulty difficulty, uint32 mapId)
         return nullptr;
 }
 
-InstanceGroupBind* Group::BindToInstance(InstanceSave* save, bool permanent, bool load, int affix1, int affix2, int affix3, int affix4)
+InstanceGroupBind* Group::BindToInstance(InstanceSave* save, bool permanent, bool load)
 {
     if (!save || isBGGroup() || isBFGroup())
         return nullptr;
@@ -2316,10 +2316,6 @@ InstanceGroupBind* Group::BindToInstance(InstanceSave* save, bool permanent, boo
         stmt->setUInt32(0, m_dbStoreId);
         stmt->setUInt32(1, save->GetInstanceId());
         stmt->setBool(2, permanent);
-        stmt->setUInt32(3, affix1);
-        stmt->setUInt32(4, affix2);
-        stmt->setUInt32(5, affix3);
-        stmt->setUInt32(6, affix4);
 
         CharacterDatabase.Execute(stmt);
     }
