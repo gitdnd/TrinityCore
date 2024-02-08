@@ -632,7 +632,6 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     proposal.state = LFG_PROPOSAL_INITIATING;
     proposal.leader.Clear();
     proposal.dungeonId = Trinity::Containers::SelectRandomContainerElement(proposalDungeons);
-    LfgQueueData const& queue = QueueDataStore[gguid];
     proposal.affix1 = queue.affix1;
     proposal.affix2 = queue.affix2;
     proposal.affix3 = queue.affix3;
