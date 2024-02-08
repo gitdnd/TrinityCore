@@ -4740,9 +4740,9 @@ namespace LuaPlayer
         if (player->GetGroup() && player->GetGroup()->GetMembersCount() == 5)
         {
             uint32 affix1 = Eluna::CHECKVAL<uint8>(E->L, 2);
-            uint32 affix2 = Eluna::CHECKVAL<uint8>(E->L, 2);
-            uint32 affix3 = Eluna::CHECKVAL<uint8>(E->L, 2);
-            uint32 affix4 = Eluna::CHECKVAL<uint8>(E->L, 2);
+            uint32 affix2 = Eluna::CHECKVAL<uint8>(E->L, 3);
+            uint32 affix3 = Eluna::CHECKVAL<uint8>(E->L, 4);
+            uint32 affix4 = Eluna::CHECKVAL<uint8>(E->L, 5);
             uint8 roles = lfg::LfgRoles::PLAYER_ROLE_ANY;
             std::set<uint32> dungeons;
             // Random 5 man dungeon
