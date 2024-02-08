@@ -66,7 +66,25 @@ struct LfgQueueData
         itemLevel(_itemLevel),
         itemLevelRange(0),
         isQueued(true)
-        { }
+    { }
+
+    LfgQueueData(time_t _joinTime, LfgDungeonSet const& _dungeons, LfgRolesMap const& _roles, int tanksNeeded, int healersNeeded, int dpsNeeded, bool _isSolo, int _itemLevel, int _penalty, uint32 _affix1, uint32 _affix2, uint32 _affix3, uint32 _affix4) :
+        joinTime(_joinTime),
+        tanks(tanksNeeded),
+        healers(healersNeeded),
+        dps(dpsNeeded),
+        dungeons(_dungeons),
+        roles(_roles),
+        isSolo(_isSolo),
+        penalty(_penalty),
+        itemLevel(_itemLevel),
+        itemLevelRange(0),
+        isQueued(true),
+        affix1(_affix1),
+        affix2(_affix2),
+        affix3(_affix3),
+        affix4(_affix4)
+    { }
 
     time_t joinTime;                                       ///< Player queue join time (to calculate wait times)
     uint8 tanks;                                           ///< Tanks needed
@@ -81,6 +99,10 @@ struct LfgQueueData
     int32 itemLevelRange;                                  ///< Highest item level difference between queued people
     bool isQueued;                                         ///< Used to preserve queue spot while a proposal is active
     bool isSolo;
+    uint32 affix1;
+    uint32 affix2;
+    uint32 affix3;
+    uint32 affix4;
 };
 
 struct LfgWaitTime
@@ -106,7 +128,7 @@ class TC_GAME_API LFGQueue
         std::string GetDetailedMatchRoles(GuidList const& check) const;
         void AddToQueue(ObjectGuid guid, bool reAdd = false);
         void RemoveFromQueue(ObjectGuid guid);
-        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel);
+        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel, uint32 affix1 = 0, uint32 affix2 = 0, uint32 affix3 = 0, uint32 affix4 = 0);
         void RemoveQueueData(ObjectGuid guid);
 
         // Update Timers (when proposal success)

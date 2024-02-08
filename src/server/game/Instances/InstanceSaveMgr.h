@@ -48,7 +48,7 @@ class TC_GAME_API InstanceSave
            - any new instance is being generated
            - the first time a player bound to InstanceId logs in
            - when a group bound to the instance is loaded */
-        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, time_t resetTime, bool canReset);
+        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime, bool canReset);
 
         /* Unloaded when m_playerList and m_groupList become empty
            or when the instance is reset */
@@ -207,7 +207,7 @@ class TC_GAME_API InstanceSaveManager
 
         void Update();
 
-        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, time_t resetTime,
+        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime,
             bool canReset, bool load = false);
         void RemoveInstanceSave(uint32 InstanceId);
         void UnloadInstanceSave(uint32 InstanceId);

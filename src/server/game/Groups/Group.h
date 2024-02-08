@@ -349,6 +349,9 @@ class TC_GAME_API Group
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
 
+        void SetAffixData(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
+        uint32 GetAffixData(uint8 slot);
+
     protected:
         bool _setMembersGroup(ObjectGuid guid, uint8 group);
         void _homebindIfInstance(Player* player);
@@ -385,5 +388,9 @@ class TC_GAME_API Group
         uint32              m_dbStoreId;                    // Represents the ID used in database (Can be reused by other groups if group was disbanded)
         bool                m_isLeaderOffline;
         TimeTrackerSmall    m_leaderOfflineTimer;
+        uint32              m_affix1;
+        uint32              m_affix2;
+        uint32              m_affix3;
+        uint32              m_affix4;
 };
 #endif

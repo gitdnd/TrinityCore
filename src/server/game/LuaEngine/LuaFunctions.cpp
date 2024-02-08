@@ -1307,6 +1307,7 @@ ElunaRegister<Map> MapMethods[] =
     { "UpdateDungeonLevel", &LuaMap::UpdateDungeonLevel },
     { "SetGraveyardOverride", &LuaMap::SetGraveyardOverride },
     { "UpscaleMapIfNeeded", &LuaMap::UpscaleMapIfNeeded},
+    { "GetAffixSlotData", &LuaMap::GetAffixSlotData },
 
     { NULL, NULL }
 };

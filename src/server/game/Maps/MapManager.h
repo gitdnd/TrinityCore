@@ -33,7 +33,7 @@ class TC_GAME_API MapManager
     public:
         static MapManager* instance();
 
-        Map* CreateBaseMap(uint32 mapId, uint32 mapLevel = 20);
+        Map* CreateBaseMap(uint32 mapId, uint32 mapLevel = 20, uint32 affix1 = 0, uint32 affix2 = 0, uint32 affix3 = 0, uint32 affix4 = 0);
         Map* FindBaseNonInstanceMap(uint32 mapId) const;
         Map* CreateMap(uint32 mapId, Player* player, uint32 loginInstanceId=0);
         Map* FindMap(uint32 mapId, uint32 instanceId) const;

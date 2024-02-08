@@ -172,7 +172,7 @@ void LFGQueue::RemoveFromQueue(ObjectGuid guid)
         QueueDataStore.erase(itDelete);
 }
 
-void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel)
+void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap, uint32 itemLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
 {
     bool isSolo = dungeons.find(STORMWINDVAULT) != dungeons.end();
     bool isRaid = dungeons.find(DRAGONISLESRAID) != dungeons.end();
@@ -184,7 +184,7 @@ void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet cons
     // TODO: calculate group penalty
     int penalty = 0;
 
-    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo, itemLevel, penalty);
+    QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap, tanksNeeded, healersNeeded, dpsNeeded, isSolo, itemLevel, penalty, affix1, affix2, affix3, affix4);
     AddToQueue(guid);
 }
 
@@ -632,6 +632,11 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     proposal.state = LFG_PROPOSAL_INITIATING;
     proposal.leader.Clear();
     proposal.dungeonId = Trinity::Containers::SelectRandomContainerElement(proposalDungeons);
+    LfgQueueData const& queue = QueueDataStore[gguid];
+    proposal.affix1 = queue.affix1;
+    proposal.affix2 = queue.affix2;
+    proposal.affix3 = queue.affix3;
+    proposal.affix4 = queue.affix4;
 
     bool leader = false;
     for (LfgRolesMap::const_iterator itRoles = proposalRoles.begin(); itRoles != proposalRoles.end(); ++itRoles)

@@ -78,7 +78,7 @@ MapManager* MapManager::instance()
     return &instance;
 }
 
-Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel)
+Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
 {
     Map* map = FindBaseMap(id);
 
@@ -93,7 +93,7 @@ Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel)
             map = new MapInstanced(id, i_gridCleanUpDelay, dungeonLevel);
         else
         {
-            map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, dungeonLevel);
+            map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, dungeonLevel, affix1, affix2, affix3, affix4);
             map->LoadRespawnTimes();
             map->LoadCorpseData();
         }
@@ -115,7 +115,18 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 
 Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
 {
-    Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20);
+    int affix1, affix2, affix3, affix4;
+    if (player)
+    {
+        if (Group* group = player->GetGroup())
+        {
+            affix1 = group->GetAffixData(1);
+            affix1 = group->GetAffixData(2);
+            affix1 = group->GetAffixData(3);
+            affix1 = group->GetAffixData(4);
+        }
+    }
+    Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20, affix1, affix2, affix3, affix4);
 
     if (m && m->Instanceable())
         m = ((MapInstanced*)m)->CreateInstanceForPlayer(id, player, loginInstanceId);

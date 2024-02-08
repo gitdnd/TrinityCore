@@ -412,5 +412,14 @@ namespace LuaMap
         map->UpscaleMapIfNeeded();
         return 0;
     }
+
+    int GetAffixSlotData(Eluna* E, Map* map)
+    {
+        Eluna::Push(E->L, map->GetAffixSlot(1));
+        Eluna::Push(E->L, map->GetAffixSlot(2));
+        Eluna::Push(E->L, map->GetAffixSlot(3));
+        Eluna::Push(E->L, map->GetAffixSlot(4));
+        return 4;
+    }
 };
 #endif

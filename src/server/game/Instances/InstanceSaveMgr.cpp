@@ -73,7 +73,7 @@ void InstanceSaveManager::Unload()
 - adding instance into manager
 - called from InstanceMap::Add, _LoadBoundInstances, LoadGroups
 */
-InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, time_t resetTime, bool canReset, bool load)
+InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime, bool canReset, bool load)
 {
     if (InstanceSave* old_save = GetInstanceSave(instanceId))
         return old_save;
@@ -113,7 +113,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
 
     TC_LOG_DEBUG("maps", "InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d", mapId, instanceId);
 
-    InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, dungeonLevel, resetTime, canReset);
+    InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, dungeonLevel, affix1, affix2, affix3, affix4, resetTime, canReset);
     if (!load)
         save->SaveToDB();
 
