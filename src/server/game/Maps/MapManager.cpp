@@ -121,9 +121,9 @@ Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
         if (Group* group = player->GetGroup())
         {
             affix1 = group->GetAffixData(1);
-            affix1 = group->GetAffixData(2);
-            affix1 = group->GetAffixData(3);
-            affix1 = group->GetAffixData(4);
+            affix2 = group->GetAffixData(2);
+            affix3 = group->GetAffixData(3);
+            affix4 = group->GetAffixData(4);
         }
     }
     Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20, affix1, affix2, affix3, affix4);

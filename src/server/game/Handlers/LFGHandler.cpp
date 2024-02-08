@@ -146,8 +146,8 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
 
-    std::set<uint32> affixes;
-    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment, groupType, affixes);
+    // Don't pass any affix data in for default LFG queue
+    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment, groupType, 0, 0, 0, 0);
 }
 
 void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)

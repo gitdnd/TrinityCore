@@ -243,7 +243,7 @@ void GroupMgr::LoadGroups()
                 diff = 0;                                   // default for both difficaly types
             }
 
-            InstanceSave* save = sInstanceSaveMgr->AddInstanceSave(mapEntry->MapID, fields[2].GetUInt32(), Difficulty(diff), fields[6].GetUInt32(), time_t(fields[5].GetUInt32()), fields[7].GetUInt64() == 0, true);
+            InstanceSave* save = sInstanceSaveMgr->AddInstanceSave(mapEntry->MapID, fields[2].GetUInt32(), Difficulty(diff), fields[6].GetUInt32(), group->GetAffixData(1), group->GetAffixData(2), group->GetAffixData(3), group->GetAffixData(4), time_t(fields[5].GetUInt32()), fields[7].GetUInt64() == 0, true);
             group->BindToInstance(save, fields[3].GetBool(), true);
             ++count;
         }
