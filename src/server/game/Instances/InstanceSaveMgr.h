@@ -119,6 +119,18 @@ class TC_GAME_API InstanceSave
            but that would depend on a lot of things that can easily change in future */
         Difficulty GetDifficulty() const { return m_difficulty; }
         int GetDungeonLevel() const { return m_dungeonLevel; }
+        uint32 GetAffixSlot(uint8 slot)
+        {
+            if (slot == 1)
+                return m_affix1;
+            if (slot == 2)
+                return m_affix2;
+            if (slot == 3)
+                return m_affix3;
+            if (slot == 4)
+                return m_affix4;
+            return 0;
+        }
 
         typedef std::list<Player*> PlayerListType;
         typedef std::list<Group*> GroupListType;
@@ -140,6 +152,10 @@ class TC_GAME_API InstanceSave
         uint32 m_mapid;
         Difficulty m_difficulty;
         int m_dungeonLevel;
+        uint32 m_affix1;
+        uint32 m_affix2;
+        uint32 m_affix3;
+        uint32 m_affix4;
         bool m_canReset;
         bool m_toDelete;
 

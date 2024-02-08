@@ -3800,8 +3800,8 @@ template TC_GAME_API void Map::RemoveFromMap(DynamicObject*, bool);
 
 /* ******* Dungeon Instance Maps ******* */
 
-InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, Map* _parent)
-  : Map(id, expiry, InstanceId, SpawnMode, dungeonLevel, _parent),
+InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent)
+  : Map(id, expiry, InstanceId, SpawnMode, dungeonLevel, affix1, affix2, affix3, affix4, _parent),
     m_resetAfterUnload(false), m_unloadWhenEmpty(false),
     i_data(nullptr), i_script_id(0)
 {
@@ -4313,7 +4313,7 @@ uint32 InstanceMap::GetMaxResetDelay() const
 /* ******* Battleground Instance Maps ******* */
 
 BattlegroundMap::BattlegroundMap(uint32 id, time_t expiry, uint32 InstanceId, Map* _parent, uint8 spawnMode)
-  : Map(id, expiry, InstanceId, spawnMode, 0, _parent), m_bg(nullptr)
+  : Map(id, expiry, InstanceId, spawnMode, 0, 0, 0, 0, 0, _parent), m_bg(nullptr)
 {
     //lets initialize visibility distance for BG/Arenas
     BattlegroundMap::InitVisibilityDistance();

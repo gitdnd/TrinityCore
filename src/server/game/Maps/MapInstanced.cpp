@@ -28,7 +28,7 @@
 #include "VMapFactory.h"
 #include "World.h"
 
-MapInstanced::MapInstanced(uint32 id, time_t expiry, uint32 dLevel) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dLevel)
+MapInstanced::MapInstanced(uint32 id, time_t expiry, uint32 dLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dLevel, affix1, affix2, affix3, affix4)
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_GRIDS*sizeof(uint16));
@@ -155,7 +155,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             {
                 map = FindInstanceMap(loginInstanceId);
                 if (!map && pSave && pSave->GetInstanceId() == loginInstanceId)
-                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel());
+                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixSlot(1), pSave->GetAffixSlot(2), pSave->GetAffixSlot(3), pSave->GetAffixSlot(4));
                 return map;
             }
 
@@ -202,7 +202,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
 {
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
@@ -226,7 +226,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 
     TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
 
-    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, this);
+    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, affix1, affix2, affix3, affix4, this);
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();

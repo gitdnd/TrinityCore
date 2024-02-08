@@ -182,10 +182,10 @@ void InstanceSaveManager::UnloadInstanceSave(uint32 InstanceId)
     }
 }
 
-// TODO(Harry): We don't currently do anything with affix data, do we want to handle save this to instances?
+// TODO(Harry): We don't persist affix data
 InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime, bool canReset)
 : m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
-  m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_canReset(canReset), m_toDelete(false) { }
+  m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_affix1(affix1), m_affix2(affix2), m_affix3(affix3), m_affix4(affix4), m_canReset(canReset), m_toDelete(false) { }
 
 InstanceSave::~InstanceSave()
 {
