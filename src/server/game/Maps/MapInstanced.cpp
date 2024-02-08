@@ -180,7 +180,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             map = FindInstanceMap(newInstanceId);
             // it is possible that the save exists but the map doesn't
             if (!map)
-                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel());
+                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixSlot(1), pSave->GetAffixSlot(2), pSave->GetAffixSlot(3), pSave->GetAffixSlot(4));
         }
         else
         {
@@ -190,12 +190,20 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
 
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
             int dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : player->GetAverageItemLevel();
+            uint32 affix1, affix2, affix3, affix4;
+            if (Group* group = player->GetGroup())
+            {
+                affix1 = group->GetAffixData(1);
+                affix2 = group->GetAffixData(2);
+                affix3 = group->GetAffixData(3);
+                affix4 = group->GetAffixData(4);
+            }
             //player->Say("Creating dungeonLevel: " + std::to_string(dungeonLevel), (Language)0, player);
             //Seems it is now possible, but I do not know if it should be allowed
             //ASSERT(!FindInstanceMap(NewInstanceId));
             map = FindInstanceMap(newInstanceId);
             if (!map)
-                map = CreateInstance(newInstanceId, nullptr, diff, dungeonLevel);
+                map = CreateInstance(newInstanceId, nullptr, diff, dungeonLevel, affix1, affix2, affix3, affix4);
         }
     }
 
