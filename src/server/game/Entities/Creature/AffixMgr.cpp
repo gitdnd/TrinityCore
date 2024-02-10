@@ -91,7 +91,16 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
     if (event > 1) {
         // FIXME: This is a temporary implementation, just cast whatever spell set
         if (!creature->HasAura(GetTargetSpell()))
-            creature->AddAura(GetTargetSpell(), creature);
+        {
+            if (Aura* aura = creature->AddAura(GetTargetSpell(), creature))
+            {
+                creature->Yell("Applied aura: " + GetTargetSpell(), LANG_UNIVERSAL);
+            }
+            else
+            {
+                creature->Yell("Failed to apply aura: " + GetTargetSpell(), LANG_UNIVERSAL);
+            }
+        }
     }
     // Add to world
     else if (event == 1)
