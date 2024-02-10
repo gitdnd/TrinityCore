@@ -95,22 +95,13 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
     if (event > 1) {
         // FIXME: This is a temporary implementation, just cast whatever spell set
         if (!creature->HasAura(GetTargetSpell()))
-        {
-            if (Aura* aura = creature->AddAura(GetTargetSpell(), creature))
-            {
-                creature->Yell("Applied aura: " + std::to_string(GetTargetSpell()), LANG_UNIVERSAL);
-            }
-            else
-            {
-                creature->Yell("Failed to apply aura: " + std::to_string(GetTargetSpell()), LANG_UNIVERSAL);
-            }
-        }
+            creature->AddAura(GetTargetSpell(), creature);
+
+        // TODO: Handle affix specific logic
     }
     // Add to world
     else if (event == 1)
     {
-        // Debugging
-        creature->SetMaxHealth(1000);
-        creature->SetHealth(1000);
+        // Apply health/damage scaling here
     }
 }

@@ -2676,7 +2676,6 @@ void Creature::ApplyAffixData(uint8 event)
         uint32 affix4 = map->GetAffixSlot(4);
         if (affix1 > 0 || affix2 > 0 || affix3 > 0 || affix4 > 0)
         {
-            // Call affix manager
             uint32 affixes[] = { affix1, affix2, affix3, affix4 };
             for (uint32 id : affixes)
             {
