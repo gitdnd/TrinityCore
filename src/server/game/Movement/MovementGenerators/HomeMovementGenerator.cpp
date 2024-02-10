@@ -146,6 +146,7 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner, bool active, b
     {
         owner->SetSpawnHealth();
         owner->LoadCreaturesAddon();
+        owner->ApplyAffixData(5);
         if (owner->IsVehicle())
             owner->GetVehicleKit()->Reset(true);
         owner->AI()->JustReachedHome();

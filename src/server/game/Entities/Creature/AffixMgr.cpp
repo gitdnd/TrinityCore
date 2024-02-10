@@ -85,11 +85,19 @@ AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint8 
 {
 }
 
-void AffixEffect::Apply(Creature* creature)
+void AffixEffect::Apply(Creature* creature, uint8 event)
 {
-    // FIXME: This is a temporary implementation, just cast whatever spell set
-    creature->AddAura(GetTargetSpell(), creature);
-    // Debugging
-    creature->SetMaxHealth(1000);
-    creature->SetHealth(1000);
+    // Spawn/Leave combat
+    if (event > 1) {
+        // FIXME: This is a temporary implementation, just cast whatever spell set
+        if (!creature->HasAura(GetTargetSpell()))
+            creature->AddAura(GetTargetSpell(), creature);
+    }
+    // Add to world
+    else if (event == 1)
+    {
+        // Debugging
+        creature->SetMaxHealth(1000);
+        creature->SetHealth(1000);
+    }
 }

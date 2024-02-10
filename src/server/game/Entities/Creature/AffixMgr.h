@@ -30,7 +30,7 @@ public:
     uint32 const GetTargetSpell() { return m_targetSpell; }
     uint8 const GetRank() { return m_rank; }
 
-    void Apply(Creature* creature);
+    void Apply(Creature* creature, uint8 event = 0);
 
 private:
     uint32 m_id;

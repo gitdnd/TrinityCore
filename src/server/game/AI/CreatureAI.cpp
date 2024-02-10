@@ -306,6 +306,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 
     me->CombatStop(true);
     me->LoadCreaturesAddon();
+    me->ApplyAffixData(2);
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);

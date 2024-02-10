@@ -74,6 +74,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data = nullptr, uint32 vehId = 0, bool dynamic = false, int dungeonLevel = 0);
         bool LoadCreaturesAddon();
+        void ApplyAffixData(uint8 event = 0);
         void SelectLevel();
         void UpdateLevelDependantStats();
         void LoadEquipment(int8 id = 1, bool force = false);

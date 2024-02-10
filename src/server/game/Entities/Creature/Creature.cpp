@@ -294,22 +294,7 @@ void Creature::AddToWorld()
         if (GetZoneScript())
             GetZoneScript()->OnCreatureCreate(this);
 
-        uint32 affix1 = map->GetAffixSlot(1);
-        uint32 affix2 = map->GetAffixSlot(2);
-        uint32 affix3 = map->GetAffixSlot(3);
-        uint32 affix4 = map->GetAffixSlot(4);
-        if (affix1 > 0 || affix2 > 0 || affix3 > 0 || affix4 > 0)
-        {
-            // Call affix manager
-            uint32 affixes[] = {affix1, affix2, affix3, affix4};
-            for (uint32 id : affixes)
-            {
-                if (AffixEffect* effect = sAffixMgr->GetAffixEffect(id))
-                {
-                    effect->Apply(this);
-                }
-            }
-        }
+        ApplyAffixData(1);
 
 #ifdef ELUNA
         if (GetMap()->GetEluna())
@@ -652,6 +637,7 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
     InitializeMovementFlags();
 
     LoadCreaturesAddon();
+    ApplyAffixData(3);
     LoadTemplateImmunities();
 
     GetThreatManager().EvaluateSuppressed();
@@ -2133,6 +2119,7 @@ void Creature::setDeathState(DeathState s)
         Motion_Initialize();
         Unit::setDeathState(ALIVE);
         LoadCreaturesAddon();
+        ApplyAffixData(4);
     }
 }
 
@@ -2677,6 +2664,29 @@ bool Creature::LoadCreaturesAddon()
     }
 
     return true;
+}
+
+void Creature::ApplyAffixData(uint8 event)
+{
+    if (Map* map = GetMap())
+    {
+        uint32 affix1 = map->GetAffixSlot(1);
+        uint32 affix2 = map->GetAffixSlot(2);
+        uint32 affix3 = map->GetAffixSlot(3);
+        uint32 affix4 = map->GetAffixSlot(4);
+        if (affix1 > 0 || affix2 > 0 || affix3 > 0 || affix4 > 0)
+        {
+            // Call affix manager
+            uint32 affixes[] = { affix1, affix2, affix3, affix4 };
+            for (uint32 id : affixes)
+            {
+                if (AffixEffect* effect = sAffixMgr->GetAffixEffect(id))
+                {
+                    effect->Apply(this, event);
+                }
+            }
+        }
+    }
 }
 
 /// Send a message to LocalDefense channel for players opposition team in the zone
