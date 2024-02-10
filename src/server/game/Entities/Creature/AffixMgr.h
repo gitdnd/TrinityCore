@@ -47,6 +47,8 @@ public:
 	AffixItem* getAffixItem(uint32 id);
 	AffixEffect* GetAffixEffect(uint32 id);
 
+    static AffixMgr* instance();
+
 private:
 	std::list<AffixItem> m_items;
 	std::list<AffixEffect> m_effects;
