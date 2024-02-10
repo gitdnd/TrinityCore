@@ -54,6 +54,7 @@
 #include "World.h"
 #include <unordered_set>
 #include <vector>
+#include <AffixMgr.h>
 
 u_map_magic MapMagic        = { {'M','A','P','S'} };
 u_map_magic MapVersionMagic = { {'v','1','.','9'} };
@@ -291,6 +292,8 @@ i_scriptLock(false), _respawnCheckTimer(0)
 
     if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
         i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
+
+    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(affix1, affix2, affix3, affix4);
 
     if(auto iTemp = sObjectMgr->GetInstanceTemplate(id))
     {

@@ -20,7 +20,7 @@ void AffixMgr::LoadDatabaseData()
                     fields[1].GetUInt8()));
         } while (result->NextRow());
     }
-    if (QueryResult result = WorldDatabase.Query("SELECT id, `rank`, baseSpell, targetSpell FROM affix_effect"))
+    if (QueryResult result = WorldDatabase.Query("SELECT id, `rank`, baseSpell, targetSpell, dungeonLevelBonus FROM affix_effect"))
     {
         do
         {
@@ -30,6 +30,7 @@ void AffixMgr::LoadDatabaseData()
                     fields[0].GetUInt32(),
                     fields[2].GetUInt32(),
                     fields[3].GetUInt32(),
+                    fields[4].GetInt32(),
                     fields[1].GetUInt8()));
         } while (result->NextRow());
     }
@@ -41,7 +42,7 @@ AffixMgr* AffixMgr::instance()
     return &instance;
 }
 
-AffixItem AffixMgr::getAffixItem(uint32 id)
+AffixItem AffixMgr::GetAffixItem(uint32 id)
 {
     for (AffixItem item : m_items)
     {
@@ -65,7 +66,18 @@ AffixEffect AffixMgr::GetAffixEffect(uint32 id)
             }
         }
     }
-    return AffixEffect(0, 0, 0, 0);
+    return AffixEffect(0, 0, 0, 0, 0);
+}
+
+int AffixMgr::GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+{
+    int bonus = 0;
+    uint32 affixes[] = {affix1, affix2, affix3, affix4};
+    for (uint32 affix : affixes)
+    {
+        bonus += GetAffixEffect(affix).GetDungeonLevelBonus();
+    }
+    return bonus;
 }
 
 ///////////////////////
@@ -81,8 +93,8 @@ AffixItem::AffixItem(uint32 id, uint8 rank) :
 // Affix Effect
 ///////////////////////
 
-AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint8 rank) :
-    m_id(id), m_baseSpell(baseSpell), m_targetSpell(targetSpell), m_rank(rank)
+AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, int dungeonLevelBonus, uint8 rank) :
+    m_id(id), m_baseSpell(baseSpell), m_targetSpell(targetSpell), m_dungeonLevelBonus(dungeonLevelBonus), m_rank(rank)
 {
 }
 

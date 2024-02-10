@@ -23,11 +23,12 @@ private:
 class AffixEffect
 {
 public:
-    AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint8 rank);
+    AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, int m_dungeonLevelBonus, uint8 rank);
 
     uint32 const GetId() { return m_id; }
     uint32 const GetBaseSpell() { return m_baseSpell; }
     uint32 const GetTargetSpell() { return m_targetSpell; }
+    int const GetDungeonLevelBonus() { return m_dungeonLevelBonus; }
     uint8 const GetRank() { return m_rank; }
 
     void Apply(Creature* creature, uint8 event = 0);
@@ -36,6 +37,7 @@ private:
     uint32 m_id;
     uint32 m_baseSpell;
     uint32 m_targetSpell;
+    int m_dungeonLevelBonus;
     uint8 m_rank;
 };
 
@@ -46,6 +48,8 @@ public:
 	
 	AffixItem getAffixItem(uint32 id);
 	AffixEffect GetAffixEffect(uint32 id);
+
+    int GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
 
     static AffixMgr* instance();
 
