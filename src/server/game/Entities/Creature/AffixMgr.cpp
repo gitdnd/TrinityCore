@@ -94,11 +94,11 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         {
             if (Aura* aura = creature->AddAura(GetTargetSpell(), creature))
             {
-                creature->Yell("Applied aura: " + GetTargetSpell(), LANG_UNIVERSAL);
+                creature->Yell("Applied aura: " + std::to_string(GetTargetSpell()), LANG_UNIVERSAL);
             }
             else
             {
-                creature->Yell("Failed to apply aura: " + GetTargetSpell(), LANG_UNIVERSAL);
+                creature->Yell("Failed to apply aura: " + std::to_string(GetTargetSpell()), LANG_UNIVERSAL);
             }
         }
     }
