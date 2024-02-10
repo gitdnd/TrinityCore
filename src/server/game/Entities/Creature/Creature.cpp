@@ -16,6 +16,7 @@
  */
 
 #include "Creature.h"
+#include <AffixMgr.h>
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -277,11 +278,12 @@ void Creature::AddToWorld()
     ///- Register the creature for guid lookup
     if (!IsInWorld())
     {
-        GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
+        Map* map = GetMap();
+        map->GetObjectsStore().Insert<Creature>(GetGUID(), this);
         if (m_spawnId)
-            GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
+            map->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
 
-        TC_LOG_DEBUG("entities.unit", "Adding creature %s with DBGUID %u to world in map %u", GetGUID().ToString().c_str(), m_spawnId, GetMap()->GetId());
+        TC_LOG_DEBUG("entities.unit", "Adding creature %s with DBGUID %u to world in map %u", GetGUID().ToString().c_str(), m_spawnId, map->GetId());
 
         Unit::AddToWorld();
         SearchFormation();
@@ -291,6 +293,26 @@ void Creature::AddToWorld()
 
         if (GetZoneScript())
             GetZoneScript()->OnCreatureCreate(this);
+
+        uint32 affix1 = map->GetAffixSlot(1);
+        uint32 affix2 = map->GetAffixSlot(2);
+        uint32 affix3 = map->GetAffixSlot(3);
+        uint32 affix4 = map->GetAffixSlot(4);
+        if (affix1 > 0 || affix2 > 0 || affix3 > 0 || affix4 > 0)
+        {
+            // Call affix manager
+            uint32 affixes[] = {affix1, affix2, affix3, affix4};
+            for (uint32 id : affixes)
+            {
+                if (id == 0)
+                    continue;
+
+                if (AffixEffect* effect = sAffixMgr->GetAffixEffect(id))
+                {
+                    effect->Apply(this);
+                }
+            }
+        }
 
 #ifdef ELUNA
         if (GetMap()->GetEluna())

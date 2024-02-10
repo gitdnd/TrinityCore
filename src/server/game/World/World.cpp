@@ -93,6 +93,7 @@
 #include "WorldSession.h"
 
 #include <boost/asio/ip/address.hpp>
+#include <AffixMgr.h>
 
 TC_GAME_API std::atomic<bool> World::m_stopEvent(false);
 TC_GAME_API uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1672,21 +1673,6 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
-    ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-        || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-        || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-        || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-        || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
-    {
-        TC_LOG_FATAL("server.loading", "Unable to load critical files - server shutting down !!!");
-        exit(1);
-    }
-
 #ifdef ELUNA
     ///- Initialize Lua Engine
     TC_LOG_INFO("server.loading", "Loading Lua scripts...");
@@ -2227,6 +2213,9 @@ void World::SetInitialWorldSettings()
 
     TC_LOG_INFO("server.loading", "Loading Custom talents...");
     sObjectMgr->LoadTalentNodes();
+
+    TC_LOG_INFO("server.loading", "Loading Affix data...");
+    sAffixMgr->LoadDatabaseData();
 
     TC_LOG_INFO("server.loading", "Initialize query data...");
     sObjectMgr->InitializeQueriesData(QUERY_DATA_ALL);
