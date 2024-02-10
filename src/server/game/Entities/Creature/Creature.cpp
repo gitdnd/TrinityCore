@@ -304,9 +304,6 @@ void Creature::AddToWorld()
             uint32 affixes[] = {affix1, affix2, affix3, affix4};
             for (uint32 id : affixes)
             {
-                if (id == 0)
-                    continue;
-
                 if (AffixEffect* effect = sAffixMgr->GetAffixEffect(id))
                 {
                     effect->Apply(this);

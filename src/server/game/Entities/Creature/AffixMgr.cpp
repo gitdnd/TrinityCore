@@ -55,6 +55,8 @@ AffixItem* AffixMgr::getAffixItem(uint32 id)
 
 AffixEffect* AffixMgr::GetAffixEffect(uint32 id)
 {
+    if (id == 0)
+        return nullptr;
     for (AffixEffect effect : m_effects)
     {
         if (effect.GetId() == id)
@@ -86,5 +88,8 @@ AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint8 
 void AffixEffect::Apply(Creature* creature)
 {
     // FIXME: This is a temporary implementation, just cast whatever spell set
-    creature->CastSpell(creature, GetTargetSpell());
+    creature->AddAura(GetTargetSpell(), creature);
+    // Debugging
+    creature->SetMaxHealth(1000);
+    creature->SetHealth(1000);
 }
