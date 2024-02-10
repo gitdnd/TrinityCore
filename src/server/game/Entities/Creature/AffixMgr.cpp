@@ -41,30 +41,31 @@ AffixMgr* AffixMgr::instance()
     return &instance;
 }
 
-AffixItem* AffixMgr::getAffixItem(uint32 id)
+AffixItem AffixMgr::getAffixItem(uint32 id)
 {
     for (AffixItem item : m_items)
     {
         if (item.GetId() == id)
         {
-            return &item;
+            return item;
         }
     }
-    return nullptr;
+    return AffixItem(0, 0);
 }
 
-AffixEffect* AffixMgr::GetAffixEffect(uint32 id)
+AffixEffect AffixMgr::GetAffixEffect(uint32 id)
 {
-    if (id == 0)
-        return nullptr;
-    for (AffixEffect effect : m_effects)
+    if (id > 0)
     {
-        if (effect.GetId() == id)
+        for (AffixEffect effect : m_effects)
         {
-            return &effect;
+            if (effect.GetId() == id)
+            {
+                return effect;
+            }
         }
     }
-    return nullptr;
+    return AffixEffect(0, 0, 0, 0);
 }
 
 ///////////////////////
@@ -87,6 +88,9 @@ AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint8 
 
 void AffixEffect::Apply(Creature* creature, uint8 event)
 {
+    if (GetId() == 0)
+        return;
+
     // Spawn/Leave combat
     if (event > 1) {
         // FIXME: This is a temporary implementation, just cast whatever spell set

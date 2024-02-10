@@ -2680,10 +2680,7 @@ void Creature::ApplyAffixData(uint8 event)
             uint32 affixes[] = { affix1, affix2, affix3, affix4 };
             for (uint32 id : affixes)
             {
-                if (AffixEffect* effect = sAffixMgr->GetAffixEffect(id))
-                {
-                    effect->Apply(this, event);
-                }
+                sAffixMgr->GetAffixEffect(id).Apply(this, event);
             }
         }
     }

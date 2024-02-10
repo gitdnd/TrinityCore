@@ -44,8 +44,8 @@ class AffixMgr
 public:
 	void LoadDatabaseData();
 	
-	AffixItem* getAffixItem(uint32 id);
-	AffixEffect* GetAffixEffect(uint32 id);
+	AffixItem getAffixItem(uint32 id);
+	AffixEffect GetAffixEffect(uint32 id);
 
     static AffixMgr* instance();
 
