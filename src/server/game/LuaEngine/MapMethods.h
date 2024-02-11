@@ -8,6 +8,7 @@
 #define MAPMETHODS_H
 
 #include "ElunaInstanceAI.h"
+#include <AffixMgr.cpp>
 
 /***
  * A game map, e.g. Azeroth, Eastern Kingdoms, the Molten Core, etc.
@@ -415,10 +416,21 @@ namespace LuaMap
 
     int GetAffixSlotData(Eluna* E, Map* map)
     {
-        Eluna::Push(E->L, map->GetAffixSlot(1));
-        Eluna::Push(E->L, map->GetAffixSlot(2));
-        Eluna::Push(E->L, map->GetAffixSlot(3));
-        Eluna::Push(E->L, map->GetAffixSlot(4));
+        bool baseSpells = Eluna::CHECKVAL<bool>(E->L, 2, false);
+        if (baseSpells)
+        {
+            Eluna::Push(E->L, sAffixMgr->GetAffixEffect(map->GetAffixSlot(1)).GetBaseSpell());
+            Eluna::Push(E->L, sAffixMgr->GetAffixEffect(map->GetAffixSlot(2)).GetBaseSpell());
+            Eluna::Push(E->L, sAffixMgr->GetAffixEffect(map->GetAffixSlot(3)).GetBaseSpell());
+            Eluna::Push(E->L, sAffixMgr->GetAffixEffect(map->GetAffixSlot(4)).GetBaseSpell());
+        }
+        else
+        {
+            Eluna::Push(E->L, map->GetAffixSlot(1));
+            Eluna::Push(E->L, map->GetAffixSlot(2));
+            Eluna::Push(E->L, map->GetAffixSlot(3));
+            Eluna::Push(E->L, map->GetAffixSlot(4));
+        }
         return 4;
     }
 };
