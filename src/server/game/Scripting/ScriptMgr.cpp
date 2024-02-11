@@ -2401,6 +2401,20 @@ void ScriptMgr::OnGroupDisband(Group* group)
     ASSERT(group);
 #ifdef ELUNA
     sWorld->GetEluna()->OnDisband(group);
+    for (GroupReference* itr = group->GetFirstMember(); itr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member || !member->GetSession())
+            continue;
+
+        if (Map* map = member->GetMap())
+        {
+            if (Eluna* eluna = map->GetEluna())
+            {
+                eluna->OnDisband(group);
+            }
+        }
+    }
 #endif
     FOREACH_SCRIPT(GroupScript)->OnDisband(group);
 }
