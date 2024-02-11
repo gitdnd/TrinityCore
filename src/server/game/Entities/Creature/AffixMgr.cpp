@@ -1,6 +1,7 @@
 
 #include <AffixMgr.h>
 #include "DatabaseEnv.h"
+#include "SpellAuras.h"
 #include "World.h"
 
 ///////////////////////
@@ -105,15 +106,24 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
 
     // Spawn/Leave combat
     if (event > 1) {
-        // FIXME: This is a temporary implementation, just cast whatever spell set
+        // Apply target spell or increase stacks up to 4
         if (!creature->HasAura(GetTargetSpell()))
             creature->AddAura(GetTargetSpell(), creature);
+        else
+        {
+            if (Aura* aura = creature->GetAura(GetTargetSpell()))
+            {
+                uint8 amount = aura->GetStackAmount();
+                if (amount < 4)
+                    aura->SetStackAmount(amount + 1);
+            }
+        }
 
         // TODO: Handle affix specific logic
     }
     // Add to world
     else if (event == 1)
     {
-        // Apply health/damage scaling here
+        // Special logic for on add to world
     }
 }
