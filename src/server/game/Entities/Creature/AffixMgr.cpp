@@ -163,7 +163,7 @@ AffixGroup::AffixGroup()
 
 void AffixGroup::SetSlot(int slot, uint32 affixId, int numRolls, uint8 rank)
 {
-    m_slots[slot] = AffixGroupSlot(slot, affixId, rank);
+    m_slots[slot] = AffixGroupSlot(affixId, numRolls, rank);
 }
 
 uint32 AffixGroup::GetAffixId(uint8 slot)
