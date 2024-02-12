@@ -4,8 +4,39 @@
 
 #include <Define.h>
 #include <Creature.h>
+#include <Group.h>
 #include <list>
 #include <map>
+
+class AffixGroupSlot
+{
+public:
+    AffixGroupSlot();
+    AffixGroupSlot(uint32 affixId, int numRolls, uint8 rank);
+
+    uint32 const GetAffixId() { return m_affixId; }
+    int const GetNumRolls() { return m_numRolls; }
+    uint8 const GetRank() { return m_rank; }
+
+private:
+    uint32 m_affixId;
+    int m_numRolls;
+    uint8 m_rank;
+};
+
+class AffixGroup
+{
+public:
+    AffixGroup();
+
+    void SetSlot(int slot, uint32 affixId, int numRolls, uint8 rank);
+    uint32 GetAffixId(uint8 slot);
+    int GetNumRolls(uint8 slot);
+    uint8 GetRank(uint8 slot);
+
+private:
+    AffixGroupSlot m_slots[4];
+};
 
 class AffixItem
 {
@@ -51,11 +82,15 @@ public:
 
     int GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
 
+    AffixGroup& GetAffixGroup(Group* group);
+
+
     static AffixMgr* instance();
 
 private:
 	std::list<AffixItem> m_items;
 	std::list<AffixEffect> m_effects;
+    std::map<uint32, AffixGroup> m_groups;
 };
 
 #define sAffixMgr AffixMgr::instance()

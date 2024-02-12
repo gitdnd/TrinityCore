@@ -7,6 +7,9 @@
 #ifndef GROUPMETHODS_H
 #define GROUPMETHODS_H
 
+#include <AffixMgr.h>
+#include <lua.h>
+
 /***
  * Inherits all methods from: none
  */
@@ -411,6 +414,44 @@ namespace LuaGroup
     {
         Eluna::Push(E->L, group->GetCappedDungeonLevel());
         return 1;
+    }
+
+    int GetAffixGroup(Eluna* E, Group* group)
+    {
+        AffixGroup affixGroup = sAffixMgr->GetAffixGroup(group);
+        int numSlots = 4;
+
+        lua_createtable(E->L, numSlots, 0);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+        for (int i = 0; i < numSlots;)
+        {
+            lua_createtable(E->L, 3, 0); // 3 being the number of values in the inner table
+            int subtable = lua_gettop(E->L);
+
+            lua_pushnumber(E->L, affixGroup.GetAffixId(i));
+            lua_rawseti(E->L, subtable, 1);
+
+            lua_pushnumber(E->L, affixGroup.GetNumRolls(i));
+            lua_rawseti(E->L, subtable, 2);
+
+            lua_pushnumber(E->L, affixGroup.GetRank(i));
+            lua_rawseti(E->L, subtable, 3);
+
+            lua_rawseti(E->L, tbl, ++i);
+        }
+        lua_settop(E->L, tbl);
+        return 1;
+    }
+
+    int SetAffixSlot(Eluna* E, Group* group)
+    {
+        uint8 slot = Eluna::CHECKVAL<uint8>(E->L, 2);
+        uint32 affixId = Eluna::CHECKVAL<uint32>(E->L, 3);
+        int rolls = Eluna::CHECKVAL<int>(E->L, 4);
+        uint8 rank = Eluna::CHECKVAL<uint8>(E->L, 5);
+        sAffixMgr->GetAffixGroup(group).SetSlot(slot, affixId, rolls, rank);
+        return 0;
     }
 };
 

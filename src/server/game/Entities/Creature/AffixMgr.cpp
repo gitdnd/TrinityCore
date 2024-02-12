@@ -7,6 +7,9 @@
 ///////////////////////
 // Affix Manager
 ///////////////////////
+///////////////////////
+//// AffixMgr Database
+///////////////////////
 
 void AffixMgr::LoadDatabaseData()
 {
@@ -36,6 +39,10 @@ void AffixMgr::LoadDatabaseData()
         } while (result->NextRow());
     }
 }
+
+///////////////////////
+//// AffixMgr API
+///////////////////////
 
 AffixMgr* AffixMgr::instance()
 {
@@ -79,6 +86,14 @@ int AffixMgr::GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, 
         bonus += GetAffixEffect(affix).GetDungeonLevelBonus();
     }
     return bonus;
+}
+
+AffixGroup& AffixMgr::GetAffixGroup(Group* group)
+{
+    uint32 guid = group->GetLowGUID();
+    if (!m_groups.count(guid))
+        m_groups[guid] = AffixGroup();
+    return m_groups[guid];
 }
 
 ///////////////////////
@@ -127,3 +142,42 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         // Special logic for on add to world
     }
 }
+
+///////////////////////
+// Affix Group & Slot
+///////////////////////
+
+AffixGroupSlot::AffixGroupSlot() :
+    m_affixId(0), m_numRolls(0), m_rank(0)
+{
+}
+
+AffixGroupSlot::AffixGroupSlot(uint32 affixId, int numRolls, uint8 rank) :
+    m_affixId(affixId), m_numRolls(numRolls), m_rank(rank)
+{
+}
+
+AffixGroup::AffixGroup()
+{
+}
+
+void AffixGroup::SetSlot(int slot, uint32 affixId, int numRolls, uint8 rank)
+{
+    m_slots[slot] = AffixGroupSlot(slot, affixId, rank);
+}
+
+uint32 AffixGroup::GetAffixId(uint8 slot)
+{
+    return m_slots[slot].GetAffixId();
+}
+
+int AffixGroup::GetNumRolls(uint8 slot)
+{
+    return m_slots[slot].GetNumRolls();
+}
+
+uint8 AffixGroup::GetRank(uint8 slot)
+{
+    return m_slots[slot].GetRank();
+}
+

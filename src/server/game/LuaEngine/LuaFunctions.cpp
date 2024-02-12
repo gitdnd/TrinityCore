@@ -1153,6 +1153,8 @@ ElunaRegister<Group> GroupMethods[] =
     { "ConvertToRaid", &LuaGroup::ConvertToRaid },
     { "GetDungeonLevel", &LuaGroup::GetDungeonLevel },
     { "GetCappedDungeonLevel", &LuaGroup::GetCappedDungeonLevel },
+    { "GetAffixGroup", &LuaGroup::GetAffixGroup },
+    { "SetAffixSlot", &LuaGroup::SetAffixSlot },
 
     { NULL, NULL }
 };
