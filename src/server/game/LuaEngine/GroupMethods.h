@@ -424,7 +424,7 @@ namespace LuaGroup
         lua_createtable(E->L, numSlots, 0);
         int tbl = lua_gettop(E->L);
         uint32 i = 0;
-        for (int i = 0; i < numSlots;)
+        for (int i = 1; i <= numSlots;)
         {
             lua_createtable(E->L, 3, 0); // 3 being the number of values in the inner table
             int subtable = lua_gettop(E->L);
@@ -438,7 +438,7 @@ namespace LuaGroup
             lua_pushnumber(E->L, affixGroup.GetRank(i));
             lua_rawseti(E->L, subtable, 3);
 
-            lua_rawseti(E->L, tbl, ++i);
+            lua_rawseti(E->L, tbl, i++);
         }
         lua_settop(E->L, tbl);
         return 1;

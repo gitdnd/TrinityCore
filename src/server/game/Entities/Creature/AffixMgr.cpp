@@ -168,16 +168,16 @@ void AffixGroup::SetSlot(int slot, uint32 affixId, int numRolls, uint8 rank)
 
 uint32 AffixGroup::GetAffixId(uint8 slot)
 {
-    return m_slots[slot].GetAffixId();
+    return m_slots[slot - 1].GetAffixId();
 }
 
 int AffixGroup::GetNumRolls(uint8 slot)
 {
-    return m_slots[slot].GetNumRolls();
+    return m_slots[slot - 1].GetNumRolls();
 }
 
 uint8 AffixGroup::GetRank(uint8 slot)
 {
-    return m_slots[slot].GetRank();
+    return m_slots[slot - 1].GetRank();
 }
 
