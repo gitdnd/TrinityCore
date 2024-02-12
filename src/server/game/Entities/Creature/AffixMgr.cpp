@@ -96,6 +96,13 @@ AffixGroup& AffixMgr::GetAffixGroup(Group* group)
     return m_groups[guid];
 }
 
+void AffixMgr::ClearAffixGroup(Group* group)
+{
+    std::map<uint32, AffixGroup>::iterator iter = m_groups.find(group->GetLeaderGUID());
+    if (iter != m_groups.end())
+        m_groups.erase(iter);
+}
+
 ///////////////////////
 // Affix Item
 ///////////////////////

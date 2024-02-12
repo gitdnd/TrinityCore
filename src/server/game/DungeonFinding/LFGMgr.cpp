@@ -39,6 +39,7 @@
 #include "SocialMgr.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "AffixMgr.h"
 
 namespace lfg
 {
@@ -1452,6 +1453,8 @@ void LFGMgr::FinishDungeon(ObjectGuid gguid, const uint32 dungeonId, Map const* 
 
     SetState(gguid, LFG_STATE_FINISHED_DUNGEON);
 
+    bool clearedAffix = false;
+
     GuidSet const& players = GetPlayers(gguid);
     for (GuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
     {
@@ -1539,6 +1542,11 @@ void LFGMgr::FinishDungeon(ObjectGuid gguid, const uint32 dungeonId, Map const* 
         TC_LOG_DEBUG("lfg.dungeon.finish", "Group: %s, Player: %s done dungeon %u, %s previously done.", gguid.ToString().c_str(), guid.ToString().c_str(), GetDungeon(gguid), done ? " " : " not");
         LfgPlayerRewardData data = LfgPlayerRewardData(dungeon->Entry(), GetDungeon(gguid, false), done, quest);
         player->GetSession()->SendLfgPlayerReward(data);
+
+        if (!clearedAffix && player->GetGroup())
+        {
+            sAffixMgr->ClearAffixGroup(player->GetGroup());
+        }
     }
 }
 

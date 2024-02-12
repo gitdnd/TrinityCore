@@ -83,6 +83,7 @@ public:
     int GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
 
     AffixGroup& GetAffixGroup(Group* group);
+    void ClearAffixGroup(Group* group);
 
 
     static AffixMgr* instance();
