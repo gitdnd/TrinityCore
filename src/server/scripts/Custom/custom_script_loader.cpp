@@ -25,6 +25,7 @@ void AddSC_IcecrownGlacier();
 void AddSC_chromie_script();
 void AddSC_Spells_Custom_Items();
 void AddSC_Spells_Custom_Talents();
+void AddSC_Spells_Custom_Affix();
 void AddSC_Spells_Custom_Generic();
 void AddSC_Spells_Custom_Class_scripts();
 void AddSC_NPCS_Custom_Pets();
@@ -43,6 +44,7 @@ void AddCustomScripts()
     AddSC_chromie_script();
     AddSC_Spells_Custom_Items();
     AddSC_Spells_Custom_Talents();
+    AddSC_Spells_Custom_Affix();
     AddSC_Spells_Custom_Generic();
     AddSC_Spells_Custom_Class_scripts();
     AddSC_NPCS_Custom_Pets();
