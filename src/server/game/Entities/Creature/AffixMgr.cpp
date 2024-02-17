@@ -126,6 +126,12 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
     if (GetId() == 0)
         return;
 
+    // Only apply affixes to enemies
+    const FactionTemplateEntry* selfFaction = sFactionTemplateStore.LookupEntry(creature->GetFaction());
+    const FactionTemplateEntry* companionFaction = sFactionTemplateStore.LookupEntry(1665); // Timeway Companion faction
+    if (selfFaction->IsFriendlyTo(*companionFaction))
+        return;
+    
     // Spawn/Leave combat
     if (event > 1) {
         // Apply target spell or increase stacks up to 4

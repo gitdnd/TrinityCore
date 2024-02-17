@@ -27,9 +27,16 @@ class spell_affix_avenging_wrath_aura : public AuraScript
         Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(caster, list, checker);
         Cell::VisitAllObjects(caster, searcher, range);
 
+        uint32 spellId = GetSpellInfo()->Effects[0].TriggerSpell;
         for (std::list<Unit*>::const_iterator it = list.begin(); it != list.end(); ++it)
         {
-            caster->CastSpell(*it, GetSpellInfo()->Effects[0].TriggerSpell);
+            if ((*it)->HasAura(spellId))
+            {
+                if (Aura* aura = (*it)->GetAura(spellId))
+                    aura->SetStackAmount(aura->GetStackAmount() + 1);
+            }
+            else
+                caster->CastSpell(*it, spellId);
         }
     }
 
