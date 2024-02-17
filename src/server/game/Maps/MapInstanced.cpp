@@ -190,7 +190,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
 
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
             int dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : player->GetAverageItemLevel();
-            uint32 affix1, affix2, affix3, affix4;
+            uint32 affix1 = 0, affix2 = 0, affix3 = 0, affix4 = 0;
             if (Group* group = player->GetGroup())
             {
                 affix1 = group->GetAffixData(1);

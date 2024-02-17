@@ -115,18 +115,8 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 
 Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
 {
-    int affix1, affix2, affix3, affix4;
-    if (player)
-    {
-        if (Group* group = player->GetGroup())
-        {
-            affix1 = group->GetAffixData(1);
-            affix2 = group->GetAffixData(2);
-            affix3 = group->GetAffixData(3);
-            affix4 = group->GetAffixData(4);
-        }
-    }
-    Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20, affix1, affix2, affix3, affix4);
+    // Affixes get set when the instance is created for the player
+    Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20);
 
     if (m && m->Instanceable())
         m = ((MapInstanced*)m)->CreateInstanceForPlayer(id, player, loginInstanceId);
