@@ -52,7 +52,7 @@ class spell_affix_arcane_unleashed_aura : public AuraScript
 {
     PrepareAuraScript(spell_affix_arcane_unleashed_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnPeriodicProc(AuraEffect const* aurEff)
     {
         auto caster = GetCaster();
         if (!caster || !GetSpellInfo() || !roll_chance_i(GetSpellInfo()->ProcChance))
@@ -64,7 +64,7 @@ class spell_affix_arcane_unleashed_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_affix_arcane_unleashed_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_affix_arcane_unleashed_aura::OnPeriodicProc, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
