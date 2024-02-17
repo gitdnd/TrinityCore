@@ -21,14 +21,13 @@ class spell_affix_avenging_wrath_aura : public AuraScript
 
         float range = 30.0f;
 
-        std::list<Unit*> list;
-
-        Trinity::AnyUnitInObjectRangeCheck checker(caster, range);
-        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(caster, list, checker);
-        Cell::VisitAllObjects(caster, searcher, range);
+        std::list<Creature*> creatureList;
+        Trinity::AnyUnitInObjectRangeCheck go_check(caster, range);
+        Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(caster, creatureList, go_check);
+        Cell::VisitGridObjects(caster, go_search, range);
 
         uint32 spellId = GetSpellInfo()->Effects[0].TriggerSpell;
-        for (std::list<Unit*>::const_iterator it = list.begin(); it != list.end(); ++it)
+        for (std::list<Creature*>::const_iterator it = creatureList.begin(); it != creatureList.end(); ++it)
         {
             if (caster->GetFactionReactionTo((*it)->GetFactionTemplateEntry(), *it) >= REP_NEUTRAL)
             {
