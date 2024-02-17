@@ -131,6 +131,15 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
     const FactionTemplateEntry* companionFaction = sFactionTemplateStore.LookupEntry(1665); // Timeway Companion faction
     if (selfFaction->IsFriendlyTo(*companionFaction))
         return;
+
+    // If unselectable
+    if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) ||
+        // if GM trigger npc
+        ((creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER) != 0) ||
+        // if critter
+        creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER)
+        // then do nothing
+        return;
     
     // Spawn/Leave combat
     if (event > 1) {
