@@ -24,6 +24,7 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "Vehicle.h"
+#include "AffixMgr.h"
 
 template<class T>
 HomeMovementGenerator<T>::HomeMovementGenerator()
@@ -146,7 +147,7 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner, bool active, b
     {
         owner->SetSpawnHealth();
         owner->LoadCreaturesAddon();
-        owner->ApplyAffixData(5);
+        owner->ApplyAffixData(AFFIX_EVENT_REACH_HOME);
         if (owner->IsVehicle())
             owner->GetVehicleKit()->Reset(true);
         owner->AI()->JustReachedHome();

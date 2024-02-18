@@ -16,7 +16,6 @@
  */
 
 #include "Creature.h"
-#include "AffixMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -294,7 +293,7 @@ void Creature::AddToWorld()
         if (GetZoneScript())
             GetZoneScript()->OnCreatureCreate(this);
 
-        ApplyAffixData(1);
+        ApplyAffixData(AFFIX_EVENT_ADD_TO_WORLD);
 
 #ifdef ELUNA
         if (GetMap()->GetEluna())
@@ -637,7 +636,7 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
     InitializeMovementFlags();
 
     LoadCreaturesAddon();
-    ApplyAffixData(3);
+    ApplyAffixData(AFFIX_EVENT_UPDATE_ENTRY);
     LoadTemplateImmunities();
 
     GetThreatManager().EvaluateSuppressed();
@@ -2119,7 +2118,7 @@ void Creature::setDeathState(DeathState s)
         Motion_Initialize();
         Unit::setDeathState(ALIVE);
         LoadCreaturesAddon();
-        ApplyAffixData(4);
+        ApplyAffixData(AFFIX_EVENT_RESPAWN);
     }
 }
 
@@ -2666,7 +2665,7 @@ bool Creature::LoadCreaturesAddon()
     return true;
 }
 
-void Creature::ApplyAffixData(uint8 event)
+void Creature::ApplyAffixData(AffixEvent event)
 {
     if (Map* map = GetMap())
     {

@@ -122,7 +122,7 @@ AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, int du
 {
 }
 
-void AffixEffect::Apply(Creature* creature, uint8 event)
+void AffixEffect::Apply(Creature* creature, AffixEvent event)
 {
     if (GetId() == 0)
         return;
@@ -144,15 +144,15 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         // then do nothing
         return;
 
-    // 1 = Add to world
-    // 2 = Leave combat
-    // 3 = Update entry
-    // 4 = Respawn
-    // 5 = On Reaching Home Position
-    if (event > 1 && event != 5) {
-        // debug
-        //creature->Yell("Applying affix based on event: " + std::to_string(event), LANG_UNIVERSAL);
-
+    // debug
+    //creature->Yell("Applying affix based on event: " + std::to_string(event), LANG_UNIVERSAL);
+ 
+    switch (event)
+    {
+    case AFFIX_EVENT_LEAVE_COMBAT:
+    case AFFIX_EVENT_UPDATE_ENTRY:
+    case AFFIX_EVENT_RESPAWN:
+    {
         // Apply target spell or increase stacks up to 4
         if (!creature->HasAura(GetTargetSpell()))
             creature->AddAura(GetTargetSpell(), creature);
@@ -165,13 +165,10 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
                     aura->SetStackAmount(amount + 1);
             }
         }
-
-        // TODO: Handle affix specific logic
+        break;
     }
-    // Add to world
-    else if (event == 1)
-    {
-        // Special logic for on add to world
+    default:
+        break;
     }
 }
 

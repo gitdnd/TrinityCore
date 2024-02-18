@@ -8,6 +8,15 @@
 #include <list>
 #include <map>
 
+enum AffixEvent
+{
+    AFFIX_EVENT_ADD_TO_WORLD = 1,
+    AFFIX_EVENT_LEAVE_COMBAT = 2,
+    AFFIX_EVENT_UPDATE_ENTRY = 3,
+    AFFIX_EVENT_RESPAWN      = 4,
+    AFFIX_EVENT_REACH_HOME   = 5
+};
+
 class AffixGroupSlot
 {
 public:
@@ -62,7 +71,7 @@ public:
     int const GetDungeonLevelBonus() { return m_dungeonLevelBonus; }
     uint8 const GetRank() { return m_rank; }
 
-    void Apply(Creature* creature, uint8 event = 0);
+    void Apply(Creature* creature, AffixEvent event);
 
 private:
     uint32 m_id;

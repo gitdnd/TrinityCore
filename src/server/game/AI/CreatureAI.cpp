@@ -33,6 +33,7 @@
 #include "TemporarySummon.h"
 #include "Vehicle.h"
 #include "World.h"
+#include "AffixMgr.h"
 
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &UnitAI::AISpellInfo[i]; }
@@ -306,7 +307,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 
     me->CombatStop(true);
     me->LoadCreaturesAddon();
-    me->ApplyAffixData(2);
+    me->ApplyAffixData(AFFIX_EVENT_LEAVE_COMBAT);
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
     me->SetLastDamagedTime(0);
