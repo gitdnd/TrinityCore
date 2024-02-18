@@ -109,11 +109,8 @@ class spell_affix_barkskin_spores_aura : public AuraScript
 
                 caster->CastSpell(caster, 460178); // boss buff
             }
-            if (aurEff->GetBase()->GetStackAmount() > 1)
+            else if (i >= 1)
             {
-                if (i == 0)
-                    PreventDefaultAction();
-
                 caster->CastSpell(caster, 460177); // normal buff many times
             }
         }
