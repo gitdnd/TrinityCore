@@ -144,8 +144,12 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         // then do nothing
         return;
 
-    // Spawn/Leave combat
-    if (event > 1) {
+    // 1 = Add to world
+    // 2 = Leave combat
+    // 3 = Update entry
+    // 4 = Respawn
+    if (event > 2) {
+        creature->Yell("Applying affix based on event: " + std::to_string(event), LANG_UNIVERSAL); // debug
         // Apply target spell or increase stacks up to 4
         if (!creature->HasAura(GetTargetSpell()))
             creature->AddAura(GetTargetSpell(), creature);
