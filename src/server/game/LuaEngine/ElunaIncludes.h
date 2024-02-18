@@ -9,6 +9,7 @@
 
 // Required
 #include "AccountMgr.h"
+#include "AffixMgr.h"
 #include "AuctionHouseMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
