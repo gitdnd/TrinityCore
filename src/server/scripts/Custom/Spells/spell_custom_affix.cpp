@@ -123,9 +123,47 @@ class spell_affix_barkskin_spores_aura : public AuraScript
     }
 };
 
+class spell_affix_ordinance_aura : public AuraScript
+{
+    PrepareAuraScript(spell_affix_ordinance_aura);
+
+    void OnPeriodicProc(AuraEffect const* aurEff)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToCreature() || !aurEff->GetBase() || !GetSpellInfo())
+        {
+            PreventDefaultAction();
+            return;
+        }
+        if (!roll_chance_i(GetSpellInfo()->ProcChance))
+        {
+            PreventDefaultAction();
+            return;
+        }
+        PreventDefaultAction();
+        auto creature = caster->ToCreature();
+        auto aura = aurEff->GetBase();
+        auto spellId = GetSpellInfo()->Effects[0].TriggerSpell;
+        for (int i = 0; i < aura->GetStackAmount(); ++i)
+        {
+            float dist = frand(5.0f, 20.0f);
+            float angle = frand(0.0f, 2.0f) * float(M_PI);
+            Position pos = GetCaster()->GetNearPosition(dist, angle);
+
+            creature->CastSpell(pos, spellId);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_affix_ordinance_aura::OnPeriodicProc, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Affix()
 {
     RegisterAuraScript(spell_affix_avenging_wrath_aura);
     RegisterAuraScript(spell_affix_arcane_unleashed_aura);
     RegisterAuraScript(spell_affix_barkskin_spores_aura);
+    RegisterAuraScript(spell_affix_ordinance_aura);
 }
