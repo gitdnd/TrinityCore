@@ -137,7 +137,9 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         // if GM trigger npc
         creature->IsTrigger() ||
         // if critter
-        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER))
+        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
+        // if not alive
+        !creature->IsAlive())
         // then do nothing
         return;
     
