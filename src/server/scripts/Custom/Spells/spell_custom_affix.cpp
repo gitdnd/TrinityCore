@@ -19,6 +19,11 @@ class spell_affix_avenging_wrath_aura : public AuraScript
         if (!caster || !GetSpellInfo())
             return;
 
+        auto baseAura = aurEff->GetBase();
+        if (!baseAura)
+            return;
+
+        uint32 stackAmount = baseAura->GetStackAmount();
         float range = 30.0f;
 
         std::list<Creature*> creatureList;
@@ -31,13 +36,16 @@ class spell_affix_avenging_wrath_aura : public AuraScript
         {
             if (caster->GetFactionReactionTo((*it)->GetFactionTemplateEntry(), *it) >= REP_NEUTRAL)
             {
-                if ((*it)->HasAura(spellId))
+                for (int i = 0; i < stackAmount; ++i)
                 {
-                    if (Aura* aura = (*it)->GetAura(spellId))
-                        aura->SetStackAmount(aura->GetStackAmount() + 1);
+                    if ((*it)->HasAura(spellId))
+                    {
+                        if (Aura* aura = (*it)->GetAura(spellId))
+                            aura->SetStackAmount(aura->GetStackAmount() + 1);
+                    }
+                    else
+                        caster->CastSpell(*it, spellId);
                 }
-                else
-                    caster->CastSpell(*it, spellId);
             }
         }
     }
@@ -55,7 +63,16 @@ class spell_affix_arcane_unleashed_aura : public AuraScript
     void OnPeriodicProc(AuraEffect const* aurEff)
     {
         auto caster = GetCaster();
-        if (!caster || !GetSpellInfo() || !roll_chance_i(GetSpellInfo()->ProcChance))
+        if (!caster || !GetSpellInfo())
+        {
+            PreventDefaultAction();
+            return;
+        }
+        auto base = aurEff->GetBase();
+        if (!base)
+            return;
+
+        if (!roll_chance_i(GetSpellInfo()->ProcChance * base->GetStackAmount()))
         {
             PreventDefaultAction();
             return;
@@ -75,15 +92,30 @@ class spell_affix_barkskin_spores_aura : public AuraScript
     void OnPeriodicProc(AuraEffect const* aurEff)
     {
         auto caster = GetCaster();
-        if (!caster || !caster->ToCreature())
+        if (!caster || !caster->ToCreature() || !aurEff->GetBase())
         {
             PreventDefaultAction();
             return;
         }
-        if (caster->ToCreature()->GetCreatureTemplate()->rank == 3)
+        auto creature = caster->ToCreature();
+        auto aura = aurEff->GetBase();
+        for (int i = 0; i < aura->GetStackAmount(); ++i)
         {
-            PreventDefaultAction();
-            caster->CastSpell(caster, 460178); // boss buff
+            if (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS &&
+                (creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB) != 0)
+            {
+                if (i == 0)
+                    PreventDefaultAction();
+
+                caster->CastSpell(caster, 460178); // boss buff
+            }
+            if (aurEff->GetBase()->GetStackAmount() > 1)
+            {
+                if (i == 0)
+                    PreventDefaultAction();
+
+                caster->CastSpell(caster, 460177); // normal buff many times
+            }
         }
         // default normal buff
     }
