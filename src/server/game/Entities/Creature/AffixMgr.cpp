@@ -142,6 +142,10 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         !creature->IsAlive())
         // then do nothing
         return;
+
+    // debug
+    if (event == 3)
+        return;
     
     // Spawn/Leave combat
     if (event > 1) {
