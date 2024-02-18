@@ -68,8 +68,35 @@ class spell_affix_arcane_unleashed_aura : public AuraScript
     }
 };
 
+class spell_affix_barkskin_spores_aura : public AuraScript
+{
+    PrepareAuraScript(spell_affix_barkskin_spores_aura);
+
+    void OnPeriodicProc(AuraEffect const* aurEff)
+    {
+        auto caster = GetCaster();
+        if (!caster || !caster->ToCreature())
+        {
+            PreventDefaultAction();
+            return;
+        }
+        if (caster->ToCreature()->GetCreatureTemplate()->rank == 3)
+        {
+            PreventDefaultAction();
+            caster->CastSpell(caster, 460178); // boss buff
+        }
+        // default normal buff
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_affix_barkskin_spores_aura::OnPeriodicProc, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Affix()
 {
     RegisterAuraScript(spell_affix_avenging_wrath_aura);
     RegisterAuraScript(spell_affix_arcane_unleashed_aura);
+    RegisterAuraScript(spell_affix_barkskin_spores_aura);
 }
