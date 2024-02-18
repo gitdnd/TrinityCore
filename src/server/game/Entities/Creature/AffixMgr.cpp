@@ -144,10 +144,6 @@ void AffixEffect::Apply(Creature* creature, uint8 event)
         // then do nothing
         return;
 
-    // debug
-    std::string test = "isTrigger = " + std::to_string(creature->IsTrigger()) + " isSelectable = " + std::to_string(creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE));
-    creature->Yell(test, LANG_UNIVERSAL);
-    
     // Spawn/Leave combat
     if (event > 1) {
         // Apply target spell or increase stacks up to 4
