@@ -253,7 +253,7 @@ void ScriptedAI::ForceCombatStop(Creature* who, bool reset /*= true*/)
 
     if (reset) {
         who->LoadCreaturesAddon();
-        who->ApplyAffixData(2);
+        who->ApplyAffixData(AFFIX_EVENT_LEAVE_COMBAT);
         who->SetLootRecipient(nullptr);
         who->ResetPlayerDamageReq();
         who->SetLastDamagedTime(0);
