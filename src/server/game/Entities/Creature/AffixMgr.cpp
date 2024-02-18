@@ -1,9 +1,9 @@
 
-#include <AffixMgr.h>
+#include "AffixMgr.h"
 #include "DatabaseEnv.h"
 #include "SpellAuras.h"
 #include "World.h"
-#include <string.h>
+#include "string.h"
 
 ///////////////////////
 // Affix Manager

@@ -16,7 +16,7 @@
  */
 
 #include "Creature.h"
-#include <AffixMgr.h>
+#include "AffixMgr.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Common.h"

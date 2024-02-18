@@ -54,7 +54,7 @@
 #include "World.h"
 #include <unordered_set>
 #include <vector>
-#include <AffixMgr.h>
+#include "AffixMgr.h"
 
 u_map_magic MapMagic        = { {'M','A','P','S'} };
 u_map_magic MapVersionMagic = { {'v','1','.','9'} };

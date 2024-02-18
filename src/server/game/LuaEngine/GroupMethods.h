@@ -7,8 +7,8 @@
 #ifndef GROUPMETHODS_H
 #define GROUPMETHODS_H
 
-#include <AffixMgr.h>
-#include <lua.h>
+#include "AffixMgr.h"
+#include "lua.h"
 
 /***
  * Inherits all methods from: none
