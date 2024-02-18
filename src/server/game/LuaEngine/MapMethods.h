@@ -8,7 +8,6 @@
 #define MAPMETHODS_H
 
 #include "ElunaInstanceAI.h"
-#include <AffixMgr.cpp>
 
 /***
  * A game map, e.g. Azeroth, Eastern Kingdoms, the Molten Core, etc.

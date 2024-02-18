@@ -37,6 +37,7 @@ extern "C"
 #include "VehicleMethods.h"
 #include "BattleGroundMethods.h"
 #include "TransportMethods.h"
+#include "AffixMgr.h"
 
 ElunaGlobal::ElunaRegister GlobalMethods[] =
 {

@@ -7,7 +7,6 @@
 #ifndef GROUPMETHODS_H
 #define GROUPMETHODS_H
 
-#include "AffixMgr.h"
 #include "lua.h"
 
 /***

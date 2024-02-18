@@ -4346,13 +4346,13 @@ namespace LuaPlayer
         return payload.size() * 2;
     }
 
-    int UpdateTalentPassives(Eluna* /*E*/, Player* player)
+    int UpdateTalentPassives(Eluna* /*E*/, Player* /*player*/)
     {
         //player->UpdateArmorPassives();
         return 0;
     }
 
-    int RemoveTalentPassives(Eluna* /*E*/, Player* player)
+    int RemoveTalentPassives(Eluna* /*E*/, Player* /*player*/)
     {
         //player->RemoveArmorPassives();
         return 0;
@@ -4672,7 +4672,7 @@ namespace LuaPlayer
         return 0;
     }
 
-    int ResetCustomTalent(Eluna* E, Player* player)
+    int ResetCustomTalent(Eluna* /*E*/, Player* player)
     {
         player->ResetCustomTalents();
         return 0;
