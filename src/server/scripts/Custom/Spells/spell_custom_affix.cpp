@@ -130,7 +130,7 @@ class spell_affix_ordinance_aura : public AuraScript
     void OnPeriodicProc(AuraEffect const* aurEff)
     {
         auto caster = GetCaster();
-        if (!caster || !caster->ToCreature() || !aurEff->GetBase() || !GetSpellInfo())
+        if (!caster || !caster->ToCreature() || !aurEff->GetBase() || !GetSpellInfo() || !caster->IsInCombat())
         {
             PreventDefaultAction();
             return;
