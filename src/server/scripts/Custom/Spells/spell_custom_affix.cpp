@@ -213,20 +213,21 @@ class spell_affix_mark_of_the_absolute_trigger_aura : public AuraScript
             return;
         }
 
-        // if in combat or casting
+        // if not in combat, or casting
         if (!caster->IsInCombat() || caster->HasUnitState(0x00008000))
         {
             return;
         }
 
-        if (roll_chance_i(50))
+        if (roll_chance_i(40))
         {
             // Anti-magic Shell
             CastSpellExtraArgs args;
             args.SetTriggerFlags(TRIGGERED_FULL_MASK);
             caster->CastSpell(caster, 7121, args);
         }
-        else if (roll_chance_i(50))
+
+        if (roll_chance_i(50))
         {
             // Frostbolt Volley
             caster->CastSpell(caster, 460186);

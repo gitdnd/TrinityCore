@@ -3599,7 +3599,16 @@ bool Creature::IsMarkOfTheAbsoluteEnabled()
 {
     if (_markOfTheAbsoluteState == 0)
     {
-        if (roll_chance_i(10))
+        int stacks = 1;
+        if (HasAura(460104))
+        {
+            // Fetch how many stacks of affix we have
+            if (Aura* aura = GetAura(460104))
+            {
+                stacks = aura->GetStackAmount();
+            }
+        }
+        if (!IsDungeonBoss() && roll_chance_i(10 * stacks))
         {
             _markOfTheAbsoluteState = 1;
         }
@@ -3608,5 +3617,5 @@ bool Creature::IsMarkOfTheAbsoluteEnabled()
             _markOfTheAbsoluteState = 2;
         }
     }
-    return _markOfTheAbsoluteState == 1;
+    return _markOfTheAbsoluteState == uint8(1);
 }
