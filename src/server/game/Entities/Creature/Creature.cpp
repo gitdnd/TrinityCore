@@ -3611,6 +3611,10 @@ bool Creature::IsMarkOfTheAbsoluteEnabled()
         if (!IsDungeonBoss() && roll_chance_i(10 * stacks))
         {
             _markOfTheAbsoluteState = 1;
+            if (!IsInCombat())
+            {
+                SetHealth(GetMaxHealth());
+            }
         }
         else
         {
