@@ -6,7 +6,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Item.h"
-#include <GridNotifiers.h>
+#include "GridNotifiers.h"
+#include "TemporarySummon.h"
 
 class spell_affix_avenging_wrath_aura : public AuraScript
 {
@@ -175,10 +176,14 @@ class spell_affix_corpse_explosion_aura : public AuraScript
         if (!baseAura)
             return;
 
-        // Repeat for each stack
-        for (int i = 1; i < baseAura->GetStackAmount(); ++i)
+        if (TempSummon* npc = caster->SummonCreature(60215, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 3000))
         {
-            caster->CastSpell(caster, GetSpellInfo()->Effects[0].TriggerSpell);
+            npc->SetReactState(REACT_PASSIVE);
+            // Repeat for each stack
+            for (int i = 0; i < baseAura->GetStackAmount(); ++i)
+            {
+                npc->CastSpell(npc, GetSpellInfo()->Effects[0].TriggerSpell);
+            }
         }
     }
 
