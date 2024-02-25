@@ -193,6 +193,53 @@ class spell_affix_corpse_explosion_aura : public AuraScript
     }
 };
 
+class spell_affix_mark_of_the_absolute_trigger_aura : public AuraScript
+{
+    PrepareAuraScript(spell_affix_mark_of_the_absolute_trigger_aura);
+
+    uint8 state = 0;
+
+    void OnPeriodicProc(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        if (!caster || !caster->ToCreature() || !aurEff->GetBase() || !GetSpellInfo())
+        {
+            return;
+        }
+
+        caster->Yell("Debug 1!", LANG_UNIVERSAL);
+        if (state == 0)
+        {
+            if (roll_chance_i(7))
+            {
+                caster->Yell("Debug I am special!", LANG_UNIVERSAL);
+                state = 1;
+            }
+            else
+            {
+                caster->Yell("Debug remove!", LANG_UNIVERSAL);
+                state = 2;
+                // Base effect, will remove this aura too
+                caster->RemoveAura(460104);
+                return;
+            }
+        }
+
+        if (!caster->IsInCombat())
+        {
+            return;
+        }
+
+        caster->Yell("Debug Firing Extra Attack!", LANG_UNIVERSAL);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_affix_mark_of_the_absolute_trigger_aura::OnPeriodicProc, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Affix()
 {
     RegisterAuraScript(spell_affix_avenging_wrath_aura);
@@ -200,4 +247,5 @@ void AddSC_Spells_Custom_Affix()
     RegisterAuraScript(spell_affix_barkskin_spores_aura);
     RegisterAuraScript(spell_affix_ordinance_aura);
     RegisterAuraScript(spell_affix_corpse_explosion_aura);
+    RegisterAuraScript(spell_affix_mark_of_the_absolute_trigger_aura);
 }
