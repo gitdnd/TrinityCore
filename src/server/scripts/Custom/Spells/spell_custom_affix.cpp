@@ -197,8 +197,6 @@ class spell_affix_mark_of_the_absolute_trigger_aura : public AuraScript
 {
     PrepareAuraScript(spell_affix_mark_of_the_absolute_trigger_aura);
 
-    uint8 state = 0;
-
     void OnPeriodicProc(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
@@ -208,30 +206,31 @@ class spell_affix_mark_of_the_absolute_trigger_aura : public AuraScript
             return;
         }
 
-        caster->Yell("Debug 1!", LANG_UNIVERSAL);
-        if (state == 0)
+        if (!caster->ToCreature()->IsMarkOfTheAbsoluteEnabled())
         {
-            if (roll_chance_i(7))
-            {
-                caster->Yell("Debug I am special!", LANG_UNIVERSAL);
-                state = 1;
-            }
-            else
-            {
-                caster->Yell("Debug remove!", LANG_UNIVERSAL);
-                state = 2;
-                // Base effect, will remove this aura too
-                caster->RemoveAura(460104);
-                return;
-            }
+            // Base effect, will remove this aura too
+            caster->RemoveAura(460104);
+            return;
         }
 
-        if (!caster->IsInCombat())
+        // if in combat or casting
+        if (!caster->IsInCombat() || caster->HasUnitState(0x00008000))
         {
             return;
         }
 
-        caster->Yell("Debug Firing Extra Attack!", LANG_UNIVERSAL);
+        if (roll_chance_i(50))
+        {
+            // Anti-magic Shell
+            CastSpellExtraArgs args;
+            args.SetTriggerFlags(TRIGGERED_FULL_MASK);
+            caster->CastSpell(caster, 7121, args);
+        }
+        else if (roll_chance_i(50))
+        {
+            // Frostbolt Volley
+            caster->CastSpell(caster, 460186);
+        }
     }
 
     void Register() override
