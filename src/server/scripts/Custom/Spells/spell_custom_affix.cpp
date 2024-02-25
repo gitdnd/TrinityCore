@@ -160,10 +160,39 @@ class spell_affix_ordinance_aura : public AuraScript
     }
 };
 
+class spell_affix_corpse_explosion_aura : public AuraScript
+{
+    PrepareAuraScript(spell_affix_corpse_explosion_aura);
+
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        if (!caster || !GetSpellInfo())
+            return;
+
+        auto baseAura = aurEff->GetBase();
+        if (!baseAura)
+            return;
+
+        // Repeat for each stack
+        for (int i = 1; i < baseAura->GetStackAmount(); ++i)
+        {
+            caster->CastSpell(caster, GetSpellInfo()->Effects[0].TriggerSpell);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_affix_corpse_explosion_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Affix()
 {
     RegisterAuraScript(spell_affix_avenging_wrath_aura);
     RegisterAuraScript(spell_affix_arcane_unleashed_aura);
     RegisterAuraScript(spell_affix_barkskin_spores_aura);
     RegisterAuraScript(spell_affix_ordinance_aura);
+    RegisterAuraScript(spell_affix_corpse_explosion_aura);
 }
