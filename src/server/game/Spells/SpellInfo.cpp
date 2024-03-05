@@ -2157,7 +2157,7 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_CURSE;
 
         // Collection of all the seal family flags. No other paladin spell has any of those.
-        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166 || Id == 97001 || Id == 97011 || Id == 97021 || Id == 97031 || Id == 97041 || Id == 97051 || Id == 97061 || Id == 97071 || Id == 97081 || Id == 97091 || Id == 97101)
+        if (Id == 20375 || Id == 53736 || Id == 20164 || Id == 20165 || Id == 21084 || Id == 31801 || Id == 20166 || Id == 97001 || Id == 97011 || Id == 97021 || Id == 97031 || Id == 97041 || Id == 97051 || Id == 97061 || Id == 97071 || Id == 97081 || Id == 97091 || Id == 97101 || Id == 97111)
             return SPELL_SPECIFIC_SEAL;
 
         if (Id == 10278 || Id == 1044 || Id == 62124 || Id == 6940 || Id == 1038)
