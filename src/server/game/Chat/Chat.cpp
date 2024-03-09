@@ -19,68 +19,23 @@
 #include "AccountMgr.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
-#include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
-#include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "Player.h"
 #include "Realm.h"
-#include "ScriptMgr.h"
-#ifdef ELUNA
-#include "LuaEngine.h"
-#endif
+#include "StringConvert.h"
 #include "World.h"
+#include "WorldSession.h"
 #include <boost/algorithm/string/replace.hpp>
 
-// Lazy loading of the command table cache from commands and the
-// ScriptMgr should be thread safe since the player commands,
-// cli commands and ScriptMgr updates are all dispatched one after
-// one inside the world update loop.
-static Optional<std::vector<ChatCommand>> commandTableCache;
-
-std::vector<ChatCommand> const& ChatHandler::getCommandTable()
-{
-    if (!commandTableCache)
-    {
-        // We need to initialize this at top since SetDataForCommandInTable
-        // calls getCommandTable() recursively.
-        commandTableCache = sScriptMgr->GetChatCommands();
-
-        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
-        PreparedQueryResult result = WorldDatabase.Query(stmt);
-        if (result)
-        {
-            do
-            {
-                Field* fields = result->Fetch();
-                std::string name = fields[0].GetString();
-
-                SetDataForCommandInTable(*commandTableCache, name.c_str(), fields[1].GetUInt16(), fields[2].GetString(), name);
-            }
-            while (result->NextRow());
-        }
-    }
-
-    return *commandTableCache;
-}
-
-void ChatHandler::invalidateCommandTable()
-{
-    commandTableCache.reset();
-}
+Player* ChatHandler::GetPlayer() const { return m_session ? m_session->GetPlayer() : nullptr; }
 
 char const* ChatHandler::GetTrinityString(uint32 entry) const
 {
     return m_session->GetTrinityString(entry);
-}
-
-bool ChatHandler::isAvailable(ChatCommand const& cmd) const
-{
-    return HasPermission(cmd.Permission);
 }
 
 bool ChatHandler::HasPermission(uint32 permission) const
@@ -143,39 +98,14 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     return false;
 }
 
-bool ChatHandler::hasStringAbbr(char const* name, char const* part)
-{
-    // non "" command
-    if (*name)
-    {
-        // "" part from non-"" command
-        if (!*part)
-            return false;
-
-        while (true)
-        {
-            if (!*part)
-                return true;
-            else if (!*name)
-                return false;
-            else if (tolower(*name) != tolower(*part))
-                return false;
-            ++name; ++part;
-        }
-    }
-    // allow with any for ""
-
-    return true;
-}
-
-void ChatHandler::SendSysMessage(const char *str, bool escapeCharacters)
+void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
 {
     std::string msg{ str };
 
     // Replace every "|" with "||" in msg
     if (escapeCharacters && msg.find('|') != std::string::npos)
     {
-        Tokenizer tokens{msg, '|'};
+        std::vector<std::string_view> tokens = Trinity::Tokenize(msg, '|', true);
         std::ostringstream stream;
         for (size_t i = 0; i < tokens.size() - 1; ++i)
             stream << tokens[i] << "||";
@@ -185,7 +115,7 @@ void ChatHandler::SendSysMessage(const char *str, bool escapeCharacters)
     }
 
     WorldPacket data;
-    for (const auto& line : Tokenizer{msg, '\n'})
+    for (std::string_view line : Trinity::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         m_session->SendPacket(&data);
@@ -195,7 +125,7 @@ void ChatHandler::SendSysMessage(const char *str, bool escapeCharacters)
 void ChatHandler::SendGlobalSysMessage(const char *str)
 {
     WorldPacket data;
-    for (const auto& line : Tokenizer{str, '\n'})
+    for (std::string_view line : Trinity::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         sWorld->SendGlobalMessage(&data);
@@ -205,7 +135,7 @@ void ChatHandler::SendGlobalSysMessage(const char *str)
 void ChatHandler::SendGlobalGMSysMessage(const char *str)
 {
     WorldPacket data;
-    for (const auto& line : Tokenizer{str, '\n'})
+    for (std::string_view line : Trinity::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
         sWorld->SendGlobalGMMessage(&data);
@@ -217,8 +147,9 @@ void ChatHandler::SendSysMessage(uint32 entry)
     SendSysMessage(GetTrinityString(entry));
 }
 
-bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, char const* text, std::string const& fullcmd)
+bool ChatHandler::_ParseCommands(std::string_view text)
 {
+<<<<<<< HEAD
     char const* oldtext = text;
     std::string cmd = "";
 
@@ -392,133 +323,45 @@ bool ChatHandler::_ParseCommands(char const* text)
         if (!sWorld->GetEluna()->OnCommand(GetSession()->GetPlayer(), text))
             return true;
 #endif
+=======
+    if (Trinity::ChatCommands::TryExecuteCommand(*this, text))
+        return true;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // Pretend commands don't exist for regular players
     if (m_session && !m_session->HasPermission(rbac::RBAC_PERM_COMMANDS_NOTIFY_COMMAND_NOT_FOUND_ERROR))
         return false;
 
     // Send error message for GMs
-    SendSysMessage(LANG_NO_CMD);
+    PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
     SetSentErrorMessage(true);
     return true;
 }
 
-bool ChatHandler::ParseCommands(char const* text)
+bool ChatHandler::ParseCommands(std::string_view text)
 {
-    ASSERT(text);
-    ASSERT(*text);
+    ASSERT(!text.empty());
 
-    /// chat case (.command or !command format)
-    if (text[0] != '!' && text[0] != '.')
+    // chat case (.command or !command format)
+    if ((text[0] != '!') && (text[0] != '.'))
         return false;
 
-    /// ignore single . and ! in line
-    if (!text[1])
+    // ignore single . and ! in line
+    if (text.length() < 2)
         return false;
 
-    /// ignore messages staring from many dots.
-    if (text[1] == '!' || text[1] == '.')
+    // ignore messages staring from many dots.
+    if (text[1] == text[0])
         return false;
 
-    return _ParseCommands(text+1);
+    // ignore messages with separator after .
+    if (text[1] == Trinity::Impl::ChatCommands::COMMAND_DELIMITER)
+        return false;
+
+    return _ParseCommands(text.substr(1));
 }
 
-bool ChatHandler::ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd)
-{
-    std::string list;
-    for (uint32 i = 0; i < table.size(); ++i)
-    {
-        // must be available (ignore handler existence to show command with possible available subcommands)
-        if (!isAvailable(table[i]))
-            continue;
-
-        // for empty subcmd show all available
-        if (*subcmd && !hasStringAbbr(table[i].Name, subcmd))
-            continue;
-
-        if (m_session)
-            list += "\n    ";
-        else
-            list += "\n\r    ";
-
-        list += table[i].Name;
-
-        if (!table[i].ChildCommands.empty())
-            list += " ...";
-    }
-
-    if (list.empty())
-        return false;
-
-    if (&table == &getCommandTable())
-    {
-        SendSysMessage(LANG_AVIABLE_CMD);
-        PSendSysMessage("%s", list.c_str());
-    }
-    else
-        PSendSysMessage(LANG_SUBCMDS_LIST, cmd, list.c_str());
-
-    return true;
-}
-
-bool ChatHandler::ShowHelpForCommand(std::vector<ChatCommand> const& table, char const* cmd)
-{
-    if (*cmd)
-    {
-        for (uint32 i = 0; i < table.size(); ++i)
-        {
-            // must be available (ignore handler existence to show command with possible available subcommands)
-            if (!isAvailable(table[i]))
-                continue;
-
-            if (!hasStringAbbr(table[i].Name, cmd))
-                continue;
-
-            // have subcommand
-            char const* subcmd = (*cmd) ? strtok(nullptr, " ") : "";
-
-            if (!table[i].ChildCommands.empty() && subcmd && *subcmd)
-            {
-                if (ShowHelpForCommand(table[i].ChildCommands, subcmd))
-                    return true;
-            }
-
-            if (!table[i].Help.empty())
-                SendSysMessage(table[i].Help.c_str());
-
-            if (!table[i].ChildCommands.empty())
-                if (ShowHelpForSubCommands(table[i].ChildCommands, table[i].Name, subcmd ? subcmd : ""))
-                    return true;
-
-            return !table[i].Help.empty();
-        }
-    }
-    else
-    {
-        for (uint32 i = 0; i < table.size(); ++i)
-        {
-            // must be available (ignore handler existence to show command with possible available subcommands)
-            if (!isAvailable(table[i]))
-                continue;
-
-            if (strlen(table[i].Name))
-                continue;
-
-            if (!table[i].Help.empty())
-                SendSysMessage(table[i].Help.c_str());
-
-            if (!table[i].ChildCommands.empty())
-                if (ShowHelpForSubCommands(table[i].ChildCommands, "", ""))
-                    return true;
-
-            return !table[i].Help.empty();
-        }
-    }
-
-    return ShowHelpForSubCommands(table, "", cmd);
-}
-
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string const& message, uint8 chatTag,
+size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
                                   std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                   uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
@@ -598,7 +441,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return receiverGUIDPos;
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string const& message,
+size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
                                   uint32 achievementId /*= 0*/, std::string const& channelName /*= ""*/, LocaleConstant locale /*= DEFAULT_LOCALE*/)
 {
     ObjectGuid senderGUID;
@@ -840,91 +683,6 @@ Creature* ChatHandler::GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowg
     return creature;
 }
 
-enum SpellLinkType
-{
-    SPELL_LINK_SPELL   = 0,
-    SPELL_LINK_TALENT  = 1,
-    SPELL_LINK_ENCHANT = 2,
-    SPELL_LINK_TRADE   = 3,
-    SPELL_LINK_GLYPH   = 4
-};
-
-static char const* const spellKeys[] =
-{
-    "Hspell",                                               // normal spell
-    "Htalent",                                              // talent spell
-    "Henchant",                                             // enchanting recipe spell
-    "Htrade",                                               // profession/skill spell
-    "Hglyph",                                               // glyph
-    nullptr
-};
-
-uint32 ChatHandler::extractSpellIdFromLink(char* text)
-{
-    // number or [name] Shift-click form |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r
-    // number or [name] Shift-click form |color|Hglyph:glyph_slot_id:glyph_prop_id|h[%s]|h|r
-    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
-    // number or [name] Shift-click form |color|Htalent:talent_id, rank|h[name]|h|r
-    // number or [name] Shift-click form |color|Htrade:spell_id, skill_id, max_value, cur_value|h[name]|h|r
-    int type = 0;
-    char* param1_str = nullptr;
-    char* idS = extractKeyFromLink(text, spellKeys, &type, &param1_str);
-    if (!idS)
-        return 0;
-
-    uint32 id = atoul(idS);
-
-    switch (type)
-    {
-        case SPELL_LINK_SPELL:
-            return id;
-        case SPELL_LINK_TALENT:
-        {
-            // talent
-            TalentEntry const* talentEntry = sTalentStore.LookupEntry(id);
-            if (!talentEntry)
-                return 0;
-
-            uint32 rank = param1_str ? atol(param1_str) : 0u;
-            if (rank >= MAX_TALENT_RANK)
-                return 0;
-
-            return talentEntry->RankID[rank];
-        }
-        case SPELL_LINK_ENCHANT:
-        case SPELL_LINK_TRADE:
-            return id;
-        case SPELL_LINK_GLYPH:
-        {
-            uint32 glyph_prop_id = param1_str ? atoul(param1_str) : 0;
-
-            GlyphPropertiesEntry const* glyphPropEntry = sGlyphPropertiesStore.LookupEntry(glyph_prop_id);
-            if (!glyphPropEntry)
-                return 0;
-
-            return glyphPropEntry->SpellId;
-        }
-    }
-
-    // unknown type?
-    return 0;
-}
-
-GameTele const* ChatHandler::extractGameTeleFromLink(char* text)
-{
-    // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    char* cId = extractKeyFromLink(text, "Htele");
-    if (!cId)
-        return nullptr;
-
-    // id case (explicit or from shift link)
-    if (cId[0] >= '0' && cId[0] <= '9')
-        if (uint32 id = atoi(cId))
-            return sObjectMgr->GetGameTele(id);
-
-    return sObjectMgr->GetGameTele(cId);
-}
-
 enum GuidLinkType
 {
     GUID_LINK_PLAYER     = 0,                              // must be first for selection in not link case
@@ -970,13 +728,13 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
         case GUID_LINK_CREATURE:
         {
             guidHigh = HighGuid::Unit;
-            ObjectGuid::LowType lowguid = atoul(idS);
+            ObjectGuid::LowType lowguid = Trinity::StringTo<ObjectGuid::LowType>(idS).value_or(0);
             return lowguid;
         }
         case GUID_LINK_GAMEOBJECT:
         {
             guidHigh = HighGuid::GameObject;
-            ObjectGuid::LowType lowguid = atoul(idS);
+            ObjectGuid::LowType lowguid = Trinity::StringTo<ObjectGuid::LowType>(idS).value_or(0);
             return lowguid;
         }
     }
@@ -1029,6 +787,10 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
     }
     else
     {
+        // populate strtok buffer to prevent crashes
+        static char dummy[1] = "";
+        strtok(dummy, "");
+
         Player* pl = getSelectedPlayerOrSelf();
         // if allowed player pointer
         if (player)
@@ -1050,24 +812,6 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
     }
 
     return true;
-}
-
-void ChatHandler::extractOptFirstArg(char* args, char** arg1, char** arg2)
-{
-    char* p1 = strtok(args, " ");
-    char* p2 = strtok(nullptr, " ");
-
-    if (!p2)
-    {
-        p2 = p1;
-        p1 = nullptr;
-    }
-
-    if (arg1)
-        *arg1 = p1;
-
-    if (arg2)
-        *arg2 = p2;
 }
 
 char* ChatHandler::extractQuotedArg(char* args)
@@ -1136,25 +880,19 @@ char const* CliHandler::GetTrinityString(uint32 entry) const
     return sObjectMgr->GetTrinityStringForDBCLocale(entry);
 }
 
-bool CliHandler::isAvailable(ChatCommand const& cmd) const
-{
-    // skip non-console commands in console case
-    return cmd.AllowConsole;
-}
-
-void CliHandler::SendSysMessage(const char *str, bool /*escapeCharacters*/)
+void CliHandler::SendSysMessage(std::string_view str, bool /*escapeCharacters*/)
 {
     m_print(m_callbackArg, str);
     m_print(m_callbackArg, "\r\n");
 }
 
-bool CliHandler::ParseCommands(char const* str)
+bool CliHandler::ParseCommands(std::string_view str)
 {
-    if (!str[0])
+    if (str.empty())
         return false;
     // Console allows using commands both with and without leading indicator
     if (str[0] == '.' || str[0] == '!')
-        ++str;
+        str = str.substr(1);
     return _ParseCommands(str);
 }
 
@@ -1222,16 +960,14 @@ int CliHandler::GetSessionDbLocaleIndex() const
     return sObjectMgr->GetDBCLocaleIndex();
 }
 
-bool AddonChannelCommandHandler::ParseCommands(char const* str)
+bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
 {
-    if (memcmp(str, "TrinityCore\t", 12))
+    if (str.length() < 17)
+        return false;
+    if (!StringStartsWith(str, "TrinityCore\t"))
         return false;
     char opcode = str[12];
-    if (!opcode) // str[12] is opcode
-        return false;
-    if (!str[13] || !str[14] || !str[15] || !str[16]) // str[13] through str[16] is 4-character command counter
-        return false;
-    echo = str+13;
+    echo = &str[13];
 
     switch (opcode)
     {
@@ -1240,10 +976,12 @@ bool AddonChannelCommandHandler::ParseCommands(char const* str)
             return true;
         case 'h': // h Issue human-readable command
         case 'i': // i Issue command
+        {
             if (!str[17])
                 return false;
             humanReadable = (opcode == 'h');
-            if (_ParseCommands(str + 17)) // actual command starts at str[17]
+            std::string_view cmd = str.substr(17);
+            if (_ParseCommands(cmd)) // actual command starts at str[17]
             {
                 if (!hadAck)
                     SendAck();
@@ -1254,10 +992,11 @@ bool AddonChannelCommandHandler::ParseCommands(char const* str)
             }
             else
             {
-                SendSysMessage(LANG_NO_CMD);
+                PSendSysMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(cmd));
                 SendFailed();
             }
             return true;
+        }
         default:
             return false;
     }
@@ -1299,7 +1038,7 @@ void AddonChannelCommandHandler::SendFailed() // f Command failed, no body
 }
 
 // m Command message, message in body
-void AddonChannelCommandHandler::SendSysMessage(char const* str, bool escapeCharacters)
+void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
 {
     ASSERT(echo);
     if (!hadAck)

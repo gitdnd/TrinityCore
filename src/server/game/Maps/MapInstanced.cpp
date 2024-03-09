@@ -26,9 +26,18 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "VMapFactory.h"
+#include "VMapManager2.h"
 #include "World.h"
 
+<<<<<<< HEAD
 MapInstanced::MapInstanced(uint32 id, time_t expiry, uint32 dLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dLevel, affix1, affix2, affix3, affix4)
+=======
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
+
+MapInstanced::MapInstanced(uint32 id, time_t expiry) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL)
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_GRIDS*sizeof(uint16));
@@ -155,7 +164,11 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             {
                 map = FindInstanceMap(loginInstanceId);
                 if (!map && pSave && pSave->GetInstanceId() == loginInstanceId)
+<<<<<<< HEAD
                     map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixSlot(1), pSave->GetAffixSlot(2), pSave->GetAffixSlot(3), pSave->GetAffixSlot(4));
+=======
+                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), player->GetTeamId());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 return map;
             }
 
@@ -180,7 +193,11 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             map = FindInstanceMap(newInstanceId);
             // it is possible that the save exists but the map doesn't
             if (!map)
+<<<<<<< HEAD
                 map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixSlot(1), pSave->GetAffixSlot(2), pSave->GetAffixSlot(3), pSave->GetAffixSlot(4));
+=======
+                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), player->GetTeamId());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         else
         {
@@ -203,14 +220,22 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             //ASSERT(!FindInstanceMap(NewInstanceId));
             map = FindInstanceMap(newInstanceId);
             if (!map)
+<<<<<<< HEAD
                 map = CreateInstance(newInstanceId, nullptr, diff, dungeonLevel, affix1, affix2, affix3, affix4);
+=======
+                map = CreateInstance(newInstanceId, nullptr, diff, player->GetTeamId());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
     }
 
     return map;
 }
 
+<<<<<<< HEAD
 InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+=======
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, TeamId InstanceTeam)
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 {
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
@@ -219,22 +244,26 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     MapEntry const* entry = sMapStore.LookupEntry(GetId());
     if (!entry)
     {
-        TC_LOG_ERROR("maps", "CreateInstance: no entry for map %d", GetId());
+        TC_LOG_ERROR("maps", "CreateInstance: no entry for map {}", GetId());
         ABORT();
     }
     InstanceTemplate const* iTemplate = sObjectMgr->GetInstanceTemplate(GetId());
     if (!iTemplate)
     {
-        TC_LOG_ERROR("maps", "CreateInstance: no instance template for map %d", GetId());
+        TC_LOG_ERROR("maps", "CreateInstance: no instance template for map {}", GetId());
         ABORT();
     }
 
     // some instances only have one difficulty
     GetDownscaledMapDifficultyData(GetId(), difficulty);
 
-    TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
+    TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: {} map instance {} for {} created with difficulty {}", save ? "" : "new ", InstanceId, GetId(), static_cast<uint32>(difficulty));
 
+<<<<<<< HEAD
     InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, affix1, affix2, affix3, affix4, this);
+=======
+    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, this, InstanceTeam);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();
@@ -255,14 +284,14 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
 
-    TC_LOG_DEBUG("maps", "MapInstanced::CreateBattleground: map bg %d for %d created.", InstanceId, GetId());
+    TC_LOG_DEBUG("maps", "MapInstanced::CreateBattleground: map bg {} for {} created.", InstanceId, GetId());
 
     PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), bg->GetMinLevel());
 
     uint8 spawnMode;
 
     if (bracketEntry)
-        spawnMode = bracketEntry->difficulty;
+        spawnMode = bracketEntry->Difficulty;
     else
         spawnMode = REGULAR_DIFFICULTY;
 
@@ -272,6 +301,12 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
     bg->SetBgMap(map);
 
     m_InstancedMaps[InstanceId] = map;
+
+#ifdef ELUNA
+    if (Eluna* e = map->GetEluna())
+        e->OnBGCreate(bg, bg->GetTypeID(), InstanceId);
+#endif
+
     return map;
 }
 

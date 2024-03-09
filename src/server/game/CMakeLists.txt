@@ -8,11 +8,30 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+
+# Initialize a variable to hold Eluna directories to exclude
+set(ELUNA_EXCLUDE_DIRS)
+
+# Exclude files in the LuaEngine directory for Mangos, CMangos and VMangos
+# or the entire directory if Eluna is disabled
+if(ELUNA)
+  list(APPEND ELUNA_EXCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/Mangos
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/CMangos
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/VMangos
+    )
+else()
+  list(APPEND ELUNA_EXCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine
+    )
+endif()
+
 CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE_SOURCES
   # Exclude
-  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
+  ${ELUNA_EXCLUDE_DIRS})
 
 if(USE_COREPCH)
   set(PRIVATE_PCH_HEADER PrecompiledHeaders/gamePCH.h)
@@ -26,7 +45,8 @@ CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC_INCLUDES
   # Exclude
-  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
+  ${ELUNA_EXCLUDE_DIRS})
 
 # Provide an interface target for the game project to allow
 # dependent projects to build meanwhile.
@@ -99,7 +119,13 @@ if(ELUNA)
   if(UNIX)
     install(DIRECTORY LuaEngine/extensions DESTINATION bin/lua_scripts/)
   elseif(WIN32)
+<<<<<<< HEAD
     install(DIRECTORY LuaEngine/extensions DESTINATION "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/")
 	install(DIRECTORY LuaEngine/.lib DESTINATION "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/")
+=======
+    install(DIRECTORY LuaEngine/extensions DESTINATION "${CMAKE_INSTALL_PREFIX}/lua_scripts/")
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
   endif()
+
+  add_subdirectory(LuaEngine)
 endif()

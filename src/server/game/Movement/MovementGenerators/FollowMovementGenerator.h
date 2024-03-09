@@ -53,7 +53,11 @@ class FollowMovementGenerator : public MovementGenerator, public AbstractFollowe
         float const _range;
         ChaseAngle const _angle;
 
+<<<<<<< HEAD
         TimeTrackerSmall _checkTimer;
+=======
+        TimeTracker _checkTimer;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         std::unique_ptr<PathGenerator> _path;
         Optional<Position> _lastTargetPosition;
 };

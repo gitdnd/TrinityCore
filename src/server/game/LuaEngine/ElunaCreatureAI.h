@@ -7,8 +7,6 @@
 #ifndef _ELUNA_CREATURE_AI_H
 #define _ELUNA_CREATURE_AI_H
 
-#include "InstanceScript.h"
-
 #include "LuaEngine.h"
 
 #if defined TRINITY || AZEROTHCORE
@@ -40,28 +38,27 @@ struct ElunaCreatureAI : ScriptedAI
     void UpdateAI(uint32 diff) override
 #endif
     {
-#ifdef TRINITY
-        //Spawns are handled by Creature.cpp - in function Creature::Update() 
-#else
         if (justSpawned)
         {
             justSpawned = false;
-
+#ifdef TRINITY
+            JustAppeared();
+#else
             JustRespawned();
-        }
 #endif
+        }
 
         if (!movepoints.empty())
         {
             for (auto& point : movepoints)
             {
-                if (!me->GetMap()->GetEluna()->MovementInform(me, point.first, point.second))
+                if (!sEluna->MovementInform(me, point.first, point.second))
                     ScriptedAI::MovementInform(point.first, point.second);
             }
             movepoints.clear();
         }
 
-        if (!me->GetMap()->GetEluna()->UpdateAI(me, diff))
+        if (!sEluna->UpdateAI(me, diff))
         {
 #if defined TRINITY || AZEROTHCORE
             if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
@@ -78,28 +75,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called at creature aggro either by MoveInLOS or Attack Start
     void JustEngagedWith(Unit* target) override
     {
-        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
-        {
-
-            auto map = me->GetMap();
-
-            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
-            data << uint32(0); // ENCOUNTER_FRAME_ENGAGE
-            data << me->GetPackGUID();
-            data << uint8(0);
-            map->SendToPlayers(&data);
-
-            Map::PlayerList const& players = map->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            {
-                auto player = itr->GetSource();
-                if (player->GetSession() && !player->IsGameMaster())
-                {
-                    player->CastSpell(player, 90191); // Dungeon Death
-                }
-            }
-        }
-        if (!me->GetMap()->GetEluna()->EnterCombat(me, target))
+        if (!sEluna->EnterCombat(me, target))
             ScriptedAI::JustEngagedWith(target);
     }
 #else
@@ -119,7 +95,7 @@ struct ElunaCreatureAI : ScriptedAI
     void DamageTaken(Unit* attacker, uint32& damage) override
 #endif
     {
-        if (!me->GetMap()->GetEluna()->DamageTaken(me, attacker, damage))
+        if (!sEluna->DamageTaken(me, attacker, damage))
         {
 #if AZEROTHCORE
             ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
@@ -132,53 +108,28 @@ struct ElunaCreatureAI : ScriptedAI
     //Called at creature death
     void JustDied(Unit* killer) override
     {
-        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
-        {
-            auto map = me->GetMap();
-
-            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
-            data << uint32(1); // ENCOUNTER_FRAME_DISENGAGE
-            data << me->GetPackGUID();
-            data << uint8(0);
-            map->SendToPlayers(&data);
-
-            Map::PlayerList const& players = map->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            {
-                auto player = itr->GetSource();
-                if (player->GetSession() && !player->IsGameMaster())
-                {
-                    player->RemoveAurasDueToSpell(90191); // Dungeon Death
-                }
-            }
-
-            if (me->GetInstanceScript())
-            {
-                me->GetInstanceScript()->DoUpdateWorldState(304, me->GetInstanceScript()->GetMaxCombatReses());
-            }
-        }
-        if (!me->GetMap()->GetEluna()->JustDied(me, killer))
+        if (!sEluna->JustDied(me, killer))
             ScriptedAI::JustDied(killer);
     }
 
     //Called at creature killing another unit
     void KilledUnit(Unit* victim) override
     {
-        if (!me->GetMap()->GetEluna()->KilledUnit(me, victim))
+        if (!sEluna->KilledUnit(me, victim))
             ScriptedAI::KilledUnit(victim);
     }
 
     // Called when the creature summon successfully other creature
     void JustSummoned(Creature* summon) override
     {
-        if (!me->GetMap()->GetEluna()->JustSummoned(me, summon))
+        if (!sEluna->JustSummoned(me, summon))
             ScriptedAI::JustSummoned(summon);
     }
 
     // Called when a summoned creature is despawned
     void SummonedCreatureDespawn(Creature* summon) override
     {
-        if (!me->GetMap()->GetEluna()->SummonedCreatureDespawn(me, summon))
+        if (!sEluna->SummonedCreatureDespawn(me, summon))
             ScriptedAI::SummonedCreatureDespawn(summon);
     }
 
@@ -193,7 +144,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called before EnterCombat even before the creature is in combat.
     void AttackStart(Unit* target) override
     {
-        if (!me->GetMap()->GetEluna()->AttackStart(me, target))
+        if (!sEluna->AttackStart(me, target))
             ScriptedAI::AttackStart(target);
     }
 
@@ -201,27 +152,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
-        {
-            auto map = me->GetMap();
-
-            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
-            data << uint32(1); // ENCOUNTER_FRAME_DISENGAGE
-            data << me->GetPackGUID();
-            data << uint8(0);
-            map->SendToPlayers(&data);
-
-            Map::PlayerList const& players = map->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            {
-                auto player = itr->GetSource();
-                if (player->GetSession() && !player->IsGameMaster())
-                {
-                    player->RemoveAurasDueToSpell(90191); // Dungeon Death
-                }
-            }
-        }
-        if (!me->GetMap()->GetEluna()->EnterEvadeMode(me))
+        if (!sEluna->EnterEvadeMode(me))
             ScriptedAI::EnterEvadeMode();
     }
 #else
@@ -237,7 +168,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called when creature appears in the world (spawn, respawn, grid load etc...)
     void JustAppeared() override
     {
-        if (!me->GetMap()->GetEluna()->JustRespawned(me))
+        if (!sEluna->JustRespawned(me))
             ScriptedAI::JustAppeared();
     }
 #else
@@ -252,21 +183,21 @@ struct ElunaCreatureAI : ScriptedAI
     // Called at reaching home after evade
     void JustReachedHome() override
     {
-        if (!me->GetMap()->GetEluna()->JustReachedHome(me))
+        if (!sEluna->JustReachedHome(me))
             ScriptedAI::JustReachedHome();
     }
 
     // Called at text emote receive from player
     void ReceiveEmote(Player* player, uint32 emoteId) override
     {
-        if (!me->GetMap()->GetEluna()->ReceiveEmote(me, player, emoteId))
+        if (!sEluna->ReceiveEmote(me, player, emoteId))
             ScriptedAI::ReceiveEmote(player, emoteId);
     }
 
     // called when the corpse of this creature gets removed
     void CorpseRemoved(uint32& respawnDelay) override
     {
-        if (!me->GetMap()->GetEluna()->CorpseRemoved(me, respawnDelay))
+        if (!sEluna->CorpseRemoved(me, respawnDelay))
             ScriptedAI::CorpseRemoved(respawnDelay);
     }
 
@@ -280,29 +211,21 @@ struct ElunaCreatureAI : ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->GetMap()->GetEluna()->MoveInLineOfSight(me, who))
+        if (!sEluna->MoveInLineOfSight(me, who))
             ScriptedAI::MoveInLineOfSight(who);
     }
 
     // Called when hit by a spell
-#if defined TRINITY
-    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
-#else
     void SpellHit(Unit* caster, SpellInfo const* spell) override
-#endif
     {
-        if (!me->GetMap()->GetEluna()->SpellHit(me, caster, spell))
+        if (!sEluna->SpellHit(me, caster, spell))
             ScriptedAI::SpellHit(caster, spell);
     }
 
     // Called when spell hits a target
-#if defined TRINITY
-    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
-#else
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-#endif
     {
-        if (!me->GetMap()->GetEluna()->SpellHitTarget(me, target, spell))
+        if (!sEluna->SpellHitTarget(me, target, spell))
             ScriptedAI::SpellHitTarget(target, spell);
     }
 
@@ -312,7 +235,7 @@ struct ElunaCreatureAI : ScriptedAI
     // Called when the creature is summoned successfully by other creature
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (!summoner->ToUnit() || !me->GetMap()->GetEluna()->OnSummoned(me, summoner->ToUnit()))
+        if (!summoner->ToUnit() || !sEluna->OnSummoned(me, summoner->ToUnit()))
             ScriptedAI::IsSummonedBy(summoner);
     }
 #else
@@ -326,24 +249,23 @@ struct ElunaCreatureAI : ScriptedAI
 
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
-        if (!me->GetMap()->GetEluna()->SummonedCreatureDies(me, summon, killer))
+        if (!sEluna->SummonedCreatureDies(me, summon, killer))
             ScriptedAI::SummonedCreatureDies(summon, killer);
     }
 
     // Called when owner takes damage
     void OwnerAttackedBy(Unit* attacker) override
     {
-        if (!me->GetMap()->GetEluna()->OwnerAttackedBy(me, attacker))
+        if (!sEluna->OwnerAttackedBy(me, attacker))
             ScriptedAI::OwnerAttackedBy(attacker);
     }
 
     // Called when owner attacks something
     void OwnerAttacked(Unit* target) override
     {
-        if (!me->GetMap()->GetEluna()->OwnerAttacked(me, target))
+        if (!sEluna->OwnerAttacked(me, target))
             ScriptedAI::OwnerAttacked(target);
     }
-
 #endif
 
 #if defined MANGOS || defined CMANGOS

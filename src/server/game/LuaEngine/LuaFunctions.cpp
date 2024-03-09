@@ -36,10 +36,8 @@ extern "C"
 #include "CorpseMethods.h"
 #include "VehicleMethods.h"
 #include "BattleGroundMethods.h"
-#include "TransportMethods.h"
-#include "AffixMgr.h"
 
-ElunaGlobal::ElunaRegister GlobalMethods[] =
+luaL_Reg GlobalMethods[] =
 {
     // Hooks
     { "RegisterPacketEvent", &LuaGlobalFunctions::RegisterPacketEvent },
@@ -145,15 +143,6 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "CreateUint64", &LuaGlobalFunctions::CreateULongLong },
     { "StartGameEvent", &LuaGlobalFunctions::StartGameEvent },
     { "StopGameEvent", &LuaGlobalFunctions::StopGameEvent },
-    { "GetElunaMapId", &LuaGlobalFunctions::GetElunaMapId },
-    { "WorldDBQueryAsync", &LuaGlobalFunctions::WorldDBQueryAsync },
-    { "CharacterDBQueryAsync", &LuaGlobalFunctions::CharacterDBQueryAsync },
-    { "LoginDBQueryAsync", &LuaGlobalFunctions::LoginDBQueryAsync },
-    { "GetCustomTalentStorage", &LuaGlobalFunctions::GetCustomTalentStorage },
-    { "GetCustomTalent", &LuaGlobalFunctions::GetCustomTalent },
-    { "LoadCustomTalentNode", &LuaGlobalFunctions::LoadCustomTalentNode },
-    { "DeleteCustomTalentNode", &LuaGlobalFunctions::DeleteTalentNodeBecauseFoeisAMadMan },
-
 
     { NULL, NULL }
 };
@@ -195,9 +184,8 @@ ElunaRegister<Object> ObjectMethods[] =
     { "ToCreature", &LuaObject::ToCreature },
     { "ToPlayer", &LuaObject::ToPlayer },
     { "ToCorpse", &LuaObject::ToCorpse },
-    { "ToTransport", &LuaObject::ToTransport },
     { "RemoveFlag", &LuaObject::RemoveFlag },
- 
+
     { NULL, NULL }
 };
 
@@ -257,12 +245,6 @@ ElunaRegister<WorldObject> WorldObjectMethods[] =
     { "PlayMusic", &LuaWorldObject::PlayMusic },
     { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
     { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
-    { "CreateTransport", &LuaWorldObject::CreateTransport },
-    { "SetZoneOverrideLight", &LuaWorldObject::SetZoneOverrideLight },
-    { "SetVisible", &LuaWorldObject::SetVisible },
-    { "SetActive", &LuaWorldObject::SetActive },
-    { "SetServersideVisibility", &LuaWorldObject::SetServersideVisibility },
-    { "SetServersideVisibilityDetection", &LuaWorldObject::SetServersideVisibilityDetection },
 
     { NULL, NULL }
 };
@@ -288,7 +270,6 @@ ElunaRegister<Unit> UnitMethods[] =
     { "GetRaceAsString", &LuaUnit::GetRaceAsString },
     { "GetClassAsString", &LuaUnit::GetClassAsString },
     { "GetAura", &LuaUnit::GetAura },
-    { "GetSpellStackAmount", &LuaUnit::GetSpellStackAmount },
     { "GetFaction", &LuaUnit::GetFaction },
     { "GetCurrentSpell", &LuaUnit::GetCurrentSpell },
     { "GetCreatureType", &LuaUnit::GetCreatureType },
@@ -451,14 +432,6 @@ ElunaRegister<Unit> UnitMethods[] =
     { "DealDamage", &LuaUnit::DealDamage },
     { "DealHeal", &LuaUnit::DealHeal },
     { "AddThreat", &LuaUnit::AddThreat },
-    { "SpawnDynObject", &LuaUnit::SpawnDynObject },
-    { "SendEncounterFrame", &LuaUnit::SendEncounterFrame },
-    { "SetCanSeePhaseOne", &LuaUnit::SetCanSeePhaseOne },
-    { "GetCanSeePhaseOne", &LuaUnit::GetCanSeePhaseOne },
-    { "SetCanSeeUniquePhase", &LuaUnit::SetCanSeeUniquePhase },
-    { "GetCanSeeUniquePhase", &LuaUnit::GetCanSeeUniquePhase },
-    { "RemoveMotion", &LuaUnit::RemoveMotion },
-    { "ClearMotion", &LuaUnit::ClearMotion },
 
     { NULL, NULL }
 };
@@ -591,7 +564,6 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SetFFA", &LuaPlayer::SetFFA },
 #endif
 
-
     // Boolean
     { "IsInGroup", &LuaPlayer::IsInGroup },
     { "IsInGuild", &LuaPlayer::IsInGuild },
@@ -605,7 +577,6 @@ ElunaRegister<Player> PlayerMethods[] =
     { "HasItem", &LuaPlayer::HasItem },
     { "Teleport", &LuaPlayer::Teleport },
     { "AddItem", &LuaPlayer::AddItem },
-    { "AddVirtualItem", &LuaPlayer::AddVirtualItem },
 #ifndef CLASSIC
     { "IsInArenaTeam", &LuaPlayer::IsInArenaTeam },
 #endif
@@ -771,51 +742,11 @@ ElunaRegister<Player> PlayerMethods[] =
 #if !defined(CLASSIC) && !defined(TBC)
     { "SendMovieStart", &LuaPlayer::SendMovieStart },
 #endif
-    { "SendUpdateWorldState", &LuaPlayer::SendUpdateWorldState },
 #ifdef CLASSIC
     { "UpdateHonor", &LuaPlayer::UpdateHonor },
     { "ResetHonor", &LuaPlayer::ResetHonor },
     { "ClearHonorInfo", &LuaPlayer::ClearHonorInfo },
 #endif
-    { "GetAvgItemLevel", &LuaPlayer::GetAvgItemLevel },
-    { "GetCappedAvgItemLevel", &LuaPlayer::GetCappedAvgItemLevel },
-    { "GetPlayerOrGroupItemLevel", &LuaPlayer::GetPlayerOrGroupItemLevel },
-    { "GetCappedPlayerOrGroupItemLevel", &LuaPlayer::GetCappedPlayerOrGroupItemLevel },
-    { "QuestKillCredit", &LuaPlayer::QuestKillCredit },
-    { "GetLFGRole", &LuaPlayer::GetLFGRole },
-    { "UpdateAchievementCriteria", &LuaPlayer::UpdateAchievementCriteria },
-    { "CompleteAchievement", &LuaPlayer::CompleteAchievement },
-    { "FinishDungeon", &LuaPlayer::FinishDungeon },
-    { "AdvanceQuestObjective", &LuaPlayer::AdvanceQuestObjective },
-    { "GetRequiredQuestObjectiveCount", &LuaPlayer::GetRequiredQuestObjectiveCount },
-    { "GetItemLevelPayload", &LuaPlayer::GetItemLevelPayload },
-    { "UpdateTalentPassives", &LuaPlayer::UpdateTalentPassives },
-    { "RemoveTalentPassives", &LuaPlayer::RemoveTalentPassives },
-    { "IsStackingSpell", &LuaPlayer::IsStackingSpell },
-    { "IncreaseSpellAuraStack", &LuaPlayer::IncreaseSpellAuraStack },
-    { "IncreaseUsedTalentCount", &LuaPlayer::IncreaseUsedTalentCount },
-    { "OverridePetSpells", &LuaPlayer::OverridePetSpells },
-    { "ResetInstances", &LuaPlayer::ResetInstances },
-    { "IsInstanceBound", &LuaPlayer::IsInstanceBound },
-    { "GetTalentLevel", &LuaPlayer::GetTalentLevel },
-    { "ScrapItem", &LuaPlayer::ScrapItem },
-    { "GetPortalLocation", &LuaPlayer::GetPortalLocation },
-    { "SetPortalLocation", &LuaPlayer::SetPortalLocation },
-    { "SetOverrideLight", &LuaPlayer::SetOverrideLight },
-    { "GetSubClass", &LuaPlayer::GetSubClass },
-    { "IsDeveloper", &LuaPlayer::IsDeveloper },
-    { "UpdateTimewalkerTabard", &LuaPlayer::UpdateTimewalkerTabard },
-    { "LearnCustomTalent", &LuaPlayer::LearnCustomTalent },
-    { "UnlearnCustomTalent", &LuaPlayer::UnlearnCustomTalent },
-    { "ResetCustomTalent", &LuaPlayer::ResetCustomTalent },
-    { "SetTalentLoadout", &LuaPlayer::SetTalentLoadout },
-    { "GetCustomTalents", &LuaPlayer::GetCustomTalents },
-    { "CanLearnCustomTalent", &LuaPlayer::CanLearnCustomTalent },
-    { "GetMagicFind", &LuaPlayer::GetMagicFind },
-    { "SendItemQueryPacket", &LuaPlayer::SendItemQueryPacket },
-    { "SetLootPreference", &LuaPlayer::SetLootPreference },
-    { "GetLootPreference", &LuaPlayer::GetLootPreference },
-    { "QueueGroupWithAffixConfig", &LuaPlayer::QueueGroupWithAffixConfig },
 
     { NULL, NULL }
 };
@@ -862,19 +793,16 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SetDefaultMovementType", &LuaCreature::SetDefaultMovementType },
     { "SetRespawnDelay", &LuaCreature::SetRespawnDelay },
     { "SetWanderRadius", &LuaCreature::SetWanderRadius },
-    { "SetRegenerateHealth", &LuaCreature::SetRegenerateHealth },
     { "SetInCombatWithZone", &LuaCreature::SetInCombatWithZone },
     { "SetDisableReputationGain", &LuaCreature::SetDisableReputationGain },
 #if defined(TRINITY) || AZEROTHCORE
     { "SetLootMode", &LuaCreature::SetLootMode },
 #endif
     { "SetNPCFlags", &LuaCreature::SetNPCFlags },
-    { "SetReactState", &LuaCreature::SetReactState },
     { "SetDeathState", &LuaCreature::SetDeathState },
     { "SetWalk", &LuaCreature::SetWalk },
     { "SetHomePosition", &LuaCreature::SetHomePosition },
     { "SetEquipmentSlots", &LuaCreature::SetEquipmentSlots },
-    { "SetWaypoint", &LuaCreature::SetWaypoint },
 
     // Boolean
     { "IsWorldBoss", &LuaCreature::IsWorldBoss },
@@ -926,14 +854,6 @@ ElunaRegister<Creature> CreatureMethods[] =
     { "SelectVictim", &LuaCreature::SelectVictim },
     { "MoveWaypoint", &LuaCreature::MoveWaypoint },
     { "UpdateEntry", &LuaCreature::UpdateEntry },
-    { "MoveCircle", &LuaCreature::MoveCircle },
-    { "ClearLoot", &LuaCreature::ClearLoot },
-    { "AnimateAndSetFlyMode", &LuaCreature::AnimateAndSetFlyMode },
-    { "AnimateAndSetLandMode", &LuaCreature::AnimateAndSetLandMode },
-
-    { "RemoveQuest", &LuaCreature::RemoveQuest },
-    { "AddQuest", &LuaCreature::AddQuest },
-    { "SendMirrorImage", &LuaCreature::SendMirrorToPlayer },
 
     { NULL, NULL }
 };
@@ -1042,7 +962,6 @@ ElunaRegister<Item> ItemMethods[] =
 
     // Other
     { "SaveToDB", &LuaItem::SaveToDB },
-    { "GetDisenchantId", &LuaItem::GetDisenchantId },
 
     { NULL, NULL }
 };
@@ -1152,10 +1071,6 @@ ElunaRegister<Group> GroupMethods[] =
     { "SendPacket", &LuaGroup::SendPacket },
     // {"ConvertToLFG", &LuaGroup::ConvertToLFG},                 // :ConvertToLFG() - UNDOCUMENTED - Converts the group to an LFG group
     { "ConvertToRaid", &LuaGroup::ConvertToRaid },
-    { "GetDungeonLevel", &LuaGroup::GetDungeonLevel },
-    { "GetCappedDungeonLevel", &LuaGroup::GetCappedDungeonLevel },
-    { "GetAffixGroup", &LuaGroup::GetAffixGroup },
-    { "SetAffixSlot", &LuaGroup::SetAffixSlot },
 
     { NULL, NULL }
 };
@@ -1305,12 +1220,6 @@ ElunaRegister<Map> MapMethods[] =
 
     // Other
     { "SaveInstanceData", &LuaMap::SaveInstanceData },
-    { "GetDungeonLevel", &LuaMap::GetDungeonLevel },
-    { "GetCappedDungeonLevel", &LuaMap::GetCappedDungeonLevel },
-    { "UpdateDungeonLevel", &LuaMap::UpdateDungeonLevel },
-    { "SetGraveyardOverride", &LuaMap::SetGraveyardOverride },
-    { "UpscaleMapIfNeeded", &LuaMap::UpscaleMapIfNeeded},
-    { "GetAffixSlotData", &LuaMap::GetAffixSlotData },
 
     { NULL, NULL }
 };
@@ -1357,16 +1266,6 @@ ElunaRegister<BattleGround> BattleGroundMethods[] =
     { "GetMinPlayersPerTeam", &LuaBattleGround::GetMinPlayersPerTeam },
     { "GetWinner", &LuaBattleGround::GetWinner },
     { "GetStatus", &LuaBattleGround::GetStatus },
-
-    { NULL, NULL }
-};
-
-ElunaRegister<Transport> TransportMethods[] =
-{
-    { "EnableMovement", &LuaTransport::EnableMovement },
-    { "AddPassenger", &LuaTransport::AddPassenger },
-    { "GetPassengers", &LuaTransport::GetPassengers },
-    { "SummonPassenger", &LuaTransport::SummonPassenger },
 
     { NULL, NULL }
 };
@@ -1509,12 +1408,6 @@ void RegisterFunctions(Eluna* E)
 
     ElunaTemplate<ElunaQuery>::Register(E, "ElunaQuery", true);
     ElunaTemplate<ElunaQuery>::SetMethods(E, QueryMethods);
-
-    ElunaTemplate<Transport>::Register(E, "Transport");
-    ElunaTemplate<Transport>::SetMethods(E, ObjectMethods);
-    ElunaTemplate<Transport>::SetMethods(E, WorldObjectMethods);
-    ElunaTemplate<Transport>::SetMethods(E, GameObjectMethods);
-    ElunaTemplate<Transport>::SetMethods(E, TransportMethods);
 
     ElunaTemplate<long long>::Register(E, "long long", true);
 

@@ -18,10 +18,13 @@
 #include "QueryResult.h"
 #include "Errors.h"
 #include "Field.h"
+#include "FieldValueConverters.h"
 #include "Log.h"
 #include "MySQLHacks.h"
 #include "MySQLWorkaround.h"
 
+namespace
+{
 static uint32 SizeForType(MYSQL_FIELD* field)
 {
     switch (field->type)
@@ -67,28 +70,28 @@ static uint32 SizeForType(MYSQL_FIELD* field)
             MYSQL_TYPE_SET:
             */
         default:
-            TC_LOG_WARN("sql.sql", "SQL::SizeForType(): invalid field type %u", uint32(field->type));
+            TC_LOG_WARN("sql.sql", "SQL::SizeForType(): invalid field type {}", uint32(field->type));
             return 0;
     }
 }
 
-DatabaseFieldTypes MysqlTypeToFieldType(enum_field_types type)
+DatabaseFieldTypes MysqlTypeToFieldType(enum_field_types type, uint32 flags)
 {
     switch (type)
     {
         case MYSQL_TYPE_NULL:
             return DatabaseFieldTypes::Null;
         case MYSQL_TYPE_TINY:
-            return DatabaseFieldTypes::Int8;
+            return (flags & UNSIGNED_FLAG) ? DatabaseFieldTypes::UInt8 : DatabaseFieldTypes::Int8;
         case MYSQL_TYPE_YEAR:
         case MYSQL_TYPE_SHORT:
-            return DatabaseFieldTypes::Int16;
+            return (flags & UNSIGNED_FLAG) ? DatabaseFieldTypes::UInt16 : DatabaseFieldTypes::Int16;
         case MYSQL_TYPE_INT24:
         case MYSQL_TYPE_LONG:
-            return DatabaseFieldTypes::Int32;
+            return (flags & UNSIGNED_FLAG) ? DatabaseFieldTypes::UInt32 : DatabaseFieldTypes::Int32;
         case MYSQL_TYPE_LONGLONG:
         case MYSQL_TYPE_BIT:
-            return DatabaseFieldTypes::Int64;
+            return (flags & UNSIGNED_FLAG) ? DatabaseFieldTypes::UInt64 : DatabaseFieldTypes::Int64;
         case MYSQL_TYPE_FLOAT:
             return DatabaseFieldTypes::Float;
         case MYSQL_TYPE_DOUBLE:
@@ -109,11 +112,94 @@ DatabaseFieldTypes MysqlTypeToFieldType(enum_field_types type)
         case MYSQL_TYPE_VAR_STRING:
             return DatabaseFieldTypes::Binary;
         default:
-            TC_LOG_WARN("sql.sql", "MysqlTypeToFieldType(): invalid field type %u", uint32(type));
+            TC_LOG_WARN("sql.sql", "MysqlTypeToFieldType(): invalid field type {}", uint32(type));
             break;
     }
 
     return DatabaseFieldTypes::Null;
+}
+
+static char const* FieldTypeToString(enum_field_types type, uint32 flags)
+{
+    switch (type)
+    {
+        case MYSQL_TYPE_BIT:         return "BIT";
+        case MYSQL_TYPE_BLOB:        return "BLOB";
+        case MYSQL_TYPE_DATE:        return "DATE";
+        case MYSQL_TYPE_DATETIME:    return "DATETIME";
+        case MYSQL_TYPE_NEWDECIMAL:  return "NEWDECIMAL";
+        case MYSQL_TYPE_DECIMAL:     return "DECIMAL";
+        case MYSQL_TYPE_DOUBLE:      return "DOUBLE";
+        case MYSQL_TYPE_ENUM:        return "ENUM";
+        case MYSQL_TYPE_FLOAT:       return "FLOAT";
+        case MYSQL_TYPE_GEOMETRY:    return "GEOMETRY";
+        case MYSQL_TYPE_INT24:       return (flags & UNSIGNED_FLAG) ? "UNSIGNED INT24" : "INT24";
+        case MYSQL_TYPE_LONG:        return (flags & UNSIGNED_FLAG) ? "UNSIGNED LONG" : "LONG";
+        case MYSQL_TYPE_LONGLONG:    return (flags & UNSIGNED_FLAG) ? "UNSIGNED LONGLONG" : "LONGLONG";
+        case MYSQL_TYPE_LONG_BLOB:   return "LONG_BLOB";
+        case MYSQL_TYPE_MEDIUM_BLOB: return "MEDIUM_BLOB";
+        case MYSQL_TYPE_NEWDATE:     return "NEWDATE";
+        case MYSQL_TYPE_NULL:        return "NULL";
+        case MYSQL_TYPE_SET:         return "SET";
+        case MYSQL_TYPE_SHORT:       return (flags & UNSIGNED_FLAG) ? "UNSIGNED SHORT" : "SHORT";
+        case MYSQL_TYPE_STRING:      return "STRING";
+        case MYSQL_TYPE_TIME:        return "TIME";
+        case MYSQL_TYPE_TIMESTAMP:   return "TIMESTAMP";
+        case MYSQL_TYPE_TINY:        return (flags & UNSIGNED_FLAG) ? "UNSIGNED TINY" : "TINY";
+        case MYSQL_TYPE_TINY_BLOB:   return "TINY_BLOB";
+        case MYSQL_TYPE_VAR_STRING:  return "VAR_STRING";
+        case MYSQL_TYPE_YEAR:        return "YEAR";
+        default:                     return "-Unknown-";
+    }
+}
+
+std::unique_ptr<BaseDatabaseResultValueConverter> FromStringValueConverters[14] =
+{
+    nullptr,
+    std::make_unique<PrimitiveResultValueConverter<uint8, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int8, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<uint16, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int16, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<uint32, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int32, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<uint64, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int64, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<float, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<double, FromStringToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<double, FromStringToDatabaseTypeConverter>>(),
+    nullptr,
+    std::make_unique<StringResultValueConverter>()
+};
+
+std::unique_ptr<BaseDatabaseResultValueConverter> BinaryValueConverters[14] =
+{
+    nullptr,
+    std::make_unique<PrimitiveResultValueConverter<uint8, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int8, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<uint16, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int16, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<uint32, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int32, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<uint64, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<int64, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<float, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<double, FromBinaryToDatabaseTypeConverter>>(),
+    std::make_unique<PrimitiveResultValueConverter<double, FromStringToDatabaseTypeConverter>>(), // always sent as string
+    nullptr,
+    std::make_unique<StringResultValueConverter>()
+};
+
+void InitializeDatabaseFieldMetadata(QueryResultFieldMetadata* meta, MySQLField const* field, uint32 fieldIndex, bool binaryProtocol)
+{
+    meta->TableName = field->org_table;
+    meta->TableAlias = field->table;
+    meta->Name = field->org_name;
+    meta->Alias = field->name;
+    meta->TypeName = FieldTypeToString(field->type, field->flags);
+    meta->Index = fieldIndex;
+    meta->Type = MysqlTypeToFieldType(field->type, field->flags);
+    meta->Converter = binaryProtocol ? BinaryValueConverters[AsUnderlyingType(meta->Type)].get() : FromStringValueConverters[AsUnderlyingType(meta->Type)].get();
+}
 }
 
 ResultSet::ResultSet(MySQLResult* result, MySQLField* fields, uint64 rowCount, uint32 fieldCount) :
@@ -122,11 +208,13 @@ _fieldCount(fieldCount),
 _result(result),
 _fields(fields)
 {
+    _fieldMetadata.resize(_fieldCount);
     _currentRow = new Field[_fieldCount];
-#ifdef TRINITY_STRICT_DATABASE_TYPE_CHECKS
     for (uint32 i = 0; i < _fieldCount; i++)
-        _currentRow[i].SetMetadata(&_fields[i], i);
-#endif
+    {
+        InitializeDatabaseFieldMetadata(&_fieldMetadata[i], &_fields[i], i, false);
+        _currentRow[i].SetMetadata(&_fieldMetadata[i]);
+    }
 }
 
 PreparedResultSet::PreparedResultSet(MySQLStmt* stmt, MySQLResult* result, uint64 rowCount, uint32 fieldCount) :
@@ -161,7 +249,7 @@ m_metadataResult(result)
     //- This is where we store the (entire) resultset
     if (mysql_stmt_store_result(m_stmt))
     {
-        TC_LOG_WARN("sql.sql", "%s:mysql_stmt_store_result, cannot bind result from MySQL server. Error: %s", __FUNCTION__, mysql_stmt_error(m_stmt));
+        TC_LOG_WARN("sql.sql", "{}:mysql_stmt_store_result, cannot bind result from MySQL server. Error: {}", __FUNCTION__, mysql_stmt_error(m_stmt));
         delete[] m_rBind;
         delete[] m_isNull;
         delete[] m_length;
@@ -172,11 +260,14 @@ m_metadataResult(result)
 
     //- This is where we prepare the buffer based on metadata
     MySQLField* field = reinterpret_cast<MySQLField*>(mysql_fetch_fields(m_metadataResult));
+    m_fieldMetadata.resize(m_fieldCount);
     std::size_t rowSize = 0;
     for (uint32 i = 0; i < m_fieldCount; ++i)
     {
         uint32 size = SizeForType(&field[i]);
         rowSize += size;
+
+        InitializeDatabaseFieldMetadata(&m_fieldMetadata[i], &field[i], i, true);
 
         m_rBind[i].buffer_type = field[i].type;
         m_rBind[i].buffer_length = size;
@@ -196,7 +287,7 @@ m_metadataResult(result)
     //- This is where we bind the bind the buffer to the statement
     if (mysql_stmt_bind_result(m_stmt, m_rBind))
     {
-        TC_LOG_WARN("sql.sql", "%s:mysql_stmt_bind_result, cannot bind result from MySQL server. Error: %s", __FUNCTION__, mysql_stmt_error(m_stmt));
+        TC_LOG_WARN("sql.sql", "{}:mysql_stmt_bind_result, cannot bind result from MySQL server. Error: {}", __FUNCTION__, mysql_stmt_error(m_stmt));
         mysql_stmt_free_result(m_stmt);
         CleanUp();
         delete[] m_isNull;
@@ -209,6 +300,8 @@ m_metadataResult(result)
     {
         for (uint32 fIndex = 0; fIndex < m_fieldCount; ++fIndex)
         {
+            m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetMetadata(&m_fieldMetadata[fIndex]);
+
             unsigned long buffer_length = m_rBind[fIndex].buffer_length;
             unsigned long fetched_length = *m_rBind[fIndex].length;
             if (!*m_rBind[fIndex].is_null)
@@ -226,7 +319,7 @@ m_metadataResult(result)
                         // when mysql_stmt_fetch returned MYSQL_DATA_TRUNCATED
                         // we cannot blindly null-terminate the data either as it may be retrieved as binary blob and not specifically a string
                         // in this case using Field::GetCString will result in garbage
-                        // TODO: remove Field::GetCString and use boost::string_ref (currently proposed for TS as string_view, maybe in C++17)
+                        // TODO: remove Field::GetCString and use std::string_view in C++17
                         if (fetched_length < buffer_length)
                             *((char*)buffer + fetched_length) = '\0';
                         break;
@@ -234,9 +327,8 @@ m_metadataResult(result)
                         break;
                 }
 
-                m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetByteValue(
-                    buffer,
-                    MysqlTypeToFieldType(m_rBind[fIndex].buffer_type),
+                m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetValue(
+                    (char const*)buffer,
                     fetched_length);
 
                 // move buffer pointer to next part
@@ -244,15 +336,10 @@ m_metadataResult(result)
             }
             else
             {
-                m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetByteValue(
+                m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetValue(
                     nullptr,
-                    MysqlTypeToFieldType(m_rBind[fIndex].buffer_type),
                     *m_rBind[fIndex].length);
             }
-
-#ifdef TRINITY_STRICT_DATABASE_TYPE_CHECKS
-            m_rows[uint32(m_rowPosition) * m_fieldCount + fIndex].SetMetadata(&field[fIndex], fIndex);
-#endif
         }
         m_rowPosition++;
     }
@@ -289,13 +376,13 @@ bool ResultSet::NextRow()
     unsigned long* lengths = mysql_fetch_lengths(_result);
     if (!lengths)
     {
-        TC_LOG_WARN("sql.sql", "%s:mysql_fetch_lengths, cannot retrieve value lengths. Error %s.", __FUNCTION__, mysql_error(_result->handle));
+        TC_LOG_WARN("sql.sql", "{}:mysql_fetch_lengths, cannot retrieve value lengths. Error {}.", __FUNCTION__, mysql_error(_result->handle));
         CleanUp();
         return false;
     }
 
     for (uint32 i = 0; i < _fieldCount; i++)
-        _currentRow[i].SetStructuredValue(row[i], MysqlTypeToFieldType(_fields[i].type), lengths[i]);
+        _currentRow[i].SetValue(row[i], lengths[i]);
 
     return true;
 }

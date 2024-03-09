@@ -49,11 +49,11 @@ class TC_GAME_API AuraApplication
     private:
         Unit* const _target;
         Aura* const _base;
-        AuraRemoveMode _removeMode:8;                  // Store info for know remove aura reason
+        AuraRemoveMode _removeMode;                    // Store info for know remove aura reason
         uint8 _slot;                                   // Aura slot on unit
         uint8 _flags;                                  // Aura info flag
         uint8 _effectsToApply;                         // Used only at spell hit to determine which effect should be applied
-        bool _needClientUpdate:1;
+        bool _needClientUpdate;
 
         explicit AuraApplication(Unit* target, Unit* caster, Aura* base, uint8 effMask);
         void _Remove();
@@ -73,7 +73,7 @@ class TC_GAME_API AuraApplication
         bool IsSelfcast() const { return (_flags & AFLAG_CASTER) != 0; }
 
         uint8 GetEffectsToApply() const { return _effectsToApply; }
-        void UpdateApplyEffectMask(uint8 newEffMask);
+        void UpdateApplyEffectMask(uint8 newEffMask, bool canHandleNewEffects);
 
         void SetRemoveMode(AuraRemoveMode mode) { _removeMode = mode; }
         AuraRemoveMode GetRemoveMode() const { return _removeMode; }
@@ -103,7 +103,7 @@ class TC_GAME_API Aura
         typedef std::unordered_map<ObjectGuid, AuraApplication*> ApplicationMap;
 
         static uint8 BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 availableEffectMask, WorldObject* owner);
-        static Aura* TryRefreshStackOrCreate(AuraCreateInfo& createInfo);
+        static Aura* TryRefreshStackOrCreate(AuraCreateInfo& createInfo, bool updateEffectMask = true);
         static Aura* TryCreate(AuraCreateInfo& createInfo);
         static Aura* Create(AuraCreateInfo& createInfo);
         explicit Aura(AuraCreateInfo const& createInfo);
@@ -215,13 +215,13 @@ class TC_GAME_API Aura
         bool CheckAreaTarget(Unit* target);
         bool CanStackWith(Aura const* existingAura) const;
 
-        bool IsProcOnCooldown(std::chrono::steady_clock::time_point now) const;
-        void AddProcCooldown(std::chrono::steady_clock::time_point cooldownEnd);
+        bool IsProcOnCooldown(TimePoint now) const;
+        void AddProcCooldown(TimePoint cooldownEnd);
         void ResetProcCooldown();
         bool IsUsingCharges() const { return m_isUsingCharges; }
         void SetUsingCharges(bool val) { m_isUsingCharges = val; }
-        void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, std::chrono::steady_clock::time_point now);
-        uint8 GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, std::chrono::steady_clock::time_point now) const;
+        void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now);
+        uint8 GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now) const;
         float CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
         void TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, ProcEventInfo& eventInfo);
 
@@ -298,7 +298,7 @@ class TC_GAME_API Aura
 
         ChargeDropEvent* m_dropEvent;
 
-        std::chrono::steady_clock::time_point m_procCooldown;
+        TimePoint m_procCooldown;
 
     private:
         std::vector<AuraApplication*> _removedApplications;

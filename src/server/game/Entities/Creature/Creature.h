@@ -24,6 +24,7 @@
 #include "DatabaseEnvFwd.h"
 #include "Duration.h"
 #include "Loot.h"
+#include "GridObject.h"
 #include "MapObject.h"
 #include "Map.h"
 #include <list>
@@ -88,7 +89,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void GetRespawnPosition(float &x, float &y, float &z, float* ori = nullptr, float* dist = nullptr) const;
         bool IsSpawnedOnTransport() const { return m_creatureData && m_creatureData->mapId != GetMapId(); }
 
-        void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
+        void SetCorpseDelay(uint32 delay, bool ignoreCorpseDecayRatio = false)
+        {
+            m_corpseDelay = delay;
+            if (ignoreCorpseDecayRatio)
+                m_ignoreCorpseDecayRatio = true;
+        }
         uint32 GetCorpseDelay() const { return m_corpseDelay; }
         bool IsRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
         bool IsCivilian() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN) != 0; }
@@ -100,7 +106,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         CreatureMovementData const& GetMovementTemplate() const;
         bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
+<<<<<<< HEAD
         bool CanSwim() const override { return GetMovementTemplate().IsSwimAllowed() || IsPet(); }
+=======
+        bool CanSwim() const override;
+        bool CanEnterWater() const override;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         bool CanFly()  const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
         bool CanHover() const { return GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || IsHovering(); }
 
@@ -132,8 +143,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool CanResetTalents(Player* player, bool pet) const;
         bool CanCreatureAttack(Unit const* victim, bool force = true) const;
         void LoadTemplateImmunities();
-        bool IsImmunedToSpell(SpellInfo const* spellInfo, WorldObject const* caster) const override;
-        bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster) const override;
+        bool IsImmunedToSpell(SpellInfo const* spellInfo, WorldObject const* caster, bool requireImmunityPurgesEffectAttribute = false) const override;
+        bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, SpellEffectInfo const& spellEffectInfo, WorldObject const* caster, bool requireImmunityPurgesEffectAttribute = false) const override;
         bool isElite() const;
         bool isWorldBoss() const;
 
@@ -150,12 +161,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         CreatureAI* AI() const { return reinterpret_cast<CreatureAI*>(GetAI()); }
 
         bool SetWalk(bool enable) override;
-        bool SetDisableGravity(bool disable, bool packetOnly = false) override;
+        bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimTier = true) override;
         bool SetSwim(bool enable) override;
         bool SetCanFly(bool enable, bool packetOnly = false) override;
         bool SetWaterWalking(bool enable, bool packetOnly = false) override;
         bool SetFeatherFall(bool enable, bool packetOnly = false) override;
-        bool SetHover(bool enable, bool packetOnly = false) override;
+        bool SetHover(bool enable, bool packetOnly = false, bool updateAnimTier = true) override;
 
         uint32 GetShieldBlockValue() const override;
 
@@ -246,11 +257,11 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool HasSearchedAssistance() const { return m_AlreadySearchedAssistance; }
         bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
         bool _IsTargetAcceptable(Unit const* target) const;
+        bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
 
         void RemoveCorpse(bool setSpawnTime = true, bool destroyForNearbyPlayers = true);
 
-        void DespawnOrUnsummon(uint32 msTimeToDespawn = 0, Seconds forceRespawnTime = 0s);
-        void DespawnOrUnsummon(Milliseconds time, Seconds forceRespawnTime = 0s) { DespawnOrUnsummon(uint32(time.count()), forceRespawnTime); }
+        void DespawnOrUnsummon(Milliseconds timeToDespawn = 0s, Seconds forceRespawnTime = 0s);
 
         time_t const& GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const;
@@ -363,8 +374,15 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void AtEngage(Unit* target) override;
         void AtDisengage() override;
 
+        bool HasCanSwimFlagOutOfCombat() const
+        {
+            return !_isMissingCanSwimFlagOutOfCombat;
+        }
+        void RefreshCanSwimFlag(bool recheck = false);
+
         std::string GetDebugInfo() const override;
 
+<<<<<<< HEAD
         int GetDungeonLevel() const;
 
         bool blockMirror;
@@ -372,6 +390,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void ApplyScaledArmor();
         void UpdateDungeonScaling();
         bool IsMarkOfTheAbsoluteEnabled();
+=======
+        void ExitVehicle(Position const* exitPosition = nullptr) override;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     protected:
         bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 entry, CreatureData const* data = nullptr, uint32 vehId = 0);
@@ -391,6 +412,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         time_t m_respawnTime;                               // (secs) time of next respawn
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
+        bool m_ignoreCorpseDecayRatio;
         float m_wanderDistance;
         uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check
         uint32 m_backpedalTime;                             // (msecs) remaining time for next move backwards check
@@ -458,7 +480,12 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Regenerate health
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
+<<<<<<< HEAD
         uint8 _markOfTheAbsoluteState;
+=======
+
+        bool _isMissingCanSwimFlagOutOfCombat;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

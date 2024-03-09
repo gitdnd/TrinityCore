@@ -112,20 +112,20 @@ public:
         // If Eluna is reloaded, it will be missing our instance data.
         // Reload here instead of waiting for the next hook call (possibly never).
         // This avoids having to have an empty Update hook handler just to trigger the reload.
-        if (!instance->GetEluna()->HasInstanceData(instance))
+        if (!sEluna->HasInstanceData(instance))
             Reload();
 
-        instance->GetEluna()->OnUpdateInstance(this, diff);
+        sEluna->OnUpdateInstance(this, diff);
     }
 
     bool IsEncounterInProgress() const override
     {
-        return instance->GetEluna()->OnCheckEncounterInProgress(const_cast<ElunaInstanceAI*>(this));
+        return sEluna->OnCheckEncounterInProgress(const_cast<ElunaInstanceAI*>(this));
     }
 
     void OnPlayerEnter(Player* player) override
     {
-        instance->GetEluna()->OnPlayerEnterInstance(this, player);
+        sEluna->OnPlayerEnterInstance(this, player);
     }
 
 #if defined TRINITY || AZEROTHCORE
@@ -134,12 +134,12 @@ public:
     void OnObjectCreate(GameObject* gameobject) override
 #endif
     {
-        instance->GetEluna()->OnGameObjectCreate(this, gameobject);
+        sEluna->OnGameObjectCreate(this, gameobject);
     }
 
     void OnCreatureCreate(Creature* creature) override
     {
-        instance->GetEluna()->OnCreatureCreate(this, creature);
+        sEluna->OnCreatureCreate(this, creature);
     }
 };
 

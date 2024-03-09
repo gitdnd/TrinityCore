@@ -54,6 +54,7 @@ public:
     }
 
     bool HasPendingCallbacks() { return !_callbacks.empty(); }
+
 private:
     AsyncCallbackProcessor(AsyncCallbackProcessor const&) = delete;
     AsyncCallbackProcessor& operator=(AsyncCallbackProcessor const&) = delete;

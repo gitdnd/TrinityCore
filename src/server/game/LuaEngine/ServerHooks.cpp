@@ -15,14 +15,20 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
+    if (!IsEnabled())\
+        return;\
     auto key = EventKey<ServerEvents>(EVENT);\
     if (!ServerEventBindings->HasBindingsFor(key))\
-        return;
+        return;\
+    LOCK_ELUNA
 
 #define START_HOOK_WITH_RETVAL(EVENT, RETVAL) \
+    if (!IsEnabled())\
+        return RETVAL;\
     auto key = EventKey<ServerEvents>(EVENT);\
     if (!ServerEventBindings->HasBindingsFor(key))\
-        return RETVAL;
+        return RETVAL;\
+    LOCK_ELUNA
 
 bool Eluna::OnAddonMessage(Player* sender, uint32 type, std::string& msg, Player* receiver, Guild* guild, Group* group, Channel* channel)
 {
@@ -60,6 +66,7 @@ bool Eluna::OnAddonMessage(Player* sender, uint32 type, std::string& msg, Player
 
 void Eluna::OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* obj)
 {
+    LOCK_ELUNA;
     ASSERT(!event_level);
 
     // Get function
@@ -285,24 +292,17 @@ void Eluna::OnShutdownCancel()
 
 void Eluna::OnWorldUpdate(uint32 diff)
 {
-    eventMgr->globalProcessor->Update(diff);
-    GetQueryProcessor().ProcessReadyCallbacks();
-
-    if (reloadEluna)
     {
-        //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] WorldUpdate reloadEluna: True");
-        if (!GetQueryProcessor().HasPendingCallbacks())
+        LOCK_ELUNA;
+        if (ShouldReload())
             _ReloadEluna();
-        //else
-            //eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Delayed reloading state for Map: %i", boundMapId).c_str());
     }
-    //else
-        //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] WorldUpdate reloadEluna: False");
+
+    eventMgr->globalProcessor->Update(diff);
 
     START_HOOK(WORLD_EVENT_ON_UPDATE);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
-
 }
 
 void Eluna::OnStartup()
@@ -350,28 +350,12 @@ void Eluna::OnPlayerLeave(Map* map, Player* player)
 
 void Eluna::OnUpdate(Map* map, uint32 diff)
 {
-    //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] OnUpdate");
-    eventMgr->globalProcessor->Update(diff);
-    //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] Post Processor Update");
-    GetQueryProcessor().ProcessReadyCallbacks();
-    //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] Post Query Update");
-
-    if (reloadEluna)
-    {
-        //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] MapUpdate reloadEluna: True");
-        if (!GetQueryProcessor().HasPendingCallbacks())
-            _ReloadEluna();
-        //else
-            //eWorld->SendServerGMMessage(SERVER_MSG_STRING, Trinity::StringFormat("[Eluna] Delayed reloading state for Map: %i", boundMapId).c_str());
-    }
-    //else
-        //eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] MapUpdate reloadEluna: False");
-
     START_HOOK(MAP_EVENT_ON_UPDATE);
+    // enable this for multithread
+    // eventMgr->globalProcessor->Update(diff);
     Push(map);
     Push(diff);
     CallAllFunctions(ServerEventBindings, key);
-    eWorld->SendServerGMMessage(SERVER_MSG_STRING, "[Eluna] Post Update Push");
 }
 
 void Eluna::OnRemove(GameObject* gameobject)
@@ -384,21 +368,6 @@ void Eluna::OnRemove(GameObject* gameobject)
 void Eluna::OnRemove(Creature* creature)
 {
     START_HOOK(WORLD_EVENT_ON_DELETE_CREATURE);
-    Push(creature);
-    CallAllFunctions(ServerEventBindings, key);
-}
-
-void Eluna::OnFreeInstanceId(uint32 instanceId)
-{
-    START_HOOK(ON_FREE_INSTANCE);
-    Push(instanceId);
-    CallAllFunctions(ServerEventBindings, key);
-}
-
-void Eluna::OnScoredCreatureDied(Map* map, Creature* creature)
-{
-    START_HOOK(ON_SCORED_CREATURE_DIED);
-    Push(map);
     Push(creature);
     CallAllFunctions(ServerEventBindings, key);
 }

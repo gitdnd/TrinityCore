@@ -9,7 +9,6 @@
 
 // Required
 #include "AccountMgr.h"
-#include "AffixMgr.h"
 #include "AuctionHouseMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -24,7 +23,6 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
-#include "LootMgr.h"
 #include "Mail.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"

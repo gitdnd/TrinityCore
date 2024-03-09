@@ -16,9 +16,12 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
+    if (!IsEnabled())\
+        return;\
     auto key = EventKey<VehicleEvents>(EVENT);\
     if (!VehicleEventBindings->HasBindingsFor(key))\
-        return;
+        return;\
+    LOCK_ELUNA
 
 void Eluna::OnInstall(Vehicle* vehicle)
 {

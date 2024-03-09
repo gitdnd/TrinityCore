@@ -23,6 +23,7 @@
 #include "ObjectGuid.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include <deque>
 #include <map>
 
 namespace WorldPackets
@@ -462,6 +463,7 @@ class TC_GAME_API Battleground
         Creature* AddCreature(uint32 entry, uint32 type, Position const& pos, TeamId teamId = TEAM_NEUTRAL, uint32 respawntime = 0, Transport* transport = nullptr);
         bool DelCreature(uint32 type);
         bool DelObject(uint32 type);
+        bool RemoveObjectFromWorld(uint32 type);
         virtual bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId = TEAM_NEUTRAL);
         bool AddSpiritGuide(uint32 type, Position const& pos, TeamId teamId = TEAM_NEUTRAL);
         int32 GetObjectType(ObjectGuid guid);
@@ -591,7 +593,7 @@ class TC_GAME_API Battleground
 
         // Player lists
         GuidVector m_ResurrectQueue;                        // Player GUID
-        GuidDeque m_OfflineQueue;                           // Player GUID
+        std::deque<ObjectGuid> m_OfflineQueue;              // Player GUID
 
         // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
         // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG

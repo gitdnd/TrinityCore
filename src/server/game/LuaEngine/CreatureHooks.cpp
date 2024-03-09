@@ -14,18 +14,24 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT, CREATURE) \
+    if (!IsEnabled())\
+        return;\
     auto entry_key = EntryKey<CreatureEvents>(EVENT, CREATURE->GetEntry());\
     auto unique_key = UniqueObjectKey<CreatureEvents>(EVENT, CREATURE->GET_GUID(), CREATURE->GetInstanceId());\
     if (!CreatureEventBindings->HasBindingsFor(entry_key))\
         if (!CreatureUniqueBindings->HasBindingsFor(unique_key))\
-            return;
+            return;\
+    LOCK_ELUNA
 
 #define START_HOOK_WITH_RETVAL(EVENT, CREATURE, RETVAL) \
+    if (!IsEnabled())\
+        return RETVAL;\
     auto entry_key = EntryKey<CreatureEvents>(EVENT, CREATURE->GetEntry());\
     auto unique_key = UniqueObjectKey<CreatureEvents>(EVENT, CREATURE->GET_GUID(), CREATURE->GetInstanceId());\
     if (!CreatureEventBindings->HasBindingsFor(entry_key))\
         if (!CreatureUniqueBindings->HasBindingsFor(unique_key))\
-            return RETVAL;
+            return RETVAL;\
+    LOCK_ELUNA
 
 void Eluna::OnDummyEffect(WorldObject* pCaster, uint32 spellId, SpellEffIndex effIndex, Creature* pTarget)
 {
@@ -276,7 +282,7 @@ void Eluna::On_Reset(Creature* me) // Not an override, custom
 }
 
 // Called when hit by a spell
-bool Eluna::SpellHit(Creature* me, WorldObject* caster, SpellInfo const* spell)
+bool Eluna::SpellHit(Creature* me, Unit* caster, SpellInfo const* spell)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_HIT_BY_SPELL, me, false);
     Push(me);
@@ -286,7 +292,7 @@ bool Eluna::SpellHit(Creature* me, WorldObject* caster, SpellInfo const* spell)
 }
 
 // Called when spell hits a target
-bool Eluna::SpellHitTarget(Creature* me, WorldObject* target, SpellInfo const* spell)
+bool Eluna::SpellHitTarget(Creature* me, Unit* target, SpellInfo const* spell)
 {
     START_HOOK_WITH_RETVAL(CREATURE_EVENT_ON_SPELL_HIT_TARGET, me, false);
     Push(me);
@@ -322,14 +328,6 @@ bool Eluna::OwnerAttacked(Creature* me, Unit* target)
     Push(me);
     Push(target);
     return CallAllFunctionsBool(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
-}
-
-void Eluna::OnMirrorPlayer(Creature* mirror, Player* player)
-{
-    START_HOOK(CREATURE_EVENT_ON_MIRROR_IMAGE, mirror);
-    Push(mirror);
-    Push(player);
-    CallAllFunctions(CreatureEventBindings, CreatureUniqueBindings, entry_key, unique_key);
 }
 
 #endif // TRINITY

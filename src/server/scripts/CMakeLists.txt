@@ -225,8 +225,13 @@ set_target_properties(scripts
 
 # Generate precompiled header
 if(USE_SCRIPTPCH)
+<<<<<<< HEAD
   list(APPEND ALL_SCRIPT_PROJECTS scripts ${DYNAMIC_SCRIPT_MODULE_PROJECTS})
   add_cxx_pch("${ALL_SCRIPT_PROJECTS}" ${PRIVATE_PCH_HEADER})
+=======
+  add_cxx_pch("scripts" ${PRIVATE_PCH_HEADER} ${DYNAMIC_SCRIPT_MODULE_PROJECTS})
+  reuse_cxx_pch("${DYNAMIC_SCRIPT_MODULE_PROJECTS}" scripts)
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 endif()
 
 # Remove all shared libraries in the installl directory which

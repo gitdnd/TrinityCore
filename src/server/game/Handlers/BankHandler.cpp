@@ -48,7 +48,11 @@ void WorldSession::HandleBankerActivateOpcode(WorldPackets::NPC::Hello& packet)
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(packet.Unit, UNIT_NPC_FLAG_BANKER);
     if (!unit)
     {
+<<<<<<< HEAD
         TC_LOG_DEBUG("network", "WORLD: HandleBankerActivateOpcode - %s not found or you can not interact with him.", packet.Unit.ToString().c_str());
+=======
+        TC_LOG_DEBUG("network", "WORLD: HandleBankerActivateOpcode - {} not found or you can not interact with him.", packet.Unit.ToString());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
     }
 
@@ -61,11 +65,19 @@ void WorldSession::HandleBankerActivateOpcode(WorldPackets::NPC::Hello& packet)
 
 void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& packet)
 {
+<<<<<<< HEAD
     TC_LOG_DEBUG("network", "STORAGE: receive bag = %u, slot = %u", packet.Bag, packet.Slot);
 
     if (!CanUseBank())
     {
         TC_LOG_DEBUG("network", "WORLD: HandleAutoBankItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
+=======
+    TC_LOG_DEBUG("network", "STORAGE: receive bag = {}, slot = {}", packet.Bag, packet.Slot);
+
+    if (!CanUseBank())
+    {
+        TC_LOG_DEBUG("network", "WORLD: HandleAutoBankItemOpcode - Unit ({}) not found or you can't interact with him.", m_currentBankerGUID.ToString());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
     }
 
@@ -94,11 +106,19 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& pa
 
 void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBankItem& packet)
 {
+<<<<<<< HEAD
     TC_LOG_DEBUG("network", "STORAGE: receive bag = %u, slot = %u", packet.Bag, packet.Slot);
 
     if (!CanUseBank())
     {
         TC_LOG_DEBUG("network", "WORLD: HandleAutoStoreBankItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
+=======
+    TC_LOG_DEBUG("network", "STORAGE: receive bag = {}, slot = {}", packet.Bag, packet.Slot);
+
+    if (!CanUseBank())
+    {
+        TC_LOG_DEBUG("network", "WORLD: HandleAutoStoreBankItemOpcode - Unit ({}) not found or you can't interact with him.", m_currentBankerGUID.ToString());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
     }
 
@@ -142,7 +162,11 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     {
         packet.Result = ERR_BANKSLOT_NOTBANKER;
         SendPacket(packet.Write());
+<<<<<<< HEAD
         TC_LOG_DEBUG("network", "WORLD: HandleBuyBankSlotOpcode - %s not found or you can't interact with him.", buyBankSlot.Banker.ToString().c_str());
+=======
+        TC_LOG_DEBUG("network", "WORLD: HandleBuyBankSlotOpcode - {} not found or you can't interact with him.", buyBankSlot.Banker.ToString());
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
     }
 
@@ -151,7 +175,11 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     // next slot
     ++slot;
 
+<<<<<<< HEAD
     TC_LOG_INFO("network", "PLAYER: Buy bank bag slot, slot number = %u", slot);
+=======
+    TC_LOG_INFO("network", "PLAYER: Buy bank bag slot, slot number = {}", slot);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     BankBagSlotPricesEntry const* slotEntry = sBankBagSlotPricesStore.LookupEntry(slot);
 
@@ -162,7 +190,11 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
         return;
     }
 
+<<<<<<< HEAD
     uint32 price = slotEntry->price;
+=======
+    uint32 price = slotEntry->Cost;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     if (!_player->HasEnoughMoney(price))
     {

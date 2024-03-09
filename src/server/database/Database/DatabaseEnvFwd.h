@@ -21,6 +21,7 @@
 #include <future>
 #include <memory>
 
+struct QueryResultFieldMetadata;
 class Field;
 
 class ResultSet;
@@ -71,8 +72,13 @@ using LoginDatabaseTransaction = SQLTransaction<LoginDatabaseConnection>;
 using WorldDatabaseTransaction = SQLTransaction<WorldDatabaseConnection>;
 
 class SQLQueryHolderBase;
+<<<<<<< HEAD
 using QueryResultHolderFuture = std::future<SQLQueryHolderBase*>;
 using QueryResultHolderPromise = std::promise<SQLQueryHolderBase*>;
+=======
+using QueryResultHolderFuture = std::future<void>;
+using QueryResultHolderPromise = std::promise<void>;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 template<typename T>
 class SQLQueryHolder;
@@ -80,6 +86,8 @@ class SQLQueryHolder;
 using CharacterDatabaseQueryHolder = SQLQueryHolder<CharacterDatabaseConnection>;
 using LoginDatabaseQueryHolder = SQLQueryHolder<LoginDatabaseConnection>;
 using WorldDatabaseQueryHolder = SQLQueryHolder<WorldDatabaseConnection>;
+
+class SQLQueryHolderCallback;
 
 // mysql
 struct MySQLHandle;

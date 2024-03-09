@@ -11,24 +11,22 @@
 
 void ElunaInstanceAI::Initialize()
 {
-    //ASSERT(!instance->GetEluna()->HasInstanceData(instance));
-    if (instance->GetEluna()->HasInstanceData(instance))
-    {
-        ELUNA_LOG_ERROR("Error in ElunaInstanceAI::Initialize(), called while having instance data map %u (%s).", instance->GetEntry()->MapID, instance->GetMapName());
-        //return;
-        // This might break things.
-        instance->GetEluna()->FreeInstanceId(instance->GetInstanceId());
-    }
-    // Create a new table for instance data.
-    lua_State* L = instance->GetEluna()->L;
-    lua_newtable(L);
-    instance->GetEluna()->CreateInstanceData(instance);
+    LOCK_ELUNA;
 
-    instance->GetEluna()->OnInitialize(this);
+    ASSERT(!sEluna->HasInstanceData(instance));
+
+    // Create a new table for instance data.
+    lua_State* L = sEluna->L;
+    lua_newtable(L);
+    sEluna->CreateInstanceData(instance);
+
+    sEluna->OnInitialize(this);
 }
 
 void ElunaInstanceAI::Load(const char* data)
 {
+    LOCK_ELUNA;
+
     // If we get passed NULL (i.e. `Reload` was called) then use
     //   the last known save data (or maybe just an empty string).
     if (!data)
@@ -42,21 +40,21 @@ void ElunaInstanceAI::Load(const char* data)
 
     if (data[0] == '\0')
     {
-        ASSERT(!instance->GetEluna()->HasInstanceData(instance));
+        ASSERT(!sEluna->HasInstanceData(instance));
 
         // Create a new table for instance data.
-        lua_State* L = instance->GetEluna()->L;
+        lua_State* L = sEluna->L;
         lua_newtable(L);
-        instance->GetEluna()->CreateInstanceData(instance);
+        sEluna->CreateInstanceData(instance);
 
-        instance->GetEluna()->OnLoad(this);
+        sEluna->OnLoad(this);
         // Stack: (empty)
         return;
     }
 
     size_t decodedLength;
     const unsigned char* decodedData = ElunaUtil::DecodeData(data, &decodedLength);
-    lua_State* L = instance->GetEluna()->L;
+    lua_State* L = sEluna->L;
 
     if (decodedData)
     {
@@ -73,9 +71,9 @@ void ElunaInstanceAI::Load(const char* data)
             // Only use the data if it's a table.
             if (lua_istable(L, -1))
             {
-                instance->GetEluna()->CreateInstanceData(instance);
+                sEluna->CreateInstanceData(instance);
                 // Stack: (empty)
-                instance->GetEluna()->OnLoad(this);
+                sEluna->OnLoad(this);
                 // WARNING! lastSaveData might be different after `OnLoad` if the Lua code saved data.
             }
             else
@@ -108,7 +106,8 @@ void ElunaInstanceAI::Load(const char* data)
 
 const char* ElunaInstanceAI::Save() const
 {
-    lua_State* L = instance->GetEluna()->L;
+    LOCK_ELUNA;
+    lua_State* L = sEluna->L;
     // Stack: (empty)
 
     /*
@@ -121,7 +120,7 @@ const char* ElunaInstanceAI::Save() const
     ElunaInstanceAI* self = const_cast<ElunaInstanceAI*>(this);
 
     lua_pushcfunction(L, mar_encode);
-    instance->GetEluna()->PushInstanceData(L, self, false);
+    sEluna->PushInstanceData(L, self, false);
     // Stack: mar_encode, instance_data
 
     if (lua_pcall(L, 1, 1, 0) != 0)
@@ -145,10 +144,11 @@ const char* ElunaInstanceAI::Save() const
 
 uint32 ElunaInstanceAI::GetData(uint32 key) const
 {
-    lua_State* L = instance->GetEluna()->L;
+    LOCK_ELUNA;
+    lua_State* L = sEluna->L;
     // Stack: (empty)
 
-    instance->GetEluna()->PushInstanceData(L, const_cast<ElunaInstanceAI*>(this), false);
+    sEluna->PushInstanceData(L, const_cast<ElunaInstanceAI*>(this), false);
     // Stack: instance_data
 
     Eluna::Push(L, key);
@@ -166,10 +166,11 @@ uint32 ElunaInstanceAI::GetData(uint32 key) const
 
 void ElunaInstanceAI::SetData(uint32 key, uint32 value)
 {
-    lua_State* L = instance->GetEluna()->L;
+    LOCK_ELUNA;
+    lua_State* L = sEluna->L;
     // Stack: (empty)
 
-    instance->GetEluna()->PushInstanceData(L, this, false);
+    sEluna->PushInstanceData(L, this, false);
     // Stack: instance_data
 
     Eluna::Push(L, key);
@@ -185,10 +186,11 @@ void ElunaInstanceAI::SetData(uint32 key, uint32 value)
 
 uint64 ElunaInstanceAI::GetData64(uint32 key) const
 {
-    lua_State* L = instance->GetEluna()->L;
+    LOCK_ELUNA;
+    lua_State* L = sEluna->L;
     // Stack: (empty)
 
-    instance->GetEluna()->PushInstanceData(L, const_cast<ElunaInstanceAI*>(this), false);
+    sEluna->PushInstanceData(L, const_cast<ElunaInstanceAI*>(this), false);
     // Stack: instance_data
 
     Eluna::Push(L, key);
@@ -206,10 +208,11 @@ uint64 ElunaInstanceAI::GetData64(uint32 key) const
 
 void ElunaInstanceAI::SetData64(uint32 key, uint64 value)
 {
-    lua_State* L = instance->GetEluna()->L;
+    LOCK_ELUNA;
+    lua_State* L = sEluna->L;
     // Stack: (empty)
 
-    instance->GetEluna()->PushInstanceData(L, this, false);
+    sEluna->PushInstanceData(L, this, false);
     // Stack: instance_data
 
     Eluna::Push(L, key);

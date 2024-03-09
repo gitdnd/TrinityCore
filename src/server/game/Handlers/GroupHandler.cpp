@@ -33,6 +33,9 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 class Aura;
 
@@ -230,7 +233,7 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
 
     if (group->GetLeaderGUID() == GetPlayer()->GetGUID())
     {
-        TC_LOG_ERROR("network", "HandleGroupAcceptOpcode: player %s %s tried to accept an invite to his own group", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+        TC_LOG_ERROR("network", "HandleGroupAcceptOpcode: player {} {} tried to accept an invite to his own group", GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 
@@ -240,6 +243,12 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
         SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
         return;
     }
+
+#ifdef ELUNA
+    if (Eluna* e = GetPlayer()->GetEluna())
+        if (!e->OnMemberAccept(group, GetPlayer()))
+            return;
+#endif
 
     Player* leader = ObjectAccessor::FindPlayer(group->GetLeaderGUID());
 
@@ -302,8 +311,8 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     //can't uninvite yourself
     if (guid == GetPlayer()->GetGUID())
     {
-        TC_LOG_ERROR("network", "WorldSession::HandleGroupUninviteGuidOpcode: leader %s %s tried to uninvite himself from the group.",
-            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+        TC_LOG_ERROR("network", "WorldSession::HandleGroupUninviteGuidOpcode: leader {} {} tried to uninvite himself from the group.",
+            GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 
@@ -347,8 +356,8 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
     // can't uninvite yourself
     if (GetPlayer()->GetName() == membername)
     {
-        TC_LOG_ERROR("network", "WorldSession::HandleGroupUninviteOpcode: leader %s %s tried to uninvite himself from the group.",
-            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+        TC_LOG_ERROR("network", "WorldSession::HandleGroupUninviteOpcode: leader {} {} tried to uninvite himself from the group.",
+            GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 
@@ -409,10 +418,7 @@ void WorldSession::HandleGroupDisbandOpcode(WorldPacket & /*recvData*/)
         return;
 
     if (_player->InBattleground())
-    {
-        SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
         return;
-    }
 
     /** error handling **/
     /********************/
@@ -480,7 +486,8 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
     if (!group)
         return;
 
-    group->CountRollVote(GetPlayer()->GetGUID(), guid, rollType);
+    if (!group->CountRollVote(GetPlayer()->GetGUID(), guid, rollType))
+        return;
 
     switch (rollType)
     {
@@ -504,7 +511,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
     recvData >> x;
     recvData >> y;
 
-    //TC_LOG_DEBUG("Received opcode MSG_MINIMAP_PING X: %f, Y: %f", x, y);
+    //TC_LOG_DEBUG("Received opcode MSG_MINIMAP_PING X: {}, Y: {}", x, y);
 
     /** error handling **/
     /********************/
@@ -676,6 +683,7 @@ void WorldSession::HandlePartyAssignmentOpcode(WorldPacket& recvData)
         case GROUP_ASSIGN_MAINTANK:
             group->RemoveUniqueGroupMemberFlag(MEMBER_FLAG_MAINTANK);           // Remove main assist flag from current if any.
             group->SetGroupMemberFlag(guid, apply, MEMBER_FLAG_MAINTANK);
+            break;
         default:
             break;
     }
@@ -728,7 +736,11 @@ void WorldSession::HandleRaidReadyCheckFinishedOpcode(WorldPacket & /*recvData*/
         return;
 
     WorldPacket data(MSG_RAID_READY_CHECK_FINISHED);
+<<<<<<< HEAD
     group->BroadcastPacket(&data, true);
+=======
+    group->BroadcastPacket(&data, true, -1);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data)
@@ -910,7 +922,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     if (mask & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
     {
         if (Vehicle* veh = player->GetVehicle())
-            *data << uint32(veh->GetVehicleInfo()->m_seatID[player->m_movementInfo.transport.seat]);
+            *data << uint32(veh->GetVehicleInfo()->SeatID[player->m_movementInfo.transport.seat]);
         else
             *data << uint32(0);
     }
@@ -1047,7 +1059,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket &recvData)
     data.put<uint64>(maskPos, petAuraMask);                 // GROUP_UPDATE_FLAG_PET_AURAS
 
     if (updateFlags & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
-        data << uint32(player->GetVehicle()->GetVehicleInfo()->m_seatID[player->m_movementInfo.transport.seat]);
+        data << uint32(player->GetVehicle()->GetVehicleInfo()->SeatID[player->m_movementInfo.transport.seat]);
 
     SendPacket(&data);
 }

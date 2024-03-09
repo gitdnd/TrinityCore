@@ -28,7 +28,7 @@
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, WorldObject* owner, bool isWorldObject, int dungeonLevel /*= 0*/) :
 Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
-m_timer(0), m_lifetime(0), m_canFollowOwner(true)
+m_timer(0), m_lifetime(0), m_canFollowOwner(true), m_visibleBySummonerOnly(false)
 {
     if (owner)
         m_summonerGUID = owner->GetGUID();
@@ -170,7 +170,7 @@ void TempSummon::Update(uint32 diff)
         }
         default:
             UnSummon();
-            TC_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            TC_LOG_ERROR("entities.unit", "Temporary summoned creature (entry: {}) have unknown type {} of ", GetEntry(), m_type);
             break;
     }
 }
@@ -254,7 +254,7 @@ void TempSummon::UnSummon(uint32 msTime)
     {
         ForcedUnsummonDelayEvent* pEvent = new ForcedUnsummonDelayEvent(*this);
 
-        m_Events.AddEvent(pEvent, m_Events.CalculateTime(msTime));
+        m_Events.AddEvent(pEvent, m_Events.CalculateTime(Milliseconds(msTime)));
         return;
     }
 
@@ -295,7 +295,7 @@ void TempSummon::RemoveFromWorld()
                     owner->m_SummonSlot[slot].Clear();
 
     //if (GetOwnerGUID())
-    //    TC_LOG_ERROR("entities.unit", "Unit %u has owner guid when removed from world", GetEntry());
+    //    TC_LOG_ERROR("entities.unit", "Unit {} has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
@@ -305,7 +305,8 @@ std::string TempSummon::GetDebugInfo() const
     std::stringstream sstr;
     sstr << Creature::GetDebugInfo() << "\n"
         << std::boolalpha
-        << "TempSummonType : " << std::to_string(GetSummonType()) << " Summoner: " << GetSummonerGUID().ToString();
+        << "TempSummonType: " << std::to_string(GetSummonType()) << " Summoner: " << GetSummonerGUID().ToString()
+        << "Timer: " << GetTimer();
     return sstr.str();
 }
 
@@ -362,7 +363,7 @@ void Minion::setDeathState(DeathState s)
 
 bool Minion::IsGuardianPet() const
 {
-    return IsPet() || (m_Properties && m_Properties->Category == SUMMON_CATEGORY_PET);
+    return IsPet() || (m_Properties && m_Properties->Control == SUMMON_CATEGORY_PET);
 }
 
 std::string Minion::GetDebugInfo() const
@@ -379,8 +380,12 @@ Guardian::Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool is
 {
     memset(m_statFromOwner, 0, sizeof(float)*MAX_STATS);
     m_unitTypeMask |= UNIT_MASK_GUARDIAN;
+<<<<<<< HEAD
     _dungeonLevelOverride = dungeonLevel;
     if (properties && (properties->Type == SUMMON_TYPE_PET || properties->Category == SUMMON_CATEGORY_PET))
+=======
+    if (properties && (properties->Title == SUMMON_TYPE_PET || properties->Control == SUMMON_CATEGORY_PET))
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         m_unitTypeMask |= UNIT_MASK_CONTROLABLE_GUARDIAN;
         InitCharmInfo();

@@ -19,10 +19,10 @@
 
 #include "wdt.h"
 
-u_map_fcc MWMOMagic = { {'O', 'M', 'W', 'M'} };
 u_map_fcc MPHDMagic = { {'D', 'H', 'P', 'M'} };
 u_map_fcc MAINMagic = { {'N', 'I', 'A', 'M'} };
 
+<<<<<<< HEAD
 bool wdt_MWMO::prepareLoadedData()
 {
     if (fcc != MWMOMagic.fcc) {
@@ -32,6 +32,8 @@ bool wdt_MWMO::prepareLoadedData()
     return true;
 }
 
+=======
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 bool wdt_MPHD::prepareLoadedData()
 {
     if (fcc != MPHDMagic.fcc)
@@ -50,7 +52,6 @@ WDT_file::WDT_file()
 {
     mphd = 0;
     main = 0;
-    wmo  = 0;
 }
 
 WDT_file::~WDT_file()
@@ -62,7 +63,6 @@ void WDT_file::free()
 {
     mphd = 0;
     main = 0;
-    wmo  = 0;
     FileLoader::free();
 }
 
@@ -83,11 +83,14 @@ bool WDT_file::prepareLoadedData()
     if (!main->prepareLoadedData()) {
         printf("failed to prepare wft_main data\n");
         return false;
+<<<<<<< HEAD
     }
     wmo = (wdt_MWMO *)((uint8*)main+ main->size+8);
     if (!wmo->prepareLoadedData()) {
         printf("Failed to load wmo loaded data\n");
         return false;
     }
+=======
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     return true;
 }

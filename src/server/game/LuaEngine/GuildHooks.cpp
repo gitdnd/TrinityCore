@@ -13,9 +13,12 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
+    if (!IsEnabled())\
+        return;\
     auto key = EventKey<GuildEvents>(EVENT);\
     if (!GuildEventBindings->HasBindingsFor(key))\
-        return;
+        return;\
+    LOCK_ELUNA
 
 void Eluna::OnAddMember(Guild* guild, Player* player, uint32 plRank)
 {

@@ -144,7 +144,11 @@ class AccountActionIpLogger : public AccountScript
                 LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
 
                 stmt->setUInt32(0, playerGuid);
+<<<<<<< HEAD
                 stmt->setUInt32(1, characterGuid);
+=======
+                stmt->setUInt64(1, characterGuid);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 stmt->setUInt32(2, realmId);
                 stmt->setUInt8(3, aType);
                 stmt->setUInt32(4, playerGuid);
@@ -156,7 +160,11 @@ class AccountActionIpLogger : public AccountScript
                 LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FACL_IP_LOGGING);
 
                 stmt->setUInt32(0, playerGuid);
+<<<<<<< HEAD
                 stmt->setUInt32(1, characterGuid);
+=======
+                stmt->setUInt64(1, characterGuid);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 stmt->setUInt32(2, realmId);
                 stmt->setUInt8(3, aType);
                 stmt->setUInt32(4, playerGuid);
@@ -240,7 +248,11 @@ class CharacterActionIpLogger : public PlayerScript
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_CHAR_IP_LOGGING);
 
             stmt->setUInt32(0, playerGuid);
+<<<<<<< HEAD
             stmt->setUInt32(1, characterGuid);
+=======
+            stmt->setUInt64(1, characterGuid);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             stmt->setUInt32(2, realmId);
             stmt->setUInt8(3, aType);
             stmt->setString(4, currentIp); // We query the ip here.
@@ -302,7 +314,11 @@ public:
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ALDL_IP_LOGGING);
 
         stmt->setUInt32(0, playerGuid);
+<<<<<<< HEAD
         stmt->setUInt32(1, characterGuid);
+=======
+        stmt->setUInt64(1, characterGuid);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         stmt->setUInt32(2, realmId);
         stmt->setUInt8(3, aType);
         stmt->setUInt32(4, playerGuid);
@@ -315,7 +331,6 @@ public:
         return;
     }
 };
-
 
 void AddSC_action_ip_logger()
 {

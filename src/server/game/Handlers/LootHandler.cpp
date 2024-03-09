@@ -215,8 +215,13 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         }
 
 #ifdef ELUNA
+<<<<<<< HEAD
         if (player->GetMap()->GetEluna())
             player->GetMap()->GetEluna()->OnLootMoney(player, loot->gold);
+=======
+        if (Eluna* e = player->GetEluna())
+            e->OnLootMoney(player, loot->gold);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
         loot->gold = 0;
 
@@ -245,7 +250,11 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     if (GetPlayer()->IsNonMeleeSpellCast(false))
         GetPlayer()->InterruptNonMeleeSpells(false);
 
+<<<<<<< HEAD
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
+=======
+    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOOTING);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
@@ -272,7 +281,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
     player->SetLootGUID(ObjectGuid::Empty);
     player->SendLootRelease(lguid);
 
-    player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
+    player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
 
     if (!player->IsInWorld())
         return;
@@ -372,7 +381,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         loot = &creature->loot;
         if (loot->isLooted())
         {
-            creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            creature->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 
             // skip pickpocketing loot for speed, skinning timer reduction is no-op in fact
             if (!creature->IsAlive())
@@ -420,7 +429,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    TC_LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
+    TC_LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [{}].", target->GetName());
 
     if (_player->GetLootGUID() != lootguid)
     {
@@ -431,7 +440,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!_player->IsInRaidWith(target) || !_player->IsInMap(target))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
-        TC_LOG_INFO("entities.player.cheat", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
+        TC_LOG_INFO("entities.player.cheat", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());
         return;
     }
 
@@ -466,8 +475,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
-        TC_LOG_DEBUG("loot", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)",
-            GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
+        TC_LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})",
+            GetPlayer()->GetName(), slotid, (unsigned long)loot->items.size());
         return;
     }
 
@@ -499,8 +508,13 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item.itemid, item.count);
 
 #ifdef ELUNA
+<<<<<<< HEAD
     if (target->GetMap()->GetEluna())
         target->GetMap()->GetEluna()->OnLootItem(target, newitem, item.count, lootguid);
+=======
+    if (Eluna* e = target->GetEluna())
+        e->OnLootItem(target, newitem, item.count, lootguid);
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     // mark as looted
     item.count = 0;

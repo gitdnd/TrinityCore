@@ -31,12 +31,12 @@ namespace LuaObject
      * @param uint32 flag : the flag to check for in the flags data
      * @return bool hasFlag
      */
-    int HasFlag(Eluna* E, Object* obj)
+    int HasFlag(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint32 flag = Eluna::CHECKVAL<uint32>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 flag = Eluna::CHECKVAL<uint32>(L, 3);
 
-        Eluna::Push(E->L, obj->HasFlag(index, flag));
+        Eluna::Push(L, obj->HasFlag(index, flag));
         return 1;
     }
 
@@ -45,9 +45,9 @@ namespace LuaObject
      *
      * @return bool inWorld
      */
-    int IsInWorld(Eluna* E, Object* obj)
+    int IsInWorld(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->IsInWorld());
+        Eluna::Push(L, obj->IsInWorld());
         return 1;
     }
 
@@ -57,10 +57,10 @@ namespace LuaObject
      * @param uint16 index
      * @return int32 value
      */
-    int GetInt32Value(Eluna* E, Object* obj)
+    int GetInt32Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        Eluna::Push(E->L, obj->GetInt32Value(index));
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        Eluna::Push(L, obj->GetInt32Value(index));
         return 1;
     }
 
@@ -70,10 +70,10 @@ namespace LuaObject
      * @param uint16 index
      * @return uint32 value
      */
-    int GetUInt32Value(Eluna* E, Object* obj)
+    int GetUInt32Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        Eluna::Push(E->L, obj->GetUInt32Value(index));
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        Eluna::Push(L, obj->GetUInt32Value(index));
         return 1;
     }
 
@@ -83,10 +83,10 @@ namespace LuaObject
      * @param uint16 index
      * @return float value
      */
-    int GetFloatValue(Eluna* E, Object* obj)
+    int GetFloatValue(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        Eluna::Push(E->L, obj->GetFloatValue(index));
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        Eluna::Push(L, obj->GetFloatValue(index));
         return 1;
     }
 
@@ -99,11 +99,11 @@ namespace LuaObject
      * @param uint8 offset : should be 0, 1, 2, or 3
      * @return uint8 value
      */
-    int GetByteValue(Eluna* E, Object* obj)
+    int GetByteValue(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint8 offset = Eluna::CHECKVAL<uint8>(E->L, 3);
-        Eluna::Push(E->L, obj->GetByteValue(index, offset));
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint8 offset = Eluna::CHECKVAL<uint8>(L, 3);
+        Eluna::Push(L, obj->GetByteValue(index, offset));
         return 1;
     }
 
@@ -116,11 +116,11 @@ namespace LuaObject
      * @param uint8 offset : should be 0 or 1
      * @return uint16 value
      */
-    int GetUInt16Value(Eluna* E, Object* obj)
+    int GetUInt16Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint8 offset = Eluna::CHECKVAL<uint8>(E->L, 3);
-        Eluna::Push(E->L, obj->GetUInt16Value(index, offset));
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint8 offset = Eluna::CHECKVAL<uint8>(L, 3);
+        Eluna::Push(L, obj->GetUInt16Value(index, offset));
         return 1;
     }
 
@@ -131,12 +131,12 @@ namespace LuaObject
      *
      * @return float scale
      */
-    int GetScale(Eluna* E, Object* obj)
+    int GetScale(lua_State* L, Object* obj)
     {
 #ifndef AZEROTHCORE
-        Eluna::Push(E->L, obj->GetObjectScale());
+        Eluna::Push(L, obj->GetObjectScale());
 #else
-        Eluna::Push(E->L, obj->GetFloatValue(OBJECT_FIELD_SCALE_X));
+        Eluna::Push(L, obj->GetFloatValue(OBJECT_FIELD_SCALE_X));
 #endif
         return 1;
     }
@@ -148,9 +148,9 @@ namespace LuaObject
      *
      * @return uint32 entry
      */
-    int GetEntry(Eluna* E, Object* obj)
+    int GetEntry(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->GetEntry());
+        Eluna::Push(L, obj->GetEntry());
         return 1;
     }
 
@@ -166,9 +166,9 @@ namespace LuaObject
      *
      * @return uint64 guid
      */
-    int GetGUID(Eluna* E, Object* obj)
+    int GetGUID(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->GET_GUID());
+        Eluna::Push(L, obj->GET_GUID());
         return 1;
     }
 
@@ -184,12 +184,12 @@ namespace LuaObject
      *
      * @return uint32 guidLow
      */
-    int GetGUIDLow(Eluna* E, Object* obj)
+    int GetGUIDLow(lua_State* L, Object* obj)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, obj->GetGUID().GetCounter());
+        Eluna::Push(L, obj->GetGUID().GetCounter());
 #else
-        Eluna::Push(E->L, obj->GetGUIDLow());
+        Eluna::Push(L, obj->GetGUIDLow());
 #endif
         return 1;
     }
@@ -211,9 +211,9 @@ namespace LuaObject
      *
      * @return uint8 typeID
      */
-    int GetTypeId(Eluna* E, Object* obj)
+    int GetTypeId(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->GetTypeId());
+        Eluna::Push(L, obj->GetTypeId());
         return 1;
     }
 
@@ -223,9 +223,9 @@ namespace LuaObject
      * @param uint16 index
      * @return uint64 value
      */
-    int GetUInt64Value(Eluna* E, Object* obj)
+    int GetUInt64Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
         obj->GetUInt64Value(index);
         return 0;
     }
@@ -240,10 +240,10 @@ namespace LuaObject
      * @param uint16 index
      * @param uint32 value
      */
-    int SetFlag(Eluna* E, Object* obj)
+    int SetFlag(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint32 flag = Eluna::CHECKVAL<uint32>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 flag = Eluna::CHECKVAL<uint32>(L, 3);
 
         obj->SetFlag(index, flag);
         return 0;
@@ -255,10 +255,10 @@ namespace LuaObject
      * @param uint16 index
      * @param int32 value
      */
-    int SetInt32Value(Eluna* E, Object* obj)
+    int SetInt32Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        int32 value = Eluna::CHECKVAL<int32>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        int32 value = Eluna::CHECKVAL<int32>(L, 3);
         obj->SetInt32Value(index, value);
         return 0;
     }
@@ -269,10 +269,10 @@ namespace LuaObject
      * @param uint16 index
      * @param uint32 value
      */
-    int SetUInt32Value(Eluna* E, Object* obj)
+    int SetUInt32Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint32 value = Eluna::CHECKVAL<uint32>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 value = Eluna::CHECKVAL<uint32>(L, 3);
         obj->SetUInt32Value(index, value);
         return 0;
     }
@@ -283,10 +283,10 @@ namespace LuaObject
      * @param uint16 index
      * @param uint32 value
      */
-    int UpdateUInt32Value(Eluna* E, Object* obj)
+    int UpdateUInt32Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint32 value = Eluna::CHECKVAL<uint32>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 value = Eluna::CHECKVAL<uint32>(L, 3);
         obj->UpdateUInt32Value(index, value);
         return 0;
     }
@@ -297,10 +297,10 @@ namespace LuaObject
      * @param uint16 index
      * @param float value
      */
-    int SetFloatValue(Eluna* E, Object* obj)
+    int SetFloatValue(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        float value = Eluna::CHECKVAL<float>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        float value = Eluna::CHECKVAL<float>(L, 3);
 
         obj->SetFloatValue(index, value);
         return 0;
@@ -313,11 +313,11 @@ namespace LuaObject
      * @param uint8 offset : should be 0, 1, 2, or 3
      * @param uint8 value
      */
-    int SetByteValue(Eluna* E, Object* obj)
+    int SetByteValue(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint8 offset = Eluna::CHECKVAL<uint8>(E->L, 3);
-        uint8 value = Eluna::CHECKVAL<uint8>(E->L, 4);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint8 offset = Eluna::CHECKVAL<uint8>(L, 3);
+        uint8 value = Eluna::CHECKVAL<uint8>(L, 4);
         obj->SetByteValue(index, offset, value);
         return 0;
     }
@@ -329,11 +329,11 @@ namespace LuaObject
      * @param uint8 offset : should be 0 or 1
      * @param uint16 value
      */
-    int SetUInt16Value(Eluna* E, Object* obj)
+    int SetUInt16Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint8 offset = Eluna::CHECKVAL<uint8>(E->L, 3);
-        uint16 value = Eluna::CHECKVAL<uint16>(E->L, 4);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint8 offset = Eluna::CHECKVAL<uint8>(L, 3);
+        uint16 value = Eluna::CHECKVAL<uint16>(L, 4);
         obj->SetUInt16Value(index, offset, value);
         return 0;
     }
@@ -345,11 +345,11 @@ namespace LuaObject
      * @param uint8 offset : should be 0 or 1
      * @param int16 value
      */
-    int SetInt16Value(Eluna* E, Object* obj)
+    int SetInt16Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint8 offset = Eluna::CHECKVAL<uint8>(E->L, 3);
-        int16 value = Eluna::CHECKVAL<int16>(E->L, 4);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint8 offset = Eluna::CHECKVAL<uint8>(L, 3);
+        int16 value = Eluna::CHECKVAL<int16>(L, 4);
         obj->SetInt16Value(index, offset, value);
         return 0;
     }
@@ -359,9 +359,9 @@ namespace LuaObject
      *
      * @param float scale
      */
-    int SetScale(Eluna* E, Object* obj)
+    int SetScale(lua_State* L, Object* obj)
     {
-        float size = Eluna::CHECKVAL<float>(E->L, 2);
+        float size = Eluna::CHECKVAL<float>(L, 2);
 
         obj->SetObjectScale(size);
         return 0;
@@ -373,10 +373,10 @@ namespace LuaObject
      * @param uint16 index
      * @param uint64 value
      */
-    int SetUInt64Value(Eluna* E, Object* obj)
+    int SetUInt64Value(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint64 value = Eluna::CHECKVAL<uint64>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint64 value = Eluna::CHECKVAL<uint64>(L, 3);
         obj->SetUInt64Value(index, value);
         return 0;
     }
@@ -387,10 +387,10 @@ namespace LuaObject
      * @param uint16 index
      * @param uint32 flag
      */
-    int RemoveFlag(Eluna* E, Object* obj)
+    int RemoveFlag(lua_State* L, Object* obj)
     {
-        uint16 index = Eluna::CHECKVAL<uint16>(E->L, 2);
-        uint32 flag = Eluna::CHECKVAL<uint32>(E->L, 3);
+        uint16 index = Eluna::CHECKVAL<uint16>(L, 2);
+        uint32 flag = Eluna::CHECKVAL<uint32>(L, 3);
 
         obj->RemoveFlag(index, flag);
         return 0;
@@ -403,9 +403,9 @@ namespace LuaObject
      *
      * @return [Corpse] corpse : the [Object] as a [Corpse], or `nil`
      */
-    int ToCorpse(Eluna* E, Object* obj)
+    int ToCorpse(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->ToCorpse());
+        Eluna::Push(L, obj->ToCorpse());
         return 1;
     }
 
@@ -416,9 +416,9 @@ namespace LuaObject
      *
      * @return [GameObject] gameObject : the [Object] as a [GameObject], or `nil`
      */
-    int ToGameObject(Eluna* E, Object* obj)
+    int ToGameObject(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->ToGameObject());
+        Eluna::Push(L, obj->ToGameObject());
         return 1;
     }
 
@@ -429,9 +429,9 @@ namespace LuaObject
      *
      * @return [Unit] unit : the [Object] as a [Unit], or `nil`
      */
-    int ToUnit(Eluna* E, Object* obj)
+    int ToUnit(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->ToUnit());
+        Eluna::Push(L, obj->ToUnit());
         return 1;
     }
 
@@ -442,9 +442,9 @@ namespace LuaObject
      *
      * @return [Creature] creature : the [Object] as a [Creature], or `nil`
      */
-    int ToCreature(Eluna* E, Object* obj)
+    int ToCreature(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->ToCreature());
+        Eluna::Push(L, obj->ToCreature());
         return 1;
     }
 
@@ -455,15 +455,9 @@ namespace LuaObject
      *
      * @return [Player] player : the [Object] as a [Player], or `nil`
      */
-    int ToPlayer(Eluna* E, Object* obj)
+    int ToPlayer(lua_State* L, Object* obj)
     {
-        Eluna::Push(E->L, obj->ToPlayer());
-        return 1;
-    }
-
-    int ToTransport(Eluna* E, Object* obj)
-    {
-        Eluna::Push(E->L, reinterpret_cast<Transport*>(obj));
+        Eluna::Push(L, obj->ToPlayer());
         return 1;
     }
 };

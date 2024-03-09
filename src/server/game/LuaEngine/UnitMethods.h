@@ -19,12 +19,12 @@ namespace LuaUnit
      * @param bool meleeAttack = false: attack with melee or not
      * @return didAttack : if the [Unit] did not attack
      */
-    int Attack(Eluna* E, Unit* unit)
+    int Attack(lua_State* L, Unit* unit)
     {
-        Unit* who = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        bool meleeAttack = Eluna::CHECKVAL<bool>(E->L, 3, false);
+        Unit* who = Eluna::CHECKOBJ<Unit>(L, 2);
+        bool meleeAttack = Eluna::CHECKVAL<bool>(L, 3, false);
 
-        Eluna::Push(E->L, unit->Attack(who, meleeAttack));
+        Eluna::Push(L, unit->Attack(who, meleeAttack));
         return 1;
     }
 
@@ -33,9 +33,9 @@ namespace LuaUnit
      *
      * @return bool isAttacking : if the [Unit] wasn't attacking already
      */
-    int AttackStop(Eluna* E, Unit* unit)
+    int AttackStop(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->AttackStop());
+        Eluna::Push(L, unit->AttackStop());
         return 1;
     }
 
@@ -44,9 +44,9 @@ namespace LuaUnit
      *
      * @return bool isStanding
      */
-    int IsStandState(Eluna* E, Unit* unit)
+    int IsStandState(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsStandState());
+        Eluna::Push(L, unit->IsStandState());
         return 1;
     }
 
@@ -55,9 +55,9 @@ namespace LuaUnit
      *
      * @return bool isMounted
      */
-    int IsMounted(Eluna* E, Unit* unit)
+    int IsMounted(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsMounted());
+        Eluna::Push(L, unit->IsMounted());
         return 1;
     }
 
@@ -66,19 +66,19 @@ namespace LuaUnit
      *
      * @return bool isRooted
      */
-    int IsRooted(Eluna* E, Unit* unit)
+    int IsRooted(lua_State* L, Unit* unit)
     {
 #ifdef AZEROTHCORE
-        Eluna::Push(E->L, unit->isInRoots() || unit->HasUnitMovementFlag(MOVEMENTFLAG_ROOT));
+        Eluna::Push(L, unit->isInRoots() || unit->HasUnitMovementFlag(MOVEMENTFLAG_ROOT));
 #endif
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->IsRooted() || unit->HasUnitMovementFlag(MOVEMENTFLAG_ROOT));
+        Eluna::Push(L, unit->IsRooted() || unit->HasUnitMovementFlag(MOVEMENTFLAG_ROOT));
 #endif
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isInRoots() || unit->IsRooted());
+        Eluna::Push(L, unit->isInRoots() || unit->IsRooted());
 #endif
 #ifdef MANGOS
-        Eluna::Push(E->L, unit->IsInRoots() || unit->IsRooted());
+        Eluna::Push(L, unit->IsInRoots() || unit->IsRooted());
 #endif
         return 1;
     }
@@ -88,9 +88,9 @@ namespace LuaUnit
      *
      * @return bool hasFullHealth
      */
-    int IsFullHealth(Eluna* E, Unit* unit)
+    int IsFullHealth(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsFullHealth());
+        Eluna::Push(L, unit->IsFullHealth());
         return 1;
     }
 
@@ -101,14 +101,14 @@ namespace LuaUnit
      * @param float radius
      * @return bool isAccessible
      */
-    int IsInAccessiblePlaceFor(Eluna* E, Unit* unit)
+    int IsInAccessiblePlaceFor(lua_State* L, Unit* unit)
     {
-        Creature* creature = Eluna::CHECKOBJ<Creature>(E->L, 2);
+        Creature* creature = Eluna::CHECKOBJ<Creature>(L, 2);
 
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->isInAccessiblePlaceFor(creature));
+        Eluna::Push(L, unit->isInAccessiblePlaceFor(creature));
 #else
-        Eluna::Push(E->L, unit->isInAccessablePlaceFor(creature));
+        Eluna::Push(L, unit->isInAccessablePlaceFor(creature));
 #endif
         return 1;
     }
@@ -118,12 +118,12 @@ namespace LuaUnit
      *
      * @return bool isAuctioneer
      */
-    int IsAuctioneer(Eluna* E, Unit* unit)
+    int IsAuctioneer(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->IsAuctioner());
+        Eluna::Push(L, unit->IsAuctioner());
 #else
-        Eluna::Push(E->L, unit->isAuctioner());
+        Eluna::Push(L, unit->isAuctioner());
 #endif
         return 1;
     }
@@ -133,12 +133,12 @@ namespace LuaUnit
      *
      * @return bool isGuildMaster
      */
-    int IsGuildMaster(Eluna* E, Unit* unit)
+    int IsGuildMaster(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isGuildMaster());
+        Eluna::Push(L, unit->isGuildMaster());
 #else
-        Eluna::Push(E->L, unit->IsGuildMaster());
+        Eluna::Push(L, unit->IsGuildMaster());
 #endif
         return 1;
     }
@@ -148,12 +148,12 @@ namespace LuaUnit
      *
      * @return bool isInnkeeper
      */
-    int IsInnkeeper(Eluna* E, Unit* unit)
+    int IsInnkeeper(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isInnkeeper());
+        Eluna::Push(L, unit->isInnkeeper());
 #else
-        Eluna::Push(E->L, unit->IsInnkeeper());
+        Eluna::Push(L, unit->IsInnkeeper());
 #endif
         return 1;
     }
@@ -163,12 +163,12 @@ namespace LuaUnit
      *
      * @return bool isTrainer
      */
-    int IsTrainer(Eluna* E, Unit* unit)
+    int IsTrainer(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isTrainer());
+        Eluna::Push(L, unit->isTrainer());
 #else
-        Eluna::Push(E->L, unit->IsTrainer());
+        Eluna::Push(L, unit->IsTrainer());
 #endif
         return 1;
     }
@@ -178,12 +178,12 @@ namespace LuaUnit
      *
      * @return bool hasGossip
      */
-    int IsGossip(Eluna* E, Unit* unit)
+    int IsGossip(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isGossip());
+        Eluna::Push(L, unit->isGossip());
 #else
-        Eluna::Push(E->L, unit->IsGossip());
+        Eluna::Push(L, unit->IsGossip());
 #endif
         return 1;
     }
@@ -193,12 +193,12 @@ namespace LuaUnit
      *
      * @return bool isTaxi
      */
-    int IsTaxi(Eluna* E, Unit* unit)
+    int IsTaxi(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isTaxi());
+        Eluna::Push(L, unit->isTaxi());
 #else
-        Eluna::Push(E->L, unit->IsTaxi());
+        Eluna::Push(L, unit->IsTaxi());
 #endif
         return 1;
     }
@@ -208,12 +208,12 @@ namespace LuaUnit
      *
      * @return bool isSpiritHealer
      */
-    int IsSpiritHealer(Eluna* E, Unit* unit)
+    int IsSpiritHealer(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isSpiritHealer());
+        Eluna::Push(L, unit->isSpiritHealer());
 #else
-        Eluna::Push(E->L, unit->IsSpiritHealer());
+        Eluna::Push(L, unit->IsSpiritHealer());
 #endif
         return 1;
     }
@@ -223,12 +223,12 @@ namespace LuaUnit
      *
      * @return bool isSpiritGuide
      */
-    int IsSpiritGuide(Eluna* E, Unit* unit)
+    int IsSpiritGuide(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isSpiritGuide());
+        Eluna::Push(L, unit->isSpiritGuide());
 #else
-        Eluna::Push(E->L, unit->IsSpiritGuide());
+        Eluna::Push(L, unit->IsSpiritGuide());
 #endif
         return 1;
     }
@@ -238,12 +238,12 @@ namespace LuaUnit
      *
      * @return bool isTabardDesigner
      */
-    int IsTabardDesigner(Eluna* E, Unit* unit)
+    int IsTabardDesigner(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isTabardDesigner());
+        Eluna::Push(L, unit->isTabardDesigner());
 #else
-        Eluna::Push(E->L, unit->IsTabardDesigner());
+        Eluna::Push(L, unit->IsTabardDesigner());
 #endif
         return 1;
     }
@@ -253,12 +253,12 @@ namespace LuaUnit
      *
      * @return bool isTabardDesigner
      */
-    int IsServiceProvider(Eluna* E, Unit* unit)
+    int IsServiceProvider(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isServiceProvider());
+        Eluna::Push(L, unit->isServiceProvider());
 #else
-        Eluna::Push(E->L, unit->IsServiceProvider());
+        Eluna::Push(L, unit->IsServiceProvider());
 #endif
         return 1;
     }
@@ -268,12 +268,12 @@ namespace LuaUnit
      *
      * @return bool isSpiritService
      */
-    int IsSpiritService(Eluna* E, Unit* unit)
+    int IsSpiritService(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isSpiritService());
+        Eluna::Push(L, unit->isSpiritService());
 #else
-        Eluna::Push(E->L, unit->IsSpiritService());
+        Eluna::Push(L, unit->IsSpiritService());
 #endif
         return 1;
     }
@@ -283,12 +283,12 @@ namespace LuaUnit
      *
      * @return bool isAlive
      */
-    int IsAlive(Eluna* E, Unit* unit)
+    int IsAlive(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isAlive());
+        Eluna::Push(L, unit->isAlive());
 #else
-        Eluna::Push(E->L, unit->IsAlive());
+        Eluna::Push(L, unit->IsAlive());
 #endif
         return 1;
     }
@@ -298,12 +298,12 @@ namespace LuaUnit
      *
      * @return bool isDead
      */
-    int IsDead(Eluna* E, Unit* unit)
+    int IsDead(lua_State* L, Unit* unit)
     {
 #ifdef MANGOS
-        Eluna::Push(E->L, unit->IsDead());
+        Eluna::Push(L, unit->IsDead());
 #else
-        Eluna::Push(E->L, unit->isDead());
+        Eluna::Push(L, unit->isDead());
 #endif
         return 1;
     }
@@ -313,12 +313,12 @@ namespace LuaUnit
      *
      * @return bool isDying
      */
-    int IsDying(Eluna* E, Unit* unit)
+    int IsDying(lua_State* L, Unit* unit)
     {
 #ifdef MANGOS
-        Eluna::Push(E->L, unit->IsDying());
+        Eluna::Push(L, unit->IsDying());
 #else
-        Eluna::Push(E->L, unit->isDying());
+        Eluna::Push(L, unit->isDying());
 #endif
         return 1;
     }
@@ -328,12 +328,12 @@ namespace LuaUnit
      *
      * @return bool isBanker
      */
-    int IsBanker(Eluna* E, Unit* unit)
+    int IsBanker(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isBanker());
+        Eluna::Push(L, unit->isBanker());
 #else
-        Eluna::Push(E->L, unit->IsBanker());
+        Eluna::Push(L, unit->IsBanker());
 #endif
         return 1;
     }
@@ -343,12 +343,12 @@ namespace LuaUnit
      *
      * @return bool isVendor
      */
-    int IsVendor(Eluna* E, Unit* unit)
+    int IsVendor(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isVendor());
+        Eluna::Push(L, unit->isVendor());
 #else
-        Eluna::Push(E->L, unit->IsVendor());
+        Eluna::Push(L, unit->IsVendor());
 #endif
         return 1;
     }
@@ -358,12 +358,12 @@ namespace LuaUnit
      *
      * @return bool isBattleMaster
      */
-    int IsBattleMaster(Eluna* E, Unit* unit)
+    int IsBattleMaster(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isBattleMaster());
+        Eluna::Push(L, unit->isBattleMaster());
 #else
-        Eluna::Push(E->L, unit->IsBattleMaster());
+        Eluna::Push(L, unit->IsBattleMaster());
 #endif
         return 1;
     }
@@ -373,12 +373,12 @@ namespace LuaUnit
      *
      * @return bool isCharmed
      */
-    int IsCharmed(Eluna* E, Unit* unit)
+    int IsCharmed(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isCharmed());
+        Eluna::Push(L, unit->isCharmed());
 #else
-        Eluna::Push(E->L, unit->IsCharmed());
+        Eluna::Push(L, unit->IsCharmed());
 #endif
         return 1;
     }
@@ -388,12 +388,12 @@ namespace LuaUnit
      *
      * @return bool isArmorer
      */
-    int IsArmorer(Eluna* E, Unit* unit)
+    int IsArmorer(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isArmorer());
+        Eluna::Push(L, unit->isArmorer());
 #else
-        Eluna::Push(E->L, unit->IsArmorer());
+        Eluna::Push(L, unit->IsArmorer());
 #endif
         return 1;
     }
@@ -403,9 +403,9 @@ namespace LuaUnit
      *
      * @return bool isAttackingPlayer
      */
-    int IsAttackingPlayer(Eluna* E, Unit* unit)
+    int IsAttackingPlayer(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->isAttackingPlayer());
+        Eluna::Push(L, unit->isAttackingPlayer());
         return 1;
     }
 
@@ -414,9 +414,9 @@ namespace LuaUnit
      *
      * @return bool isPvP
      */
-    int IsPvPFlagged(Eluna* E, Unit* unit)
+    int IsPvPFlagged(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsPvP());
+        Eluna::Push(L, unit->IsPvP());
         return 1;
     }
 
@@ -426,12 +426,12 @@ namespace LuaUnit
      *
      * @return bool isOnVehicle
      */
-    int IsOnVehicle(Eluna* E, Unit* unit)
+    int IsOnVehicle(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetVehicle());
+        Eluna::Push(L, unit->GetVehicle());
 #else
-        Eluna::Push(E->L, unit->IsBoarded());
+        Eluna::Push(L, unit->IsBoarded());
 #endif
         return 1;
     }
@@ -442,12 +442,12 @@ namespace LuaUnit
      *
      * @return bool inCombat
      */
-    int IsInCombat(Eluna* E, Unit* unit)
+    int IsInCombat(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isInCombat());
+        Eluna::Push(L, unit->isInCombat());
 #else
-        Eluna::Push(E->L, unit->IsInCombat());
+        Eluna::Push(L, unit->IsInCombat());
 #endif
         return 1;
     }
@@ -457,9 +457,9 @@ namespace LuaUnit
      *
      * @return bool underWater
      */
-    int IsUnderWater(Eluna* E, Unit* unit)
+    int IsUnderWater(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsUnderWater());
+        Eluna::Push(L, unit->IsUnderWater());
         return 1;
     }
     
@@ -468,9 +468,9 @@ namespace LuaUnit
      *
      * @return bool inWater
      */
-    int IsInWater(Eluna* E, Unit* unit)
+    int IsInWater(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsInWater());
+        Eluna::Push(L, unit->IsInWater());
         return 1;
     }
     
@@ -479,9 +479,9 @@ namespace LuaUnit
      *
      * @return bool notMoving
      */
-    int IsStopped(Eluna* E, Unit* unit)
+    int IsStopped(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsStopped());
+        Eluna::Push(L, unit->IsStopped());
         return 1;
     }
     
@@ -490,12 +490,12 @@ namespace LuaUnit
      *
      * @return bool questGiver
      */
-    int IsQuestGiver(Eluna* E, Unit* unit)
+    int IsQuestGiver(lua_State* L, Unit* unit)
     {
 #ifdef CMANGOS
-        Eluna::Push(E->L, unit->isQuestGiver());
+        Eluna::Push(L, unit->isQuestGiver());
 #else
-        Eluna::Push(E->L, unit->IsQuestGiver());
+        Eluna::Push(L, unit->IsQuestGiver());
 #endif
         return 1;
     }
@@ -506,9 +506,9 @@ namespace LuaUnit
      * @param int32 healthpct : percentage in integer from
      * @return bool isBelow
      */
-    int HealthBelowPct(Eluna* E, Unit* unit)
+    int HealthBelowPct(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->HealthBelowPct(Eluna::CHECKVAL<int32>(E->L, 2)));
+        Eluna::Push(L, unit->HealthBelowPct(Eluna::CHECKVAL<int32>(L, 2)));
         return 1;
     }
     
@@ -518,9 +518,9 @@ namespace LuaUnit
      * @param int32 healthpct : percentage in integer from
      * @return bool isAbove
      */
-    int HealthAbovePct(Eluna* E, Unit* unit)
+    int HealthAbovePct(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->HealthAbovePct(Eluna::CHECKVAL<int32>(E->L, 2)));
+        Eluna::Push(L, unit->HealthAbovePct(Eluna::CHECKVAL<int32>(L, 2)));
         return 1;
     }
     
@@ -530,11 +530,11 @@ namespace LuaUnit
      * @param uint32 spell : entry of the aura spell
      * @return bool hasAura
      */
-    int HasAura(Eluna* E, Unit* unit)
+    int HasAura(lua_State* L, Unit* unit)
     {
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 2);
 
-        Eluna::Push(E->L, unit->HasAura(spell));
+        Eluna::Push(L, unit->HasAura(spell));
         return 1;
     }
 
@@ -543,12 +543,12 @@ namespace LuaUnit
      *
      * @return bool isCasting
      */
-    int IsCasting(Eluna* E, Unit* unit)
+    int IsCasting(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->HasUnitState(UNIT_STATE_CASTING));
+        Eluna::Push(L, unit->HasUnitState(UNIT_STATE_CASTING));
 #else
-        Eluna::Push(E->L, unit->IsNonMeleeSpellCasted(false));
+        Eluna::Push(L, unit->IsNonMeleeSpellCasted(false));
 #endif
         return 1;
     }
@@ -559,32 +559,32 @@ namespace LuaUnit
      * @param [UnitState] state : an unit state
      * @return bool hasState
      */
-    int HasUnitState(Eluna* E, Unit* unit)
+    int HasUnitState(lua_State* L, Unit* unit)
     {
-        uint32 state = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 state = Eluna::CHECKVAL<uint32>(L, 2);
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->HasUnitState(state));
+        Eluna::Push(L, unit->HasUnitState(state));
 #else
-        Eluna::Push(E->L, unit->hasUnitState(state));
+        Eluna::Push(L, unit->hasUnitState(state));
 #endif
         return 1;
     }
 
-    /*int IsVisible(Eluna* E, Unit* unit)
+    /*int IsVisible(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsVisible());
+        Eluna::Push(L, unit->IsVisible());
         return 1;
     }*/
 
-    /*int IsMoving(Eluna* E, Unit* unit)
+    /*int IsMoving(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->isMoving());
+        Eluna::Push(L, unit->isMoving());
         return 1;
     }*/
 
-    /*int IsFlying(Eluna* E, Unit* unit)
+    /*int IsFlying(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->IsFlying());
+        Eluna::Push(L, unit->IsFlying());
         return 1;
     }*/
     
@@ -593,9 +593,9 @@ namespace LuaUnit
      *
      * @return [Unit] owner
      */
-    int GetOwner(Eluna* E, Unit* unit)
+    int GetOwner(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetOwner());
+        Eluna::Push(L, unit->GetOwner());
         return 1;
     }
     
@@ -604,12 +604,12 @@ namespace LuaUnit
      *
      * @return uint64 ownerGUID
      */
-    int GetOwnerGUID(Eluna* E, Unit* unit)
+    int GetOwnerGUID(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetOwnerGUID());
+        Eluna::Push(L, unit->GetOwnerGUID());
 #else
-        Eluna::Push(E->L, unit->GetOwnerGuid());
+        Eluna::Push(L, unit->GetOwnerGuid());
 #endif
         return 1;
     }
@@ -619,9 +619,9 @@ namespace LuaUnit
      *
      * @return uint32 mountId : displayId of the mount
      */
-    int GetMountId(Eluna* E, Unit* unit)
+    int GetMountId(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetMountID());
+        Eluna::Push(L, unit->GetMountID());
         return 1;
     }
     
@@ -630,12 +630,12 @@ namespace LuaUnit
      *
      * @return uint64 creatorGUID
      */
-    int GetCreatorGUID(Eluna* E, Unit* unit)
+    int GetCreatorGUID(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetCreatorGUID());
+        Eluna::Push(L, unit->GetCreatorGUID());
 #else
-        Eluna::Push(E->L, unit->GetCreatorGuid());
+        Eluna::Push(L, unit->GetCreatorGuid());
 #endif
         return 1;
     }
@@ -645,12 +645,12 @@ namespace LuaUnit
      *
      * @return uint64 charmerGUID
      */
-    int GetCharmerGUID(Eluna* E, Unit* unit)
+    int GetCharmerGUID(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetCharmerGUID());
+        Eluna::Push(L, unit->GetCharmerGUID());
 #else
-        Eluna::Push(E->L, unit->GetCharmerGuid());
+        Eluna::Push(L, unit->GetCharmerGuid());
 #endif
         return 1;
     }
@@ -660,14 +660,14 @@ namespace LuaUnit
      *
      * @return uint64 charmedGUID
      */
-    int GetCharmGUID(Eluna* E, Unit* unit)
+    int GetCharmGUID(lua_State* L, Unit* unit)
     {
 #if defined AZEROTHCORE
-        Eluna::Push(E->L, unit->GetCharmGUID());
+        Eluna::Push(L, unit->GetCharmGUID());
 #elif defined TRINITY
-        Eluna::Push(E->L, unit->GetCharmedGUID());
+        Eluna::Push(L, unit->GetCharmedGUID());
 #else
-        Eluna::Push(E->L, unit->GetCharmGuid());
+        Eluna::Push(L, unit->GetCharmGuid());
 #endif
         return 1;
     }
@@ -677,12 +677,12 @@ namespace LuaUnit
      *
      * @return uint64 petGUID
      */
-    int GetPetGUID(Eluna* E, Unit* unit)
+    int GetPetGUID(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetPetGUID());
+        Eluna::Push(L, unit->GetPetGUID());
 #else
-        Eluna::Push(E->L, unit->GetPetGuid());
+        Eluna::Push(L, unit->GetPetGuid());
 #endif
         return 1;
     }
@@ -692,12 +692,12 @@ namespace LuaUnit
      *
      * @return uint64 controllerGUID
      */
-    int GetControllerGUID(Eluna* E, Unit* unit)
+    int GetControllerGUID(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetCharmerOrOwnerGUID());
+        Eluna::Push(L, unit->GetCharmerOrOwnerGUID());
 #else
-        Eluna::Push(E->L, unit->GetCharmerOrOwnerGuid());
+        Eluna::Push(L, unit->GetCharmerOrOwnerGuid());
 #endif
         return 1;
     }
@@ -707,12 +707,12 @@ namespace LuaUnit
      *
      * @return uint64 controllerGUID
      */
-    int GetControllerGUIDS(Eluna* E, Unit* unit)
+    int GetControllerGUIDS(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetCharmerOrOwnerOrOwnGUID());
+        Eluna::Push(L, unit->GetCharmerOrOwnerOrOwnGUID());
 #else
-        Eluna::Push(E->L, unit->GetCharmerOrOwnerOrOwnGuid());
+        Eluna::Push(L, unit->GetCharmerOrOwnerOrOwnGuid());
 #endif
         return 1;
     }
@@ -723,14 +723,14 @@ namespace LuaUnit
      * @param uint32 statType
      * @return float stat
      */
-    int GetStat(Eluna* E, Unit* unit)
+    int GetStat(lua_State* L, Unit* unit)
     {
-        uint32 stat = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 stat = Eluna::CHECKVAL<uint32>(L, 2);
 
         if (stat >= MAX_STATS)
             return 1;
 
-        Eluna::Push(E->L, unit->GetStat((Stats)stat));
+        Eluna::Push(L, unit->GetStat((Stats)stat));
         return 1;
     }
 
@@ -740,14 +740,14 @@ namespace LuaUnit
      * @param uint32 spellSchool
      * @return uint32 spellPower
      */
-    int GetBaseSpellPower(Eluna* E, Unit* unit)
+    int GetBaseSpellPower(lua_State* L, Unit* unit)
     {
-        uint32 spellschool = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 spellschool = Eluna::CHECKVAL<uint32>(L, 2);
 
         if (spellschool >= MAX_SPELL_SCHOOL)
             return 1;
 
-        Eluna::Push(E->L, unit->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + spellschool));
+        Eluna::Push(L, unit->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + spellschool));
         return 1;
     }
     
@@ -756,12 +756,12 @@ namespace LuaUnit
      *
      * @return [Unit] victim
      */
-    int GetVictim(Eluna* E, Unit* unit)
+    int GetVictim(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetVictim());
+        Eluna::Push(L, unit->GetVictim());
 #else
-        Eluna::Push(E->L, unit->getVictim());
+        Eluna::Push(L, unit->getVictim());
 #endif
         return 1;
     }
@@ -782,13 +782,13 @@ namespace LuaUnit
      * @param [CurrentSpellTypes] spellType
      * @return [Spell] castedSpell
      */
-    int GetCurrentSpell(Eluna* E, Unit* unit)
+    int GetCurrentSpell(lua_State* L, Unit* unit)
     {
-        uint32 type = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
         if (type >= CURRENT_MAX_SPELL)
-            return luaL_argerror(E->L, 2, "valid CurrentSpellTypes expected");
+            return luaL_argerror(L, 2, "valid CurrentSpellTypes expected");
 
-        Eluna::Push(E->L, unit->GetCurrentSpell(type));
+        Eluna::Push(L, unit->GetCurrentSpell(type));
         return 1;
     }
     
@@ -797,12 +797,12 @@ namespace LuaUnit
      *
      * @return uint8 standState
      */
-    int GetStandState(Eluna* E, Unit* unit)
+    int GetStandState(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetStandState());
+        Eluna::Push(L, unit->GetStandState());
 #else
-        Eluna::Push(E->L, unit->getStandState());
+        Eluna::Push(L, unit->getStandState());
 #endif
         return 1;
     }
@@ -812,9 +812,9 @@ namespace LuaUnit
      *
      * @return uint32 displayId
      */
-    int GetDisplayId(Eluna* E, Unit* unit)
+    int GetDisplayId(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetDisplayId());
+        Eluna::Push(L, unit->GetDisplayId());
         return 1;
     }
     
@@ -823,9 +823,9 @@ namespace LuaUnit
      *
      * @return uint32 displayId
      */
-    int GetNativeDisplayId(Eluna* E, Unit* unit)
+    int GetNativeDisplayId(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetNativeDisplayId());
+        Eluna::Push(L, unit->GetNativeDisplayId());
         return 1;
     }
     
@@ -834,12 +834,12 @@ namespace LuaUnit
      *
      * @return uint8 level
      */
-    int GetLevel(Eluna* E, Unit* unit)
+    int GetLevel(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetLevel());
+        Eluna::Push(L, unit->GetLevel());
 #else
-        Eluna::Push(E->L, unit->getLevel());
+        Eluna::Push(L, unit->getLevel());
 #endif
         return 1;
     }
@@ -849,13 +849,13 @@ namespace LuaUnit
      *
      * @return uint32 healthAmount
      */
-    int GetHealth(Eluna* E, Unit* unit)
+    int GetHealth(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetHealth());
+        Eluna::Push(L, unit->GetHealth());
         return 1;
     }
 
-    Powers PowerSelectorHelper(Eluna* E, Unit* unit, int powerType = -1)
+    Powers PowerSelectorHelper(lua_State* L, Unit* unit, int powerType = -1)
     {
 #ifdef TRINITY
         if (powerType == -1)
@@ -869,7 +869,7 @@ namespace LuaUnit
 #endif
 
         if (powerType < 0 || powerType >= int(MAX_POWERS))
-            luaL_argerror(E->L, 2, "valid Powers expected");
+            luaL_argerror(L, 2, "valid Powers expected");
 
         return (Powers)powerType;
     }
@@ -894,12 +894,12 @@ namespace LuaUnit
      * @param int type = -1 : a valid power type from [Powers] or -1 for the [Unit]'s current power type
      * @return uint32 powerAmount
      */
-    int GetPower(Eluna* E, Unit* unit)
+    int GetPower(lua_State* L, Unit* unit)
     {
-        int type = Eluna::CHECKVAL<int>(E->L, 2, -1);
-        Powers power = PowerSelectorHelper(E, unit, type);
+        int type = Eluna::CHECKVAL<int>(L, 2, -1);
+        Powers power = PowerSelectorHelper(L, unit, type);
 
-        Eluna::Push(E->L, unit->GetPower(power));
+        Eluna::Push(L, unit->GetPower(power));
         return 1;
     }
 
@@ -923,12 +923,12 @@ namespace LuaUnit
      * @param int type = -1 : a valid power type from [Powers] or -1 for the [Unit]'s current power type
      * @return uint32 maxPowerAmount
      */
-    int GetMaxPower(Eluna* E, Unit* unit)
+    int GetMaxPower(lua_State* L, Unit* unit)
     {
-        int type = Eluna::CHECKVAL<int>(E->L, 2, -1);
-        Powers power = PowerSelectorHelper(E, unit, type);
+        int type = Eluna::CHECKVAL<int>(L, 2, -1);
+        Powers power = PowerSelectorHelper(L, unit, type);
 
-        Eluna::Push(E->L, unit->GetMaxPower(power));
+        Eluna::Push(L, unit->GetMaxPower(power));
         return 1;
     }
 
@@ -952,17 +952,17 @@ namespace LuaUnit
      * @param int type = -1 : a valid power type from [Powers] or -1 for the [Unit]'s current power type
      * @return float powerPct
      */
-    int GetPowerPct(Eluna* E, Unit* unit)
+    int GetPowerPct(lua_State* L, Unit* unit)
     {
-        int type = Eluna::CHECKVAL<int>(E->L, 2, -1);
-        Powers power = PowerSelectorHelper(E, unit, type);
+        int type = Eluna::CHECKVAL<int>(L, 2, -1);
+        Powers power = PowerSelectorHelper(L, unit, type);
 
 #if (!defined(TRINITY) && defined(WOTLK))
         float percent = ((float)unit->GetPower(power) / (float)unit->GetMaxPower(power)) * 100.0f;
 #else
         float percent = ((float)unit->GetPower(power) / (float)unit->GetMaxPower(power)) * 100.0f;
 #endif
-        Eluna::Push(E->L, percent);
+        Eluna::Push(L, percent);
         return 1;
     }
 
@@ -985,14 +985,14 @@ namespace LuaUnit
      *
      * @return [Powers] powerType
      */
-    int GetPowerType(Eluna* E, Unit* unit)
+    int GetPowerType(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetPowerType());
+        Eluna::Push(L, unit->GetPowerType());
 #elif AZEROTHCORE
-        Eluna::Push(E->L, unit->getPowerType());
+        Eluna::Push(L, unit->getPowerType());
 #else
-        Eluna::Push(E->L, unit->GetPowerType());
+        Eluna::Push(L, unit->GetPowerType());
 #endif
         return 1;
     }
@@ -1002,9 +1002,9 @@ namespace LuaUnit
      *
      * @return uint32 maxHealth
      */
-    int GetMaxHealth(Eluna* E, Unit* unit)
+    int GetMaxHealth(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetMaxHealth());
+        Eluna::Push(L, unit->GetMaxHealth());
         return 1;
     }
 
@@ -1013,12 +1013,12 @@ namespace LuaUnit
      *
      * @return float healthPct
      */
-    int GetHealthPct(Eluna* E, Unit* unit)
+    int GetHealthPct(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetHealthPct());
+        Eluna::Push(L, unit->GetHealthPct());
 #else
-        Eluna::Push(E->L, unit->GetHealthPercent());
+        Eluna::Push(L, unit->GetHealthPercent());
 #endif
         return 1;
     }
@@ -1028,12 +1028,12 @@ namespace LuaUnit
      *
      * @return uint8 gender : 0 for male, 1 for female and 2 for none
      */
-    int GetGender(Eluna* E, Unit* unit)
+    int GetGender(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetGender());
+        Eluna::Push(L, unit->GetGender());
 #else
-        Eluna::Push(E->L, unit->getGender());
+        Eluna::Push(L, unit->getGender());
 #endif
         return 1;
     }
@@ -1043,12 +1043,12 @@ namespace LuaUnit
      *
      * @return [Races] race
      */
-    int GetRace(Eluna* E, Unit* unit)
+    int GetRace(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetRace());
+        Eluna::Push(L, unit->GetRace());
 #else
-        Eluna::Push(E->L, unit->getRace());
+        Eluna::Push(L, unit->getRace());
 #endif
         return 1;
     }
@@ -1058,12 +1058,12 @@ namespace LuaUnit
      *
      * @return [Classes] class
      */
-    int GetClass(Eluna* E, Unit* unit)
+    int GetClass(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetClass());
+        Eluna::Push(L, unit->GetClass());
 #else
-        Eluna::Push(E->L, unit->getClass());
+        Eluna::Push(L, unit->getClass());
 #endif
         return 1;
     }
@@ -1073,12 +1073,12 @@ namespace LuaUnit
     *
     * @return uint32 racemask
     */
-    int GetRaceMask(Eluna* E, Unit* unit)
+    int GetRaceMask(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetRaceMask());
+        Eluna::Push(L, unit->GetRaceMask());
 #else
-        Eluna::Push(E->L, unit->getRaceMask());
+        Eluna::Push(L, unit->getRaceMask());
 #endif
         return 1;
     }
@@ -1088,12 +1088,12 @@ namespace LuaUnit
     *
     * @return uint32 classmask
     */
-    int GetClassMask(Eluna* E, Unit* unit)
+    int GetClassMask(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetClassMask());
+        Eluna::Push(L, unit->GetClassMask());
 #else
-        Eluna::Push(E->L, unit->getClassMask());
+        Eluna::Push(L, unit->getClassMask());
 #endif
         return 1;
     }
@@ -1122,9 +1122,9 @@ namespace LuaUnit
      *
      * @return [CreatureType] creatureType
      */
-    int GetCreatureType(Eluna* E, Unit* unit)
+    int GetCreatureType(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetCreatureType());
+        Eluna::Push(L, unit->GetCreatureType());
         return 1;
     }
 
@@ -1149,11 +1149,11 @@ namespace LuaUnit
      * @param [LocaleConstant] locale = DEFAULT_LOCALE
      * @return string className : class name or nil
      */
-    int GetClassAsString(Eluna* E, Unit* unit)
+    int GetClassAsString(lua_State* L, Unit* unit)
     {
-        uint8 locale = Eluna::CHECKVAL<uint8>(E->L, 2, DEFAULT_LOCALE);
+        uint8 locale = Eluna::CHECKVAL<uint8>(L, 2, DEFAULT_LOCALE);
         if (locale >= TOTAL_LOCALES)
-            return luaL_argerror(E->L, 2, "valid LocaleConstant expected");
+            return luaL_argerror(L, 2, "valid LocaleConstant expected");
 
 #ifdef TRINITY
         const ChrClassesEntry* entry = sChrClassesStore.LookupEntry(unit->GetClass());
@@ -1163,7 +1163,7 @@ namespace LuaUnit
         if (!entry)
             return 1;
 
-        Eluna::Push(E->L, entry->name[locale]);
+        Eluna::Push(L, entry->name[locale]);
         return 1;
     }
 
@@ -1188,11 +1188,11 @@ namespace LuaUnit
      * @param [LocaleConstant] locale = DEFAULT_LOCALE : locale to return the race name in
      * @return string raceName : race name or nil
      */
-    int GetRaceAsString(Eluna* E, Unit* unit)
+    int GetRaceAsString(lua_State* L, Unit* unit)
     {
-        uint8 locale = Eluna::CHECKVAL<uint8>(E->L, 2, DEFAULT_LOCALE);
+        uint8 locale = Eluna::CHECKVAL<uint8>(L, 2, DEFAULT_LOCALE);
         if (locale >= TOTAL_LOCALES)
-            return luaL_argerror(E->L, 2, "valid LocaleConstant expected");
+            return luaL_argerror(L, 2, "valid LocaleConstant expected");
 
 #ifdef TRINITY
         const ChrRacesEntry* entry = sChrRacesStore.LookupEntry(unit->GetRace());
@@ -1202,7 +1202,7 @@ namespace LuaUnit
         if (!entry)
             return 1;
 
-        Eluna::Push(E->L, entry->name[locale]);
+        Eluna::Push(L, entry->name[locale]);
         return 1;
     }
 
@@ -1211,12 +1211,12 @@ namespace LuaUnit
      *
      * @return uint32 faction
      */
-    int GetFaction(Eluna* E, Unit* unit)
+    int GetFaction(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        Eluna::Push(E->L, unit->GetFaction());
+        Eluna::Push(L, unit->GetFaction());
 #else
-        Eluna::Push(E->L, unit->getFaction());
+        Eluna::Push(L, unit->getFaction());
 #endif
         return 1;
     }
@@ -1227,38 +1227,16 @@ namespace LuaUnit
      * @param uint32 spellID : entry of the aura spell
      * @return [Aura] aura : aura object or nil
      */
-    int GetAura(Eluna* E, Unit* unit)
+    int GetAura(lua_State* L, Unit* unit)
     {
-        uint32 spellID = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 spellID = Eluna::CHECKVAL<uint32>(L, 2);
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetAura(spellID));
+        Eluna::Push(L, unit->GetAura(spellID));
 #else
-        Eluna::Push(E->L, unit->GetAura(spellID, EFFECT_INDEX_0));
+        Eluna::Push(L, unit->GetAura(spellID, EFFECT_INDEX_0));
 #endif
         return 1;
     }
-
-#if defined TRINITY || AZEROTHCORE
-    /**
-     * Returns the stack of [Aura]s of the given spell entry on the [Unit] or nil.
-     *
-     * @param uint32 spellID : entry of the aura spell
-     * @return uint8 number : Stack of spells or nil
-     */
-    int GetSpellStackAmount(Eluna* E, Unit* unit)
-    {
-        uint32 spellID = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Aura const* spell = unit->GetAura(spellID);
-
-        if (!spell)
-            return 1;
-
-        Eluna::Push(E->L, spell->GetStackAmount());
-
-        return 1;
-    }
-
-#endif
 
     /**
      * Returns a table containing friendly [Unit]'s within given range of the [Unit].
@@ -1266,9 +1244,9 @@ namespace LuaUnit
      * @param float range = 533.333 : search radius
      * @return table friendyUnits : table filled with friendly units
      */
-    int GetFriendlyUnitsInRange(Eluna* E, Unit* unit)
+    int GetFriendlyUnitsInRange(lua_State* L, Unit* unit)
     {
-        float range = Eluna::CHECKVAL<float>(E->L, 2, SIZE_OF_GRIDS);
+        float range = Eluna::CHECKVAL<float>(L, 2, SIZE_OF_GRIDS);
 
         std::list<Unit*> list;
 #ifdef TRINITY
@@ -1287,17 +1265,17 @@ namespace LuaUnit
         ElunaUtil::ObjectGUIDCheck guidCheck(unit->GET_GUID());
         list.remove_if(guidCheck);
 
-        lua_createtable(E->L, list.size(), 0);
-        int tbl = lua_gettop(E->L);
+        lua_createtable(L, list.size(), 0);
+        int tbl = lua_gettop(L);
         uint32 i = 0;
 
         for (std::list<Unit*>::const_iterator it = list.begin(); it != list.end(); ++it)
         {
-            Eluna::Push(E->L, *it);
-            lua_rawseti(E->L, tbl, ++i);
+            Eluna::Push(L, *it);
+            lua_rawseti(L, tbl, ++i);
         }
 
-        lua_settop(E->L, tbl);
+        lua_settop(L, tbl);
         return 1;
     }
 
@@ -1307,9 +1285,9 @@ namespace LuaUnit
      * @param float range = 533.333 : search radius
      * @return table unfriendyUnits : table filled with unfriendly units
      */
-    int GetUnfriendlyUnitsInRange(Eluna* E, Unit* unit)
+    int GetUnfriendlyUnitsInRange(lua_State* L, Unit* unit)
     {
-        float range = Eluna::CHECKVAL<float>(E->L, 2, SIZE_OF_GRIDS);
+        float range = Eluna::CHECKVAL<float>(L, 2, SIZE_OF_GRIDS);
 
         std::list<Unit*> list;
 #ifdef TRINITY
@@ -1328,17 +1306,17 @@ namespace LuaUnit
         ElunaUtil::ObjectGUIDCheck guidCheck(unit->GET_GUID());
         list.remove_if(guidCheck);
 
-        lua_createtable(E->L, list.size(), 0);
-        int tbl = lua_gettop(E->L);
+        lua_createtable(L, list.size(), 0);
+        int tbl = lua_gettop(L);
         uint32 i = 0;
 
         for (std::list<Unit*>::const_iterator it = list.begin(); it != list.end(); ++it)
         {
-            Eluna::Push(E->L, *it);
-            lua_rawseti(E->L, tbl, ++i);
+            Eluna::Push(L, *it);
+            lua_rawseti(L, tbl, ++i);
         }
 
-        lua_settop(E->L, tbl);
+        lua_settop(L, tbl);
         return 1;
     }
 
@@ -1348,20 +1326,20 @@ namespace LuaUnit
      *
      * @return [Vehicle] vehicle
      */
-    int GetVehicleKit(Eluna* E, Unit* unit)
+    int GetVehicleKit(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetVehicleKit());
+        Eluna::Push(L, unit->GetVehicleKit());
 #else
-        Eluna::Push(E->L, unit->GetVehicleInfo());
+        Eluna::Push(L, unit->GetVehicleInfo());
 #endif
         return 1;
     }
 
     /*
-    int GetVehicle(Eluna* E, Unit* unit)
+    int GetVehicle(lua_State* L, Unit* unit)
     {
-    Eluna::Push(E->L, unit->GetVehicle());
+    Eluna::Push(L, unit->GetVehicle());
     return 1;
     }
     */
@@ -1371,12 +1349,12 @@ namespace LuaUnit
      *
      * @return uint64 critterGuid
      */
-    int GetCritterGUID(Eluna* E, Unit* unit)
+    int GetCritterGUID(lua_State* L, Unit* unit)
     {
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->GetCritterGUID());
+        Eluna::Push(L, unit->GetCritterGUID());
 #else
-        Eluna::Push(E->L, unit->GetCritterGuid());
+        Eluna::Push(L, unit->GetCritterGuid());
 #endif
         return 1;
     }
@@ -1403,16 +1381,16 @@ namespace LuaUnit
      * @param [UnitMoveType] type
      * @return float speed
      */
-    int GetSpeed(Eluna* E, Unit* unit)
+    int GetSpeed(lua_State* L, Unit* unit)
     {
-        uint32 type = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
         if (type >= MAX_MOVE_TYPE)
-            return luaL_argerror(E->L, 2, "valid UnitMoveType expected");
+            return luaL_argerror(L, 2, "valid UnitMoveType expected");
 
 #ifndef TRINITY
-        Eluna::Push(E->L, unit->GetSpeedRate((UnitMoveType)type));
+        Eluna::Push(L, unit->GetSpeedRate((UnitMoveType)type));
 #else
-        Eluna::Push(E->L, unit->GetSpeed((UnitMoveType)type));
+        Eluna::Push(L, unit->GetSpeed((UnitMoveType)type));
 #endif
         return 1;
     }
@@ -1449,9 +1427,9 @@ namespace LuaUnit
      *
      * @return [MovementGeneratorType] movementType
      */
-    int GetMovementType(Eluna* E, Unit* unit)
+    int GetMovementType(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->GetMotionMaster()->GetCurrentMovementGeneratorType());
+        Eluna::Push(L, unit->GetMotionMaster()->GetCurrentMovementGeneratorType());
         return 1;
     }
 
@@ -1460,9 +1438,9 @@ namespace LuaUnit
      *
      * @param uint64 guid : new owner guid
      */
-    int SetOwnerGUID(Eluna* E, Unit* unit)
+    int SetOwnerGUID(lua_State* L, Unit* unit)
     {
-        uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
+        uint64 guid = Eluna::CHECKVAL<uint64>(L, 2);
 
 #if defined TRINITY || AZEROTHCORE
         unit->SetOwnerGUID(ObjectGuid(guid));
@@ -1477,9 +1455,9 @@ namespace LuaUnit
      *
      * @param bool apply = true : true if set on, false if off
      */
-    int SetPvP(Eluna* E, Unit* unit)
+    int SetPvP(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 
         unit->SetPvP(apply);
         return 0;
@@ -1497,11 +1475,11 @@ namespace LuaUnit
      *
      * @param [SheathState] sheathState : valid SheathState
      */
-    int SetSheath(Eluna* E, Unit* unit)
+    int SetSheath(lua_State* L, Unit* unit)
     {
-        uint32 sheathed = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 sheathed = Eluna::CHECKVAL<uint32>(L, 2);
         if (sheathed >= MAX_SHEATH_STATE)
-            return luaL_argerror(E->L, 2, "valid SheathState expected");
+            return luaL_argerror(L, 2, "valid SheathState expected");
 
         unit->SetSheath((SheathState)sheathed);
         return 0;
@@ -1512,9 +1490,9 @@ namespace LuaUnit
      *
      * @param string name : new name
      */
-    int SetName(Eluna* E, Unit* unit)
+    int SetName(lua_State* L, Unit* unit)
     {
-        const char* name = Eluna::CHECKVAL<const char*>(E->L, 2);
+        const char* name = Eluna::CHECKVAL<const char*>(L, 2);
         if (std::string(name).length() > 0)
             unit->SetName(name);
         return 0;
@@ -1543,14 +1521,14 @@ namespace LuaUnit
      * @param float rate
      * @param bool forced = false
      */
-    int SetSpeed(Eluna* E, Unit* unit)
+    int SetSpeed(lua_State* L, Unit* unit)
     {
-        uint32 type = Eluna::CHECKVAL<uint32>(E->L, 2);
-        float rate = Eluna::CHECKVAL<float>(E->L, 3);
-        bool forced = Eluna::CHECKVAL<bool>(E->L, 4, false);
+        uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
+        float rate = Eluna::CHECKVAL<float>(L, 3);
+        bool forced = Eluna::CHECKVAL<bool>(L, 4, false);
         (void)forced; // ensure that the variable is referenced in order to pass compiler checks
         if (type >= MAX_MOVE_TYPE)
-            return luaL_argerror(E->L, 2, "valid UnitMoveType expected");
+            return luaL_argerror(L, 2, "valid UnitMoveType expected");
 #if defined TRINITY || AZEROTHCORE
         unit->SetSpeedRate((UnitMoveType)type, rate);
 #else
@@ -1564,9 +1542,9 @@ namespace LuaUnit
      *
      * @param uint32 faction : new faction ID
      */
-    int SetFaction(Eluna* E, Unit* unit)
+    int SetFaction(lua_State* L, Unit* unit)
     {
-        uint32 factionId = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 factionId = Eluna::CHECKVAL<uint32>(L, 2);
 #ifdef TRINITY
         unit->SetFaction(factionId);
 #else
@@ -1580,9 +1558,9 @@ namespace LuaUnit
      *
      * @param uint8 level : new level
      */
-    int SetLevel(Eluna* E, Unit* unit)
+    int SetLevel(lua_State* L, Unit* unit)
     {
-        uint8 newlevel = Eluna::CHECKVAL<uint8>(E->L, 2);
+        uint8 newlevel = Eluna::CHECKVAL<uint8>(L, 2);
 
         if (newlevel < 1)
             return 0;
@@ -1607,9 +1585,9 @@ namespace LuaUnit
      *
      * @param uint32 health : new health
      */
-    int SetHealth(Eluna* E, Unit* unit)
+    int SetHealth(lua_State* L, Unit* unit)
     {
-        uint32 amt = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 amt = Eluna::CHECKVAL<uint32>(L, 2);
         unit->SetHealth(amt);
         return 0;
     }
@@ -1619,9 +1597,9 @@ namespace LuaUnit
      *
      * @param uint32 maxHealth : new max health
      */
-    int SetMaxHealth(Eluna* E, Unit* unit)
+    int SetMaxHealth(lua_State* L, Unit* unit)
     {
-        uint32 amt = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 amt = Eluna::CHECKVAL<uint32>(L, 2);
         unit->SetMaxHealth(amt);
         return 0;
     }
@@ -1646,11 +1624,11 @@ namespace LuaUnit
      * @param uint32 amount : new power amount
      * @param int type = -1 : a valid power type from [Powers] or -1 for the [Unit]'s current power type
      */
-    int SetPower(Eluna* E, Unit* unit)
+    int SetPower(lua_State* L, Unit* unit)
     {
-        uint32 amt = Eluna::CHECKVAL<uint32>(E->L, 2);
-        int type = Eluna::CHECKVAL<int>(E->L, 3, -1);
-        Powers power = PowerSelectorHelper(E, unit, type);
+        uint32 amt = Eluna::CHECKVAL<uint32>(L, 2);
+        int type = Eluna::CHECKVAL<int>(L, 3, -1);
+        Powers power = PowerSelectorHelper(L, unit, type);
 
         unit->SetPower(power, amt);
         return 0;
@@ -1676,11 +1654,11 @@ namespace LuaUnit
      * @param int32 amount : amount to modify
      * @param int type = -1 : a valid power type from [Powers] or -1 for the [Unit]'s current power type
      */
-    int ModifyPower(Eluna* E, Unit* unit)
+    int ModifyPower(lua_State* L, Unit* unit)
     {
-        int32 amt = Eluna::CHECKVAL<int32>(E->L, 2);
-        int type = Eluna::CHECKVAL<int>(E->L, 3, -1);
-        Powers power = PowerSelectorHelper(E, unit, type);
+        int32 amt = Eluna::CHECKVAL<int32>(L, 2);
+        int type = Eluna::CHECKVAL<int>(L, 3, -1);
+        Powers power = PowerSelectorHelper(L, unit, type);
 
         unit->ModifyPower(power, amt);
         return 0;
@@ -1706,11 +1684,11 @@ namespace LuaUnit
      * @param int type = -1 : a valid power type from [Powers] or -1 for the [Unit]'s current power type
      * @param uint32 maxPower : new max power amount
      */
-    int SetMaxPower(Eluna* E, Unit* unit)
+    int SetMaxPower(lua_State* L, Unit* unit)
     {
-        int type = Eluna::CHECKVAL<int>(E->L, 2, -1);
-        uint32 amt = Eluna::CHECKVAL<uint32>(E->L, 3);
-        Powers power = PowerSelectorHelper(E, unit, type);
+        int type = Eluna::CHECKVAL<int>(L, 2, -1);
+        uint32 amt = Eluna::CHECKVAL<uint32>(L, 3);
+        Powers power = PowerSelectorHelper(L, unit, type);
 
         unit->SetMaxPower(power, amt);
         return 0;
@@ -1735,11 +1713,11 @@ namespace LuaUnit
      *
      * @param [Powers] type : a valid power type
      */
-    int SetPowerType(Eluna* E, Unit* unit)
+    int SetPowerType(lua_State* L, Unit* unit)
     {
-        uint32 type = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
         if (type >= int(MAX_POWERS))
-            return luaL_argerror(E->L, 2, "valid Powers expected");
+            return luaL_argerror(L, 2, "valid Powers expected");
 
 #ifdef TRINITY
         unit->SetPowerType((Powers)type);
@@ -1756,9 +1734,9 @@ namespace LuaUnit
      *
      * @param uint32 displayId
      */
-    int SetDisplayId(Eluna* E, Unit* unit)
+    int SetDisplayId(lua_State* L, Unit* unit)
     {
-        uint32 model = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 model = Eluna::CHECKVAL<uint32>(L, 2);
         unit->SetDisplayId(model);
         return 0;
     }
@@ -1768,9 +1746,9 @@ namespace LuaUnit
      *
      * @param uint32 displayId
      */
-    int SetNativeDisplayId(Eluna* E, Unit* unit)
+    int SetNativeDisplayId(lua_State* L, Unit* unit)
     {
-        uint32 model = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 model = Eluna::CHECKVAL<uint32>(L, 2);
         unit->SetNativeDisplayId(model);
         return 0;
     }
@@ -1780,9 +1758,9 @@ namespace LuaUnit
      *
      * @param uint32 orientation
      */
-    int SetFacing(Eluna* E, Unit* unit)
+    int SetFacing(lua_State* L, Unit* unit)
     {
-        float o = Eluna::CHECKVAL<float>(E->L, 2);
+        float o = Eluna::CHECKVAL<float>(L, 2);
         unit->SetFacingTo(o);
         return 0;
     }
@@ -1792,9 +1770,9 @@ namespace LuaUnit
      *
      * @param [WorldObject] target
      */
-    int SetFacingToObject(Eluna* E, Unit* unit)
+    int SetFacingToObject(lua_State* L, Unit* unit)
     {
-        WorldObject* obj = Eluna::CHECKOBJ<WorldObject>(E->L, 2);
+        WorldObject* obj = Eluna::CHECKOBJ<WorldObject>(L, 2);
         unit->SetFacingToObject(obj);
         return 0;
     }
@@ -1804,9 +1782,9 @@ namespace LuaUnit
      *
      * @param uint64 guid
      */
-    int SetCreatorGUID(Eluna* E, Unit* unit)
+    int SetCreatorGUID(lua_State* L, Unit* unit)
     {
-        uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
+        uint64 guid = Eluna::CHECKVAL<uint64>(L, 2);
 #if defined TRINITY || AZEROTHCORE
         unit->SetCreatorGUID(ObjectGuid(guid));
 #else
@@ -1820,9 +1798,9 @@ namespace LuaUnit
      *
      * @param uint64 guid
      */
-    int SetPetGUID(Eluna* E, Unit* unit)
+    int SetPetGUID(lua_State* L, Unit* unit)
     {
-        uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
+        uint64 guid = Eluna::CHECKVAL<uint64>(L, 2);
 #if defined TRINITY || AZEROTHCORE
         unit->SetPetGUID(ObjectGuid(guid));
 #else
@@ -1836,9 +1814,9 @@ namespace LuaUnit
      *
      * @param bool enable = true
      */
-    int SetWaterWalk(Eluna* E, Unit* unit)
+    int SetWaterWalk(lua_State* L, Unit* unit)
     {
-        bool enable = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool enable = Eluna::CHECKVAL<bool>(L, 2, true);
 #if defined TRINITY || AZEROTHCORE
         unit->SetWaterWalking(enable);
 #else
@@ -1852,9 +1830,9 @@ namespace LuaUnit
      *
      * @param uint8 state : stand state
      */
-    int SetStandState(Eluna* E, Unit* unit)
+    int SetStandState(lua_State* L, Unit* unit)
     {
-        uint8 state = Eluna::CHECKVAL<uint8>(E->L, 2);
+        uint8 state = Eluna::CHECKVAL<uint8>(L, 2);
         unit->SetStandState(state);
         return 0;
     }
@@ -1865,9 +1843,9 @@ namespace LuaUnit
      *
      * @param bool apply = true
      */
-    int SetFFA(Eluna* E, Unit* unit)
+    int SetFFA(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 
 #ifdef TRINITY
         if (apply)
@@ -1906,9 +1884,9 @@ namespace LuaUnit
      *
      * @param bool apply = true
      */
-    int SetSanctuary(Eluna* E, Unit* unit)
+    int SetSanctuary(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 
         if (apply)
         {
@@ -1922,9 +1900,9 @@ namespace LuaUnit
         return 0;
     }
 
-    int SetCritterGUID(Eluna* E, Unit* unit)
+    int SetCritterGUID(lua_State* L, Unit* unit)
     {
-        uint64 guid = Eluna::CHECKVAL<uint64>(E->L, 2);
+        uint64 guid = Eluna::CHECKVAL<uint64>(L, 2);
 #if defined TRINITY || AZEROTHCORE
         unit->SetCritterGUID(ObjectGuid(guid));
 #else
@@ -1934,9 +1912,9 @@ namespace LuaUnit
     }
 #endif
 
-    /*int SetStunned(Eluna* E, Unit* unit)
+    /*int SetStunned(lua_State* L, Unit* unit)
     {
-    bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+    bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
     unit->SetControlled(apply, UNIT_STATE_STUNNED);
     return 0;
     }*/
@@ -1946,9 +1924,9 @@ namespace LuaUnit
      *
      * @param bool apply = true
      */
-    int SetRooted(Eluna* E, Unit* unit)
+    int SetRooted(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 #if defined TRINITY || AZEROTHCORE
         unit->SetControlled(apply, UNIT_STATE_ROOT);
 #else
@@ -1962,9 +1940,9 @@ namespace LuaUnit
      *
      * @param bool apply = true
      */
-    int SetConfused(Eluna* E, Unit* unit)
+    int SetConfused(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 #if defined TRINITY || AZEROTHCORE
         unit->SetControlled(apply, UNIT_STATE_CONFUSED);
 #else
@@ -1978,9 +1956,9 @@ namespace LuaUnit
      *
      * @param bool apply = true
      */
-    int SetFeared(Eluna* E, Unit* unit)
+    int SetFeared(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 #if defined TRINITY || AZEROTHCORE
         unit->SetControlled(apply, UNIT_STATE_FLEEING);
 #else
@@ -1989,16 +1967,16 @@ namespace LuaUnit
         return 0;
     }
 
-    /*int SetCanFly(Eluna* E, Unit* unit)
+    /*int SetCanFly(lua_State* L, Unit* unit)
     {
-        bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
         unit->SetCanFly(apply);
         return 0;
     }*/
 
-    /*int SetVisible(Eluna* E, Unit* unit)
+    /*int SetVisible(lua_State* L, Unit* unit)
     {
-        bool x = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool x = Eluna::CHECKVAL<bool>(L, 2, true);
         unit->SetVisible(x);
         return 0;
     }*/
@@ -2006,7 +1984,7 @@ namespace LuaUnit
     /**
      * Clears the [Unit]'s threat list.
      */
-    int ClearThreatList(Eluna* /*E*/, Unit* unit)
+    int ClearThreatList(lua_State* /*L*/, Unit* unit)
     {
 #ifdef TRINITY
         unit->GetThreatManager().ClearAllThreat();
@@ -2023,9 +2001,9 @@ namespace LuaUnit
      *
      * @param uint32 displayId
      */
-    int Mount(Eluna* E, Unit* unit)
+    int Mount(lua_State* L, Unit* unit)
     {
-        uint32 displayId = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 displayId = Eluna::CHECKVAL<uint32>(L, 2);
 
         unit->Mount(displayId);
         return 0;
@@ -2034,7 +2012,7 @@ namespace LuaUnit
     /**
      * Dismounts the [Unit].
      */
-    int Dismount(Eluna* /*E*/, Unit* unit)
+    int Dismount(lua_State* /*L*/, Unit* unit)
     {
         if (unit->IsMounted())
         {
@@ -2055,9 +2033,9 @@ namespace LuaUnit
      *
      * @param uint32 emoteId
      */
-    int Emote(Eluna* E, Unit* unit)
+    int Emote(lua_State* L, Unit* unit)
     {
-        unit->HandleEmoteCommand(Eluna::CHECKVAL<uint32>(E->L, 2));
+        unit->HandleEmoteCommand(Eluna::CHECKVAL<uint32>(L, 2));
         return 0;
     }
 
@@ -2066,9 +2044,9 @@ namespace LuaUnit
      *
      * @param uint32 emoteId
      */
-    int EmoteState(Eluna* E, Unit* unit)
+    int EmoteState(lua_State* L, Unit* unit)
     {
-        uint32 emoteId = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 emoteId = Eluna::CHECKVAL<uint32>(L, 2);
 
         unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, emoteId);
         return 0;
@@ -2079,9 +2057,9 @@ namespace LuaUnit
      *
      * @return int32 percentage
      */
-    int CountPctFromCurHealth(Eluna* E, Unit* unit)
+    int CountPctFromCurHealth(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->CountPctFromCurHealth(Eluna::CHECKVAL<int32>(E->L, 2)));
+        Eluna::Push(L, unit->CountPctFromCurHealth(Eluna::CHECKVAL<int32>(L, 2)));
         return 1;
     }
 
@@ -2090,9 +2068,9 @@ namespace LuaUnit
      *
      * @return int32 percentage
      */
-    int CountPctFromMaxHealth(Eluna* E, Unit* unit)
+    int CountPctFromMaxHealth(lua_State* L, Unit* unit)
     {
-        Eluna::Push(E->L, unit->CountPctFromMaxHealth(Eluna::CHECKVAL<int32>(E->L, 2)));
+        Eluna::Push(L, unit->CountPctFromMaxHealth(Eluna::CHECKVAL<int32>(L, 2)));
         return 1;
     }
 
@@ -2104,17 +2082,17 @@ namespace LuaUnit
      * @param string msg
      * @param [Player] target
      */
-    int SendChatMessageToPlayer(Eluna* E, Unit* unit)
+    int SendChatMessageToPlayer(lua_State* L, Unit* unit)
     {
-        uint8 type = Eluna::CHECKVAL<uint8>(E->L, 2);
-        uint32 lang = Eluna::CHECKVAL<uint32>(E->L, 3);
-        std::string msg = Eluna::CHECKVAL<std::string>(E->L, 4);
-        Player* target = Eluna::CHECKOBJ<Player>(E->L, 5);
+        uint8 type = Eluna::CHECKVAL<uint8>(L, 2);
+        uint32 lang = Eluna::CHECKVAL<uint32>(L, 3);
+        std::string msg = Eluna::CHECKVAL<std::string>(L, 4);
+        Player* target = Eluna::CHECKOBJ<Player>(L, 5);
 
         if (type >= MAX_CHAT_MSG_TYPE)
-            return luaL_argerror(E->L, 2, "valid ChatMsg expected");
+            return luaL_argerror(L, 2, "valid ChatMsg expected");
         if (lang >= LANGUAGES_COUNT)
-            return luaL_argerror(E->L, 3, "valid Language expected");
+            return luaL_argerror(L, 3, "valid Language expected");
 
         WorldPacket data;
 #if defined TRINITY || AZEROTHCORE
@@ -2140,7 +2118,7 @@ namespace LuaUnit
     /**
      * Stops the [Unit]'s movement
      */
-    int MoveStop(Eluna* /*E*/, Unit* unit)
+    int MoveStop(lua_State* /*L*/, Unit* unit)
     {
         unit->StopMoving();
         return 0;
@@ -2151,13 +2129,13 @@ namespace LuaUnit
      *
      * @param bool reset = true : cleans movement
      */
-    int MoveExpire(Eluna* /*E*/, Unit* unit)
+    int MoveExpire(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        //(void) L; // ensure that the variable is referenced in order to pass compiler checks
+        (void) L; // ensure that the variable is referenced in order to pass compiler checks
         unit->GetMotionMaster()->Clear();
 #else
-        bool reset = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool reset = Eluna::CHECKVAL<bool>(L, 2, true);
         unit->GetMotionMaster()->MovementExpired(reset);
 #endif
         return 0;
@@ -2168,13 +2146,13 @@ namespace LuaUnit
      *
      * @param bool reset = true : clean movement
      */
-    int MoveClear(Eluna* /*E*/, Unit* unit)
+    int MoveClear(lua_State* L, Unit* unit)
     {
 #ifdef TRINITY
-        //(void) L; // ensure that the variable is referenced in order to pass compiler checks
+        (void) L; // ensure that the variable is referenced in order to pass compiler checks
         unit->GetMotionMaster()->Clear();
 #else
-        bool reset = Eluna::CHECKVAL<bool>(E->L, 2, true);
+        bool reset = Eluna::CHECKVAL<bool>(L, 2, true);
         unit->GetMotionMaster()->Clear(reset);
 #endif
         return 0;
@@ -2183,7 +2161,7 @@ namespace LuaUnit
     /**
      * The [Unit] will be idle
      */
-    int MoveIdle(Eluna* /*E*/, Unit* unit)
+    int MoveIdle(lua_State* /*L*/, Unit* unit)
     {
         unit->GetMotionMaster()->MoveIdle();
         return 0;
@@ -2194,9 +2172,9 @@ namespace LuaUnit
      *
      * @param float radius : limit on how far the [Unit] will move at random
      */
-    int MoveRandom(Eluna* E, Unit* unit)
+    int MoveRandom(lua_State* L, Unit* unit)
     {
-        float radius = Eluna::CHECKVAL<float>(E->L, 2);
+        float radius = Eluna::CHECKVAL<float>(L, 2);
         float x, y, z;
         unit->GetPosition(x, y, z);
 #if defined TRINITY || AZEROTHCORE
@@ -2210,7 +2188,7 @@ namespace LuaUnit
     /**
      * The [Unit] will move to its set home location
      */
-    int MoveHome(Eluna* /*E*/, Unit* unit)
+    int MoveHome(lua_State* /*L*/, Unit* unit)
     {
         unit->GetMotionMaster()->MoveTargetedHome();
         return 0;
@@ -2223,11 +2201,11 @@ namespace LuaUnit
      * @param float dist = 0 : distance to start following
      * @param float angle = 0
      */
-    int MoveFollow(Eluna* E, Unit* unit)
+    int MoveFollow(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        float dist = Eluna::CHECKVAL<float>(E->L, 3, 0.0f);
-        float angle = Eluna::CHECKVAL<float>(E->L, 4, 0.0f);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
+        float dist = Eluna::CHECKVAL<float>(L, 3, 0.0f);
+        float angle = Eluna::CHECKVAL<float>(L, 4, 0.0f);
         unit->GetMotionMaster()->MoveFollow(target, dist, angle);
         return 0;
     }
@@ -2239,11 +2217,11 @@ namespace LuaUnit
      * @param float dist = 0 : distance start chasing
      * @param float angle = 0
      */
-    int MoveChase(Eluna* E, Unit* unit)
+    int MoveChase(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        float dist = Eluna::CHECKVAL<float>(E->L, 3, 0.0f);
-        float angle = Eluna::CHECKVAL<float>(E->L, 4, 0.0f);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
+        float dist = Eluna::CHECKVAL<float>(L, 3, 0.0f);
+        float angle = Eluna::CHECKVAL<float>(L, 4, 0.0f);
         unit->GetMotionMaster()->MoveChase(target, dist, angle);
         return 0;
     }
@@ -2251,7 +2229,7 @@ namespace LuaUnit
     /**
      * The [Unit] will move confused
      */
-    int MoveConfused(Eluna* /*E*/, Unit* unit)
+    int MoveConfused(lua_State* /*L*/, Unit* unit)
     {
         unit->GetMotionMaster()->MoveConfused();
         return 0;
@@ -2263,10 +2241,10 @@ namespace LuaUnit
      * @param [Unit] target
      * @param uint32 time = 0 : flee delay
      */
-    int MoveFleeing(Eluna* E, Unit* unit)
+    int MoveFleeing(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        uint32 time = Eluna::CHECKVAL<uint32>(E->L, 3, 0);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
+        uint32 time = Eluna::CHECKVAL<uint32>(L, 3, 0);
         unit->GetMotionMaster()->MoveFleeing(target, time);
         return 0;
     }
@@ -2280,13 +2258,13 @@ namespace LuaUnit
      * @param float z
      * @param bool genPath = true : if true, generates path
      */
-    int MoveTo(Eluna* E, Unit* unit)
+    int MoveTo(lua_State* L, Unit* unit)
     {
-        uint32 id = Eluna::CHECKVAL<uint32>(E->L, 2);
-        float x = Eluna::CHECKVAL<float>(E->L, 3);
-        float y = Eluna::CHECKVAL<float>(E->L, 4);
-        float z = Eluna::CHECKVAL<float>(E->L, 5);
-        bool genPath = Eluna::CHECKVAL<bool>(E->L, 6, true);
+        uint32 id = Eluna::CHECKVAL<uint32>(L, 2);
+        float x = Eluna::CHECKVAL<float>(L, 3);
+        float y = Eluna::CHECKVAL<float>(L, 4);
+        float z = Eluna::CHECKVAL<float>(L, 5);
+        bool genPath = Eluna::CHECKVAL<bool>(L, 6, true);
         unit->GetMotionMaster()->MovePoint(id, x, y, z, genPath);
         return 0;
     }
@@ -2301,24 +2279,21 @@ namespace LuaUnit
      * @param float zSpeed : start velocity
      * @param float maxHeight : maximum height
      * @param uint32 id = 0 : unique movement Id
-     * @param bool hasOrientation = false : whether to force a orientation during the jump
-     * @param float o = 0 : orientation to use if hasOrientation is true
      */
-    int MoveJump(Eluna* E, Unit* unit)
+    int MoveJump(lua_State* L, Unit* unit)
     {
-        float x = Eluna::CHECKVAL<float>(E->L, 2);
-        float y = Eluna::CHECKVAL<float>(E->L, 3);
-        float z = Eluna::CHECKVAL<float>(E->L, 4);
-        float zSpeed = Eluna::CHECKVAL<float>(E->L, 5);
-        float maxHeight = Eluna::CHECKVAL<float>(E->L, 6);
-        uint32 id = Eluna::CHECKVAL<uint32>(E->L, 7, 0);
-        bool hasOrientation = Eluna::CHECKVAL<bool>(E->L, 8, false);
-        float o = Eluna::CHECKVAL<float>(E->L, 9, 0);
+        float x = Eluna::CHECKVAL<float>(L, 2);
+        float y = Eluna::CHECKVAL<float>(L, 3);
+        float z = Eluna::CHECKVAL<float>(L, 4);
+        float zSpeed = Eluna::CHECKVAL<float>(L, 5);
+        float maxHeight = Eluna::CHECKVAL<float>(L, 6);
+        uint32 id = Eluna::CHECKVAL<uint32>(L, 7, 0);
 
 #if (defined(CMANGOS) || defined(MANGOS)) && defined(WOTLK)
         unit->GetMotionMaster()->MoveJump(x, y, z, zSpeed, maxHeight, id);
 #else
-        unit->GetMotionMaster()->MoveJump(x, y, z, o, zSpeed, maxHeight, id, hasOrientation);
+        Position pos(x, y, z);
+        unit->GetMotionMaster()->MoveJump(pos, zSpeed, maxHeight, id);
 #endif
         return 0;
     }
@@ -2332,13 +2307,13 @@ namespace LuaUnit
      * @param [Player] receiver : specific [Unit] to receive the message
      * @param bool bossWhisper = false : is a boss whisper
      */
-    int SendUnitWhisper(Eluna* E, Unit* unit)
+    int SendUnitWhisper(lua_State* L, Unit* unit)
     {
-        const char* msg = Eluna::CHECKVAL<const char*>(E->L, 2);
-        uint32 lang = Eluna::CHECKVAL<uint32>(E->L, 3);
+        const char* msg = Eluna::CHECKVAL<const char*>(L, 2);
+        uint32 lang = Eluna::CHECKVAL<uint32>(L, 3);
         (void)lang; // ensure that the variable is referenced in order to pass compiler checks
-        Player* receiver = Eluna::CHECKOBJ<Player>(E->L, 4);
-        bool bossWhisper = Eluna::CHECKVAL<bool>(E->L, 5, false);
+        Player* receiver = Eluna::CHECKOBJ<Player>(L, 4);
+        bool bossWhisper = Eluna::CHECKVAL<bool>(L, 5, false);
         if (std::string(msg).length() > 0)
 #ifdef TRINITY
             unit->Whisper(msg, (Language)lang, receiver, bossWhisper);
@@ -2355,11 +2330,11 @@ namespace LuaUnit
      * @param [Unit] receiver = nil : specific [Unit] to receive the message
      * @param bool bossEmote = false : is a boss emote
      */
-    int SendUnitEmote(Eluna* E, Unit* unit)
+    int SendUnitEmote(lua_State* L, Unit* unit)
     {
-        const char* msg = Eluna::CHECKVAL<const char*>(E->L, 2);
-        Unit* receiver = Eluna::CHECKOBJ<Unit>(E->L, 3, false);
-        bool bossEmote = Eluna::CHECKVAL<bool>(E->L, 4, false);
+        const char* msg = Eluna::CHECKVAL<const char*>(L, 2);
+        Unit* receiver = Eluna::CHECKOBJ<Unit>(L, 3, false);
+        bool bossEmote = Eluna::CHECKVAL<bool>(L, 4, false);
         if (std::string(msg).length() > 0)
 #ifdef TRINITY
             unit->TextEmote(msg, receiver, bossEmote);
@@ -2375,10 +2350,10 @@ namespace LuaUnit
      * @param string msg : message for the [Unit] to say
      * @param uint32 language : language for the [Unit] to speak
      */
-    int SendUnitSay(Eluna* E, Unit* unit)
+    int SendUnitSay(lua_State* L, Unit* unit)
     {
-        const char* msg = Eluna::CHECKVAL<const char*>(E->L, 2);
-        uint32 language = Eluna::CHECKVAL<uint32>(E->L, 3, 0);
+        const char* msg = Eluna::CHECKVAL<const char*>(L, 2);
+        uint32 language = Eluna::CHECKVAL<uint32>(L, 3);
         if (std::string(msg).length() > 0)
 #ifdef TRINITY
             unit->Say(msg, (Language)language, unit);
@@ -2394,10 +2369,10 @@ namespace LuaUnit
      * @param string msg : message for the [Unit] to yell
      * @param uint32 language : language for the [Unit] to speak
      */
-    int SendUnitYell(Eluna* E, Unit* unit)
+    int SendUnitYell(lua_State* L, Unit* unit)
     {
-        const char* msg = Eluna::CHECKVAL<const char*>(E->L, 2);
-        uint32 language = Eluna::CHECKVAL<uint32>(E->L, 3, 0);
+        const char* msg = Eluna::CHECKVAL<const char*>(L, 2);
+        uint32 language = Eluna::CHECKVAL<uint32>(L, 3);
         if (std::string(msg).length() > 0)
 #ifdef TRINITY
             unit->Yell(msg, (Language)language, unit);
@@ -2410,7 +2385,7 @@ namespace LuaUnit
     /**
      * Unmorphs the [Unit] setting it's display ID back to the native display ID.
      */
-    int DeMorph(Eluna* /*E*/, Unit* unit)
+    int DeMorph(lua_State* /*L*/, Unit* unit)
     {
         unit->DeMorph();
         return 0;
@@ -2423,11 +2398,11 @@ namespace LuaUnit
      * @param uint32 spell : entry of a spell
      * @param bool triggered = false : if true the spell is instant and has no cost
      */
-    int CastSpell(Eluna* E, Unit* unit)
+    int CastSpell(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2, false);
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 3);
-        bool triggered = Eluna::CHECKVAL<bool>(E->L, 4, false);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2, false);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 3);
+        bool triggered = Eluna::CHECKVAL<bool>(L, 4, false);
 #ifdef CMANGOS
         SpellEntry const* spellEntry = GetSpellStore()->LookupEntry<SpellEntry>(spell);
 #endif
@@ -2461,19 +2436,19 @@ namespace LuaUnit
      * @param [Item] castItem = nil
      * @param uint64 originalCaster = 0
      */
-    int CastCustomSpell(Eluna* E, Unit* unit)
+    int CastCustomSpell(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2, false);
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 3);
-        bool triggered = Eluna::CHECKVAL<bool>(E->L, 4, false);
-        bool has_bp0 = !lua_isnoneornil(E->L, 5);
-        int32 bp0 = Eluna::CHECKVAL<int32>(E->L, 5, 0);
-        bool has_bp1 = !lua_isnoneornil(E->L, 6);
-        int32 bp1 = Eluna::CHECKVAL<int32>(E->L, 6, 0);
-        bool has_bp2 = !lua_isnoneornil(E->L, 7);
-        int32 bp2 = Eluna::CHECKVAL<int32>(E->L, 7, 0);
-        Item* castItem = Eluna::CHECKOBJ<Item>(E->L, 8, false);
-        uint64 originalCaster = Eluna::CHECKVAL<uint64>(E->L, 9, 0);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2, false);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 3);
+        bool triggered = Eluna::CHECKVAL<bool>(L, 4, false);
+        bool has_bp0 = !lua_isnoneornil(L, 5);
+        int32 bp0 = Eluna::CHECKVAL<int32>(L, 5, 0);
+        bool has_bp1 = !lua_isnoneornil(L, 6);
+        int32 bp1 = Eluna::CHECKVAL<int32>(L, 6, 0);
+        bool has_bp2 = !lua_isnoneornil(L, 7);
+        int32 bp2 = Eluna::CHECKVAL<int32>(L, 7, 0);
+        Item* castItem = Eluna::CHECKOBJ<Item>(L, 8, false);
+        uint64 originalCaster = Eluna::CHECKVAL<uint64>(L, 9, 0);
 
 #ifdef TRINITY
         CastSpellExtraArgs args;
@@ -2505,13 +2480,13 @@ namespace LuaUnit
      * @param uint32 spell : entry of a spell
      * @param bool triggered = false : if true the spell is instant and has no cost
      */
-    int CastSpellAoF(Eluna* E, Unit* unit)
+    int CastSpellAoF(lua_State* L, Unit* unit)
     {
-        float _x = Eluna::CHECKVAL<float>(E->L, 2);
-        float _y = Eluna::CHECKVAL<float>(E->L, 3);
-        float _z = Eluna::CHECKVAL<float>(E->L, 4);
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 5);
-        bool triggered = Eluna::CHECKVAL<bool>(E->L, 6, true);
+        float _x = Eluna::CHECKVAL<float>(L, 2);
+        float _y = Eluna::CHECKVAL<float>(L, 3);
+        float _z = Eluna::CHECKVAL<float>(L, 4);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 5);
+        bool triggered = Eluna::CHECKVAL<bool>(L, 6, true);
 #ifdef CMANGOS
         unit->CastSpell(_x, _y, _z, spell, TRIGGERED_OLD_TRIGGERED);
 #endif
@@ -2533,7 +2508,7 @@ namespace LuaUnit
     /**
      * Clears the [Unit]'s combat
      */
-    int ClearInCombat(Eluna* /*E*/, Unit* unit)
+    int ClearInCombat(lua_State* /*L*/, Unit* unit)
     {
         unit->ClearInCombat();
         return 0;
@@ -2544,9 +2519,9 @@ namespace LuaUnit
      *
      * @param uint32 spell = 0 : entry of a spell
      */
-    int StopSpellCast(Eluna* E, Unit* unit)
+    int StopSpellCast(lua_State* L, Unit* unit)
     {
-        uint32 spellId = Eluna::CHECKVAL<uint32>(E->L, 2, 0);
+        uint32 spellId = Eluna::CHECKVAL<uint32>(L, 2, 0);
         unit->CastStop(spellId);
         return 0;
     }
@@ -2559,10 +2534,10 @@ namespace LuaUnit
      * @param int32 spellType : type of spell to interrupt
      * @param bool delayed = true : skips if the spell is delayed
      */
-    int InterruptSpell(Eluna* E, Unit* unit)
+    int InterruptSpell(lua_State* L, Unit* unit)
     {
-        int spellType = Eluna::CHECKVAL<int>(E->L, 2);
-        bool delayed = Eluna::CHECKVAL<bool>(E->L, 3, true);
+        int spellType = Eluna::CHECKVAL<int>(L, 2);
+        bool delayed = Eluna::CHECKVAL<bool>(L, 3, true);
         switch (spellType)
         {
             case 0:
@@ -2578,7 +2553,7 @@ namespace LuaUnit
                 spellType = CURRENT_AUTOREPEAT_SPELL;
                 break;
             default:
-                return luaL_argerror(E->L, 2, "valid CurrentSpellTypes expected");
+                return luaL_argerror(L, 2, "valid CurrentSpellTypes expected");
         }
 
         unit->InterruptSpell((CurrentSpellTypes)spellType, delayed);
@@ -2592,10 +2567,10 @@ namespace LuaUnit
      * @param [Unit] target : aura will be applied on the target
      * @return [Aura] aura
      */
-    int AddAura(Eluna* E, Unit* unit)
+    int AddAura(lua_State* L, Unit* unit)
     {
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 2);
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 3);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 2);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 3);
 #ifdef CMANGOS
         SpellEntry const* spellEntry = GetSpellStore()->LookupEntry<SpellEntry>(spell);
 #endif
@@ -2612,7 +2587,7 @@ namespace LuaUnit
             return 1;
 
 #if defined TRINITY || AZEROTHCORE
-        Eluna::Push(E->L, unit->AddAura(spell, target));
+        Eluna::Push(L, unit->AddAura(spell, target));
 #else
         if (!IsSpellAppliesAura(spellEntry) && !IsSpellHaveEffect(spellEntry, SPELL_EFFECT_PERSISTENT_AREA_AURA))
             return 1;
@@ -2632,7 +2607,7 @@ namespace LuaUnit
                 holder->AddAura(aur, SpellEffIndex(i));
             }
         }
-        Eluna::Push(E->L, target->AddSpellAuraHolder(holder));
+        Eluna::Push(L, target->AddSpellAuraHolder(holder));
 #endif
         return 1;
     }
@@ -2642,9 +2617,9 @@ namespace LuaUnit
      *
      * @param uint32 spell : entry of a spell
      */
-    int RemoveAura(Eluna* E, Unit* unit)
+    int RemoveAura(lua_State* L, Unit* unit)
     {
-        uint32 spellId = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 spellId = Eluna::CHECKVAL<uint32>(L, 2);
         unit->RemoveAurasDueToSpell(spellId);
         return 0;
     }
@@ -2654,7 +2629,7 @@ namespace LuaUnit
      *
      *     Note: talents and racials are also auras, use with caution
      */
-    int RemoveAllAuras(Eluna* /*E*/, Unit* unit)
+    int RemoveAllAuras(lua_State* /*L*/, Unit* unit)
     {
         unit->RemoveAllAuras();
         return 0;
@@ -2665,9 +2640,9 @@ namespace LuaUnit
      *
      * @param [UnitState] state
      */
-    int AddUnitState(Eluna* E, Unit* unit)
+    int AddUnitState(lua_State* L, Unit* unit)
     {
-        uint32 state = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 state = Eluna::CHECKVAL<uint32>(L, 2);
 
 #if defined TRINITY || AZEROTHCORE
         unit->AddUnitState(state);
@@ -2682,9 +2657,9 @@ namespace LuaUnit
      *
      * @param [UnitState] state
      */
-    int ClearUnitState(Eluna* E, Unit* unit)
+    int ClearUnitState(lua_State* L, Unit* unit)
     {
-        uint32 state = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 state = Eluna::CHECKVAL<uint32>(L, 2);
 
 #if defined TRINITY || AZEROTHCORE
         unit->ClearUnitState(state);
@@ -2702,12 +2677,12 @@ namespace LuaUnit
      * @param float z
      * @param float o : orientation
      */
-    int NearTeleport(Eluna* E, Unit* unit)
+    int NearTeleport(lua_State* L, Unit* unit)
     {
-        float x = Eluna::CHECKVAL<float>(E->L, 2);
-        float y = Eluna::CHECKVAL<float>(E->L, 3);
-        float z = Eluna::CHECKVAL<float>(E->L, 4);
-        float o = Eluna::CHECKVAL<float>(E->L, 5);
+        float x = Eluna::CHECKVAL<float>(L, 2);
+        float y = Eluna::CHECKVAL<float>(L, 3);
+        float z = Eluna::CHECKVAL<float>(L, 4);
+        float o = Eluna::CHECKVAL<float>(L, 5);
 
         unit->NearTeleportTo(x, y, z, o);
         return 0;
@@ -2736,15 +2711,15 @@ namespace LuaUnit
      * @param [SpellSchools] school = MAX_SPELL_SCHOOL : school the damage is done in or MAX_SPELL_SCHOOL for direct damage
      * @param uint32 spell = 0 : spell that inflicts the damage
      */
-    int DealDamage(Eluna* E, Unit* unit)
+    int DealDamage(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        uint32 damage = Eluna::CHECKVAL<uint32>(E->L, 3);
-        bool durabilityloss = Eluna::CHECKVAL<bool>(E->L, 4, true);
-        uint32 school = Eluna::CHECKVAL<uint32>(E->L, 5, MAX_SPELL_SCHOOL);
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 6, 0);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
+        uint32 damage = Eluna::CHECKVAL<uint32>(L, 3);
+        bool durabilityloss = Eluna::CHECKVAL<bool>(L, 4, true);
+        uint32 school = Eluna::CHECKVAL<uint32>(L, 5, MAX_SPELL_SCHOOL);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 6, 0);
         if (school > MAX_SPELL_SCHOOL)
-            return luaL_argerror(E->L, 6, "valid SpellSchool expected");
+            return luaL_argerror(L, 6, "valid SpellSchool expected");
 
         // flat melee damage without resistence/etc reduction
         if (school == MAX_SPELL_SCHOOL)
@@ -2875,12 +2850,12 @@ namespace LuaUnit
      * @param uint32 amount : amount to heal
      * @param bool critical = false : if true, heal is logged as critical
      */
-    int DealHeal(Eluna* E, Unit* unit)
+    int DealHeal(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 3);
-        uint32 amount = Eluna::CHECKVAL<uint32>(E->L, 4);
-        bool critical = Eluna::CHECKVAL<bool>(E->L, 5, false);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 3);
+        uint32 amount = Eluna::CHECKVAL<uint32>(L, 4);
+        bool critical = Eluna::CHECKVAL<bool>(L, 5, false);
 
 #ifdef TRINITY
         if (const SpellInfo* info = sSpellMgr->GetSpellInfo(spell))
@@ -2911,10 +2886,10 @@ namespace LuaUnit
      * @param [Unit] target : [Unit] to kill
      * @param bool durLoss = true : when true, the target's items suffer durability loss
      */
-    int Kill(Eluna* E, Unit* unit)
+    int Kill(lua_State* L, Unit* unit)
     {
-        Unit* target = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        bool durLoss = Eluna::CHECKVAL<bool>(E->L, 3, true);
+        Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
+        bool durLoss = Eluna::CHECKVAL<bool>(L, 3, true);
 
 #if defined TRINITY || AZEROTHCORE
         Unit::Kill(unit, target, durLoss);
@@ -2946,19 +2921,19 @@ namespace LuaUnit
      * @param [SpellSchoolMask] schoolMask = 0 : [SpellSchoolMask] of the threat causer
      * @param uint32 spell = 0 : spell entry used for threat
      */
-    int AddThreat(Eluna* E, Unit* unit)
+    int AddThreat(lua_State* L, Unit* unit)
     {
-        Unit* victim = Eluna::CHECKOBJ<Unit>(E->L, 2);
-        float threat = Eluna::CHECKVAL<float>(E->L, 3, true);
-        uint32 spell = Eluna::CHECKVAL<uint32>(E->L, 4, 0);
+        Unit* victim = Eluna::CHECKOBJ<Unit>(L, 2);
+        float threat = Eluna::CHECKVAL<float>(L, 3, true);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 4, 0);
 
 #ifdef TRINITY
         unit->GetThreatManager().AddThreat(victim, threat, spell ? sSpellMgr->GetSpellInfo(spell) : NULL, true, true);
 #elif AZEROTHCORE
-        uint32 schoolMask = Eluna::CHECKVAL<uint32>(E->L, 5, 0);
+        uint32 schoolMask = Eluna::CHECKVAL<uint32>(L, 5, 0);
         if (schoolMask > SPELL_SCHOOL_MASK_ALL)
         {
-            return luaL_argerror(E->L, 4, "valid SpellSchoolMask expected");
+            return luaL_argerror(L, 4, "valid SpellSchoolMask expected");
         }
         unit->AddThreat(victim, threat, (SpellSchoolMask)schoolMask, spell ? sSpellMgr->GetSpellInfo(spell) : NULL);
 #else
@@ -2977,33 +2952,33 @@ namespace LuaUnit
         return 0;
     }
 
-    /*int RestoreDisplayId(Eluna* E, Unit* unit)
+    /*int RestoreDisplayId(lua_State* L, Unit* unit)
     {
         unit->RestoreDisplayId();
         return 0;
     }*/
 
-    /*int RestoreFaction(Eluna* E, Unit* unit)
+    /*int RestoreFaction(lua_State* L, Unit* unit)
     {
         unit->RestoreFaction();
         return 0;
     }*/
 
-    /*int RemoveBindSightAuras(Eluna* E, Unit* unit)
+    /*int RemoveBindSightAuras(lua_State* L, Unit* unit)
     {
         unit->RemoveBindSightAuras();
         return 0;
     }*/
 
-    /*int RemoveCharmAuras(Eluna* E, Unit* unit)
+    /*int RemoveCharmAuras(lua_State* L, Unit* unit)
     {
         unit->RemoveCharmAuras();
         return 0;
     }*/
 
-    /*int DisableMelee(Eluna* E, Unit* unit)
+    /*int DisableMelee(lua_State* L, Unit* unit)
     {
-    bool apply = Eluna::CHECKVAL<bool>(E->L, 2, true);
+    bool apply = Eluna::CHECKVAL<bool>(L, 2, true);
 
     if (apply)
     unit->AddUnitState(UNIT_STATE_CANNOT_AUTOATTACK);
@@ -3012,14 +2987,14 @@ namespace LuaUnit
     return 0;
     }*/
 
-    /*int SummonGuardian(Eluna* E, Unit* unit)
+    /*int SummonGuardian(lua_State* L, Unit* unit)
     {
-    uint32 entry = Eluna::CHECKVAL<uint32>(E->L, 2);
-    float x = Eluna::CHECKVAL<float>(E->L, 3);
-    float y = Eluna::CHECKVAL<float>(E->L, 4);
-    float z = Eluna::CHECKVAL<float>(E->L, 5);
-    float o = Eluna::CHECKVAL<float>(E->L, 6);
-    uint32 desp = Eluna::CHECKVAL<uint32>(E->L, 7, 0);
+    uint32 entry = Eluna::CHECKVAL<uint32>(L, 2);
+    float x = Eluna::CHECKVAL<float>(L, 3);
+    float y = Eluna::CHECKVAL<float>(L, 4);
+    float z = Eluna::CHECKVAL<float>(L, 5);
+    float o = Eluna::CHECKVAL<float>(L, 6);
+    uint32 desp = Eluna::CHECKVAL<uint32>(L, 7, 0);
 
     SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(61);
     if (!properties)
@@ -3048,120 +3023,8 @@ namespace LuaUnit
     }
     summon->AI()->EnterEvadeMode();
 
-    Eluna::Push(E->L, summon);
+    Eluna::Push(L, summon);
     return 1;
     }*/
-
-    /**
-     * Spawns a dynamic object
-     *
-     * @param uint32 spell id
-     * @param float radius
-     * @param uint8 type (only 0-2 valid)
-     * @param uint32 duration (in seconds)
-     * @param float x cord
-     * @param float y cord
-     * @param float z cord
-     */
-    int SpawnDynObject(Eluna* E, Unit* unit)
-    {
-        uint32 spellId = Eluna::CHECKVAL<uint32>(E->L, 2);
-        float radius = Eluna::CHECKVAL<float>(E->L, 3);
-        uint8 type = Eluna::CHECKVAL<uint8>(E->L, 4);
-        uint32 duration = Eluna::CHECKVAL<uint32>(E->L, 5);
-        float x = Eluna::CHECKVAL<float>(E->L, 6);
-        float y = Eluna::CHECKVAL<float>(E->L, 7);
-        float z = Eluna::CHECKVAL<float>(E->L, 8);
-        if(!sSpellMgr->GetSpellInfo(spellId))
-            return luaL_argerror(E->L, 2, "invalid spell supplied .");
-        if (type >= 3)
-            return luaL_argerror(E->L, 4, "valid dynamic object type expected");
-        DynamicObject* dynObj = new DynamicObject(false);
-        if (dynObj->CreateDynamicObject(unit->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), unit, spellId, Position(x, y, z), radius, DynamicObjectType(type)))
-            dynObj->SetDuration(duration);
-        else
-        {
-            delete dynObj;
-            return luaL_error(E->L, "Unexpected error occured creating dynamic object.");
-        }
-          
-        return 0;
-    }
-
-    int SendEncounterFrame(Eluna* E, Unit* unit)
-    {
-        uint32 type = Eluna::CHECKVAL<uint32>(E->L, 2);
-        uint8 param1 = Eluna::CHECKVAL<uint8>(E->L, 3);
-        uint8 param2 = Eluna::CHECKVAL<uint8>(E->L, 4);
-        if(type > 7)
-            return luaL_error(E->L, "SendEncounterFrame type larger then expected ( > 7)");
-        WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
-        data << uint32(type);
-
-        switch (type)
-        {
-        case /*ENCOUNTER_FRAME_ENGAGE*/0:
-        case /*ENCOUNTER_FRAME_DISENGAGE*/1:
-        case /*ENCOUNTER_FRAME_UPDATE_PRIORITY*/2:
-            data << unit->GetPackGUID();
-            data << uint8(param1);
-            break;
-        case /*ENCOUNTER_FRAME_ADD_TIMER*/3:
-        case /*ENCOUNTER_FRAME_ENABLE_OBJECTIVE*/4:
-        case /*ENCOUNTER_FRAME_DISABLE_OBJECTIVE*/6:
-            data << uint8(param1);
-            break;
-        case /*ENCOUNTER_FRAME_UPDATE_OBJECTIVE*/5:
-            data << uint8(param1);
-            data << uint8(param2);
-            break;
-        default:
-            break;
-        }
-        unit->GetMap()->SendToPlayers(&data);
-        return 0;
-    }
-
-    int SetCanSeePhaseOne(Eluna* E, Unit* unit)
-    {
-        bool canSee = Eluna::CHECKVAL<bool>(E->L, 2);
-        unit->SetCanSeePhaseOne(canSee);
-        return 0;
-    }
-
-    int GetCanSeePhaseOne(Eluna* E, Unit* unit)
-    {
-        Eluna::Push(E->L, unit->CanSeePhaseOne());
-        return 1;
-    }
-
-    int SetCanSeeUniquePhase(Eluna* E, Unit* unit)
-    {
-        bool canSee = Eluna::CHECKVAL<bool>(E->L, 2);
-        unit->SetCanSeeUniquePhase(canSee);
-        return 0;
-    }
-
-    int GetCanSeeUniquePhase(Eluna* E, Unit* unit)
-    {
-        Eluna::Push(E->L, unit->CanSeeUniquePhase());
-        return 1;
-    }
-
-    int RemoveMotion(Eluna* E, Unit* unit)
-    {
-        int moveType = Eluna::CHECKVAL<int>(E->L, 2);
-        int moveSlot = Eluna::CHECKVAL<int>(E->L, 3, 0);
-
-
-        unit->GetMotionMaster()->Remove((MovementGeneratorType)moveType, (MovementSlot)moveSlot);
-        return 0;
-    }
-
-    int ClearMotion(Eluna* /*E*/, Unit* unit)
-    {
-        unit->GetMotionMaster()->Clear();
-        return 0;
-    }
 };
 #endif

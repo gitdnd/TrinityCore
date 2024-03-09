@@ -19,21 +19,35 @@
 #define __AUTHSESSION_H__
 
 #include "AsyncCallbackProcessor.h"
+<<<<<<< HEAD
 #include "BigNumber.h"
 #include "ByteBuffer.h"
+=======
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include "Common.h"
+#include "CryptoHash.h"
+#include "DatabaseEnvFwd.h"
+#include "Duration.h"
 #include "Optional.h"
 #include "Socket.h"
+<<<<<<< HEAD
 #include "QueryResult.h"
 #include <memory>
+=======
+#include "SRP6.h"
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <boost/asio/ip/tcp.hpp>
 #include <openssl/md5.h>
 #include <boost/thread.hpp>
 
 using boost::asio::ip::tcp;
 
+<<<<<<< HEAD
 class AuthSession;
 class Field;
+=======
+class ByteBuffer;
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 struct AuthHandler;
 
 enum AuthStatus
@@ -145,14 +159,11 @@ private:
     void ReconnectChallengeCallback(PreparedQueryResult result);
     void RealmListCallback(PreparedQueryResult result);
 
-    void SetVSFields(const std::string& rI);
+    bool VerifyVersion(uint8 const* a, int32 aLength, Trinity::Crypto::SHA1::Digest const& versionProof, bool isReconnect);
 
-    bool VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect);
-
-    BigNumber N, s, g, v;
-    BigNumber b, B;
-    BigNumber K;
-    BigNumber _reconnectProof;
+    Optional<Trinity::Crypto::SRP6> _srp6;
+    SessionKey _sessionKey = {};
+    std::array<uint8, 16> _reconnectProof = {};
 
     AuthStatus _status;
     AccountInfo _accountInfo;
@@ -161,6 +172,7 @@ private:
     std::string _os;
     std::string _ipCountry;
     uint16 _build;
+    Minutes _timezoneOffset;
     uint8 _expversion;
 
     QueryCallbackProcessor _queryProcessor;

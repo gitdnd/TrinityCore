@@ -19,9 +19,9 @@ namespace LuaBattleGround
      *
      * @return string name
      */
-    int GetName(Eluna* E, BattleGround* bg)
+    int GetName(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetName());
+        Eluna::Push(L, bg->GetName());
         return 1;
     }
 
@@ -31,14 +31,14 @@ namespace LuaBattleGround
      * @param [Team] team : team ID
      * @return uint32 count
      */
-    int GetAlivePlayersCountByTeam(Eluna* E, BattleGround* bg)
+    int GetAlivePlayersCountByTeam(lua_State* L, BattleGround* bg)
     {
-        uint32 team = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 team = Eluna::CHECKVAL<uint32>(L, 2);
 
 #ifndef AZEROTHCORE
-        Eluna::Push(E->L, bg->GetAlivePlayersCountByTeam((Team)team));
+        Eluna::Push(L, bg->GetAlivePlayersCountByTeam((Team)team));
 #else
-        Eluna::Push(E->L, bg->GetAlivePlayersCountByTeam((TeamId)team));
+        Eluna::Push(L, bg->GetAlivePlayersCountByTeam((TeamId)team));
 #endif
         return 1;
     }
@@ -48,9 +48,9 @@ namespace LuaBattleGround
      *
      * @return [Map] map
      */
-    int GetMap(Eluna* E, BattleGround* bg)
+    int GetMap(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetBgMap());
+        Eluna::Push(L, bg->GetBgMap());
         return 1;
     }
 
@@ -60,11 +60,11 @@ namespace LuaBattleGround
      * @param uint32 kills : amount of kills
      * @return uint32 bonusHonor
      */
-    int GetBonusHonorFromKillCount(Eluna* E, BattleGround* bg)
+    int GetBonusHonorFromKillCount(lua_State* L, BattleGround* bg)
     {
-        uint32 kills = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 kills = Eluna::CHECKVAL<uint32>(L, 2);
 
-        Eluna::Push(E->L, bg->GetBonusHonorFromKill(kills));
+        Eluna::Push(L, bg->GetBonusHonorFromKill(kills));
         return 1;
     }
 
@@ -74,9 +74,9 @@ namespace LuaBattleGround
      *
      * @return [BattleGroundBracketId] bracketId
      */
-    int GetBracketId(Eluna* E, BattleGround* bg)
+    int GetBracketId(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetBracketId());
+        Eluna::Push(L, bg->GetBracketId());
         return 1;
     }
 #endif
@@ -86,12 +86,12 @@ namespace LuaBattleGround
      *
      * @return uint32 endTime
      */
-    int GetEndTime(Eluna* E, BattleGround* bg)
+    int GetEndTime(lua_State* L, BattleGround* bg)
     {
 #ifdef CATA
-        Eluna::Push(E->L, bg->GetRemainingTime());
+        Eluna::Push(L, bg->GetRemainingTime());
 #else
-        Eluna::Push(E->L, bg->GetEndTime());
+        Eluna::Push(L, bg->GetEndTime());
 #endif
         return 1;
     }
@@ -102,14 +102,14 @@ namespace LuaBattleGround
      * @param [Team] team : team ID
      * @return uint32 freeSlots
      */
-    int GetFreeSlotsForTeam(Eluna* E, BattleGround* bg)
+    int GetFreeSlotsForTeam(lua_State* L, BattleGround* bg)
     {
-        uint32 team = Eluna::CHECKVAL<uint32>(E->L, 2);
+        uint32 team = Eluna::CHECKVAL<uint32>(L, 2);
 
 #ifndef AZEROTHCORE
-        Eluna::Push(E->L, bg->GetFreeSlotsForTeam((Team)team));
+        Eluna::Push(L, bg->GetFreeSlotsForTeam((Team)team));
 #else
-        Eluna::Push(E->L, bg->GetFreeSlotsForTeam((TeamId)team));
+        Eluna::Push(L, bg->GetFreeSlotsForTeam((TeamId)team));
 #endif
         return 1;
     }
@@ -119,9 +119,9 @@ namespace LuaBattleGround
      *
      * @return uint32 instanceId
      */
-    int GetInstanceId(Eluna* E, BattleGround* bg)
+    int GetInstanceId(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetInstanceID());
+        Eluna::Push(L, bg->GetInstanceID());
         return 1;
     }
 
@@ -130,9 +130,9 @@ namespace LuaBattleGround
      *
      * @return uint32 mapId
      */
-    int GetMapId(Eluna* E, BattleGround* bg)
+    int GetMapId(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetMapId());
+        Eluna::Push(L, bg->GetMapId());
         return 1;
     }
 
@@ -141,12 +141,12 @@ namespace LuaBattleGround
      *
      * @return [BattleGroundTypeId] typeId
      */
-    int GetTypeId(Eluna* E, BattleGround* bg)
+    int GetTypeId(lua_State* L, BattleGround* bg)
     {
 #ifndef AZEROTHCORE
-        Eluna::Push(E->L, bg->GetTypeID());
+        Eluna::Push(L, bg->GetTypeID());
 #else
-        Eluna::Push(E->L, bg->GetBgTypeID());
+        Eluna::Push(L, bg->GetBgTypeID());
 #endif
         return 1;
     }
@@ -156,9 +156,9 @@ namespace LuaBattleGround
      *
      * @return uint32 maxLevel
      */
-    int GetMaxLevel(Eluna* E, BattleGround* bg)
+    int GetMaxLevel(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetMaxLevel());
+        Eluna::Push(L, bg->GetMaxLevel());
         return 1;
     }
 
@@ -167,9 +167,9 @@ namespace LuaBattleGround
      *
      * @return uint32 minLevel
      */
-    int GetMinLevel(Eluna* E, BattleGround* bg)
+    int GetMinLevel(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetMinLevel());
+        Eluna::Push(L, bg->GetMinLevel());
         return 1;
     }
 
@@ -178,12 +178,12 @@ namespace LuaBattleGround
      *
      * @return uint32 maxPlayerCount
      */
-    int GetMaxPlayers(Eluna* E, BattleGround* bg)
+    int GetMaxPlayers(lua_State* L, BattleGround* bg)
     {
 #ifndef AZEROTHCORE
-        Eluna::Push(E->L, bg->GetMaxPlayers());
+        Eluna::Push(L, bg->GetMaxPlayers());
 #else
-        Eluna::Push(E->L, bg->GetMaxPlayersPerTeam() * 2);
+        Eluna::Push(L, bg->GetMaxPlayersPerTeam() * 2);
 #endif
         return 1;
     }
@@ -193,12 +193,12 @@ namespace LuaBattleGround
      *
      * @return uint32 minPlayerCount
      */
-    int GetMinPlayers(Eluna* E, BattleGround* bg)
+    int GetMinPlayers(lua_State* L, BattleGround* bg)
     {
 #ifndef AZEROTHCORE
-        Eluna::Push(E->L, bg->GetMinPlayers());
+        Eluna::Push(L, bg->GetMinPlayers());
 #else
-        Eluna::Push(E->L, bg->GetMaxPlayersPerTeam() * 2);
+        Eluna::Push(L, bg->GetMaxPlayersPerTeam() * 2);
 #endif
         return 1;
     }
@@ -208,9 +208,9 @@ namespace LuaBattleGround
      *
      * @return uint32 maxTeamPlayerCount
      */
-    int GetMaxPlayersPerTeam(Eluna* E, BattleGround* bg)
+    int GetMaxPlayersPerTeam(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetMaxPlayersPerTeam());
+        Eluna::Push(L, bg->GetMaxPlayersPerTeam());
         return 1;
     }
 
@@ -219,9 +219,9 @@ namespace LuaBattleGround
      *
      * @return uint32 minTeamPlayerCount
      */
-    int GetMinPlayersPerTeam(Eluna* E, BattleGround* bg)
+    int GetMinPlayersPerTeam(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetMinPlayersPerTeam());
+        Eluna::Push(L, bg->GetMinPlayersPerTeam());
         return 1;
     }
 
@@ -230,9 +230,9 @@ namespace LuaBattleGround
      *
      * @return [Team] team
      */
-    int GetWinner(Eluna* E, BattleGround* bg)
+    int GetWinner(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetWinner());
+        Eluna::Push(L, bg->GetWinner());
         return 1;
     }
 
@@ -241,9 +241,9 @@ namespace LuaBattleGround
      *
      * @return [BattleGroundStatus] status
      */
-    int GetStatus(Eluna* E, BattleGround* bg)
+    int GetStatus(lua_State* L, BattleGround* bg)
     {
-        Eluna::Push(E->L, bg->GetStatus());
+        Eluna::Push(L, bg->GetStatus());
         return 1;
     }
 };

@@ -60,7 +60,6 @@ target_include_directories(common
 
 target_link_libraries(common
   PRIVATE
-    process
     trinity-core-interface
   PUBLIC
     argon2
@@ -73,7 +72,8 @@ target_link_libraries(common
     openssl
     valgrind
     threads
-    jemalloc)
+    jemalloc
+    short_alloc)
 
 
 if (ELUNA)

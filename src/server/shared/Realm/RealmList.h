@@ -19,6 +19,7 @@
 #define _REALMLIST_H
 
 #include "Define.h"
+#include "Duration.h"
 #include "Realm.h"
 #include <array>
 #include <map>
@@ -41,15 +42,6 @@ namespace boost
     namespace system
     {
         class error_code;
-    }
-}
-
-namespace Trinity
-{
-    namespace Asio
-    {
-        class IoContext;
-        class DeadlineTimer;
     }
 }
 
@@ -84,7 +76,7 @@ private:
     RealmMap _realms;
     uint32 _updateInterval;
     std::unique_ptr<Trinity::Asio::DeadlineTimer> _updateTimer;
-    std::unique_ptr<boost::asio::ip::tcp_resolver> _resolver;
+    std::unique_ptr<Trinity::Asio::Resolver> _resolver;
 };
 
 #define sRealmList RealmList::Instance()

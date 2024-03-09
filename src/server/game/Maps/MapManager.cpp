@@ -17,6 +17,7 @@
 
 #include "MapManager.h"
 #include "InstanceSaveMgr.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -28,7 +29,6 @@
 #include "World.h"
 #include "Corpse.h"
 #include "ObjectMgr.h"
-#include "Language.h"
 #include "WorldPacket.h"
 #include "Group.h"
 #include "Player.h"
@@ -36,6 +36,7 @@
 #include "Opcodes.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaConfig.h"
 #endif
 
 MapManager::MapManager()
@@ -52,15 +53,24 @@ void MapManager::Initialize()
     Map::InitStateMachine();
 
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
+<<<<<<< HEAD
 /*#if ELUNA
     if (num_threads > 1)
+=======
+#if ELUNA
+    if (sElunaConfig->IsElunaEnabled() && sElunaConfig->IsElunaCompatibilityMode() && num_threads > 1)
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
-        // Force 1 thread for Eluna as lua is single threaded. By default thread count is 1
-        // This should allow us not to use mutex locks
-        TC_LOG_ERROR("maps", "Map update threads set to %i, when Eluna only allows 1, changing to 1", num_threads);
+        // Force 1 thread for Eluna if compatibility mode is enabled. Compatibility mode is single state and does not allow more update threads.
+        TC_LOG_ERROR("maps", "Map update threads set to {}, when Eluna in compatibility mode only allows 1, changing to 1", num_threads);
         num_threads = 1;
     }
+<<<<<<< HEAD
 #endif*/
+=======
+#endif
+
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // Start mtmaps if needed.
     if (num_threads > 0)
         m_updater.activate(num_threads);
@@ -152,7 +162,7 @@ Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool
     Difficulty targetDifficulty, requestedDifficulty;
     targetDifficulty = requestedDifficulty = player->GetDifficulty(entry->IsRaid());
     // Get the highest available difficulty if current setting is higher than the instance allows
-    MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(entry->MapID, targetDifficulty);
+    MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(entry->ID, targetDifficulty);
     if (!mapDiff)
         return Map::CANNOT_ENTER_DIFFICULTY_UNAVAILABLE;
 
@@ -164,7 +174,7 @@ Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool
     if (!player->Satisfy(sObjectMgr->GetAccessRequirement(mapid, targetDifficulty), mapid, true))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
-    char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
+    char const* mapName = entry->MapName[player->GetSession()->GetSessionDbcLocale()];
 
     Group* group = player->GetGroup();
     if (entry->IsRaid()) // can only enter in a raid group
@@ -189,10 +199,10 @@ Map::EnterState MapManager::PlayerCannotEnter(uint32 mapid, Player* player, bool
             if (!corpseMap)
                 return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
 
-            TC_LOG_DEBUG("maps", "MAP: Player '%s' has corpse in instance '%s' and can enter.", player->GetName().c_str(), mapName);
+            TC_LOG_DEBUG("maps", "MAP: Player '{}' has corpse in instance '{}' and can enter.", player->GetName(), mapName);
         }
         else
-            TC_LOG_DEBUG("maps", "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
+            TC_LOG_DEBUG("maps", "Map::CanPlayerEnter - player '{}' is dead but does not have a corpse!", player->GetName());
     }
 
     //Get instance where player's group is bound & its map
@@ -373,6 +383,7 @@ void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
     _nextInstanceId = std::min(instanceId, _nextInstanceId);
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
+<<<<<<< HEAD
     sWorld->GetEluna()->OnFreeInstanceId(instanceId);
     if (calledMap)
         if (Eluna* e = calledMap->GetEluna())
@@ -393,6 +404,18 @@ void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
             if(iMap->GetEluna())
                 iMap->GetEluna()->FreeInstanceId(instanceId);*/
     //}
+=======
+    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
+    {
+        Map* map = itr->second;
+        if (!map->Instanceable())
+            continue;
+
+        Map* iMap = ((MapInstanced*)map)->FindInstanceMap(instanceId);
+        if (iMap && iMap->GetEluna())
+            iMap->GetEluna()->FreeInstanceId(instanceId);
+    }
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 }
 

@@ -81,19 +81,19 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     MapEntry const* entry = sMapStore.LookupEntry(mapId);
     if (!entry)
     {
-        TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
+        TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: wrong mapid = {}, instanceid = {}!", mapId, instanceId);
         return nullptr;
     }
 
     if (instanceId == 0)
     {
-        TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
+        TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: mapid = {}, wrong instanceid = {}!", mapId, instanceId);
         return nullptr;
     }
 
     if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
     {
-        TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
+        TC_LOG_ERROR("misc", "InstanceSaveManager::AddInstanceSave: mapid = {}, instanceid = {}, wrong dificalty {}!", mapId, instanceId, static_cast<uint32>(difficulty));
         return nullptr;
     }
 
@@ -101,7 +101,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     {
         // initialize reset time
         // for normal instances if no creatures are killed the instance will reset in two hours
-        if (entry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
+        if (entry->InstanceType == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
             resetTime = GetResetTimeFor(mapId, difficulty);
         else
         {
@@ -111,7 +111,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
         }
     }
 
-    TC_LOG_DEBUG("maps", "InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d", mapId, instanceId);
+    TC_LOG_DEBUG("maps", "InstanceSaveManager::AddInstanceSave: mapid = {}, instanceid = {}", mapId, instanceId);
 
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, dungeonLevel, affix1, affix2, affix3, affix4, resetTime, canReset);
     if (!load)
@@ -228,7 +228,7 @@ time_t InstanceSave::GetResetTimeForDB()
 {
     // only save the reset time for normal instances
     MapEntry const* entry = sMapStore.LookupEntry(GetMapId());
-    if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
+    if (!entry || entry->InstanceType == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
         return 0;
     else
         return GetResetTime();
@@ -299,7 +299,7 @@ void InstanceSaveManager::LoadInstances()
     // Load reset times and clean expired instances
     sInstanceSaveMgr->LoadResetTimes();
 
-    TC_LOG_INFO("server.loading", ">> Loaded instances in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded instances in {} ms", GetMSTimeDiffToNow(oldMSTime));
 
 }
 
@@ -364,7 +364,7 @@ void InstanceSaveManager::LoadResetTimes()
             MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
             if (!mapDiff)
             {
-                TC_LOG_ERROR("misc", "InstanceSaveManager::LoadResetTimes: invalid mapid(%u)/difficulty(%u) pair in instance_reset!", mapid, difficulty);
+                TC_LOG_ERROR("misc", "InstanceSaveManager::LoadResetTimes: invalid mapid({})/difficulty({}) pair in instance_reset!", mapid, static_cast<uint32>(difficulty));
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GLOBAL_INSTANCE_RESETTIME);
                 stmt->setUInt16(0, uint16(mapid));
@@ -400,7 +400,7 @@ void InstanceSaveManager::LoadResetTimes()
             continue;
 
         // the reset_delay must be at least one day
-        uint32 period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME))/DAY) * DAY);
+        uint32 period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME)) / float(DAY)) * float(DAY));
         if (period < DAY)
             period = DAY;
 
@@ -452,12 +452,12 @@ time_t InstanceSaveManager::GetSubsequentResetTime(uint32 mapid, Difficulty diff
     MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
     if (!mapDiff || !mapDiff->resetTime)
     {
-        TC_LOG_ERROR("misc", "InstanceSaveManager::GetSubsequentResetTime: not valid difficulty or no reset delay for map %u", mapid);
+        TC_LOG_ERROR("misc", "InstanceSaveManager::GetSubsequentResetTime: not valid difficulty or no reset delay for map {}", mapid);
         return 0;
     }
 
     time_t resetHour = sWorld->getIntConfig(CONFIG_INSTANCE_RESET_TIME_HOUR);
-    time_t period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME)) / DAY) * DAY);
+    time_t period = uint32(((mapDiff->resetTime * sWorld->getRate(RATE_INSTANCE_RESET_TIME)) / float(DAY)) * float(DAY));
     if (period < DAY)
         period = DAY;
 
@@ -501,7 +501,7 @@ void InstanceSaveManager::ScheduleReset(bool add, time_t time, InstResetEvent ev
             }
 
             if (itr == m_resetTimeQueue.end())
-                TC_LOG_ERROR("misc", "InstanceSaveManager::ScheduleReset: cannot cancel the reset, the event(%d, %d, %d) was not found!", event.type, event.mapid, event.instanceId);
+                TC_LOG_ERROR("misc", "InstanceSaveManager::ScheduleReset: cannot cancel the reset, the event({}, {}, {}) was not found!", event.type, event.mapid, event.instanceId);
         }
     }
     else
@@ -602,7 +602,7 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
 
 void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 {
-    TC_LOG_DEBUG("maps", "InstanceSaveMgr::_ResetInstance %u, %u", mapid, instanceId);
+    TC_LOG_DEBUG("maps", "InstanceSaveMgr::_ResetInstance {}, {}", mapid, instanceId);
     Map const* map = sMapMgr->CreateBaseMap(mapid);
     if (!map->Instanceable())
         return;
@@ -636,7 +636,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
     if (!mapEntry->Instanceable())
         return;
-    TC_LOG_DEBUG("misc", "InstanceSaveManager::ResetOrWarnAll: Processing map %s (%u) on difficulty %u (warn? %u)", mapEntry->name[0], mapid, uint8(difficulty), warn);
+    TC_LOG_DEBUG("misc", "InstanceSaveManager::ResetOrWarnAll: Processing map {} ({}) on difficulty {} (warn? {})", mapEntry->MapName[0], mapid, static_cast<uint32>(difficulty), warn);
 
     time_t now = GameTime::GetGameTime();
 

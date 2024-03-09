@@ -24,51 +24,11 @@
 #include "Database/QueryResult.h"
 #include "Log.h"
 #endif
-#include "World.h"
-#include <iostream>
-
-#if defined(TRINITY_PLATFORM) && defined(TRINITY_PLATFORM_WINDOWS)
-#if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(AC_PLATFORM) && defined(AC_PLATFORM_WINDOWS)
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#elif defined(PLATFORM) && defined(PLATFORM_WINDOWS)
-#if PLATFORM == PLATFORM_WINDOWS
-#define ELUNA_WINDOWS
-#endif
-#else
-#error Eluna could not determine platform
-#endif
 
 #ifdef TRINITY
-template<typename Format, typename... Args>
-inline void sendWebhook(Format&& fmt, Args&&... args)
-{
-    //if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
-    //{
-        std::ostringstream str;
-        str << "DiscordScriptError.exe";
-        str << " \"" << Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...) << "\" &";
-        std::system(str.str().c_str());
-        //std::string fargs = Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
-        //spawnl(P_NOWAITO, "DiscordScriptError.exe", fargs.c_str(), NULL);
-    //}
-    //std::system("C:\\HoT\\Development\\Server\\DiscordScriptError.exe");
-    //ShellExecute(NULL, "open", "C:\\HoT\\Development\\Server\\DiscordScriptError.exe", Trinity::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...).c_str(), NULL, SW_HIDE);
-}
-
 typedef QueryResult ElunaQuery;
 #define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
-//#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
-#define ELUNA_LOG_ERROR(...) \
-{ \
-    sendWebhook(__VA_ARGS__); \
-    TC_LOG_ERROR("eluna", __VA_ARGS__); \
-}
-
+#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
 #define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #define GET_GUID                GetGUID
 
@@ -118,8 +78,6 @@ typedef QueryNamedResult ElunaQuery;
 #endif
 #endif
 
-typedef std::vector<uint8> BytecodeBuffer;
-
 class Unit;
 class WorldObject;
 struct FactionTemplateEntry;
@@ -155,8 +113,7 @@ namespace ElunaUtil
     {
     public:
         WorldObjectInRangeCheck(bool nearest, WorldObject const* obj, float range,
-            uint16 typeMask = 0, uint32 entry = 0, uint32 hostile = 0, uint32 dead = 0,
-            bool filterGM = true);
+            uint16 typeMask = 0, uint32 entry = 0, uint32 hostile = 0, uint32 dead = 0);
         WorldObject const& GetFocusObject() const;
         bool operator()(WorldObject* u);
 
@@ -169,7 +126,6 @@ namespace ElunaUtil
         uint16 const i_typeMask;
         uint32 const i_dead; // 0 both, 1 alive, 2 dead
         bool const i_nearest;
-        bool const i_filterGM;
     };
 
     /*

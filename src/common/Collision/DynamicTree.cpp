@@ -18,10 +18,15 @@
 #include "DynamicTree.h"
 #include "BoundingIntervalHierarchyWrapper.h"
 #include "GameObjectModel.h"
+<<<<<<< HEAD
 #include "Log.h"
 #include "MapTree.h"
 #include "ModelIgnoreFlags.h"
 #include "ModelInstance.h"
+=======
+#include "MapTree.h"
+#include "ModelIgnoreFlags.h"
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include "RegularGrid.h"
 #include "Timer.h"
 #include "VMapFactory.h"
@@ -103,7 +108,7 @@ struct DynTreeImpl : public ParentTree/*, public Intersectable*/
         }
     }
 
-    TimeTrackerSmall rebalance_timer;
+    TimeTracker rebalance_timer;
     int unbalanced_times;
 };
 
@@ -152,26 +157,39 @@ struct DynamicTreeIntersectionCallback
     bool didHit() const { return did_hit;}
 };
 
-struct DynamicTreeIntersectionCallback_WithLogger
+struct DynamicTreeAreaInfoCallback
 {
-    bool did_hit;
-    uint32 phase_mask;
-    DynamicTreeIntersectionCallback_WithLogger(uint32 phasemask) : did_hit(false), phase_mask(phasemask)
+    DynamicTreeAreaInfoCallback(uint32 phaseMask) : _phaseMask(phaseMask) {}
+
+    void operator()(G3D::Vector3 const& p, GameObjectModel const& obj)
     {
-        TC_LOG_DEBUG("maps", "Dynamic Intersection log");
+        obj.intersectPoint(p, _areaInfo, _phaseMask);
     }
-    bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance)
+
+    VMAP::AreaInfo const& GetAreaInfo() const { return _areaInfo; }
+
+private:
+    uint32 _phaseMask;
+    VMAP::AreaInfo _areaInfo;
+};
+
+struct DynamicTreeLocationInfoCallback
+{
+    DynamicTreeLocationInfoCallback(uint32 phaseMask) : _phaseMask(phaseMask), _hitModel(nullptr) {}
+
+    void operator()(G3D::Vector3 const& p, GameObjectModel const& obj)
     {
-        TC_LOG_DEBUG("maps", "testing intersection with %s", obj.name.c_str());
-        bool hit = obj.intersectRay(r, distance, true, phase_mask, VMAP::ModelIgnoreFlags::Nothing);
-        if (hit)
-        {
-            did_hit = true;
-            TC_LOG_DEBUG("maps", "result: intersects");
-        }
-        return hit;
+        if (obj.GetLocationInfo(p, _locationInfo, _phaseMask))
+            _hitModel = &obj;
     }
-    bool didHit() const { return did_hit;}
+
+    VMAP::LocationInfo& GetLocationInfo() { return _locationInfo; }
+    GameObjectModel const* GetHitModel() const { return _hitModel; }
+
+private:
+    uint32 _phaseMask;
+    VMAP::LocationInfo _locationInfo;
+    GameObjectModel const* _hitModel;
 };
 
 struct DynamicTreeAreaInfoCallback
@@ -316,11 +334,19 @@ void DynamicMapTree::getAreaAndLiquidData(float x, float y, float z, uint32 phas
         data.floorZ = intersectionCallBack.GetLocationInfo().ground_Z;
         uint32 liquidType = intersectionCallBack.GetLocationInfo().hitModel->GetLiquidType();
         float liquidLevel;
+<<<<<<< HEAD
         if (!reqLiquidType || (dynamic_cast<VMAP::VMapManager2*>(VMAP::VMapFactory::createOrGetVMapManager())->GetLiquidFlagsPtr(liquidType) & reqLiquidType))
             if (intersectionCallBack.GetHitModel()->GetLiquidLevel(v, intersectionCallBack.GetLocationInfo(), liquidLevel))
                 data.liquidInfo = boost::in_place(liquidType, liquidLevel);
 
         data.areaInfo = boost::in_place(0,
+=======
+        if (!reqLiquidType || VMAP::VMapFactory::createOrGetVMapManager()->GetLiquidFlagsPtr(liquidType) & reqLiquidType)
+            if (intersectionCallBack.GetHitModel()->GetLiquidLevel(v, intersectionCallBack.GetLocationInfo(), liquidLevel))
+                data.liquidInfo.emplace(liquidType, liquidLevel);
+
+        data.areaInfo.emplace(0,
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             intersectionCallBack.GetLocationInfo().rootId,
             intersectionCallBack.GetLocationInfo().hitModel->GetWmoID(),
             intersectionCallBack.GetLocationInfo().hitModel->GetMogpFlags());

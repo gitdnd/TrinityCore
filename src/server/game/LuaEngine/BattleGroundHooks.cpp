@@ -13,9 +13,12 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
+    if (!IsEnabled())\
+        return;\
     auto key = EventKey<BGEvents>(EVENT);\
     if (!BGEventBindings->HasBindingsFor(key))\
-        return;
+        return;\
+    LOCK_ELUNA
 
 void Eluna::OnBGStart(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
 {

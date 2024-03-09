@@ -22,6 +22,10 @@
 #include "Guild.h"
 #include "ObjectGuid.h"
 #include "PacketUtilities.h"
+<<<<<<< HEAD
+=======
+#include "WowTime.h"
+>>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <array>
 
 namespace WorldPackets
@@ -89,7 +93,7 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             std::string GuildName;
-            time_t CreateDate = time_t(0);
+            WowTime CreateDate;
             int32 NumMembers = 0;
             int32 NumAccounts = 0;
         };
@@ -207,7 +211,7 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint8 Type = 0;
-            std::array<char const*, 3> Params = { };
+            Array<std::string_view, 3> Params;
             ObjectGuid Guid;
         };
 
