@@ -36,6 +36,7 @@
 #include "Opcodes.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaLoader.h"
 #endif
 
 MapManager::MapManager()
@@ -80,6 +81,12 @@ MapManager* MapManager::instance()
 
 Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
 {
+    if (sElunaLoader->ShouldMapLoadEluna(id))
+    {
+        ASSERT(!true, "weeeeeeeeeeeeeeeeeee");
+        return nullptr;
+    }
+
     Map* map = FindBaseMap(id);
 
     if (map == nullptr)
