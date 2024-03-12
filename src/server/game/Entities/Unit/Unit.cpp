@@ -11382,11 +11382,11 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
     // handle player kill only if not suicide (spirit of redemption for example)
     if (player && attacker != victim)
     {
-        if (OutdoorPvP* pvp = player->GetOutdoorPvP())
-            pvp->HandleKill(player, victim);
+        //if (OutdoorPvP* pvp = player->GetOutdoorPvP())
+            //pvp->HandleKill(player, victim);
 
-        if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
-            bf->HandleKill(player, victim);
+        //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
+            //bf->HandleKill(player, victim);
     }
 
     //if (victim->GetTypeId() == TYPEID_PLAYER)

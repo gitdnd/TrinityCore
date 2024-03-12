@@ -48,6 +48,7 @@ OutdoorPvPMgr* OutdoorPvPMgr::instance()
 
 void OutdoorPvPMgr::InitOutdoorPvP()
 {
+    return;
     uint32 oldMSTime = getMSTime();
 
     //                                                 0       1

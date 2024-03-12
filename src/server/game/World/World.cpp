@@ -2294,12 +2294,12 @@ void World::SetInitialWorldSettings()
     sBattlegroundMgr->InitAutomaticArenaPointDistribution();
 
     ///- Initialize outdoor pvp
-    TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
-    sOutdoorPvPMgr->InitOutdoorPvP();
+    //TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
+    //sOutdoorPvPMgr->InitOutdoorPvP();
 
     ///- Initialize Battlefield
-    TC_LOG_INFO("server.loading", "Starting Battlefield System");
-    sBattlefieldMgr->InitBattlefield();
+    //TC_LOG_INFO("server.loading", "Starting Battlefield System");
+    //sBattlefieldMgr->InitBattlefield();
 
     TC_LOG_INFO("server.loading", "Loading Transports...");
     sTransportMgr->SpawnContinentTransports();
@@ -2578,10 +2578,10 @@ void World::Update(uint32 diff)
     sBattlegroundMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("UpdateBattlegroundMgr");
 
-    sOutdoorPvPMgr->Update(diff);
+    //sOutdoorPvPMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("UpdateOutdoorPvPMgr");
 
-    sBattlefieldMgr->Update(diff);
+    //sBattlefieldMgr->Update(diff);
     sWorldUpdateTime.RecordUpdateTimeDuration("BattlefieldMgr");
 
     ///- Delete all characters which have been deleted X days before

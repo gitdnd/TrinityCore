@@ -1953,8 +1953,8 @@ void Player::RemoveFromWorld()
         ObjectGuid lootGuid = GetLootGUID();
         if (!lootGuid.IsEmpty())
             m_session->DoLootRelease(lootGuid);
-        sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
+        //sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
+        //sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
     }
 
     // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate
@@ -4702,7 +4702,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     uint32 newzone, newarea;
     GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);
-    sOutdoorPvPMgr->HandlePlayerResurrects(this, newzone);
+    //sOutdoorPvPMgr->HandlePlayerResurrects(this, newzone);
 
     if (InBattleground())
     {
@@ -5107,9 +5107,9 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
         ClosestGrave = bg->GetClosestGraveyard(this);
     else
     {
-        if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
-            ClosestGrave = bf->GetClosestGraveyard(this);
-        else
+        //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
+            //ClosestGrave = bf->GetClosestGraveyard(this);
+        //else
         {
             ClosestGrave = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
             overrideRepopLoc = true;
@@ -7281,8 +7281,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     // call leave script hooks immedately (before updating flags)
     if (oldZone != newZone)
     {
-        sOutdoorPvPMgr->HandlePlayerLeaveZone(this, oldZone);
-        sBattlefieldMgr->HandlePlayerLeaveZone(this, oldZone);
+        //sOutdoorPvPMgr->HandlePlayerLeaveZone(this, oldZone);
+        //sBattlefieldMgr->HandlePlayerLeaveZone(this, oldZone);
     }
 
     // group update
@@ -7353,8 +7353,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     sScriptMgr->OnPlayerUpdateZone(this, newZone, newArea);
     if (oldZone != newZone)
     {
-        sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
-        sBattlefieldMgr->HandlePlayerEnterZone(this, newZone);
+        //sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
+        //sBattlefieldMgr->HandlePlayerEnterZone(this, newZone);
         SendInitWorldStates(newZone, newArea);              // only if really enters to new zone, not just area change, works strange...
         if (Guild* guild = GetGuild())
             guild->UpdateMemberData(this, GUILD_MEMBER_DATA_ZONEID, newZone);
@@ -9101,9 +9101,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
 {
     uint32 mapId = GetMapId();
     Battleground* battleground = GetBattleground();
-    OutdoorPvP* outdoorPvP = sOutdoorPvPMgr->GetOutdoorPvPToZoneId(zoneId);
+    OutdoorPvP* outdoorPvP = nullptr;// sOutdoorPvPMgr->GetOutdoorPvPToZoneId(zoneId);
     InstanceScript* instance = GetInstanceScript();
-    Battlefield* battlefield = sBattlefieldMgr->GetBattlefieldToZoneId(zoneId);
+    Battlefield* battlefield = nullptr;// sBattlefieldMgr->GetBattlefieldToZoneId(zoneId);
 
     TC_LOG_DEBUG("network", "Player::SendInitWorldStates: Sending SMSG_INIT_WORLD_STATES for Map: %u, Zone: %u", mapId, zoneId);
 
@@ -14841,10 +14841,10 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 case GOSSIP_OPTION_TABARDDESIGNER:
                 case GOSSIP_OPTION_AUCTIONEER:
                     break;                                  // no checks
-                case GOSSIP_OPTION_OUTDOORPVP:
-                    if (!sOutdoorPvPMgr->CanTalkTo(this, creature, itr->second))
-                        canTalk = false;
-                    break;
+                //case GOSSIP_OPTION_OUTDOORPVP:
+                    //if (!sOutdoorPvPMgr->CanTalkTo(this, creature, itr->second))
+                        //canTalk = false;
+                    //break;
                 default:
                     TC_LOG_ERROR("sql.sql", "Creature entry %u has unknown gossip option %u for menu %u.", creature->GetEntry(), itr->second.OptionType, itr->second.MenuID);
                     canTalk = false;
@@ -14993,8 +14993,8 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
 
             break;
         }
-        case GOSSIP_OPTION_OUTDOORPVP:
-            sOutdoorPvPMgr->HandleGossipOption(this, source->ToCreature(), gossipListId);
+        //case GOSSIP_OPTION_OUTDOORPVP:
+            //sOutdoorPvPMgr->HandleGossipOption(this, source->ToCreature(), gossipListId);
             break;
         case GOSSIP_OPTION_SPIRITHEALER:
             if (isDead())
@@ -24493,7 +24493,7 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
 
 OutdoorPvP* Player::GetOutdoorPvP() const
 {
-    return sOutdoorPvPMgr->GetOutdoorPvPToZoneId(GetZoneId());
+    return nullptr; // sOutdoorPvPMgr->GetOutdoorPvPToZoneId(GetZoneId());
 }
 
 bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item const* ignoreItem) const

@@ -2081,15 +2081,15 @@ void GameObject::Use(Unit* user)
 
     if (!sSpellMgr->GetSpellInfo(spellId))
     {
-        if (user->GetTypeId() != TYPEID_PLAYER || !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this))
+        if (user->GetTypeId() != TYPEID_PLAYER /*|| !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this)*/)
             TC_LOG_ERROR("misc", "WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u)", spellId, GetEntry(), GetGoType());
         else
             TC_LOG_DEBUG("outdoorpvp", "WORLD: %u non-dbc spell was handled by OutdoorPvP", spellId);
         return;
     }
 
-    if (Player* player = user->ToPlayer())
-        sOutdoorPvPMgr->HandleCustomSpell(player, spellId, this);
+    //if (Player* player = user->ToPlayer())
+        //sOutdoorPvPMgr->HandleCustomSpell(player, spellId, this);
 
     if (spellCaster)
         spellCaster->CastSpell(user, spellId, triggered);

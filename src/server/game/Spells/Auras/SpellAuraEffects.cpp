@@ -3134,8 +3134,8 @@ void AuraEffect::HandleAuraModEffectImmunity(AuraApplication const* aurApp, uint
             if (Battleground* bg = player->GetBattleground())
                 bg->EventPlayerDroppedFlag(player);
         }
-        else
-            sOutdoorPvPMgr->HandleDropFlag(player, GetSpellInfo()->Id);
+        //else
+            //sOutdoorPvPMgr->HandleDropFlag(player, GetSpellInfo()->Id);
     }
 }
 
@@ -4510,8 +4510,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (Battleground* bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->GetGUID());
-                                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
-                                    bf->RemovePlayerFromResurrectQueue(target->GetGUID());
+                                //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
+                                    //bf->RemovePlayerFromResurrectQueue(target->GetGUID());
                             }
                             break;
                         case 36730:                                     // Flame Strike
