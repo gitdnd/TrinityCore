@@ -1717,7 +1717,7 @@ void World::SetInitialWorldSettings()
 
     std::vector<uint32> mapIds;
     for (uint32 mapId = 0; mapId < sMapStore.GetNumRows(); mapId++)
-        if (sMapStore.LookupEntry(mapId))
+        if (sMapStore.LookupEntry(mapId) && sElunaLoader->ShouldMapLoadEluna(mapId))
             mapIds.push_back(mapId);
 
     if (VMAP::VMapManager2* vmmgr2 = dynamic_cast<VMAP::VMapManager2*>(VMAP::VMapFactory::createOrGetVMapManager()))
