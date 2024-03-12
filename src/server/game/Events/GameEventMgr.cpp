@@ -31,6 +31,7 @@
 #include "World.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
+#include "ElunaLoader.h"
 #endif
 #include "WorldStatePackets.h"
 
@@ -428,6 +429,9 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
+                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                    continue;
+
                 // Log error for pooled object, but still spawn it
                 if (uint32 poolId = sPoolMgr->IsPartOfAPool(SPAWN_TYPE_CREATURE, guid))
                     TC_LOG_ERROR("sql.sql", "`game_event_creature`: game event id (%i) contains creature (%u) which is part of a pool (%u). This should be spawned in game_event_pool", event_id, guid, poolId);
@@ -477,6 +481,9 @@ void GameEventMgr::LoadFromDB()
                     TC_LOG_ERROR("sql.sql", "`game_event_gameobject`: game event id (%i) is out of range compared to max event id in `game_event`.", event_id);
                     continue;
                 }
+
+                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                    continue;
 
                 // Log error for pooled object, but still spawn it
                 if (uint32 poolId = sPoolMgr->IsPartOfAPool(SPAWN_TYPE_GAMEOBJECT, guid))
