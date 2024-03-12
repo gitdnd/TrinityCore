@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "ElunaLoader.h"
 
 ////////////////////////////////////////////////////////////
 // template class ActivePoolData
@@ -513,6 +514,10 @@ void PoolMgr::LoadFromDB()
                     TC_LOG_ERROR("sql.sql", "`pool_creature` has an invalid chance (%f) for creature guid (%u) in pool id (%u), skipped.", chance, guid, pool_id);
                     continue;
                 }
+
+                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                    continue;
+
                 PoolTemplateData* pPoolTemplate = &mPoolTemplate[pool_id];
                 PoolObject plObject = PoolObject(guid, chance);
                 PoolGroup<Creature>& cregroup = mPoolCreatureGroups[pool_id];
@@ -581,6 +586,9 @@ void PoolMgr::LoadFromDB()
                     TC_LOG_ERROR("sql.sql", "`pool_gameobject` has an invalid chance (%f) for gameobject guid (%u) in pool id (%u), skipped.", chance, guid, pool_id);
                     continue;
                 }
+
+                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                    continue;
 
                 PoolTemplateData* pPoolTemplate = &mPoolTemplate[pool_id];
                 PoolObject plObject = PoolObject(guid, chance);
