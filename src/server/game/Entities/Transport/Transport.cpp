@@ -31,6 +31,7 @@
 #include "UpdateData.h"
 #include "Vehicle.h"
 #include <G3D/Vector3.h>
+#include "ElunaLoader.h"
 
 Transport::Transport() : GameObject(),
     _transportInfo(nullptr), _isMoving(true), _pendingStop(false),
@@ -303,6 +304,9 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
 Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data)
 {
+    if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+        return;
+
     Map* map = GetMap();
     if (map->GetCreatureRespawnTime(guid))
         return nullptr;
@@ -351,6 +355,9 @@ Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData c
 
 GameObject* Transport::CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data)
 {
+    if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+        return;
+
     Map* map = GetMap();
     if (map->GetGORespawnTime(guid))
         return nullptr;
