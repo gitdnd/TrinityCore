@@ -500,7 +500,7 @@ void PoolMgr::LoadFromDB()
                 CreatureData const* data = sObjectMgr->GetCreatureData(guid);
                 if (!data)
                 {
-                    TC_LOG_ERROR("sql.sql", "`pool_creature` has a non existing creature spawn (GUID: %u) defined for pool id (%u), skipped.", guid, pool_id);
+                    //TC_LOG_ERROR("sql.sql", "`pool_creature` has a non existing creature spawn (GUID: %u) defined for pool id (%u), skipped.", guid, pool_id);
                     continue;
                 }
                 auto it = mPoolTemplate.find(pool_id);
@@ -561,7 +561,7 @@ void PoolMgr::LoadFromDB()
                 GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
                 if (!data)
                 {
-                    TC_LOG_ERROR("sql.sql", "`pool_gameobject` has a non existing gameobject spawn (GUID: %u) defined for pool id (%u), skipped.", guid, pool_id);
+                    //TC_LOG_ERROR("sql.sql", "`pool_gameobject` has a non existing gameobject spawn (GUID: %u) defined for pool id (%u), skipped.", guid, pool_id);
                     continue;
                 }
 
@@ -634,7 +634,7 @@ void PoolMgr::LoadFromDB()
                     auto it = mPoolTemplate.find(mother_pool_id);
                     if (it == mPoolTemplate.end())
                     {
-                        TC_LOG_ERROR("sql.sql", "`pool_pool` mother_pool id (%u) is not in `pool_template`, skipped.", mother_pool_id);
+                        //TC_LOG_ERROR("sql.sql", "`pool_pool` mother_pool id (%u) is not in `pool_template`, skipped.", mother_pool_id);
                         continue;
                     }
                 }
@@ -642,7 +642,7 @@ void PoolMgr::LoadFromDB()
                     auto it = mPoolTemplate.find(child_pool_id);
                     if (it == mPoolTemplate.end())
                     {
-                        TC_LOG_ERROR("sql.sql", "`pool_pool` included pool_id (%u) is not in `pool_template`, skipped.", child_pool_id);
+                        //TC_LOG_ERROR("sql.sql", "`pool_pool` included pool_id (%u) is not in `pool_template`, skipped.", child_pool_id);
                         continue;
                     }
                 }

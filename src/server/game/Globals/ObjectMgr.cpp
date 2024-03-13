@@ -949,7 +949,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 
         if (!sObjectMgr->GetCreatureTemplate(entry))
         {
-            TC_LOG_ERROR("sql.sql", "Creature template (Entry: %u) does not exist but has a record in `creature_template_addon`", entry);
+            //TC_LOG_ERROR("sql.sql", "Creature template (Entry: %u) does not exist but has a record in `creature_template_addon`", entry);
             continue;
         }
 
@@ -1478,7 +1478,7 @@ void ObjectMgr::LoadCreatureAddons()
         CreatureData const* creData = GetCreatureData(guid);
         if (!creData)
         {
-            TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) does not exist but has a record in `creature_addon`", guid);
+            //TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) does not exist but has a record in `creature_addon`", guid);
             continue;
         }
 
@@ -1578,7 +1578,7 @@ void ObjectMgr::LoadGameObjectAddons()
         GameObjectData const* goData = GetGameObjectData(guid);
         if (!goData)
         {
-            TC_LOG_ERROR("sql.sql", "GameObject (GUID: %u) does not exist but has a record in `gameobject_addon`", guid);
+            //TC_LOG_ERROR("sql.sql", "GameObject (GUID: %u) does not exist but has a record in `gameobject_addon`", guid);
             continue;
         }
 
@@ -1768,7 +1768,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
         ObjectGuid::LowType spawnId = fields[0].GetUInt32();
         if (!GetCreatureData(spawnId))
         {
-            TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) does not exist but has a record in `creature_movement_override`", spawnId);
+            //TC_LOG_ERROR("sql.sql", "Creature (GUID: %u) does not exist but has a record in `creature_movement_override`", spawnId);
             continue;
         }
 
@@ -8455,7 +8455,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
         GameObjectTemplate const* got = sObjectMgr->GetGameObjectTemplate(entry);
         if (!got)
         {
-            TC_LOG_ERROR("sql.sql", "GameObject template (Entry: %u) does not exist but has a record in `gameobject_template_addon`", entry);
+            //TC_LOG_ERROR("sql.sql", "GameObject template (Entry: %u) does not exist but has a record in `gameobject_template_addon`", entry);
             continue;
         }
 
@@ -8510,7 +8510,7 @@ void ObjectMgr::LoadGameObjectOverrides()
         GameObjectData const* goData = GetGameObjectData(spawnId);
         if (!goData)
         {
-            TC_LOG_ERROR("sql.sql", "GameObject (SpawnId: %u) does not exist but has a record in `gameobject_overrides`", spawnId);
+            //TC_LOG_ERROR("sql.sql", "GameObject (SpawnId: %u) does not exist but has a record in `gameobject_overrides`", spawnId);
             continue;
         }
 
