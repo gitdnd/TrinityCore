@@ -97,15 +97,10 @@ uint32 MySQLConnection::Open()
 
     int port;
     char const* unix_socket;
-    unsigned int timeout = 360;
+    //unsigned int timeout = 10;
 
-<<<<<<< HEAD
-    mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
-    mysql_options(mysqlInit, MYSQL_OPT_READ_TIMEOUT, (char const*)&timeout);
-=======
     mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8mb4");
     //mysql_options(mysqlInit, MYSQL_OPT_READ_TIMEOUT, (char const*)&timeout);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     #ifdef _WIN32
     if (m_connectionInfo.host == ".")                                           // named pipe use option (Windows)
     {
