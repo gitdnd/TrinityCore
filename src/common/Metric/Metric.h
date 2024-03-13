@@ -27,11 +27,7 @@
 #include <iosfwd>
 #include <memory>
 #include <string>
-<<<<<<< HEAD
-#include <vector>
-=======
 #include <unordered_map>
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <utility>
 
 namespace Trinity
@@ -49,19 +45,14 @@ enum MetricDataType
     METRIC_DATA_EVENT
 };
 
-<<<<<<< HEAD
-typedef std::pair<std::string, std::string> MetricTag;
-=======
 using MetricTag = std::pair<std::string, std::string>;
 using MetricTagsVector = boost::container::small_vector<MetricTag, 2>;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 struct MetricData
 {
     std::string Category;
     SystemTimePoint Timestamp;
     MetricDataType Type;
-    std::vector<MetricTag> Tags;
 
     // LogValue-specific fields
     MetricTagsVector Tags;
@@ -123,13 +114,8 @@ public:
     void Update();
     bool ShouldLog(std::string const& category, int64 value) const;
 
-<<<<<<< HEAD
-    template<class T>
-    void LogValue(std::string const& category, T value, std::vector<MetricTag> tags)
-=======
     template<class T, class... Tags>
     void LogValue(std::string category, T value, Tags&&... tags)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         using namespace std::chrono;
 
@@ -137,14 +123,9 @@ public:
         data->Category = std::move(category);
         data->Timestamp = system_clock::now();
         data->Type = METRIC_DATA_VALUE;
-<<<<<<< HEAD
-        data->Value = FormatInfluxDBValue(value);
-        data->Tags = std::move(tags);
-=======
         data->ValueOrEventText = FormatInfluxDBValue(value);
         if constexpr (sizeof...(tags) > 0)
             (data->Tags.emplace_back(std::move(tags)), ...);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         _queuedData.Enqueue(data);
     }
@@ -157,25 +138,6 @@ public:
 
 #define sMetric Metric::instance()
 
-<<<<<<< HEAD
-#define TC_METRIC_TAG(name, value) { name, value }
-
-#ifdef PERFORMANCE_PROFILING
-#define TC_METRIC_EVENT(category, title, description) ((void)0)
-#define TC_METRIC_VALUE(category, value) ((void)0)
-#elif TRINITY_PLATFORM != TRINITY_PLATFORM_WINDOWS
-#define TC_METRIC_EVENT(category, title, description)                  \
-        do {                                                           \
-            if (sMetric->IsEnabled())                                  \
-                sMetric->LogEvent(category, title, description);       \
-        } while (0)
-#define TC_METRIC_VALUE(category, value, ...)                          \
-        do {                                                           \
-            if (sMetric->IsEnabled())                                  \
-                sMetric->LogValue(category, value, { __VA_ARGS__ });   \
-        } while (0)
-#else
-=======
 template<typename LoggerType>
 class MetricStopWatch
 {
@@ -231,7 +193,6 @@ Optional<MetricStopWatch<LoggerType>> MakeMetricStopWatch(LoggerType&& loggerFun
                 sMetric->LogValue(category, value, ##__VA_ARGS__);     \
         } while (0)
 #  else
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #define TC_METRIC_EVENT(category, title, description)                  \
         __pragma(warning(push))                                        \
         __pragma(warning(disable:4127))                                \
@@ -245,11 +206,7 @@ Optional<MetricStopWatch<LoggerType>> MakeMetricStopWatch(LoggerType&& loggerFun
         __pragma(warning(disable:4127))                                \
         do {                                                           \
             if (sMetric->IsEnabled())                                  \
-<<<<<<< HEAD
-                sMetric->LogValue(category, value, { __VA_ARGS__ });   \
-=======
                 sMetric->LogValue(category, value, ##__VA_ARGS__);     \
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         } while (0)                                                    \
         __pragma(warning(pop))
 #  endif

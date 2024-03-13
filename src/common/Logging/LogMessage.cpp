@@ -33,11 +33,7 @@ std::string LogMessage::getTimeStr(time_t time)
 {
     tm aTm;
     localtime_r(&time, &aTm);
-<<<<<<< HEAD
-    return Trinity::StringFormat("%04d-%02d-%02d_%02d:%02d:%02d", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
-=======
     return Trinity::StringFormat("{:04}-{:02}-{:02}_{:02}:{:02}:{:02}", aTm.tm_year + 1900, aTm.tm_mon + 1, aTm.tm_mday, aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 std::string LogMessage::getTimeStr() const

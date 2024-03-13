@@ -18,15 +18,8 @@
 #include "DynamicTree.h"
 #include "BoundingIntervalHierarchyWrapper.h"
 #include "GameObjectModel.h"
-<<<<<<< HEAD
-#include "Log.h"
 #include "MapTree.h"
 #include "ModelIgnoreFlags.h"
-#include "ModelInstance.h"
-=======
-#include "MapTree.h"
-#include "ModelIgnoreFlags.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include "RegularGrid.h"
 #include "Timer.h"
 #include "VMapFactory.h"
@@ -192,41 +185,6 @@ private:
     GameObjectModel const* _hitModel;
 };
 
-struct DynamicTreeAreaInfoCallback
-{
-    DynamicTreeAreaInfoCallback(uint32 phaseMask) : _phaseMask(phaseMask) {}
-
-    void operator()(G3D::Vector3 const& p, GameObjectModel const& obj)
-    {
-        obj.intersectPoint(p, _areaInfo, _phaseMask);
-    }
-
-    VMAP::AreaInfo const& GetAreaInfo() const { return _areaInfo; }
-
-private:
-    uint32 _phaseMask;
-    VMAP::AreaInfo _areaInfo;
-};
-
-struct DynamicTreeLocationInfoCallback
-{
-    DynamicTreeLocationInfoCallback(uint32 phaseMask) : _phaseMask(phaseMask), _hitModel(nullptr) {}
-
-    void operator()(G3D::Vector3 const& p, GameObjectModel const& obj)
-    {
-        if (obj.GetLocationInfo(p, _locationInfo, _phaseMask))
-            _hitModel = &obj;
-    }
-
-    VMAP::LocationInfo& GetLocationInfo() { return _locationInfo; }
-    GameObjectModel const* GetHitModel() const { return _hitModel; }
-
-private:
-    uint32 _phaseMask;
-    VMAP::LocationInfo _locationInfo;
-    GameObjectModel const* _hitModel;
-};
-
 bool DynamicMapTree::getIntersectionTime(const uint32 phasemask, const G3D::Ray& ray,
                                          const G3D::Vector3& endPos, float& maxDist) const
 {
@@ -334,19 +292,11 @@ void DynamicMapTree::getAreaAndLiquidData(float x, float y, float z, uint32 phas
         data.floorZ = intersectionCallBack.GetLocationInfo().ground_Z;
         uint32 liquidType = intersectionCallBack.GetLocationInfo().hitModel->GetLiquidType();
         float liquidLevel;
-<<<<<<< HEAD
-        if (!reqLiquidType || (dynamic_cast<VMAP::VMapManager2*>(VMAP::VMapFactory::createOrGetVMapManager())->GetLiquidFlagsPtr(liquidType) & reqLiquidType))
-            if (intersectionCallBack.GetHitModel()->GetLiquidLevel(v, intersectionCallBack.GetLocationInfo(), liquidLevel))
-                data.liquidInfo = boost::in_place(liquidType, liquidLevel);
-
-        data.areaInfo = boost::in_place(0,
-=======
         if (!reqLiquidType || VMAP::VMapFactory::createOrGetVMapManager()->GetLiquidFlagsPtr(liquidType) & reqLiquidType)
             if (intersectionCallBack.GetHitModel()->GetLiquidLevel(v, intersectionCallBack.GetLocationInfo(), liquidLevel))
                 data.liquidInfo.emplace(liquidType, liquidLevel);
 
         data.areaInfo.emplace(0,
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             intersectionCallBack.GetLocationInfo().rootId,
             intersectionCallBack.GetLocationInfo().hitModel->GetWmoID(),
             intersectionCallBack.GetLocationInfo().hitModel->GetMogpFlags());

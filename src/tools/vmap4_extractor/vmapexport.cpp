@@ -490,7 +490,7 @@ int main(int argc, char ** argv)
 
             strncpy(map_ids[x].name, map_name, max_map_name_length);
             map_ids[x].name[max_map_name_length - 1] = '\0';
-            printf("Map %d - %s\n", map_ids[x].id, map_ids[x].name);
+            printf("Map - %s\n", map_ids[x].name);
         }
 
         delete dbc;

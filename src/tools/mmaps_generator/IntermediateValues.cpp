@@ -203,8 +203,6 @@ namespace MMAP
         char objFileName[255];
         sprintf(objFileName, "meshes/map%03u%02u%02u.obj", mapID, tileY, tileX);
 
-        printf("Writing: meshes/map%03u%02u%02u.obj\n", mapID, tileY, tileX);
-
         FILE* objFile = fopen(objFileName, "wb");
         if (!objFile)
         {

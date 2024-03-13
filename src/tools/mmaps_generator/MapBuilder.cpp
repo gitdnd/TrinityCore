@@ -454,23 +454,12 @@ namespace MMAP
                 // unpack tile coords
                 StaticMapTree::unpackTileID((*it), tileX, tileY);
 
-<<<<<<< HEAD
-                if (!shouldSkipTile(mapID, tileX, tileY)) {
-                    printf("Building tile: %d, %d\n", tileX, tileY);
-                    buildTile(mapID, tileX, tileY, navMesh);
-                }
-                else {
-                    printf("Skipping tile: %d, %d\n", tileX, tileY);
-                }
-                ++m_totalTilesProcessed;
-=======
                 TileInfo tileInfo;
                 tileInfo.m_mapId = mapID;
                 tileInfo.m_tileX = tileX;
                 tileInfo.m_tileY = tileY;
                 memcpy(&tileInfo.m_navMeshParams, navMesh->getParams(), sizeof(dtNavMeshParams));
                 _queue.Push(tileInfo);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             }
 
             dtFreeNavMesh(navMesh);
@@ -935,7 +924,6 @@ namespace MMAP
         }
         while (false);
 
-        printf("Creating debug output...\n");
         if (m_debugOutput)
         {
             // restore padding so that the debug visualization is correct
@@ -1073,38 +1061,27 @@ namespace MMAP
     }
 
     /**************************************************************************/
-<<<<<<< HEAD
-    bool MapBuilder::shouldSkipTile(uint32 /*mapID*/, uint32 /*tileX*/, uint32 /*tileY*/)
-=======
     bool TileBuilder::shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY) const
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
-        /*char fileName[255];
+        char fileName[255];
         sprintf(fileName, "mmaps/%03u%02i%02i.mmtile", mapID, tileY, tileX);
         FILE* file = fopen(fileName, "rb");
-        if (!file) {
-            printf("Failed to find mmtile\n");
+        if (!file)
             return false;
-        }
 
         MmapTileHeader header;
         int count = fread(&header, sizeof(MmapTileHeader), 1, file);
         fclose(file);
-        if (count != 1) {
-            printf("Tile header count not 1\n");
+        if (count != 1)
             return false;
-        }
 
-        if (header.mmapMagic != MMAP_MAGIC || header.dtVersion != uint32(DT_NAVMESH_VERSION)) {
-            printf("mmapMagic invalid\n");
+        if (header.mmapMagic != MMAP_MAGIC || header.dtVersion != uint32(DT_NAVMESH_VERSION))
             return false;
-        }
 
-        if (header.mmapVersion != MMAP_VERSION) {
-            printf("mmap version wrong\n");
+        if (header.mmapVersion != MMAP_VERSION)
             return false;
-        }*/
-        return false;
+
+        return true;
     }
 
     rcConfig MapBuilder::GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig) const

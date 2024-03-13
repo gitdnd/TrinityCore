@@ -162,11 +162,7 @@ void Metric::SendBatch()
             batchedData << ",realm=" << _realmName;
 
         for (MetricTag const& tag : data->Tags)
-<<<<<<< HEAD
-            batchedData << "," << tag.first << "=" << tag.second;
-=======
             batchedData << "," << tag.first << "=" << FormatInfluxDBTagValue(tag.second);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         batchedData << " ";
 

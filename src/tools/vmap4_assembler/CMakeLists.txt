@@ -10,13 +10,7 @@
 
 set(PRIVATE_SOURCES VMapAssembler.cpp)
 
-<<<<<<< HEAD
-if(WIN32)
-  list(APPEND PRIVATE_SOURCES ${sources_windows})
-endif()
-=======
 list(APPEND PRIVATE_SOURCES ${sources_windows})
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 add_executable(vmap4assembler ${PRIVATE_SOURCES})
 
