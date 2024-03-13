@@ -19,35 +19,20 @@
 #define __AUTHSESSION_H__
 
 #include "AsyncCallbackProcessor.h"
-<<<<<<< HEAD
-#include "BigNumber.h"
-#include "ByteBuffer.h"
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include "Common.h"
 #include "CryptoHash.h"
 #include "DatabaseEnvFwd.h"
 #include "Duration.h"
 #include "Optional.h"
 #include "Socket.h"
-<<<<<<< HEAD
-#include "QueryResult.h"
-#include <memory>
-=======
 #include "SRP6.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <boost/asio/ip/tcp.hpp>
-#include <openssl/md5.h>
 #include <boost/thread.hpp>
+#include <openssl/md5.h>
 
 using boost::asio::ip::tcp;
 
-<<<<<<< HEAD
-class AuthSession;
-class Field;
-=======
 class ByteBuffer;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 struct AuthHandler;
 
 enum AuthStatus
@@ -62,9 +47,9 @@ enum AuthStatus
 
 // TODO: Add as config variable.
 #ifndef _WIN32
- #define PATCH_PATH "../var/patches/"
+#define PATCH_PATH "../var/patches/"
 #else
- #define PATCH_PATH "./patches/"
+#define PATCH_PATH "./patches/"
 #endif
 
 typedef struct PATCH_INFO
@@ -140,7 +125,6 @@ public:
 
     FILE* pPatch;
     PatcherRunnable* _patcher;
-
 protected:
     void ReadHandler() override;
 

@@ -31,11 +31,6 @@
 #include "TOTP.h"
 #include "Util.h"
 #include <boost/lexical_cast.hpp>
-<<<<<<< HEAD
-#include <openssl/crypto.h>
-#include <boost/thread.hpp>
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 using boost::asio::ip::tcp;
 
@@ -74,6 +69,27 @@ typedef struct AUTH_LOGON_CHALLENGE_C
     uint8   I[1];
 } sAuthLogonChallenge_C;
 static_assert(sizeof(sAuthLogonChallenge_C) == (1 + 1 + 2 + 4 + 1 + 1 + 1 + 2 + 4 + 4 + 4 + 4 + 4 + 1 + 1));
+
+typedef struct XFER_INIT_C
+{
+    uint8 cmd;
+    uint8 fileNameLen;
+    uint8 fileName[5];
+    uint64 file_size;
+    uint8 md5[MD5_DIGEST_LENGTH];
+} XferInit_C;
+
+typedef struct XFER_RESUME_C
+{
+    uint8 cmd;
+    uint64 pos;
+} XferResume_C;
+
+typedef struct XFER_RESUME_S
+{
+    uint8 cmd;
+    uint64 pos;
+} XferResume_S;
 
 typedef struct AUTH_LOGON_PROOF_C
 {
@@ -114,27 +130,6 @@ typedef struct AUTH_RECONNECT_PROOF_C
     uint8   number_of_keys;
 } sAuthReconnectProof_C;
 static_assert(sizeof(sAuthReconnectProof_C) == (1 + 16 + 20 + 20 + 1));
-
-typedef struct XFER_INIT_C
-{
-    uint8 cmd;
-    uint8 fileNameLen;
-    uint8 fileName[5];
-    uint64 file_size;
-    uint8 md5[MD5_DIGEST_LENGTH];
-} XferInit_C;
-
-typedef struct XFER_RESUME_C
-{
-    uint8 cmd;
-    uint64 pos;
-} XferResume_C;
-
-typedef struct XFER_RESUME_S
-{
-    uint8 cmd;
-    uint64 pos;
-} XferResume_S;
 
 #pragma pack(pop)
 
@@ -393,7 +388,7 @@ void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
     pi.build = build;
     pi.locale = locale.i;
     pi.filesize = uint64(size);
-    MD5_Final((uint8*)& pi.md5, &ctx);
+    MD5_Final((uint8*)&pi.md5, &ctx);
     _patches.push_back(pi);
     TC_LOG_DEBUG("server.authserver", "Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
 }
@@ -506,9 +501,9 @@ std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
     handlers[AUTH_RECONNECT_CHALLENGE] = { STATUS_CHALLENGE, AUTH_LOGON_CHALLENGE_INITIAL_SIZE, &AuthSession::HandleReconnectChallenge };
     handlers[AUTH_RECONNECT_PROOF]     = { STATUS_RECONNECT_PROOF, sizeof(AUTH_RECONNECT_PROOF_C),    &AuthSession::HandleReconnectProof };
     handlers[REALM_LIST]               = { STATUS_AUTHED,    REALM_LIST_PACKET_SIZE,            &AuthSession::HandleRealmList };
-    handlers[XFER_ACCEPT]              = { STATUS_AUTHED, XFER_ACCEPT_SIZE, &AuthSession::HandleXferAccept };
-    handlers[XFER_RESUME]              = { STATUS_AUTHED, XFER_RESUME_SIZE, &AuthSession::HandleXferResume };
-    handlers[XFER_CANCEL]              = { STATUS_AUTHED, XFER_CANCEL_SIZE, &AuthSession::HandleXferCancel };
+    handlers[XFER_ACCEPT] = { STATUS_AUTHED, XFER_ACCEPT_SIZE, &AuthSession::HandleXferAccept };
+    handlers[XFER_RESUME] = { STATUS_AUTHED, XFER_RESUME_SIZE, &AuthSession::HandleXferResume };
+    handlers[XFER_CANCEL] = { STATUS_AUTHED, XFER_CANCEL_SIZE, &AuthSession::HandleXferCancel };
 
     return handlers;
 }
@@ -519,13 +514,8 @@ void AccountInfo::LoadResult(Field* fields)
 {
     //          0           1         2               3          4                5                                                             6
     //SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate,
-<<<<<<< HEAD
-    //                               7           8            9               10   11   12
-    //       ab.unbandate = ab.bandate, aa.SecurityLevel, a.totp_secret, a.sha_pass_hash, a.v, a.s
-=======
     //                               7                 8
     //       ab.unbandate = ab.bandate, aa.SecurityLevel (, more query-specific fields)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     //FROM account a LEFT JOIN account_access aa ON a.id = aa.AccountID LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 WHERE a.username = ?
 
     Id = fields[0].GetUInt32();
@@ -545,15 +535,7 @@ void AccountInfo::LoadResult(Field* fields)
 }
 
 AuthSession::AuthSession(tcp::socket&& socket) : Socket(std::move(socket)),
-<<<<<<< HEAD
-_status(STATUS_CHALLENGE), _build(0), _expversion(0), _patcher(NULL), pPatch(NULL)
-{
-    N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
-    g.SetDword(7);
-}
-=======
 _status(STATUS_CHALLENGE), _build(0), _timezoneOffset(0min), _expversion(0) { }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 void AuthSession::Start()
 {
@@ -620,7 +602,6 @@ void AuthSession::ReadHandler()
 
         if (_status != itr->second.status)
         {
-            TC_LOG_DEBUG("network", "Status %d doesn't match status %d, disconnecting", _status, itr->second.status);
             CloseSocket();
             return;
         }
@@ -635,7 +616,6 @@ void AuthSession::ReadHandler()
             size += challenge->size;
             if (size > MAX_ACCEPTED_CHALLENGE_SIZE)
             {
-                TC_LOG_DEBUG("network", "Exceeded MAX_ACCEPTED_CHALLENGE_SIZE, disconnecting");
                 CloseSocket();
                 return;
             }
@@ -700,12 +680,8 @@ bool AuthSession::HandleLogonChallenge()
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
     stmt->setString(0, login);
 
-<<<<<<< HEAD
-    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::LogonChallengeCallback, this, std::placeholders::_1)));
-=======
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt)
         .WithPreparedCallback([this](PreparedQueryResult result) { LogonChallengeCallback(std::move(result)); }));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     return true;
 }
 
@@ -806,26 +782,9 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
 
     // Fill the response packet with the result
     //if (AuthHelper::IsAcceptedClientBuild(_build))
-        pkt << uint8(WOW_SUCCESS);
-    //else
-    //    pkt << uint8(WOW_FAIL_VERSION_INVALID);
-
-<<<<<<< HEAD
-    // B may be calculated < 32B so we force minimal length to 32B
-    pkt.append(B.AsByteArray(32).get(), 32);      // 32 bytes
-    pkt << uint8(1);
-    pkt.append(g.AsByteArray(1).get(), 1);
-    pkt << uint8(32);
-    pkt.append(N.AsByteArray(32).get(), 32);
-    pkt.append(s.AsByteArray(int32(BufferSizes::SRP_6_S)).get(), size_t(BufferSizes::SRP_6_S));   // 32 bytes
-    pkt.append(VersionChallenge.data(), VersionChallenge.size());
-    pkt << uint8(securityFlags);            // security flags (0x0...0x04)
-
-    if (securityFlags & 0x01)               // PIN input
     {
-        pkt << uint32(0);
-        pkt << uint64(0) << uint64(0);      // 16 bytes hash?
-=======
+        pkt << uint8(WOW_SUCCESS);
+
         pkt.append(_srp6->B);
         pkt << uint8(1);
         pkt.append(_srp6->g);
@@ -857,25 +816,9 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
             ipAddress, port, _accountInfo.Login, _localizationName, GetLocaleByName(_localizationName));
 
         _status = STATUS_LOGON_PROOF;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
-
-    if (securityFlags & 0x02)               // Matrix input
-    {
-        pkt << uint8(0);
-        pkt << uint8(0);
-        pkt << uint8(0);
-        pkt << uint8(0);
-        pkt << uint64(0);
-    }
-
-    if (securityFlags & 0x04)               // Security token input
-        pkt << uint8(1);
-
-    TC_LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s is using '%s' locale (%u)",
-        ipAddress.c_str(), port, _accountInfo.Login.c_str(), _localizationName.c_str(), GetLocaleByName(_localizationName));
-
-    _status = STATUS_LOGON_PROOF;
+    //else
+        //pkt << uint8(WOW_FAIL_VERSION_INVALID);
 
     SendPacket(pkt);
 }
@@ -889,80 +832,6 @@ bool AuthSession::HandleLogonProof()
     // Read the packet
     sAuthLogonProof_C *logonProof = reinterpret_cast<sAuthLogonProof_C*>(GetReadBuffer().GetReadPointer());
 
-<<<<<<< HEAD
-    // Continue the SRP6 calculation based on data received from the client
-    BigNumber A;
-
-    A.SetBinary(logonProof->A, 32);
-
-    // SRP safeguard: abort if A == 0
-    if ((A % N).IsZero())
-        return false;
-
-    SHA1Hash sha;
-    sha.UpdateBigNumbers(&A, &B, nullptr);
-    sha.Finalize();
-    BigNumber u;
-    u.SetBinary(sha.GetDigest(), 20);
-    BigNumber S = (A * (v.ModExp(u, N))).ModExp(b, N);
-
-    uint8 t[32];
-    uint8 t1[16];
-    uint8 vK[40];
-    memcpy(t, S.AsByteArray(32).get(), 32);
-
-    for (int i = 0; i < 16; ++i)
-        t1[i] = t[i * 2];
-
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
-
-    for (int i = 0; i < 20; ++i)
-        vK[i * 2] = sha.GetDigest()[i];
-
-    for (int i = 0; i < 16; ++i)
-        t1[i] = t[i * 2 + 1];
-
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
-
-    for (int i = 0; i < 20; ++i)
-        vK[i * 2 + 1] = sha.GetDigest()[i];
-
-    K.SetBinary(vK, 40);
-
-    uint8 hash[20];
-
-    sha.Initialize();
-    sha.UpdateBigNumbers(&N, nullptr);
-    sha.Finalize();
-    memcpy(hash, sha.GetDigest(), 20);
-    sha.Initialize();
-    sha.UpdateBigNumbers(&g, nullptr);
-    sha.Finalize();
-
-    for (int i = 0; i < 20; ++i)
-        hash[i] ^= sha.GetDigest()[i];
-
-    BigNumber t3;
-    t3.SetBinary(hash, 20);
-
-    sha.Initialize();
-    sha.UpdateData(_accountInfo.Login);
-    sha.Finalize();
-    uint8 t4[SHA_DIGEST_LENGTH];
-    memcpy(t4, sha.GetDigest(), SHA_DIGEST_LENGTH);
-
-    sha.Initialize();
-    sha.UpdateBigNumbers(&t3, nullptr);
-    sha.UpdateData(t4, SHA_DIGEST_LENGTH);
-    sha.UpdateBigNumbers(&s, &A, &B, &K, nullptr);
-    sha.Finalize();
-    BigNumber M;
-    M.SetBinary(sha.GetDigest(), sha.GetLength());
-=======
     // If the client has no valid version
     if (_expversion == NO_VALID_EXP_FLAG)
     {
@@ -970,7 +839,6 @@ bool AuthSession::HandleLogonProof()
         TC_LOG_DEBUG("network", "Client with invalid version, patching is not implemented");
         return false;
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // Check if SRP6 results match (password is correct), else send an error
     if (std::optional<SessionKey> K = _srp6->VerifyChallengeResponse(logonProof->A, logonProof->clientM))
@@ -1168,12 +1036,8 @@ bool AuthSession::HandleReconnectChallenge()
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RECONNECTCHALLENGE);
     stmt->setString(0, login);
 
-<<<<<<< HEAD
-    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::ReconnectChallengeCallback, this, std::placeholders::_1)));
-=======
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt)
         .WithPreparedCallback([this](PreparedQueryResult result) { ReconnectChallengeCallback(std::move(result)); }));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     return true;
 }
 
