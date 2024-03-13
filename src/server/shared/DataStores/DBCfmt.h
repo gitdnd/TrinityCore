@@ -43,7 +43,7 @@ char constexpr CinematicSequencesEntryfmt[] = "nxiiiiiiii";
 char constexpr CreatureDisplayInfofmt[] = "nixifxxxxxxxxxxx";
 char constexpr CreatureDisplayInfoExtrafmt[] = "diixxxxxxxxxxxxxxxxxx";
 char constexpr CreatureFamilyfmt[] = "nfifiiiiixssssssssssssssssxx";
-char constexpr CreatureModelDatafmt[] = "nisxfxxxxxxxxxfffxxxxxxxxxxx";
+char constexpr CreatureModelDatafmt[] = "nisxfxxxxxxxxxxffxxxxxxxxxxx";
 char constexpr CreatureSpellDatafmt[] = "niiiixxxx";
 char constexpr CreatureTypefmt[] = "nxxxxxxxxxxxxxxxxxx";
 char constexpr CurrencyTypesfmt[] = "xnxi";
@@ -113,11 +113,7 @@ char constexpr SpellDifficultyfmt[] = "niiii";
 char constexpr CustomSpellDifficultyfmt[] = "ppppp";
 char constexpr CustomSpellDifficultyIndex[] = "id";
 char constexpr SpellDurationfmt[] = "niii";
-<<<<<<< HEAD
-char constexpr SpellEntryfmt[]       = "niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiifxiiiiiiiiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiifffiiiiiiiiiiiiiissssssssssssssssxssssssssssssssssxssssssssssssssssxxxxxxxxxxxxxxxxxxiiiiiiiiiiixfffxxxiiiiixxfffxx";
-=======
 char constexpr SpellEntryfmt[] = "niiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiifxiiiiiiiiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiifffiiiiiiiiiiiiiissssssssssssssssxssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiiiiiiiiiiixfffxxxiiiiixxfffxx";
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 char constexpr CustomSpellEntryfmt[] = "papppppppppppapapaaaaaaaaaaapaaapapppppppaaaaapaapaaaaaaaaaaaaaaaaaappppppppppppppppppppppppppppppppppppaaappppppppppppaaapppppppppaaaaapaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaappppppppapppaaaaappaaaaaaaa";
 char constexpr CustomSpellEntryIndex[] = "Id";
 char constexpr SpellFocusObjectfmt[] = "nxxxxxxxxxxxxxxxxx";

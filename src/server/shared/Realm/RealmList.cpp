@@ -41,11 +41,7 @@ void RealmList::Initialize(Trinity::Asio::IoContext& ioContext, uint32 updateInt
 {
     _updateInterval = updateInterval;
     _updateTimer = std::make_unique<Trinity::Asio::DeadlineTimer>(ioContext);
-<<<<<<< HEAD
-    _resolver = std::make_unique<boost::asio::ip::tcp::resolver>(ioContext);
-=======
     _resolver = std::make_unique<Trinity::Asio::Resolver>(ioContext);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     LoadBuildInfo();
     // Get the content of the realmlist table in the database
