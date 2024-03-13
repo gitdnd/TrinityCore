@@ -6762,7 +6762,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
 InstanceTemplate const* ObjectMgr::GetInstanceTemplate(uint32 mapID) const
 {
-    if(!sElunaLoader->ShouldMapLoadEluna(mapID)
+    if(!sElunaLoader->ShouldMapLoadEluna(mapID))
         return nullptr;
 
     InstanceTemplateContainer::const_iterator itr = _instanceTemplateStore.find(uint16(mapID));
