@@ -34,6 +34,7 @@
 #include "IPLocation.h"
 #include "GitRevision.h"
 #include "Locales.h"
+
 #include "MySQLThreading.h"
 #include "OpenSSLCrypto.h"
 #include "ProcessPriority.h"
@@ -80,7 +81,7 @@ void SignalHandler(std::weak_ptr<Trinity::Asio::IoContext> ioContextRef, boost::
 void KeepDatabaseAliveHandler(std::weak_ptr<Trinity::Asio::DeadlineTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
 void BanExpiryHandler(std::weak_ptr<Trinity::Asio::DeadlineTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, std::string& configService);
-extern Patcher patcher;
+//extern Patcher patcher;
 
 int main(int argc, char** argv)
 {
@@ -158,7 +159,7 @@ int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
-    patcher.Initialize();
+    //patcher.Initialize();
 
     sSecretMgr->Initialize();
 

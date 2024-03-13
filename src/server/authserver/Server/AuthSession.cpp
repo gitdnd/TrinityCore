@@ -149,7 +149,7 @@ struct TransferDataPacket
 #pragma pack(pop)
 #endif
 
-
+/*
 Patcher patcher;
 
 // Send content of patch file to the client
@@ -480,7 +480,7 @@ PatcherRunnable::PatcherRunnable(AuthSession* as, uint64 _pos, uint64 _size)
 void PatcherRunnable::stop()
 {
     stopped = true;
-}
+}*/
 
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
@@ -501,9 +501,9 @@ std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
     handlers[AUTH_RECONNECT_CHALLENGE] = { STATUS_CHALLENGE, AUTH_LOGON_CHALLENGE_INITIAL_SIZE, &AuthSession::HandleReconnectChallenge };
     handlers[AUTH_RECONNECT_PROOF]     = { STATUS_RECONNECT_PROOF, sizeof(AUTH_RECONNECT_PROOF_C),    &AuthSession::HandleReconnectProof };
     handlers[REALM_LIST]               = { STATUS_AUTHED,    REALM_LIST_PACKET_SIZE,            &AuthSession::HandleRealmList };
-    handlers[XFER_ACCEPT] = { STATUS_AUTHED, XFER_ACCEPT_SIZE, &AuthSession::HandleXferAccept };
-    handlers[XFER_RESUME] = { STATUS_AUTHED, XFER_RESUME_SIZE, &AuthSession::HandleXferResume };
-    handlers[XFER_CANCEL] = { STATUS_AUTHED, XFER_CANCEL_SIZE, &AuthSession::HandleXferCancel };
+    //handlers[XFER_ACCEPT] = { STATUS_AUTHED, XFER_ACCEPT_SIZE, &AuthSession::HandleXferAccept };
+    //handlers[XFER_RESUME] = { STATUS_AUTHED, XFER_RESUME_SIZE, &AuthSession::HandleXferResume };
+    //handlers[XFER_CANCEL] = { STATUS_AUTHED, XFER_CANCEL_SIZE, &AuthSession::HandleXferCancel };
 
     return handlers;
 }
@@ -884,12 +884,12 @@ bool AuthSession::HandleLogonProof()
         // If the client has no valid version
         if (_expversion == NO_VALID_EXP_FLAG)
         {
-            if (patcher.PossiblePatching(_build, _localizationName))
-            {
-                _status = STATUS_AUTHED; // Will get disconnected without this
-                if (patcher.InitPatching(_build, _localizationName, this))
-                    return true;
-            }
+            //if (patcher.PossiblePatching(_build, _localizationName))
+            //{
+                //_status = STATUS_AUTHED; // Will get disconnected without this
+                //if (patcher.InitPatching(_build, _localizationName, this))
+                    //return true;
+            //}
             ByteBuffer packet;
             packet << uint8(AUTH_LOGON_PROOF);
             packet << uint8(WOW_FAIL_VERSION_INVALID);

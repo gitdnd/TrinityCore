@@ -27,7 +27,7 @@
 #include "Socket.h"
 #include "SRP6.h"
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/thread.hpp>
+//#include <boost/thread.hpp>
 #include <openssl/md5.h>
 
 using boost::asio::ip::tcp;
@@ -52,11 +52,13 @@ enum AuthStatus
 #else
 #define PATCH_PATH "./patches/"
 #endif
-
+/*
 typedef struct PATCH_INFO
 {
     int build;
-    int locale;
+    int
+
+    ;
     uint64 filesize;
     uint8 md5[MD5_DIGEST_LENGTH];
 } PATCH_INFO;
@@ -93,7 +95,7 @@ private:
     uint64 pos;
     uint64 size;
     bool stopped;
-};
+};*/
 
 struct AccountInfo
 {
@@ -124,8 +126,8 @@ public:
 
     void SendPacket(ByteBuffer& packet);
 
-    FILE* pPatch;
-    PatcherRunnable* _patcher;
+    //FILE* pPatch;
+    //PatcherRunnable* _patcher;
 protected:
     void ReadHandler() override;
 

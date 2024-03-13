@@ -17,11 +17,10 @@
 
 #include "Random.h"
 #include "Errors.h"
-<<<<<<< HEAD
-=======
+
 #include "SFMTRand.h"
 #include <memory>
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+
 #include <random>
 
 static thread_local std::unique_ptr<SFMTRand> sfmtRand;
