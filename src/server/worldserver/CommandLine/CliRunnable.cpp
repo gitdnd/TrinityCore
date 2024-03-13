@@ -35,70 +35,8 @@
 #include <cstring>
 #include <readline/readline.h>
 #include <readline/history.h>
-<<<<<<< HEAD
-#include "Chat.h"
-#endif
-
-static constexpr char CLI_PREFIX[] = "TC> ";
-
-static inline void PrintCliPrefix()
-{
-    printf("%s", CLI_PREFIX);
-}
-
-#if TRINITY_PLATFORM != TRINITY_PLATFORM_WINDOWS
-char* command_finder(char const* text, int state)
-{
-    static size_t idx, len;
-    char const* ret;
-    std::vector<ChatCommand> const& cmd = ChatHandler::getCommandTable();
-
-    if (!state)
-    {
-        idx = 0;
-        len = strlen(text);
-    }
-
-    while (idx < cmd.size())
-    {
-        ret = cmd[idx].Name;
-        if (!cmd[idx].AllowConsole)
-        {
-            ++idx;
-            continue;
-        }
-
-        ++idx;
-        //printf("Checking %s \n", cmd[idx].Name);
-        if (strncmp(ret, text, len) == 0)
-            return strdup(ret);
-    }
-
-    return ((char*)nullptr);
-}
-
-char** cli_completion(char const* text, int start, int /*end*/)
-{
-    char** matches = nullptr;
-
-    if (start)
-        rl_bind_key('\t', rl_abort);
-    else
-        matches = rl_completion_matches((char*)text, &command_finder);
-    return matches;
-}
-
-int cli_hook_func()
-{
-       if (World::IsStopped())
-           rl_done = 1;
-       return 0;
-}
-
-=======
 #else
 #include <Windows.h>
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
 static constexpr char CLI_PREFIX[] = "TC> ";
@@ -180,24 +118,17 @@ void CliThread()
     // later it will be printed after command queue updates
     PrintCliPrefix();
 #else
-<<<<<<< HEAD
-    rl_attempted_completion_function = cli_completion;
-    rl_event_hook = cli_hook_func;
-=======
     ::rl_attempted_completion_function = &Trinity::Impl::Readline::cli_completion;
     {
         static char BLANK = '\0';
         ::rl_completer_word_break_characters = &BLANK;
     }
     ::rl_event_hook = &Trinity::Impl::Readline::cli_hook_func;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
     if (sConfigMgr->GetBoolDefault("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
-<<<<<<< HEAD
-=======
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
     if (sConfigMgr->GetBoolDefault("FlashAtStart", true))
     {
@@ -210,7 +141,6 @@ void CliThread()
         FlashWindowEx(&fInfo);
     }
 #endif
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
     while (!World::IsStopped())
     {
@@ -219,26 +149,11 @@ void CliThread()
         std::string command;
 
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-<<<<<<< HEAD
-        wchar_t commandbuf[256];
-        if (fgetws(commandbuf, sizeof(commandbuf), stdin))
-        {
-            if (!WStrToUtf8(commandbuf, wcslen(commandbuf), command))
-            {
-                PrintCliPrefix();
-                continue;
-            }
-        }
-#else
-        char* command_str = readline(CLI_PREFIX);
-        rl_bind_key('\t', rl_complete);
-=======
         if (!ReadWinConsole(command))
             continue;
 #else
         char* command_str = readline(CLI_PREFIX);
         ::rl_bind_key('\t', ::rl_complete);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         if (command_str != nullptr)
         {
             command = command_str;
@@ -252,11 +167,7 @@ void CliThread()
             if (nextLineIndex && *nextLineIndex == 0)
             {
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-<<<<<<< HEAD
-                    PrintCliPrefix();
-=======
                 PrintCliPrefix();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
                 continue;
             }

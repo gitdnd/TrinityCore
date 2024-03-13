@@ -85,10 +85,7 @@ char serviceDescription[] = "TrinityCore World of Warcraft emulator world servic
  *  2 - paused
  */
 int m_ServiceStatus = -1;
-<<<<<<< HEAD
-=======
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <boost/dll/shared_library.hpp>
 #include <timeapi.h>
 #endif
@@ -146,40 +143,16 @@ extern int main(int argc, char** argv)
         return 0;
 
 #ifdef _WIN32
-<<<<<<< HEAD
-    if (configService.compare("install") == 0)
-        return WinServiceInstall() == true ? 0 : 1;
-    else if (configService.compare("uninstall") == 0)
-        return WinServiceUninstall() == true ? 0 : 1;
-    else if (configService.compare("run") == 0)
-        WinServiceRun();
-=======
     if (configService == "install")
         return WinServiceInstall() ? 0 : 1;
     else if (configService == "uninstall")
         return WinServiceUninstall() ? 0 : 1;
     else if (configService == "run")
         return WinServiceRun() ? 0 : 1;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     Optional<UINT> newTimerResolution;
     boost::system::error_code dllError;
     std::shared_ptr<boost::dll::shared_library> winmm(new boost::dll::shared_library("winmm.dll", dllError, boost::dll::load_mode::search_system_folders), [&](boost::dll::shared_library* lib)
-<<<<<<< HEAD
-        {
-            try
-            {
-                if (newTimerResolution)
-                    lib->get<decltype(timeEndPeriod)>("timeEndPeriod")(*newTimerResolution);
-            }
-            catch (std::exception const&)
-            {
-                // ignore
-            }
-
-            delete lib;
-        });
-=======
     {
         try
         {
@@ -193,7 +166,6 @@ extern int main(int argc, char** argv)
 
         delete lib;
     });
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     if (winmm->is_loaded())
     {
@@ -214,10 +186,7 @@ extern int main(int argc, char** argv)
             printf("Failed to initialize timer resolution: %s\n", e.what());
         }
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
     std::string configError;
@@ -346,12 +315,6 @@ extern int main(int argc, char** argv)
         sInstanceSaveMgr->Unload();
         sOutdoorPvPMgr->Die();                     // unload it before MapManager
         sMapMgr->UnloadAll();                      // unload all grids (including locked in memory)
-<<<<<<< HEAD
-#ifdef ELUNA
-        //Eluna::Uninitialize();
-#endif
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     });
 
     // Start the Remote Access port (acceptor) if enabled
@@ -539,25 +502,17 @@ void WorldUpdateLoop()
         uint32 diff = getMSTimeDiff(realPrevTime, realCurrTime);
         if (diff < minUpdateDiff)
         {
-<<<<<<< HEAD
-            // sleep until enough time passes that we can update all timers
-            std::this_thread::sleep_for(Milliseconds(minUpdateDiff - diff));
-=======
             uint32 sleepTime = minUpdateDiff - diff;
             if (sleepTime >= halfMaxCoreStuckTime)
                 TC_LOG_ERROR("server.worldserver", "WorldUpdateLoop() waiting for {} ms with MaxCoreStuckTime set to {} ms", sleepTime, maxCoreStuckTime);
             // sleep until enough time passes that we can update all timers
             std::this_thread::sleep_for(Milliseconds(sleepTime));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             continue;
         }
 
         sWorld->Update(diff);
         realPrevTime = realCurrTime;
-<<<<<<< HEAD
-=======
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #ifdef _WIN32
         if (m_ServiceStatus == 0)
             World::StopNow(SHUTDOWN_EXIT_CODE);
