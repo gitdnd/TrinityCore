@@ -104,8 +104,6 @@ if(ELUNA)
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/extensions/
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/extensions ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/extensions/
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/.lib/
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/.lib ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/.lib/
       )
     elseif(MINGW)
       add_custom_command(TARGET game
@@ -119,12 +117,7 @@ if(ELUNA)
   if(UNIX)
     install(DIRECTORY LuaEngine/extensions DESTINATION bin/lua_scripts/)
   elseif(WIN32)
-<<<<<<< HEAD
-    install(DIRECTORY LuaEngine/extensions DESTINATION "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/")
-	install(DIRECTORY LuaEngine/.lib DESTINATION "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/lua_scripts/")
-=======
     install(DIRECTORY LuaEngine/extensions DESTINATION "${CMAKE_INSTALL_PREFIX}/lua_scripts/")
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
   endif()
 
   add_subdirectory(LuaEngine)
