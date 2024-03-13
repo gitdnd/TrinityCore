@@ -264,6 +264,8 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 
 bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
 {
+    if (!sElunaLoader->ShouldMapLoadEluna(mapid))
+        return false;
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     if (startUp)
