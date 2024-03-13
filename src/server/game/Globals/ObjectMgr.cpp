@@ -2325,7 +2325,9 @@ void ObjectMgr::LoadCreatures()
     do
     {
         Field* fields = result->Fetch();
-
+        uint16 mapId = fields[2].GetUInt16();
+        if (!sElunaLoader->ShouldMapLoadEluna(mapId))
+            continue;
         ObjectGuid::LowType guid = fields[0].GetUInt32();
         uint32 entry        = fields[1].GetUInt32();
 
@@ -2339,7 +2341,7 @@ void ObjectMgr::LoadCreatures()
         CreatureData& data = _creatureDataStore[guid];
         data.spawnId        = guid;
         data.id             = entry;
-        data.mapId          = fields[2].GetUInt16();
+        data.mapId          = mapId;
         data.spawnPoint.Relocate(fields[3].GetFloat(), fields[4].GetFloat(), fields[5].GetFloat(), fields[6].GetFloat());
         data.displayid      = fields[7].GetUInt32();
         data.equipmentId    = fields[8].GetInt8();
@@ -2621,7 +2623,9 @@ void ObjectMgr::LoadGameObjects()
     do
     {
         Field* fields = result->Fetch();
-
+        uint16 mapId = fields[2].GetUInt16();
+        if (!sElunaLoader->ShouldMapLoadEluna(mapId))
+            continue;
         ObjectGuid::LowType guid = fields[0].GetUInt32();
         uint32 entry        = fields[1].GetUInt32();
 
@@ -2655,7 +2659,7 @@ void ObjectMgr::LoadGameObjects()
 
         data.spawnId        = guid;
         data.id             = entry;
-        data.mapId          = fields[2].GetUInt16();
+        data.mapId          = mapId;
         data.spawnPoint.Relocate(fields[3].GetFloat(), fields[4].GetFloat(), fields[5].GetFloat(), fields[6].GetFloat());
         data.rotation.x     = fields[7].GetFloat();
         data.rotation.y     = fields[8].GetFloat();
