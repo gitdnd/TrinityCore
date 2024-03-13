@@ -729,11 +729,7 @@ enum SpellAttr7 : uint32
     SPELL_ATTR7_CANT_PARRY                       = 0x01000000, // TITLE Spell cannot be parried
     SPELL_ATTR7_CANT_MISS                        = 0x02000000, // TITLE Spell cannot be missed
     SPELL_ATTR7_UNK26                            = 0x04000000, // TITLE Unknown attribute 26@Attr7
-<<<<<<< HEAD
-    SPELL_ATTR7_BYPASS_PREVENT_RES               = 0x08000000, // TITLE Bypasses the prevent resurrection aura. 27@Attr7
-=======
     SPELL_ATTR7_BYPASS_NO_RESURRECT_AURA         = 0x08000000, // TITLE Bypasses the prevent resurrection aura
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     SPELL_ATTR7_CONSOLIDATED_RAID_BUFF           = 0x10000000, // TITLE Consolidate in raid buff frame (client only)
     SPELL_ATTR7_UNK29                            = 0x20000000, // TITLE Unknown attribute 29@Attr7
     SPELL_ATTR7_UNK30                            = 0x40000000, // TITLE Unknown attribute 30@Attr7
@@ -3931,7 +3927,7 @@ enum WorldState : uint32
     WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20009,      // Next daily calendar deletions of old events time
 };
 
-<<<<<<< HEAD
+
 enum CustomSpells : uint32
 {
     SPELL_BLOOD_MAGIC = 450000,
@@ -3958,8 +3954,6 @@ enum CustomTalentErrorResponses : uint8
 
 };
 
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 namespace Trinity
 {
 namespace Impl

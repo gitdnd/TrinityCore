@@ -32,6 +32,7 @@
 
 using boost::asio::ip::tcp;
 
+class AuthSession;
 class ByteBuffer;
 struct AuthHandler;
 
