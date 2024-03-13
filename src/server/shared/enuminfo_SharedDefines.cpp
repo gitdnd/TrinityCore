@@ -3063,7 +3063,7 @@ TC_API_EXPORT size_t EnumUtils<SpellFamilyNames>::ToIndex(SpellFamilyNames value
         case SPELLFAMILY_HUNTER: return 8;
         case SPELLFAMILY_PALADIN: return 9;
         case SPELLFAMILY_SHAMAN: return 10;
-        case SPELLFAMILY_UNK2: return 11;
+        case SPELLFAMILY_CLASSLESS: return 11;
         case SPELLFAMILY_POTION: return 12;
         case SPELLFAMILY_DEATHKNIGHT: return 13;
         case SPELLFAMILY_PET: return 14;
