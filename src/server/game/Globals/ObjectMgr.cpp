@@ -2860,18 +2860,18 @@ void ObjectMgr::LoadSpawnGroups()
         SpawnMetadata const* data = GetSpawnMetadata(spawnType, spawnId);
         if (!data)
         {
-            TC_LOG_ERROR("sql.sql", "Spawn data with ID (%u,%u) not found, but is listed as a member of spawn group %u!", uint32(spawnType), spawnId, groupId);
+            //TC_LOG_ERROR("sql.sql", "Spawn data with ID (%u,%u) not found, but is listed as a member of spawn group %u!", uint32(spawnType), spawnId, groupId);
             continue;
         }
         else if (data->spawnGroupData->groupId)
         {
-            TC_LOG_ERROR("sql.sql", "Spawn with ID (%u,%u) is listed as a member of spawn group %u, but is already a member of spawn group %u. Skipping.", uint32(spawnType), spawnId, groupId, data->spawnGroupData->groupId);
+            //TC_LOG_ERROR("sql.sql", "Spawn with ID (%u,%u) is listed as a member of spawn group %u, but is already a member of spawn group %u. Skipping.", uint32(spawnType), spawnId, groupId, data->spawnGroupData->groupId);
             continue;
         }
         auto it = _spawnGroupDataStore.find(groupId);
         if (it == _spawnGroupDataStore.end())
         {
-            TC_LOG_ERROR("sql.sql", "Spawn group %u assigned to spawn ID (%u,%u), but group does not exist!", groupId, uint32(spawnType), spawnId);
+            //TC_LOG_ERROR("sql.sql", "Spawn group %u assigned to spawn ID (%u,%u), but group does not exist!", groupId, uint32(spawnType), spawnId);
             continue;
         }
         else
