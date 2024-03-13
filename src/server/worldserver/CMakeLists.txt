@@ -14,14 +14,9 @@ CollectSourceFiles(
   # Exclude
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-<<<<<<< HEAD
-if(WIN32)
-  list(APPEND PRIVATE_SOURCES ${sources_windows})
-=======
 list(APPEND PRIVATE_SOURCES ${sources_windows})
 
 if(WIN32)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
   if(MSVC)
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()
