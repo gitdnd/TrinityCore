@@ -56,6 +56,7 @@
 #include "World.h"
 //VirtualItem
 #include "VirtualItemMgr.h"
+#include "ElunaLoader.h"
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
@@ -6761,6 +6762,9 @@ void ObjectMgr::LoadInstanceTemplate()
 
 InstanceTemplate const* ObjectMgr::GetInstanceTemplate(uint32 mapID) const
 {
+    if(!sElunaLoader->ShouldMapLoadEluna(mapID)
+        return nullptr;
+
     InstanceTemplateContainer::const_iterator itr = _instanceTemplateStore.find(uint16(mapID));
     if (itr != _instanceTemplateStore.end())
         return &(itr->second);
