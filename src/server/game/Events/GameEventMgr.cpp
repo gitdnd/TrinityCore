@@ -419,7 +419,7 @@ void GameEventMgr::LoadFromDB()
                 CreatureData const* data = sObjectMgr->GetCreatureData(guid);
                 if (!data)
                 {
-                    TC_LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: %u) not found in `creature` table.", guid);
+                   // TC_LOG_ERROR("sql.sql", "`game_event_creature` contains creature (GUID: %u) not found in `creature` table.", guid);
                     continue;
                 }
 
@@ -472,7 +472,7 @@ void GameEventMgr::LoadFromDB()
                 GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
                 if (!data)
                 {
-                    TC_LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: %u) not found in `gameobject` table.", guid);
+                    //TC_LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: %u) not found in `gameobject` table.", guid);
                     continue;
                 }
 
@@ -539,8 +539,8 @@ void GameEventMgr::LoadFromDB()
                     int8 equipId = static_cast<int8>(newModelEquipSet.equipment_id);
                     if (!sObjectMgr->GetEquipmentInfo(entry, equipId))
                     {
-                        TC_LOG_ERROR("sql.sql", "Table `game_event_model_equip` contains creature (Guid: %u, entry: %u) with equipment_id %u not found in table `creature_equip_template`. Setting entry to no equipment.",
-                                         guid, entry, newModelEquipSet.equipment_id);
+                       // TC_LOG_ERROR("sql.sql", "Table `game_event_model_equip` contains creature (Guid: %u, entry: %u) with equipment_id %u not found in table `creature_equip_template`. Setting entry to no equipment.",
+                         //                guid, entry, newModelEquipSet.equipment_id);
                         continue;
                     }
                 }
