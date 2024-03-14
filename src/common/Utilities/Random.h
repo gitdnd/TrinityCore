@@ -20,8 +20,6 @@
 
 #include "Define.h"
 #include "Duration.h"
-#include "SFMTRand.h"
-#include <boost/thread/tss.hpp>
 #include <limits>
 #include <random>
 
