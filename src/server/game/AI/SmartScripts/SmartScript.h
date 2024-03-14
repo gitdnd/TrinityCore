@@ -54,10 +54,7 @@ class TC_GAME_API SmartScript
         uint32 GetPathId() const { return mPathId; }
         WorldObject* GetBaseObject() const;
         WorldObject* GetBaseObjectOrPlayerTrigger() const;
-<<<<<<< HEAD
-=======
         bool HasAnyEventWithFlag(uint32 flag) const { return mAllEventFlags & flag; }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         static bool IsUnit(WorldObject* obj);
         static bool IsPlayer(WorldObject* obj);
         static bool IsCreature(WorldObject* obj);

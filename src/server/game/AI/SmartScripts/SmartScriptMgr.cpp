@@ -2090,10 +2090,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_SET_DATA:
         case SMART_ACTION_ATTACK_STOP:
-<<<<<<< HEAD
-        case SMART_ACTION_SET_VISIBILITY:
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         case SMART_ACTION_WP_PAUSE:
         case SMART_ACTION_FORCE_DESPAWN:
         case SMART_ACTION_SET_INGAME_PHASE_MASK:

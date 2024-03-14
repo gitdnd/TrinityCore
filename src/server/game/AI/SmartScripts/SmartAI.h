@@ -122,8 +122,6 @@ class TC_GAME_API SmartAI : public CreatureAI
 
         // Called when spell hits a target
         void SpellHitTarget(WorldObject* target, SpellInfo const* spellInfo) override;
-<<<<<<< HEAD
-=======
 
         // Called when a spell finishes
         void OnSpellCast(SpellInfo const* spellInfo) override;
@@ -133,7 +131,6 @@ class TC_GAME_API SmartAI : public CreatureAI
 
         // Called when a spell starts
         void OnSpellStart(SpellInfo const* spellInfo) override;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         // Called at any Damage from any attacker (before damage apply)
         void DamageTaken(Unit* doneBy, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override;

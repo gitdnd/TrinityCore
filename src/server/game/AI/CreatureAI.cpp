@@ -33,7 +33,6 @@
 #include "TemporarySummon.h"
 #include "Vehicle.h"
 #include "World.h"
-#include "AffixMgr.h"
 
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &UnitAI::AISpellInfo[i]; }
@@ -447,7 +446,12 @@ Creature* CreatureAI::DoSummon(uint32 entry, WorldObject* obj, float radius, Mil
     return me->SummonCreature(entry, pos, summonType, despawnTime);
 }
 
-<<<<<<< HEAD
+Creature* CreatureAI::DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius, Milliseconds despawnTime, TempSummonType summonType)
+{
+    Position pos = obj->GetRandomNearPosition(radius);
+    pos.m_positionZ += flightZ;
+    return me->SummonCreature(entry, pos, summonType, despawnTime);
+}
 
 void CreatureAI::Encircle()
 {
@@ -501,14 +505,4 @@ void CreatureAI::Backpedal()
         return;
 
     me->GetMotionMaster()->MoveBackpedal(target, me->GetMeleeRange(target) / 1.5);
-}
-
-Creature* CreatureAI::DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius, uint32 despawnTime, TempSummonType summonType)
-=======
-Creature* CreatureAI::DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius, Milliseconds despawnTime, TempSummonType summonType)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
-{
-    Position pos = obj->GetRandomNearPosition(radius);
-    pos.m_positionZ += flightZ;
-    return me->SummonCreature(entry, pos, summonType, despawnTime);
 }

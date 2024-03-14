@@ -104,7 +104,6 @@ class TC_GAME_API CreatureAI : public UnitAI
         bool IsEngaged() const { return _isEngaged; }
 
         void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
-
         void Encircle();
         void Backpedal();
 
@@ -147,13 +146,6 @@ class TC_GAME_API CreatureAI : public UnitAI
         // Called when spell hits a target
         virtual void SpellHitTarget(WorldObject* /*target*/, SpellInfo const* /*spellInfo*/) { }
 
-<<<<<<< HEAD
-        // Called when a spell cast gets interrupted
-        virtual void OnSpellCastInterrupt(SpellInfo const* /*spell*/) { }
-
-        // Called when a spell cast has been successfully finished
-        virtual void OnSuccessfulSpellCast(SpellInfo const* /*spell*/) { }
-=======
         // Called when a spell finishes
         virtual void OnSpellCast(SpellInfo const* /*spell*/) { }
 
@@ -165,7 +157,6 @@ class TC_GAME_API CreatureAI : public UnitAI
 
         // Called when a channeled spell finishes
         virtual void OnChannelFinished(SpellInfo const* /*spell*/) { }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         // Should return true if the NPC is currently being escorted
         virtual bool IsEscorted() const { return false; }

@@ -183,17 +183,12 @@ enum SMART_EVENT
     SMART_EVENT_SCENE_CANCEL             = 80,      // don't use on 3.3.5a
     SMART_EVENT_SCENE_COMPLETE           = 81,      // don't use on 3.3.5a
     SMART_EVENT_SUMMONED_UNIT_DIES       = 82,      // CreatureId(0 all), CooldownMin, CooldownMax
-<<<<<<< HEAD
-
-    SMART_EVENT_END                      = 83
-=======
     SMART_EVENT_ON_SPELL_CAST            = 83,      // SpellID, CooldownMin, CooldownMax
     SMART_EVENT_ON_SPELL_FAILED          = 84,      // SpellID, CooldownMin, CooldownMax
     SMART_EVENT_ON_SPELL_START           = 85,      // SpellID, CooldownMin, CooldownMax
     SMART_EVENT_ON_DESPAWN               = 86,      // NONE
 
     SMART_EVENT_END                      = 87
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 
 struct SmartEvent
@@ -1518,13 +1513,10 @@ const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
     {SMART_EVENT_SCENE_CANCEL,              0 },
     {SMART_EVENT_SCENE_COMPLETE,            0 },
     {SMART_EVENT_SUMMONED_UNIT_DIES,        SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
-<<<<<<< HEAD
-=======
     {SMART_EVENT_ON_SPELL_CAST,             SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_ON_SPELL_FAILED,           SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_ON_SPELL_START,            SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_ON_DESPAWN,                SMART_SCRIPT_TYPE_MASK_CREATURE },
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 
 enum SmartEventFlags

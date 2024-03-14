@@ -617,8 +617,6 @@ void SmartAI::SpellHit(WorldObject* caster, SpellInfo const* spellInfo)
 void SmartAI::SpellHitTarget(WorldObject* target, SpellInfo const* spellInfo)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_SPELLHIT_TARGET, target->ToUnit(), 0, 0, false, spellInfo, target->ToGameObject());
-<<<<<<< HEAD
-=======
 }
 
 void SmartAI::OnSpellCast(SpellInfo const* spellInfo)
@@ -629,7 +627,6 @@ void SmartAI::OnSpellCast(SpellInfo const* spellInfo)
 void SmartAI::OnSpellFailed(SpellInfo const* spellInfo)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELL_FAILED, nullptr, 0, 0, false, spellInfo);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void SmartAI::OnSpellStart(SpellInfo const* spellInfo)
@@ -950,12 +947,8 @@ void SmartAI::UpdatePath(uint32 diff)
     // handle pause
     if (HasEscortState(SMART_ESCORT_PAUSED) && (_waypointReached || _waypointPauseForced))
     {
-<<<<<<< HEAD
-        if (!me->IsInCombat() && !HasEscortState(SMART_ESCORT_RETURNING))
-=======
         // Resume only if there was a pause timer set
         if (_waypointPauseTimer && !me->IsInCombat() && !HasEscortState(SMART_ESCORT_RETURNING))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         {
             if (_waypointPauseTimer <= diff)
                 ResumePath();
@@ -1146,11 +1139,7 @@ class SmartTrigger : public AreaTriggerScript
             TC_LOG_DEBUG("scripts.ai", "AreaTrigger {} is using SmartTrigger script", trigger->ID);
             SmartScript script;
             script.OnInitialize(player, trigger);
-<<<<<<< HEAD
-            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->id);
-=======
             script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->ID);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return true;
         }
 };

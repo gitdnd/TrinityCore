@@ -1210,15 +1210,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SUMMON_CREATURE:
         {
-<<<<<<< HEAD
-            WorldObject* baseObj = GetBaseObjectOrPlayerTrigger();
-            if (!baseObj)
-=======
             EnumFlag<SmartActionSummonCreatureFlags> flags(static_cast<SmartActionSummonCreatureFlags>(e.action.summonCreature.flags));
             bool preferUnit = flags.HasFlag(SmartActionSummonCreatureFlags::PreferUnit);
             WorldObject* summoner = preferUnit ? unit : Coalesce<WorldObject>(GetBaseObjectOrPlayerTrigger(), unit);
             if (!summoner)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 break;
 
             bool personalSpawn = flags.HasFlag(SmartActionSummonCreatureFlags::PersonalSpawn);
@@ -1232,35 +1227,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 y += e.target.y;
                 z += e.target.z;
                 o += e.target.o;
-<<<<<<< HEAD
-                if (Creature* summon = baseObj->SummonCreature(e.action.summonCreature.creature, x, y, z, o, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
-                    if (e.action.summonCreature.attackInvoker)
-                        summon->AI()->AttackStart(target->ToUnit());
-=======
                 for (uint32 counter = 0; counter < spawnsCount; counter++)
                 {
                     if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, x, y, z, o, (TempSummonType)e.action.summonCreature.type, Milliseconds(e.action.summonCreature.duration), personalSpawn))
                         if (e.action.summonCreature.attackInvoker)
                             summon->AI()->AttackStart(target->ToUnit());
                 }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             }
 
             if (e.GetTargetType() != SMART_TARGET_POSITION)
                 break;
 
-<<<<<<< HEAD
-            if (Creature* summon = baseObj->SummonCreature(e.action.summonCreature.creature, e.target.x, e.target.y, e.target.z, e.target.o, (TempSummonType)e.action.summonCreature.type, e.action.summonCreature.duration))
-                if (unit && e.action.summonCreature.attackInvoker)
-                    summon->AI()->AttackStart(unit);
-=======
             for (uint32 counter = 0; counter < spawnsCount; counter++)
             {
                 if (Creature* summon = summoner->SummonCreature(e.action.summonCreature.creature, e.target.x, e.target.y, e.target.z, e.target.o, (TempSummonType)e.action.summonCreature.type, Milliseconds(e.action.summonCreature.duration), personalSpawn))
                     if (unit && e.action.summonCreature.attackInvoker)
                         summon->AI()->AttackStart(unit);
             }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             break;
         }
         case SMART_ACTION_SUMMON_GO:
@@ -2747,11 +2730,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         }
         case SMART_TARGET_CLOSEST_UNSPAWNED_GAMEOBJECT:
         {
-<<<<<<< HEAD
-            if (GameObject* target = baseObject->FindNearestUnspawnedGameObject(e.target.closest.entry, float(e.target.closest.dist ? e.target.closest.dist : 100)))
-=======
             if (GameObject* target = baseObject->FindNearestUnspawnedGameObject(e.target.goClosest.entry, float(e.target.goClosest.dist ? e.target.goClosest.dist : 100)))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 targets.push_back(target);
             break;
         }
@@ -3716,17 +3695,6 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerEntry const* at)
                     trigger = at;
                     atPlayer = obj->ToPlayer();
                     TC_LOG_DEBUG("scripts.ai", "SmartScript::OnInitialize: source is AreaTrigger {}, triggered by player {}", trigger->ID, atPlayer->GetGUID().ToString());
-                }
-                else
-                    TC_LOG_ERROR("misc", "SmartScript::OnInitialize: !WARNING! Player TypeID is only allowed for AreaTriggers");
-                break;
-            case TYPEID_PLAYER:
-                if (at)
-                {
-                    mScriptType = SMART_SCRIPT_TYPE_AREATRIGGER;
-                    trigger = at;
-                    atPlayer = obj->ToPlayer();
-                    TC_LOG_DEBUG("scripts.ai", "SmartScript::OnInitialize: source is AreaTrigger %u, triggered by player %s", trigger->id, atPlayer->GetGUID().ToString().c_str());
                 }
                 else
                     TC_LOG_ERROR("misc", "SmartScript::OnInitialize: !WARNING! Player TypeID is only allowed for AreaTriggers");

@@ -177,26 +177,7 @@ class TC_GAME_API UnitAI
             std::list<Unit*> targetList;
             SelectTargetList(targetList, std::numeric_limits<uint32>::max(), targetType, offset, predicate);
 
-<<<<<<< HEAD
-            // maybe nothing fulfills the predicate
-            if (targetList.empty())
-                return nullptr;
-
-            switch (targetType)
-            {
-                case SelectTargetMethod::MaxThreat:
-                case SelectTargetMethod::MinThreat:
-                case SelectTargetMethod::MaxDistance:
-                case SelectTargetMethod::MinDistance:
-                    return targetList.front();
-                case SelectTargetMethod::Random:
-                    return Trinity::Containers::SelectRandomContainerElement(targetList);
-                default:
-                    return nullptr;
-            }
-=======
             return FinalizeTargetSelection(targetList, targetType);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
 
         // Select the best (up to) <num> targets (in <targetType> order) from the threat list that fulfill the following:
@@ -220,72 +201,10 @@ class TC_GAME_API UnitAI
             if (!PrepareTargetListSelection(targetList, targetType, offset))
                 return;
 
-<<<<<<< HEAD
-            if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
-            {
-                for (ThreatReference const* ref : mgr.GetUnsortedThreatList())
-                {
-                    if (ref->IsOffline())
-                        continue;
-
-                    targetList.push_back(ref->GetVictim());
-                }
-            }
-            else
-            {
-                Unit* currentVictim = mgr.GetCurrentVictim();
-                if (currentVictim)
-                    targetList.push_back(currentVictim);
-
-                for (ThreatReference const* ref : mgr.GetSortedThreatList())
-                {
-                    if (ref->IsOffline())
-                        continue;
-
-                    Unit* thisTarget = ref->GetVictim();
-                    if (thisTarget != currentVictim)
-                        targetList.push_back(thisTarget);
-                }
-            }
-
-            // shortcut: the list isn't gonna get any larger
-            if (targetList.size() <= offset)
-            {
-                targetList.clear();
-                return;
-            }
-
-            // right now, list is unsorted for DISTANCE types - re-sort by SelectTargetMethod::MaxDistance
-            if (targetType == SelectTargetMethod::MaxDistance || targetType == SelectTargetMethod::MinDistance)
-                SortByDistance(targetList, targetType == SelectTargetMethod::MinDistance);
-
-            // now the list is MAX sorted, reverse for MIN types
-            if (targetType == SelectTargetMethod::MinThreat)
-                targetList.reverse();
-
-            // ignore the first <offset> elements
-            while (offset)
-            {
-                targetList.pop_front();
-                --offset;
-            }
-
-            // then finally filter by predicate
-            targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
-
-            if (targetList.size() <= num)
-                return;
-
-            if (targetType == SelectTargetMethod::Random)
-                Trinity::Containers::RandomResize(targetList, num);
-            else
-                targetList.resize(num);
-=======
             // then finally filter by predicate
             targetList.remove_if([&predicate](Unit* target) { return !predicate(target); });
 
             FinalizeTargetListSelection(targetList, num, targetType);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
 
         // Called when the unit enters combat
