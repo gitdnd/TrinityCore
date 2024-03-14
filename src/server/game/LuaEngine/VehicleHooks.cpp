@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2016 Eluna Lua Engine <http://emudevs.com/>
+ * Copyright (C) 2010 - 2024 Eluna Lua Engine <https://elunaluaengine.github.io/>
  * This program is free software licensed under GPL version 3
  * Please see the included DOCS/LICENSE.md for more information
  */
@@ -16,49 +16,46 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
-    if (!IsEnabled())\
-        return;\
     auto key = EventKey<VehicleEvents>(EVENT);\
     if (!VehicleEventBindings->HasBindingsFor(key))\
-        return;\
-    LOCK_ELUNA
+        return;
 
 void Eluna::OnInstall(Vehicle* vehicle)
 {
     START_HOOK(VEHICLE_EVENT_ON_INSTALL);
-    Push(vehicle);
+    HookPush(vehicle);
     CallAllFunctions(VehicleEventBindings, key);
 }
 
 void Eluna::OnUninstall(Vehicle* vehicle)
 {
     START_HOOK(VEHICLE_EVENT_ON_UNINSTALL);
-    Push(vehicle);
+    HookPush(vehicle);
     CallAllFunctions(VehicleEventBindings, key);
 }
 
 void Eluna::OnInstallAccessory(Vehicle* vehicle, Creature* accessory)
 {
     START_HOOK(VEHICLE_EVENT_ON_INSTALL_ACCESSORY);
-    Push(vehicle);
-    Push(accessory);
+    HookPush(vehicle);
+    HookPush(accessory);
     CallAllFunctions(VehicleEventBindings, key);
 }
 
 void Eluna::OnAddPassenger(Vehicle* vehicle, Unit* passenger, int8 seatId)
 {
     START_HOOK(VEHICLE_EVENT_ON_ADD_PASSENGER);
-    Push(vehicle);
-    Push(passenger);
-    Push(seatId);
+    HookPush(vehicle);
+    HookPush(passenger);
+    HookPush(seatId);
     CallAllFunctions(VehicleEventBindings, key);
 }
 
 void Eluna::OnRemovePassenger(Vehicle* vehicle, Unit* passenger)
 {
     START_HOOK(VEHICLE_EVENT_ON_REMOVE_PASSENGER);
-    Push(vehicle);
-    Push(passenger);
+    HookPush(vehicle);
+    HookPush(passenger);
     CallAllFunctions(VehicleEventBindings, key);
 }
 

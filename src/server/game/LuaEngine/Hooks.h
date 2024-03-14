@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2016 Eluna Lua Engine <http://emudevs.com/>
+ * Copyright (C) 2010 - 2024 Eluna Lua Engine <https://elunaluaengine.github.io/>
  * This program is free software licensed under GPL version 3
  * Please see the included DOCS/LICENSE.md for more information
  */
@@ -80,6 +80,7 @@ namespace Hooks
         REGTYPE_CREATURE_GOSSIP,
         REGTYPE_GAMEOBJECT,
         REGTYPE_GAMEOBJECT_GOSSIP,
+        REGTYPE_SPELL,
         REGTYPE_ITEM,
         REGTYPE_ITEM_GOSSIP,
         REGTYPE_PLAYER_GOSSIP,
@@ -93,7 +94,7 @@ namespace Hooks
     {
         PACKET_EVENT_ON_PACKET_RECEIVE          =     5,       // (event, packet, player) - Player only if accessible. Can return false, newPacket
         PACKET_EVENT_ON_PACKET_RECEIVE_UNKNOWN  =     6,       // Not Implemented
-        PACKET_EVENT_ON_PACKET_SEND             =     7,       // (event, packet, player) - Player only if accessible. Can return false, newPacket
+        PACKET_EVENT_ON_PACKET_SEND             =     7,       // (event, packet, player) - Player only if accessible. Can return false
 
         PACKET_EVENT_COUNT
     };
@@ -107,7 +108,7 @@ namespace Hooks
         SERVER_EVENT_ON_SOCKET_CLOSE            =     4,       // Not Implemented
         SERVER_EVENT_ON_PACKET_RECEIVE          =     5,       // (event, packet, player) - Player only if accessible. Can return false, newPacket
         SERVER_EVENT_ON_PACKET_RECEIVE_UNKNOWN  =     6,       // Not Implemented
-        SERVER_EVENT_ON_PACKET_SEND             =     7,       // (event, packet, player) - Player only if accessible. Can return false, newPacket
+        SERVER_EVENT_ON_PACKET_SEND             =     7,       // (event, packet, player) - Player only if accessible. Can return false
 
         // World
         WORLD_EVENT_ON_OPEN_STATE_CHANGE        =     8,        // (event, open) - Needs core support on Mangos
@@ -201,9 +202,21 @@ namespace Hooks
         PLAYER_EVENT_ON_LOOT_MONEY              =     37,       // (event, player, amount)
         PLAYER_EVENT_ON_QUEST_ABANDON           =     38,       // (event, player, questId)
         PLAYER_EVENT_ON_LEARN_TALENTS           =     39,       // (event, player, talentId, talentRank, spellid)
-        // UNUSED                               =     40,       // (event, player)
-        // UNUSED                               =     41,       // (event, player)
+        PLAYER_EVENT_ON_ENVIRONMENTAL_DEATH     =     40,       // (event, player, environmentalDamageType)
+        PLAYER_EVENT_ON_TRADE_ACCEPT            =     41,       // (event, player, target) - Can return false to interrupt trade
         PLAYER_EVENT_ON_COMMAND                 =     42,       // (event, player, command) - player is nil if command used from console. Can return false
+        PLAYER_EVENT_ON_SKILL_CHANGE            =     43,       // (event, player, skillId, skillValue) - Returns new skill level value
+        PLAYER_EVENT_ON_LEARN_SPELL             =     44,       // (event, player, spellId)
+        PLAYER_EVENT_ON_ACHIEVEMENT_COMPLETE    =     45,       // (event, player, achievementId)
+        PLAYER_EVENT_ON_DISCOVER_AREA           =     46,       // (event, player, area)
+        PLAYER_EVENT_ON_UPDATE_AREA             =     47,       // (event, player, oldArea, newArea)
+        PLAYER_EVENT_ON_TRADE_INIT              =     48,       // (event, player, target) - Can return false to interrupt trade
+        PLAYER_EVENT_ON_SEND_MAIL               =     49,       // (event, player, recipientGuid) - Can return false to interrupt sending
+        // UNUSED                               =     50,       // (event, player)
+        // UNUSED                               =     51,       // (event, player)
+        // UNUSED                               =     52,       // (event, player)
+        // UNUSED                               =     53,       // (event, player)
+        PLAYER_EVENT_ON_QUEST_STATUS_CHANGED    =     54,       // (event, player, questId, status)
 
         PLAYER_EVENT_COUNT
     };
@@ -235,6 +248,7 @@ namespace Hooks
         GROUP_EVENT_ON_LEADER_CHANGE            =     4,       // (event, group, newLeaderGuid, oldLeaderGuid)
         GROUP_EVENT_ON_DISBAND                  =     5,       // (event, group)
         GROUP_EVENT_ON_CREATE                   =     6,       // (event, group, leaderGuid, groupType)
+        GROUP_EVENT_ON_MEMBER_ACCEPT            =     7,       // (event, group, player) - Can return false to disable accepting
 
         GROUP_EVENT_COUNT
     };
@@ -261,7 +275,7 @@ namespace Hooks
         CREATURE_EVENT_ON_REACH_WP                        = 6,  // (event, creature, type, id) - Can return true to stop normal action
         CREATURE_EVENT_ON_AIUPDATE                        = 7,  // (event, creature, diff) - Can return true to stop normal action
         CREATURE_EVENT_ON_RECEIVE_EMOTE                   = 8,  // (event, creature, player, emoteid) - Can return true to stop normal action
-        CREATURE_EVENT_ON_DAMAGE_TAKEN                    = 9,  // (event, creature, attacker, damage) - Can return new damage
+        CREATURE_EVENT_ON_DAMAGE_TAKEN                    = 9,  // (event, creature, attacker, damage) - Can return true to stop normal action, can return new damage as second return value.
         CREATURE_EVENT_ON_PRE_COMBAT                      = 10, // (event, creature, target) - Can return true to stop normal action
         // UNUSED
         CREATURE_EVENT_ON_OWNER_ATTACKED                  = 12, // (event, creature, target) - Can return true to stop normal action            // Not on mangos
@@ -278,7 +292,7 @@ namespace Hooks
         CREATURE_EVENT_ON_RESET                           = 23, // (event, creature)
         CREATURE_EVENT_ON_REACH_HOME                      = 24, // (event, creature) - Can return true to stop normal action
         // UNUSED                                         = 25, // (event, creature)
-        CREATURE_EVENT_ON_CORPSE_REMOVED                  = 26, // (event, creature, respawndelay) - Can return true, newRespawnDelay
+        CREATURE_EVENT_ON_CORPSE_REMOVED                  = 26, // (event, creature, respawndelay) - Can return true to stop normal action, can return new respawndelay as second return value
         CREATURE_EVENT_ON_MOVE_IN_LOS                     = 27, // (event, creature, unit) - Can return true to stop normal action. Does not actually check LOS, just uses the sight range
         // UNUSED                                         = 28, // (event, creature)
         // UNUSED                                         = 29, // (event, creature)
@@ -297,9 +311,9 @@ namespace Hooks
     {
         GAMEOBJECT_EVENT_ON_AIUPDATE                    = 1,    // (event, go, diff)
         GAMEOBJECT_EVENT_ON_SPAWN                       = 2,    // (event, go)
-        GAMEOBJECT_EVENT_ON_DUMMY_EFFECT                = 3,    // (event, caster, spellid, effindex, go)
-        GAMEOBJECT_EVENT_ON_QUEST_ACCEPT                = 4,    // (event, player, go, quest) - Can return true
-        GAMEOBJECT_EVENT_ON_QUEST_REWARD                = 5,    // (event, player, go, quest, opt) - Can return true
+        GAMEOBJECT_EVENT_ON_DUMMY_EFFECT                = 3,    // (event, caster, spellid, effindex, go) - Can return true to stop normal action
+        GAMEOBJECT_EVENT_ON_QUEST_ACCEPT                = 4,    // (event, player, go, quest) - Can return true to stop normal action
+        GAMEOBJECT_EVENT_ON_QUEST_REWARD                = 5,    // (event, player, go, quest, opt) - Can return true to stop normal action
         GAMEOBJECT_EVENT_ON_DIALOG_STATUS               = 6,    // (event, player, go)
         GAMEOBJECT_EVENT_ON_DESTROYED                   = 7,    // (event, go, attacker)
         GAMEOBJECT_EVENT_ON_DAMAGED                     = 8,    // (event, go, attacker)
@@ -308,8 +322,14 @@ namespace Hooks
         // UNUSED                                       = 11,   // (event, gameobject)
         GAMEOBJECT_EVENT_ON_ADD                         = 12,   // (event, gameobject)
         GAMEOBJECT_EVENT_ON_REMOVE                      = 13,   // (event, gameobject)
-        GAMEOBJECT_EVENT_ON_USE                         = 14,   // (event, go, player)
+        GAMEOBJECT_EVENT_ON_USE                         = 14,   // (event, go, player) - Can return true to stop normal action
         GAMEOBJECT_EVENT_COUNT
+    };
+
+    enum SpellEvents
+    {
+        SPELL_EVENT_ON_CAST                             = 1,    // (event, spell, skipCheck)
+        SPELL_EVENT_COUNT
     };
 
     enum ItemEvents
@@ -319,6 +339,12 @@ namespace Hooks
         ITEM_EVENT_ON_QUEST_ACCEPT                      = 3,    // (event, player, item, quest) - Can return true
         ITEM_EVENT_ON_EXPIRE                            = 4,    // (event, player, itemid) - Can return true
         ITEM_EVENT_ON_REMOVE                            = 5,    // (event, player, item) - Can return true
+
+        // Custom
+        ITEM_EVENT_ON_ADD                               = 6,    // (event, player, item)
+        ITEM_EVENT_ON_EQUIP                             = 7,    // (event, player, item, slot)
+        ITEM_EVENT_ON_UNEQUIP                           = 8,    // (event, player, item, slot)
+
         ITEM_EVENT_COUNT
     };
 
@@ -349,6 +375,7 @@ namespace Hooks
         INSTANCE_EVENT_ON_CHECK_ENCOUNTER_IN_PROGRESS   = 7,    // (event, instance_data, map)
         INSTANCE_EVENT_COUNT
     };
+
 };
 
 #endif // _HOOKS_H

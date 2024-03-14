@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 - 2016 Eluna Lua Engine <http://emudevs.com/>
+ * Copyright (C) 2010 - 2024 Eluna Lua Engine <https://elunaluaengine.github.io/>
  * This program is free software licensed under GPL version 3
  * Please see the included DOCS/LICENSE.md for more information
  */
@@ -13,59 +13,69 @@
 using namespace Hooks;
 
 #define START_HOOK(EVENT) \
-    if (!IsEnabled())\
-        return;\
     auto key = EventKey<GroupEvents>(EVENT);\
     if (!GroupEventBindings->HasBindingsFor(key))\
-        return;\
-    LOCK_ELUNA
+        return;
 
-void Eluna::OnAddMember(Group* group, uint64 guid)
+#define START_HOOK_WITH_RETVAL(EVENT, RETVAL) \
+    auto key = EventKey<GroupEvents>(EVENT);\
+    if (!GroupEventBindings->HasBindingsFor(key))\
+        return RETVAL;
+
+void Eluna::OnAddMember(Group* group, ObjectGuid guid)
 {
     START_HOOK(GROUP_EVENT_ON_MEMBER_ADD);
-    Push(group);
-    Push(guid);
+    HookPush(group);
+    HookPush(guid);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnInviteMember(Group* group, uint64 guid)
+void Eluna::OnInviteMember(Group* group, ObjectGuid guid)
 {
     START_HOOK(GROUP_EVENT_ON_MEMBER_INVITE);
-    Push(group);
-    Push(guid);
+    HookPush(group);
+    HookPush(guid);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnRemoveMember(Group* group, uint64 guid, uint8 method)
+void Eluna::OnRemoveMember(Group* group, ObjectGuid guid, uint8 method)
 {
     START_HOOK(GROUP_EVENT_ON_MEMBER_REMOVE);
-    Push(group);
-    Push(guid);
-    Push(method);
+    HookPush(group);
+    HookPush(guid);
+    HookPush(method);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid)
+void Eluna::OnChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
 {
     START_HOOK(GROUP_EVENT_ON_LEADER_CHANGE);
-    Push(group);
-    Push(newLeaderGuid);
-    Push(oldLeaderGuid);
+    HookPush(group);
+    HookPush(newLeaderGuid);
+    HookPush(oldLeaderGuid);
     CallAllFunctions(GroupEventBindings, key);
 }
 
 void Eluna::OnDisband(Group* group)
 {
     START_HOOK(GROUP_EVENT_ON_DISBAND);
-    Push(group);
+    HookPush(group);
     CallAllFunctions(GroupEventBindings, key);
 }
 
-void Eluna::OnCreate(Group* group, uint64 leaderGuid, GroupType groupType)
+void Eluna::OnCreate(Group* group, ObjectGuid leaderGuid, GroupType groupType)
 {
     START_HOOK(GROUP_EVENT_ON_CREATE);
-    Push(group);
-    Push(leaderGuid);
-    Push(groupType);
+    HookPush(group);
+    HookPush(leaderGuid);
+    HookPush(groupType);
     CallAllFunctions(GroupEventBindings, key);
+}
+
+bool Eluna::OnMemberAccept(Group* group, Player* player)
+{
+    START_HOOK_WITH_RETVAL(GROUP_EVENT_ON_MEMBER_ACCEPT, true);
+    HookPush(group);
+    HookPush(player);
+    return CallAllFunctionsBool(GroupEventBindings, key, true);
 }

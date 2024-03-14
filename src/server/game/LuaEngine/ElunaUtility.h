@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2016 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2024 Eluna Lua Engine <https://elunaluaengine.github.io/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -12,26 +12,30 @@
 #include <mutex>
 #include <memory>
 #include "Common.h"
+#ifndef CMANGOS
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
+#else
+#include "Globals/SharedDefines.h"
+#include "Entities/ObjectGuid.h"
+#endif
 #ifdef TRINITY
 #include "QueryResult.h"
 #include "Log.h"
 #ifdef CATA
 #include "Object.h"
 #endif
-#else
+#elif VMANGOS
 #include "Database/QueryResult.h"
 #include "Log.h"
+#else
+#include "Database/QueryResult.h"
+#include "Log/Log.h"
 #endif
 
-#ifdef TRINITY
+#if defined(TRINITY) || defined(AZEROTHCORE)
 typedef QueryResult ElunaQuery;
-#define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
-#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
-#define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
 #define GET_GUID                GetGUID
-
 #define HIGHGUID_PLAYER         HighGuid::Player
 #define HIGHGUID_UNIT           HighGuid::Unit
 #define HIGHGUID_ITEM           HighGuid::Item
@@ -45,12 +49,40 @@ typedef QueryResult ElunaQuery;
 #define HIGHGUID_MO_TRANSPORT   HighGuid::Mo_Transport
 #define HIGHGUID_INSTANCE       HighGuid::Instance
 #define HIGHGUID_GROUP          HighGuid::Group
-#elif AZEROTHCORE
-typedef QueryResult ElunaQuery;
-#define ELUNA_LOG_INFO(...)     sLog->outString(__VA_ARGS__);
-#define ELUNA_LOG_ERROR(...)    sLog->outError(__VA_ARGS__);
-#define ELUNA_LOG_DEBUG(...)    sLog->outDebug(LOG_FILTER_NONE,__VA_ARGS__);
-#define GET_GUID                GetGUID
+#endif
+
+#ifdef TRINITY
+#ifdef WOTLK
+#include "fmt/printf.h"
+#define ELUNA_LOG_TC_FMT(TC_LOG_MACRO, ...) \
+    try { \
+        std::string message = fmt::sprintf(__VA_ARGS__); \
+        TC_LOG_MACRO("eluna", "{}", message); \
+    } catch (const std::exception& e) { \
+        TC_LOG_MACRO("eluna", "Failed to format log message: {}", e.what()); \
+    }
+#define ELUNA_LOG_INFO(...)     ELUNA_LOG_TC_FMT(TC_LOG_INFO, __VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    ELUNA_LOG_TC_FMT(TC_LOG_ERROR, __VA_ARGS__);
+#define ELUNA_LOG_DEBUG(...)    ELUNA_LOG_TC_FMT(TC_LOG_DEBUG, __VA_ARGS__);
+#else
+#define ELUNA_LOG_INFO(...)     TC_LOG_INFO("eluna", __VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    TC_LOG_ERROR("eluna", __VA_ARGS__);
+#define ELUNA_LOG_DEBUG(...)    TC_LOG_DEBUG("eluna", __VA_ARGS__);
+#endif
+#elif defined(AZEROTHCORE)
+#define ELUNA_LOG_INFO(...)     LOG_INFO("eluna", __VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    LOG_ERROR("eluna", __VA_ARGS__);
+#define ELUNA_LOG_DEBUG(...)    LOG_DEBUG("eluna", __VA_ARGS__);
+#elif VMANGOS
+typedef QueryNamedResult ElunaQuery;
+#define ASSERT                  MANGOS_ASSERT
+#define ELUNA_LOG_INFO(...)     sLog.Out(LOG_ELUNA, LOG_LVL_BASIC,__VA_ARGS__);
+#define ELUNA_LOG_ERROR(...)    sLog.Out(LOG_ELUNA, LOG_LVL_ERROR,__VA_ARGS__);
+#define ELUNA_LOG_DEBUG(...)    sLog.Out(LOG_ELUNA, LOG_LVL_DEBUG,__VA_ARGS__);
+#define GET_GUID                GetObjectGuid
+#define GetGameObjectTemplate   GetGameObjectInfo
+#define GetItemTemplate         GetItemPrototype
+#define GetTemplate             GetProto
 #else
 typedef QueryNamedResult ElunaQuery;
 #define ASSERT                  MANGOS_ASSERT
@@ -63,7 +95,7 @@ typedef QueryNamedResult ElunaQuery;
 #define GetTemplate             GetProto
 #endif
 
-#if defined(TRINITY) || defined(MANGOS)
+#if defined(TRINITY) || defined(AZEROTHCORE) || defined(MANGOS) || defined(CMANGOS) || defined(VMANGOS)
 #ifndef MAKE_NEW_GUID
 #define MAKE_NEW_GUID(l, e, h)  ObjectGuid(h, e, l)
 #endif
@@ -77,6 +109,8 @@ typedef QueryNamedResult ElunaQuery;
 #define GUID_HIPART(guid)       ObjectGuid(guid).GetHigh()
 #endif
 #endif
+
+typedef std::vector<uint8> BytecodeBuffer;
 
 class Unit;
 class WorldObject;
@@ -126,25 +160,6 @@ namespace ElunaUtil
         uint16 const i_typeMask;
         uint32 const i_dead; // 0 both, 1 alive, 2 dead
         bool const i_nearest;
-    };
-
-    /*
-     * Usage:
-     * Inherit this class, then when needing lock, use
-     * Guard guard(GetLock());
-     *
-     * The lock is automatically released at end of scope
-     */
-    class Lockable
-    {
-    public:
-        typedef std::mutex LockType;
-        typedef std::lock_guard<LockType> Guard;
-
-        LockType& GetLock() { return _lock; }
-
-    private:
-        LockType _lock;
     };
 
     /*
