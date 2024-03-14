@@ -26,7 +26,6 @@
 #include "Loot.h"
 #include "GridObject.h"
 #include "MapObject.h"
-#include "Map.h"
 #include <list>
 #include "AffixMgr.h"
 
@@ -106,12 +105,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         CreatureMovementData const& GetMovementTemplate() const;
         bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
-<<<<<<< HEAD
-        bool CanSwim() const override { return GetMovementTemplate().IsSwimAllowed() || IsPet(); }
-=======
         bool CanSwim() const override;
         bool CanEnterWater() const override;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         bool CanFly()  const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
         bool CanHover() const { return GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || IsHovering(); }
 
@@ -363,6 +358,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsFreeToMove();
         static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
         static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
+
         CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
         void SetTextRepeatId(uint8 textGroup, uint8 id);
         void ClearTextRepeatGroup(uint8 textGroup);
@@ -382,17 +378,14 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         std::string GetDebugInfo() const override;
 
-<<<<<<< HEAD
         int GetDungeonLevel() const;
 
-        bool blockMirror;
         void ApplyScaledResistances();
         void ApplyScaledArmor();
         void UpdateDungeonScaling();
         bool IsMarkOfTheAbsoluteEnabled();
-=======
+
         void ExitVehicle(Position const* exitPosition = nullptr) override;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     protected:
         bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 entry, CreatureData const* data = nullptr, uint32 vehId = 0);
@@ -480,12 +473,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         // Regenerate health
         bool _regenerateHealth; // Set on creation
         bool _regenerateHealthLock; // Dynamically set
-<<<<<<< HEAD
         uint8 _markOfTheAbsoluteState;
-=======
 
         bool _isMissingCanSwimFlagOutOfCombat;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

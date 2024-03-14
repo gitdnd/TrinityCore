@@ -375,17 +375,14 @@ std::string Minion::GetDebugInfo() const
     return sstr.str();
 }
 
-Guardian::Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject, uint32 dungeonLevel) : Minion(properties, owner, isWorldObject)
+Guardian::Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject, int dungeonLevel) : Minion(properties, owner, isWorldObject)
 , m_bonusSpellDamage(0)
 {
     memset(m_statFromOwner, 0, sizeof(float)*MAX_STATS);
     m_unitTypeMask |= UNIT_MASK_GUARDIAN;
-<<<<<<< HEAD
     _dungeonLevelOverride = dungeonLevel;
-    if (properties && (properties->Type == SUMMON_TYPE_PET || properties->Category == SUMMON_CATEGORY_PET))
-=======
+
     if (properties && (properties->Title == SUMMON_TYPE_PET || properties->Control == SUMMON_CATEGORY_PET))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         m_unitTypeMask |= UNIT_MASK_CONTROLABLE_GUARDIAN;
         InitCharmInfo();

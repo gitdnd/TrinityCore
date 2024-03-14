@@ -254,20 +254,11 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 }
 
 Creature::Creature(bool isWorldObject): Unit(isWorldObject), MapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipient(), m_lootRecipientGroup(0), _pickpocketLootRestore(0),
-<<<<<<< HEAD
-    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE),
-    m_backpedalTime(MOVE_BACKWARDS_CHECK_INTERVAL), m_encircleTime(MOVE_CIRCLE_CHECK_INTERVAL), 
-    m_defaultMovementType(IDLE_MOTION_TYPE), m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false), m_cannotReachTarget(false), m_cannotReachTimer(0),
-    m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), _waypointPathId(0), _currentWaypointNodeInfo(0, 0),
-    m_formation(nullptr), m_triggerJustAppeared(true), m_respawnCompatibilityMode(false), _lastDamagedTime(0),
-    _regenerateHealth(true), _regenerateHealthLock(false), blockMirror(false), _markOfTheAbsoluteState(0)
-=======
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_ignoreCorpseDecayRatio(false), m_wanderDistance(0.0f), m_boundaryCheckTime(2500), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE),
     m_defaultMovementType(IDLE_MOTION_TYPE), m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false), m_cannotReachTarget(false), m_cannotReachTimer(0),
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), _waypointPathId(0), _currentWaypointNodeInfo(0, 0),
     m_formation(nullptr), m_triggerJustAppeared(true), m_respawnCompatibilityMode(false), _lastDamagedTime(0),
-    _regenerateHealth(true), _regenerateHealthLock(false), _isMissingCanSwimFlagOutOfCombat(false)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    _regenerateHealth(true), _regenerateHealthLock(false), _isMissingCanSwimFlagOutOfCombat(false), _markOfTheAbsoluteState(0)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -290,16 +281,11 @@ void Creature::AddToWorld()
     ///- Register the creature for guid lookup
     if (!IsInWorld())
     {
-        Map* map = GetMap();
-        map->GetObjectsStore().Insert<Creature>(GetGUID(), this);
+        GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
         if (m_spawnId)
-            map->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
+            GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
 
-<<<<<<< HEAD
-        TC_LOG_DEBUG("entities.unit", "Adding creature %s with DBGUID %u to world in map %u", GetGUID().ToString().c_str(), m_spawnId, map->GetId());
-=======
         TC_LOG_DEBUG("entities.unit", "Adding creature {} with DBGUID {} to world in map {}", GetGUID().ToString(), m_spawnId, GetMap()->GetId());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         Unit::AddToWorld();
         SearchFormation();
@@ -313,13 +299,8 @@ void Creature::AddToWorld()
         ApplyAffixData(AFFIX_EVENT_ADD_TO_WORLD);
 
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnAddToWorld(this);
-=======
         if (Eluna* e = GetEluna())
             e->OnAddToWorld(this);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     }
 }
@@ -329,13 +310,8 @@ void Creature::RemoveFromWorld()
     if (IsInWorld())
     {
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnRemoveFromWorld(this);
-=======
         if (Eluna* e = GetEluna())
             e->OnRemoveFromWorld(this);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
@@ -894,17 +870,10 @@ void Creature::Update(uint32 diff)
                         if (sWorld->getBoolConfig(CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID) || !GetMap()->IsRaid())
                         {
                             RegenerateHealth();
-<<<<<<< HEAD
-                            TC_LOG_DEBUG("entities.unit.chase", "RegenerateHealth() enabled because Creature cannot reach the target. Detail: %s", GetDebugInfo().c_str());
-                        }
-                        else
-                            TC_LOG_DEBUG("entities.unit.chase", "RegenerateHealth() disabled even if the Creature cannot reach the target. Detail: %s", GetDebugInfo().c_str());
-=======
                             TC_LOG_DEBUG("entities.unit.chase", "RegenerateHealth() enabled because Creature cannot reach the target. Detail: {}", GetDebugInfo());
                         }
                         else
                             TC_LOG_DEBUG("entities.unit.chase", "RegenerateHealth() disabled even if the Creature cannot reach the target. Detail: {}", GetDebugInfo());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     }
                 }
 
@@ -1552,6 +1521,7 @@ void Creature::UpdateLevelDependantStats()
 
     SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
 
+    // damage
     float basedamage = stats->GenerateBaseDamage(cInfo);
 
     if (dungeonLevel > 0 && dungeonLevel < 10000)
@@ -1585,6 +1555,8 @@ void Creature::UpdateLevelDependantStats()
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
     SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
 
+    //float armor = (float)stats->GenerateArmor(cInfo); /// @todo Why is this treated as uint32 when it's a float?
+    //SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
     ApplyScaledArmor();
 }
 
@@ -2116,12 +2088,11 @@ void Creature::setDeathState(DeathState s)
 
         Unit::setDeathState(CORPSE);
 
-        auto map = GetMap();
-        if (map->GetEluna())
+        if (Eluna * e = GetEluna())
         {
-            if (map->IsDungeon() || map->IsRaid())
+            if (GetMap()->IsDungeon() || GetMap()->IsRaid())
             {
-                map->GetEluna()->OnScoredCreatureDied(map, this);
+                e->OnScoredCreatureDied(map, this);
             }
         }
     }
@@ -2160,14 +2131,10 @@ void Creature::setDeathState(DeathState s)
 
         Motion_Initialize();
         Unit::setDeathState(ALIVE);
-<<<<<<< HEAD
-        LoadCreaturesAddon();
         ApplyAffixData(AFFIX_EVENT_RESPAWN);
-=======
 
         if (!IsPet())
             LoadCreaturesAddon();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 }
 
@@ -3043,11 +3010,7 @@ void Creature::SetCannotReachTarget(bool cannotReach)
     m_cannotReachTimer = 0;
 
     if (cannotReach)
-<<<<<<< HEAD
-        TC_LOG_DEBUG("entities.unit.chase", "Creature::SetCannotReachTarget() called with true. Details: %s", GetDebugInfo().c_str());
-=======
         TC_LOG_DEBUG("entities.unit.chase", "Creature::SetCannotReachTarget() called with true. Details: {}", GetDebugInfo());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 bool Creature::SetWalk(bool enable)
@@ -3532,7 +3495,17 @@ std::string Creature::GetDebugInfo() const
     return sstr.str();
 }
 
-<<<<<<< HEAD
+void Creature::ExitVehicle(Position const* /*exitPosition*/)
+{
+    bool const isInVehicle = GetVehicle();
+    Unit::ExitVehicle();
+
+    // if alive creature exits a vehicle, set it's home position to the
+    // exited position so it won't run away (home) and evade if it's hostile
+    if (isInVehicle && IsAlive())
+        SetHomePosition(GetPosition());
+}
+
 void Creature::ApplyScaledResistances()
 {
     auto const cInfo = GetCreatureTemplate();
@@ -3588,7 +3561,7 @@ void Creature::ApplyScaledArmor()
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), GetCreatureTemplate()->unit_class);
     float armor = stats->GenerateArmor(GetCreatureTemplate());
     int dungeonLevel = GetDungeonLevel();
-    if(dungeonLevel > 1 && !IsPet())
+    if (dungeonLevel > 1 && !IsPet())
         armor += ((float)dungeonLevel / 1000.0f) * armor;
 
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
@@ -3696,15 +3669,5 @@ bool Creature::IsMarkOfTheAbsoluteEnabled()
         }
     }
     return _markOfTheAbsoluteState == uint8(1);
-=======
-void Creature::ExitVehicle(Position const* /*exitPosition*/)
-{
-    bool const isInVehicle = GetVehicle();
-    Unit::ExitVehicle();
-
-    // if alive creature exits a vehicle, set it's home position to the
-    // exited position so it won't run away (home) and evade if it's hostile
-    if (isInVehicle && IsAlive())
-        SetHomePosition(GetPosition());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
+

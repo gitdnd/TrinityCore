@@ -414,9 +414,9 @@ struct TC_GAME_API CreatureBaseStats
         return uint32(ceil(BaseMana * info->ModMana));
     }
 
-    float GenerateArmor(CreatureTemplate const* info) const
+    uint32 GenerateArmor(CreatureTemplate const* info) const
     {
-        return ceil(BaseArmor * info->ModArmor);
+        return uint32(ceil(BaseArmor * info->ModArmor));
     }
 
     float GenerateBaseDamage(CreatureTemplate const* info) const

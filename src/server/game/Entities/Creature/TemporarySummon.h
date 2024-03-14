@@ -98,7 +98,7 @@ class TC_GAME_API Minion : public TempSummon
 class TC_GAME_API Guardian : public Minion
 {
     public:
-        Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject, uint32 dungeonLevel = 0);
+        Guardian(SummonPropertiesEntry const* properties, Unit* owner, bool isWorldObject, int dungeonLevel = 0);
         void InitStats(uint32 duration) override;
         bool InitStatsForLevel(uint8 level);
         void InitSummon() override;
