@@ -72,9 +72,6 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPackets::Guild::GuildDeclineInv
     if (GetPlayer()->GetGuildId())
         return;
 
-    if (GetPlayer()->GetGuildId())
-        return;
-
     GetPlayer()->SetGuildIdInvited(0);
 }
 

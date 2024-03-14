@@ -410,37 +410,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPackets::Calendar::CalendarInv
 
         if (_player->GetTeam() != inviteeTeam && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR))
         {
-<<<<<<< HEAD
-            if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(guid))
-            {
-                inviteeGuid = guid;
-                inviteeTeam = Player::TeamForRaceNoOverride(characterInfo->Race);
-                inviteeGuildId = characterInfo->GuildId;
-            }
-        }
-    }
-
-    if (!inviteeGuid)
-    {
-        sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_PLAYER_NOT_FOUND);
-        return;
-    }
-
-    if (_player->GetTeam() != inviteeTeam && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR))
-    {
-        sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_NOT_ALLIED);
-        return;
-    }
-
-    if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = %u AND friend = %u", inviteeGuid.GetCounter(), playerGuid.GetCounter()))
-    {
-        Field* fields = result->Fetch();
-        if (fields[0].GetUInt8() & SOCIAL_FLAG_IGNORED)
-        {
-            sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_IGNORING_YOU_S, name.c_str());
-=======
             sCalendarMgr->SendCalendarCommandResult(playerGuid, CALENDAR_ERROR_NOT_ALLIED);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return;
         }
 

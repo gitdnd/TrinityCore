@@ -736,11 +736,7 @@ void WorldSession::HandleRaidReadyCheckFinishedOpcode(WorldPacket & /*recvData*/
         return;
 
     WorldPacket data(MSG_RAID_READY_CHECK_FINISHED);
-<<<<<<< HEAD
-    group->BroadcastPacket(&data, true);
-=======
     group->BroadcastPacket(&data, true, -1);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data)

@@ -50,12 +50,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
     data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
     data << uint8(nameData->Race);
     data << uint8(nameData->Sex);
-    if (player == GetPlayer())
-    {
-        data << player->GetClass();
-    }
-    else
-        data << uint8(nameData->Class);
+    data << uint8(nameData->Class);
 
     if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {
@@ -172,11 +167,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
             if (corpseMapEntry->IsDungeon() && corpseMapEntry->CorpseMapID >= 0)
             {
                 // if corpse map have entrance
-<<<<<<< HEAD
-                if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->entrance_map, _player->GetGroupOrPlayerItemLevel()))
-=======
-                if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->CorpseMapID))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+                if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->CorpseMapID, _player->GetGroupOrPlayerItemLevel()))
                 {
                     mapID = corpseMapEntry->CorpseMapID;
                     x = corpseMapEntry->Corpse.X;

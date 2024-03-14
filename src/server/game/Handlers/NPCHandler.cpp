@@ -186,13 +186,8 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     _player->PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (_player->GetMap()->GetEluna())
-        if (!_player->GetMap()->GetEluna()->OnGossipHello(_player, unit))
-=======
     if (Eluna* e = GetPlayer()->GetEluna())
         if (!e->OnGossipHello(_player, unit))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     if (!unit->AI()->OnGossipHello(_player))
     {
@@ -226,7 +221,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 void WorldSession::SendSpiritResurrect()
 {
     _player->ResurrectPlayer(0.5f, true);
-    // _player->DurabilityLossAll(0.25f, true);
+    _player->DurabilityLossAll(0.25f, true);
 
     // get corpse nearest graveyard
     WorldSafeLocsEntry const* corpseGrave = nullptr;
@@ -315,23 +310,6 @@ void WorldSession::HandleRequestStabledPets(WorldPacket& recvData)
 
 void WorldSession::SendStablePet(ObjectGuid guid)
 {
-<<<<<<< HEAD
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS_DETAIL);
-
-    stmt->setUInt32(0, _player->GetGUID().GetCounter());
-    stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
-    stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
-
-    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::SendStablePetCallback, this, guid, std::placeholders::_1)));
-}
-
-void WorldSession::SendStablePetCallback(ObjectGuid guid, PreparedQueryResult result)
-{
-    if (!GetPlayer())
-        return;
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     TC_LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS Send.");
 
     WorldPacket data(MSG_LIST_STABLED_PETS, 200);           // guess size
@@ -438,26 +416,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
         return;
     }
 
-<<<<<<< HEAD
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS);
-
-    stmt->setUInt32(0, _player->GetGUID().GetCounter());
-    stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
-    stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
-
-    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleStablePetCallback, this, std::placeholders::_1)));
-}
-
-void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
-{
-    if (!GetPlayer())
-        return;
-
-    uint8 freeSlot = 1;
-    if (result)
-=======
     for (uint32 freeSlot = 0; freeSlot < petStable->MaxStabledPets; ++freeSlot)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         if (!petStable->StabledPets[freeSlot])
         {
@@ -484,19 +443,8 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
         }
     }
 
-<<<<<<< HEAD
-    WorldPacket data(SMSG_STABLE_RESULT, 1);
-    if (freeSlot > 0 && freeSlot <= GetPlayer()->m_stableSlots)
-    {
-        _player->RemovePet(_player->GetPet(), PetSaveMode(freeSlot));
-        SendPetStableResult(STABLE_SUCCESS_STABLE);
-    }
-    else
-        SendPetStableResult(STABLE_ERR_STABLE);
-=======
     // not free stable slot
     SendPetStableResult(STABLE_ERR_STABLE);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::HandleUnstablePet(WorldPacket& recvData)
@@ -517,36 +465,9 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-<<<<<<< HEAD
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_ENTRY);
-
-    stmt->setUInt32(0, _player->GetGUID().GetCounter());
-    stmt->setUInt32(1, petnumber);
-    stmt->setUInt8(2, PET_SAVE_FIRST_STABLE_SLOT);
-    stmt->setUInt8(3, PET_SAVE_LAST_STABLE_SLOT);
-
-    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleUnstablePetCallback, this, petnumber, std::placeholders::_1)));
-}
-
-void WorldSession::HandleUnstablePetCallback(uint32 petId, PreparedQueryResult result)
-{
-    if (!GetPlayer())
-        return;
-
-    uint32 petEntry = 0;
-    if (result)
-    {
-        Field* fields = result->Fetch();
-        petEntry = fields[0].GetUInt32();
-    }
-
-    if (!petEntry)
-    {
-=======
     PetStable* petStable = GetPlayer()->GetPetStable();
     if (!petStable)
     {
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         SendPetStableResult(STABLE_ERR_STABLE);
         return;
     }
@@ -576,8 +497,6 @@ void WorldSession::HandleUnstablePetCallback(uint32 petId, PreparedQueryResult r
     Pet* oldPet = _player->GetPet();
     if (oldPet)
     {
-<<<<<<< HEAD
-=======
         // try performing a swap, client sends this packet instead of swap when starting from stabled slot
         if (!oldPet->IsAlive() || !oldPet->IsHunterPet())
         {
@@ -607,7 +526,6 @@ void WorldSession::HandleUnstablePetCallback(uint32 petId, PreparedQueryResult r
     }
     else if (petStable->CurrentPet || !petStable->UnslottedPets.empty())
     {
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         SendPetStableResult(STABLE_ERR_STABLE);
         return;
     }
@@ -616,14 +534,6 @@ void WorldSession::HandleUnstablePetCallback(uint32 petId, PreparedQueryResult r
     if (!newPet->LoadPetFromDB(_player, 0, petnumber, false))
     {
         delete newPet;
-<<<<<<< HEAD
-        newPet = nullptr;
-        SendPetStableResult(STABLE_ERR_STABLE);
-        return;
-    }
-
-    SendPetStableResult(STABLE_SUCCESS_UNSTABLE);
-=======
 
         petStable->UnslottedPets.push_back(std::move(*petStable->CurrentPet));
         petStable->CurrentPet.reset();
@@ -648,7 +558,6 @@ void WorldSession::HandleUnstablePetCallback(uint32 petId, PreparedQueryResult r
 
         SendPetStableResult(STABLE_SUCCESS_UNSTABLE);
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
@@ -674,13 +583,8 @@ void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
         StableSlotPricesEntry const* SlotPrice = sStableSlotPricesStore.LookupEntry(petStable.MaxStabledPets + 1);
         if (_player->HasEnoughMoney(SlotPrice->Cost))
         {
-<<<<<<< HEAD
-            ++GetPlayer()->m_stableSlots;
-            _player->ModifyMoney(-int32(SlotPrice->Price));
-=======
             ++petStable.MaxStabledPets;
             _player->ModifyMoney(-int32(SlotPrice->Cost));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             SendPetStableResult(STABLE_SUCCESS_BUY_SLOT);
         }
         else
@@ -721,24 +625,6 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
     }
 
     // Find swapped pet slot in stable
-<<<<<<< HEAD
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
-
-    stmt->setUInt32(0, _player->GetGUID().GetCounter());
-    stmt->setUInt32(1, petId);
-
-    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleStableSwapPetCallback, this, petId, std::placeholders::_1)));
-}
-
-void WorldSession::HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult result)
-{
-    if (!GetPlayer())
-        return;
-
-    if (!result)
-    {
-=======
     auto stabledPet = std::find_if(petStable->StabledPets.begin(), petStable->StabledPets.end(), [petId](Optional<PetStable::PetInfo> const& pet)
     {
         return pet && pet->PetNumber == petId;
@@ -746,27 +632,11 @@ void WorldSession::HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult
 
     if (stabledPet == petStable->StabledPets.end())
     {
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         SendPetStableResult(STABLE_ERR_STABLE);
         return;
     }
 
-<<<<<<< HEAD
-    Field* fields = result->Fetch();
-
-    uint32 slot     = fields[0].GetUInt8();
-    uint32 petEntry = fields[1].GetUInt32();
-
-    if (!petEntry)
-    {
-        SendPetStableResult(STABLE_ERR_STABLE);
-        return;
-    }
-
-    CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(petEntry);
-=======
     CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate((*stabledPet)->CreatureId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     if (!creatureInfo || !creatureInfo->IsTameable(_player->CanTameExoticPets()))
     {
         // if problem in exotic pet
@@ -780,8 +650,6 @@ void WorldSession::HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult
     Pet* oldPet = _player->GetPet();
     if (oldPet)
     {
-<<<<<<< HEAD
-=======
         if (!oldPet->IsAlive() || !oldPet->IsHunterPet())
         {
             SendPetStableResult(STABLE_ERR_STABLE);
@@ -810,7 +678,6 @@ void WorldSession::HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult
     }
     else if (petStable->CurrentPet || !petStable->UnslottedPets.empty())
     {
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         SendPetStableResult(STABLE_ERR_STABLE);
         return;
     }
@@ -821,11 +688,6 @@ void WorldSession::HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult
     {
         delete newPet;
         SendPetStableResult(STABLE_ERR_STABLE);
-<<<<<<< HEAD
-    }
-    else
-        SendPetStableResult(STABLE_SUCCESS_UNSTABLE);
-=======
 
         petStable->UnslottedPets.push_back(std::move(*petStable->CurrentPet));
         petStable->CurrentPet.reset();
@@ -848,7 +710,6 @@ void WorldSession::HandleStableSwapPetCallback(uint32 petId, PreparedQueryResult
 
         SendPetStableResult(STABLE_SUCCESS_UNSTABLE);
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)

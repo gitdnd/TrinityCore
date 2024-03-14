@@ -17,14 +17,12 @@
 
 #include "WorldSession.h"
 #include "Channel.h"
-#include "Chat.h"
 #include "ChannelMgr.h"
 #include "DBCStores.h"
 #include "Log.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
 #include <cctype>
-#include "Util.h"
 
 static size_t const MAX_CHANNEL_PASS_STR = 31;
 static size_t const MAX_CHANNEL_NAME_STR = 31;
@@ -67,26 +65,16 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     if (!DisallowHyperlinksAndMaybeKick(channelName))
         return;
-    /*std::string upperCase = channelName;
-    Utf8ToUpperOnlyLatin(upperCase);
-    if (upperCase == "WORLD" || upperCase == "WORLDCHAT")
-    {
-        channelName = "WorldChat";
-        channelId = 26;
-    }
-    ChatHandler(this).PSendSysMessage("%s, (%s), %u", channelName, upperCase, channelId);*/
+
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
         if (channelId)
         { // system channel
             if (Channel* channel = cMgr->GetSystemChannel(channelId, zone))
                 channel->JoinChannel(GetPlayer());
-            //else
-                //ChatHandler(this).PSendSysMessage("Didn't find system channel.");
         }
         else
         { // custom channel
-            //ChatHandler(this).PSendSysMessage("Creating custom channel?");
             if (channelName.length() > MAX_CHANNEL_NAME_STR)
             {
                 TC_LOG_ERROR("network", "Player {} tried to create a channel with a name more than {} characters long - blocked", GetPlayer()->GetGUID().ToString(), MAX_CHANNEL_NAME_STR);

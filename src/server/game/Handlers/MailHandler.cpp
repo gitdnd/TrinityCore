@@ -119,20 +119,9 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
         return;
     }
 
-<<<<<<< HEAD
-    uint32 cost = 0;  // make sending mail free
-=======
     int32 cost = !sendMail.Info.Attachments.empty() ? 30 * sendMail.Info.Attachments.size() : 30;  // price hardcoded in client
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     int32 reqmoney = cost + sendMail.Info.SendMoney;
-
-    // since money is disabled, error if anyone tries to send money or cod items
-    if (money > 0 || COD > 0)
-    {
-        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
-        return;
-    }
 
     // Check for overflow
     if (reqmoney < sendMail.Info.SendMoney)
@@ -321,16 +310,6 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
     }
     else
     {
-<<<<<<< HEAD
-        if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(receiverGuid))
-        {
-            receiverTeam = Player::TeamForRaceNoOverride(characterInfo->Race);
-            receiverLevel = characterInfo->Level;
-            receiverAccountId = characterInfo->AccountId;
-        }
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_COUNT);
         stmt->setUInt32(0, receiverGuid.GetCounter());
 

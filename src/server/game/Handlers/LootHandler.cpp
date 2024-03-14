@@ -84,7 +84,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-        bool lootAllowed = creature && creature->IsAlive() == (creature->loot.loot_type == LOOT_PICKPOCKETING);
+        bool lootAllowed = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
         if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
         {
             player->SendLootError(lguid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
@@ -92,13 +92,6 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         }
 
         loot = &creature->loot;
-    }
-
-    lootSlot = loot->lootSlotFromIndex(lootSlot, player);
-    if (lootSlot == -1)
-    {
-        TC_LOG_DEBUG("loot", "lootSlotFromIndex returned -1 for player %s", GetPlayer()->GetName().c_str());
-        return;
     }
 
     player->StoreLootItem(lootSlot, loot);
@@ -215,13 +208,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         }
 
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (player->GetMap()->GetEluna())
-            player->GetMap()->GetEluna()->OnLootMoney(player, loot->gold);
-=======
         if (Eluna* e = player->GetEluna())
             e->OnLootMoney(player, loot->gold);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
         loot->gold = 0;
 
@@ -250,11 +238,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     if (GetPlayer()->IsNonMeleeSpellCast(false))
         GetPlayer()->InterruptNonMeleeSpells(false);
 
-<<<<<<< HEAD
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
-=======
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOOTING);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
@@ -466,13 +450,6 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!loot)
         return;
 
-    slotid = loot->lootSlotFromIndex(slotid, GetPlayer());
-    if (slotid == -1)
-    {
-        TC_LOG_DEBUG("loot", "MasterLootItem: lootSlotFromIndex returned -1 for player %s", GetPlayer()->GetName().c_str());
-        return;
-    }
-
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
         TC_LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})",
@@ -508,13 +485,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item.itemid, item.count);
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (target->GetMap()->GetEluna())
-        target->GetMap()->GetEluna()->OnLootItem(target, newitem, item.count, lootguid);
-=======
     if (Eluna* e = target->GetEluna())
         e->OnLootItem(target, newitem, item.count, lootguid);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     // mark as looted
     item.count = 0;

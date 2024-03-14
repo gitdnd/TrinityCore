@@ -27,18 +27,16 @@
 
 void WorldSession::HandleLearnTalentOpcode(WorldPacket& recvData)
 {
-    recvData.rfinish();
-    /*uint32 talent_id, requested_rank;
+    uint32 talent_id, requested_rank;
     recvData >> talent_id >> requested_rank;
 
     _player->LearnTalent(talent_id, requested_rank);
-    _player->SendTalentsInfoData(false);*/
+    _player->SendTalentsInfoData(false);
 }
 
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 {
-    recvPacket.rfinish();
-    /*TC_LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS");
+    TC_LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS");
 
     uint32 talentsCount;
     recvPacket >> talentsCount;
@@ -57,19 +55,12 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 
     _player->SendTalentsInfoData(false);
 
-    recvPacket.rfinish();*/
+    recvPacket.rfinish();
 }
 
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPackets::Talents::ConfirmRespecWipe& confirmRespecWipe)
 {
-<<<<<<< HEAD
-    recvData.rfinish();
-    /*TC_LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
-    ObjectGuid guid;
-    recvData >> guid;
-=======
     TC_LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     Creature* trainer = GetPlayer()->GetNPCIfCanInteractWith(confirmRespecWipe.RespecMaster, UNIT_NPC_FLAG_TRAINER);
     if (!trainer)
@@ -98,12 +89,8 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPackets::Talents::ConfirmR
     _player->ModifyMoney(-(int32)cost);
     _player->IncreaseResetTalentsCostAndCounters(cost);
     _player->SendTalentsInfoData(false);
-<<<<<<< HEAD
-    unit->CastSpell(_player, 14867, true);                  //spell: "Untalent Visual Effect"*/
-=======
 
     trainer->CastSpell(_player, 14867 /*SPELL_UNTALENT_VISUAL_EFFECT*/, true);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recvData)

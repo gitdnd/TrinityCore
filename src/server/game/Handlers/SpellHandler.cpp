@@ -320,13 +320,8 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     if (GameObject* go = GetPlayer()->GetGameObjectIfCanInteractWith(guid))
     {
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (_player->GetMap()->GetEluna())
-            if (_player->GetMap()->GetEluna()->OnGameObjectUse(_player, go))
-=======
         if (Eluna* e = GetPlayer()->GetEluna())
             if (e->OnGameObjectUse(_player, go))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 return;
 #endif
         if (go->AI()->OnReportUse(_player))
@@ -382,11 +377,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
 
         if (!allow)
-        {
-            recvPacket.rfinish();
-            Spell::SendCastResult(caster->ToPlayer(), spellInfo, castCount, SPELL_FAILED_SPELL_UNAVAILABLE);
             return;
-        }
     }
 
     // Client is resending autoshot cast opcode when other spell is cast during shoot rotation
@@ -556,18 +547,6 @@ void WorldSession::HandleCancelChanneling(WorldPackets::Spells::CancelChannellin
     if (!spell || spell->GetSpellInfo()->Id != spellInfo->Id)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(cancelChanneling.ChannelSpell);
-    if (!spellInfo)
-        return;
-
-    // not allow remove spells with attr SPELL_ATTR0_CANT_CANCEL
-    if (spellInfo->HasAttribute(SPELL_ATTR0_CANT_CANCEL))
-        return;
-
-    Spell* spell = mover->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
-    if (!spell || spell->GetSpellInfo()->Id != spellInfo->Id)
-        return;
-
     mover->InterruptSpell(CURRENT_CHANNELED_SPELL);
 }
 
@@ -594,26 +573,16 @@ void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& tot
 void WorldSession::HandleSelfResOpcode(WorldPacket & /*recvData*/)
 {
     TC_LOG_DEBUG("network", "WORLD: CMSG_SELF_RES");                  // empty opcode
-<<<<<<< HEAD
-    if (auto spell = sSpellMgr->GetSpellInfo(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL)))
-    {
-
-        if (_player->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !spell->HasAttribute(SPELL_ATTR7_BYPASS_PREVENT_RES))
-            return; // silent return, client should display error by itself and not send this opcode
-
-
-=======
 
     if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL)))
     {
         if (_player->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !spell->HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECT_AURA))
             return; // silent return, client should display error by itself and not send this opcode
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         _player->CastSpell(_player, spell->Id);
         _player->SetUInt32Value(PLAYER_SELF_RES_SPELL, 0);
     }
- }
+}
 
 void WorldSession::HandleSpellClick(WorldPacket& recvData)
 {
@@ -644,15 +613,6 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     if (!unit)
         return;
 
-    if (Creature* pMirror = unit->ToCreature())
-    {
-        if (_player->GetMap()->GetEluna())
-            _player->GetMap()->GetEluna()->OnMirrorPlayer(pMirror, GetPlayer());
-
-        if (pMirror->blockMirror)
-            return;
-    }
-        
     if (!unit->HasAuraType(SPELL_AURA_CLONE_CASTER))
         return;
 
@@ -748,7 +708,7 @@ void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     if (!caster)
         return;
 
-    auto mover = _player->GetUnitBeingMoved();
+    auto mover = GetGameClient()->GetActivelyMovedUnit();
     if (mover->GetGUID() != caster->GetGUID())
         return;
 

@@ -102,13 +102,8 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     _player->PlayerTalkClass->ClearMenus();
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (_player->GetMap()->GetEluna())
-        if (_player->GetMap()->GetEluna()->OnGossipHello(_player, creature))
-=======
     if (Eluna* e = GetPlayer()->GetEluna())
         if (e->OnGossipHello(_player, creature))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return;
 #endif
 
@@ -334,13 +329,8 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 
                         _player->PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-<<<<<<< HEAD
-                        if (_player->GetMap()->GetEluna())
-                            _player->GetMap()->GetEluna()->OnQuestReward(_player, questgiver, quest, reward);
-=======
                         if (Eluna* e = GetPlayer()->GetEluna())
                             e->OnQuestReward(_player, questgiver, quest, reward);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
                         questgiver->AI()->OnQuestReward(_player, quest, reward);
 
@@ -364,13 +354,8 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 
                         _player->PlayerTalkClass->ClearMenus();
 #ifdef ELUNA
-<<<<<<< HEAD
-                        if (_player->GetMap()->GetEluna())
-                            _player->GetMap()->GetEluna()->OnQuestReward(_player, questGiver, quest, reward);
-=======
                         if (Eluna* e = GetPlayer()->GetEluna())
                             e->OnQuestReward(_player, questGiver, quest, reward);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
                         questGiver->AI()->OnQuestReward(_player, quest, reward);
                         break;
@@ -463,13 +448,8 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             _player->RemoveTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, questId);
 
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (_player->GetMap()->GetEluna())
-                _player->GetMap()->GetEluna()->OnQuestAbandon(_player, questId);
-=======
             if (Eluna* e = GetPlayer()->GetEluna())
                 e->OnQuestAbandon(_player, questId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
             TC_LOG_INFO("network", "Player {} abandoned quest {}", _player->GetGUID().ToString(), questId);

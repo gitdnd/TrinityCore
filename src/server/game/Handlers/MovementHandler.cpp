@@ -15,11 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-<<<<<<< HEAD
-#include "AnticheatMgr.h"
-=======
 #include "Battleground.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include "Common.h"
 #include "Corpse.h"
 #include "GameTime.h"
@@ -43,11 +39,7 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
-<<<<<<< HEAD
-#include "Chat.h"
-=======
 #include <boost/circular_buffer.hpp>
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
 {
@@ -306,21 +298,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     recvData.rfinish();                         // prevent warnings spam
 
     if (!movementInfo.pos.IsPositionValid())
-<<<<<<< HEAD
-    {
-        //ChatHandler(this).PSendSysMessage("Desync F detected, report to devs.");
-        recvData.rfinish();                     // prevent warnings spam
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
 
     if (!mover->movespline->Finalized())
-<<<<<<< HEAD
-    {
-        //ChatHandler(this).PSendSysMessage("Desync E detected, report to devs.");
-        recvData.rfinish();                     // prevent warnings spam
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
 
     /* handle special cases */
@@ -328,47 +308,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         // We were teleported, skip packets that were broadcast before teleport
         if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
-<<<<<<< HEAD
-        {
-            //ChatHandler(this).PSendSysMessage("Desync detected, attempting to fix.");
-            recvData.rfinish();                 // prevent warnings spam
-            if (Player* plrMover = mover->ToPlayer())
-            {
-                if (plrMover->GetMapId() == 761)
-                {
-                    plrMover->TeleportTo(761, -1014.48f, 1340.47f, 8.55f, plrMover->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-                    /*std::list<GameObject*> list;
-                    plrMover->GetGameObjectListWithEntryInGrid(list, 50010, 1000.f);
-                    if (!list.empty())
-                    {
-                        GameObject* transport = list.front();
-                        plrMover->TeleportTo(plrMover->GetMapId(), transport->GetPositionX() + 6.1f, transport->GetPositionY() -1.1f, transport->GetPositionZ() + 9.5f, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-                    }*/
-                }
-            }
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return;
 
         // transports size limited
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
         if (fabs(movementInfo.transport.pos.GetPositionX()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionY()) > 75.0f || fabs(movementInfo.transport.pos.GetPositionZ()) > 75.0f)
-<<<<<<< HEAD
-        {
-            //ChatHandler(this).PSendSysMessage("Desync B detected, report to devs.");
-            recvData.rfinish();                 // prevent warnings spam
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return;
 
         if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
-<<<<<<< HEAD
-        {
-            ChatHandler(this).PSendSysMessage("Desync C detected, report to devs.");
-            recvData.rfinish();                 // prevent warnings spam
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return;
 
         // if we boarded a transport, add us to it
@@ -410,24 +358,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
 
-<<<<<<< HEAD
-    if (plrMover)
-        sAnticheatMgr->StartHackDetection(plrMover, movementInfo, opcode);
-
-    if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
-    {
-        // now client not include swimming flag in case jumping under water
-        plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetMap()->IsUnderWater(plrMover->GetPhaseMask(), movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
-    }
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
     int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
     if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
-        //ChatHandler(this).PSendSysMessage("Desync D detected, report to devs.");
         TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
         movementInfo.time = GameTime::GetGameTimeMS();
     }

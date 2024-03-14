@@ -49,30 +49,8 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recvData)
     CharacterCacheEntry const* friendCharacterInfo = sCharacterCache->GetCharacterCacheByName(friendName);
     if (!friendCharacterInfo)
     {
-<<<<<<< HEAD
-        if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(friendGuid))
-        {
-            if (friendGuid == GetPlayer()->GetGUID())
-                friendResult = FRIEND_SELF;
-            else if (GetPlayer()->GetSocial()->HasFriend(friendGuid))
-                friendResult = FRIEND_ALREADY;
-            else
-            {
-                Player* pFriend = ObjectAccessor::FindPlayer(friendGuid);
-                if (pFriend && pFriend->IsVisibleGloballyFor(GetPlayer()))
-                    friendResult = FRIEND_ADDED_ONLINE;
-                else
-                    friendResult = FRIEND_ADDED_OFFLINE;
-                if (GetPlayer()->GetSocial()->AddToSocialList(friendGuid, SOCIAL_FLAG_FRIEND))
-                    GetPlayer()->GetSocial()->SetFriendNote(friendGuid, friendNote);
-                else
-                    friendResult = FRIEND_LIST_FULL;
-            }
-        }
-=======
         sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_NOT_FOUND, ObjectGuid::Empty);
         return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 
     auto processFriendRequest = [this,

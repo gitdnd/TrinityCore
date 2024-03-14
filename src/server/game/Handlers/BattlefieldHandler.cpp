@@ -176,11 +176,7 @@ void WorldSession::HandleBfQueueExitRequest(WorldPacket& recvData)
 
     recvData >> battleId;
 
-<<<<<<< HEAD
-    TC_LOG_DEBUG("misc", "HandleBfQueueExitRequest: battleId: %u ", battleId);
-=======
     TC_LOG_DEBUG("misc", "HandleBfQueueExitRequest: battleId: {} ", battleId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
     if (!bf)
