@@ -23,10 +23,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Weather.h"
-<<<<<<< HEAD
-=======
 #include "WowTime.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <array>
 
 enum WeatherState : uint32;

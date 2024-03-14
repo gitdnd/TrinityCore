@@ -243,14 +243,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             BuildShortcut();
             _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
 
-<<<<<<< HEAD
-            if (startFarFromPoly)
-                _type = PathType(_type | PATHFIND_FARFROMPOLY_START);
-            if (endFarFromPoly)
-                _type = PathType(_type | PATHFIND_FARFROMPOLY_END);
-=======
             AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
             return;
         }
@@ -266,14 +259,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
             _type = PathType(PATHFIND_INCOMPLETE);
 
-<<<<<<< HEAD
-            if (startFarFromPoly)
-                _type = PathType(_type | PATHFIND_FARFROMPOLY_START);
-            if (endFarFromPoly)
-                _type = PathType(_type | PATHFIND_FARFROMPOLY_END);
-=======
             AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
     }
 
@@ -292,14 +278,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         {
             _type = PathType(PATHFIND_INCOMPLETE);
 
-<<<<<<< HEAD
-            if (startFarFromPoly)
-                _type = PathType(_type | PATHFIND_FARFROMPOLY_START);
-            if (endFarFromPoly)
-                _type = PathType(_type | PATHFIND_FARFROMPOLY_END);
-=======
             AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         else
          _type = PATHFIND_NORMAL;
@@ -400,44 +379,10 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         dtStatus dtResult;
         if (_useRaycast)
         {
-<<<<<<< HEAD
-            float hit = 0;
-            float hitNormal[3];
-            memset(hitNormal, 0, sizeof(hitNormal));
-
-            dtResult = _navMeshQuery->raycast(
-                            suffixStartPoly,
-                            suffixEndPoint,
-                            endPoint,
-                            &_filter,
-                            &hit,
-                            hitNormal,
-                            _pathPolyRefs + prefixPolyLength - 1,
-                            (int*)&suffixPolyLength,
-                            MAX_PATH_LENGTH - prefixPolyLength);
-
-            // raycast() sets hit to FLT_MAX if there is a ray between start and end
-            if (hit != FLT_MAX)
-            {
-                // the ray hit something, return no path instead of the incomplete one
-                Clear();
-                _polyLength = 2;
-                _pathPoints.resize(2);
-                _pathPoints[0] = GetStartPosition();
-                float hitPos[3];
-                dtVlerp(hitPos, startPoint, endPoint, hit);
-                _pathPoints[1] = G3D::Vector3(hitPos[2], hitPos[0], hitPos[1]);
-
-                NormalizePath();
-                _type = PATHFIND_INCOMPLETE;
-                return;
-            }
-=======
             TC_LOG_ERROR("maps.mmaps", "PathGenerator::BuildPolyPath() called with _useRaycast with a previous path for unit {}", _source->GetGUID().ToString());
             BuildShortcut();
             _type = PATHFIND_NOPATH;
             return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         else
         {
@@ -575,14 +520,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     else
         _type = PATHFIND_INCOMPLETE;
 
-<<<<<<< HEAD
-    if (startFarFromPoly)
-        _type = PathType(_type | PATHFIND_FARFROMPOLY_START);
-    if (endFarFromPoly)
-        _type = PathType(_type | PATHFIND_FARFROMPOLY_END);
-=======
     AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // generate the point-path out of our up-to-date poly-path
     BuildPointPath(startPoint, endPoint);
@@ -595,43 +533,11 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
     dtStatus dtResult = DT_FAILURE;
     if (_useRaycast)
     {
-<<<<<<< HEAD
-        dtResult = DT_SUCCESS;
-        pointCount = 1;
-        memcpy(&pathPoints[VERTEX_SIZE * 0], startPoint, sizeof(float)* 3); // first point
-
-        // path has to be split into polygons with dist SMOOTH_PATH_STEP_SIZE between them
-        G3D::Vector3 startVec = G3D::Vector3(startPoint[0], startPoint[1], startPoint[2]);
-        G3D::Vector3 endVec = G3D::Vector3(endPoint[0], endPoint[1], endPoint[2]);
-        G3D::Vector3 diffVec = (endVec - startVec);
-        G3D::Vector3 prevVec = startVec;
-        float len = diffVec.length();
-        diffVec *= SMOOTH_PATH_STEP_SIZE / len;
-
-        // If the path is short PATHFIND_SHORT will be set as type
-        while (len > SMOOTH_PATH_STEP_SIZE && pointCount < MAX_POINT_PATH_LENGTH)
-        {
-            len -= SMOOTH_PATH_STEP_SIZE;
-            prevVec += diffVec;
-            pathPoints[VERTEX_SIZE * pointCount + 0] = prevVec.x;
-            pathPoints[VERTEX_SIZE * pointCount + 1] = prevVec.y;
-            pathPoints[VERTEX_SIZE * pointCount + 2] = prevVec.z;
-            ++pointCount;
-        }
-
-        // If the path is short PATHFIND_SHORT will be set as type
-        if (pointCount < MAX_POINT_PATH_LENGTH)
-        {
-            memcpy(&pathPoints[VERTEX_SIZE * pointCount], endPoint, sizeof(float) * 3); // last point
-            ++pointCount;
-        }
-=======
         // _straightLine uses raycast and it currently doesn't support building a point path, only a 2-point path with start and hitpoint/end is returned
         TC_LOG_ERROR("maps.mmaps", "PathGenerator::BuildPointPath() called with _useRaycast for unit {}", _source->GetGUID().ToString());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
     else if (_useStraightPath)
     {

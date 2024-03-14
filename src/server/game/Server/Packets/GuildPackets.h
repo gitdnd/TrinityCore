@@ -22,10 +22,7 @@
 #include "Guild.h"
 #include "ObjectGuid.h"
 #include "PacketUtilities.h"
-<<<<<<< HEAD
-=======
 #include "WowTime.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include <array>
 
 namespace WorldPackets

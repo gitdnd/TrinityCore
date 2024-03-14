@@ -414,12 +414,6 @@ class TC_GAME_API CreatureScript : public ScriptObject
         explicit CreatureScript(char const* name);
 
     public:
-<<<<<<< HEAD
-        // Called when an unit exits a vehicle
-        virtual void ModifyVehiclePassengerExitPos(Unit* /*passenger*/, Vehicle* /*vehicle*/, Position& /*pos*/) { }
- 
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         // Called when a CreatureAI object is needed for the creature.
         virtual CreatureAI* GetAI(Creature* creature) const = 0;
 };
@@ -467,17 +461,6 @@ class TC_GAME_API BattlefieldScript : public ScriptObject
     protected:
 
         explicit BattlefieldScript(char const* name);
-
-    public:
-
-        virtual Battlefield* GetBattlefield() const = 0;
-};
-
-class TC_GAME_API BattlefieldScript : public ScriptObject
-{
-    protected:
-
-        BattlefieldScript(char const* name);
 
     public:
 
@@ -1070,7 +1053,8 @@ class TC_GAME_API ScriptMgr
         void OnQuestStatusChange(Player* player, uint32 questId);
         void OnMovieComplete(Player* player, uint32 movieId);
         void OnPlayerRepop(Player* player);
-     public: /* AccountScript */
+
+    public: /* AccountScript */
 
         void OnAccountLogin(uint32 accountId);
         void OnFailedAccountLogin(uint32 accountId);

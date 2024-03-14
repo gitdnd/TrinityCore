@@ -438,11 +438,7 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> authSession->BattlegroupID;
     recvPacket >> authSession->RealmID;               // realmId from auth_database.realmlist table
     recvPacket >> authSession->DosResponse;
-<<<<<<< HEAD
-    recvPacket.read(authSession->Digest, 20);
-=======
     recvPacket.read(authSession->Digest);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     authSession->AddonInfo.resize(recvPacket.size() - recvPacket.rpos());
     recvPacket.read(authSession->AddonInfo.contents(), authSession->AddonInfo.size()); // .contents will throw if empty, thats what we want
 
@@ -451,14 +447,10 @@ void WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     stmt->setInt32(0, int32(realm.Id.Realm));
     stmt->setString(1, authSession->Account);
 
-<<<<<<< HEAD
-    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::HandleAuthSessionCallback, this, authSession, std::placeholders::_1)));
-=======
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback([this, authSession = std::move(authSession)](PreparedQueryResult result) mutable
     {
         HandleAuthSessionCallback(std::move(authSession), std::move(result));
     }));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result)
@@ -509,14 +501,6 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
             GetRemoteIpAddress().to_string(), authSession->RealmID, realm.Id.Realm);
         DelayedCloseSocket();
         return;
-    }
-
-    if (authSession->Build != realm.Build)
-    {
-        //SendAuthResponseError(AUTH_VERSION_MISMATCH);
-        TC_LOG_ERROR("sql.sql", "Wrong build number got %u wanted %u", authSession->Build, realm.Build);
-        //DelayedCloseSocket();
-        //return;
     }
 
     // Must be done before WorldSession is created

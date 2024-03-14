@@ -93,10 +93,7 @@ void FlightPathMovementGenerator::DoReset(Player* owner)
     }
     init.SetFirstPointId(GetCurrentNode());
     init.SetFly();
-    float flightspeed = PLAYER_FLIGHT_SPEED;
-    if (owner->GetMapId())
-        flightspeed = 45.f;
-    init.SetVelocity(flightspeed);
+    init.SetVelocity(PLAYER_FLIGHT_SPEED);
     init.Launch();
 }
 
