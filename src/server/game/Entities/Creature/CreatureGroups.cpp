@@ -133,13 +133,13 @@ void FormationMgr::LoadCreatureFormations()
         {
             if (!sObjectMgr->GetCreatureData(member.LeaderSpawnId))
             {
-                TC_LOG_ERROR("sql.sql", "creature_formations table leader guid %u incorrect (not exist)", member.LeaderSpawnId);
+                //TC_LOG_ERROR("sql.sql", "creature_formations table leader guid %u incorrect (not exist)", member.LeaderSpawnId);
                 continue;
             }
 
             if (!sObjectMgr->GetCreatureData(memberSpawnId))
             {
-                TC_LOG_ERROR("sql.sql", "creature_formations table member guid %u incorrect (not exist)", memberSpawnId);
+                //TC_LOG_ERROR("sql.sql", "creature_formations table member guid %u incorrect (not exist)", memberSpawnId);
                 continue;
             }
 
