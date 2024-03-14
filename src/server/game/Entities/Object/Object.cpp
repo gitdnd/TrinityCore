@@ -497,16 +497,6 @@ void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player const*
             ((updateType == UPDATETYPE_VALUES ? _changesMask.GetBit(index) : m_uint32Values[index]) && (flags[index] & visibleFlag)))
         {
             updateMask.SetBit(index);
-            /*if (IsPlayer() && index == UNIT_FIELD_BYTES_0)
-            {
-                const Player* pThis = ToPlayer();
-                uint8 const sendClass =  pThis->GetSubClass();
-                uint32 fieldbytes = m_uint32Values[index];
-                fieldbytes &= ~uint32(uint32(0xFF) << (UNIT_BYTES_0_OFFSET_CLASS * 8));
-                fieldbytes |= uint32(uint32(sendClass ? sendClass : pThis->GetClass()) << (UNIT_BYTES_0_OFFSET_CLASS * 8));
-                fieldBuffer << fieldbytes;
-            }
-            else*/
             fieldBuffer << m_uint32Values[index];
         }
     }
@@ -1069,11 +1059,7 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 void WorldObject::Update([[maybe_unused]] uint32 time_diff)
 {
 #ifdef ELUNA
-<<<<<<< HEAD
-    if(elunaEvents && GetMap()->GetEluna())
-=======
     if(elunaEvents) // can be null on maps without eluna
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         elunaEvents->Update(time_diff);
 #endif
 }
@@ -1195,21 +1181,6 @@ float WorldObject::GetDistance2d(float x, float y) const
     return d > 0.0f ? d : 0.0f;
 }
 
-float WorldObject::GetRawDistance(const WorldObject* obj, bool is3D) const
-{
-    float dx = GetPositionX() - obj->GetPositionX();
-    float dy = GetPositionY() - obj->GetPositionY();
-    float distsq = dx * dx + dy * dy;
-
-    if (is3D)
-    {
-        float dz = GetPositionZ() - obj->GetPositionZ();
-        distsq += dz * dz;
-    }
-
-    return distsq;
-}
-
 bool WorldObject::IsSelfOrInSameMap(WorldObject const* obj) const
 {
     if (this == obj)
@@ -1251,10 +1222,7 @@ bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool 
 
 bool WorldObject::IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D /*= true*/, bool incOwnRadius /*= true*/, bool incTargetRadius /*= true*/) const
 {
-    return obj &&
-        IsInMap(obj) &&
-        InSamePhase(obj) &&
-        _IsWithinDist(obj, dist2compare, is3D, incOwnRadius, incTargetRadius);
+    return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D, incOwnRadius, incTargetRadius);
 }
 
 Position WorldObject::GetHitSpherePointFor(Position const& dest) const
@@ -1875,15 +1843,6 @@ void WorldObject::SetMap(Map* map)
     m_InstanceId = map->GetInstanceId();
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    delete elunaEvents;
-    elunaEvents = nullptr;
-    if (GetMap()->GetEluna())
-    {
-        // On multithread replace this with a pointer to map's Eluna pointer stored in a map
-        elunaEvents = new ElunaEventProcessor(GetMap()->GetEluna(), this);
-    }
-=======
     //@todo: possibly look into cleanly clearing all pending events from previous map's event mgr.
 
     // if multistate, delete elunaEvents and set to nullptr. events shouldn't move across states.
@@ -1897,7 +1856,6 @@ void WorldObject::SetMap(Map* map)
     if(Eluna * e = map->GetEluna())
         if(!elunaEvents)
             elunaEvents = new ElunaEventProcessor(e, this);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
     if (IsWorldObject())
@@ -1931,11 +1889,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-<<<<<<< HEAD
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, int dungeonLevel)
-=======
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, bool visibleBySummonerOnly /*= false*/)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, int dungeonLevel, bool visibleBySummonerOnly /*= false*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2075,43 +2029,27 @@ void WorldObject::ClearZoneScript()
     m_zoneScript = nullptr;
 }
 
-<<<<<<< HEAD
-TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despawnTime /*= 0*/, uint32 /*vehId = 0*/, uint32 spellId /*= 0*/, int dungeonLevel /*= 0*/)
+TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, uint32 /*vehId = 0*/, uint32 spellId /*= 0*/, int dungeonLevel, bool visibleBySummonerOnly /*= false*/)
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime, this, spellId, 0, dungeonLevel))
-=======
-TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, uint32 /*vehId = 0*/, uint32 spellId /*= 0*/, bool visibleBySummonerOnly /*= false*/)
-{
-    if (Map* map = FindMap())
-    {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime.count(), this, spellId, 0, visibleBySummonerOnly))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime.count(), this, spellId, 0, dungeonLevel, visibleBySummonerOnly))
         {
             summon->SetTempSummonType(despawnType);
             return summon;
         }
     }
+
     return nullptr;
 }
 
-<<<<<<< HEAD
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 despawnTime /*= 0*/, int dungeonLevel /*= 0*/)
-=======
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, bool visibleBySummonerOnly /*= false*/)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, int dungeonLevel, bool visibleBySummonerOnly /*= false*/)
 {
     if (!x && !y && !z)
         GetClosePoint(x, y, z, GetCombatReach());
     if (!o)
         o = GetOrientation();
-<<<<<<< HEAD
-
-    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, 0, 0, dungeonLevel);
-=======
-    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, 0, 0, visibleBySummonerOnly);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, 0, 0,  dungeonLevel, visibleBySummonerOnly);
 }
 
 GameObject* WorldObject::SummonGameObject(uint32 entry, Position const& pos, QuaternionData const& rot, Seconds respawnTime, GOSummonType summonType)
@@ -2144,11 +2082,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, Position const& pos, Qua
     return go;
 }
 
-<<<<<<< HEAD
-GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, QuaternionData const& rot, uint32 respawnTime, GOSummonType summonType)
-=======
 GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, QuaternionData const& rot, Seconds respawnTime, GOSummonType summonType)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 {
     if (!x && !y && !z)
     {
@@ -2460,7 +2394,7 @@ int32 WorldObject::ModSpellDuration(SpellInfo const* spellInfo, WorldObject cons
     // Glyphs which increase duration of selfcast buffs
     if (unitTarget == this)
     {
-        switch (spellInfo->SpellFamilyName) // Will need to update if we choose to use these effects -Itswicky
+        switch (spellInfo->SpellFamilyName)
         {
             case SPELLFAMILY_DRUID:
                 if (spellInfo->SpellFamilyFlags[0] & 0x100)
@@ -2643,6 +2577,7 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* victim, SpellInfo const* sp
         if (roll_chance_i(blockChance))
             return SPELL_MISS_BLOCK;
     }
+
 
     return SPELL_MISS_NONE;
 }
@@ -3004,31 +2939,13 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
         return false;
 
     Unit const* unitOrOwner = unit;
-<<<<<<< HEAD
-    if (GameObject const* go = ToGameObject())
-        if (go->GetGoType() == GAMEOBJECT_TYPE_TRAP)
-            unitOrOwner = go->GetOwner();
-=======
     GameObject const* go = ToGameObject();
     if (go && go->GetGoType() == GAMEOBJECT_TYPE_TRAP)
         unitOrOwner = go->GetOwner();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // ignore immunity flags when assisting
     if (unitOrOwner && unitTarget && !(isPositiveSpell && bySpell->HasAttribute(SPELL_ATTR6_ASSIST_IGNORE_IMMUNE_FLAG)))
     {
-<<<<<<< HEAD
-        if (!unitOrOwner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && unitTarget->IsImmuneToNPC())
-            return false;
-
-        if (!unitTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && unitOrOwner->IsImmuneToNPC())
-            return false;
-
-        if (unitOrOwner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && unitTarget->IsImmuneToPC())
-            return false;
-
-        if (unitTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && unitOrOwner->IsImmuneToPC())
-=======
         if (!unitOrOwner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && unitTarget->IsImmuneToNPC())
             return false;
 
@@ -3039,7 +2956,6 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
             return false;
 
         if (unitTarget->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && unitOrOwner->IsImmuneToPC())
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             return false;
     }
 
@@ -3096,11 +3012,7 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
 
     // PvP case - can't attack when attacker or target are in sanctuary
     // however, 13850 client doesn't allow to attack when one of the unit's has sanctuary flag and is pvp
-<<<<<<< HEAD
-    if (unitTarget && unitTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && unitOrOwner && unitOrOwner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && (unitTarget->IsInSanctuary() || unitOrOwner->IsInSanctuary()))
-=======
     if (unitTarget && unitTarget->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && unitOrOwner && unitOrOwner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && (unitTarget->IsInSanctuary() || unitOrOwner->IsInSanctuary()))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return false;
 
     // additional checks - only PvP case
@@ -3373,11 +3285,6 @@ void WorldObject::GetContactPoint(WorldObject const* obj, float& x, float& y, fl
     GetNearPoint(obj, x, y, z, distance2d, GetAbsoluteAngle(obj));
 }
 
-float WorldObject::GetObjectSize() const
-{
-    return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? GetFloatValue(UNIT_FIELD_COMBATREACH) : DEFAULT_PLAYER_BOUNDING_RADIUS * GetObjectScale();
-}
-
 void WorldObject::MovePosition(Position &pos, float dist, float angle)
 {
     angle += GetOrientation();
@@ -3441,13 +3348,6 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
 
     // Use a detour raycast to get our first collision point
     PathGenerator path(this);
-<<<<<<< HEAD
-    path.CalculatePath(destx, desty, destz, false, true);
-
-    // We have a invalid path result. Skip further processing.
-    if (path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
-        return;
-=======
     path.SetUseRaycast(true);
     path.CalculatePath(destx, desty, destz, false);
 
@@ -3455,7 +3355,6 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     if (!(path.GetPathType() & PATHFIND_NOT_USING_PATH))
         if (path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
             return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     G3D::Vector3 result = path.GetPath().back();
     destx = result.x;
@@ -3464,22 +3363,6 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
 
     // check static LOS
     float halfHeight = GetCollisionHeight() * 0.5f;
-<<<<<<< HEAD
-    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(),
-        pos.m_positionX, pos.m_positionY, pos.m_positionZ + halfHeight,
-        destx, desty, destz + halfHeight,
-        destx, desty, destz, -0.5f);
-
-    destz -= halfHeight;
-	
-	// Collided with static LOS object, move back to collision point
-	if (col)
-	{
-		destx -= CONTACT_DISTANCE * std::cos(angle);
-		desty -= CONTACT_DISTANCE * std::sin(angle);
-		dist = std::sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-	}
-=======
     bool col = false;
 
     // Unit is flying, check for potential collision via vmaps
@@ -3500,7 +3383,6 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
             dist = std::sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
         }
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // check dynamic collision
     col = GetMap()->getObjectHitPos(GetPhaseMask(),

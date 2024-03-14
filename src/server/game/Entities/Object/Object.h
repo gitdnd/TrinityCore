@@ -170,42 +170,6 @@ class TC_GAME_API Object
         void ForceValuesUpdateAtIndex(uint32);
 
         inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
-<<<<<<< HEAD
-        static Player* ToPlayer(Object* o) { if (o && o->GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player*>(o); else return nullptr; }
-        static Player const* ToPlayer(Object const* o) { if (o && o->GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player const*>(o); else return nullptr; }
-        Player* ToPlayer() { return ToPlayer(this); }
-        Player const* ToPlayer() const { return ToPlayer(this); }
-
-        inline bool IsCreature() const { return GetTypeId() == TYPEID_UNIT; }
-        static Creature* ToCreature(Object* o) { if (o && o->GetTypeId() == TYPEID_UNIT) return reinterpret_cast<Creature*>(o); else return nullptr; }
-        static Creature const* ToCreature(Object const* o) { if (o && o->GetTypeId() == TYPEID_UNIT) return reinterpret_cast<Creature const*>(o); else return nullptr; }
-        Creature* ToCreature() { return ToCreature(this); }
-        Creature const* ToCreature() const { return ToCreature(this); }
-
-        inline bool IsUnit() const { return isType(TYPEMASK_UNIT); }
-        static Unit* ToUnit(Object* o) { if (o && o->isType(TYPEMASK_UNIT)) return reinterpret_cast<Unit*>(o); else return nullptr; }
-        static Unit const* ToUnit(Object const* o) { if (o && o->isType(TYPEMASK_UNIT)) return reinterpret_cast<Unit const*>(o); else return nullptr; }
-        Unit* ToUnit() { return ToUnit(this); }
-        Unit const* ToUnit() const { return ToUnit(this); }
-
-        inline bool IsGameObject() const { return GetTypeId() == TYPEID_GAMEOBJECT; }
-        static GameObject* ToGameObject(Object* o) { if (o && o->GetTypeId() == TYPEID_GAMEOBJECT) return reinterpret_cast<GameObject*>(o); else return nullptr; }
-        static GameObject const* ToGameObject(Object const* o) { if (o && o->GetTypeId() == TYPEID_GAMEOBJECT) return reinterpret_cast<GameObject const*>(o); else return nullptr; }
-        GameObject* ToGameObject() { return ToGameObject(this); }
-        GameObject const* ToGameObject() const { return ToGameObject(this); }
-
-        inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
-        static Corpse* ToCorpse(Object* o) { if (o && o->GetTypeId() == TYPEID_CORPSE) return reinterpret_cast<Corpse*>(o); else return nullptr; }
-        static Corpse const* ToCorpse(Object const* o) { if (o && o->GetTypeId() == TYPEID_CORPSE) return reinterpret_cast<Corpse const*>(o); else return nullptr; }
-        Corpse* ToCorpse() { return ToCorpse(this); }
-        Corpse const* ToCorpse() const { return ToCorpse(this); }
-
-        inline bool IsDynObject() const { return GetTypeId() == TYPEID_DYNAMICOBJECT; }
-        static DynamicObject* ToDynObject(Object* o) { if (o && o->GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject*>(o); else return nullptr; }
-        static DynamicObject const* ToDynObject(Object const* o) { if (o && o->GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject const*>(o); else return nullptr; }
-        DynamicObject* ToDynObject() { return ToDynObject(this); }
-        DynamicObject const* ToDynObject() const { return ToDynObject(this); }
-=======
         static Player* ToPlayer(Object* o) { return o ? o->ToPlayer() : nullptr; }
         static Player const* ToPlayer(Object const* o) { return o ? o->ToPlayer() : nullptr; }
         Player* ToPlayer() { if (IsPlayer()) return reinterpret_cast<Player*>(this); else return nullptr; }
@@ -240,12 +204,8 @@ class TC_GAME_API Object
         static DynamicObject const* ToDynObject(Object const* o) { return o ? o->ToDynObject() : nullptr; }
         DynamicObject* ToDynObject() { if (IsDynObject()) return reinterpret_cast<DynamicObject*>(this); else return nullptr; }
         DynamicObject const* ToDynObject() const { if (IsDynObject()) return reinterpret_cast<DynamicObject const*>(this); else return nullptr; }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         virtual std::string GetDebugInfo() const;
-
-        UpdateMask GetChangesMask() { return _changesMask; }
-        void AddToObjectUpdateIfNeeded();
 
     protected:
         Object();
@@ -280,6 +240,7 @@ class TC_GAME_API Object
 
         virtual bool AddToObjectUpdate() = 0;
         virtual void RemoveFromObjectUpdate() = 0;
+        void AddToObjectUpdateIfNeeded();
 
         bool m_objectUpdated;
 
@@ -352,12 +313,11 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         void GetRandomPoint(Position const& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
         Position GetRandomPoint(Position const& srcPos, float distance) const;
 
-        float GetObjectSize() const;
-
         uint32 GetInstanceId() const { return m_InstanceId; }
 
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
+        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask) != 0; }
         bool InSamePhase(uint32 otherMask) const
         {
             uint32 myMask = GetPhaseMask();
@@ -378,16 +338,15 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
                     (otherMask == 1 && CanSeePhaseOne()) ||
                     // If I am in phase 1, I am must be a creature and I can see unique phases
                     (myMask == 1 && (ToCreature() && CanSeeUniquePhase()));
-                    // Unimplemented logic:
-                    // - If I am in phase 64+, I am a creature, and can I see phase
-                    // - If I am in phase 64+, I am a player, I can see phase 1
-                    // ...
+                // Unimplemented logic:
+                // - If I am in phase 64+, I am a creature, and can I see phase
+                // - If I am in phase 64+, I am a player, I can see phase 1
+                // ...
             }
             // Otherwise both our phases are 1-63, use the normal behaviour
             return (myMask & otherMask) != 0;
         }
-        bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
-        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && b && b->InSamePhase(a); }
+        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
 
         uint32 GetZoneId() const { return m_zoneId; }
         uint32 GetAreaId() const { return m_areaId; }
@@ -406,7 +365,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         float GetDistance(WorldObject const* obj) const;
         float GetDistance(Position const& pos) const;
         float GetDistance(float x, float y, float z) const;
-        float GetRawDistance(const WorldObject* obj, bool is3D) const;
         float GetDistance2d(WorldObject const* obj) const;
         float GetDistance2d(float x, float y) const;
         float GetDistanceZ(WorldObject const* obj) const;
@@ -474,20 +432,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
         void ClearZoneScript();
         ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
-<<<<<<< HEAD
-        TempSummon* SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType = TEMPSUMMON_MANUAL_DESPAWN, uint32 despawnTime = 0, uint32 vehId = 0, uint32 spellId = 0, int dungeonLevel = 0);
-        TempSummon* SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType, Milliseconds despawnTime, uint32 vehId = 0, uint32 spellId = 0, int dungeonLevel = 0) { return SummonCreature(entry, pos, despawnType, uint32(despawnTime.count()), vehId, spellId, dungeonLevel); }
-        TempSummon* SummonCreature(uint32 entry, float x, float y, float z, float o = 0, TempSummonType despawnType = TEMPSUMMON_MANUAL_DESPAWN, uint32 despawnTime = 0, int dungeonLevel = 0);
-        GameObject* SummonGameObject(uint32 entry, Position const& pos, QuaternionData const& rot, uint32 respawnTime /* s */, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
-        GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, QuaternionData const& rot, uint32 respawnTime /* s */, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
-        Creature*   SummonTrigger(float x, float y, float z, float ang, uint32 dur, CreatureAI* (*GetAI)(Creature*) = nullptr);
-        void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
-
-        Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
-        GameObject* FindNearestGameObject(uint32 entry, float range) const;
-=======
-        TempSummon* SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType = TEMPSUMMON_MANUAL_DESPAWN, Milliseconds despawnTime = 0s, uint32 vehId = 0, uint32 spellId = 0, bool visibleBySummonerOnly = false);
-        TempSummon* SummonCreature(uint32 entry, float x, float y, float z, float o = 0, TempSummonType despawnType = TEMPSUMMON_MANUAL_DESPAWN, Milliseconds despawnTime = 0s, bool visibleBySummonerOnly = false);
+        TempSummon* SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType = TEMPSUMMON_MANUAL_DESPAWN, Milliseconds despawnTime = 0s, uint32 vehId = 0, uint32 spellId = 0, int dungeonLevel, bool visibleBySummonerOnly = false);
+        TempSummon* SummonCreature(uint32 entry, float x, float y, float z, float o = 0, TempSummonType despawnType = TEMPSUMMON_MANUAL_DESPAWN, Milliseconds despawnTime = 0s, int dungeonLevel, bool visibleBySummonerOnly = false);
         GameObject* SummonGameObject(uint32 entry, Position const& pos, QuaternionData const& rot, Seconds respawnTime, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, QuaternionData const& rot, Seconds respawnTime, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
         Creature*   SummonTrigger(float x, float y, float z, float ang, Milliseconds despawnTime, CreatureAI* (*GetAI)(Creature*) = nullptr);
@@ -495,7 +441,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
         GameObject* FindNearestGameObject(uint32 entry, float range, bool spawnedOnly = true) const;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         GameObject* FindNearestUnspawnedGameObject(uint32 entry, float range) const;
         GameObject* FindNearestGameObjectOfType(GameobjectTypes type, float range) const;
         Player* SelectNearestPlayer(float distance) const;
@@ -614,26 +559,15 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         float GetFloorZ() const;
         virtual float GetCollisionHeight() const { return 0.0f; }
-        virtual float GetCollisionWidth() const { return GetObjectSize(); }
-        virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
 
         float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
         float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
-<<<<<<< HEAD
         bool CanSeePhaseOne() const { return m_canSeePhaseOne; }
         void SetCanSeePhaseOne(bool canSee) { m_canSeePhaseOne = canSee; }
         bool CanSeeUniquePhase() const { return m_canSeeUniquePhase; }
         void SetCanSeeUniquePhase(bool canSee) { m_canSeeUniquePhase = canSee; }
 
-#ifdef ELUNA
-        ElunaEventProcessor* elunaEvents;
-        
-        Eluna* GetEluna() const;
-#endif
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         std::string GetDebugInfo() const override;
 
         // Event handler
@@ -673,6 +607,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         uint32 m_InstanceId;                              // in map copy with instance id
         uint32 m_phaseMask;                               // in area phase state
+
         bool m_canSeePhaseOne = true;
         bool m_canSeeUniquePhase = true;
 
