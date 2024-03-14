@@ -47,10 +47,7 @@
 #include "VMapFactory.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
-<<<<<<< HEAD
-=======
 #include "ElunaConfig.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #include "ElunaLoader.h"
 #endif
 #include "VMapManager2.h"
@@ -99,9 +96,6 @@ Map::~Map()
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
-    //eluna->Uninitialize();
-    delete eluna;
-    eluna = nullptr;
 
 #ifdef ELUNA
     delete eluna;
@@ -292,38 +286,15 @@ void Map::DeleteStateMachine()
 
 Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent):
 _creatureToMoveLock(false), _gameObjectsToMoveLock(false), _dynamicObjectsToMoveLock(false),
-i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_dungeonLevel(dungeonLevel), i_affix1(affix1), i_affix2(affix2), i_affix3(affix3), i_affix4(affix4), i_InstanceId(InstanceId),
+i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
 m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
 i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _respawnCheckTimer(0)
 {
-    // lua state begins uninitialized
-    eluna = nullptr;
-    graveyardOverride = WorldLocation();
     m_parentMap = (_parent ? _parent : this);
-<<<<<<< HEAD
-
-    if (IsParent() || !Instanceable())
-        i_dungeonLevel = 0;
-
-    if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
-        i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
-
-    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(affix1, affix2, affix3, affix4);
-
-    if(auto iTemp = sObjectMgr->GetInstanceTemplate(id))
-    {
-        if (iTemp->minDungeonLevel > i_dungeonLevel)
-            i_dungeonLevel = iTemp->minDungeonLevel;
-    }
-
-    if (sElunaLoader->ShouldMapLoadEluna(id))
-        if(!IsParent() || (IsParent() && !Instanceable()))
-            eluna = new Eluna(id);
-
-=======
+    graveyardOverride = WorldLocation();
 #ifdef ELUNA
     // lua state begins uninitialized
     eluna = nullptr;
@@ -332,7 +303,20 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
         if (!IsParentMap() || (IsParentMap() && !Instanceable()))
             eluna = new Eluna(this);
 #endif
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    if (_parent || !Instanceable())
+        i_dungeonLevel = 0;
+
+    if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
+        i_dungeonLevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
+
+    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(affix1, affix2, affix3, affix4);
+
+    if (auto iTemp = sObjectMgr->GetInstanceTemplate(id))
+    {
+        if (iTemp->minDungeonLevel > i_dungeonLevel)
+            i_dungeonLevel = iTemp->minDungeonLevel;
+    }
+
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)
@@ -2844,11 +2828,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
     {
         if (wmoData->areaInfo)
         {
-<<<<<<< HEAD
-            data.areaInfo = boost::in_place(wmoData->areaInfo->adtId, wmoData->areaInfo->rootId, wmoData->areaInfo->groupId, wmoData->areaInfo->mogpFlags);
-=======
             data.areaInfo.emplace(wmoData->areaInfo->adtId, wmoData->areaInfo->rootId, wmoData->areaInfo->groupId, wmoData->areaInfo->mogpFlags);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             // wmo found
             WMOAreaTableEntry const* wmoEntry = GetWMOAreaTableEntryByTripple(wmoData->areaInfo->rootId, wmoData->areaInfo->adtId, wmoData->areaInfo->groupId);
             data.outdoors = (wmoData->areaInfo->mogpFlags & 0x8) != 0;
@@ -2909,11 +2889,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, fl
             }
         }
 
-<<<<<<< HEAD
-        data.liquidInfo = boost::in_place();
-=======
         data.liquidInfo.emplace();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         data.liquidInfo->level = wmoData->liquidInfo->level;
         data.liquidInfo->depth_level = wmoData->floorZ;
         data.liquidInfo->entry = liquidType;
@@ -3143,23 +3119,7 @@ bool Map::CheckRespawn(RespawnInfo* info)
                 alreadyExists = true;
                 break;
             }
-<<<<<<< HEAD
-            case SPAWN_TYPE_GAMEOBJECT:
-                // gameobject check is simpler - they cannot be dead or escorting
-                if (_gameobjectBySpawnIdStore.find(info->spawnId) != _gameobjectBySpawnIdStore.end())
-                    doDelete = true;
-                break;
-            default:
-                ABORT_MSG("Invalid spawn type %u with spawnId %u on map %u", uint32(info->type), info->spawnId, GetId());
-                return true;
-        }
-        if (doDelete)
-        {
-            info->respawnTime = 0;
-            return false;
-=======
             break;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         case SPAWN_TYPE_GAMEOBJECT:
             // gameobject check is simpler - they cannot be dead or escorting
@@ -3191,24 +3151,6 @@ bool Map::CheckRespawn(RespawnInfo* info)
         info->respawnTime = respawnTime;
         return false;
     }
-<<<<<<< HEAD
-
-    // now, check if we're part of a pool
-    if (poolId)
-    {
-        // ok, part of a pool - hand off to pool logic to handle this, we're just going to remove the respawn and call it a day
-        if (info->type == SPAWN_TYPE_GAMEOBJECT)
-            sPoolMgr->UpdatePool<GameObject>(poolId, info->spawnId);
-        else if (info->type == SPAWN_TYPE_CREATURE)
-            sPoolMgr->UpdatePool<Creature>(poolId, info->spawnId);
-        else
-            ABORT_MSG("Invalid spawn type %u (spawnid %u) on map %u", uint32(info->type), info->spawnId, GetId());
-        info->respawnTime = 0;
-        return false;
-    }
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // everything ok, let's spawn
     return true;
 }
@@ -3218,11 +3160,7 @@ void Map::Respawn(RespawnInfo* info, CharacterDatabaseTransaction dbTrans)
     if (info->respawnTime <= GameTime::GetGameTime())
         return;
     info->respawnTime = GameTime::GetGameTime();
-<<<<<<< HEAD
-    _respawnTimes.increase(info->handle);
-=======
     _respawnTimes->increase(static_cast<RespawnInfoWithHandle*>(info)->handle);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     SaveRespawnInfoDB(*info, dbTrans);
 }
 
@@ -3679,21 +3617,12 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetEluna())
-    {
-        if (Creature* creature = obj->ToCreature())
-            GetEluna()->OnRemove(creature);
-        else if (GameObject* gameobject = obj->ToGameObject())
-            GetEluna()->OnRemove(gameobject);
-=======
     if (Eluna* e = GetEluna())
     {
         if (Creature* creature = obj->ToCreature())
             e->OnRemove(creature);
         else if (GameObject* gameobject = obj->ToGameObject())
             e->OnRemove(gameobject);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 #endif
 
@@ -3932,13 +3861,8 @@ template TC_GAME_API void Map::RemoveFromMap(DynamicObject*, bool);
 
 /* ******* Dungeon Instance Maps ******* */
 
-<<<<<<< HEAD
-InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent)
+InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent, TeamId InstanceTeam)
   : Map(id, expiry, InstanceId, SpawnMode, dungeonLevel, affix1, affix2, affix3, affix4, _parent),
-=======
-InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _parent, TeamId InstanceTeam)
-  : Map(id, expiry, InstanceId, SpawnMode, _parent),
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     m_resetAfterUnload(false), m_unloadWhenEmpty(false),
     i_data(nullptr), i_script_id(0), i_script_team(InstanceTeam)
 {
@@ -4030,13 +3954,8 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             InstanceSave* mapSave = sInstanceSaveMgr->GetInstanceSave(GetInstanceId());
             if (!mapSave)
             {
-<<<<<<< HEAD
-                TC_LOG_DEBUG("maps", "InstanceMap::Add: creating instance save for map %d spawnmode %d with instance id %d", GetId(), GetSpawnMode(), GetInstanceId());
-                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), GetDungeonLevel(), i_affix1, i_affix2, i_affix3, i_affix4, 0, true);
-=======
                 TC_LOG_DEBUG("maps", "InstanceMap::Add: creating instance save for map {} spawnmode {} with instance id {}", GetId(), GetSpawnMode(), GetInstanceId());
-                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), 0, true);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), GetDungeonLevel(), i_affix1, i_affix2, i_affix3, i_affix4, 0, true);
             }
 
             ASSERT(mapSave);
@@ -4161,15 +4080,9 @@ void InstanceMap::CreateInstanceData(bool load)
     bool isElunaAI = false;
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetEluna())
-    {
-        i_data = GetEluna()->GetInstanceData(this);
-=======
     if (Eluna* e = GetEluna())
     {
         i_data = e->GetInstanceData(this);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         if (i_data)
             isElunaAI = true;
     }
@@ -4475,15 +4388,8 @@ BattlegroundMap::~BattlegroundMap()
 void BattlegroundMap::InitVisibilityDistance()
 {
     //init visibility distance for BG/Arenas
-<<<<<<< HEAD
-    m_VisibleDistance = World::GetMaxVisibleDistanceInBGArenas();
-    m_VisibilityNotifyPeriod = World::GetVisibilityNotifyPeriodInBGArenas();
-    if (GetId() == 767)
-        m_VisibleDistance = MAX_VISIBILITY_DISTANCE;
-=======
     m_VisibleDistance        = IsBattleArena() ? World::GetMaxVisibleDistanceInArenas() : World::GetMaxVisibleDistanceInBG();
     m_VisibilityNotifyPeriod = IsBattleArena() ? World::GetVisibilityNotifyPeriodInArenas() : World::GetVisibilityNotifyPeriodInBG();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 Map::EnterState BattlegroundMap::CannotEnter(Player* player)
@@ -4705,174 +4611,6 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     }
 
     return time_t(0);
-}
-
-/**
- * @brief Check if a given source can reach a specific point following a path
- * and normalize the coords. Use this method for long paths, otherwise use the
- * overloaded method with the start coords when you need to do a quick check on small segments
- *
- */
-bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator* path, float& destX, float& destY, float& destZ, bool failOnCollision) const
-{
-    G3D::Vector3 prevPath = path->GetStartPosition();
-    for (auto& vector : path->GetPath())
-    {
-        float x = vector.x;
-        float y = vector.y;
-        float z = vector.z;
-
-        if (!CanReachPositionAndGetValidCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, failOnCollision))
-        {
-            destX = x;
-            destY = y;
-            destZ = z;
-            return false;
-        }
-
-        prevPath = vector;
-    }
-
-    destX = prevPath.x;
-    destY = prevPath.y;
-    destZ = prevPath.z;
-
-    return true;
-}
-
-/**
- * @brief validate the new destination and set reachable coords
- * Check if a given unit can reach a specific point on a segment
- * and set the correct dest coords
- * NOTE: use this method with small segments.
- *
- * @param failOnCollision if true, the methods will return false when a collision occurs
- *
- * @return true if the destination is valid, false otherwise
- *
- *
-*/
-bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float& destX, float& destY, float& destZ, bool failOnCollision) const
-{
-    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision);
-}
-
-bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision) const
-{
-    if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
-        return false;
-
-    /** If it's not a Unit then we do not have to continue. */
-    Unit const* unit = source->ToUnit();
-    if (!unit)
-        return true;
-
-    /*
-     * Walkable checks
-     */
-    bool isWaterNext = IsInWater(source->GetPhaseMask(), destX, destY, destZ);
-    Creature const* creature = unit->ToCreature();
-    bool cannotEnterWater = isWaterNext && (creature && !creature->CanSwim());
-    bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
-    if (cannotEnterWater || cannotWalkOrFly)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-/**
- * @brief validate the new destination and set coords
- * Check if a given unit can face collisions in a specific segment
- *
- * @return true if the destination is valid, false otherwise
- *
- **/
-bool Map::CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision) const
-{
-    // Prevent invalid coordinates here, position is unchanged
-    if (!Trinity::IsValidMapCoord(startX, startY, startZ) || !Trinity::IsValidMapCoord(destX, destY, destZ))
-    {
-        TC_LOG_FATAL("maps", "Map::CheckCollisionAndGetValidCoords invalid coordinates startX: {}, startY: {}, startZ: {}, destX: {}, destY: {}, destZ: {}", startX, startY, startZ, destX, destY, destZ);
-        return false;
-    }
-
-    bool isWaterNext = IsInWater(source->GetPhaseMask(), destX, destY, destZ);
-
-    PathGenerator path(source);
-
-    // Use a detour raycast to get our first collision point
-    //path.SetUseRaycast(true);
-    bool result = path.CalculatePath(destX, destY, destZ, false);
-
-    Unit const* unit = source->ToUnit();
-    bool notOnGround = path.GetPathType() & PATHFIND_NOT_USING_PATH
-        || isWaterNext || (unit && unit->IsFlying());
-
-    // Check for valid path types before we proceed
-    if (!result || (!notOnGround && path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
-    {
-        return false;
-    }
-
-    G3D::Vector3 endPos = path.GetPath().back();
-    destX = endPos.x;
-    destY = endPos.y;
-    destZ = endPos.z;
-
-    // collision check
-    bool collided = false;
-
-    // check static LOS
-    float halfHeight = source->GetCollisionHeight() * 0.5f;
-
-    // Unit is not on the ground, check for potential collision via vmaps
-    if (notOnGround)
-    {
-        bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
-            startX, startY, startZ + halfHeight,
-            destX, destY, destZ + halfHeight,
-            destX, destY, destZ, -CONTACT_DISTANCE);
-
-        destZ -= halfHeight;
-
-        // Collided with static LOS object, move back to collision point
-        if (col)
-            collided = true;
-    }
-
-    // check dynamic collision
-    bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
-        startX, startY, startZ + halfHeight,
-        destX, destY, destZ + halfHeight,
-        destX, destY, destZ, -CONTACT_DISTANCE);
-
-    destZ -= halfHeight;
-
-    // Collided with a gameobject, move back to collision point
-    if (col)
-        collided = true;
-
-    float groundZ = VMAP_INVALID_HEIGHT_VALUE;
-    source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
-
-    // position has no ground under it (or is too far away)
-    if (groundZ <= INVALID_HEIGHT && unit && !unit->CanFly())
-    {
-        // fall back to gridHeight if any
-        float gridHeight = GetGridHeight(destX, destY);
-        if (gridHeight > INVALID_HEIGHT)
-        {
-            destZ = gridHeight + unit->GetHoverHeight();
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    return !failOnCollision || !collided;
 }
 
 void Map::LoadCorpseData()
@@ -5194,10 +4932,19 @@ std::string InstanceMap::GetDebugInfo() const
     return sstr.str();
 }
 
-<<<<<<< HEAD
+#ifdef ELUNA
+Eluna *Map::GetEluna() const
+{
+    if(sElunaConfig->IsElunaCompatibilityMode())
+        return sWorld->GetEluna();
+
+    return eluna;
+}
+#endif
+
 int Map::GetCappedDungeonLevel(uint32 softcapMod) const
 {
-   return std::clamp<int>(i_dungeonLevel, 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
+    return std::clamp<int>(i_dungeonLevel, 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
 }
 
 void Map::SetDungeonLevel(int value)
@@ -5217,7 +4964,7 @@ void Map::SetDungeonLevel(int value)
 
 void Map::UpdateDungeonLevel()
 {
-    const PlayerList &players = GetPlayers();
+    const PlayerList& players = GetPlayers();
     auto level = 0.0f;
     for (auto itr = players.begin(); itr != players.end(); ++itr)
     {
@@ -5253,16 +5000,5 @@ void Map::UpscaleMapIfNeeded()
     if (level > GetCappedDungeonLevel())
         SetDungeonLevel(level);
 }
-=======
-#ifdef ELUNA
-Eluna *Map::GetEluna() const
-{
-    if(sElunaConfig->IsElunaCompatibilityMode())
-        return sWorld->GetEluna();
-
-    return eluna;
-}
-#endif
 
 template class TC_GAME_API TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid>;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209

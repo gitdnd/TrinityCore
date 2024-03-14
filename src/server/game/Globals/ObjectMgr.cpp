@@ -56,7 +56,6 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
-//VirtualItem
 #include "VirtualItemMgr.h"
 
 ScriptMapMap sSpellScripts;
@@ -537,38 +536,38 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     for (uint8 i = 0; i < MAX_KILL_CREDIT; ++i)
         creatureTemplate.KillCredit[i] = fields[4 + i].GetUInt32();
 
-    creatureTemplate.Modelid1 = fields[6].GetUInt32();
-    creatureTemplate.Modelid2 = fields[7].GetUInt32();
-    creatureTemplate.Modelid3 = fields[8].GetUInt32();
-    creatureTemplate.Modelid4 = fields[9].GetUInt32();
-    creatureTemplate.Name = fields[10].GetString();
-    creatureTemplate.Title = fields[11].GetString();
-    creatureTemplate.IconName = fields[12].GetString();
-    creatureTemplate.GossipMenuId = fields[13].GetUInt32();
-    creatureTemplate.minlevel = fields[14].GetUInt8();
-    creatureTemplate.maxlevel = fields[15].GetUInt8();
-    creatureTemplate.expansion = uint32(fields[16].GetInt16());
-    creatureTemplate.faction = fields[17].GetUInt16();
-    creatureTemplate.npcflag = fields[18].GetUInt32();
-    creatureTemplate.speed_walk = fields[19].GetFloat();
-    creatureTemplate.speed_run = fields[20].GetFloat();
-    creatureTemplate.scale = fields[21].GetFloat();
-    creatureTemplate.rank = fields[22].GetUInt8();
-    creatureTemplate.dmgschool = uint32(fields[23].GetInt8());
-    creatureTemplate.BaseAttackTime = fields[24].GetUInt32();
-    creatureTemplate.RangeAttackTime = fields[25].GetUInt32();
-    creatureTemplate.BaseVariance = fields[26].GetFloat();
-    creatureTemplate.RangeVariance = fields[27].GetFloat();
-    creatureTemplate.unit_class = fields[28].GetUInt8();
-    creatureTemplate.unit_flags = fields[29].GetUInt32();
-    creatureTemplate.unit_flags2 = fields[30].GetUInt32();
-    creatureTemplate.dynamicflags = fields[31].GetUInt32();
-    creatureTemplate.family = CreatureFamily(fields[32].GetUInt8());
-    creatureTemplate.type = fields[33].GetUInt8();
-    creatureTemplate.type_flags = fields[34].GetUInt32();
-    creatureTemplate.lootid = fields[35].GetUInt32();
+    creatureTemplate.Modelid1         = fields[6].GetUInt32();
+    creatureTemplate.Modelid2         = fields[7].GetUInt32();
+    creatureTemplate.Modelid3         = fields[8].GetUInt32();
+    creatureTemplate.Modelid4         = fields[9].GetUInt32();
+    creatureTemplate.Name             = fields[10].GetString();
+    creatureTemplate.Title            = fields[11].GetString();
+    creatureTemplate.IconName         = fields[12].GetString();
+    creatureTemplate.GossipMenuId     = fields[13].GetUInt32();
+    creatureTemplate.minlevel         = fields[14].GetUInt8();
+    creatureTemplate.maxlevel         = fields[15].GetUInt8();
+    creatureTemplate.expansion        = uint32(fields[16].GetInt16());
+    creatureTemplate.faction          = fields[17].GetUInt16();
+    creatureTemplate.npcflag          = fields[18].GetUInt32();
+    creatureTemplate.speed_walk       = fields[19].GetFloat();
+    creatureTemplate.speed_run        = fields[20].GetFloat();
+    creatureTemplate.scale            = fields[21].GetFloat();
+    creatureTemplate.rank             = fields[22].GetUInt8();
+    creatureTemplate.dmgschool        = uint32(fields[23].GetInt8());
+    creatureTemplate.BaseAttackTime   = fields[24].GetUInt32();
+    creatureTemplate.RangeAttackTime  = fields[25].GetUInt32();
+    creatureTemplate.BaseVariance     = fields[26].GetFloat();
+    creatureTemplate.RangeVariance    = fields[27].GetFloat();
+    creatureTemplate.unit_class       = fields[28].GetUInt8();
+    creatureTemplate.unit_flags       = fields[29].GetUInt32();
+    creatureTemplate.unit_flags2      = fields[30].GetUInt32();
+    creatureTemplate.dynamicflags     = fields[31].GetUInt32();
+    creatureTemplate.family           = CreatureFamily(fields[32].GetUInt8());
+    creatureTemplate.type             = fields[33].GetUInt8();
+    creatureTemplate.type_flags       = fields[34].GetUInt32();
+    creatureTemplate.lootid           = fields[35].GetUInt32();
     creatureTemplate.pickpocketLootId = fields[36].GetUInt32();
-    creatureTemplate.SkinLootId = fields[37].GetUInt32();
+    creatureTemplate.SkinLootId       = fields[37].GetUInt32();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         creatureTemplate.resistance[i] = 0;
@@ -577,11 +576,11 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
         creatureTemplate.spells[i] = 0;
 
     creatureTemplate.PetSpellDataId = fields[38].GetUInt32();
-    creatureTemplate.VehicleId = fields[39].GetUInt32();
-    creatureTemplate.mingold = fields[40].GetUInt32();
-    creatureTemplate.maxgold = fields[41].GetUInt32();
-    creatureTemplate.AIName = fields[42].GetString();
-    creatureTemplate.MovementType = fields[43].GetUInt8();
+    creatureTemplate.VehicleId      = fields[39].GetUInt32();
+    creatureTemplate.mingold        = fields[40].GetUInt32();
+    creatureTemplate.maxgold        = fields[41].GetUInt32();
+    creatureTemplate.AIName         = fields[42].GetString();
+    creatureTemplate.MovementType   = fields[43].GetUInt8();
     if (!fields[44].IsNull())
         creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[44].GetUInt8());
 
@@ -600,21 +599,23 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     if (!fields[49].IsNull())
         creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[49].GetUInt8());
 
-<<<<<<< HEAD
-    creatureTemplate.HoverHeight = fields[50].GetFloat();
-    creatureTemplate.ModHealth = fields[51].GetFloat();
-    creatureTemplate.ModMana = fields[52].GetFloat();
-    creatureTemplate.ModArmor = fields[53].GetFloat();
-    creatureTemplate.ModDamage = fields[54].GetFloat();
-    creatureTemplate.ModExperience = fields[55].GetFloat();
-    creatureTemplate.RacialLeader = fields[56].GetBool();
+    if (!fields[50].IsNull())
+        creatureTemplate.Movement.InteractionPauseTimer = fields[50].GetUInt32();
 
-    creatureTemplate.movementId = fields[57].GetUInt32();
-    creatureTemplate.RegenHealth = fields[58].GetBool();
-    creatureTemplate.MechanicImmuneMask = fields[59].GetUInt32();
-    creatureTemplate.SpellSchoolImmuneMask = fields[60].GetUInt32();
-    creatureTemplate.flags_extra = fields[61].GetUInt32();
-    creatureTemplate.ScriptID = GetScriptId(fields[62].GetString());
+    creatureTemplate.HoverHeight    = fields[51].GetFloat();
+    creatureTemplate.ModHealth      = fields[52].GetFloat();
+    creatureTemplate.ModMana        = fields[53].GetFloat();
+    creatureTemplate.ModArmor       = fields[54].GetFloat();
+    creatureTemplate.ModDamage      = fields[55].GetFloat();
+    creatureTemplate.ModExperience  = fields[56].GetFloat();
+    creatureTemplate.RacialLeader   = fields[57].GetBool();
+
+    creatureTemplate.movementId            = fields[58].GetUInt32();
+    creatureTemplate.RegenHealth           = fields[59].GetBool();
+    creatureTemplate.MechanicImmuneMask    = fields[60].GetUInt32();
+    creatureTemplate.SpellSchoolImmuneMask = fields[61].GetUInt32();
+    creatureTemplate.flags_extra           = fields[62].GetUInt32();
+    creatureTemplate.ScriptID              = GetScriptId(fields[63].GetString());
 }
 
 void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
@@ -695,20 +696,24 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
         if (!fields[49].IsNull())
             creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[49].GetUInt8());
 
-        creatureTemplate.HoverHeight = fields[50].GetFloat();
-        creatureTemplate.ModHealth = fields[51].GetFloat();
-        creatureTemplate.ModMana = fields[52].GetFloat();
-        creatureTemplate.ModArmor = fields[53].GetFloat();
-        creatureTemplate.ModDamage = fields[54].GetFloat();
-        creatureTemplate.ModExperience = fields[55].GetFloat();
-        creatureTemplate.RacialLeader = fields[56].GetBool();
+        if (!fields[50].IsNull())
+            creatureTemplate.Movement.InteractionPauseTimer = fields[50].GetUInt32();
 
-        creatureTemplate.movementId = fields[57].GetUInt32();
-        creatureTemplate.RegenHealth = fields[58].GetBool();
-        creatureTemplate.MechanicImmuneMask = fields[59].GetUInt32();
-        creatureTemplate.SpellSchoolImmuneMask = fields[60].GetUInt32();
-        creatureTemplate.flags_extra = fields[61].GetUInt32();
-        creatureTemplate.ScriptID = GetScriptId(fields[62].GetString());
+        creatureTemplate.HoverHeight = fields[51].GetFloat();
+        creatureTemplate.ModHealth = fields[52].GetFloat();
+        creatureTemplate.ModMana = fields[53].GetFloat();
+        creatureTemplate.ModArmor = fields[54].GetFloat();
+        creatureTemplate.ModDamage = fields[55].GetFloat();
+        creatureTemplate.ModExperience = fields[56].GetFloat();
+        creatureTemplate.RacialLeader = fields[57].GetBool();
+
+        creatureTemplate.movementId = fields[58].GetUInt32();
+        creatureTemplate.RegenHealth = fields[59].GetBool();
+        creatureTemplate.MechanicImmuneMask = fields[60].GetUInt32();
+        creatureTemplate.SpellSchoolImmuneMask = fields[61].GetUInt32();
+        creatureTemplate.flags_extra = fields[62].GetUInt32();
+        creatureTemplate.ScriptID = GetScriptId(fields[63].GetString());
+
         if (QueryResult resistanceResults = WorldDatabase.PQuery("SELECT School, Resistance FROM creature_template_resistance where CreatureID = %u", entry))
         {
             do
@@ -805,20 +810,23 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
         if (!fields[49].IsNull())
             creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[49].GetUInt8());
 
-        creatureTemplate.HoverHeight = fields[50].GetFloat();
-        creatureTemplate.ModHealth = fields[51].GetFloat();
-        creatureTemplate.ModMana = fields[52].GetFloat();
-        creatureTemplate.ModArmor = fields[53].GetFloat();
-        creatureTemplate.ModDamage = fields[54].GetFloat();
-        creatureTemplate.ModExperience = fields[55].GetFloat();
-        creatureTemplate.RacialLeader = fields[56].GetBool();
+        if (!fields[50].IsNull())
+            creatureTemplate.Movement.InteractionPauseTimer = fields[50].GetUInt32();
 
-        creatureTemplate.movementId = fields[57].GetUInt32();
-        creatureTemplate.RegenHealth = fields[58].GetBool();
-        creatureTemplate.MechanicImmuneMask = fields[59].GetUInt32();
-        creatureTemplate.SpellSchoolImmuneMask = fields[60].GetUInt32();
-        creatureTemplate.flags_extra = fields[61].GetUInt32();
-        creatureTemplate.ScriptID = GetScriptId(fields[62].GetString());
+        creatureTemplate.HoverHeight = fields[51].GetFloat();
+        creatureTemplate.ModHealth = fields[52].GetFloat();
+        creatureTemplate.ModMana = fields[53].GetFloat();
+        creatureTemplate.ModArmor = fields[54].GetFloat();
+        creatureTemplate.ModDamage = fields[55].GetFloat();
+        creatureTemplate.ModExperience = fields[56].GetFloat();
+        creatureTemplate.RacialLeader = fields[57].GetBool();
+
+        creatureTemplate.movementId = fields[58].GetUInt32();
+        creatureTemplate.RegenHealth = fields[59].GetBool();
+        creatureTemplate.MechanicImmuneMask = fields[60].GetUInt32();
+        creatureTemplate.SpellSchoolImmuneMask = fields[61].GetUInt32();
+        creatureTemplate.flags_extra = fields[62].GetUInt32();
+        creatureTemplate.ScriptID = GetScriptId(fields[63].GetString());
         if (QueryResult resistanceResults = WorldDatabase.PQuery("SELECT School, Resistance FROM creature_template_resistance where CreatureID = %u", entry))
         {
             do
@@ -839,25 +847,6 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
         }
         creatureTemplate.InitializeQueryData();
     }
-=======
-    if (!fields[50].IsNull())
-        creatureTemplate.Movement.InteractionPauseTimer = fields[50].GetUInt32();
-
-    creatureTemplate.HoverHeight    = fields[51].GetFloat();
-    creatureTemplate.ModHealth      = fields[52].GetFloat();
-    creatureTemplate.ModMana        = fields[53].GetFloat();
-    creatureTemplate.ModArmor       = fields[54].GetFloat();
-    creatureTemplate.ModDamage      = fields[55].GetFloat();
-    creatureTemplate.ModExperience  = fields[56].GetFloat();
-    creatureTemplate.RacialLeader   = fields[57].GetBool();
-
-    creatureTemplate.movementId            = fields[58].GetUInt32();
-    creatureTemplate.RegenHealth           = fields[59].GetBool();
-    creatureTemplate.MechanicImmuneMask    = fields[60].GetUInt32();
-    creatureTemplate.SpellSchoolImmuneMask = fields[61].GetUInt32();
-    creatureTemplate.flags_extra           = fields[62].GetUInt32();
-    creatureTemplate.ScriptID              = GetScriptId(fields[63].GetString());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
@@ -3329,37 +3318,12 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.MinMoneyLoot            = fields[135].GetUInt32();
         itemTemplate.MaxMoneyLoot            = fields[136].GetUInt32();
         itemTemplate.FlagsCu                 = fields[137].GetUInt32();
-        if (itemTemplate.ItemId >= 70000 && itemTemplate.GemProperties >= 150000)
-        {
-            if (GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(itemTemplate.GemProperties))
-            {
-                if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(gemProperty->spellitemenchantement))
-                {
-                    if(SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(enchant->spellid[0]))
-                    {
-                        if (SpellInfo const* actualSpell = sSpellMgr->GetSpellInfo(spellEntry->Effects[EFFECT_0].TriggerSpell))
-                        {
-                            const std::string newdesc = GetSpellGemDesc(actualSpell->Id);
-                            if (newdesc != "")
-                            {
-                                itemTemplate.Description = newdesc;
-                            }
-                            else
-                            {
-                                std::stringstream ss;
-                                ss << itemTemplate.Description << "\n\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << actualSpell->SpellDescription[LOCALE_enUS] << "|r";
-                                itemTemplate.Description = ss.str().c_str();
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
         // Checks
 
-        //ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
+        /*ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
 
-        /*if (dbcitem)
+        if (dbcitem)
         {
             if (itemTemplate.Class != dbcitem->ClassID)
             {
@@ -3401,11 +3365,7 @@ void ObjectMgr::LoadItemTemplates()
 
         }
         else
-<<<<<<< HEAD
-            TC_LOG_ERROR("sql.sql", "Item (Entry: %u) does not exist in item.dbc! (not correct id?).", entry);*/
-=======
-            TC_LOG_ERROR("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+            TC_LOG_ERROR("sql.sql", "Item (Entry: {}) does not exist in item.dbc! (not correct id?).", entry);*/
 
         if (itemTemplate.Class >= MAX_ITEM_CLASS)
         {
@@ -3767,7 +3727,7 @@ void ObjectMgr::LoadItemTemplates()
 
         if (itemTemplate.FlagsCu & ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE && !VirtualItemMgr::IsVirtualTemplate(&itemTemplate))
         {
-            TC_LOG_ERROR("sql.sql", "Item (Entry %u) has flag ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE but it is not a valid virtual item template", entry);
+            TC_LOG_ERROR("sql.sql", "Item (Entry {}) has flag ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE but it is not a valid virtual item template", entry);
             itemTemplate.FlagsCu &= ~ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE;
         }
 
@@ -3963,32 +3923,6 @@ void ObjectMgr::LoadItemTemplate(uint32 entry)
         itemTemplate.MinMoneyLoot = fields[135].GetUInt32();
         itemTemplate.MaxMoneyLoot = fields[136].GetUInt32();
         itemTemplate.FlagsCu = fields[137].GetUInt32();
-        if (itemTemplate.ItemId >= 70000 && itemTemplate.GemProperties >= 150000)
-        {
-            if (GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(itemTemplate.GemProperties))
-            {
-                if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(gemProperty->spellitemenchantement))
-                {
-                    if (SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(enchant->spellid[0]))
-                    {
-                        if (SpellInfo const* actualSpell = sSpellMgr->GetSpellInfo(spellEntry->Effects[EFFECT_0].TriggerSpell))
-                        {
-                            const std::string newdesc = GetSpellGemDesc(actualSpell->Id);
-                            if (newdesc != "")
-                            {
-                                itemTemplate.Description = newdesc;
-                            }
-                            else
-                            {
-                                std::stringstream ss;
-                                ss << itemTemplate.Description << "\n\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << actualSpell->SpellDescription[LOCALE_enUS] << "|r";
-                                itemTemplate.Description = ss.str().c_str();
-                            }
-                        }
-                    }
-                }
-            }
-        }
         // Load cached data
         itemTemplate._LoadTotalAP();
         itemTemplate.InitializeQueryData();
@@ -4106,32 +4040,6 @@ void ObjectMgr::LoadItemTemplate(uint32 entry)
         itemTemplate.MinMoneyLoot = fields[135].GetUInt32();
         itemTemplate.MaxMoneyLoot = fields[136].GetUInt32();
         itemTemplate.FlagsCu = fields[137].GetUInt32();
-        if (itemTemplate.ItemId >= 70000 && itemTemplate.GemProperties >= 150000)
-        {
-            if (GemPropertiesEntry const* gemProperty = sGemPropertiesStore.LookupEntry(itemTemplate.GemProperties))
-            {
-                if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(gemProperty->spellitemenchantement))
-                {
-                    if (SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(enchant->spellid[0]))
-                    {
-                        if (SpellInfo const* actualSpell = sSpellMgr->GetSpellInfo(spellEntry->Effects[EFFECT_0].TriggerSpell))
-                        {
-                            const std::string newdesc = GetSpellGemDesc(actualSpell->Id);
-                            if (newdesc != "")
-                            {
-                                itemTemplate.Description = newdesc;
-                            }
-                            else
-                            {
-                                std::stringstream ss;
-                                ss << itemTemplate.Description << "\n\n" << "|cff00ccff" << actualSpell->SpellName[LOCALE_enUS] << "|r\n\n" << "|cff67BCFF" << actualSpell->SpellDescription[LOCALE_enUS] << "|r";
-                                itemTemplate.Description = ss.str().c_str();
-                            }
-                        }
-                    }
-                }
-            }
-        }
         // Load cached data
         itemTemplate._LoadTotalAP();
         itemTemplate.InitializeQueryData();
@@ -4235,7 +4143,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
 
         itemTemplate->customFlags = uint32(fields[i++].GetUInt32());
         uint8 sheath = fields[i++].GetUInt8();
-        if(sheath != 0)
+        if (sheath != 0)
             itemTemplate->Sheath = uint32(sheath);
 
         itemTemplate->legendaryId = fields[i++].GetUInt32();
@@ -4288,10 +4196,12 @@ void ObjectMgr::LoadVirtualItemTemplates()
     TC_LOG_INFO("server.loading", ">> Loaded %u virtual item templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
+
 ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry) const
 {
     if (auto vIT = sVirtualItemMgr.GetVirtualTemplate(entry))
         return vIT;
+
     return Trinity::Containers::MapGetValuePtr(_itemTemplateStore, entry);
 }
 
@@ -5472,11 +5382,11 @@ void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, Play
                 info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3: (lvl > 5 ? 1: 0));
                 break;
             case CLASS_TIMEWALKER:
-                info->stats[STAT_STRENGTH]  += (lvl > 38 ? 2 : (lvl > 6 && (lvl % 2) ? 1 : 0));
-                info->stats[STAT_STAMINA]   += (lvl > 32 ? 2 : (lvl > 4 ? 1 : 0));
-                info->stats[STAT_AGILITY]   += (lvl > 38 ? 2 : (lvl > 8 && (lvl % 2) ? 1 : 0));
+                info->stats[STAT_STRENGTH] += (lvl > 38 ? 2 : (lvl > 6 && (lvl % 2) ? 1 : 0));
+                info->stats[STAT_STAMINA] += (lvl > 32 ? 2 : (lvl > 4 ? 1 : 0));
+                info->stats[STAT_AGILITY] += (lvl > 38 ? 2 : (lvl > 8 && (lvl % 2) ? 1 : 0));
                 info->stats[STAT_INTELLECT] += (lvl > 38 ? 3 : (lvl > 4 ? 1 : 0));
-                info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3 : (lvl > 5 ? 1 : 0));
+                info->stats[STAT_SPIRIT] += (lvl > 38 ? 3 : (lvl > 5 ? 1 : 0));
         }
     }
 }
@@ -6912,7 +6822,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
     if (!result)
     {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 instance templates. DB table `page_text` is empty!");
+        TC_LOG_INFO("server.loading", ">> Loaded 0 instance templates. DB table `instance_template` is empty!");
         return;
     }
 
@@ -6931,14 +6841,16 @@ void ObjectMgr::LoadInstanceTemplate()
 
         InstanceTemplate instanceTemplate;
 
+
         instanceTemplate.AllowMount = fields[3].GetBool();
-        instanceTemplate.Parent     = uint32(fields[1].GetUInt16());
-        instanceTemplate.ScriptId   = sObjectMgr->GetScriptId(fields[2].GetString());
+        instanceTemplate.Parent = uint32(fields[1].GetUInt16());
+        instanceTemplate.ScriptId = sObjectMgr->GetScriptId(fields[2].GetString());
         instanceTemplate.maxPlayerOverride = fields[4].GetUInt32();
         instanceTemplate.mapXPRate = fields[5].GetFloat();
         instanceTemplate.vLvlMod = fields[6].GetUInt32();
         instanceTemplate.minDungeonLevel = fields[7].GetUInt32();
         instanceTemplate.softcapMod = fields[8].GetUInt32();
+
         _instanceTemplateStore[mapID] = instanceTemplate;
 
         ++count;
@@ -7036,11 +6948,7 @@ void ObjectMgr::LoadInstanceEncounters()
                 continue;
         }
 
-<<<<<<< HEAD
-        DungeonEncounterList& encounters = _dungeonEncounterStore[MAKE_PAIR32(dungeonEncounter->mapId, dungeonEncounter->difficulty)];
-=======
         DungeonEncounterList& encounters = _dungeonEncounterStore[MAKE_PAIR32(dungeonEncounter->MapID, dungeonEncounter->Difficulty)];
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         encounters.emplace_back(std::make_unique<DungeonEncounter>(dungeonEncounter, EncounterCreditType(creditType), creditEntry, lastEncounterDungeon));
         ++count;
     } while (result->NextRow());
@@ -10485,8 +10393,7 @@ bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item, bool persist /*= tru
 
 bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* player, std::set<uint32>* /*skip_vendors*/, uint32 /*ORnpcflag*/) const
 {
-    /*
-    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(vendor_entry);
+    /*CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(vendor_entry);
     if (!cInfo)
     {
         if (player)
@@ -10509,8 +10416,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
                 skip_vendors->insert(vendor_entry);
         }
         return false;
-    }
-    */
+    }*/
 
     if (!sObjectMgr->GetItemTemplate(item_id))
     {
@@ -11307,37 +11213,6 @@ ByteBuffer QuestPOIWrapper::BuildQueryData() const
     return tempBuffer;
 }
 
-void ObjectMgr::LoadSpellGemDescriptors()
-{
-    _spellGemDesc.clear();
-
-    QueryResult result = WorldDatabase.Query("SELECT SpellId, Description FROM item_spell_gem_desc");
-
-    if (!result)
-    {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 spell gem desc. DB table `item_spell_gem_desc` is empty!");
-        return;
-    }
-    _spellGemDesc.reserve(result->GetRowCount());
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 id = fields[0].GetUInt32();
-        std::string desc = fields[1].GetString();
-        _spellGemDesc.emplace(id, desc);
-    } while (result->NextRow());
-}
-
-std::string ObjectMgr::GetSpellGemDesc(uint32 id) const
-{
-    auto desc = _spellGemDesc.find(id);
-    if (desc != _spellGemDesc.end())
-        return desc->second;
-
-    return "";
-}
-
 TalentNodeInfo const* ObjectMgr::GetTalentNode(uint32 entry) const
 {
     return Trinity::Containers::MapGetValuePtr(_talentNodeStore, entry);
@@ -11401,7 +11276,7 @@ void ObjectMgr::LoadTalentNodes()
             } while (parentLinkQuery->NextRow());
         }
         //@todo Validation.
-        
+
     } while (result->NextRow());
 }
 
@@ -11467,7 +11342,7 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
 void ObjectMgr::DeleteTalentNodeEntry(uint32 node)
 {
     auto size = _talentNodeStore.size();
-    for (TalentNodeContainer::iterator& itr = _talentNodeStore.begin(); itr != _talentNodeStore.end();)
+    for (TalentNodeContainer::iterator&& itr = _talentNodeStore.begin(); itr != _talentNodeStore.end();)
     {
         if (itr->first == node)
         {

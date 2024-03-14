@@ -42,15 +42,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_MAIL_LIST_INFO, "SELECT id, sender, (SELECT name FROM characters WHERE guid = sender) AS sendername, receiver, (SELECT name FROM characters WHERE guid = receiver) AS receivername, "
                      "subject, deliver_time, expire_time, money, has_items FROM mail WHERE receiver = ? ", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_MAIL_LIST_ITEMS, "SELECT itemEntry,count FROM item_instance WHERE guid = ?", CONNECTION_SYNCH);
-    PrepareStatement(CHAR_SEL_ENUM, "SELECT c.guid, c.name, c.race, c.class, c.gender, c.skin, c.face, c.hairStyle, c.hairColor, c.facialStyle, "
-                     "CAST(IFNULL(FLOOR((slotdata.head + slotdata.neck + slotdata.shoulders + slotdata.chest + slotdata.waist + slotdata.legs + slotdata.feet + slotdata.wrists + slotdata.hands + slotdata.finger1 + slotdata.finger2 + slotdata.trinket1 + slotdata.trinket2 + slotdata.back + slotdata.mainhand) / 15), 1) AS SIGNED) AS `level`, "
-                     "c.zone, c.map, c.position_x, c.position_y, c.position_z, "
+    PrepareStatement(CHAR_SEL_ENUM, "SELECT c.guid, c.name, c.race, c.class, c.gender, c.skin, c.face, c.hairStyle, c.hairColor, c.facialStyle, c.level, c.zone, c.map, c.position_x, c.position_y, c.position_z, "
                      "gm.guildid, c.playerFlags, c.at_login, cp.entry, cp.modelid, cp.level, c.equipmentCache, cb.guid "
-                     "FROM characters AS c "
-                     "LEFT JOIN character_slot_max_level AS slotdata ON c.guid = slotdata.guid "
-                     "LEFT JOIN character_pet AS cp ON c.guid = cp.owner AND cp.slot = ? LEFT JOIN guild_member AS gm ON c.guid = gm.guid "
-                     "LEFT JOIN character_banned AS cb ON c.guid = cb.guid AND cb.active = 1 WHERE c.account = ? AND c.deleteInfos_Name IS NULL "
-                     "ORDER BY c.guid", CONNECTION_ASYNC);
+                     "FROM characters AS c LEFT JOIN character_pet AS cp ON c.guid = cp.owner AND cp.slot = ? LEFT JOIN guild_member AS gm ON c.guid = gm.guid "
+                     "LEFT JOIN character_banned AS cb ON c.guid = cb.guid AND cb.active = 1 WHERE c.account = ? AND c.deleteInfos_Name IS NULL ORDER BY c.guid", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_ENUM_DECLINED_NAME, "SELECT c.guid, c.name, c.race, c.class, c.gender, c.skin, c.face, c.hairStyle, c.hairColor, c.facialStyle, c.level, c.zone, c.map, "
                      "c.position_x, c.position_y, c.position_z, gm.guildid, c.playerFlags, c.at_login, cp.entry, cp.modelid, cp.level, c.equipmentCache, "
                      "cb.guid, cd.genitive FROM characters AS c LEFT JOIN character_pet AS cp ON c.guid = cp.owner AND cp.slot = ? "
@@ -70,8 +65,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
                      "position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, "
                      "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
                      "arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
-                     "health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, "
-                     "actionBars, grantableLevels, fishingSteps, talentLevel,lootPref "
+                     "health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, fishingSteps, talentLevel, lootPref "
                      "FROM characters c LEFT JOIN character_fishingsteps cfs ON c.guid = cfs.guid WHERE c.guid = ?", CONNECTION_ASYNC);
 
     PrepareStatement(CHAR_SEL_GROUP_MEMBER, "SELECT guid FROM group_member WHERE memberGuid = ?", CONNECTION_BOTH);
@@ -601,7 +595,15 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME, "UPDATE quest_tracker SET quest_complete_time = NOW() WHERE id = ? AND character_guid = ? ORDER BY quest_accept_time DESC LIMIT 1", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME, "UPDATE quest_tracker SET quest_abandon_time = NOW() WHERE id = ? AND character_guid = ? ORDER BY quest_accept_time DESC LIMIT 1", CONNECTION_ASYNC);
 
-    // VirtualItem
+    // DeserterTracker
+    PrepareStatement(CHAR_INS_DESERTER_TRACK, "INSERT INTO battleground_deserters (guid, type, datetime) VALUES (?, ?, NOW())", CONNECTION_ASYNC);
+
+    //Custom
+        // Max inventory slot handling
+    PrepareStatement(CHAR_SEL_ITEM_LEVEL_SLOTS, "SELECT head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged FROM character_slot_max_level WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_ITEM_LEVEL_SLOTS, "REPLACE INTO character_slot_max_level (guid, head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_ITEM_LEVEL_SLOTS, "DELETE FROM character_slot_max_level WHERE guid = ?", CONNECTION_ASYNC);
+
     PrepareStatement(CHAR_INS_VIRTUAL_TEMPLATE, "REPLACE INTO item_template_virtual (entry, base_entry, itemguid, name, inventoryType, Quality, Flags, displayId, ItemLevel, StatsCount, "
         "stat_type1, stat_value1, stat_type2, stat_value2, stat_type3, stat_value3, stat_type4, stat_value4, stat_type5, stat_value5, "
         "stat_type6, stat_value6, stat_type7, stat_value7, stat_type8, stat_value8, stat_type9, stat_value9, stat_type10, stat_value10, "
@@ -614,15 +616,6 @@ void CharacterDatabaseConnection::DoPrepareStatements()
         "seed, socketSeed, qualitySeed, statSeed, nameSeed, displaySeed, spellSeed, statValueSeed, statGroupSeed, setSeed, legendarySeed, "
         "statGroup, customFlags, sheath, legendaryId, generatedMagicFind, honePercent) VALUES "
         "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
-
-    // DeserterTracker
-    PrepareStatement(CHAR_INS_DESERTER_TRACK, "INSERT INTO battleground_deserters (guid, type, datetime) VALUES (?, ?, NOW())", CONNECTION_ASYNC);
-
-    // Max inventory slot handling
-    PrepareStatement(CHAR_SEL_ITEM_LEVEL_SLOTS, "SELECT head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged FROM character_slot_max_level WHERE guid = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_UPD_ITEM_LEVEL_SLOTS, "REPLACE INTO character_slot_max_level (guid, head, neck, shoulders, body, chest, waist, legs, feet, wrists, hands, finger1, finger2, trinket1, trinket2, back, mainhand, offhand, ranged) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_DEL_ITEM_LEVEL_SLOTS, "DELETE FROM character_slot_max_level WHERE guid = ?", CONNECTION_ASYNC);
-
     PrepareStatement(CHAR_SEL_NUM_TALENTS_FREE, "SELECT COUNT(*) FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CUSTOM_TALENTS, "SELECT node_index, loadout FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_CUSTOM_TALENTS, "DELETE FROM player_talents WHERE guid = ?", CONNECTION_ASYNC);

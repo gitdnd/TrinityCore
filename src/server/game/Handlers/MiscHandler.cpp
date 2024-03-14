@@ -81,13 +81,8 @@ void WorldSession::HandleRepopRequest(WorldPackets::Misc::RepopRequest& /*packet
     }
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetPlayer()->GetMap()->GetEluna())
-        GetPlayer()->GetMap()->GetEluna()->OnRepop(GetPlayer());
-=======
     if (Eluna* e = GetPlayer()->GetEluna())
         e->OnRepop(GetPlayer());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
     //this is spirit release confirm?
@@ -185,19 +180,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         {
 
 #ifdef ELUNA
-<<<<<<< HEAD
-            if(_player->GetMap()->GetEluna())
-                if (!_player->GetMap()->GetEluna()->OnGossipSelectCode(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
-#endif
-                if (!unit->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
-                    _player->OnGossipSelect(unit, gossipListId, menuId);
-=======
             if (Eluna* e = GetPlayer()->GetEluna())
                 if (!e->OnGossipSelectCode(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
 #endif
             if (!unit->AI()->OnGossipSelectCode(_player, menuId, gossipListId, code.c_str()))
                 _player->OnGossipSelect(unit, gossipListId, menuId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         else if (item)
         {
@@ -210,19 +197,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         else
         {
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (_player->GetMap()->GetEluna())
-                if (!_player->GetMap()->GetEluna()->OnGossipSelectCode(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
-#endif
-                if (!go->AI()->GossipSelectCode(_player, menuId, gossipListId, code.c_str()))
-                    _player->OnGossipSelect(go, gossipListId, menuId);
-=======
             if (Eluna* e = GetPlayer()->GetEluna())
                 if (!e->OnGossipSelectCode(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str()))
 #endif
             if (!go->AI()->OnGossipSelectCode(_player, menuId, gossipListId, code.c_str()))
                 _player->OnGossipSelect(go, gossipListId, menuId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
     }
     else
@@ -230,19 +209,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         if (unit)
         {
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (_player->GetMap()->GetEluna())
-                if (!_player->GetMap()->GetEluna()->OnGossipSelect(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
-#endif
-                if (!unit->AI()->GossipSelect(_player, menuId, gossipListId))
-                    _player->OnGossipSelect(unit, gossipListId, menuId);
-=======
             if (Eluna* e = GetPlayer()->GetEluna())
                 if (!e->OnGossipSelect(_player, unit, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
 #endif
             if (!unit->AI()->OnGossipSelect(_player, menuId, gossipListId))
                 _player->OnGossipSelect(unit, gossipListId, menuId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         else if (item)
         {
@@ -255,19 +226,11 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
         else
         {
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (_player->GetMap()->GetEluna())
-                if (!_player->GetMap()->GetEluna()->OnGossipSelect(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
-#endif
-                if (!go->AI()->GossipSelect(_player, menuId, gossipListId))
-                    _player->OnGossipSelect(go, gossipListId, menuId);
-=======
             if (Eluna* e = GetPlayer()->GetEluna())
                 if (!e->OnGossipSelect(_player, go, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId)))
 #endif
             if (!go->AI()->OnGossipSelect(_player, menuId, gossipListId))
                 _player->OnGossipSelect(go, gossipListId, menuId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
     }
 }
@@ -351,7 +314,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     {
         // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
         //if (target.GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
-        //    continue;
+            //continue;
 
         // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
         if (!HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && target.GetSecurity() > AccountTypes(gmLevelInWhoList))
@@ -439,7 +402,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
             lvl = STRONG_MAX_LEVEL;
         }
 
-        data << name;                                     // player name
+        data << name;
         data << target.GetGuildName();                    // guild name
         data << uint32(lvl);                              // player level
         data << uint32(class_);                           // player class
@@ -463,10 +426,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
         DoLootRelease(lguid);
 
     bool instantLogout = (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat()) ||
-        GetPlayer()->IsInFlight() ||
-        HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT) ||
-        GetPlayer()->GetMapId() == 550 ||
-        GetPlayer()->GetMapId() == 765;
+                         GetPlayer()->IsInFlight() || HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT) || GetPlayer()->GetMapId() == 765;
 
     /// TODO: Possibly add RBAC permission to log out in combat
     bool canLogoutInCombat = GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
@@ -503,11 +463,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
         if (GetPlayer()->GetStandState() == UNIT_STAND_STATE_STAND)
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
         GetPlayer()->SetRooted(true);
-<<<<<<< HEAD
-        GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-=======
         GetPlayer()->SetUnitFlag(UNIT_FLAG_STUNNED);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 
     SetLogoutStartTime(GameTime::GetGameTime());
@@ -1522,7 +1478,7 @@ void WorldSession::HandleInstanceLockResponse(WorldPacket& recvPacket)
     if (accept)
         _player->BindToInstance();
     else
-        _player->RepopAtGraveyard(true);
+        _player->RepopAtGraveyard();
 
     _player->SetPendingBind(0, 0);
 }

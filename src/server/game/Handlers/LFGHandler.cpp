@@ -30,6 +30,7 @@
 #include "Chat.h"
 #include "SpellMgr.h"
 #include "SpellAuras.h"
+
 void BuildPlayerLockDungeonBlock(WorldPacket& data, lfg::LfgLockMap const& lock)
 {
     data << uint32(lock.size());                           // Size of lock dungeons
@@ -52,16 +53,9 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, lfg::LfgLockPartyMap const& l
 
 void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
 {
-    Group* group = GetPlayer()->GetGroup();
     if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER) ||
-<<<<<<< HEAD
-        (group && group->GetLeaderGUID() != GetPlayer()->GetGUID() && !group->isLFGGroup()))
-    {
-        recvData.rfinish();
-=======
         (GetPlayer()->GetGroup() && GetPlayer()->GetGroup()->GetLeaderGUID() != GetPlayer()->GetGUID() &&
         (GetPlayer()->GetGroup()->GetMembersCount() == MAX_GROUP_SIZE || !GetPlayer()->GetGroup()->isLFGGroup())))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
 
     if (packet.Slots.empty())
@@ -77,8 +71,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
         if (sLFGDungeonStore.LookupEntry(dungeon))
             newDungeons.insert(dungeon);
     }
-
-<<<<<<< HEAD
+    const Group* group = GetPlayer()->GetGroup();
     // Determine type
     // FIXME(Harry): Hardcode LFG Raid Id
     lfg::LfgGroupType groupType = lfg::LfgGroupType::GROUP_5_MAN;
@@ -99,8 +92,6 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     // FIXME(Harry): Disable queueing for raid from LFG temporarily
     if (groupType == lfg::LfgGroupType::GROUP_10_MAN /*&& (newDungeons.size() > 1 || (group && group->GetMembersCount() > MAXLFGRAIDGROUPSIZE))*/)
     {
-        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s If queueing for a raid, can only select a single raid and group size must be <= %d", GetPlayerInfo().c_str(), MAXLFGRAIDGROUPSIZE);
-        recvData.rfinish();
         return;
     }
     else if (
@@ -109,16 +100,12 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     {
         SendNotification("Your group size is bigger than the dungeon allows for.");
         ChatHandler(this).SendSysMessage("Your group size is bigger than the dungeon allows for.");
-        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Group size is bigger than max group size", GetPlayerInfo().c_str());
-        recvData.rfinish();
         return;
     }
     else if (groupType == lfg::LfgGroupType::GROUP_SOLO && group)
     {
         SendNotification("You cannot be in a group if queueing for solo content.");
         ChatHandler(this).SendSysMessage("You cannot be in a group if queueing for solo content.");
-        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Cannot be in a group if queueing for solo content", GetPlayerInfo().c_str());
-        recvData.rfinish();
         return;
     }
     else if (
@@ -127,31 +114,21 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     {
         SendNotification("You cannot que for mixed group size dungeons.");
         ChatHandler(this).SendSysMessage("You cannot que for mixed group size dungeons.");
-        TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s Cannot queue for mixed group size dungeons", GetPlayerInfo().c_str());
-        recvData.rfinish();
         return;
     }
 
-    recvData.read_skip<uint32>();                          // for 0..uint8 (always 3) { uint8 (always 0) }
-    
-    std::string comment;
-    recvData >> comment;
     if (_player->GetQuestStatus(60007) != QUEST_STATUS_REWARDED)
     {
         SendNotification("You cannot que for a dungeon without completing 'Power Shards and Jewelcrafting'.");
         return;
     }
-    TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
-        GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
+
 
     // Don't pass any affix data in for default LFG queue
-    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment, groupType, 0, 0, 0, 0);
-=======
+    sLFGMgr->JoinLfg(GetPlayer(), uint8(packet.Roles), newDungeons, packet.Comment, groupType, 0, 0, 0, 0);
+
     TC_LOG_DEBUG("lfg", "CMSG_LFG_JOIN {} roles: {}, Dungeons: {}, Comment: {}",
                  GetPlayerInfo(), packet.Roles, newDungeons.size(), packet.Comment);
-
-    sLFGMgr->JoinLfg(GetPlayer(), uint8(packet.Roles), newDungeons, packet.Comment);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void WorldSession::HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& /*packet*/)
@@ -175,16 +152,9 @@ void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
     recvData >> lfgGroupID;
     recvData >> accept;
 
-<<<<<<< HEAD
-
-    TC_LOG_DEBUG("lfg", "CMSG_LFG_PROPOSAL_RESULT %s proposal: %u accept: %u",
-        GetPlayerInfo().c_str(), lfgGroupID, accept ? 1 : 0);
-=======
     TC_LOG_DEBUG("lfg", "CMSG_LFG_PROPOSAL_RESULT {} proposal: {} accept: {}",
         GetPlayerInfo(), lfgGroupID, accept ? 1 : 0);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     sLFGMgr->UpdateProposal(lfgGroupID, GetPlayer()->GetGUID(), accept);
-
     if (!accept)
     {
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(71041))
@@ -242,19 +212,15 @@ void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
 {
     bool out;
     recvData >> out;
-<<<<<<< HEAD
+
     if (GetPlayer()->IsInCombat())
     {
         SendLfgTeleportError(uint8(7));
         return;
     }
-    TC_LOG_DEBUG("lfg", "CMSG_LFG_TELEPORT %s out: %u",
-        GetPlayerInfo().c_str(), out ? 1 : 0);
-=======
 
     TC_LOG_DEBUG("lfg", "CMSG_LFG_TELEPORT {} out: {}",
         GetPlayerInfo(), out ? 1 : 0);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     sLFGMgr->TeleportPlayer(GetPlayer(), out, true);
 }
 

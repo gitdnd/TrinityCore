@@ -311,11 +311,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
 // Only _static_ data send in this packet !!!
 void WorldSession::HandleItemQuerySingleOpcode(WorldPackets::Query::QueryItemSingle& query)
 {
-<<<<<<< HEAD
-    //TC_LOG_INFO("network", "STORAGE: Item Query = %u", query.ItemID);
-=======
     TC_LOG_INFO("network", "STORAGE: Item Query = {}", query.ItemID);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(query.ItemID))
     {
@@ -637,6 +633,8 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     SetCurrentVendor(vendorEntry);
 
     VendorItemData const* items = vendorEntry ? sObjectMgr->GetNpcVendorItemList(vendorEntry) : vendor->GetVendorItems();
+
+    VendorItemData const* items = vendor->GetVendorItems();
     if (!items)
     {
         WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
@@ -1002,27 +1000,24 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
             if (i != firstPrismatic)
                 return;
-        }
-        else
-        {
-
-            if (!(GemProps[i]->color & itemProto->Socket[i].Color))
+            else
             {
-                _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
-                return;
+
+                if (!(GemProps[i]->Type & itemProto->Socket[i].Color))
+                {
+                    _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
+                    return;
+                }
             }
         }
 
         // tried to put normal gem in meta socket
         if (itemProto->Socket[i].Color == SOCKET_COLOR_META && GemProps[i]->Type != SOCKET_COLOR_META)
             return;
-<<<<<<< HEAD
-=======
 
         // tried to put meta gem in normal socket
         if (itemProto->Socket[i].Color != SOCKET_COLOR_META && GemProps[i]->Type == SOCKET_COLOR_META)
             return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 
     uint32 GemEnchants[MAX_GEM_SOCKETS];

@@ -27,7 +27,6 @@
 #include "MapRefManager.h"
 #include "MPSCQueue.h"
 #include "ObjectGuid.h"
-#include "PathGenerator.h"
 #include "Optional.h"
 #include "SharedDefines.h"
 #include "SpawnData.h"
@@ -61,7 +60,6 @@ class Unit;
 class Weather;
 class WorldObject;
 class WorldPacket;
-class PathGenerator;
 struct MapDifficulty;
 struct MapEntry;
 struct Position;
@@ -330,9 +328,6 @@ typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStored
 class TC_GAME_API Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
-#ifdef ELUNA
-    friend class Eluna;
-#endif
     public:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent = nullptr);
         virtual ~Map();
@@ -408,7 +403,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         static void DeleteStateMachine();
 
         Map const* GetParent() const { return m_parentMap; }
-        bool IsParent() const { return this == m_parentMap; }
 
         void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, PositionFullTerrainStatus& data, uint8 reqLiquidType, float collisionHeight) const;
         ZLiquidStatus GetLiquidStatus(uint32 phaseMask, float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr, float collisionHeight = 2.03128f) const; // DEFAULT_COLLISION_HEIGHT in Object.h
@@ -479,6 +473,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         int GetCappedDungeonLevel(uint32 softcapMod = 0) const;
         void SetDungeonLevel(int value);
         void UpdateDungeonLevel();
+
         bool Instanceable() const;
         bool IsDungeon() const;
         bool IsNonRaidDungeon() const;
@@ -526,11 +521,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         void UpdateIteratorBack(Player* player);
 
-<<<<<<< HEAD
-        TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0, int dungeonLevel = 0);
-=======
-        TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0, bool visibleOnlyBySummoner = false);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+        TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0, int dungeonLevel, bool visibleOnlyBySummoner = false);
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
         Player* GetPlayer(ObjectGuid const& guid);
         Corpse* GetCorpse(ObjectGuid const& guid);
@@ -599,10 +590,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const { return std::max<float>(GetHeight(x, y, z, vmap, maxSearchDist), GetGameObjectFloor(phasemask, x, y, z, maxSearchDist)); }
         float GetHeight(uint32 phasemask, Position const& pos, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const { return GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), vmap, maxSearchDist); }
         bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const;
-        bool CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator* path, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
-        bool CanReachPositionAndGetValidCoords(WorldObject const* source, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
-        bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
-        bool CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
         void Balance() { _dynamicTree.balance(); }
         void RemoveGameObjectModel(GameObjectModel const& model) { _dynamicTree.remove(model); }
         void InsertGameObjectModel(GameObjectModel const& model) { _dynamicTree.insert(model); }
@@ -684,10 +671,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         }
 
         virtual std::string GetDebugInfo() const;
-#ifdef ELUNA
-        Eluna* GetEluna() const { return eluna; }
-        Eluna* eluna;
-#endif
+
         WorldLocation graveyardOverride;
 
         void UpscaleMapIfNeeded();
@@ -964,11 +948,7 @@ enum InstanceResetMethod
 class TC_GAME_API InstanceMap : public Map
 {
     public:
-<<<<<<< HEAD
-        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent);
-=======
-        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, Map* _parent, TeamId InstanceTeam);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent, TeamId InstanceTeam);
         ~InstanceMap();
         bool AddPlayerToMap(Player*) override;
         void RemovePlayerFromMap(Player*, bool) override;

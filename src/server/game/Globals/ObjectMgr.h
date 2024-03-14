@@ -930,6 +930,8 @@ enum QueryDataGroup
     QUERY_DATA_ALL              = 0xFF
 };
 
+class PlayerDumpReader;
+
 struct TalentNodeInfo
 {
     uint32 Index;
@@ -943,8 +945,6 @@ struct TalentNodeInfo
     std::vector<uint32> all_links;
 };
 typedef std::unordered_map<uint32, TalentNodeInfo> TalentNodeContainer;
-
-class PlayerDumpReader;
 
 class TC_GAME_API ObjectMgr
 {
@@ -981,7 +981,6 @@ class TC_GAME_API ObjectMgr
         typedef std::vector<std::string> ScriptNameContainer;
 
         typedef std::map<uint32, uint32> CharacterConversionMap;
-
 
         GameObjectTemplate const* GetGameObjectTemplate(uint32 entry) const;
         GameObjectTemplateContainer const& GetGameObjectTemplates() const { return _gameObjectTemplateStore; }
@@ -1168,9 +1167,9 @@ class TC_GAME_API ObjectMgr
         void LoadCreatureClassLevelStats();
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
+        void LoadCreatureTemplateCustom(Field* fields);
         void LoadCreatureTemplateAddons();
         void LoadCreatureTemplate(Field* fields);
-        void LoadCreatureTemplateCustom(Field* fields);
         void LoadCreatureTemplateResistances();
         void LoadCreatureTemplateSpells();
         void CheckCreatureTemplate(CreatureTemplate const* cInfo);
@@ -1251,10 +1250,6 @@ class TC_GAME_API ObjectMgr
         void LoadVendors();
         void LoadTrainers();
         void LoadCreatureDefaultTrainers();
-        void LoadSpellGemDescriptors();
-        std::string GetSpellGemDesc(uint32 id) const;
-        typedef std::unordered_map<uint32, const std::string> spellGemDescContainer;
-        spellGemDescContainer _spellGemDesc;
 
         void InitializeQueriesData(QueryDataGroup mask);
 
