@@ -62,12 +62,6 @@ class TC_GAME_API Vehicle : public TransportBase
         void RemoveAllPassengers();
         bool IsVehicleInUse() const;
         bool IsControllableVehicle() const;
-<<<<<<< HEAD
-
-        void SetLastShootPos(Position const& pos) { _lastShootPos.Relocate(pos); }
-        Position const& GetLastShootPos() const { return _lastShootPos; }
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         SeatMap Seats;                                      ///< The collection of all seats on the vehicle. Including vacant ones.
 

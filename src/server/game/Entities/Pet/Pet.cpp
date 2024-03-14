@@ -593,8 +593,8 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
             RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
 
             // lose happiness when died and not in BG/Arena
-            //if (!GetMap()->IsBattlegroundOrArena())
-            //    ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
+            if (!GetMap()->IsBattlegroundOrArena())
+                ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
             //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
@@ -718,7 +718,7 @@ void Pet::LoseHappiness()
     int32 addvalue = 670;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
     if (IsInCombat())                                        //we know in combat happiness fades faster, multiplier guess
         addvalue = int32(addvalue * 1.5f);
-    ModifyPower(POWER_HAPPINESS, addvalue); // ADD happiness instead of losing, the longer we have the pet the more happy it gets
+    ModifyPower(POWER_HAPPINESS, -addvalue);
 }
 
 HappinessState Pet::GetHappinessState()
@@ -780,14 +780,8 @@ void Pet::GivePetLevel(uint8 level)
 
     if (getPetType() == HUNTER_PET)
     {
-<<<<<<< HEAD
-        SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-        // Harry: Disabled
-        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, /*uint32(sObjectMgr->GetXPForLevel(level)*PET_XP_FACTOR)*/ 0);
-=======
         SetPetExperience(0);
         SetPetNextLevelExperience(uint32(sObjectMgr->GetXPForLevel(level)*PET_XP_FACTOR));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 
     InitStatsForLevel(level);
@@ -851,18 +845,10 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
 
     SetMaxPower(POWER_HAPPINESS, GetCreatePowerValue(POWER_HAPPINESS));
     SetPower(POWER_HAPPINESS, 166500);
-<<<<<<< HEAD
-    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
-    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    // Harry: Disabled
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, /*uint32(sObjectMgr->GetXPForLevel(GetLevel()+1)*PET_XP_FACTOR)*/ 0);
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-=======
     SetPetNameTimestamp(0);
     SetPetExperience(0);
     SetPetNextLevelExperience(uint32(sObjectMgr->GetXPForLevel(GetLevel()+1)*PET_XP_FACTOR));
     ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
     {
@@ -889,8 +875,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     {
         if (GetOwner()->GetClass() == CLASS_WARLOCK
             || GetOwner()->GetClass() == CLASS_SHAMAN        // Fire Elemental
-            || GetOwner()->GetClass() == CLASS_DEATH_KNIGHT  // Risen Ghoul
-            || GetOwner()->GetClass() == CLASS_TIMEWALKER)
+            || GetOwner()->GetClass() == CLASS_DEATH_KNIGHT) // Risen Ghoul
         {
             petType = SUMMON_PET;
         }
@@ -1000,8 +985,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
         case HUNTER_PET:
         {
-            // Harry: Disabled
-            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, /*uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR)*/ 0);
+            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(petlevel)*PET_XP_FACTOR));
             //these formula may not be correct; however, it is designed to be close to what it should be
             //this makes dps 0.5 of pets level
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
@@ -1092,10 +1076,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 }
                 case 31216: // Mirror Image
                 {
-                    if (Player* plrOwner = GetOwner()->ToPlayer())
-                        SetBonusDamage(plrOwner->GetSpellPowerForSchool(SPELL_SCHOOL_FROST) * 0.33f);
-                    else
-                        SetBonusDamage(int32(GetOwner()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
+                    SetBonusDamage(int32(GetOwner()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
                     SetDisplayId(GetOwner()->GetDisplayId());
                     if (!pInfo)
                     {
@@ -2027,17 +2008,6 @@ Player* Pet::GetOwner() const
 float Pet::GetNativeObjectScale() const
 {
     CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(GetCreatureTemplate()->family);
-<<<<<<< HEAD
-    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
-    {
-        float scale;
-        if (GetLevel() >= creatureFamily->maxScaleLevel)
-            scale = creatureFamily->maxScale;
-        else if (GetLevel() <= creatureFamily->minScaleLevel)
-            scale = creatureFamily->minScale;
-        else
-            scale = creatureFamily->minScale + float(GetLevel() - creatureFamily->minScaleLevel) / creatureFamily->maxScaleLevel * (creatureFamily->maxScale - creatureFamily->minScale);
-=======
     if (creatureFamily && creatureFamily->MinScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;
@@ -2047,7 +2017,6 @@ float Pet::GetNativeObjectScale() const
             scale = creatureFamily->MinScale;
         else
             scale = creatureFamily->MinScale + float(GetLevel() - creatureFamily->MinScaleLevel) / creatureFamily->MaxScaleLevel * (creatureFamily->MaxScale - creatureFamily->MinScale);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         return scale;
     }
