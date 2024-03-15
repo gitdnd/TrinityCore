@@ -53,24 +53,15 @@ void MapManager::Initialize()
     Map::InitStateMachine();
 
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
-<<<<<<< HEAD
-/*#if ELUNA
-    if (num_threads > 1)
-=======
 #if ELUNA
     if (sElunaConfig->IsElunaEnabled() && sElunaConfig->IsElunaCompatibilityMode() && num_threads > 1)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         // Force 1 thread for Eluna if compatibility mode is enabled. Compatibility mode is single state and does not allow more update threads.
         TC_LOG_ERROR("maps", "Map update threads set to {}, when Eluna in compatibility mode only allows 1, changing to 1", num_threads);
         num_threads = 1;
     }
-<<<<<<< HEAD
-#endif*/
-=======
 #endif
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // Start mtmaps if needed.
     if (num_threads > 0)
         m_updater.activate(num_threads);
@@ -125,7 +116,6 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 
 Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
 {
-    // Affixes get set when the instance is created for the player
     Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20);
 
     if (m && m->Instanceable())
@@ -377,34 +367,12 @@ uint32 MapManager::GenerateInstanceId()
     return newInstanceId;
 }
 
-void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
+void MapManager::FreeInstanceId(uint32 instanceId)
 {
     // If freed instance id is lower than the next id available for new instances, use the freed one instead
     _nextInstanceId = std::min(instanceId, _nextInstanceId);
     _freeInstanceIds[instanceId] = true;
 #ifdef ELUNA
-<<<<<<< HEAD
-    sWorld->GetEluna()->OnFreeInstanceId(instanceId);
-    if (calledMap)
-        if (Eluna* e = calledMap->GetEluna())
-            e->FreeInstanceId(instanceId);
-    /*for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
-    {
-        if (!itr->second || !itr->second->Instanceable())
-            continue;
-
-        //if (itr->second->GetInstanceId() == instanceId)
-        //{
-            if (Eluna* e = itr->second->GetEluna())
-                e->FreeInstanceId(instanceId);
-        //}
-        //Only needed if per instance map eluna.
-        /*Map* iMap = ((MapInstanced*)itr->second)->FindInstanceMap(instanceId);
-        if (iMap)
-            if(iMap->GetEluna())
-                iMap->GetEluna()->FreeInstanceId(instanceId);*/
-    //}
-=======
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
     {
         Map* map = itr->second;
@@ -415,42 +383,5 @@ void MapManager::FreeInstanceId(uint32 instanceId, Map* calledMap)
         if (iMap && iMap->GetEluna())
             iMap->GetEluna()->FreeInstanceId(instanceId);
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
-}
-
-void MapManager::ReloadEluna(int32 mapId)
-{
-    // Reloads the global Eluna state
-    if(mapId == -1)
-        sWorld->GetEluna()->reloadEluna = true;
-
-    for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
-    {
-        Map* map = itr->second;
-        bool shouldReload = false;
-
-        if (mapId <= -1)// all case
-            shouldReload = true;
-        else if (mapId >= 0 && uint32(mapId) == itr->first)
-            shouldReload = true;
-
-        if (shouldReload)
-        {
-            if (map->GetEluna())
-                map->GetEluna()->reloadEluna = true;
-
-            if (!map->Instanceable())
-                continue;
-
-            // Only if each instance gets a state.
-            MapInstanced::InstancedMaps& maps = ((MapInstanced*)map)->GetInstancedMaps();
-            for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
-            {
-                if (mitr->second->GetEluna())
-                    mitr->second->GetEluna()->reloadEluna = true;
-            }
-        }
-    }
-
 }

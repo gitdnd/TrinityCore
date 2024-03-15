@@ -28,7 +28,7 @@ class TC_GAME_API MapInstanced : public Map
     public:
         typedef std::unordered_map< uint32, Map*> InstancedMaps;
 
-        MapInstanced(uint32 id, time_t expiry, uint32 dLevel = 20, uint32 affix1 = 0, uint32 affix2 = 0, uint32 affix3 = 0, uint32 affix4 = 0);
+        MapInstanced(uint32 id, time_t expiry, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
         ~MapInstanced() { }
 
         // functions overwrite Map versions
@@ -63,11 +63,7 @@ class TC_GAME_API MapInstanced : public Map
         virtual void InitVisibilityDistance() override;
 
     private:
-<<<<<<< HEAD
-        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
-=======
-        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, TeamId InstanceTeam);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, TeamId InstanceTeam);
         BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
         InstancedMaps m_InstancedMaps;
