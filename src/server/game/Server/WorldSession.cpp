@@ -253,10 +253,6 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     sScriptMgr->OnPacketSend(this, *packet);
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    //if (!Eluna::GEluna->OnPacketSend(this, *packet))
-        //return;
-=======
     if (Player* plr = GetPlayer())
     {
         if (Eluna* e = plr->GetEluna())
@@ -265,7 +261,6 @@ void WorldSession::SendPacket(WorldPacket const* packet)
                 return;
         }
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
     TC_LOG_TRACE("network.opcode", "S->C: {} {}", GetPlayerInfo(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet->GetOpcode())));
@@ -326,28 +321,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         {
             switch (opHandle->Status)
             {
-            case STATUS_LOGGEDIN:
-                if (!_player)
-                {
-                    // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
-                    //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
-                    //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
-                    if (!m_playerRecentlyLogout)
+                case STATUS_LOGGEDIN:
+                    if (!_player)
                     {
-<<<<<<< HEAD
-                        requeuePackets.push_back(packet);
-                        deletePacket = false;
-                        TC_LOG_DEBUG("network", "Re-enqueueing packet with opcode %s with with status STATUS_LOGGEDIN. "
-                            "Player is currently not in world yet.", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str());
-                    }
-                }
-                else if (_player->IsInWorld())
-                {
-                    sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                    if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
-                        break;
-=======
                         // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
                         //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
                         //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
@@ -435,82 +411,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (Eluna* e = sWorld->GetEluna())
                             if (!e->OnPacketReceive(this, *packet))
                                 break;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
-                }
-                // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
-                break;
-            case STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT:
-                if (!_player && !m_playerRecentlyLogout && !m_playerLogout) // There's a short delay between _player = null and m_playerRecentlyLogout = true during logout
-                    LogUnexpectedOpcode(packet, "STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT",
-                        "the player has not logged in yet and not recently logout");
-                else
-                {
-                    if (GetSecurity() < SEC_ADMINISTRATOR)
-                    {
-                        if (!AntiDOS.EvaluateOpcode(*packet, currentTime))
-                            break;
+                        opHandle->Call(this, *packet);
+                        LogUnprocessedTail(packet);
                     }
-<<<<<<< HEAD
-
-                    // not expected _player or must checked in packet hanlder
-                    sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                    if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
-                        break;
-#endif
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
-                }
-                break;
-            case STATUS_TRANSFER:
-                if (!_player)
-                    LogUnexpectedOpcode(packet, "STATUS_TRANSFER", "the player has not logged in yet");
-                else if (_player->IsInWorld())
-                    LogUnexpectedOpcode(packet, "STATUS_TRANSFER", "the player is still in world");
-                else
-                {
-                    if (GetSecurity() < SEC_ADMINISTRATOR)
-                    {
-                        if (!AntiDOS.EvaluateOpcode(*packet, currentTime))
-                            break;
-                    }
-
-                    sScriptMgr->OnPacketReceive(this, *packet);
-
-                    if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
-                        break;
-
-                    opHandle->Call(this, *packet);
-                    LogUnprocessedTail(packet);
-                }
-                break;
-            case STATUS_AUTHED:
-                // prevent cheating with skip queue wait
-                if (m_inQueue)
-                {
-                    LogUnexpectedOpcode(packet, "STATUS_AUTHED", "the player not pass queue yet");
-                    break;
-                }
-
-                // some auth opcodes can be recieved before STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes
-                // however when we recieve CMSG_CHAR_ENUM we are surely no longer during the logout process.
-                if (packet->GetOpcode() == CMSG_CHAR_ENUM)
-                    m_playerRecentlyLogout = false;
-
-                if (GetSecurity() < SEC_ADMINISTRATOR)
-                {
-                    if (!AntiDOS.EvaluateOpcode(*packet, currentTime))
-                        break;
-                }
-
-
-                sScriptMgr->OnPacketReceive(this, *packet);
-#ifdef ELUNA
-                if (!sWorld->GetEluna()->OnPacketReceive(this, *packet))
-=======
                     else
                         processedPackets = MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE;   // break out of packet processing loop
                     break;
@@ -521,20 +425,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 case STATUS_UNHANDLED:
                     TC_LOG_DEBUG("network.opcode", "Received not handled opcode {} from {}", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode()))
                         , GetPlayerInfo());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     break;
-#endif
-                opHandle->Call(this, *packet);
-                LogUnprocessedTail(packet);
-                break;
-            case STATUS_NEVER:
-                TC_LOG_ERROR("network.opcode", "Received not allowed opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
-                    , GetPlayerInfo().c_str());
-                break;
-            case STATUS_UNHANDLED:
-                TC_LOG_DEBUG("network.opcode", "Received not handled opcode %s from %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())).c_str()
-                    , GetPlayerInfo().c_str());
-                break;
             }
         }
         catch (WorldPackets::InvalidHyperlinkException const& ihe)
@@ -647,7 +538,7 @@ void WorldSession::LogoutPlayer(bool save)
         {
             _player->CombatStop();
             _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard(true);
+            _player->RepopAtGraveyard();
         }
         else if (_player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         {
@@ -655,11 +546,11 @@ void WorldSession::LogoutPlayer(bool save)
             _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             _player->KillPlayer();
             _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard(true);
+            _player->RepopAtGraveyard();
         }
         else if (_player->HasPendingBind())
         {
-            _player->RepopAtGraveyard(true);
+            _player->RepopAtGraveyard();
             _player->SetPendingBind(0, 0);
         }
         else if (_player->GetMapId() != 765 && GetSecurity() < SEC_ADMINISTRATOR && _player->IsAlive())
@@ -1379,17 +1270,7 @@ void WorldSession::ProcessQueryCallbacks()
 {
     _queryProcessor.ProcessReadyCallbacks();
     _transactionCallbacks.ProcessReadyCallbacks();
-<<<<<<< HEAD
-
-    if (_realmAccountLoginCallback.valid() && _realmAccountLoginCallback.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-        InitializeSessionCallback(static_cast<CharacterDatabaseQueryHolder*>(_realmAccountLoginCallback.get()));
-
-    //! HandlePlayerLoginOpcode
-    if (_charLoginCallback.valid() && _charLoginCallback.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-        HandlePlayerLogin(reinterpret_cast<LoginQueryHolder*>(_charLoginCallback.get()));
-=======
     _queryHolderProcessor.ProcessReadyCallbacks();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 TransactionCallback& WorldSession::AddTransactionCallback(TransactionCallback&& callback)
@@ -1397,16 +1278,12 @@ TransactionCallback& WorldSession::AddTransactionCallback(TransactionCallback&& 
     return _transactionCallbacks.AddCallback(std::move(callback));
 }
 
-<<<<<<< HEAD
-void WorldSession::InitWarden(BigNumber* k, std::string const& os)
-=======
 SQLQueryHolderCallback& WorldSession::AddQueryHolderCallback(SQLQueryHolderCallback&& callback)
 {
     return _queryHolderProcessor.AddCallback(std::move(callback));
 }
 
 void WorldSession::InitWarden(SessionKey const& k, std::string const& os)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 {
     if (os == "Win")
     {
@@ -1662,6 +1539,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY:     //   0               2.5
         case CMSG_BEGIN_TRADE:                          //   0               2.5
         case CMSG_INITIATE_TRADE:                       //   0               3
+        case CMSG_MESSAGECHAT:                          //   0               3.5
         case CMSG_INSPECT:                              //   0               3.5
         case CMSG_AREA_SPIRIT_HEALER_QUERY:             // not profiled
         case CMSG_STANDSTATECHANGE:                     // not profiled
@@ -1811,11 +1689,7 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
             maxPacketCounterAllowed = 3;
             break;
         }
-        case CMSG_MESSAGECHAT:                          //   0               3.5
-        {
-            maxPacketCounterAllowed = 75;
-            break;
-        }
+
         case CMSG_ITEM_REFUND_INFO:                     // not profiled
         {
             maxPacketCounterAllowed = PLAYER_SLOTS_COUNT;

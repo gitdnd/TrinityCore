@@ -265,6 +265,7 @@ bool Trinity::Helpers::Entity::IsPlayerHealer(Player const* who)
 {
     if (!who)
         return false;
+
     return who->GetSubClass() == CLASS_SUB_HISTORIAN;
     /*switch (who->GetClass())
     {
@@ -291,6 +292,7 @@ bool Trinity::Helpers::Entity::IsPlayerRangedAttacker(Player const* who)
 {
     if (!who)
         return false;
+
     switch (who->GetSubClass())
     {
     case CLASS_SUB_WARDEN:
@@ -303,6 +305,7 @@ bool Trinity::Helpers::Entity::IsPlayerRangedAttacker(Player const* who)
     default:
         return false;
     }
+
     /*switch (who->GetClass())
     {
         case CLASS_WARRIOR:

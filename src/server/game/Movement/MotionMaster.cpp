@@ -652,21 +652,20 @@ void MotionMaster::MoveBackpedal(Unit* target, float dist)
     point.y = pos.m_positionY + dist * sinf(angle);
     point.z = pos.m_positionZ;
 
-    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true))
-    {
-        return;
-    }
-
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(point.x, point.y, point.z, false);
-    init.SetFacing(target);
-    init.SetWalk(true);
-
-    /** Beasts move backwards instead of turning around */
-    if (_owner->ToCreature() && _owner->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_BEAST)
-        init.SetOrientationFixed(true);
-
-    init.Launch();
+    //if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true))
+    //{
+        //return;
+    //}
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=, this, target = target->GetGUID()](Movement::MoveSplineInit& init)
+        {
+            init.MoveTo(point.x, point.y, point.z, false);
+            init.SetFacing(target);
+            init.SetWalk(true);
+            /** Beasts move backwards instead of turning around */
+            if (_owner->ToCreature() && _owner->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_BEAST)
+                init.SetOrientationFixed(true);
+        };
+    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, 0));
 }
 
 const float fanningRadius = 1.f;
@@ -699,7 +698,7 @@ void MotionMaster::MoveEncircle(Unit* target)
     Unit* collider = nullptr;
     Trinity::AnyUnitFulfillingConditionInRangeCheck collisionCheck(_owner, [&](Unit* unit)->bool
         {
-            return _owner != unit && unit->GetVictim() && unit->GetVictim() == target && !unit->isMoving() && !unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            return _owner != unit && unit->GetVictim() && unit->GetVictim() == target && !unit->isMoving() && !unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE);
         }, (fanningRadius / radiusReduction) * (fanningRadius / radiusReduction));
     Trinity::UnitSearcher<Trinity::AnyUnitFulfillingConditionInRangeCheck> checker(_owner, collider, collisionCheck);
     Cell::VisitAllObjects(_owner, checker, (fanningRadius / radiusReduction));
@@ -719,16 +718,18 @@ void MotionMaster::MoveEncircle(Unit* target)
     target->GetNearPoint(_owner, x, y, z, targetDist, ori);
 
     /** Validate. */
-    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, x, y, z, true))
-    {
-        return;
-    }
+    //if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, x, y, z, true))
+    //{
+        //return;
+    //}
 
     /** Execute Movement. */
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z, false, true);
-    init.SetWalk(true);
-    init.Launch();
+    std::function<void(Movement::MoveSplineInit&)> initializer = [=, this, target = target->GetGUID()](Movement::MoveSplineInit& init)
+        {
+            init.MoveTo(x, y, z, false, true);
+            init.SetWalk(true);
+        };
+    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, 0));
 }
 
 void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
@@ -871,13 +872,6 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     // Use a mmap raycast to get a valid destination.
     _owner->MovePositionToFirstCollision(dest, dist, _owner->GetRelativeAngle(srcX, srcY) + float(M_PI));
 
-<<<<<<< HEAD
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false);
-    init.SetParabolic(max_height, 0);
-    init.SetOrientationFixed(true);
-    init.SetVelocity(speedXY);
-=======
     std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
     {
         init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false);
@@ -885,7 +879,6 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
         init.SetOrientationFixed(true);
         init.SetVelocity(speedXY);
     };
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, 0);
     movement->Priority = MOTION_PRIORITY_HIGHEST;
@@ -924,18 +917,6 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
     float moveTimeHalf = speedZ / Movement::gravity;
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
 
-<<<<<<< HEAD
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(x, y, z, false);
-    init.SetParabolic(max_height, 0);
-    init.SetVelocity(speedXY);
-    if (hasOrientation)
-    {
-        init.SetFacing(o);
-        init.SetOrientationFixed(true);
-    }
-    GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(init), EFFECT_MOTION_TYPE, id);
-=======
     std::function<void(Movement::MoveSplineInit&)> initializer = [=](Movement::MoveSplineInit& init)
     {
         init.MoveTo(x, y, z, false);
@@ -946,7 +927,6 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
     };
 
     GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, id);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     movement->Priority = MOTION_PRIORITY_HIGHEST;
     movement->BaseUnitState = UNIT_STATE_JUMPING;
     movement->AddFlag(MOVEMENTGENERATOR_FLAG_PERSIST_ON_DEATH);
