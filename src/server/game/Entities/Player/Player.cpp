@@ -2342,12 +2342,8 @@ void Player::SetGameMaster(bool on)
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
-<<<<<<< HEAD
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
-=======
-        SetUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         if (Pet* pet = GetPet())
             pet->SetFaction(FACTION_FRIENDLY);
@@ -2379,13 +2375,9 @@ void Player::SetGameMaster(bool on)
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
-<<<<<<< HEAD
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_UBER);
         if(!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
             RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
-=======
-        RemoveUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         if (Pet* pet = GetPet())
             pet->SetFaction(GetFaction());
@@ -2523,13 +2515,9 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 
     // FIXME(Harry): Disabled temporarily
     // XP to money conversion processed in Player::RewardQuest
-<<<<<<< HEAD
     //if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     //    return;
     if (level >= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
-=======
-    if (IsMaxLevel())
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
 
     uint32 bonus_xp;
@@ -2546,7 +2534,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 newXP = GetXP() + xp + bonus_xp;
 
-<<<<<<< HEAD
+
     while (newXP >= nextLvlXP && talent_level < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
     {
         newXP -= nextLvlXP;
@@ -2565,14 +2553,6 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
             if (GetMap()->GetEluna())
                 GetMap()->GetEluna()->OnLevelChanged(this, talent_level - 1);
         }
-=======
-    while (newXP >= nextLvlXP && !IsMaxLevel())
-    {
-        newXP -= nextLvlXP;
-
-        if (!IsMaxLevel())
-            GiveLevel(level + 1);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         //level = GetLevel();
         nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
@@ -2756,18 +2736,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
     PlayerLevelInfo info;
     sObjectMgr->GetPlayerLevelInfo(GetRace(), GetClass(), GetLevel(), &info);
 
-<<<<<<< HEAD
+
     SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)+10);
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetTalentLevel()));
-=======
-    uint8 exp_max_lvl = GetMaxLevelForExpansion(GetSession()->Expansion());
-    uint8 conf_max_lvl = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-    if (exp_max_lvl == DEFAULT_MAX_LEVEL || exp_max_lvl >= conf_max_lvl)
-        SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, conf_max_lvl);
-    else
-        SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, exp_max_lvl);
-    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetLevel()));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // reset before any aura state sources (health set/aura apply)
     SetUInt32Value(UNIT_FIELD_AURASTATE, 0);
@@ -3641,11 +3612,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (itr == m_spells.end())
         return;                                             // already unleared
 
-<<<<<<< HEAD
     //bool giveTalentPoints = disabled || !itr->second->disabled;
-=======
-    bool giveTalentPoints = disabled || !itr->second.disabled;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     bool cur_active    = itr->second.active;
     bool cur_dependent = itr->second.dependent;
@@ -3943,24 +3910,7 @@ bool Player::ResetTalents(bool involuntarily /*= false*/)
         return false;
     }
 
-<<<<<<< HEAD
-    m_usedTalentCount = 0;
 
-    uint32 cost = 0;
-
-    if (!no_cost && !sWorld->getBoolConfig(CONFIG_NO_RESET_TALENT_COST))
-    {
-        cost = ResetTalentsCost();
-
-        if (!HasEnoughMoney(cost))
-        {
-            SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, nullptr, 0, 0);
-            return false;
-        }
-    }
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
 
     for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
@@ -4663,13 +4613,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     CastAllObtainSpells();
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetMap()->GetEluna())
-        GetMap()->GetEluna()->OnResurrect(this);
-=======
     if (Eluna* e = GetEluna())
         e->OnResurrect(this);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     if (!applySickness)
         return;
@@ -5387,13 +5332,8 @@ void Player::UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchant
                     amount += enchantmentEntry->EffectPointsMin[i];
                     break;
                 case ITEM_ENCHANTMENT_TYPE_TOTEM:
-<<<<<<< HEAD
                     //if (GetClass() == CLASS_SHAMAN)
-                        amount += enchantmentEntry->amount[i] * item->GetTemplate()->Delay / 1000.0f;
-=======
-                    if (GetClass() == CLASS_SHAMAN)
                         amount += enchantmentEntry->EffectPointsMin[i] * item->GetTemplate()->Delay / 1000.0f;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     break;
                 default:
                     break;
@@ -6693,15 +6633,15 @@ uint32 Player::TeamForRaceNoOverride(uint8 race)
 {
     if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
     {
-        switch (rEntry->TeamID)
+        switch (rEntry->FactionID)
         {
         case 1: return HORDE;
         case 7: return ALLIANCE;
         }
-        TC_LOG_ERROR("entities.player", "Race (%u) has wrong teamid (%u) in DBC: wrong DBC files?", uint32(race), rEntry->TeamID);
+        TC_LOG_ERROR("entities.player", "Race ({}) has wrong teamid (%u) in DBC: wrong DBC files?", uint32(race), rEntry->FactionID);
     }
     else
-        TC_LOG_ERROR("entities.player", "Race (%u) not found in DBC: wrong DBC files?", uint32(race));
+        TC_LOG_ERROR("entities.player", "Race ({}) not found in DBC: wrong DBC files?", uint32(race));
 
     return ALLIANCE;
 }
@@ -6818,17 +6758,10 @@ void Player::RewardReputation(Unit* victim, float rate)
     if (GetChampioningFaction())
     {
         // support for: Championing - http://www.wowwiki.com/Championing
-<<<<<<< HEAD
         //Map const* map = GetMap();
         //if (map->IsNonRaidDungeon())
         //    if (LFGDungeonEntry const* dungeon = GetLFGDungeon(map->GetId(), map->GetDifficulty()))
         //        if (dungeon->reclevel == 80)
-=======
-        Map const* map = GetMap();
-        if (map->IsNonRaidDungeon())
-            if (LFGDungeonEntry const* dungeon = GetLFGDungeon(map->GetId(), map->GetDifficulty()))
-                if (dungeon->TargetLevel == 80)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     ChampioningFaction = GetChampioningFaction();
     }
 
@@ -11417,13 +11350,8 @@ InventoryResult Player::CanStoreItems(Item** items, int count, uint32* itemLimit
 
         uint32_t remaining_count = item->GetCount();
 
-<<<<<<< HEAD
-        TC_LOG_DEBUG("entities.player.items", "Player::CanStoreItems: Player '%s' (%s), Index: %i ItemID: %u, Count: %u",
-            GetName().c_str(), GetGUID().ToString().c_str(), k + 1, item->GetEntry(), remaining_count);
-=======
         TC_LOG_DEBUG("entities.player.items", "Player::CanStoreItems: Player '{}' ({}), Index: {} ItemID: {}, Count: {}",
             GetName(), GetGUID().ToString(), k + 1, item->GetEntry(), remaining_count);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         ItemTemplate const* pProto = item->GetTemplate();
 
         // strange item
@@ -12171,15 +12099,9 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
             return EQUIP_ERR_NONE;
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetMap()->GetEluna())
-    {
-        InventoryResult eres = GetMap()->GetEluna()->OnCanUseItem(this, proto->ItemId);
-=======
     if (Eluna* e = GetEluna())
     {
         InventoryResult eres = e->OnCanUseItem(this, proto->ItemId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         if (eres != EQUIP_ERR_OK)
             return eres;
     }
@@ -12355,7 +12277,6 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
-<<<<<<< HEAD
         uint32 quality = pItem->GetTemplate()->Quality;
         if (modifier.isCrafted)
         {
@@ -12377,8 +12298,6 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
             }
             //UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEM, pItem->GetTemplate()->Quality, 1/*, pItem->GetTemplate()->GetItemLevel() */);
         }
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && !sVirtualItemMgr.GetVirtualTemplate(item))
         {
@@ -12399,7 +12318,6 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
             CharacterDatabase.Execute(stmt);
         }
 
-<<<<<<< HEAD
         ApplyVirtualItemLegendayEffects(pItem);
 
         // Broadcast to world chat if not a GM
@@ -12412,12 +12330,10 @@ Item* Player::StoreNewItem3(ItemPosCountVec const& dest, uint32 item, bool updat
                 "0:0:0:0:" << "0:0:0:0|h[" << pItem->GetTemplate()->Name1 << "]|h|r" << "!";
             sWorld->SendGlobalText(oss.str().c_str(), nullptr, CHAT_MSG_LOOT);
         }
-=======
 #ifdef ELUNA
         if (Eluna* e = GetEluna())
             e->OnAdd(this, pItem);
 #endif
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
     return pItem;
 }
@@ -12669,16 +12585,11 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         ApplyEquipCooldown(pItem2);
         UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnEquip(this, pItem2, bag, slot);
-=======
         if (Eluna* e = GetEluna())
         {
             e->OnEquip(this, pItem2, bag, slot); // This should be removed in the future
             e->OnItemEquip(this, pItem2, slot);
         }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
         // No longer used, should be removed
         // UpdateArmorPassives();
@@ -12698,16 +12609,11 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot, pItem->GetEntry());
     UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetMap()->GetEluna())
-        GetMap()->GetEluna()->OnEquip(this, pItem, bag, slot);
-=======
     if (Eluna* e = GetEluna())
     {
         e->OnEquip(this, pItem, bag, slot); // This should be removed in the future
         e->OnItemEquip(this, pItem, slot);
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     // No longer used, should be removed
     // UpdateArmorPassives();
@@ -12743,16 +12649,11 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
         UpdateCraftingSkill(pItem, slot);
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnEquip(this, pItem, (pos >> 8), slot);
-=======
         if (Eluna* e = GetEluna())
         {
             e->OnEquip(this, pItem, (pos >> 8), slot); // This should be removed in the future
             e->OnItemEquip(this, pItem, slot);
         }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     }
 }
@@ -15531,13 +15432,8 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
             PlayerTalkClass->ClearMenus();
 
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->OnQuestAccept(this, questGiver->ToCreature(), quest);
-=======
             if (Eluna* e = GetEluna())
                 e->OnQuestAccept(this, questGiver->ToCreature(), quest);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
             questGiver->ToCreature()->AI()->OnQuestAccept(this, quest);
 
@@ -15574,13 +15470,8 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
             PlayerTalkClass->ClearMenus();
 
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->OnQuestAccept(this, questGiver->ToGameObject(), quest);
-=======
             if (Eluna* e = GetEluna())
                 e->OnQuestAccept(this, questGiver->ToGameObject(), quest);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
             questGiver->ToGameObject()->AI()->OnQuestAccept(this, quest);
 
@@ -15830,11 +15721,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
-<<<<<<< HEAD
     if (GetTalentLevel() < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
-=======
-    if (!IsMaxLevel())
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         GiveXP(XP, nullptr);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
@@ -16709,13 +16596,8 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         case TYPEID_GAMEOBJECT:
         {
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->GetDialogStatus(this, questgiver->ToGameObject());
-=======
             if (Eluna* e = GetEluna())
                 e->GetDialogStatus(this, questgiver->ToGameObject());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
             if (auto ai = questgiver->ToGameObject()->AI())
                 if (auto questStatus = ai->GetDialogStatus(this))
@@ -16727,13 +16609,8 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
         case TYPEID_UNIT:
         {
 #ifdef ELUNA
-<<<<<<< HEAD
-            if (GetMap()->GetEluna())
-                GetMap()->GetEluna()->GetDialogStatus(this, questgiver->ToCreature());
-=======
             if (Eluna* e = GetEluna())
                 e->GetDialogStatus(this, questgiver->ToCreature());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
             if (auto ai = questgiver->ToCreature()->AI())
                 if (auto questStatus = ai->GetDialogStatus(this))
@@ -18076,7 +17953,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     m_achievementMgr->LoadFromDB(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS));
 
     // Load highest slot data very early so that it is available when OnEquip methods are called
-    _LoadHighestSlotItemLevels(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS));
+    _LoadHighestSlotItemLevels(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS));
 
     uint32 money = fields[8].GetUInt32();
     if (money > MAX_MONEY_AMOUNT)
@@ -18594,7 +18471,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
     // after spell and quest load
     // Override free talents with new system
-    PreparedQueryResult usedTalentResult = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
+    PreparedQueryResult usedTalentResult = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
     if (usedTalentResult)
     {
         m_usedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
@@ -18724,7 +18601,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
-    LoadCustomTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
+    LoadCustomTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
 
 
     return true;
@@ -20462,11 +20339,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
     if (m_session->isLogingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats(trans);
 
-<<<<<<< HEAD
     sAnticheatMgr->SavePlayerData(this);
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -21444,12 +21317,7 @@ void Player::UpdatePvPFlag(time_t currTime)
 
     if (!pvpInfo.EndTimer || (currTime < pvpInfo.EndTimer +300) || pvpInfo.IsHostile)
         return;
-
-<<<<<<< HEAD
-    if (pvpInfo.EndTimer && pvpInfo.EndTimer <= currTime)
-=======
     if (pvpInfo.EndTimer <= currTime)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         pvpInfo.EndTimer = 0;
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
@@ -23712,10 +23580,6 @@ void Player::SendInitialPacketsAfterAddToMap()
         SendDirectMessage(&setCompoundState);
     }
 
-<<<<<<< HEAD
-    //SendAurasForTarget(this);
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     SendEnchantmentDurations();                             // must be after add to map
     SendItemDurations();                                    // must be after add to map
     SendQuestGiverStatusMultiple();
@@ -24111,11 +23975,7 @@ void Player::LearnSkillRewardedSpells(uint32 skillId, uint32 skillValue)
 
 void Player::SendAurasForTarget(Unit* target, bool force /*= false*/) const
 {
-<<<<<<< HEAD
-    if (!target || (!force && target->GetVisibleAuras()->empty()))                  // speedup things
-=======
     if (!target || (!force && target->GetVisibleAuras().empty()))                  // speedup things
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
@@ -25827,13 +25687,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             sLootItemStorage->RemoveStoredLootItemForContainer(loot->containerID, item->itemid, item->count, item->itemIndex);
 
 #ifdef ELUNA
-<<<<<<< HEAD
-        if (GetMap()->GetEluna())
-            GetMap()->GetEluna()->OnLootItem(this, newitem, item->count, this->GetLootGUID());
-=======
         if (Eluna* e = GetEluna())
             e->OnLootItem(this, newitem, item->count, this->GetLootGUID());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     }
     else
@@ -26172,7 +26027,8 @@ void Player::CompletedAchievement(uint32 id)
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank)
 {
-    uint32 CurTalentPoints = GetFreeTalentPoints();
+    // We don't use default talents.
+    /*uint32 CurTalentPoints = GetFreeTalentPoints();
 
     if (CurTalentPoints == 0)
         return;
@@ -26254,26 +26110,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                                 spentPointsInRow += (rank + 1);
 
     // not have required min points spent in talent tree
-<<<<<<< HEAD
-    if (GetClass() != CLASS_TIMEWALKER)
-    {
-        if (spentPoints < (talentInfo->Row * MAX_TALENT_RANK))
-            return;
-    }
-    else
-    {
-        // Do not allow spending more than 1 point per row as an adventurer.
-        if (spentPointsInRow > 0)
-            return;
-
-        // Do not allow spending points in tiers higher than the amount of spent points.
-        if (spentPoints < talentInfo->Row)
-            return;
-    }
-=======
     if (spentPoints < (talentInfo->TierID * MAX_TALENT_RANK))
         return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
     // spell not set in talent.dbc
     uint32 spellid = talentInfo->SpellRank[talentRank];
@@ -26297,16 +26135,11 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 
 #ifdef ELUNA
-<<<<<<< HEAD
-    if (GetMap()->GetEluna())
-        GetMap()->GetEluna()->OnLearnTalents(this, talentId, talentRank, spellid);
-=======
     if (Eluna* e = GetEluna())
         e->OnLearnTalents(this, talentId, talentRank, spellid);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
     // No longer used, should be removed
-    // UpdateArmorPassives();
+    // UpdateArmorPassives();*/
 }
 
 void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank)
@@ -26701,11 +26534,7 @@ void Player::BuildEnchantmentsInfoData(WorldPacket* data)
 
         data->put<uint16>(enchantmentMaskPos, enchantmentMask);
 
-<<<<<<< HEAD
-        *data << uint16(item->GetItemRandomPropertyId());                // Random item property id
-=======
         *data << int16(item->GetItemRandomPropertyId());                 // Random item property id
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         *data << item->GetGuidValue(ITEM_FIELD_CREATOR).WriteAsPacked(); // item creator
         *data << uint32(item->GetItemSuffixFactor());                    // SuffixFactor
     }
@@ -28056,7 +27885,6 @@ std::string Player::GetDebugInfo() const
     return sstr.str();
 }
 
-<<<<<<< HEAD
 uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
 {
     uint8 count = 0;
@@ -28577,9 +28405,9 @@ void Player::SetTalentLoadout(uint32 val)
                         thisPlayer->LoadActions(result);
                 }));
     }
-=======
+}
+
 GameClient* Player::GetGameClient() const
 {
     return GetSession()->GetGameClient();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }

@@ -181,11 +181,9 @@ enum WorldBoolConfigs : uint32
     CONFIG_CHECK_GOBJECT_LOS,
     CONFIG_RESPAWN_DYNAMIC_ESCORTNPC,
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
-<<<<<<< HEAD
-    CONFIG_ALLOW_DEVELOPMENT,
-=======
     CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE,
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    CONFIG_ALLOW_DEVELOPMENT,
+
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -469,7 +467,6 @@ enum WorldIntConfigs : uint32
     CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT,
     CONFIG_RESPAWN_GUIDWARNING_FREQUENCY,
     CONFIG_SOCKET_TIMEOUTTIME_ACTIVE,
-<<<<<<< HEAD
     // VirtualItem
     CONFIG_ITEMGEN_QUALITY_POOR,
     CONFIG_ITEMGEN_QUALITY_COMMON,
@@ -498,9 +495,7 @@ enum WorldIntConfigs : uint32
     CONFIG_ITEMGEN_SETCHANCE_EPIC,
     CONFIG_ITEMGEN_SETCHANCE_LEGENDARY,
     CONFIG_MAX_MAGIC_FIND,
-=======
     CONFIG_PENDING_MOVE_CHANGES_TIMEOUT,
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -757,13 +752,7 @@ class TC_GAME_API World
         void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(char const* text, WorldSession* self, ChatMsg msg = CHAT_MSG_SYSTEM);
         void SendGMText(uint32 string_id, ...);
-<<<<<<< HEAD
-        void SendGMText(char const* text);
-        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
-        void SendServerGMMessage(ServerMessageType type, const char* text = "", Player* player = nullptr);
-=======
         void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
         bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, uint32 team = 0);
@@ -886,10 +875,6 @@ class TC_GAME_API World
         Eluna* GetEluna() const { return eluna; }
         Eluna* eluna;
 #endif
-<<<<<<< HEAD
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     protected:
         void _UpdateGameTime();
 
