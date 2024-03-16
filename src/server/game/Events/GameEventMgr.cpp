@@ -149,12 +149,8 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
         sWorld->setWorldState(event_id, GameTime::GetGameTime());
 #ifdef ELUNA
         if (IsActiveEvent(event_id))
-<<<<<<< HEAD
-            sWorld->GetEluna()->OnGameEventStart(event_id);
-=======
             if (Eluna* e = sWorld->GetEluna())
                 e->OnGameEventStart(event_id);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
         return false;
     }
@@ -181,12 +177,8 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
 
 #ifdef ELUNA
         if (IsActiveEvent(event_id))
-<<<<<<< HEAD
-            sWorld->GetEluna()->OnGameEventStart(event_id);
-=======
             if (Eluna* e = sWorld->GetEluna())
                 e->OnGameEventStart(event_id);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
         return conditions_met;
     }
@@ -236,12 +228,8 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
 
 #ifdef ELUNA
     if (!IsActiveEvent(event_id))
-<<<<<<< HEAD
-        sWorld->GetEluna()->OnGameEventStop(event_id);
-=======
         if (Eluna* e = sWorld->GetEluna())
             e->OnGameEventStop(event_id);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 }
 
@@ -1021,13 +1009,7 @@ void GameEventMgr::LoadHolidayDates()
 
     } while (result->NextRow());
 
-<<<<<<< HEAD
-    TC_LOG_INFO("server.loading", ">> Loaded %u holiday dates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
-    //load game event spells
-=======
     TC_LOG_INFO("server.loading", ">> Loaded {} holiday dates in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 uint32 GameEventMgr::GetNPCFlag(Creature* cr)

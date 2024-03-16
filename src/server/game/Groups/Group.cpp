@@ -41,13 +41,10 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-<<<<<<< HEAD
 #include "AffixMgr.h"
-=======
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
 itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
@@ -2295,11 +2292,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
                     else
                     {
                         WorldSafeLocsEntry const * graveyardLocation = sObjectMgr->GetClosestGraveyard(instanceEntrance->target_X, instanceEntrance->target_Y, instanceEntrance->target_Z, instanceEntrance->target_mapId, SendMsgTo->GetTeam());
-<<<<<<< HEAD
-                        uint32 const zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, graveyardLocation->map_id, graveyardLocation->x, graveyardLocation->y, graveyardLocation->z);
-=======
                         uint32 const zoneId = sMapMgr->GetZoneId(PHASEMASK_NORMAL, graveyardLocation->Continent, graveyardLocation->Loc.X, graveyardLocation->Loc.Y, graveyardLocation->Loc.Z);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
                         for (MemberSlot const& member : GetMemberSlots())
                         {

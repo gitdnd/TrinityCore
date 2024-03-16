@@ -542,11 +542,7 @@ void Guild::Member::SetStats(Player* player)
     m_accountId = player->GetSession()->GetAccountId();
 }
 
-<<<<<<< HEAD
-void Guild::Member::SetStats(std::string const& name, uint32 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId)
-=======
-void Guild::Member::SetStats(std::string_view name, uint8 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+void Guild::Member::SetStats(std::string_view name, uint32 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId)
 {
     m_name      = name;
     m_level     = level;
@@ -1272,29 +1268,19 @@ void Guild::HandleRoster(WorldSession* session)
         memberData.AreaID = int32(member.GetZoneId());
         memberData.LastSave = float(float(GameTime::GetGameTime() - member.GetLogoutTime()) / float(DAY));
 
-<<<<<<< HEAD
-        memberData.Status = member->GetFlags();
-        memberData.Level = member->GetLevel() > STRONG_MAX_LEVEL ? STRONG_MAX_LEVEL : member->GetLevel();
-        memberData.ClassID = member->GetClass();
-        memberData.Gender = member->GetGender();
+        memberData.Status = member.GetFlags();
+        memberData.Level = member.GetLevel() > STRONG_MAX_LEVEL ? STRONG_MAX_LEVEL : member.GetLevel();
+        memberData.ClassID = member.GetClass();
+        memberData.Gender = member.GetGender();
 
         // If player level is more than 255 (uint8) then inject the rest in the player name
-        std::string name = member->GetName();
-        if (member->GetLevel() > STRONG_MAX_LEVEL)
+        std::string name = member.GetName();
+        if (member.GetLevel() > STRONG_MAX_LEVEL)
         {
             name = name + "|" + std::to_string(300 - STRONG_MAX_LEVEL);
         }
         memberData.Name = name;
-        memberData.Note = member->GetPublicNote();
-=======
-        memberData.Status = member.GetFlags();
-        memberData.Level = member.GetLevel();
-        memberData.ClassID = member.GetClass();
-        memberData.Gender = member.GetGender();
-
-        memberData.Name = member.GetName();
         memberData.Note = member.GetPublicNote();
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         if (sendOfficerNote)
             memberData.OfficerNote = member.GetOfficerNote();
     }

@@ -290,11 +290,7 @@ class TC_GAME_API Guild
                 Member(ObjectGuid::LowType guildId, ObjectGuid guid, uint8 rankId);
 
                 void SetStats(Player* player);
-<<<<<<< HEAD
-                void SetStats(std::string const& name, uint32 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId);
-=======
-                void SetStats(std::string_view name, uint8 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+                void SetStats(std::string_view name, uint32 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId);
                 bool CheckStats() const;
 
                 void SetPublicNote(std::string_view publicNote);
@@ -733,7 +729,7 @@ class TC_GAME_API Guild
 
         void ResetTimes();
         void _CreateNewBankTab();
-        void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, char const* param1 = nullptr, char const* param2 = nullptr, char const* param3 = nullptr) const;
+        void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, Optional<std::string_view> param1 = {}, Optional<std::string_view> param2 = {}, Optional<std::string_view> param3 = {}) const;
         inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
 
     protected:
@@ -764,14 +760,9 @@ class TC_GAME_API Guild
 
         inline uint8 _GetLowestRankId() const { return uint8(m_ranks.size() - 1); }
 
-<<<<<<< HEAD
-         inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
-        inline BankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? m_bankTabs[tabId] : nullptr; }
-=======
         inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
         inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
         inline BankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         inline Member const* GetMember(ObjectGuid guid) const
         {
@@ -797,14 +788,9 @@ class TC_GAME_API Guild
         static void _DeleteMemberFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType lowguid);
 
         // Tries to create new bank tab
-<<<<<<< HEAD
-       // Creates default guild ranks with names in given locale
-        void _CreateDefaultGuildRanks(CharacterDatabaseTransaction& trans, LocaleConstant loc);
-=======
-        void _CreateNewBankTab();
+
         // Creates default guild ranks with names in given locale
         void _CreateDefaultGuildRanks(CharacterDatabaseTransaction trans, LocaleConstant loc);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         // Creates new rank
         bool _CreateRank(CharacterDatabaseTransaction trans, std::string_view name, uint32 rights);
         // Update account number when member added/removed from guild
@@ -841,9 +827,5 @@ class TC_GAME_API Guild
         void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
         void _SendBankList(WorldSession* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
-<<<<<<< HEAD
-=======
-        void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, Optional<std::string_view> param1 = {}, Optional<std::string_view> param2 = {}, Optional<std::string_view> param3 = {}) const;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 #endif
