@@ -452,13 +452,9 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
         joinData.result = LFG_JOIN_NOT_MEET_REQS;
     else if (grp)
     {
-<<<<<<< HEAD
-        if ((groupType == GROUP_5_MAN && grp->GetMembersCount() > MAXGROUPSIZE) ||
+        if ((groupType == GROUP_5_MAN && grp->GetMembersCount() > MAX_GROUP_SIZE) ||
             (groupType == GROUP_3_MAN && grp->GetMembersCount() > MAXSMALLGROUPSIZE) ||
             (groupType == GROUP_10_MAN && grp->GetMembersCount() > MAXLFGRAIDGROUPSIZE))
-=======
-        if (grp->GetMembersCount() > MAX_GROUP_SIZE)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             joinData.result = LFG_JOIN_TOO_MUCH_MEMBERS;
         else
         {
@@ -554,13 +550,8 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
 
     if (isRaid)
     {
-<<<<<<< HEAD
-        TC_LOG_DEBUG("lfg.join", "%s trying to join raid browser and it's disabled.", guid.ToString().c_str());
-        return joinData.result;
-=======
         TC_LOG_DEBUG("lfg.join", "{} trying to join raid browser and it's disabled.", guid.ToString());
-        return;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+        return joinData.result;
     }
 
     std::string debugNames = "";
@@ -627,15 +618,9 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
         debugNames.append(player->GetName());
     }
 
-<<<<<<< HEAD
-    TC_LOG_DEBUG("lfg.join", "%s joined (%s), Members: %s. Dungeons (%u): %s", guid.ToString().c_str(),
-        grp ? "group" : "player", debugNames.c_str(), uint32(dungeons.size()), ConcatenateDungeons(dungeons).c_str());
-
-    return joinData.result;
-=======
     TC_LOG_DEBUG("lfg.join", "{} joined ({}), Members: {}. Dungeons ({}): {}", guid.ToString(),
         grp ? "group" : "player", debugNames, uint32(dungeons.size()), ConcatenateDungeons(dungeons));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    return joinData.result;
 }
 
 /**
@@ -740,8 +725,7 @@ void LFGMgr::UpdateRoleCheck(ObjectGuid gguid, ObjectGuid guid /* = ObjectGuid::
     // Sanitize input roles
     roles &= PLAYER_ROLE_ANY;
 
-<<<<<<< HEAD
-=======
+
     if (guid)
     {
         if (Player* player = ObjectAccessor::FindPlayer(guid))
@@ -750,7 +734,6 @@ void LFGMgr::UpdateRoleCheck(ObjectGuid gguid, ObjectGuid guid /* = ObjectGuid::
             return;
     }
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     LfgRoleCheck& roleCheck = itRoleCheck->second;
     bool sendRoleChosen = roleCheck.state != LFG_ROLECHECK_DEFAULT && guid;
 
@@ -1481,15 +1464,7 @@ void LFGMgr::FinishDungeon(ObjectGuid gguid, const uint32 dungeonId, Map const* 
 
     if (GetState(gguid) == LFG_STATE_FINISHED_DUNGEON) // Shouldn't happen. Do not reward multiple times
     {
-<<<<<<< HEAD
-        // debug: Remove ASAP
-        std::ostringstream debug;
-        debug << " LFGMgr::FinishDungeon called twice, dungeon id " << gDungeonId;
-        sWorld->SendGMText(debug.str().c_str());
-        TC_LOG_DEBUG("lfg.dungeon.finish", "Group: %s already rewarded", gguid.ToString().c_str());
-=======
         TC_LOG_DEBUG("lfg.dungeon.finish", "Group: {} already rewarded", gguid.ToString());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return;
     }
 

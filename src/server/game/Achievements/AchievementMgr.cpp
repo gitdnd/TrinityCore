@@ -713,34 +713,36 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         Cell::VisitWorldObjects(GetPlayer(), _worker, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 
-<<<<<<< HEAD
-    WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
-    data << GetPlayer()->GetPackGUID();
-    data << uint32(achievement->ID);
-    data.AppendPackedTime(GameTime::GetGameTime());
-    data << uint32(0);
     if (localBroadcast)
-        GetPlayer()->SendDirectMessage(&data);
-    else
-        GetPlayer()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
-=======
-    auto achievementEarnedBuilder = [&](Player const* receiver)
     {
         WowTime now = *GameTime::GetUtcWowTime();
-        now += receiver->GetSession()->GetTimezoneOffset();
+        now += GetPlayer()->GetSession()->GetTimezoneOffset();
 
         WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
         data << GetPlayer()->GetPackGUID();
         data << uint32(achievement->ID);
         data << now;
         data << uint32(0);
-        receiver->SendDirectMessage(&data);
-    };
+        GetPlayer()->SendDirectMessage(&data);
+    }
+    else
+    {
+        auto achievementEarnedBuilder = [&](Player const* receiver)
+            {
+                WowTime now = *GameTime::GetUtcWowTime();
+                now += receiver->GetSession()->GetTimezoneOffset();
 
-    float dist = sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY);
-    Trinity::PlayerDistWorker notifier(GetPlayer(), dist, achievementEarnedBuilder);
-    Cell::VisitWorldObjects(GetPlayer(), notifier, dist);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+                WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
+                data << GetPlayer()->GetPackGUID();
+                data << uint32(achievement->ID);
+                data << now;
+                data << uint32(0);
+                receiver->SendDirectMessage(&data);
+            };
+        float dist = sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY);
+        Trinity::PlayerDistWorker notifier(GetPlayer(), dist, achievementEarnedBuilder);
+        Cell::VisitWorldObjects(GetPlayer(), notifier, dist);
+    }
 }
 
 void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const

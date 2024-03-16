@@ -53,59 +53,36 @@ void BattlefieldMgr::InitBattlefield()
         {
             Field* fields = result->Fetch();
 
-<<<<<<< HEAD
-            uint32 typeId = fields[0].GetUInt32();
-
-            if (typeId >= BATTLEFIELD_MAX)
-            {
-                TC_LOG_ERROR("sql.sql", "BattlefieldMgr::InitBattlefield: Invalid TypeId value %u in battlefield_template, skipped.", typeId);
-=======
             uint32 typeId = fields[0].GetUInt8();
 
             if (typeId >= BATTLEFIELD_MAX)
             {
                 TC_LOG_ERROR("sql.sql", "BattlefieldMgr::InitBattlefield: Invalid TypeId value {} in battlefield_template, skipped.", typeId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 continue;
             }
 
             uint32 scriptId = sObjectMgr->GetScriptId(fields[1].GetString());
 
             Battlefield* bf = sScriptMgr->CreateBattlefield(scriptId);
-<<<<<<< HEAD
-
-            if (!bf->SetupBattlefield())
-            {
-                TC_LOG_INFO("bg.battlefield", "Setting up battlefield with TypeId %u failed.", typeId);
-=======
             if (!bf)
                 continue;
 
             if (!bf->SetupBattlefield())
             {
                 TC_LOG_INFO("bg.battlefield", "Setting up battlefield with TypeId {} failed.", typeId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 delete bf;
             }
             else
             {
                 _battlefieldSet.push_back(bf);
-<<<<<<< HEAD
-                TC_LOG_INFO("bg.battlefield", "Setting up battlefield with TypeId %u succeeded.", typeId);
-=======
                 TC_LOG_INFO("bg.battlefield", "Setting up battlefield with TypeId {} succeeded.", typeId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             }
 
             ++count;
         } while (result->NextRow());
     }
 
-<<<<<<< HEAD
-    TC_LOG_INFO("server.loading", ">> Loaded %u battlefields in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-=======
     TC_LOG_INFO("server.loading", ">> Loaded {} battlefields in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void BattlefieldMgr::AddZone(uint32 zoneId, Battlefield* bf)
