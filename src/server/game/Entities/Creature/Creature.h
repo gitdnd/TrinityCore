@@ -380,6 +380,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         int GetDungeonLevel() const;
 
+        bool blockMirror;
         void ApplyScaledResistances();
         void ApplyScaledArmor();
         void UpdateDungeonScaling();
