@@ -317,7 +317,6 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         virtual void SetPhaseMask(uint32 newPhaseMask, bool update);
         uint32 GetPhaseMask() const { return m_phaseMask; }
-        bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask) != 0; }
         bool InSamePhase(uint32 otherMask) const
         {
             uint32 myMask = GetPhaseMask();
@@ -346,7 +345,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
             // Otherwise both our phases are 1-63, use the normal behaviour
             return (myMask & otherMask) != 0;
         }
-        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && a->InSamePhase(b); }
+        bool InSamePhase(WorldObject const* obj) const { return obj && InSamePhase(obj->GetPhaseMask()); }
+        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && b && b->InSamePhase(a); }
 
         uint32 GetZoneId() const { return m_zoneId; }
         uint32 GetAreaId() const { return m_areaId; }

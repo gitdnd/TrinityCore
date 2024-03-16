@@ -1038,10 +1038,7 @@ class TC_GAME_API Unit : public WorldObject
         void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
         void HandleProcExtraAttackFor(Unit* victim, uint32 count);
 
-<<<<<<< HEAD
-        void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, bool crit = false, Spell* spell = nullptr);
-        void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
-=======
+
         void SetLastExtraAttackSpell(uint32 spellId) { _lastExtraAttackSpell = spellId; }
         uint32 GetLastExtraAttackSpell() const { return _lastExtraAttackSpell; }
         void AddExtraAttacks(uint32 count);
@@ -1050,7 +1047,6 @@ class TC_GAME_API Unit : public WorldObject
 
         void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, bool crit = false, bool blocked = false, Spell* spell = nullptr);
         void DealSpellDamage(SpellNonMeleeDamage const* damageInfo, bool durabilityLoss);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         // player or player's pet resilience (-1%)
         float GetMeleeCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_MELEE); }
@@ -1216,11 +1212,9 @@ class TC_GAME_API Unit : public WorldObject
         void MonsterMoveWithSpeed(float x, float y, float z, float speed, bool generatePath = false, bool forceDestination = false);
         void SendMovementFlagUpdate(bool self = false);
 
-<<<<<<< HEAD
-=======
+
         void SetHoverHeight(float hoverHeight) { SetFloatValue(UNIT_FIELD_HOVERHEIGHT, hoverHeight); }
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         bool IsGravityDisabled() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY); }
         bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING); }
         bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_HOVER); }
@@ -1830,18 +1824,6 @@ class TC_GAME_API Unit : public WorldObject
         virtual void Whisper(uint32 textId, Player* target, bool isBossWhisper = false);
 
         float GetCollisionHeight() const override;
-<<<<<<< HEAD
-        float GetCollisionWidth() const override;
-        float GetCollisionRadius() const override;
-
-        std::string GetDebugInfo() const override;
-
-        void OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto);
-        void OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain, SpellInfo const* spellProto);
-        bool ShouldIgnoreAiSwitch(uint32 entry);
-
-        int32 GetAuraAmount(uint32 aura_type);
-=======
         uint32 GetVirtualItemId(uint32 slot) const;
         void SetVirtualItem(uint32 slot, uint32 itemId);
 
@@ -1852,7 +1834,11 @@ class TC_GAME_API Unit : public WorldObject
 
         std::string GetDebugInfo() const override;
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+        void OnDamageDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& dmg, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto);
+        void OnHealDealMakeThisAnAuraHookSometimeLater(Unit* victim, uint32& gain, SpellInfo const* spellProto);
+        bool ShouldIgnoreAiSwitch(uint32 entry);
+
+        int32 GetAuraAmount(uint32 aura_type);
     protected:
         explicit Unit (bool isWorldObject);
 
@@ -1954,10 +1940,6 @@ class TC_GAME_API Unit : public WorldObject
         void ProcSkillsAndReactives(bool isVictim, Unit* procTarget, uint32 typeMask, uint32 hitMask, WeaponAttackType attType);
 
     protected:
-<<<<<<< HEAD
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         void SetFeared(bool apply);
         void SetConfused(bool apply);
         void SetStunned(bool apply);

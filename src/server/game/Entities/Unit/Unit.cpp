@@ -306,11 +306,7 @@ Unit::Unit(bool isWorldObject) :
     m_removedAurasCount(0), m_charmer(nullptr), m_charmed(nullptr),
     i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_vehicle(nullptr), m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE), m_Diminishing(), m_combatManager(this), m_threatManager(this),
-<<<<<<< HEAD
-    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_lastComboPoints(0), m_spellHistory(new SpellHistory(this))
-=======
-    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), _spellHistory(new SpellHistory(this))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    m_aiLocked(false), m_comboTarget(nullptr), m_comboPoints(0), m_lastComboPoints(0), _spellHistory(new SpellHistory(this))
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -444,12 +440,7 @@ Unit::~Unit()
 void Unit::Update(uint32 p_time)
 {
 #ifdef ELUNA
-<<<<<<< HEAD
-    // only update events if you are on a Lua state enabled map
-    if(elunaEvents && GetMap()->GetEluna())
-=======
     if(elunaEvents) // can be null on maps without eluna
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         elunaEvents->Update(p_time);
 #endif
 
@@ -743,15 +734,12 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
-<<<<<<< HEAD
+
     if (attacker && spellProto)
         attacker->OnDamageDealMakeThisAnAuraHookSometimeLater(victim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto);
 
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-=======
     // Signal to pets that their owner was attacked - except when DOT.
     if (attacker != victim && damagetype != DOT)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         for (Unit* controlled : victim->m_Controlled)
             if (Creature* cControlled = controlled->ToCreature())
@@ -1016,11 +1004,7 @@ void Unit::CastStop(uint32 except_spellid)
             InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-<<<<<<< HEAD
-void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit, Spell* spell /*= nullptr*/)
-=======
 void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType, bool crit /*= false*/, bool blocked /*= false*/, Spell* spell /*= nullptr*/)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 {
     if (damage < 0)
         return;
@@ -1045,7 +1029,6 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             case SPELL_DAMAGE_CLASS_RANGED:
             case SPELL_DAMAGE_CLASS_MELEE:
             {
-<<<<<<< HEAD
                 // Heavy Blows --Itswicky
                 if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
                 {
@@ -1063,19 +1046,6 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     }
                 }
 
-                // Physical Damage
-                if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
-                {
-                    // Spells with this attribute were already calculated in MeleeSpellHitResult
-                    if (!spellInfo->HasAttribute(SPELL_ATTR3_BLOCKABLE_SPELL))
-                    {
-                        // Get blocked status
-                        blocked = isSpellBlocked(victim, spellInfo, attackType);
-                    }
-                }
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 if (crit)
                 {
                     damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
@@ -3194,11 +3164,7 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
         }
 
         if (GetTypeId() == TYPEID_UNIT && IsAIEnabled())
-<<<<<<< HEAD
-            ToCreature()->AI()->OnSpellCastInterrupt(spell->GetSpellInfo());
-=======
             ToCreature()->AI()->OnSpellFailed(spell->GetSpellInfo());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 }
 
@@ -4338,11 +4304,7 @@ void Unit::RemoveAllAuras()
                     sstr << auraPair.second->GetDebugInfo() << "\n";
             }
 
-<<<<<<< HEAD
-            TC_LOG_ERROR("entities.unit", "%s", sstr.str().c_str());
-=======
             TC_LOG_ERROR("entities.unit", "{}", sstr.str());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             ABORT_MSG("%s", sstr.str().c_str());
 
             break;
@@ -6840,7 +6802,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             }
             case 666: // Fester --Itswicky
             {
-                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo(), EFFECT_0);
+                int32 bonus = CalculateSpellDamage((*i)->GetSpellInfo()->GetEffect(EFFECT_0));
                 int32 totalBonus = 0;
                 AuraApplicationMap const& victimAuras = victim->GetAppliedAuras();
                 for (AuraApplicationMap::const_iterator itr = victimAuras.begin(); itr != victimAuras.end(); ++itr)
@@ -7502,22 +7464,18 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
         default:
             return 0.f;
     }
+        
 
-<<<<<<< HEAD
-    // Ambush --Itswicky
-    if (caster && caster->HasAura(93173) && HealthAbovePct(50))
-    {
-        AuraEffect const* aurEff = caster->GetAuraEffect(93173, 0);
-        float bonus = aurEff->GetAmount();
-        crit_chance += bonus;
-    }        
-
-    // for this types the bonus was already added in GetUnitCriticalChance, do not add twice
-    if (caster && spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE && spellInfo->DmgClass != SPELL_DAMAGE_CLASS_RANGED)
-=======
     if (caster)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
+        // Ambush --Itswicky
+        if (caster->HasAura(93173) && HealthAbovePct(50.f))
+        {
+            AuraEffect const* aurEff = caster->GetAuraEffect(93173, 0);
+            float bonus = aurEff->GetAmount();
+            crit_chance += bonus;
+        }
+
         crit_chance += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_CHANCE_FOR_CASTER, [caster, spellInfo](AuraEffect const* aurEff) -> bool
         {
             if (aurEff->GetCasterGUID() == caster->GetGUID() && aurEff->IsAffectedOnSpell(spellInfo))
@@ -9878,13 +9836,7 @@ void Unit::ScheduleAIChange()
 {
     const bool charmed = IsCharmed();
     if (charmed)
-<<<<<<< HEAD
-    {
-        PushAI(nullptr);
-    }
-=======
         PushAI(GetScheduledChangeAI());
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     else
     {
         RestoreDisabledAI();
@@ -10722,8 +10674,6 @@ bool Unit::IsPolymorphed() const
     return spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH;
 }
 
-<<<<<<< HEAD
-=======
 void Unit::SetAnimTier(AnimTier tier)
 {
     if (!IsCreature())
@@ -10732,7 +10682,6 @@ void Unit::SetAnimTier(AnimTier tier)
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, static_cast<uint8>(tier));
 }
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 void Unit::RecalculateObjectScale()
 {
     int32 scaleAuras = GetTotalAuraModifier(SPELL_AURA_MOD_SCALE) + GetTotalAuraModifier(SPELL_AURA_MOD_SCALE_2);
@@ -11465,13 +11414,8 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         // only if not player and not controlled by player pet. And not at BG
         if ((durabilityLoss && !player && !victim->ToPlayer()->InBattleground()) || (player && sWorld->getBoolConfig(CONFIG_DURABILITY_LOSS_IN_PVP)))
         {
-<<<<<<< HEAD
-            TC_LOG_DEBUG("entities.unit", "We are dead, losing %f percent durability", sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
-            // plrVictim->DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
-=======
             TC_LOG_DEBUG("entities.unit", "We are dead, losing {} percent durability", sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
-            plrVictim->DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+            //plrVictim->DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
             // durability lost message
             // plrVictim->SendDurabilityLoss();
         }
@@ -12831,24 +12775,14 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
             return formEntry->CreatureDisplayID[0];
         else
         {
-<<<<<<< HEAD
             if (Player::TeamForRaceNoOverride(GetRace()) == ALLIANCE)
-                modelid = formEntry->modelID_A;
-=======
-            if (Player::TeamForRace(GetRace()) == ALLIANCE)
                 modelid = formEntry->CreatureDisplayID[0];
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             else
                 modelid = formEntry->CreatureDisplayID[1];
 
             // If the player is horde but there are no values for the horde modelid - take the alliance modelid
-<<<<<<< HEAD
             if (!modelid && Player::TeamForRaceNoOverride(GetRace()) == HORDE)
-                modelid = formEntry->modelID_A;
-=======
-            if (!modelid && Player::TeamForRace(GetRace()) == HORDE)
                 modelid = formEntry->CreatureDisplayID[0];
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
     }
 
@@ -14077,55 +14011,6 @@ void Unit::Whisper(std::string_view text, Language language, Player* target, boo
     target->SendDirectMessage(&data);
 }
 
-<<<<<<< HEAD
-/**
- * @brief this method gets the diameter of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
- *
- * If the player is mounted the diameter also takes in consideration the mount size
- *
- * @return float The diameter of a unit
- */
-float Unit::GetCollisionWidth() const
-{
-    if (GetTypeId() == TYPEID_PLAYER)
-        return GetObjectSize();
-
-    float scaleMod = GetObjectScale(); // 99% sure about this
-    float objectSize = GetObjectSize();
-    float defaultSize = DEFAULT_PLAYER_BOUNDING_RADIUS * scaleMod;
-
-    //! Dismounting case - use basic default model data
-    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
-
-    if (IsMounted())
-    {
-        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
-        {
-            if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
-            {
-                if (G3D::fuzzyGt(mountModelData->CollisionWidth, modelData->CollisionWidth))
-                    modelData = mountModelData;
-            }
-        }
-    }
-
-    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2;
-    // if the objectSize is the default value or the creature is mounted and we have a DBC value, then we can retrieve DBC value instead
-    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize, defaultSize) || IsMounted()) ? collisionWidth : objectSize;
-}
-
-/**
- * @brief this method gets the radius of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
- *
- * If the player is mounted the radius also takes in consideration the mount size
- *
- * @return float The radius of a unit
- */
-float Unit::GetCollisionRadius() const
-{
-    return GetCollisionWidth() / 2;
-=======
 uint32 Unit::GetVirtualItemId(uint32 slot) const
 {
     if (slot >= MAX_EQUIPMENT_ITEMS)
@@ -14140,7 +14025,6 @@ void Unit::SetVirtualItem(uint32 slot, uint32 itemId)
         return;
 
     SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot, itemId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject const* target)

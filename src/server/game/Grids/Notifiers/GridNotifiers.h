@@ -25,7 +25,6 @@
 #include "GameObject.h"
 #include "Group.h"
 #include "Player.h"
-#include "Log.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "UnitAI.h"
@@ -1128,7 +1127,7 @@ namespace Trinity
         WorldObject const& GetFocusObject() const { return *i_obj; }
         bool operator()(Unit* u)
         {
-            return i_functor(u) && i_obj->GetRawDistance(u, true) <= i_range;
+            return i_functor(u) && i_obj->IsWithinDistInMap(u, i_range);
         }
     private:
         WorldObject const* i_obj;

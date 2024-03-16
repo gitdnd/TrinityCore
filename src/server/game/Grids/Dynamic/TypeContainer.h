@@ -164,17 +164,6 @@ public:
     bool Remove(KEY_TYPE const& handle);
 
     template<class SPECIFIC_TYPE>
-<<<<<<< HEAD
-    std::size_t Size() const
-    {
-        std::size_t size = 0;
-        Trinity::Size(_elements, &size, (SPECIFIC_TYPE*)nullptr);
-        return size;
-    }
-
-    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }
-    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& GetElements() const { return _elements; }
-=======
     SPECIFIC_TYPE* Find(KEY_TYPE const& handle);
 
     template<class SPECIFIC_TYPE>
@@ -182,7 +171,6 @@ public:
 
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements();
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& GetElements() const;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 private:
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> _elements;

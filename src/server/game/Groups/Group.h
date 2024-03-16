@@ -39,19 +39,14 @@ class WorldSession;
 
 struct MapEntry;
 
-<<<<<<< HEAD
-#define MAXGROUPSIZE 5
-#define MAXSMALLGROUPSIZE 3
-#define MAXRAIDSIZE 40
-#define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
-#define TARGETICONCOUNT 8
-=======
+
 #define MAX_GROUP_SIZE      5
+#define MAXSMALLGROUPSIZE 3
 #define MAX_RAID_SIZE       40
 #define MAX_RAID_SUBGROUPS  MAX_RAID_SIZE / MAX_GROUP_SIZE
 
 #define TARGET_ICONS_COUNT  8
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+
 
 #define SOLOCONTENTGROUPSIZE 1
 #define THREEMANGROUPSIZE 3
@@ -396,14 +391,10 @@ class TC_GAME_API Group
         uint32              m_maxEnchantingLevel;
         uint32              m_dbStoreId;                    // Represents the ID used in database (Can be reused by other groups if group was disbanded)
         bool                m_isLeaderOffline;
-<<<<<<< HEAD
-        TimeTrackerSmall    m_leaderOfflineTimer;
         uint32              m_affix1;
         uint32              m_affix2;
         uint32              m_affix3;
         uint32              m_affix4;
-=======
         TimeTracker         m_leaderOfflineTimer;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 #endif
