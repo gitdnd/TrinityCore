@@ -740,20 +740,12 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
         return;
 
     uint32 dungeonId = 0;
-    //debug: Remove ASAP
-    std::ostringstream debug;
-    debug << "UpdateEncounterState ";
     
     for (auto const& encounter : *encounters)
     {
         if (encounter->creditType == type && encounter->creditEntry == creditEntry)
         {
-<<<<<<< HEAD
-            completedEncounters |= 1 << encounter->dbcEntry->encounterIndex;
-            debug << " found encounter " << encounter->dbcEntry->id << " encounter index " << encounter->dbcEntry->encounterIndex << " encounterMask " << completedEncounters;
-=======
             completedEncounters |= 1 << encounter->dbcEntry->Bit;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             if (encounter->lastEncounterDungeon)
             {
                 dungeonId = encounter->lastEncounterDungeon;

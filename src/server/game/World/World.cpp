@@ -90,10 +90,7 @@
 #ifdef ELUNA
 #include "LuaEngine.h"
 #include "ElunaLoader.h"
-<<<<<<< HEAD
-=======
 #include "ElunaConfig.h"
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 #include "WhoListStorage.h"
 #include "WorldSession.h"
@@ -1702,14 +1699,6 @@ void World::SetInitialWorldSettings()
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
-<<<<<<< HEAD
-    TC_LOG_INFO("server.loading", "Loading Lua scripts...");
-    sElunaLoader->LoadScripts();
-
-    TC_LOG_INFO("server.loading", "Starting Eluna world state...");
-    // use map id -1 for the global Eluna state
-    eluna = new Eluna(-1);
-=======
     TC_LOG_INFO("server.loading", "Loading Eluna config...");
     sElunaConfig->Initialize();
 
@@ -1719,7 +1708,6 @@ void World::SetInitialWorldSettings()
         TC_LOG_INFO("server.loading", "Loading Lua scripts...");
         sElunaLoader->LoadScripts();
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
 
     ///- Initialize pool manager
@@ -1890,8 +1878,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Disables");                         // must be before loading quests and items
     DisableMgr::LoadDisables();
 
-    TC_LOG_INFO("server.loading", "Loading Spell Gem Desc...");
-    sObjectMgr->LoadSpellGemDescriptors();
 
     // VirtualItem
     TC_LOG_INFO("server.loading", "Loading Virtual ItemNames...");
@@ -2379,14 +2365,11 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Calculate guild limitation(s) reset time...");
     InitGuildResetTime();
 
-<<<<<<< HEAD
-=======
 #ifdef ELUNA
     if(GetEluna())
         GetEluna()->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run.
 #endif
 
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // Preload all cells, if required for the base maps
     if (sWorld->getBoolConfig(CONFIG_BASEMAP_LOAD_GRIDS))
     {
@@ -2490,15 +2473,12 @@ void World::LoadAutobroadcasts()
 /// Update the World !
 void World::Update(uint32 diff)
 {
-<<<<<<< HEAD
     if (diff > 200)
     {
         TC_LOG_ERROR("network", "Update diff over 100ms: %u", diff);
     }
 
-=======
     TC_METRIC_TIMER("world_update_time_total");
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
     time_t currentGameTime = GameTime::GetGameTime();
@@ -3263,15 +3243,9 @@ void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
             str += " - " + reason;
 
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
-<<<<<<< HEAD
         ObjectAccessor::SaveAllPlayers();
-        SendServerMessage(msgid, str.c_str(), player);
-        TC_LOG_DEBUG("misc", "Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
-=======
-
         SendServerMessage(msgid, str, player);
         TC_LOG_DEBUG("misc", "Server is {} in {}", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 }
 
