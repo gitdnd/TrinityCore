@@ -786,15 +786,9 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
     {
         if (type == DAMAGE_FALL)                               // DealDamage does not apply item durability loss from self-induced damage.
         {
-<<<<<<< HEAD
-            TC_LOG_DEBUG("entities.player", "Player::EnvironmentalDamage: Player '%s' (%s) fall to death, losing %f durability",
-                GetName().c_str(), GetGUID().ToString().c_str(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
-            // DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
-=======
             TC_LOG_DEBUG("entities.player", "Player::EnvironmentalDamage: Player '{}' ({}) fall to death, losing {} durability",
                 GetName(), GetGUID().ToString(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
-            DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+            //DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
             // durability lost message
             // SendDurabilityLoss();
         }
@@ -1652,11 +1646,7 @@ uint8 Player::GetChatTag() const
         tag |= CHAT_TAG_DND;
     if (isAFK())
         tag |= CHAT_TAG_AFK;
-<<<<<<< HEAD
     if (IsDeveloper() && isGMChat())
-=======
-    if (IsDeveloper())
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         tag |= CHAT_TAG_DEV;
 
     return tag;
@@ -2035,12 +2025,9 @@ void Player::RegenerateAll()
     m_foodEmoteTimerCount += m_regenTimer;
 
     Regenerate(POWER_ENERGY);
-<<<<<<< HEAD
 
     Regenerate(POWER_FOCUS);
 
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     Regenerate(POWER_MANA);
     Regenerate(POWER_RAGE);
     Regenerate(POWER_RUNIC_POWER);
@@ -2105,89 +2092,9 @@ void Player::Regenerate(Powers power)
         return;
 
     uint32 curValue = GetPower(power);
-<<<<<<< HEAD
 
-    /// @todo possible use of miscvalueb instead of amount
-    if (HasAuraTypeWithValue(SPELL_AURA_PREVENT_REGENERATE_POWER, power))
-        return;
-
-    float addvalue = 0.0f;
-
-    switch (power)
-    {
-        case POWER_MANA:
-        {
-            bool recentCast = IsUnderLastManaUseEffect();
-            float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
-            float bonusRate = 1.5f;
-
-            // Talent: Eureka: Increases mana regeneration by 25% when below 30% mana
-            if (HasSpell(180141))
-            {
-                int32 percent = std::floor((float(curValue) / float(maxValue)) * 100.0f);
-                if (percent < 30)
-                {
-                    bonusRate = 1.75f;
-                }
-            }
-
-            if (GetLevel() < 15)
-                ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (GetLevel() * 0.066f));
-
-            if (recentCast) // Trinity Updates Mana in intervals of 2s, which is correct
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * 0.001f * m_regenTimer * bonusRate;
-            else
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 0.001f * m_regenTimer * bonusRate;
-        }   break;
-        case POWER_RAGE:                                    // Regenerate rage
-        {
-            if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
-            {
-                float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -20 * RageDecreaseRate;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
-            }
-        }   break;
-        case POWER_ENERGY:                                  // Regenerate energy (rogue)
-            addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
-            break;
-        case POWER_FOCUS:
-            addvalue += (0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS))*0.5f;
-
-            // Talent: Nesingwary's Track: Increases Focus Regeneration by 10%
-            if (HasSpell(180094))
-            {
-                addvalue = addvalue * 1.1f;
-            }
-            break;
-        case POWER_RUNIC_POWER:
-        {
-            if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
-            {
-                float RunicPowerDecreaseRate = sWorld->getRate(RATE_POWER_RUNICPOWER_LOSS);
-                addvalue += -30 * RunicPowerDecreaseRate;         // 3 RunicPower by tick
-            }
-        }   break;
-        case POWER_RUNE:
-        case POWER_HAPPINESS:
-            break;
-        case POWER_HEALTH:
-            return;
-        default:
-            break;
-    }
-
-    // Mana regen calculated in Player::UpdateManaRegen()
-    if (power != POWER_MANA)
-    {
-        addvalue *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power);
-
-        // Butchery requires combat for this effect
-        if (power != POWER_RUNIC_POWER || IsInCombat())
-            addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * ((power != POWER_ENERGY && power != POWER_FOCUS) ? m_regenTimerCount : m_regenTimer) / (5 * IN_MILLISECONDS);
-    }
-=======
     float addvalue  = GetPowerRegen(power) * 0.001f * m_regenTimer;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+
 
     if (addvalue < 0.0f)
     {

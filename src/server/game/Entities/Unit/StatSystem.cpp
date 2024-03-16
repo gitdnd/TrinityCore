@@ -1014,6 +1014,21 @@ void Player::UpdatePowerRegen(Powers power)
                 result_regen += result_regen_interrupted;
             break;
         }
+        case POWER_FOCUS:
+        {
+            result_regen += (0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS)) * 0.5f;
+            result_regen_interrupted = 0.f;
+
+            result_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, AsUnderlyingType(power));
+            result_regen_interrupted += static_cast<float>(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, AsUnderlyingType(power))) / 5.f;
+            result_regen += result_regen_interrupted;
+            // Talent: Nesingwary's Track: Increases Focus Regeneration by 10%
+            if (HasSpell(180094))
+            {
+                result_regen = result_regen * 1.1f;
+            }
+            break;
+        }
         default:
             break;
     }

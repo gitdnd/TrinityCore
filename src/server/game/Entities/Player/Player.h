@@ -740,13 +740,11 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 33,
-<<<<<<< HEAD
-    PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS     = 34,
-    PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS      = 35,
-    PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS          = 36,
-=======
-    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 34,
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS = 34,
+
+    PLAYER_LOGIN_QUERY_LOAD_HIGHEST_SLOT_LEVELS     = 35,
+    PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS      = 36,
+    PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS          = 37,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1365,13 +1363,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void SaveToDB(bool create = false);
         void SaveToDB(CharacterDatabaseTransaction trans, bool create = false);
-<<<<<<< HEAD
-        void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction& trans);                    // fast save function for item/money cheating preventing
-        void SaveGoldToDB(CharacterDatabaseTransaction& trans) const;
-=======
         void SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans);                    // fast save function for item/money cheating preventing
         void SaveGoldToDB(CharacterDatabaseTransaction trans) const;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
         static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGuid guid, CharacterDatabaseTransaction trans);
@@ -2242,7 +2235,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint8 GetEquippedItemsOfArmorType(uint8 type);
         void UpdateArmorPassives();
         void RemoveArmorPassives();
-        bool Player::HasGemSpell(uint32 spell) { return m_GemSpells.find(spell) != m_GemSpells.end(); }
+        bool HasGemSpell(uint32 spell) { return m_GemSpells.find(spell) != m_GemSpells.end(); }
         void AddGemSpell(uint32 spell, uint32 aura) { m_GemSpells.insert(std::make_pair(spell, aura)); }
         void RemoveGemSpell(uint32 spell) { m_GemSpells.erase(spell); }
         uint32 ItemLevelForSlot(uint8 slot);
@@ -2366,36 +2359,14 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _LoadGlyphs(PreparedQueryResult result);
         void _LoadTalents(PreparedQueryResult result);
         void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
-<<<<<<< HEAD
+
         void _LoadHighestSlotItemLevels(PreparedQueryResult result);
-=======
         void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
         /*********************************************************/
 
-<<<<<<< HEAD
-        void _SaveActions(CharacterDatabaseTransaction& trans);
-        void _SaveAuras(CharacterDatabaseTransaction& trans);
-        void _SaveInventory(CharacterDatabaseTransaction& trans);
-        void _SaveMail(CharacterDatabaseTransaction& trans);
-        void _SaveQuestStatus(CharacterDatabaseTransaction& trans);
-        void _SaveDailyQuestStatus(CharacterDatabaseTransaction& trans);
-        void _SaveWeeklyQuestStatus(CharacterDatabaseTransaction& trans);
-        void _SaveMonthlyQuestStatus(CharacterDatabaseTransaction& trans);
-        void _SaveSeasonalQuestStatus(CharacterDatabaseTransaction& trans);
-        void _SaveSkills(CharacterDatabaseTransaction& trans);
-        void _SaveSpells(CharacterDatabaseTransaction& trans);
-        void _SaveEquipmentSets(CharacterDatabaseTransaction& trans);
-        void _SaveBGData(CharacterDatabaseTransaction& trans);
-        void _SaveGlyphs(CharacterDatabaseTransaction& trans) const;
-        void _SaveTalents(CharacterDatabaseTransaction& trans);
-        void _SaveStats(CharacterDatabaseTransaction& trans) const;
-        void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction& trans);
-        void _SaveSlotHighestLevel(CharacterDatabaseTransaction& trans);
-=======
         void _SaveActions(CharacterDatabaseTransaction trans);
         void _SaveAuras(CharacterDatabaseTransaction trans);
         void _SaveInventory(CharacterDatabaseTransaction trans);
@@ -2413,7 +2384,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _SaveTalents(CharacterDatabaseTransaction trans);
         void _SaveStats(CharacterDatabaseTransaction trans) const;
         void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         /*********************************************************/
         /***              ENVIRONMENTAL SYSTEM                 ***/
