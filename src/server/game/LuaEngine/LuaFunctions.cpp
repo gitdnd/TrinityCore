@@ -37,6 +37,10 @@ extern "C"
 #include "VehicleMethods.h"
 #include "BattleGroundMethods.h"
 
+// custom methods
+#include "CustomMethods.h"
+#include "TransportMethods.h"
+
 #if (!defined(TBC) && !defined(CLASSIC))
 // fix compile error about accessing vehicle destructor
 template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
@@ -181,9 +185,18 @@ void RegisterFunctions(Eluna* E)
     ElunaTemplate<ElunaQuery>::Register(E, "ElunaQuery", true);
     ElunaTemplate<ElunaQuery>::SetMethods(E, LuaQuery::QueryMethods);
 
+    ElunaTemplate<Transport>::Register(E, "Transport");
+    ElunaTemplate<Transport>::SetMethods(E, LuaObject::ObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, LuaWorldObject::WorldObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, LuaGameObject::GameObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, LuaTransport::TransportMethods);
+
     ElunaTemplate<long long>::Register(E, "long long", true);
 
     ElunaTemplate<unsigned long long>::Register(E, "unsigned long long", true);
+
+    // Register custom functions
+    LuaCustom::RegisterCustomFunctions(E);
 
     LuaVal::Register(E->L);
 }
