@@ -2384,6 +2384,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _SaveTalents(CharacterDatabaseTransaction trans);
         void _SaveStats(CharacterDatabaseTransaction trans) const;
         void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
+        void _SaveSlotHighestLevel(CharacterDatabaseTransaction& trans);
 
         /*********************************************************/
         /***              ENVIRONMENTAL SYSTEM                 ***/

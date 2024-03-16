@@ -282,7 +282,6 @@ uint32 AccountMgr::GetId(std::string_view username)
     return (result) ? (*result)[0].GetUInt32() : 0;
 }
 
-<<<<<<< HEAD
 uint32 AccountMgr::GetIdByEmail(std::string const& email)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_EMAIL);
@@ -302,18 +301,6 @@ std::string AccountMgr::GetUsernameById(uint32 id)
     return (result) ? (*result)[0].GetString() : "";
 }
 
-
-uint32 AccountMgr::GetSecurity(uint32 accountId)
-{
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ACCESS_GMLEVEL);
-    stmt->setUInt32(0, accountId);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    return (result) ? (*result)[0].GetUInt8() : uint32(SEC_PLAYER);
-}
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 uint32 AccountMgr::GetSecurity(uint32 accountId, int32 realmId)
 {
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_GMLEVEL_BY_REALMID);

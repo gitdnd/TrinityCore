@@ -880,10 +880,6 @@ class TC_GAME_API World
         Eluna* GetEluna() const { return eluna; }
         Eluna* eluna;
 #endif
-<<<<<<< HEAD
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     protected:
         void _UpdateGameTime();
 
