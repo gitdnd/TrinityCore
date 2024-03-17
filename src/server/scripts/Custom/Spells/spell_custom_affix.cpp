@@ -13,7 +13,7 @@ class spell_affix_avenging_wrath_aura : public AuraScript
 {
     PrepareAuraScript(spell_affix_avenging_wrath_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -37,7 +37,7 @@ class spell_affix_avenging_wrath_aura : public AuraScript
         {
             if (caster->GetFactionReactionTo((*it)->GetFactionTemplateEntry(), *it) >= REP_NEUTRAL)
             {
-                for (int i = 0; i < stackAmount; ++i)
+                for (uint32 i = 0; i < stackAmount; ++i)
                 {
                     if ((*it)->HasAura(spellId))
                     {
@@ -165,7 +165,7 @@ class spell_affix_corpse_explosion_aura : public AuraScript
 {
     PrepareAuraScript(spell_affix_corpse_explosion_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -244,7 +244,7 @@ class spell_affix_mark_of_the_absolute_chance_aura : public AuraScript
 {
     PrepareAuraScript(spell_affix_mark_of_the_absolute_chance_aura);
 
-    void OnPeriodicProc(AuraEffect const* aurEff)
+    void OnPeriodicProc(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
         auto caster = GetCaster();

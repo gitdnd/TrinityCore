@@ -225,7 +225,7 @@ public:
         return true;
     }
 
-    static bool HandleSetGMVisibleCommand(ChatHandler* handler, uint32 val)
+    static bool HandleSetGMVisibleCommand(ChatHandler* handler, int8 val)
     {
         Player* _player = handler->GetSession()->GetPlayer();
 
@@ -239,7 +239,7 @@ public:
         return true;
     }
 
-    static bool HandleSetGMVisibleDetectCommand(ChatHandler* handler, uint32 val)
+    static bool HandleSetGMVisibleDetectCommand(ChatHandler* handler, int8 val)
     {
         Player* _player = handler->GetSession()->GetPlayer();
 

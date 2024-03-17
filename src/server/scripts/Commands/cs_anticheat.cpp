@@ -36,11 +36,7 @@ public:
         static std::vector<ChatCommand> anticheatCommandTable =
         {
             { "global",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatGlobalCommand,    "" },
-            { "player",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatPlayerCommand,    "" },
-            { "delete",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatDeleteCommand,    "" },
             { "handle",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAntiCheatHandleCommand,    "" },
-            { "jail",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAnticheatJailCommand,    "" },
-            { "warn",       rbac::RBAC_PERM_COMMAND_ANTICHEAT, true,  &HandleAnticheatWarnCommand,    "" },
         };
 
         static std::vector<ChatCommand> commandTable =
@@ -49,99 +45,6 @@ public:
         };
 
         return commandTable;
-    }
-
-    static bool HandleAnticheatWarnCommand(ChatHandler* handler/*, Optional<PlayerIdentifier> player*/)
-    {
-        /*if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
-            return false;
-
-        if (!player)
-            player = PlayerIdentifier::FromTarget(handler);
-        if (!player || !player->IsConnected())
-        {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        ChatHandler(player->GetConnectedPlayer()->GetSession()).SendSysMessage("The anticheat system has reported several times that you may be cheating. You will be monitored to confirm if this is accurate.");*/
-        return true;
-    }
-
-    static bool HandleAnticheatJailCommand(ChatHandler* handler/*, Optional<PlayerIdentifier> player*/)
-    {
-        /*
-        if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
-            return false;
-
-        if (!player)
-            player = PlayerIdentifier::FromTarget(handler);
-        if (!player || !player->IsConnected())
-        {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        Player* pTarget = player->GetConnectedPlayer();
-
-        // teleport both to jail.
-        WorldLocation jail {1, 16226.5f, 16403.6f, -64.5f, 3.2f};
-        pTarget->TeleportTo(jail);
-        handler->GetPlayer()->TeleportTo(jail);
-        pTarget->SetHomebind(jail, 876);*/
-
-        return true;
-    }
-
-    static bool HandleAntiCheatDeleteCommand(ChatHandler* /*handler*//*, Variant<EXACT_SEQUENCE("deleteall"), PlayerIdentifier> command*/)
-    {
-        /*
-        if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
-            return false;
-
-        if (command.holds_alternative<EXACT_SEQUENCE("deleteall")>())
-            sAnticheatMgr->AnticheatDeleteCommand(0);
-        else
-            sAnticheatMgr->AnticheatDeleteCommand(command.get<PlayerIdentifier>().GetGUID().GetCounter());*/
-
-        return true;
-    }
-
-    static bool HandleAntiCheatPlayerCommand(ChatHandler* handler/*, Optional<PlayerIdentifier> player*/)
-    {
-        /*
-        if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_ENABLE))
-            return false;
-
-        if (!player)
-            player = PlayerIdentifier::FromTarget(handler);
-        if (!player)
-        {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        uint32 guid = player->GetGUID().GetCounter();
-
-        float average = sAnticheatMgr->GetAverage(guid);
-        uint32 total_reports = sAnticheatMgr->GetTotalReports(guid);
-        uint32 speed_reports = sAnticheatMgr->GetTypeReports(guid,0);
-        uint32 fly_reports = sAnticheatMgr->GetTypeReports(guid,1);
-        uint32 jump_reports = sAnticheatMgr->GetTypeReports(guid,3);
-        uint32 waterwalk_reports = sAnticheatMgr->GetTypeReports(guid,2);
-        uint32 teleportplane_reports = sAnticheatMgr->GetTypeReports(guid,4);
-        uint32 climb_reports = sAnticheatMgr->GetTypeReports(guid,5);
-
-        handler->PSendSysMessage("Information about player %s",player->GetName().c_str());
-        handler->PSendSysMessage("Average: %f || Total Reports: %u ",average,total_reports);
-        handler->PSendSysMessage("Speed Reports: %u || Fly Reports: %u || Jump Reports: %u ",speed_reports,fly_reports,jump_reports);
-        handler->PSendSysMessage("Walk On Water Reports: %u  || Teleport To Plane Reports: %u",waterwalk_reports,teleportplane_reports);
-        handler->PSendSysMessage("Climb Reports: %u", climb_reports);*/
-
-        return true;
     }
 
     static bool HandleAntiCheatHandleCommand(ChatHandler* handler, bool enable)

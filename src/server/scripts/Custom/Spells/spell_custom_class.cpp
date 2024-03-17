@@ -117,7 +117,7 @@ class spell_class_seal_of_command : public AuraScript
         return eventInfo.GetProcTarget() != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
@@ -126,7 +126,7 @@ class spell_class_seal_of_command : public AuraScript
 
         //checking proc type
         uint32 spellId = 0;
-        WeaponAttackType attType = BASE_ATTACK;
+        //WeaponAttackType attType = BASE_ATTACK;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_MAINHAND_ATTACK)
             spellId = SPELL_CLASS_SEAL_OF_COMMAND_MH;
@@ -234,7 +234,7 @@ class spell_class_seal_of_spellblade : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        Unit* caster = eventInfo.GetActor();
+        //Unit* caster = eventInfo.GetActor();
         return eventInfo.GetProcTarget() != nullptr;
 
     }
@@ -294,7 +294,7 @@ class spell_class_seal_of_darktide : public AuraScript
         PreventDefaultAction();
 
         Unit* victim = eventInfo.GetProcTarget();
-        Unit* caster = eventInfo.GetActor();
+        //Unit* caster = eventInfo.GetActor();
 
         // Taking Arcane Spell Power of the Caster
         int32 spa = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
@@ -403,7 +403,7 @@ class spell_class_seal_of_flametongue_passive : public AuraScript
 {
     PrepareAuraScript(spell_class_seal_of_flametongue_passive);
 
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
         {
@@ -606,7 +606,7 @@ class spell_class_seal_of_windfury : public AuraScript
             return;
 
         // Weapon dmg calculations mh
-        float ap = player->GetTotalAttackPowerValue(BASE_ATTACK);
+        //float ap = player->GetTotalAttackPowerValue(BASE_ATTACK);
         int32 mws = player->GetAttackTime(BASE_ATTACK);
         mws /= 1000.0f;
         float mhdmg = (extraAttackPower / 14.f * mws);
@@ -617,14 +617,14 @@ class spell_class_seal_of_windfury : public AuraScript
         float ohdmg = (extraAttackPower / 14.f * omws);
 
         //Weapon dmg calculations ranged
-        float rap = player->GetTotalAttackPowerValue(RANGED_ATTACK);
+        //float rap = player->GetTotalAttackPowerValue(RANGED_ATTACK);
         int32 rws = player->GetAttackTime(RANGED_ATTACK);
         rws /= 1000.0f;
         float rdmg = (extraAttackPower / 14.f * rws);
 
         //checking proc type
         uint32 spellId = 0;
-        WeaponAttackType attType = BASE_ATTACK;
+        //WeaponAttackType attType = BASE_ATTACK;
         float wfdmg = mhdmg;
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_MAINHAND_ATTACK)
             spellId = SPELL_CLASS_SEAL_OF_WINDFURY_MH;
@@ -681,7 +681,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         return eventInfo.GetProcTarget() != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
@@ -722,7 +722,7 @@ class spell_class_seal_of_bloodgrip_passive : public AuraScript
 {
     PrepareAuraScript(spell_class_seal_of_bloodgrip_passive);
 
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
         {
@@ -786,7 +786,7 @@ class spell_class_aura_of_steel : public AuraScript
             canBeRecalculated = false;
 
 
-            Player* player = GetCaster()->ToPlayer();
+            //Player* player = GetCaster()->ToPlayer();
             int32 armor = GetTarget()->GetTotalAuraModValue(UNIT_MOD_ARMOR);
 
             int32 bp = std::lroundf(armor * 0.05f);

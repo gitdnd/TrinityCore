@@ -315,7 +315,7 @@ class spell_evokers_intellect_aura : public AuraScript
 {
     PrepareAuraScript(spell_evokers_intellect_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         uint32 spell = eventInfo.GetSpellInfo()->Id;
@@ -496,7 +496,7 @@ class spell_item_metamorph_gem : public AuraScript
 {
     PrepareAuraScript(spell_item_metamorph_gem);
 
-    void HandleApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* pCaster = GetCaster()->ToPlayer())
         {
@@ -509,7 +509,7 @@ class spell_item_metamorph_gem : public AuraScript
 
     }
 
-    void HandleRemoveEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* pCaster = GetCaster()->ToPlayer())
         {

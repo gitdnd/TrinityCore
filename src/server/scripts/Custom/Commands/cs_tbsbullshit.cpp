@@ -54,7 +54,7 @@ public:
         return true;
     }
 
-    static bool HandleClearInventory(ChatHandler* handler, char const* args)
+    static bool HandleClearInventory(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
         player->ClearInventory();
@@ -111,7 +111,7 @@ public:
         return true;
     }
 
-    static bool HandleToggleCheatSpells(ChatHandler* handler, char const* args)
+    static bool HandleToggleCheatSpells(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if(handler->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR)
@@ -121,7 +121,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugStatPrint(ChatHandler* handler, char const* args)
+    static bool HandleDebugStatPrint(ChatHandler* handler)
     {
         Player* player = handler->getSelectedPlayerOrSelf();
         handler->PSendSysMessage("Magic Find %u", player->GetMagicFind());
@@ -177,7 +177,7 @@ public:
         return true;
     }
 
-    static bool HandleAOELootCommand(ChatHandler* handler, char const* args)
+    static bool HandleAOELootCommand(ChatHandler* handler)
     {
         float radius = 40.0f;
         Player* object = handler->GetSession()->GetPlayer();

@@ -75,10 +75,10 @@ public:
         return GOMoveCommandTable;
     }
 
-    static bool GOMove_Command(ChatHandler* handler, const char* args)
+    static bool GOMove_Command(ChatHandler* /*handler*/, const char* /*args*/)
     {
-        if (!args)
-            return false;
+        //if (!args)
+            //return false;
 
         return false;
         /*char* ID_t = strtok((char*)args, " ");

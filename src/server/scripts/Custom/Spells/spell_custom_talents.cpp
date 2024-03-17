@@ -11,7 +11,7 @@ class spell_talent_combulstibolt_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_combulstibolt_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -36,7 +36,7 @@ class spell_talent_burningarmor_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_burningarmor_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -64,7 +64,7 @@ class spell_talent_engulf_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_engulf_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         auto caster = GetCaster();
         auto target = eventInfo.GetProcTarget();
@@ -159,7 +159,7 @@ class spell_talent_from_the_ashes_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_from_the_ashes_aura);
 
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         auto caster = GetCaster();
         auto target = GetTarget();
@@ -202,7 +202,7 @@ class spell_talent_from_the_ashes_phoenix_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_from_the_ashes_phoenix_aura);
 
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         auto caster = GetCaster();
         auto target = GetTarget();
@@ -232,7 +232,7 @@ class spell_talent_from_the_ashes_resurrection_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_from_the_ashes_resurrection_aura);
 
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         auto caster = GetCaster();
         auto target = GetTarget();
@@ -296,7 +296,7 @@ class spell_talent_heart_glacier_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_heart_glacier_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -318,7 +318,7 @@ class spell_talent_polar_affliction_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_polar_affliction_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -369,7 +369,7 @@ class spell_talent_hammer_of_the_north_aura : public AuraScript
 {
     PrepareAuraScript(spell_talent_hammer_of_the_north_aura);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         auto caster = GetCaster();
@@ -616,7 +616,7 @@ class spell_frostfire_bolt_combo_spender : public SpellScript
         uint8 comboPoints = GetCaster()->GetComboPoints(GetHitUnit());
         if (!comboPoints)
             return;
-        uint32 slowAmount = comboPoints * 5;
+        int32 slowAmount = comboPoints * 5;
         uint32 damageAmount = GetHitDamage() * (comboPoints * 0.05);
         CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
         args.AddSpellBP0(-slowAmount);
@@ -934,7 +934,7 @@ public:
     {
         PrepareAuraScript(spell_from_the_ashes_proc_engulf_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             auto caster = GetCaster();
             auto target = eventInfo.GetProcTarget();
@@ -970,7 +970,7 @@ public:
     {
         PrepareAuraScript(hot_defiance_AuraScript);
 
-        void HandleDummyTick(AuraEffect const* aurEff)
+        void HandleDummyTick(AuraEffect const* /*aurEff*/)
         {
             Unit* target = GetTarget();
             if (target && target->HealthBelowPct(50))
@@ -1051,7 +1051,7 @@ public:
     {
         PrepareAuraScript(hot_enfeeble_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
@@ -1085,7 +1085,7 @@ public:
     {
         PrepareAuraScript(hot_one_with_the_shadow_AuraScript);
 
-        void HandleDummyTick(AuraEffect const* aurEff)
+        void HandleDummyTick(AuraEffect const* /*aurEff*/)
         {
             Unit* target = GetTarget();
             if (!target)
@@ -1124,7 +1124,7 @@ public:
     {
         PrepareAuraScript(hot_violent_bastion_AuraScript);
 
-        void HandleDummyTick(AuraEffect const* aurEff)
+        void HandleDummyTick(AuraEffect const* /*aurEff*/)
         {
             Unit* target = GetTarget();
             if (!target)
@@ -1166,7 +1166,7 @@ public:
     {
         PrepareAuraScript(hot_blood_siphon_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -1197,7 +1197,7 @@ public:
     {
         PrepareAuraScript(hot_soul_siphon_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -1228,7 +1228,7 @@ public:
     {
         PrepareAuraScript(hot_mana_on_kill_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -1259,7 +1259,7 @@ public:
     {
         PrepareAuraScript(hot_life_on_kill_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -1290,7 +1290,7 @@ public:
     {
         PrepareAuraScript(hot_blood_drinker_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -1389,7 +1389,7 @@ public:
             else return urand(1, 100) < 11;
         }
 
-        void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             Unit* attacker = eventInfo.GetProcTarget();
@@ -1512,7 +1512,7 @@ public:
     {
         PrepareAuraScript(hot_companionship_AuraScript);
 
-        void HandleDummyTick(AuraEffect const* aurEff)
+        void HandleDummyTick(AuraEffect const* /*aurEff*/)
         {
             Unit* target = GetTarget();
             if (!target)
@@ -1582,7 +1582,7 @@ public:
     {
         PrepareAuraScript(hot_lone_wolf_AuraScript);
 
-        void HandleDummyTick(AuraEffect const* aurEff)
+        void HandleDummyTick(AuraEffect const* /*aurEff*/)
         {
             Unit* target = GetTarget();
             if (!target)
@@ -1651,7 +1651,7 @@ public:
     {
         PrepareAuraScript(hot_shield_supperiosity_AuraScript);
 
-        void HandleDummyTick(AuraEffect const* aurEff)
+        void HandleDummyTick(AuraEffect const* /*aurEff*/)
         {
             if (!GetTarget())
                 return;
@@ -1868,12 +1868,12 @@ public:
     {
         PrepareAuraScript(hot_wild_quiver_AuraScript);
 
-        bool CheckProc(ProcEventInfo& eventInfo)
+        bool CheckProc(ProcEventInfo& /*eventInfo*/)
         {
             return (urand(1, 100) <= 20);
         }
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             DamageInfo* damageInfo = eventInfo.GetDamageInfo();
@@ -1949,7 +1949,7 @@ public:
     {
         PrepareAuraScript(hot_thrash_AuraScript);
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -1988,7 +1988,7 @@ public:
             return (eventInfo.GetHitMask() & PROC_HIT_CRITICAL);
         }
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
 
@@ -2020,12 +2020,12 @@ public:
     {
         PrepareAuraScript(hot_flurry_effect_AuraScript);
 
-        bool CheckProc(ProcEventInfo& eventInfo)
+        bool CheckProc(ProcEventInfo& /*eventInfo*/)
         {
             return true;
         }
 
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
 
@@ -2109,16 +2109,9 @@ public:
                 return;
 
             ItemTemplate const* proto = shield->GetTemplate();
-            ScalingStatDistributionEntry const* ssd = target->GetScalingStatDistributionFor(*proto);
-            ScalingStatValuesEntry const* ssv = target->GetScalingStatValuesFor(*proto);
 
             uint32 armor = proto->Armor;
-            if (ssv)
-            {
-                if (uint32 ssvarmor = ssv->getArmorMod(proto->ScalingStatValue))
-                    armor = ssvarmor;
-            }
-            else if (armor && proto->ArmorDamageModifier)
+             if (armor && proto->ArmorDamageModifier)
                 armor -= uint32(proto->ArmorDamageModifier);
 
             armor = (float)armor * ((float)amount / 100.f);
@@ -2327,7 +2320,7 @@ class spell_burnout : public AuraScript
         amount = -1;
     }
 
-    void Absorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
         SpellInfo const* spellInfo = dmgInfo.GetSpellInfo();
         int32 dmg = dmgInfo.GetDamage();

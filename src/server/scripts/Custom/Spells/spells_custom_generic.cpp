@@ -170,7 +170,7 @@ class spell_gen_subclass : public AuraScript
         }
     }
 
-    void HandleRemoveEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Player* plrCaster = GetCaster()->ToPlayer();
         if (plrCaster)
