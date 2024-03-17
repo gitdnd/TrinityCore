@@ -345,10 +345,7 @@ std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplic
     {TARGET_OBJECT_TYPE_GOBJ, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_DEFAULT,  TARGET_DIR_FRONT},       // 108 TARGET_GAMEOBJECT_CONE
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 109
     {TARGET_OBJECT_TYPE_DEST, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_ENTRY,    TARGET_DIR_NONE},        // 110 TARGET_UNIT_CONE_ENTRY_110
-<<<<<<< HEAD
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_NEARBY,  TARGET_CHECK_ALLY,     TARGET_DIR_NONE },       // 111 TARGET_UNIT_SUMMONS
-};
-=======
 } };
 
 SpellEffectInfo::SpellEffectInfo() : _spellInfo(nullptr), EffectIndex(EFFECT_0), Effect(SPELL_EFFECT_NONE), ApplyAuraName(SPELL_AURA_NONE),
@@ -357,7 +354,6 @@ SpellEffectInfo::SpellEffectInfo() : _spellInfo(nullptr), EffectIndex(EFFECT_0),
     TriggerSpell(0), ImplicitTargetConditions(nullptr), _immunityInfo(nullptr)
 {
 }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
@@ -802,7 +798,6 @@ std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_d
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 162 SPELL_EFFECT_TALENT_SPEC_SELECT
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 163 SPELL_EFFECT_163
     {EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT}, // 164 SPELL_EFFECT_REMOVE_AURA
-<<<<<<< HEAD
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM }, // 165 SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM }, // 166 SPELL_EFFECT_ADD_STAT_TO_VIRTUAL_ITEM
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_UNIT }, // 167 SPELL_EFFECT_CREATE_VIRTUAL_ITEM
@@ -817,10 +812,7 @@ std::array<SpellEffectInfo::StaticData, TOTAL_SPELL_EFFECTS> SpellEffectInfo::_d
     { EFFECT_IMPLICIT_TARGET_EXPLICIT, TARGET_OBJECT_TYPE_ITEM }, // 176 SPELL_EFFECT_HONE_VIRTUAL_ITEM
 
 
-};
-=======
 } };
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
 SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 {
@@ -887,20 +879,8 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->ActiveIconID;
     Priority = spellEntry->SpellPriority;
-<<<<<<< HEAD
-    for (uint8 i = 0; i < 16; ++i)
-        SpellName[i] = spellEntry->SpellName[i];
-
-    for (uint8 i = 0; i < 16; ++i)
-        Rank[i] = spellEntry->Rank[i];
-
-    for (uint8 i = 0; i < 16; ++i)
-        SpellDescription[i] = spellEntry->Description[i];
-
-=======
     SpellName = spellEntry->Name;
     Rank = spellEntry->NameSubtext;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     MaxTargetLevel = spellEntry->MaxTargetLevel;
     MaxAffectedTargets = spellEntry->MaxTargets;
     SpellFamilyName = spellEntry->SpellClassSet;
@@ -993,7 +973,7 @@ bool SpellInfo::HasDamageEffects() const
         return true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (Effects[i].IsEffect())
+        if (_effects[i].IsEffect())
         {
             /*
             * Too many false positives
@@ -1004,7 +984,7 @@ bool SpellInfo::HasDamageEffects() const
                 if (damageEffectFound)
                     break;
             }*/
-            switch (Effects[i].Effect)
+            switch (_effects[i].Effect)
             {
             case SPELL_EFFECT_WEAPON_DAMAGE:
             case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
@@ -1867,11 +1847,7 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
-<<<<<<< HEAD
-    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !HasAttribute(SPELL_ATTR7_BYPASS_PREVENT_RES))
-=======
     if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECT_AURA))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         if (HasEffect(SPELL_EFFECT_SELF_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT_NEW))
             return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
 
@@ -2153,7 +2129,7 @@ void SpellInfo::_LoadSpellSpecific()
         if (Id == 43002 || Id == 42995)
             return SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE;
 
-        if (((SpellFamilyFlags[0] & 0x1000000) || Id == 12826) && Effects[0].ApplyAuraName == SPELL_AURA_MOD_CONFUSE)
+        if (((SpellFamilyFlags[0] & 0x1000000) || Id == 12826) && _effects[0].ApplyAuraName == SPELL_AURA_MOD_CONFUSE)
             return SPELL_SPECIFIC_MAGE_POLYMORPH;
 
         if (Id == 12292) // Death Wish
@@ -2271,8 +2247,6 @@ void SpellInfo::_LoadSpellSpecific()
                 }
                 break;
             }
-<<<<<<< HEAD
-=======
             case SPELLFAMILY_MAGE:
             {
                 // family flags 18(Molten), 25(Frost/Ice), 28(Mage)
@@ -2360,7 +2334,6 @@ void SpellInfo::_LoadSpellSpecific()
 
                 break;
             }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             case SPELLFAMILY_DEATHKNIGHT:
                 if (Id == 48266 || Id == 48263 || Id == 48265)
                     return SPELL_SPECIFIC_PRESENCE;
@@ -3307,7 +3280,6 @@ uint32 SpellInfo::GetAllowedMechanicMask() const
     return _allowedMechanicMask;
 }
 
-<<<<<<< HEAD
 bool SpellInfo::IsSupportSpell() const
 {
     if (!IsPositive())
@@ -3315,7 +3287,7 @@ bool SpellInfo::IsSupportSpell() const
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        switch (Effects[i].Effect)
+        switch (_effects[i].Effect)
         {
         case SPELL_EFFECT_HEAL:
         case SPELL_EFFECT_HEAL_PCT:
@@ -3329,7 +3301,7 @@ bool SpellInfo::IsSupportSpell() const
         case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
         case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
         {
-            switch (Effects[i].ApplyAuraName)
+            switch (_effects[i].ApplyAuraName)
             {
             case SPELL_AURA_DAMAGE_SHIELD:
             case SPELL_AURA_PERIODIC_HEAL:
@@ -3339,7 +3311,7 @@ bool SpellInfo::IsSupportSpell() const
             case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
             case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
             {
-                if (auto const trigger = sSpellMgr->GetSpellInfo(Effects[i].TriggerSpell))
+                if (auto const trigger = sSpellMgr->GetSpellInfo(_effects[i].TriggerSpell))
                     return trigger->IsSupportSpell();
                 break;
             }
@@ -3361,7 +3333,7 @@ bool SpellInfo::IsPhysicalDamageSpell() const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        switch (Effects[i].Effect)
+        switch (_effects[i].Effect)
         {
         case SPELL_EFFECT_SCHOOL_DAMAGE:
         case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
@@ -3376,7 +3348,7 @@ bool SpellInfo::IsPhysicalDamageSpell() const
         case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
         case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
         {
-            switch (Effects[i].ApplyAuraName)
+            switch (_effects[i].ApplyAuraName)
             {
             case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
             case SPELL_AURA_PERIODIC_DAMAGE:
@@ -3386,7 +3358,7 @@ bool SpellInfo::IsPhysicalDamageSpell() const
             case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
             case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
             {
-                if (auto const trigger = sSpellMgr->GetSpellInfo(Effects[i].TriggerSpell))
+                if (auto const trigger = sSpellMgr->GetSpellInfo(_effects[i].TriggerSpell))
                     return trigger->IsPhysicalDamageSpell();
                 break;
             }
@@ -3401,7 +3373,8 @@ bool SpellInfo::IsPhysicalDamageSpell() const
         }
     }
     return false;
-=======
+}
+
 uint32 SpellInfo::GetMechanicImmunityMask(Unit* caster) const
 {
     uint32 casterMechanicImmunityMask = caster->GetMechanicImmunityMask();
@@ -3418,7 +3391,6 @@ uint32 SpellInfo::GetMechanicImmunityMask(Unit* caster) const
     }
 
     return mechanicImmunityMask;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }
 
 float SpellInfo::GetMinRange(bool positive /*= false*/) const
@@ -3544,15 +3516,9 @@ int32 SpellInfo::CalcPowerCost(WorldObject const* caster, SpellSchoolMask school
         if (usingPower == POWER_HEALTH)
             return unitCaster->GetHealth();
         // Else drain all power
-<<<<<<< HEAD
-        if (usingPower < MAX_POWERS)
-            return unitCaster->GetPower(usingPower);
-        TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
-=======
         if (PowerType < MAX_POWERS)
             return unitCaster->GetPower(PowerType);
         TC_LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '{}' in spell {}", PowerType, Id);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return 0;
     }
 
@@ -3764,14 +3730,10 @@ inline bool _isPositiveTarget(SpellEffectInfo const& effect)
 
 bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& effect, std::unordered_set<std::pair<uint32, SpellEffIndex>>& visited)
 {
-<<<<<<< HEAD
     if (spellInfo->Id == 180250)
         return false;
 
-    if (!spellInfo->Effects[effIndex].IsEffect())
-=======
     if (!effect.IsEffect())
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         return true;
 
     // attribute may be already set in DB
@@ -3789,9 +3751,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
     visited.insert({ spellInfo->Id, effect.EffectIndex });
 
     //We need scaling level info for some auras that compute bp 0 or positive but should be debuffs
-<<<<<<< HEAD
-    float bpScalePerLevel = spellInfo->Effects[effIndex].RealPointsPerLevel;
-    int32 bp = spellInfo->Effects[effIndex].CalcValue();
 
     if (spellInfo->Id == 40251)
         return false;
@@ -3815,12 +3774,9 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
     if (spellInfo->Id == 53201)
         return false;
 
-    switch (spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
-=======
     float bpScalePerLevel = effect.RealPointsPerLevel;
     int32 bp = effect.CalcValue();
     switch (spellInfo->SpellFamilyName)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         case SPELLFAMILY_GENERIC:
             switch (spellInfo->Id)
@@ -4022,13 +3978,10 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
             case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
             case SPELL_AURA_MOD_INCREASE_SWIM_SPEED:
-<<<<<<< HEAD
             case SPELL_AURA_MOD_SPELL_POWER_BY_MANA:
-=======
             case SPELL_AURA_MOD_PERCENT_STAT:
             case SPELL_AURA_MOD_INCREASE_HEALTH:
             case SPELL_AURA_MOD_SPEED_ALWAYS:
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 if (bp < 0 || bpScalePerLevel < 0) //TODO: What if both are 0? Should it be a buff or debuff?
                     return false;
                 break;
@@ -4045,14 +3998,10 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             case SPELL_AURA_MOD_SPEED_SLOW_ALL:
             case SPELL_AURA_MELEE_SLOW:
             case SPELL_AURA_MOD_ATTACK_POWER_PCT:
-<<<<<<< HEAD
             case SPELL_AURA_MOD_SPELL_POWER_PCT:
-                if (!_isPositiveTarget(spellInfo, effIndex) || bp < 0)
-=======
             case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
             case SPELL_AURA_MOD_HEALING_PCT:
                 if (!_isPositiveTarget(effect) || bp < 0)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     return false;
                 break;
             case SPELL_AURA_MOD_DAMAGE_TAKEN:           // dependent from basepoint sign (positive -> negative)
@@ -4072,10 +4021,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
                 break;
             case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:   // check targets and basepoints (target enemy and negative bp -> negative)
                 if (!_isPositiveTarget(effect) && bp < 0)
-                    return false;
-                break;
-            case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:   // check targets and basepoints (target enemy and negative bp -> negative)
-                if (!_isPositiveTarget(spellInfo, effIndex) && bp < 0)
                     return false;
                 break;
             case SPELL_AURA_ADD_TARGET_TRIGGER:
@@ -4131,8 +4076,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             case SPELL_AURA_DUMMY:
             case SPELL_AURA_PERIODIC_DUMMY:
             case SPELL_AURA_MOD_HEALING:
-<<<<<<< HEAD
-=======
             case SPELL_AURA_MOD_WEAPON_CRIT_PERCENT:
             case SPELL_AURA_POWER_BURN:
             case SPELL_AURA_MOD_COOLDOWN:
@@ -4145,7 +4088,6 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             case SPELL_AURA_MOD_SHAPESHIFT:
             case SPELL_AURA_MOD_THREAT:
             case SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE:
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 // check target for positive and negative spells
                 if (!_isPositiveTarget(effect))
                     return false;

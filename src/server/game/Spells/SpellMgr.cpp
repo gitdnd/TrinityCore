@@ -3357,17 +3357,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         58552, // Return to Orgrimmar
         58533, // Return to Stormwind
         21855, // Challenge Flag
-<<<<<<< HEAD
-        51122, // Fierce Lightning Stike
-        71848  // Toxic Wasteling Find Target
-=======
         38762, // Force of Neltharaku
         51122, // Fierce Lightning Stike
         71848, // Toxic Wasteling Find Target
         36146, // Chains of Naberius
         33711, // Murmur's Touch
         38794  // Murmur's Touch
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
@@ -4367,11 +4362,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Unbound Plague (Professor Putricide) (needs target selection script)
     ApplySpellFix({ 70911, 72854, 72855, 72856 }, [](SpellInfo* spellInfo)
     {
-<<<<<<< HEAD
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
-=======
         spellInfo->_GetEffect(EFFECT_0).TargetB = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     });
 
     ApplySpellFix({

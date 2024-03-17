@@ -1877,13 +1877,8 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                             continue;
 
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-<<<<<<< HEAD
                         if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139) // Checks familyflags. Noting it here -Itswicky
-                            Rage_val += target->CalculateSpellDamage(spellInfo, EFFECT_0) * 10;
-=======
-                        if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
                             Rage_val += target->CalculateSpellDamage(spellInfo->GetEffect(EFFECT_0)) * 10;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     }
                 }
                 if (target->GetPower(POWER_RAGE) > Rage_val)
@@ -4513,40 +4508,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         // AT REMOVE
         else
         {
-<<<<<<< HEAD
-            if ((GetSpellInfo()->IsQuestTame()) && caster && caster->IsAlive() && target->IsAlive())
-            {
-                uint32 finalSpelId = 0;
-                switch (GetId())
-                {
-                    case 19548: finalSpelId = 19597; break;
-                    case 19674: finalSpelId = 19677; break;
-                    case 19687: finalSpelId = 19676; break;
-                    case 19688: finalSpelId = 19678; break;
-                    case 19689: finalSpelId = 19679; break;
-                    case 19692: finalSpelId = 19680; break;
-                    case 19693: finalSpelId = 19684; break;
-                    case 19694: finalSpelId = 19681; break;
-                    case 19696: finalSpelId = 19682; break;
-                    case 19697: finalSpelId = 19683; break;
-                    case 19699: finalSpelId = 19685; break;
-                    case 19700: finalSpelId = 19686; break;
-                    case 30646: finalSpelId = 30647; break;
-                    case 30653: finalSpelId = 30648; break;
-                    case 30654: finalSpelId = 30652; break;
-                    case 30099: finalSpelId = 30100; break;
-                    case 30102: finalSpelId = 30103; break;
-                    case 30105: finalSpelId = 30104; break;
-                }
-
-                if (finalSpelId)
-                    caster->CastSpell(target, finalSpelId, this);
-            }
-
-            switch (m_spellInfo->SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
-=======
             switch (m_spellInfo->SpellFamilyName)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             {
                 case SPELLFAMILY_GENERIC:
                     switch (GetId())
@@ -5153,13 +5115,8 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
 #ifdef ELUNA
             Creature* c = target->ToCreature();
             if (c && caster)
-<<<<<<< HEAD
-                if(caster->GetMap()->GetEluna())
-                    caster->GetMap()->GetEluna()->OnDummyEffect(triggerCaster, GetId(), SpellEffIndex(GetEffIndex()), c);
-=======
                 if(Eluna * e = caster->GetEluna())
                     e->OnDummyEffect(triggerCaster, GetId(), SpellEffIndex(GetEffIndex()), c);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 #endif
             triggerCaster->CastSpell(target, triggerSpellId, this);
             TC_LOG_DEBUG("spells.aura.effect", "AuraEffect::HandlePeriodicTriggerSpellAuraTick: Spell {} Trigger {}", GetId(), triggeredSpellInfo->Id);
@@ -5942,7 +5899,7 @@ void AuraEffect::HandleTempLearnSpell(AuraApplication const* aurApp, uint8 mode,
     Player* pT = target->ToPlayer();
     //if(GetId() <= 160424 && GetId() >= 160000)
         pT->RemoveAura(450002);
-    uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
+    uint32 triggerSpellId = GetSpellEffectInfo().TriggerSpell;
     pT->ToggleTempSpell(triggerSpellId, GetId(), apply);
 
 }

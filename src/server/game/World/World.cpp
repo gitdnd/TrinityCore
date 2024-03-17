@@ -3287,15 +3287,20 @@ void World::SendServerMessage(ServerMessageType messageID, std::string stringPar
 /// Send a server message to the user(s)
 void World::SendServerGMMessage(ServerMessageType type, const char* text, Player* player)
 {
-    WorldPacket data(SMSG_SERVER_MESSAGE, 50);              // guess size
-    data << uint32(type);
+    WorldPackets::Chat::ChatServerMessage chatServerMessage;
+    chatServerMessage.MessageID = int32(type);
     if (type <= SERVER_MSG_STRING)
-        data << text;
+        chatServerMessage.StringParam = text;
 
     if (player)
-        player->SendDirectMessage(&data);
+        player->SendDirectMessage(chatServerMessage.Write());
     else
-        SendGlobalGMMessage(&data);
+        SendGlobalMessage(chatServerMessage.Write());
+
+    if (player)
+        player->SendDirectMessage(chatServerMessage.Write());
+    else
+        SendGlobalGMMessage(chatServerMessage.Write());
 }
 
 void World::UpdateSessions(uint32 diff)
