@@ -70,27 +70,6 @@ typedef struct AUTH_LOGON_CHALLENGE_C
 } sAuthLogonChallenge_C;
 static_assert(sizeof(sAuthLogonChallenge_C) == (1 + 1 + 2 + 4 + 1 + 1 + 1 + 2 + 4 + 4 + 4 + 4 + 4 + 1 + 1));
 
-typedef struct XFER_INIT_C
-{
-    uint8 cmd;
-    uint8 fileNameLen;
-    uint8 fileName[5];
-    uint64 file_size;
-    uint8 md5[MD5_DIGEST_LENGTH];
-} XferInit_C;
-
-typedef struct XFER_RESUME_C
-{
-    uint8 cmd;
-    uint64 pos;
-} XferResume_C;
-
-typedef struct XFER_RESUME_S
-{
-    uint8 cmd;
-    uint64 pos;
-} XferResume_S;
-
 typedef struct AUTH_LOGON_PROOF_C
 {
     uint8   cmd;
@@ -133,364 +112,12 @@ static_assert(sizeof(sAuthReconnectProof_C) == (1 + 16 + 20 + 20 + 1));
 
 #pragma pack(pop)
 
-#if defined(__GNUC__)
-#pragma pack(1)
-#else
-#pragma pack(push,1)
-#endif
-struct TransferDataPacket
-{
-    uint8 cmd;
-    uint16 chunk_size;
-};
-#if defined(__GNUC__)
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
-
-/*
-Patcher patcher;
-
-// Send content of patch file to the client
-void PatcherRunnable::run()
-{
-    TC_LOG_INFO("network", "PatcherRunnable::run(): %ld -> %ld", pos, size);
-
-    while (pos < size && !stopped)
-    {
-        // Handle socket closed
-        if (!mySocket || !mySocket->IsOpen())
-        {
-            TC_LOG_INFO("network", "PatcherRunnable::run(): Socket is closed, stopping patcher");
-            break;
-        }
-
-        uint64 left = size - pos;
-        uint16 send = (left > 4096) ? 4096 : left;
-
-        char* bytes = new char[sizeof(TransferDataPacket) + send];
-        TransferDataPacket* hdr = (TransferDataPacket*)bytes;
-        hdr->cmd = uint8(XFER_DATA);
-        hdr->chunk_size = send;
-        fread(bytes + sizeof(TransferDataPacket), 1, send, mySocket->pPatch);
-
-        ByteBuffer pkt(sizeof(TransferDataPacket) + send);
-        pkt.append(bytes, sizeof(TransferDataPacket) + send);
-
-        mySocket->SendPacket(pkt);
-        delete[] bytes;
-
-        pos += send;
-
-        _sleep(sConfigMgr->GetIntDefault("PatchPacketDelay", 100));
-    }
-
-    if (!stopped && mySocket)
-    {
-        fclose(mySocket->pPatch);
-        mySocket->pPatch = NULL;
-        mySocket->_patcher = NULL;
-    }
-
-    TC_LOG_INFO("network", "patcher done.");
-}
-
-// Launch the patch hashing mechanism on object creation
-void Patcher::Initialize()
-{
-    m_dataDir = sConfigMgr->GetStringDefault("DataDir", "./data/") + "/patches/";
-    if (!m_dataDir.empty())
-        if ((m_dataDir.at(m_dataDir.length() - 1) != '/') && (m_dataDir.at(m_dataDir.length() - 1) != '\\'))
-            m_dataDir.push_back('/');
-
-    TC_LOG_INFO("network", "Searching for available patches.");
-    LoadPatchesInfo();
-}
-
-PATCH_INFO* Patcher::getPatchInfo(int _build, std::string _locale, bool* fallback)
-{
-    PATCH_INFO* patch = NULL;
-    int locale = *((int*)(_locale.c_str()));
-
-    TC_LOG_DEBUG("network", "Client with version %i and locale %s (%x) looking for patch.", _build, _locale.c_str(), locale);
-
-    // Hardcoded for enGB
-    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
-        if (it->build == _build && it->locale == 'BGne')
-        {
-            patch = &(*it);
-            *fallback = true;
-        }
-
-    for (Patches::iterator it = _patches.begin(); it != _patches.end(); ++it)
-        if (it->build == _build && it->locale == locale)
-        {
-            patch = &(*it);
-            *fallback = false;
-        }
-
-    return patch;
-}
-
-bool Patcher::PossiblePatching(int _build, std::string _locale)
-{
-    bool temp;
-    return getPatchInfo(_build, _locale, &temp) != NULL;
-}
-
-bool Patcher::InitPatching(int _build, std::string _locale, AuthSession* _session)
-{
-    bool fallback;
-    PATCH_INFO* patch = getPatchInfo(_build, _locale, &fallback);
-
-    // one of them nonzero, start patching.
-    if (patch)
-    {
-        ByteBuffer pkt;
-        pkt << uint8(AUTH_LOGON_PROOF);
-        pkt << uint8(LOGIN_DOWNLOAD_FILE);
-        _session->SendPacket(pkt);
-
-        std::stringstream path;
-        if (fallback)
-        {
-            path << PATCH_PATH << _build << "-enGB.mpq";
-        }
-        else
-        {
-            path << PATCH_PATH << _build << "-" << _locale << ".mpq";
-        }
-        _session->pPatch = fopen(path.str().c_str(), "rb");
-        TC_LOG_INFO("network", "Sending Patch: %s", path.str().c_str());
-        XFER_INIT_C packet;
-        packet.cmd = XFER_INITIATE;
-        packet.fileNameLen = 5;
-        packet.fileName[0] = 'P';
-        packet.fileName[1] = 'a';
-        packet.fileName[2] = 't';
-        packet.fileName[3] = 'c';
-        packet.fileName[4] = 'h';
-        packet.file_size = patch->filesize;
-        memcpy(packet.md5, patch->md5, MD5_DIGEST_LENGTH);
-        pkt.resize(sizeof(packet));
-        std::memcpy(pkt.contents(), &packet, sizeof(packet));
-        _session->SendPacket(pkt);
-        return true;
-    }
-    else
-    {
-        TC_LOG_INFO("network", "Client with version %i and locale %s did not get a patch.", _build, _locale.c_str());
-        return false;
-    }
-}
-
-// Preload MD5 hashes of existing patch files on server
-#ifndef _WIN32
-#include <dirent.h>
-#include <errno.h>
-void Patcher::LoadPatchesInfo()
-{
-    DIR* dirp;
-    struct dirent* dp;
-    dirp = opendir(PATCH_PATH);
-
-    if (!dirp)
-        return;
-
-    while (dirp)
-    {
-        errno = 0;
-        if ((dp = readdir(dirp)) != NULL)
-        {
-            int l = strlen(dp->d_name);
-
-            if (l < 8)
-                continue;
-
-            if (!memcmp(&dp->d_name[l - 4], ".mpq", 4))
-            {
-                LoadPatchMD5(PATCH_PATH, dp->d_name);
-            }
-        }
-        else
-        {
-            if (errno != 0)
-            {
-                closedir(dirp);
-                return;
-            }
-            break;
-        }
-    }
-
-    if (dirp)
-        closedir(dirp);
-}
-#else
-void Patcher::LoadPatchesInfo()
-{
-    WIN32_FIND_DATA fil;
-    HANDLE hFil = FindFirstFile(PATCH_PATH "*.mpq", &fil);
-    if (hFil == INVALID_HANDLE_VALUE)
-        return;                                             // no patches were found
-
-    do
-    {
-        TC_LOG_DEBUG("server.authserver", "Found patch: %s", fil.cFileName);
-        LoadPatchMD5(PATCH_PATH, fil.cFileName);
-    } while (FindNextFile(hFil, &fil));
-}
-#endif
-
-// Calculate and store MD5 hash for a given patch file
-void Patcher::LoadPatchMD5(const char* szPath, char* szFileName)
-{
-    int build;
-    union
-    {
-        int i;
-        char c[4];
-    } locale;
-
-    if (sscanf(szFileName, "%i-%c%c%c%c.mpq", &build, &locale.c[0], &locale.c[1], &locale.c[2], &locale.c[3]) != 5)
-        return;
-
-    // Try to open the patch file
-    std::string path = szPath;
-    path += szFileName;
-    FILE* pPatch = fopen(path.c_str(), "rb");
-
-    if (!pPatch)
-    {
-        TC_LOG_ERROR("network", "Error loading patch %s\n", path.c_str());
-        return;
-    }
-
-    // Calculate the MD5 hash
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
-    uint8* buf = new uint8[512 * 1024];
-
-    while (!feof(pPatch))
-    {
-        size_t read = fread(buf, 1, 512 * 1024, pPatch);
-        MD5_Update(&ctx, buf, read);
-    }
-
-    delete[] buf;
-    fseek(pPatch, 0, SEEK_END);
-    size_t size = ftell(pPatch);
-    fclose(pPatch);
-
-    // Store the result in the internal patch hash map
-    PATCH_INFO pi;
-    pi.build = build;
-    pi.locale = locale.i;
-    pi.filesize = uint64(size);
-    MD5_Final((uint8*)&pi.md5, &ctx);
-    _patches.push_back(pi);
-    TC_LOG_DEBUG("server.authserver", "Added patch for %i %c%c%c%c.", build, locale.c[0], locale.c[1], locale.c[2], locale.c[3]);
-}
-
-// Resume patch transfer
-bool AuthSession::HandleXferResume()
-{
-    TC_LOG_DEBUG("server.authserver", "Entering HandleXferResume");
-
-    XferResume_C* challenge = reinterpret_cast<XferResume_C*>(GetReadBuffer().GetReadPointer());
-
-    if (patcher.PossiblePatching(_build, _localizationName))
-    {
-        fseek(pPatch, 0, SEEK_END);
-        size_t size = ftell(pPatch);
-
-        TC_LOG_DEBUG("network", "Seeking to file position: %ld", long(challenge->pos));
-
-        fseek(pPatch, long(challenge->pos), 0);
-
-        if (_patcher)
-        {
-            _patcher->stop();
-            delete _patcher;
-        }
-        _patcher = new PatcherRunnable(this, challenge->pos, size);
-        boost::thread u(&PatcherRunnable::run, _patcher);
-        // Potentially open to a DOS attach since we spawn a new thread each time.
-        // Need to implement a thread pool if this ever becomes an issue
-        u.detach();
-        _patcher->patchThread = &u;
-        return true;
-    }
-    return false;
-}
-
-// Cancel patch transfer
-bool AuthSession::HandleXferCancel()
-{
-    TC_LOG_DEBUG("server.authserver", "Entering _HandleXferCancel");
-    if (_patcher)
-    {
-        _patcher->stop();
-        if (_patcher->patchThread) {
-            boost::thread* thread = _patcher->patchThread;
-            thread->join();
-        }
-        delete _patcher;
-    }
-    CloseSocket();
-    return true;
-}
-
-// Accept patch transfer
-bool AuthSession::HandleXferAccept()
-{
-    TC_LOG_DEBUG("server.authserver", "Entering HandleXferAccept");
-    // Check packet length and patch existence
-    if (!pPatch)
-    {
-        TC_LOG_ERROR("network", "Error while accepting patch transfer (wrong packet)");
-        return false;
-    }
-
-    // Launch a PatcherRunnable thread, starting at the beginning of the patch file
-    fseek(pPatch, 0, SEEK_END);
-    size_t size = ftell(pPatch);
-    fseek(pPatch, 0, 0);
-
-    if (_patcher)
-    {
-        _patcher->stop();
-        delete _patcher;
-    }
-    _patcher = new PatcherRunnable(this, 0, size);
-    boost::thread u(&PatcherRunnable::run, _patcher);
-    _patcher->patchThread = &u;
-    return true;
-}
-
-PatcherRunnable::PatcherRunnable(AuthSession* as, uint64 _pos, uint64 _size)
-{
-    mySocket = as;
-    pos = _pos;
-    size = _size;
-    stopped = false;
-}
-
-void PatcherRunnable::stop()
-{
-    stopped = true;
-}*/
-
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 #define MAX_ACCEPTED_CHALLENGE_SIZE (sizeof(AUTH_LOGON_CHALLENGE_C) + 16)
 
 #define AUTH_LOGON_CHALLENGE_INITIAL_SIZE 4
 #define REALM_LIST_PACKET_SIZE 5
-#define XFER_ACCEPT_SIZE 1
-#define XFER_RESUME_SIZE 9
-#define XFER_CANCEL_SIZE 1
 
 std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
 {
@@ -501,9 +128,6 @@ std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
     handlers[AUTH_RECONNECT_CHALLENGE] = { STATUS_CHALLENGE, AUTH_LOGON_CHALLENGE_INITIAL_SIZE, &AuthSession::HandleReconnectChallenge };
     handlers[AUTH_RECONNECT_PROOF]     = { STATUS_RECONNECT_PROOF, sizeof(AUTH_RECONNECT_PROOF_C),    &AuthSession::HandleReconnectProof };
     handlers[REALM_LIST]               = { STATUS_AUTHED,    REALM_LIST_PACKET_SIZE,            &AuthSession::HandleRealmList };
-    //handlers[XFER_ACCEPT] = { STATUS_AUTHED, XFER_ACCEPT_SIZE, &AuthSession::HandleXferAccept };
-    //handlers[XFER_RESUME] = { STATUS_AUTHED, XFER_RESUME_SIZE, &AuthSession::HandleXferResume };
-    //handlers[XFER_CANCEL] = { STATUS_AUTHED, XFER_CANCEL_SIZE, &AuthSession::HandleXferCancel };
 
     return handlers;
 }
@@ -781,7 +405,7 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     );
 
     // Fill the response packet with the result
-    //if (AuthHelper::IsAcceptedClientBuild(_build))
+    if (AuthHelper::IsAcceptedClientBuild(_build))
     {
         pkt << uint8(WOW_SUCCESS);
 
@@ -817,8 +441,8 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
 
         _status = STATUS_LOGON_PROOF;
     }
-    //else
-        //pkt << uint8(WOW_FAIL_VERSION_INVALID);
+    else
+        pkt << uint8(WOW_FAIL_VERSION_INVALID);
 
     SendPacket(pkt);
 }
@@ -881,22 +505,6 @@ bool AuthSession::HandleLogonProof()
 
         TC_LOG_DEBUG("server.authserver", "'{}:{}' User '{}' successfully authenticated", GetRemoteIpAddress().to_string(), GetRemotePort(), _accountInfo.Login);
 
-        // If the client has no valid version
-        if (_expversion == NO_VALID_EXP_FLAG)
-        {
-            //if (patcher.PossiblePatching(_build, _localizationName))
-            //{
-                //_status = STATUS_AUTHED; // Will get disconnected without this
-                //if (patcher.InitPatching(_build, _localizationName, this))
-                    //return true;
-            //}
-            ByteBuffer packet;
-            packet << uint8(AUTH_LOGON_PROOF);
-            packet << uint8(WOW_FAIL_VERSION_INVALID);
-            SendPacket(packet);
-            return true;
-        }
-
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
 
@@ -922,7 +530,7 @@ bool AuthSession::HandleLogonProof()
             proof.error = 0;
             proof.AccountFlags = 0x00800000;    // 0x01 = GM, 0x08 = Trial, 0x00800000 = Pro pass (arena tournament)
             proof.SurveyId = 0;
-            proof.LoginFlags = 0x1;               // 0x1 = has account message
+            proof.LoginFlags = 0;               // 0x1 = has account message
 
             packet.resize(sizeof(proof));
             std::memcpy(packet.contents(), &proof, sizeof(proof));

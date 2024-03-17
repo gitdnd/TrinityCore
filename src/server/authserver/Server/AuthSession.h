@@ -27,12 +27,9 @@
 #include "Socket.h"
 #include "SRP6.h"
 #include <boost/asio/ip/tcp.hpp>
-//#include <boost/thread.hpp>
-#include <openssl/md5.h>
 
 using boost::asio::ip::tcp;
 
-class AuthSession;
 class ByteBuffer;
 struct AuthHandler;
 
@@ -45,57 +42,6 @@ enum AuthStatus
     STATUS_WAITING_FOR_REALM_LIST,
     STATUS_CLOSED
 };
-
-// TODO: Add as config variable.
-#ifndef _WIN32
-#define PATCH_PATH "../var/patches/"
-#else
-#define PATCH_PATH "./patches/"
-#endif
-/*
-typedef struct PATCH_INFO
-{
-    int build;
-    int
-
-    ;
-    uint64 filesize;
-    uint8 md5[MD5_DIGEST_LENGTH];
-} PATCH_INFO;
-
-class Patcher
-{
-    typedef std::vector<PATCH_INFO> Patches;
-public:
-    void Initialize();
-
-    void LoadPatchMD5(const char*, char*);
-    bool GetHash(char* pat, uint8 mymd5[16]);
-
-    bool InitPatching(int _build, std::string _locale, AuthSession* _session);
-    bool PossiblePatching(int _build, std::string _locale);
-
-private:
-    PATCH_INFO* getPatchInfo(int _build, std::string _locale, bool* fallback);
-    void LoadPatchesInfo();
-    Patches _patches;
-    std::string m_dataDir;
-};
-
-// Launch a thread to transfer a patch to the client
-class PatcherRunnable
-{
-public:
-    PatcherRunnable(AuthSession* session, uint64 start, uint64 size);
-    void run();
-    void stop();
-    boost::thread* patchThread;
-private:
-    AuthSession* mySocket;
-    uint64 pos;
-    uint64 size;
-    bool stopped;
-};*/
 
 struct AccountInfo
 {
@@ -126,8 +72,6 @@ public:
 
     void SendPacket(ByteBuffer& packet);
 
-    //FILE* pPatch;
-    //PatcherRunnable* _patcher;
 protected:
     void ReadHandler() override;
 
@@ -137,9 +81,6 @@ private:
     bool HandleReconnectChallenge();
     bool HandleReconnectProof();
     bool HandleRealmList();
-    bool HandleXferAccept();
-    bool HandleXferResume();
-    bool HandleXferCancel();
 
     void CheckIpCallback(PreparedQueryResult result);
     void LogonChallengeCallback(PreparedQueryResult result);

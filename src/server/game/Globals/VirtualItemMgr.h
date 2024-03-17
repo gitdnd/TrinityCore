@@ -6,9 +6,7 @@
 #include <random>
 #include <set>
 #include <vector>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
-#include <boost/thread/tss.hpp>
+#include <shared_mutex>
 
 #ifndef VIRTUAL_ITEM_MGR_H
 #define VIRTUAL_ITEM_MGR_H
@@ -287,9 +285,9 @@ class VirtualItemMgr
 public:
     typedef std::unordered_map<uint32, VirtualItemTemplate*> Store;
 
-    typedef boost::shared_mutex LockType;
-    typedef boost::shared_lock<LockType> ReadGuard;
-    typedef boost::unique_lock<LockType> WriteGuard;
+    typedef std::shared_mutex LockType;
+    typedef std::shared_lock<LockType> ReadGuard;
+    typedef std::unique_lock<LockType> WriteGuard;
 
     /**
      * minEntry and maxEntry are used as the boundaries for the entries the EntryGenerators use.
