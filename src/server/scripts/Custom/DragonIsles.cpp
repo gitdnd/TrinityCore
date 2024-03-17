@@ -36,7 +36,7 @@ public:
                 // Only summon if not next to drop point
                 if (!caster->FindNearestCreature(52024, 5.0f))
                 {
-                    caster->SummonCreature(52022, GetCaster()->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN, 0);
+                    caster->SummonCreature(52022, GetCaster()->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN);
                 }
             }
         }

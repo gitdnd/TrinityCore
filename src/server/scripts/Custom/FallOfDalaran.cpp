@@ -27,7 +27,7 @@ public:
         void OnPeriodic(AuraEffect const* aurEff)
         {
             if ((aurEff->GetTickNumber() - 1) % 5)
-                GetTarget()->CastSpell(nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, { aurEff, GetCasterGUID() });
+                GetTarget()->CastSpell(nullptr, GetSpellInfo()->_effects[aurEff->GetEffIndex()].TriggerSpell, { aurEff, GetCasterGUID() });
         }
 
         void Register() override

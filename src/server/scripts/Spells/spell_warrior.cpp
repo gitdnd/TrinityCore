@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Scripts for spells with SPELLFAMILY_WARRIOR and SPELLFAMILY_GENERIC spells used by warrior players.
- * Ordered alphabetically using scriptname.
- * Scriptnames of files in this file should be prefixed with "spell_warr_".
- */
+ /*
+  * Scripts for spells with SPELLFAMILY_WARRIOR and SPELLFAMILY_GENERIC spells used by warrior players.
+  * Ordered alphabetically using scriptname.
+  * Scriptnames of files in this file should be prefixed with "spell_warr_".
+  */
 
 #include "ScriptMgr.h"
 #include "ItemTemplate.h"
@@ -33,59 +33,59 @@
 
 enum WarriorSpells
 {
-    SPELL_WARRIOR_BLADESTORM_PERIODIC_WHIRLWIND     = 50622,
-    SPELL_WARRIOR_BLOODTHIRST                       = 23885,
-    SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
-    SPELL_WARRIOR_BLOODSURGE_R1                     = 46913,
-    SPELL_WARRIOR_CHARGE                            = 34846,
-    SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE              = 59653,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
-    SPELL_WARRIOR_DEEP_WOUNDS_PERIODIC              = 12721,
-    SPELL_WARRIOR_EXECUTE                           = 20647,
-    SPELL_WARRIOR_EXECUTE_GCD_REDUCED               = 71069,
-    SPELL_WARRIOR_EXTRA_CHARGE                      = 70849,
-    SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
-    SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT      = 64976,
-    SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
-    SPELL_WARRIOR_RETALIATION_DAMAGE                = 20240,
-    SPELL_WARRIOR_SLAM                              = 50783,
-    SPELL_WARRIOR_SLAM_GCD_REDUCED                  = 71072,
-    SPELL_WARRIOR_SUDDEN_DEATH_R1                   = 29723,
-    SPELL_WARRIOR_SUNDER_ARMOR                      = 58567,
-    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1   = 12723,
-    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2   = 26654,
-    SPELL_WARRIOR_TAUNT                             = 355,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1        = 46859,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_2        = 46860,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1     = 64849,
-    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
-    SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
-    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
+    SPELL_WARRIOR_BLADESTORM_PERIODIC_WHIRLWIND = 50622,
+    SPELL_WARRIOR_BLOODTHIRST = 23885,
+    SPELL_WARRIOR_BLOODTHIRST_DAMAGE = 23881,
+    SPELL_WARRIOR_BLOODSURGE_R1 = 46913,
+    SPELL_WARRIOR_CHARGE = 34846,
+    SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE = 59653,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_1 = 12162,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_2 = 12850,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_3 = 12868,
+    SPELL_WARRIOR_DEEP_WOUNDS_PERIODIC = 12721,
+    SPELL_WARRIOR_EXECUTE = 20647,
+    SPELL_WARRIOR_EXECUTE_GCD_REDUCED = 71069,
+    SPELL_WARRIOR_EXTRA_CHARGE = 70849,
+    SPELL_WARRIOR_GLYPH_OF_EXECUTION = 58367,
+    SPELL_WARRIOR_GLYPH_OF_VIGILANCE = 63326,
+    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF = 65156,
+    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT = 64976,
+    SPELL_WARRIOR_LAST_STAND_TRIGGERED = 12976,
+    SPELL_WARRIOR_RETALIATION_DAMAGE = 20240,
+    SPELL_WARRIOR_SLAM = 50783,
+    SPELL_WARRIOR_SLAM_GCD_REDUCED = 71072,
+    SPELL_WARRIOR_SUDDEN_DEATH_R1 = 29723,
+    SPELL_WARRIOR_SUNDER_ARMOR = 58567,
+    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1 = 12723,
+    SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2 = 26654,
+    SPELL_WARRIOR_TAUNT = 355,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1 = 46859,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_2 = 46860,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1 = 64849,
+    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2 = 64850,
+    SPELL_WARRIOR_VIGILANCE_PROC = 50725,
+    SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT = 59665,
     SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER = 59725,
-    SPELL_WARRIOR_SECOND_WIND_TRIGGER_1             = 29841,
-    SPELL_WARRIOR_SECOND_WIND_TRIGGER_2             = 29842,
-    SPELL_WARRIOR_GLYPH_OF_BLOCKING                 = 58374,
-    SPELL_WARRIOR_STOICISM                          = 70845,
-    SPELL_WARRIOR_T10_MELEE_4P_BONUS                = 70847,
-    SPELL_WARRIOR_INTERVENE_THREAT                  = 59667
+    SPELL_WARRIOR_SECOND_WIND_TRIGGER_1 = 29841,
+    SPELL_WARRIOR_SECOND_WIND_TRIGGER_2 = 29842,
+    SPELL_WARRIOR_GLYPH_OF_BLOCKING = 58374,
+    SPELL_WARRIOR_STOICISM = 70845,
+    SPELL_WARRIOR_T10_MELEE_4P_BONUS = 70847,
+    SPELL_WARRIOR_INTERVENE_THREAT = 59667
 };
 
 enum WarriorSpellIcons
 {
-    WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989
+    WARRIOR_ICON_ID_SUDDEN_DEATH = 1989
 };
 
 enum MiscSpells
 {
-    SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
-    SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
-    SPELL_PRIEST_RENEWED_HOPE                       = 63944,
-    SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
-    SPELL_CATEGORY_SHIELD_SLAM                      = 1209
+    SPELL_PALADIN_BLESSING_OF_SANCTUARY = 20911,
+    SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY = 25899,
+    SPELL_PRIEST_RENEWED_HOPE = 63944,
+    SPELL_GEN_DAMAGE_REDUCTION_AURA = 68066,
+    SPELL_CATEGORY_SHIELD_SLAM = 1209
 };
 
 // 23881 - Bloodthirst
@@ -216,12 +216,12 @@ class spell_warr_deep_wounds : public SpellScript
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
-        {
-            SPELL_WARRIOR_DEEP_WOUNDS_RANK_1,
-            SPELL_WARRIOR_DEEP_WOUNDS_RANK_2,
-            SPELL_WARRIOR_DEEP_WOUNDS_RANK_3,
-            SPELL_WARRIOR_DEEP_WOUNDS_PERIODIC
-        });
+            {
+                SPELL_WARRIOR_DEEP_WOUNDS_RANK_1,
+                SPELL_WARRIOR_DEEP_WOUNDS_RANK_2,
+                SPELL_WARRIOR_DEEP_WOUNDS_RANK_3,
+                SPELL_WARRIOR_DEEP_WOUNDS_PERIODIC
+            });
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -318,46 +318,6 @@ class spell_warr_execute : public SpellScript
                 newRage = std::max(newRage, ragesave);
             }
 
-<<<<<<< HEAD
-            void HandleEffect(SpellEffIndex effIndex)
-            {
-                Unit* caster = GetCaster();
-                if (Unit* target = GetHitUnit())
-                {
-                    SpellInfo const* spellInfo = GetSpellInfo();
-                    int32 rageUsed = std::min<int32>(30 - spellInfo->CalcPowerCost(caster, SpellSchoolMask(spellInfo->SchoolMask)), caster->GetPower(POWER_FOCUS));
-                    int32 newRage = std::max<int32>(0, caster->GetPower(POWER_FOCUS) - rageUsed);
-
-                    // Sudden Death rage save
-                    if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, WARRIOR_ICON_ID_SUDDEN_DEATH, EFFECT_0))
-                    {
-                        int32 ragesave = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue() * 10;
-                        newRage = std::max(newRage, ragesave);
-                    }
-
-                    caster->SetPower(POWER_FOCUS, uint32(newRage));
-                    // Glyph of Execution bonus
-                    if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_EXECUTION, EFFECT_0))
-                        rageUsed += aurEff->GetAmount() * 10;
-
-
-                    int32 bp = GetEffectValue() + int32(rageUsed * spellInfo->Effects[effIndex].DamageMultiplier + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.2f);
-                    CastSpellExtraArgs args(GetOriginalCaster()->GetGUID());
-                    args.AddSpellBP0(bp);
-                    caster->CastSpell(target, SPELL_WARRIOR_EXECUTE, args);
-                }
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_execute_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_warr_execute_SpellScript();
-=======
             caster->SetPower(POWER_RAGE, uint32(newRage));
             // Glyph of Execution bonus
             if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_EXECUTION, EFFECT_0))
@@ -367,7 +327,6 @@ class spell_warr_execute : public SpellScript
             CastSpellExtraArgs args(GetOriginalCaster()->GetGUID());
             args.AddSpellBP0(bp);
             caster->CastSpell(target, SPELL_WARRIOR_EXECUTE, args);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
     }
 
@@ -386,12 +345,12 @@ class spell_warr_extra_proc : public AuraScript
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
-        {
-            SPELL_WARRIOR_T10_MELEE_4P_BONUS,
-            SPELL_WARRIOR_EXTRA_CHARGE,
-            SPELL_WARRIOR_SLAM_GCD_REDUCED,
-            SPELL_WARRIOR_EXECUTE_GCD_REDUCED
-        });
+            {
+                SPELL_WARRIOR_T10_MELEE_4P_BONUS,
+                SPELL_WARRIOR_EXTRA_CHARGE,
+                SPELL_WARRIOR_SLAM_GCD_REDUCED,
+                SPELL_WARRIOR_EXECUTE_GCD_REDUCED
+            });
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -489,28 +448,6 @@ class spell_warr_improved_spell_reflection : public AuraScript
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_warr_improved_spell_reflection::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
-};
-
-// 3411 - Intervene
-class spell_warr_intervene : public SpellScript
-{
-    PrepareSpellScript(spell_warr_intervene);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_WARRIOR_INTERVENE_THREAT });
-    }
-
-    void HandleThreat(SpellEffIndex /*effIndex*/)
-    {
-        Unit* target = GetHitUnit();
-        target->CastSpell(target, SPELL_WARRIOR_INTERVENE_THREAT, true);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_warr_intervene::HandleThreat, EFFECT_0, SPELL_EFFECT_CHARGE);
     }
 };
 
@@ -668,7 +605,7 @@ class spell_warr_rend : public AuraScript
 
     void Register() override
     {
-         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warr_rend::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warr_rend::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -709,10 +646,10 @@ class spell_warr_second_wind : public AuraScript
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
-        {
-            SPELL_WARRIOR_SECOND_WIND_TRIGGER_1,
-            SPELL_WARRIOR_SECOND_WIND_TRIGGER_2
-        });
+            {
+                SPELL_WARRIOR_SECOND_WIND_TRIGGER_1,
+                SPELL_WARRIOR_SECOND_WIND_TRIGGER_2
+            });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -840,10 +777,10 @@ class spell_warr_sword_and_board : public AuraScript
     {
         // Remove cooldown on Shield Slam
         GetTarget()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
-        {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-            return spellInfo && spellInfo->GetCategory() == SPELL_CATEGORY_SHIELD_SLAM;
-        }, true);
+            {
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                return spellInfo && spellInfo->GetCategory() == SPELL_CATEGORY_SHIELD_SLAM;
+            }, true);
     }
 
     void Register() override
@@ -884,12 +821,12 @@ class spell_warr_vigilance : public AuraScript
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
-        {
-            SPELL_WARRIOR_GLYPH_OF_VIGILANCE,
-            SPELL_WARRIOR_VIGILANCE_PROC,
-            SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT,
-            SPELL_GEN_DAMAGE_REDUCTION_AURA
-        });
+            {
+                SPELL_WARRIOR_GLYPH_OF_VIGILANCE,
+                SPELL_WARRIOR_VIGILANCE_PROC,
+                SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT,
+                SPELL_GEN_DAMAGE_REDUCTION_AURA
+            });
     }
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -906,8 +843,8 @@ class spell_warr_vigilance : public AuraScript
         Unit* target = GetTarget();
         if (target->HasAura(SPELL_GEN_DAMAGE_REDUCTION_AURA) &&
             !(target->HasAura(SPELL_PALADIN_BLESSING_OF_SANCTUARY) ||
-            target->HasAura(SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY) ||
-            target->HasAura(SPELL_PRIEST_RENEWED_HOPE)))
+                target->HasAura(SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY) ||
+                target->HasAura(SPELL_PRIEST_RENEWED_HOPE)))
         {
             target->RemoveAurasDueToSpell(SPELL_GEN_DAMAGE_REDUCTION_AURA);
         }
@@ -978,36 +915,6 @@ class spell_warr_vigilance_trigger : public SpellScript
 
 void AddSC_warrior_spell_scripts()
 {
-<<<<<<< HEAD
-    new spell_warr_bloodthirst();
-    new spell_warr_bloodthirst_heal();
-    new spell_warr_charge();
-    new spell_warr_concussion_blow();
-    new spell_warr_damage_shield();
-    new spell_warr_deep_wounds();
-    new spell_warr_deep_wounds_aura();
-    new spell_warr_execute();
-    new spell_warr_extra_proc();
-    new spell_warr_glyph_of_blocking();
-    new spell_warr_glyph_of_sunder_armor();
-    new spell_warr_improved_spell_reflection();
-    RegisterSpellScript(spell_warr_intervene);
-    new spell_warr_intimidating_shout();
-    new spell_warr_item_t10_prot_4p_bonus();
-    new spell_warr_last_stand();
-    new spell_warr_overpower();
-    new spell_warr_rend();
-    new spell_warr_retaliation();
-    new spell_warr_second_wind();
-    new spell_warr_shattering_throw();
-    new spell_warr_slam();
-    new spell_warr_sweeping_strikes();
-    new spell_warr_sword_and_board();
-    new spell_warr_t3_prot_8p_bonus();
-    new spell_warr_vigilance();
-    new spell_warr_vigilance_redirect_threat();
-    new spell_warr_vigilance_trigger();
-=======
     RegisterSpellScript(spell_warr_bloodthirst);
     RegisterSpellScript(spell_warr_bloodthirst_heal);
     RegisterSpellScript(spell_warr_charge);
@@ -1036,5 +943,4 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_vigilance);
     RegisterSpellScript(spell_warr_vigilance_redirect_threat);
     RegisterSpellScript(spell_warr_vigilance_trigger);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }

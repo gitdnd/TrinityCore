@@ -9,7 +9,7 @@ public:
 
     struct instance_kara_crypts_InstanceMapScript : public InstanceScript
     {
-        instance_kara_crypts_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_kara_crypts_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("KC");
             SetBossNumber(4);
@@ -29,7 +29,7 @@ public:
 
     struct instance_fall_of_dalaran_InstanceMapScript : public InstanceScript
     {
-        instance_fall_of_dalaran_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_fall_of_dalaran_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("FD");
             SetBossNumber(5);
@@ -49,7 +49,7 @@ public:
 
     struct instance_northshire_siege_InstanceMapScript : public InstanceScript
     {
-        instance_northshire_siege_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_northshire_siege_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("NS");
             SetBossNumber(3);
@@ -69,7 +69,7 @@ public:
 
     struct instance_valour_keep_InstanceMapScript : public InstanceScript
     {
-        instance_valour_keep_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_valour_keep_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("VK");
             SetBossNumber(4);
@@ -89,7 +89,7 @@ public:
 
     struct instance_worlds_end_InstanceMapScript : public InstanceScript
     {
-        instance_worlds_end_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_worlds_end_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("WE");
             SetBossNumber(4);
@@ -109,7 +109,7 @@ public:
 
     struct instance_stromgarde_InstanceMapScript : public InstanceScript
     {
-        instance_stromgarde_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_stromgarde_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("SG");
             SetBossNumber(7);
@@ -129,7 +129,7 @@ public:
 
     struct instance_arathor_InstanceMapScript : public InstanceScript
     {
-        instance_arathor_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_arathor_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
             SetHeaders("AR");
             SetBossNumber(3);

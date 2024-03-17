@@ -45,16 +45,6 @@ public:
     {
         static ChatCommandTable gmCommandTable =
         {
-<<<<<<< HEAD
-            { "chat",    rbac::RBAC_PERM_COMMAND_GM_CHAT,    false, &HandleGMChatCommand,       "" },
-            { "fly",     rbac::RBAC_PERM_COMMAND_GM_FLY,     false, &HandleGMFlyCommand,        "" },
-            { "ingame",  rbac::RBAC_PERM_COMMAND_GM_INGAME,   true, &HandleGMListIngameCommand, "" },
-            { "list",    rbac::RBAC_PERM_COMMAND_GM_LIST,     true, &HandleGMListFullCommand,   "" },
-            { "visible", rbac::RBAC_PERM_COMMAND_GM_VISIBLE, false, &HandleGMVisibleCommand,    "" },
-            { "setvisible", rbac::RBAC_PERM_COMMAND_GM_VISIBLE, false, &HandleSetGMVisibleCommand,    "" },
-            { "setdetect", rbac::RBAC_PERM_COMMAND_GM_VISIBLE, false, &HandleSetGMVisibleDetectCommand,    "" },
-            { "",        rbac::RBAC_PERM_COMMAND_GM,         false, &HandleGMCommand,           "" },
-=======
             { "chat",       HandleGMChatCommand,        rbac::RBAC_PERM_COMMAND_GM_CHAT,        Console::No },
             { "fly",        HandleGMFlyCommand,         rbac::RBAC_PERM_COMMAND_GM_FLY,         Console::No },
             { "ingame",     HandleGMListIngameCommand,  rbac::RBAC_PERM_COMMAND_GM_INGAME,      Console::Yes },
@@ -62,7 +52,8 @@ public:
             { "visible",    HandleGMVisibleCommand,     rbac::RBAC_PERM_COMMAND_GM_VISIBLE,     Console::No },
             { "on",         HandleGMOnCommand,          rbac::RBAC_PERM_COMMAND_GM,             Console::No },
             { "off",        HandleGMOffCommand,         rbac::RBAC_PERM_COMMAND_GM,             Console::No },
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
+            { "setvisible", HandleSetGMVisibleCommand,  rbac::RBAC_PERM_COMMAND_GM_VISIBLE,     Console::No },
+            { "setdetect", HandleSetGMVisibleDetectCommand, rbac::RBAC_PERM_COMMAND_GM_VISIBLE,    Console::No },
         };
         static ChatCommandTable commandTable =
         {
@@ -210,14 +201,9 @@ public:
             return true;
         }
 
-<<<<<<< HEAD
         uint32 VISUAL_AURA = 37800;
         if (handler->GetSession()->GetAccountId() == 1)
             VISUAL_AURA = 37803;
-        std::string param = (char*)args;
-=======
-        const uint32 VISUAL_AURA = 37800;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         if (*visibleArg)
         {
@@ -239,40 +225,24 @@ public:
         return true;
     }
 
-<<<<<<< HEAD
-    static bool HandleSetGMVisibleCommand(ChatHandler* handler, char const* args)
+    static bool HandleSetGMVisibleCommand(ChatHandler* handler, uint32 val)
     {
         Player* _player = handler->GetSession()->GetPlayer();
 
-        if (!*args)
-        {
-            handler->PSendSysMessage(LANG_YOU_ARE, _player->isGMVisible() ? handler->GetTrinityString(LANG_VISIBLE) : handler->GetTrinityString(LANG_INVISIBLE));
-            return true;
-        }
-
-        int32 val = atoi((char*)args);
-
-        if (val < 0)
-            val = 0;
 
         if (val > _player->GetSession()->GetSecurity())
             val = _player->GetSession()->GetSecurity();
 
         _player->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, val);
         _player->UpdateObjectVisibility();
-        _player->UpdateObjectVisibility(); // this is stupid if it fixes an issue.
         handler->PSendSysMessage("Set gm visibility to %i", val);
         return true;
     }
 
-    static bool HandleSetGMVisibleDetectCommand(ChatHandler* handler, char const* args)
+    static bool HandleSetGMVisibleDetectCommand(ChatHandler* handler, uint32 val)
     {
-        if (!*args)
-            return false;
-
         Player* _player = handler->GetSession()->GetPlayer();
 
-        int32 val = atoi((char*)args);
 
         if (val < 0)
             val = 0;
@@ -288,11 +258,8 @@ public:
         return true;
     }
 
-    //Enable\Disable GM Mode
-    static bool HandleGMCommand(ChatHandler* handler, char const* args)
-=======
+
     static bool HandleGMOnCommand(ChatHandler* handler)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         handler->GetPlayer()->SetGameMaster(true);
         handler->GetPlayer()->UpdateTriggerVisibility();

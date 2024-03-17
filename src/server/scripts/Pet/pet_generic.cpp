@@ -140,28 +140,6 @@ struct npc_pet_gen_soul_trader : public ScriptedAI
 
 enum LichPet
 {
-<<<<<<< HEAD
-    SPELL_LICH_ONSUMMON     = 69735,
-    SPELL_LICH_REMOVE_AURA  = 69736
-};
-
-struct npc_pet_lich : public ScriptedAI
-{
-    npc_pet_lich(Creature* creature) : ScriptedAI(creature) { }
-
-    void LeavingWorld() override
-    {
-        if (Unit* owner = me->GetOwner())
-            DoCast(owner, SPELL_LICH_REMOVE_AURA);
-    }
-
-    void JustAppeared() override
-    {
-        if (Unit* owner = me->GetOwner())
-            DoCast(owner, SPELL_LICH_ONSUMMON);
-
-        CreatureAI::JustAppeared();
-=======
     SPELL_LICH_PET_AURA         = 69732,
     SPELL_LICH_PET_AURA_ONKILL  = 69731,
     SPELL_LICH_PET_EMOTE        = 70049,
@@ -430,7 +408,6 @@ class spell_gen_elwynn_lamb : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_elwynn_lamb::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 };
 
@@ -438,9 +415,6 @@ void AddSC_generic_pet_scripts()
 {
     RegisterCreatureAI(npc_pet_gen_pandaren_monk);
     RegisterCreatureAI(npc_pet_gen_soul_trader);
-<<<<<<< HEAD
-    RegisterCreatureAI(npc_pet_lich);
-=======
     RegisterSpellScript(spell_pet_gen_lich_pet_onsummon);
     RegisterSpellScript(spell_pet_gen_lich_pet_aura_remove);
     RegisterSpellScript(spell_pet_gen_lich_pet_aura);
@@ -450,5 +424,4 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_elwynn_forest_wolf);
     RegisterSpellScript(spell_gen_elwynn_forest_wolf);
     RegisterSpellScript(spell_gen_elwynn_lamb);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 }

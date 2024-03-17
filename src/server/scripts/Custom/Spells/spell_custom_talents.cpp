@@ -342,7 +342,7 @@ class spell_talent_polar_affliction_aura : public AuraScript
         if (!hasFrostDebuff)
             return;
         // If immune to Freeze/Stun effects, increase Frost damage taken instead
-        if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), 0, caster) ||
+        if (target->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(180230), sSpellMgr->GetSpellInfo(180230)->GetEffect(EFFECT_0), caster) ||
             ((target->GetMechanicImmunityMask() & MECHANIC_STUN) > 0) ||
             ((target->GetMechanicImmunityMask() & MECHANIC_FREEZE) > 0))
         {
@@ -554,7 +554,7 @@ public:
 
             CastSpellExtraArgs args(aurEff);
             args.AddSpellBP0(damage * 0.05);
-            actor->CastSpell(eventInfo.GetProcTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, args);
+            actor->CastSpell(eventInfo.GetProcTarget(), GetSpellInfo()->_effects[EFFECT_0].TriggerSpell, args);
         }
 
         void Register() override
@@ -695,7 +695,7 @@ class spell_verdant_dreamer_periodic_aura : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+        return ValidateSpellInfo({ spellInfo->_effects[EFFECT_0].TriggerSpell });
     }
 
     void PeriodicTick(AuraEffect const* aurEff)
@@ -725,7 +725,7 @@ class spell_warlords_charge_periodic_aura : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+        return ValidateSpellInfo({ spellInfo->_effects[EFFECT_0].TriggerSpell });
     }
 
     void PeriodicTick(AuraEffect const* aurEff)
@@ -755,7 +755,7 @@ class spell_point_blank_periodic_aura : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+        return ValidateSpellInfo({ spellInfo->_effects[EFFECT_0].TriggerSpell });
     }
 
     void PeriodicTick(AuraEffect const* aurEff)
@@ -792,7 +792,7 @@ class spell_dead_eye_periodic_aura : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+        return ValidateSpellInfo({ spellInfo->_effects[EFFECT_0].TriggerSpell });
     }
 
     void PeriodicTick(AuraEffect const* aurEff)
@@ -852,7 +852,7 @@ public:
                 PreventDefaultAction();
                 if (!eventInfo.GetDamageInfo())
                     return;
-                uint32 spell = spellInfo->Effects[0].TriggerSpell;
+                uint32 spell = spellInfo->_effects[0].TriggerSpell;
                 uint32 proc_dmg = (float(eventInfo.GetDamageInfo()->GetDamage()) * (float(aurEff->GetAmount()) / 100.0));
                 CastSpellExtraArgs args(aurEff);
                 args.OriginalCaster = GetCasterGUID();
@@ -894,7 +894,7 @@ public:
                 if (Player* playerTarget = GetUnitOwner()->ToPlayer())
                 {
                     int32 baseAmount = aurEff->GetBaseAmount();
-                    int32 amount = playerTarget->CalculateSpellDamage(GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount);
+                    int32 amount = playerTarget->CalculateSpellDamage(aurEff->GetSpellEffectInfo(), &baseAmount);
                     GetEffect(EFFECT_0)->SetAmount(amount);
                 }
             }
@@ -906,7 +906,7 @@ public:
             {
                 int32 baseAmount = aurEff->GetBaseAmount();
                 int32 amount = playerTarget->isMoving() ?
-                    playerTarget->CalculateSpellDamage(GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount) :
+                    playerTarget->CalculateSpellDamage(aurEff->GetSpellEffectInfo(), &baseAmount) :
                     aurEff->GetAmount() - 1;
                 aurEff->SetAmount(amount);
             }
@@ -1014,7 +1014,7 @@ public:
             if (!damageInfo || !damageInfo->GetDamage())
                 return;
 
-            int32 healamount = ((float)damageInfo->GetDamage() * ((float)GetSpellInfo()->Effects[EFFECT_0].BasePoints / 100.f)) + 0.5f;
+            int32 healamount = ((float)damageInfo->GetDamage() * ((float)GetSpellInfo()->_effects[EFFECT_0].BasePoints / 100.f)) + 0.5f;
             if (healamount > 0)
             {
                 Unit* actor = eventInfo.GetActor();
@@ -1756,10 +1756,10 @@ public:
 
                             if (ssd && ssv)
                             {
-                                if (ssd->StatMod[i] < 0)
-                                    continue;
-                                statType = ssd->StatMod[i];
-                                val = (ssv->getssdMultiplier(itemplate->ScalingStatValue) * ssd->Modifier[i]) / 10000;
+                                //if (ssd->StatMod[i] < 0)
+                                    //continue;
+                                //statType = ssd->StatMod[i];
+                                //val = (ssv->getssdMultiplier(itemplate->ScalingStatValue) * ssd->Modifier[i]) / 10000;
                             }
                             else
                             {
@@ -2199,7 +2199,7 @@ class spell_firebrand_weapon : public AuraScript
         if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
             return;
 
-        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        int32 bp = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
         caster->CastSpell(damageInfo->GetVictim(), 93020, args);
@@ -2224,7 +2224,7 @@ class spell_combustibolt : public AuraScript
         if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
             return;
 
-        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        int32 bp = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
         caster->CastSpell(damageInfo->GetVictim(), 93028, args);
@@ -2249,7 +2249,7 @@ class spell_soothing_flame : public AuraScript
         if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
             return;
 
-        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        int32 bp = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(healInfo->GetHeal() * bp / 300);
         caster->CastSpell(healInfo->GetTarget(), 93031, args);
@@ -2280,7 +2280,7 @@ class spell_battle_rouse : public AuraScript
         PreventDefaultAction();
 
         Unit* victim = GetTarget();
-        int32 bp = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        int32 bp = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
         int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), bp));
 
         if (amount >= 1)
@@ -2316,8 +2316,8 @@ class spell_burnout : public AuraScript
 
     bool Load() override
     {
-        _absorbPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
-        _dot = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        _absorbPct = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
+        _dot = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
         return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
     }
 
@@ -2423,7 +2423,7 @@ class spell_field_medic : public AuraScript
         if (!healInfo || !healInfo->GetHeal() || !healInfo->GetTarget())
             return;
 
-        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        int32 bp = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(healInfo->GetHeal() * bp / 400);
         caster->CastSpell(caster, 94010, args);
@@ -2449,16 +2449,16 @@ class spell_druidic_rite : public AuraScript
         if (!trigger)
             return;
 
-        if (trigger->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE)
-            triggerBP = trigger->Effects[EFFECT_0].CalcValue();
-        else if (trigger->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE_PCT)
+        if (trigger->_effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE)
+            triggerBP = trigger->_effects[EFFECT_0].CalcValue();
+        else if (trigger->_effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE_PCT)
         {
-            int32 bp0 = trigger->Effects[EFFECT_0].CalcValue();
+            int32 bp0 = trigger->_effects[EFFECT_0].CalcValue();
             int32 mana = caster->GetMaxPower(POWER_MANA);
             triggerBP = (mana / 100) * bp0;
         }
 
-        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        int32 bp = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(triggerBP * bp / 400);
         caster->CastSpell(caster, 94011, args);
@@ -2474,31 +2474,31 @@ void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
     new spell_respiratory_pause();
-    RegisterAuraScript(spell_second_wind_health_aura);
-    RegisterAuraScript(spell_perseverance_health_aura);
-    RegisterAuraScript(spell_verdant_dreamer_periodic_aura);
-    RegisterAuraScript(spell_warlords_charge_periodic_aura);
-    RegisterAuraScript(spell_point_blank_periodic_aura);
-    RegisterAuraScript(spell_dead_eye_periodic_aura);
-    RegisterAuraScript(spell_talent_combulstibolt_aura);
-    RegisterAuraScript(spell_talent_burningarmor_aura);
-    RegisterAuraScript(spell_talent_engulf_aura);
-    RegisterAuraScript(spell_talent_engulfing_flames_aura);
-    RegisterAuraScript(spell_talent_fire_ward_aura);
-    RegisterAuraScript(spell_talent_from_the_ashes_aura);
-    RegisterAuraScript(spell_talent_from_the_ashes_phoenix_aura);
-    RegisterAuraScript(spell_talent_from_the_ashes_resurrection_aura);
-    RegisterAuraScript(spell_talent_icy_veins_aura);
-    RegisterAuraScript(spell_talent_heart_glacier_aura);
-    RegisterAuraScript(spell_talent_polar_affliction_aura);
-    RegisterAuraScript(spell_talent_hammer_of_the_north_aura);
-    RegisterAuraScript(spell_talent_congelation_trigger_aura);
-    RegisterAuraScript(spell_talent_congelation_actual_aura);
-    RegisterAuraScript(spell_talent_frozenheart_trigger_aura);
-    RegisterAuraScript(spell_talent_frozenheart_actual_aura);
-    RegisterAuraScript(spell_talent_coldtempered_aura);
+    RegisterSpellScript(spell_second_wind_health_aura);
+    RegisterSpellScript(spell_perseverance_health_aura);
+    RegisterSpellScript(spell_verdant_dreamer_periodic_aura);
+    RegisterSpellScript(spell_warlords_charge_periodic_aura);
+    RegisterSpellScript(spell_point_blank_periodic_aura);
+    RegisterSpellScript(spell_dead_eye_periodic_aura);
+    RegisterSpellScript(spell_talent_combulstibolt_aura);
+    RegisterSpellScript(spell_talent_burningarmor_aura);
+    RegisterSpellScript(spell_talent_engulf_aura);
+    RegisterSpellScript(spell_talent_engulfing_flames_aura);
+    RegisterSpellScript(spell_talent_fire_ward_aura);
+    RegisterSpellScript(spell_talent_from_the_ashes_aura);
+    RegisterSpellScript(spell_talent_from_the_ashes_phoenix_aura);
+    RegisterSpellScript(spell_talent_from_the_ashes_resurrection_aura);
+    RegisterSpellScript(spell_talent_icy_veins_aura);
+    RegisterSpellScript(spell_talent_heart_glacier_aura);
+    RegisterSpellScript(spell_talent_polar_affliction_aura);
+    RegisterSpellScript(spell_talent_hammer_of_the_north_aura);
+    RegisterSpellScript(spell_talent_congelation_trigger_aura);
+    RegisterSpellScript(spell_talent_congelation_actual_aura);
+    RegisterSpellScript(spell_talent_frozenheart_trigger_aura);
+    RegisterSpellScript(spell_talent_frozenheart_actual_aura);
+    RegisterSpellScript(spell_talent_coldtempered_aura);
     new spell_cold_steel_aura();
-    RegisterAuraScript(spell_glaciation_aura);
+    RegisterSpellScript(spell_glaciation_aura);
     RegisterSpellScript(spell_frostfire_bolt_combo_spender);
     RegisterSpellScript(spell_ice_barrier_combo_spender);
     new spell_from_the_ashes_proc_engulf();
@@ -2512,8 +2512,8 @@ void AddSC_Spells_Custom_Talents()
     new hot_mana_on_kill();
     new hot_life_on_kill();
     new hot_blood_drinker();
-    RegisterAuraScript(spell_gen_shield_sup_dummy);
-    RegisterAuraScript(spell_gen_shield_sup);
+    RegisterSpellScript(spell_gen_shield_sup_dummy);
+    RegisterSpellScript(spell_gen_shield_sup);
     new hot_blind_on_hit();
     new hot_maligant_deterioration();
     new hot_nathrezim_pact();
@@ -2528,12 +2528,12 @@ void AddSC_Spells_Custom_Talents()
     new hot_flurry_effect();
     new hot_shield_armorvalue();
     new hot_dazzling_light();
-    RegisterAuraScript(spell_firebrand_weapon);
-    RegisterAuraScript(spell_combustibolt);
-    RegisterAuraScript(spell_soothing_flame);
-    RegisterAuraScript(spell_burnout);
-    RegisterAuraScript(spell_battle_rouse);
-    RegisterAuraScript(spell_whirling_barrier);
-    RegisterAuraScript(spell_field_medic);
-    RegisterAuraScript(spell_druidic_rite);
+    RegisterSpellScript(spell_firebrand_weapon);
+    RegisterSpellScript(spell_combustibolt);
+    RegisterSpellScript(spell_soothing_flame);
+    RegisterSpellScript(spell_burnout);
+    RegisterSpellScript(spell_battle_rouse);
+    RegisterSpellScript(spell_whirling_barrier);
+    RegisterSpellScript(spell_field_medic);
+    RegisterSpellScript(spell_druidic_rite);
 }

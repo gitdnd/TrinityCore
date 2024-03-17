@@ -1458,72 +1458,10 @@ struct npc_brewfest_reveler_2 : ScriptedAI
     {
         NPC_BREWFEST_REVELER    = 24484,
 
-<<<<<<< HEAD
-        void Reset() override
-        {
-            _damageTimes.clear();
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!_EnterEvadeMode(why))
-                return;
-
-            Reset();
-        }
-
-        void DamageTaken(Unit* doneBy, uint32& damage) override
-        {
-            if (doneBy)
-                _damageTimes[doneBy->GetGUID()] = GameTime::GetGameTime();
-
-            if (me->GetHealthPct() < 15.0f || me->GetHealth() <= damage)
-                damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!_combatCheckTimer || !me->IsInCombat())
-                return;
-
-            if (diff < _combatCheckTimer)
-            {
-                _combatCheckTimer -= diff;
-                return;
-            }
-
-            _combatCheckTimer = 500;
-
-            time_t const now = GameTime::GetGameTime();
-            auto const& pveRefs = me->GetCombatManager().GetPvECombatRefs();
-            for (auto itr = _damageTimes.begin(); itr != _damageTimes.end();)
-            {
-                // If unit has not dealt damage to training dummy for 5 seconds, remove him from combat
-                if (itr->second < now - 5)
-                {
-                    auto it = pveRefs.find(itr->first);
-                    if (it != pveRefs.end())
-                        it->second->EndCombat();
-
-                    itr = _damageTimes.erase(itr);
-                }
-                else
-                    ++itr;
-            }
-
-            for (auto const& pair : pveRefs)
-                if (_damageTimes.find(pair.first) == _damageTimes.end())
-                    _damageTimes[pair.first] = now;
-        }
-
-        std::unordered_map<ObjectGuid, time_t> _damageTimes;
-        uint32 _combatCheckTimer;
-=======
         EVENT_FILL_LIST         = 1,
         EVENT_FACE_TO           = 2,
         EVENT_EMOTE             = 3,
         EVENT_NEXT              = 4
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     };
 
     npc_brewfest_reveler_2(Creature* creature) : ScriptedAI(creature) { }

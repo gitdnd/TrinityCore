@@ -16,7 +16,7 @@ class spell_gen_between_cast_periodic : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+        return ValidateSpellInfo({ spellInfo->_effects[EFFECT_0].TriggerSpell });
     }
 
     void PeriodicTick(AuraEffect const* aurEff)
@@ -37,7 +37,7 @@ class spell_gen_between_cast_periodic : public AuraScript
 
             // Check of player is between the caster and the target, and check player Z is within range of the caster and target Z
             if (player->IsInBetween(GetCaster(), GetTarget(), 2.f) && abs(GetCaster()->GetPositionZ() - player->GetPositionZ()) <= 3)
-                player->CastSpell(player, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+                player->CastSpell(player, GetSpellInfo()->_effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
     }
 
@@ -53,7 +53,7 @@ class spell_gen_between_cast_periodic_nozcheck : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+        return ValidateSpellInfo({ spellInfo->_effects[EFFECT_0].TriggerSpell });
     }
 
     void PeriodicTick(AuraEffect const* aurEff)
@@ -74,7 +74,7 @@ class spell_gen_between_cast_periodic_nozcheck : public AuraScript
 
             // Check of player is between the caster and the target
             if (player->IsInBetween(GetCaster(), GetTarget(), 5.f))
-                player->CastSpell(player, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+                player->CastSpell(player, GetSpellInfo()->_effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
     }
 
@@ -217,9 +217,9 @@ class spell_gen_subclass : public AuraScript
 
 void AddSC_Spells_Custom_Generic()
 {
-    RegisterAuraScript(spell_gen_between_cast_periodic);
-    RegisterAuraScript(spell_gen_between_cast_periodic_nozcheck);
+    RegisterSpellScript(spell_gen_between_cast_periodic);
+    RegisterSpellScript(spell_gen_between_cast_periodic_nozcheck);
     RegisterSpellScript(spell_generate_combopoint_all);
-    RegisterAuraScript(spell_gen_fly_in_hub);
-    RegisterAuraScript(spell_gen_subclass);
+    RegisterSpellScript(spell_gen_fly_in_hub);
+    RegisterSpellScript(spell_gen_subclass);
 }

@@ -482,10 +482,6 @@ bool BattlefieldWG::SetupBattlefield()
         m_GraveyardList[i] = graveyard;
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     Workshops.resize(WG_MAX_WORKSHOP);
     // Spawn workshop creatures and gameobjects
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
@@ -575,20 +571,12 @@ void BattlefieldWG::OnBattleStart()
         // Update faction of relic, only attacker can click on
         relic->SetFaction(WintergraspFaction[GetAttackerTeam()]);
         // Set in use (not allow to click on before last door is broken)
-<<<<<<< HEAD
-        relic->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
-=======
         relic->SetFlag(GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         m_titansRelicGUID = relic->GetGUID();
     }
     else
         TC_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // Update tower visibility and update faction
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
@@ -784,10 +772,7 @@ void BattlefieldWG::DoCompleteOrIncrementAchievement(uint32 achievement, Player*
         case ACHIEVEMENTS_WIN_WG_100:
         {
             // player->UpdateAchievementCriteria();
-<<<<<<< HEAD
-=======
             break;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
         default:
         {
@@ -823,11 +808,7 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
         case AREA_THE_CHILLED_QUAGMIRE:
             return BATTLEFIELD_WG_GY_HORDE;
         default:
-<<<<<<< HEAD
-            TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id %u", areaId);
-=======
             TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id {}", areaId);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             break;
     }
 
@@ -987,11 +968,7 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
         HandlePromotion(killer, victim);
 
         // Allow to Skin non-released corpse
-<<<<<<< HEAD
-        victim->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-=======
         victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     }
 
     /// @todoRecent PvP activity worldstate
@@ -1518,11 +1495,7 @@ void BfWGGameObjectBuilding::Destroyed()
                     go->SetGoState(GO_STATE_ACTIVE);
             _wg->SetRelicInteractible(true);
             if (_wg->GetRelic())
-<<<<<<< HEAD
-                _wg->GetRelic()->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
-=======
                 _wg->GetRelic()->RemoveFlag(GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             else
                 TC_LOG_ERROR("bg.battlefield.wg", "Titan Relic not found.");
             break;

@@ -83,29 +83,6 @@ public:
 };
 
 /*#####
-<<<<<<< HEAD
-# item_gor_dreks_ointment
-#####*/
-
-class item_gor_dreks_ointment : public ItemScript
-{
-public:
-    item_gor_dreks_ointment() : ItemScript("item_gor_dreks_ointment") { }
-
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& targets) override
-    {
-        if (targets.GetUnitTarget() && targets.GetUnitTarget()->GetTypeId() == TYPEID_UNIT &&
-            targets.GetUnitTarget()->GetEntry() == 20748 && !targets.GetUnitTarget()->HasAura(32578))
-            return false;
-
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
-        return true;
-    }
-};
-
-/*#####
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 # item_mysterious_egg
 #####*/
 
@@ -233,10 +210,6 @@ class item_generic_limit_chance_above_60 : public ItemScript
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
-<<<<<<< HEAD
-    new item_gor_dreks_ointment();
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     new item_mysterious_egg();
     new item_disgusting_jar();
     new item_petrov_cluster_bombs();

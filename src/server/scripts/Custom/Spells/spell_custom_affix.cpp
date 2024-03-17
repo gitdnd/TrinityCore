@@ -32,7 +32,7 @@ class spell_affix_avenging_wrath_aura : public AuraScript
         Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(caster, creatureList, go_check);
         Cell::VisitGridObjects(caster, go_search, range);
 
-        uint32 spellId = GetSpellInfo()->Effects[0].TriggerSpell;
+        uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
         for (std::list<Creature*>::const_iterator it = creatureList.begin(); it != creatureList.end(); ++it)
         {
             if (caster->GetFactionReactionTo((*it)->GetFactionTemplateEntry(), *it) >= REP_NEUTRAL)
@@ -144,7 +144,7 @@ class spell_affix_ordinance_aura : public AuraScript
         PreventDefaultAction();
         auto creature = caster->ToCreature();
         auto aura = aurEff->GetBase();
-        auto spellId = GetSpellInfo()->Effects[0].TriggerSpell;
+        auto spellId = GetSpellInfo()->_effects[0].TriggerSpell;
         for (int i = 0; i < aura->GetStackAmount(); ++i)
         {
             float dist = frand(5.0f, 20.0f);
@@ -176,13 +176,13 @@ class spell_affix_corpse_explosion_aura : public AuraScript
         if (!baseAura)
             return;
 
-        if (TempSummon* npc = caster->SummonCreature(60215, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 3000))
+        if (TempSummon* npc = caster->SummonCreature(60215, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 3s))
         {
             npc->SetReactState(REACT_PASSIVE);
             // Repeat for each stack
             for (int i = 0; i < baseAura->GetStackAmount(); ++i)
             {
-                npc->CastSpell(npc, GetSpellInfo()->Effects[0].TriggerSpell);
+                npc->CastSpell(npc, GetSpellInfo()->_effects[0].TriggerSpell);
             }
         }
     }
@@ -268,11 +268,11 @@ class spell_affix_mark_of_the_absolute_chance_aura : public AuraScript
 
 void AddSC_Spells_Custom_Affix()
 {
-    RegisterAuraScript(spell_affix_avenging_wrath_aura);
-    RegisterAuraScript(spell_affix_arcane_unleashed_aura);
-    RegisterAuraScript(spell_affix_barkskin_spores_aura);
-    RegisterAuraScript(spell_affix_ordinance_aura);
-    RegisterAuraScript(spell_affix_corpse_explosion_aura);
-    RegisterAuraScript(spell_affix_mark_of_the_absolute_trigger_aura);
-    RegisterAuraScript(spell_affix_mark_of_the_absolute_chance_aura);
+    RegisterSpellScript(spell_affix_avenging_wrath_aura);
+    RegisterSpellScript(spell_affix_arcane_unleashed_aura);
+    RegisterSpellScript(spell_affix_barkskin_spores_aura);
+    RegisterSpellScript(spell_affix_ordinance_aura);
+    RegisterSpellScript(spell_affix_corpse_explosion_aura);
+    RegisterSpellScript(spell_affix_mark_of_the_absolute_trigger_aura);
+    RegisterSpellScript(spell_affix_mark_of_the_absolute_chance_aura);
 }

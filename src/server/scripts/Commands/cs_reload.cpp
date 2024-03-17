@@ -103,8 +103,6 @@ public:
             { "creature_template",             rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_TEMPLATE,                true,  &HandleReloadCreatureTemplateCommand,           "" },
             { "disables",                      rbac::RBAC_PERM_COMMAND_RELOAD_DISABLES,                         true,  &HandleReloadDisablesCommand,                   "" },
             { "disenchant_loot_template",      rbac::RBAC_PERM_COMMAND_RELOAD_DISENCHANT_LOOT_TEMPLATE,         true,  &HandleReloadLootTemplatesDisenchantCommand,    "" },
-            { "eluna",                         rbac::RBAC_PERM_COMMAND_RELOAD_CONFIG,                           true,  &HandleReloadElunaCommand,                      "" },
-            { "luacache",                      rbac::RBAC_PERM_COMMAND_RELOAD_CONFIG,                           true,  &HandleReloadElunaScriptsCommand,               "" },
             { "event_scripts",                 rbac::RBAC_PERM_COMMAND_RELOAD_EVENT_SCRIPTS,                    true,  &HandleReloadEventScriptsCommand,               "" },
             { "fishing_loot_template",         rbac::RBAC_PERM_COMMAND_RELOAD_FISHING_LOOT_TEMPLATE,            true,  &HandleReloadLootTemplatesFishingCommand,       "" },
             { "graveyard_zone",                rbac::RBAC_PERM_COMMAND_RELOAD_GRAVEYARD_ZONE,                   true,  &HandleReloadGameGraveyardZoneCommand,          "" },
@@ -433,15 +431,10 @@ public:
         if (!*args)
             return false;
 
-<<<<<<< HEAD
-        Tokenizer entries(std::string(args), ' ');
         std::ostringstream oss;
         oss << "creature template entries ";
 
-        for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
-=======
         for (std::string_view entryStr : Trinity::Tokenize(args, ' ', false))
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         {
             uint32 entry = Trinity::StringTo<uint32>(entryStr).value_or(0);
 
@@ -1222,12 +1215,11 @@ public:
         if (!*args)
             return false;
 
-        Tokenizer entries(std::string(args), ' ');
         std::ostringstream oss;
         oss << "item template entries ";
-        for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
+        for (std::string_view entryStr : Trinity::Tokenize(args, ' ', false))
         {
-            uint32 entry = uint32(atoi(*itr));
+            uint32 entry = Trinity::StringTo<uint32>(entryStr).value_or(0);
 
             sObjectMgr->LoadItemTemplate(entry);
             if (const ItemTemplate* reloadItem = sObjectMgr->GetItemTemplate(entry))
@@ -1240,42 +1232,6 @@ public:
         }
         oss << "reloaded.";
         handler->SendGlobalGMSysMessage(oss.str().c_str());
-        return true;
-    }
-
-    static bool HandleReloadElunaCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-        {
-            sElunaLoader->LoadScripts();
-            sMapMgr->ReloadEluna(handler->GetSession() ? handler->GetSession()->GetPlayer()->GetMapId() : -1);
-        }
-        else if (std::string((char*)args) == "all")
-        {
-            sElunaLoader->LoadScripts();
-            sMapMgr->ReloadEluna(-1);
-        }
-        else
-        {
-            Tokenizer entries(std::string(args), ' ');
-            if(entries.size() >= 1)
-                sElunaLoader->LoadScripts();
-
-            for (Tokenizer::const_iterator itr = entries.begin(); itr != entries.end(); ++itr)
-            {
-                uint32 mapId = uint32(atoi(*itr));
-                sMapMgr->ReloadEluna(mapId);
-            }
-        }
-
-        return true;
-    }
-
-    static bool HandleReloadElunaScriptsCommand(ChatHandler* handler, char const* args)
-    {
-        sElunaLoader->LoadScripts();
-        handler->SendGlobalGMSysMessage("eluna scripts reloaded.");
-
         return true;
     }
 };

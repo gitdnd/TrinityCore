@@ -550,7 +550,7 @@ public:
                 return;
 
             SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(DamageSpell);
-            int32 amount = spellInfo->Effects[EFFECT_0].CalcValue();
+            int32 amount = spellInfo->_effects[EFFECT_0].CalcValue();
             amount *= stacks;
             amount /= maxStacks;
 
@@ -806,19 +806,19 @@ class spell_class_aura_of_steel : public AuraScript
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
-    RegisterAuraScript(spell_class_seal_of_righteousness);
-    RegisterAuraScript(spell_class_seal_of_command);
-    RegisterAuraScript(spell_class_seal_of_rockbiter);
-    RegisterAuraScript(spell_class_rockbiter_shield);
-    RegisterAuraScript(spell_class_seal_of_spellblade);
-    RegisterAuraScript(spell_class_seal_of_darktide);
-    RegisterAuraScript(spell_class_seal_of_flametongue);
-    RegisterAuraScript(spell_class_seal_of_flametongue_passive);
-    RegisterAuraScript(spell_class_seal_of_light);
-    RegisterAuraScript(spell_class_seal_of_light_heal);
-    RegisterAuraScript(spell_class_seal_of_windfury);
-    RegisterAuraScript(spell_class_seal_of_bloodgrip);
-    RegisterAuraScript(spell_class_seal_of_bloodgrip_passive);
-    RegisterAuraScript(spell_class_serrated_shot_bleed);
-    RegisterAuraScript(spell_class_aura_of_steel);
+    RegisterSpellScript(spell_class_seal_of_righteousness);
+    RegisterSpellScript(spell_class_seal_of_command);
+    RegisterSpellScript(spell_class_seal_of_rockbiter);
+    RegisterSpellScript(spell_class_rockbiter_shield);
+    RegisterSpellScript(spell_class_seal_of_spellblade);
+    RegisterSpellScript(spell_class_seal_of_darktide);
+    RegisterSpellScript(spell_class_seal_of_flametongue);
+    RegisterSpellScript(spell_class_seal_of_flametongue_passive);
+    RegisterSpellScript(spell_class_seal_of_light);
+    RegisterSpellScript(spell_class_seal_of_light_heal);
+    RegisterSpellScript(spell_class_seal_of_windfury);
+    RegisterSpellScript(spell_class_seal_of_bloodgrip);
+    RegisterSpellScript(spell_class_seal_of_bloodgrip_passive);
+    RegisterSpellScript(spell_class_serrated_shot_bleed);
+    RegisterSpellScript(spell_class_aura_of_steel);
 };

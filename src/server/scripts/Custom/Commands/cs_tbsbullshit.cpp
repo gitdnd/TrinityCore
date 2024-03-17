@@ -40,16 +40,12 @@ public:
         return tbsBullshitCommandTable;
     }
 
-    static bool HandleCirclerLaserCommand(ChatHandler* handler, char const* args)
+    static bool HandleCirclerLaserCommand(ChatHandler* handler, float radius, uint8 step)
     {
         Player* player = handler->GetSession()->GetPlayer();
-        char* radius_str = strtok((char*)args, " ");
-        char* step_str = args ? strtok(nullptr, " ") : "8";
-        float radius = atof(radius_str);
-        uint8 step = atoi(step_str);
-        if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
+        if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*60s))
         {
-            if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10 * MINUTE * IN_MILLISECONDS))
+            if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*60s))
             {
                 master->CastSpell(slave, 82000, true);
                 slave->GetMotionMaster()->MoveCirclePath(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), radius, roll_chance_f(50.f), step);

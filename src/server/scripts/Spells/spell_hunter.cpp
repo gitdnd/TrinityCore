@@ -237,7 +237,6 @@ class spell_hun_chimera_shot : public SpellScript
                     {
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_SERPENT;
 
-<<<<<<< HEAD
                         // Search only Serpent Sting, Viper Sting, Scorpid Sting auras
                         uint32 Id = aura->GetSpellInfo()->Id;
                         if (Id != 49001 && Id != 3034 && Id != 3043)
@@ -277,11 +276,6 @@ class spell_hun_chimera_shot : public SpellScript
                             aura->RefreshDuration();
                         }
                         break;
-=======
-                        // calculate damage of basic tick (bonuses are already factored in AuraEffect)
-                        basePoint = aurEff->GetAmount() * aurEff->GetTotalTicks();
-                        ApplyPct(basePoint, 40);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                     }
                     // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
                     else if (familyFlag[1] & 0x00000080)
@@ -1066,44 +1060,10 @@ class spell_hun_readiness : public SpellScript
         }, true);
     }
 
-<<<<<<< HEAD
-            void HandleDummy(SpellEffIndex /*effIndex*/) // Checks familyflags. Noting it here -Itswicky
-            {
-                // immediately finishes the cooldown on your other Hunter abilities except Bestial Wrath
-                GetCaster()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
-                {
-                    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-
-                    ///! If spellId in cooldown map isn't valid, the above will return a null pointer.
-                    /*if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
-                        spellInfo->Id != SPELL_HUNTER_READINESS &&
-                        spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH &&
-                        spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU &&
-                        spellInfo->GetRecoveryTime() > 0)
-                        return true;*/
-                    if (spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS && ((spellInfo->SpellFamilyFlags[0] & 0x8) || spellInfo->SpellFamilyFlags[0] & 0x200000))
-                        return true;
-
-                    return false;
-                }, true);
-            }
-
-            void Register() override
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_hun_readiness_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_hun_readiness_SpellScript();
-        }
-=======
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_hun_readiness::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 };
 
 // 53480 - Roar of Sacrifice

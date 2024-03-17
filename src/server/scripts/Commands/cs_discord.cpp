@@ -30,13 +30,13 @@ public:
     {
         static std::vector<ChatCommand> discordCommandTable =
         {
-            { "forgotpassword",         rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_PASSWORD,          true,  &HandlDiscordForgotPasswordCommand,       ""       },
+            /*{"forgotpassword",         rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_PASSWORD,          true,  &HandlDiscordForgotPasswordCommand,       ""},
             { "forgotusername",         rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_USERNAME,          true,  &HandlDiscordForgotUsernameCommand,       ""       },
             { "changepassword",         rbac::RBAC_PERM_COMMAND_DISCORD_CHANGE_PASSWORD,          true,  &HandlDiscordChangePasswordCommand,       ""       },
             { "setup2fa",               rbac::RBAC_PERM_COMMAND_DISCORD_SETUP_2FA,                true,  &HandlDiscordSetup2FACommand,       ""       },
             { "registeraccount",        rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCOUNT,         true,  &HandlDiscordRegisterAccountCommand,       ""       },
             { "registeraccesskey",      rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCESS_KEY,      true,  &HandlDiscordRegisterAccessKeyCommand,       ""       },
-            { "status",                 rbac::RBAC_PERM_COMMAND_DISCORD_ACCOUNT_STATUS,           true,  &HandlDiscordAccountStatusCommand,       ""       },
+            { "status",                 rbac::RBAC_PERM_COMMAND_DISCORD_ACCOUNT_STATUS,           true,  &HandlDiscordAccountStatusCommand,       ""       },*/
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -45,7 +45,7 @@ public:
         return commandTable;
     }
 
-    static bool HandlDiscordForgotPasswordCommand(ChatHandler* handler, std::string const& discordId)
+    /*static bool HandlDiscordForgotPasswordCommand(ChatHandler* handler, std::string const& discordId)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -65,7 +65,7 @@ public:
         return true;
     }
 
-    static bool HandlDiscordForgotUsernameCommand(ChatHandler* handler, std::string const& discordId)
+    static bool HandlDiscordForgotUsernameCommand(ChatHandler* handler, std::string discordId)
     {
         uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
         if (!accountId)
@@ -264,7 +264,7 @@ public:
         }
 
         return accountId;
-    }
+    }*/
 };
 
 void AddSC_discord_commandscript()

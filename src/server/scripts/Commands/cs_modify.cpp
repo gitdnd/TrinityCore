@@ -398,16 +398,7 @@ public:
 
     static bool CheckModifySpeed(ChatHandler* handler, Unit* target, float speed, float minimumBound, float maximumBound, bool checkInFlight = true)
     {
-<<<<<<< HEAD
-        if (!*args)
-            return false;
-
-        speed = (float)atof((char*)args);
-
         /*if (speed > maximumBound || speed < minimumBound)
-=======
-        if (speed > maximumBound || speed < minimumBound)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);

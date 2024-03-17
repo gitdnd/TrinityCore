@@ -563,11 +563,11 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_temporal_time_crystal);
     RegisterSpellScript(spell_item_floating_cult_thesis);
     RegisterSpellScript(spell_item_transmog);
-    RegisterAuraScript(spell_evokers_intellect_aura);
+    RegisterSpellScript(spell_evokers_intellect_aura);
     RegisterSpellScript(spell_item_rename_character);
     RegisterSpellScript(spell_item_customize_character);
     RegisterSpellScript(spell_item_faction_change_character);
     RegisterSpellScript(spell_item_change_race_character);
-    RegisterAuraScript(spell_item_metamorph_gem);
-    RegisterAuraScript(spell_tobenamedlegendary_dodge_thing);
+    RegisterSpellScript(spell_item_metamorph_gem);
+    RegisterSpellScript(spell_tobenamedlegendary_dodge_thing);
 }

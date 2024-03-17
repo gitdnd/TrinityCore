@@ -80,7 +80,8 @@ public:
         if (!args)
             return false;
 
-        char* ID_t = strtok((char*)args, " ");
+        return false;
+        /*char* ID_t = strtok((char*)args, " ");
         if (!ID_t)
             return false;
         uint32 ID = static_cast<uint32>(atoul(ID_t));
@@ -227,7 +228,7 @@ public:
         }
         else
             return false;
-        return true;
+        return true;*/
     }
 };
 

@@ -17,7 +17,6 @@
 
 // This is where scripts' loading functions should be declared:
 
-<<<<<<< HEAD
 void AddSC_GOMove_commandscript();
 void AddSC_FallOfDalaran();
 void AddSC_DragonIsles();
@@ -33,8 +32,6 @@ void AddSC_NPCS_Custom_Pets();
 void AddSC_Instance_Dummies();
 void AddSC_TbsBullshit_commandscript();
 
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
 void AddCustomScripts()
