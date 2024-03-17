@@ -2224,8 +2224,8 @@ void GameObject::Use(Unit* user)
         return;
     }
 
-    if (Player* player = user->ToPlayer())
-        sOutdoorPvPMgr->HandleCustomSpell(player, spellId, this);
+    //if (Player* player = user->ToPlayer())
+        //sOutdoorPvPMgr->HandleCustomSpell(player, spellId, this);
 
     if (spellCaster)
         spellCaster->CastSpell(user, spellId, triggered);

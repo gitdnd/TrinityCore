@@ -39,6 +39,7 @@
 #ifdef ELUNA
 #include "LuaEngine.h"
 #include "ElunaConfig.h"
+#include "ElunaLoader.h"
 #endif
 
 MapManager::MapManager()
@@ -83,6 +84,12 @@ MapManager* MapManager::instance()
 
 Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
 {
+    if (!sElunaLoader->ShouldMapLoadEluna(id))
+    {
+        ASSERT(!true, "weeeeeeeeeeeeeeeeeee");
+        return nullptr;
+    }
+
     Map* map = FindBaseMap(id);
 
     if (map == nullptr)
@@ -263,6 +270,8 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 
 bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
 {
+    if (!sElunaLoader->ShouldMapLoadEluna(mapid))
+        return false;
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     if (startUp)

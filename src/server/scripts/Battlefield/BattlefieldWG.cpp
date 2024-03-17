@@ -1883,6 +1883,6 @@ public:
 };
 
 void AddSC_BF_wintergrasp() {
-    new Battlefield_wintergrasp();
-    new npc_wg_give_promotion_credit();
+    //new Battlefield_wintergrasp();
+    //new npc_wg_give_promotion_credit();
 }

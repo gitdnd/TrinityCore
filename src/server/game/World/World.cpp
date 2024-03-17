@@ -1744,7 +1744,7 @@ void World::SetInitialWorldSettings()
 
     std::vector<uint32> mapIds;
     for (uint32 mapId = 0; mapId < sMapStore.GetNumRows(); mapId++)
-        if (sMapStore.LookupEntry(mapId))
+        if (sMapStore.LookupEntry(mapId) && sElunaLoader->ShouldMapLoadEluna(mapId))
             mapIds.push_back(mapId);
 
     vmmgr2->InitializeThreadUnsafe(mapIds);
@@ -2332,12 +2332,12 @@ void World::SetInitialWorldSettings()
     sBattlegroundMgr->InitAutomaticArenaPointDistribution();
 
     ///- Initialize outdoor pvp
-    TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
-    sOutdoorPvPMgr->InitOutdoorPvP();
+    //TC_LOG_INFO("server.loading", "Starting Outdoor PvP System");
+    //sOutdoorPvPMgr->InitOutdoorPvP();
 
     ///- Initialize Battlefield
-    TC_LOG_INFO("server.loading", "Starting Battlefield System");
-    sBattlefieldMgr->InitBattlefield();
+    //TC_LOG_INFO("server.loading", "Starting Battlefield System");
+    //sBattlefieldMgr->InitBattlefield();
 
     TC_LOG_INFO("server.loading", "Loading Transports...");
     sTransportMgr->SpawnContinentTransports();
