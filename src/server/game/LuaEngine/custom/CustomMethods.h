@@ -1235,6 +1235,470 @@ namespace LuaCustom
         obj->UpdateObjectVisibility();
         return 0;
     }
+
+    enum SelectAggroTarget
+    {
+        SELECT_TARGET_RANDOM = 0,   // Just selects a random target
+        SELECT_TARGET_TOPAGGRO,     // Selects targes from top aggro to bottom
+        SELECT_TARGET_BOTTOMAGGRO,  // Selects targets from bottom aggro to top
+        SELECT_TARGET_NEAREST,
+        SELECT_TARGET_FARTHEST
+    };
+
+    /**
+     * Returns a target from the [Creature]'s threat list based on the
+     *   supplied arguments.
+     *
+     *     enum SelectAggroTarget
+     *     {
+     *         SELECT_TARGET_RANDOM = 0,  //Just selects a random target
+     *         SELECT_TARGET_TOPAGGRO,    //Selects targets from top aggro to bottom
+     *         SELECT_TARGET_BOTTOMAGGRO, //Selects targets from bottom aggro to top
+     *         SELECT_TARGET_NEAREST,
+     *         SELECT_TARGET_FARTHEST
+     *     };
+     *
+     * For example, if you wanted to select the third-farthest [Player]
+     *   within 50 yards that has the [Aura] "Corrupted Blood" (ID 24328),
+     *   you could use this function like so:
+     *
+     *     target = creature:GetAITarget(4, true, 3, 50, 24328)
+     *
+     * @param [SelectAggroTarget] targetType : how the threat list should be sorted
+     * @param bool playerOnly = false : if `true`, skips targets that aren't [Player]s
+     * @param uint32 position = 0 : used as an offset into the threat list. If `targetType` is random, used as the number of players from top of aggro to choose from
+     * @param float distance = 0.0 : if positive, the maximum distance for the target. If negative, the minimum distance
+     * @param int32 aura = 0 : if positive, the target must have this [Aura]. If negative, the the target must not have this Aura
+     * @return [Unit] target : the target, or `nil`
+     */
+    int GetAITarget(Eluna* E, Creature* creature)
+    {
+        uint32 targetType = E->CHECKVAL<uint32>(2);
+        bool playerOnly = E->CHECKVAL<bool>(3, false);
+        uint32 position = E->CHECKVAL<uint32>(4, 0);
+        float dist = E->CHECKVAL<float>(5, 0.0f);
+        int32 aura = E->CHECKVAL<int32>(6, 0);
+
+        auto const& threatlist = creature->GetThreatManager().GetSortedThreatList();
+
+        std::list<Unit*> targetList;
+        for (ThreatReference const* itr : threatlist)
+        {
+            Unit* target = itr->GetVictim();
+            if (!target || itr->IsOffline())
+                continue;
+            if (playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+                continue;
+            if (aura > 0 && !target->HasAura(aura))
+                continue;
+            else if (aura < 0 && target->HasAura(-aura))
+                continue;
+            if (dist > 0.0f && !creature->IsWithinDist(target, dist))
+                continue;
+            else if (dist < 0.0f && creature->IsWithinDist(target, -dist))
+                continue;
+            targetList.push_back(target);
+        }
+
+        if (targetList.empty())
+            return 1;
+        if (position >= targetList.size())
+            return 1;
+
+        if (targetType == SELECT_TARGET_NEAREST || targetType == SELECT_TARGET_FARTHEST)
+            targetList.sort(ElunaUtil::ObjectDistanceOrderPred(creature));
+
+        switch (targetType)
+        {
+        case SELECT_TARGET_NEAREST:
+        case SELECT_TARGET_TOPAGGRO:
+        {
+            std::list<Unit*>::const_iterator itr = targetList.begin();
+            if (position)
+                std::advance(itr, position);
+            E->Push(*itr);
+        }
+        break;
+        case SELECT_TARGET_FARTHEST:
+        case SELECT_TARGET_BOTTOMAGGRO:
+        {
+            std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
+            if (position)
+                std::advance(ritr, position);
+            E->Push(*ritr);
+        }
+        break;
+        case SELECT_TARGET_RANDOM:
+        {
+            std::list<Unit*>::const_iterator itr = targetList.begin();
+            if (position)
+                std::advance(itr, urand(0, position));
+            else
+                std::advance(itr, urand(0, targetList.size() - 1));
+            E->Push(*itr);
+        }
+        break;
+        default:
+            luaL_argerror(E->L, 2, "SelectAggroTarget expected");
+            break;
+        }
+
+        return 1;
+    }
+    
+    /**
+     * Adds an [Item] to a vendor and updates the world database.
+     *
+     * @param uint32 entry : [Creature] entry Id
+     * @param uint32 item : [Item] entry Id
+     * @param int32 maxcount : max [Item] stack count
+     * @param uint32 incrtime : combined with maxcount, incrtime tells how often (in seconds) the vendor list is refreshed and the limited [Item] copies are restocked
+     * @param uint32 extendedcost : unique cost of an [Item], such as conquest points for example
+     */
+    int AddVendorItem(Eluna* E)
+    {
+        uint32 entry = E->CHECKVAL<uint32>(1);
+        uint32 item = E->CHECKVAL<uint32>(2);
+        int maxcount = E->CHECKVAL<int>(3);
+        uint32 incrtime = E->CHECKVAL<uint32>(4);
+        uint32 extendedcost = E->CHECKVAL<uint32>(5);
+        bool persist = E->CHECKVAL<bool>(6, true);
+
+        if (!eObjectMgr->IsVendorItemValid(entry, item, maxcount, incrtime, extendedcost))
+            return 0;
+
+        eObjectMgr->AddVendorItem(entry, item, maxcount, incrtime, extendedcost, persist);
+
+        return 0;
+    }
+
+    /**
+     * Removes an [Item] from a vendor and updates the database.
+     *
+     * @param uint32 entry : [Creature] entry Id
+     * @param uint32 item : [Item] entry Id
+     */
+    int VendorRemoveItem(Eluna* E)
+    {
+        uint32 entry = E->CHECKVAL<uint32>(1);
+        uint32 item = E->CHECKVAL<uint32>(2);
+        bool persist = E->CHECKVAL<bool>(3, true);
+
+        if (!eObjectMgr->GetCreatureTemplate(entry))
+            return luaL_argerror(E->L, 1, "valid CreatureEntry expected");
+
+        eObjectMgr->RemoveVendorItem(entry, item, persist);
+
+        return 0;
+    }
+
+    /**
+     * Returns the area ID of the [Map] at the specified X, Y, and Z coordinates.
+     *
+     * @param float x
+     * @param float y
+     * @param float z
+     * @param uint32 phasemask = PHASEMASK_NORMAL
+     * @return uint32 areaId
+     */
+    int GetAreaId(Eluna* E, Map* map)
+    {
+        float x = E->CHECKVAL<float>(2);
+        float y = E->CHECKVAL<float>(3);
+        float z = E->CHECKVAL<float>(4);
+        float phasemask = E->CHECKVAL<uint32>(5, PHASEMASK_NORMAL);
+
+        E->Push(map->GetAreaId(phasemask, x, y, z));
+        return 1;
+    }
+
+    /**
+    * Returns a table with all the current [Player]s in the map
+    *
+    *     enum TeamId
+    *     {
+    *         TEAM_ALLIANCE = 0,
+    *         TEAM_HORDE = 1,
+    *         TEAM_NEUTRAL = 2
+    *     };
+    *
+    * @param [TeamId] team : optional check team of the [Player], Alliance, Horde or Neutral (All)
+    * @return table mapPlayers
+    */
+    int GetPlayers(Eluna* E, Map* map)
+    {
+        bool includeGMS = E->CHECKVAL<bool>(2, false);
+
+        lua_newtable(E->L);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+
+        Map::PlayerList const& players = map->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        {
+            Player* player = itr->GetSource();
+            if (!player)
+                continue;
+            if (player->GetSession())
+            {
+                if (!includeGMS && player->IsGameMaster())
+                    continue;
+
+                E->Push(player);
+                lua_rawseti(E->L, tbl, ++i);
+            }
+        }
+
+        lua_settop(E->L, tbl);
+        return 1;
+    }
+
+    /**
+     * Sends a vendor window to the [Player] from the [WorldObject] specified.
+     *
+     * @param [WorldObject] sender
+     */
+    int SendListInventory(Eluna* E, Player* player)
+    {
+        WorldObject* obj = E->CHECKOBJ<WorldObject>(2);
+        uint32 vendorId = E->CHECKVAL<uint32>(3, 0);
+
+        player->GetSession()->SendListInventory(obj->GET_GUID(), vendorId);
+        return 0;
+    }
+
+    /**
+     * Makes the [Unit] jump to the coordinates
+     *
+     * @param float x
+     * @param float y
+     * @param float z
+     * @param float zSpeed : start velocity
+     * @param float maxHeight : maximum height
+     * @param uint32 id = 0 : unique movement Id
+     * @param bool hasOrientation = false : whether to force a orientation during the jump
+     * @param float o = 0 : orientation to use if hasOrientation is true
+     */
+    int MoveJump(Eluna* E, Unit* unit)
+    {
+        float x = E->CHECKVAL<float>(2);
+        float y = E->CHECKVAL<float>(3);
+        float z = E->CHECKVAL<float>(4);
+        float zSpeed = E->CHECKVAL<float>(5);
+        float maxHeight = E->CHECKVAL<float>(6);
+        uint32 id = E->CHECKVAL<uint32>(7, 0);
+        bool hasOrientation = E->CHECKVAL<bool>(8, false);
+        float o = E->CHECKVAL<float>(9, 0);
+
+        unit->GetMotionMaster()->MoveJump(x, y, z, o, zSpeed, maxHeight, id, hasOrientation);
+        return 0;
+    }
+
+    /**
+     * The [Unit] will say the message
+     *
+     * @param string msg : message for the [Unit] to say
+     * @param uint32 language : language for the [Unit] to speak
+     */
+    int SendUnitSay(Eluna* E, Unit* unit)
+    {
+        const char* msg = E->CHECKVAL<const char*>(2);
+        uint32 language = E->CHECKVAL<uint32>(3, 0);
+        if (std::string(msg).length() > 0)
+            unit->Say(msg, (Language)language, unit);
+
+        return 0;
+    }
+
+    /**
+     * The [Unit] will yell the message
+     *
+     * @param string msg : message for the [Unit] to yell
+     * @param uint32 language : language for the [Unit] to speak
+     */
+    int SendUnitYell(Eluna* E, Unit* unit)
+    {
+        const char* msg = E->CHECKVAL<const char*>(2);
+        uint32 language = E->CHECKVAL<uint32>(3, 0);
+        if (std::string(msg).length() > 0)
+            unit->Yell(msg, (Language)language, unit);
+
+        return 0;
+    }
+
+    /**
+     * Returns the nearest [Player] object in sight of the [WorldObject] or within the given range
+     *
+     * @param float range = 533.33333 : optionally set range. Default range is grid size
+     * @param uint32 hostile = 0 : 0 both, 1 hostile, 2 friendly
+     * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
+     * @param bool filterGM = true : true excludes GMs from the return result, false includes them.
+     *
+     * @return [Player] nearestPlayer
+     */
+    int GetNearestPlayer(Eluna* E, WorldObject* obj)
+    {
+        float range = E->CHECKVAL<float>(2, SIZE_OF_GRIDS);
+        uint32 hostile = E->CHECKVAL<uint32>(3, 0);
+        uint32 dead = E->CHECKVAL<uint32>(4, 1);
+        bool filterGM = E->CHECKVAL<bool>(5, true);
+
+        Unit* target = NULL;
+        ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, TYPEMASK_PLAYER, 0, hostile, dead, filterGM);
+        Trinity::UnitLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, target, checker);
+        Cell::VisitAllObjects(obj, searcher, range);
+
+        E->Push(target);
+        return 1;
+    }
+
+    /**
+     * Returns a table of [Player] objects in sight of the [WorldObject] or within the given range
+     *
+     * @param float range = 533.33333 : optionally set range. Default range is grid size
+     * @param uint32 hostile = 0 : 0 both, 1 hostile, 2 friendly
+     * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
+     * @param bool filterGM = true : true excludes GMs from the return result, false includes them.
+     *
+     * @return table playersInRange : table of [Player]s
+     */
+    int GetPlayersInRange(Eluna* E, WorldObject* obj)
+    {
+        float range = E->CHECKVAL<float>(2, SIZE_OF_GRIDS);
+        uint32 hostile = E->CHECKVAL<uint32>(3, 0);
+        uint32 dead = E->CHECKVAL<uint32>(4, 1);
+        bool filterGM = E->CHECKVAL<bool>(5, true);
+
+        std::list<Player*> list;
+        ElunaUtil::WorldObjectInRangeCheck checker(false, obj, range, TYPEMASK_PLAYER, 0, hostile, dead, filterGM);
+
+        Trinity::PlayerListSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, list, checker);
+        Cell::VisitAllObjects(obj, searcher, range);
+
+        lua_createtable(E->L, list.size(), 0);
+        int tbl = lua_gettop(E->L);
+        uint32 i = 0;
+
+        for (std::list<Player*>::const_iterator it = list.begin(); it != list.end(); ++it)
+        {
+            auto player = *it;
+            if (filterGM && player->IsGameMaster())
+                continue;
+
+            E->Push(*it);
+            lua_rawseti(E->L, tbl, ++i);
+        }
+
+        lua_settop(E->L, tbl);
+        return 1;
+    }
+
+    /**
+     * Returns nearest [WorldObject] in sight of the [WorldObject].
+     * The distance, type, entry and hostility requirements the [WorldObject] must match can be passed.
+     *
+     * @param float range = 533.33333 : optionally set range. Default range is grid size
+     * @param [TypeMask] type = 0 : the [TypeMask] that the [WorldObject] must be. This can contain multiple types. 0 will be ingored
+     * @param uint32 entry = 0 : the entry of the [WorldObject], 0 will be ingored
+     * @param uint32 hostile = 0 : specifies whether the [WorldObject] needs to be 1 hostile, 2 friendly or 0 either
+     * @param uint32 dead = 1 : 0 both, 1 alive, 2 dead
+     *
+     * @return [WorldObject] worldObject
+     */
+    int GetNearObject(Eluna* E, WorldObject* obj)
+    {
+        float range = E->CHECKVAL<float>(2, SIZE_OF_GRIDS);
+        uint16 type = E->CHECKVAL<uint16>(3, 0); // TypeMask
+        uint32 entry = E->CHECKVAL<uint32>(4, 0);
+        uint32 hostile = E->CHECKVAL<uint32>(5, 0); // 0 none, 1 hostile, 2 friendly
+        uint32 dead = E->CHECKVAL<uint32>(6, 1); // 0 both, 1 alive, 2 dead
+        bool filterGM = E->CHECKVAL<bool>(7, true);
+
+        float x, y, z;
+        obj->GetPosition(x, y, z);
+        ElunaUtil::WorldObjectInRangeCheck checker(true, obj, range, type, entry, hostile, dead, filterGM);
+
+        WorldObject* target = NULL;
+
+        Trinity::WorldObjectLastSearcher<ElunaUtil::WorldObjectInRangeCheck> searcher(obj, target, checker);
+        Cell::VisitAllObjects(obj, searcher, range);
+
+        E->Push(target);
+        return 1;
+    }
+
+    /**
+     * Spawns the creature at specified location.
+     *
+     *     enum TempSummonType
+     *     {
+     *         TEMPSUMMON_TIMED_OR_DEAD_DESPAWN       = 1, // despawns after a specified time OR when the creature disappears
+     *         TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN     = 2, // despawns after a specified time OR when the creature dies
+     *         TEMPSUMMON_TIMED_DESPAWN               = 3, // despawns after a specified time
+     *         TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT = 4, // despawns after a specified time after the creature is out of combat
+     *         TEMPSUMMON_CORPSE_DESPAWN              = 5, // despawns instantly after death
+     *         TEMPSUMMON_CORPSE_TIMED_DESPAWN        = 6, // despawns after a specified time after death
+     *         TEMPSUMMON_DEAD_DESPAWN                = 7, // despawns when the creature disappears
+     *         TEMPSUMMON_MANUAL_DESPAWN              = 8, // despawns when UnSummon() is called
+     *         TEMPSUMMON_TIMED_OOC_OR_CORPSE_DESPAWN = 9, // despawns after a specified time (OOC) OR when the creature dies
+     *         TEMPSUMMON_TIMED_OOC_OR_DEAD_DESPAWN   = 10 // despawns after a specified time (OOC) OR when the creature disappears
+     *     };
+     *
+     * @param uint32 entry : [Creature]'s entry ID
+     * @param float x
+     * @param float y
+     * @param float z
+     * @param float o
+     * @param [TempSummonType] spawnType = MANUAL_DESPAWN : defines how and when the creature despawns
+     * @param uint32 despawnTimer = 0 : despawn time in milliseconds
+     * @return [Creature] spawnedCreature
+     */
+    int SpawnCreature(Eluna* E, WorldObject* obj)
+    {
+        uint32 entry = E->CHECKVAL<uint32>(2);
+        float x = E->CHECKVAL<float>(3);
+        float y = E->CHECKVAL<float>(4);
+        float z = E->CHECKVAL<float>(5);
+        float o = E->CHECKVAL<float>(6);
+        uint32 spawnType = E->CHECKVAL<uint32>(7, 8);
+        uint32 despawnTimer = E->CHECKVAL<uint32>(8, 0);
+        int dungeonLevel = E->CHECKVAL<int>(9, 0);
+
+        TempSummonType type;
+        switch (spawnType)
+        {
+        case 1:
+            type = TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
+            break;
+        case 2:
+            type = TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN;
+            break;
+        case 3:
+            type = TEMPSUMMON_TIMED_DESPAWN;
+            break;
+        case 4:
+            type = TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT;
+            break;
+        case 5:
+            type = TEMPSUMMON_CORPSE_DESPAWN;
+            break;
+        case 6:
+            type = TEMPSUMMON_CORPSE_TIMED_DESPAWN;
+            break;
+        case 7:
+            type = TEMPSUMMON_DEAD_DESPAWN;
+            break;
+        case 8:
+            type = TEMPSUMMON_MANUAL_DESPAWN;
+            break;
+        default:
+            return luaL_argerror(E->L, 7, "valid SpawnType expected");
+        }
+
+        E->Push(obj->SummonCreature(entry, x, y, z, o, type, Milliseconds(despawnTimer), dungeonLevel));
+        return 1;
+    }
+
     
     
     // REGISTERS
@@ -1245,6 +1709,8 @@ namespace LuaCustom
         { "GetCustomTalent", &LuaCustom::GetCustomTalent },
         { "LoadCustomTalentNode", &LuaCustom::LoadCustomTalentNode },
         { "DeleteCustomTalentNode", &LuaCustom::DeleteTalentNodeBecauseFoeisAMadMan },
+        { "VendorRemoveItem", &LuaCustom::VendorRemoveItem },
+        { "AddVendorItem", &LuaCustom::AddVendorItem },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
@@ -1264,6 +1730,10 @@ namespace LuaCustom
         { "SetActive", &LuaCustom::SetActive },
         { "SetServersideVisibility", &LuaCustom::SetServersideVisibility },
         { "SetServersideVisibilityDetection", &LuaCustom::SetServersideVisibilityDetection },
+        { "SpawnCreature", &LuaCustom::SpawnCreature },
+        { "GetNearObject", &LuaCustom::GetNearObject },
+        { "GetPlayersInRange", &LuaCustom::GetPlayersInRange },
+        { "GetNearestPlayer", &LuaCustom::GetNearestPlayer },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
@@ -1279,6 +1749,9 @@ namespace LuaCustom
         { "GetCanSeeUniquePhase", &LuaCustom::GetCanSeeUniquePhase },
         { "RemoveMotion", &LuaCustom::RemoveMotion },
         { "ClearMotion", &LuaCustom::ClearMotion },
+        { "SendUnitSay", &LuaCustom::SendUnitSay },
+        { "SendUnitYell", &LuaCustom::SendUnitYell },
+        { "MoveJump", &LuaCustom::MoveJump },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
@@ -1326,6 +1799,7 @@ namespace LuaCustom
         { "SetLootPreference", &LuaCustom::SetLootPreference },
         { "GetLootPreference", &LuaCustom::GetLootPreference },
         { "QueueGroupWithAffixConfig", &LuaCustom::QueueGroupWithAffixConfig },
+        { "SendListInventory", &LuaCustom::SendListInventory },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
@@ -1342,6 +1816,7 @@ namespace LuaCustom
         { "RemoveQuest", &LuaCustom::RemoveQuest },
         { "AddQuest", &LuaCustom::AddQuest },
         { "SendMirrorImage", &LuaCustom::SendMirrorToPlayer },
+        { "GetAITarget", &LuaCustom::GetAITarget },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
@@ -1371,6 +1846,8 @@ namespace LuaCustom
         { "SetGraveyardOverride", &LuaCustom::SetGraveyardOverride },
         { "UpscaleMapIfNeeded", &LuaCustom::UpscaleMapIfNeeded},
         { "GetAffixSlotData", &LuaCustom::GetAffixSlotData },
+        { "GetPlayers", &LuaCustom::GetPlayers },
+        { "GetAreaId", &LuaCustom::GetAreaId },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
