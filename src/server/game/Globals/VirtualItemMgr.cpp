@@ -1037,11 +1037,11 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
     for (itemSpellInfo const &someSpells : availableSpells)
     {
         SelectMinMaxSkip(someSpells.minQuality, someSpells.maxQuality, output->Quality);
-        SelectMinMaxSkip(someSpells.minItemLevel, someSpells.maxItemLevel, output->ItemLevel);
-        SelectSkip(someSpells.itemClass, output->Class);
-        SelectSkip(someSpells.subClass, output->SubClass);
-        SelectSkip(someSpells.inventoryType, output->InventoryType);
-        SelectSkip(someSpells.statGroup, output->statGroup);
+        SelectMinMaxSkip(someSpells.minItemLevel, someSpells.maxItemLevel, int32(output->ItemLevel));
+        SelectSkip(someSpells.itemClass, int32(output->Class));
+        SelectSkip(someSpells.subClass, int32(output->SubClass));
+        SelectSkip(someSpells.inventoryType, int32(output->InventoryType));
+        SelectSkip(StatGroup(someSpells.statGroup), output->statGroup);
 
         if(someSpells.itemClass <= -2)
         {
@@ -2090,7 +2090,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     }
     for (auto const& itr : _LegendaryTemplateStore)
     {
-        SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, output->ItemLevel);
+        SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, int32(output->ItemLevel));
         if (SelectSkipDebug(itr.second.itemClass, output->Class, "[Class]"))
             continue;
         if (SelectSkipDebug(itr.second.itemSubClass, output->SubClass, "[SubClass]"))
