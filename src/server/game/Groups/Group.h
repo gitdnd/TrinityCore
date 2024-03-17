@@ -24,6 +24,7 @@
 #include "Loot.h"
 #include "SharedDefines.h"
 #include "Timer.h"
+#include "UniqueTrackablePtr.h"
 #include <map>
 
 class Battlefield;
@@ -355,6 +356,7 @@ class TC_GAME_API Group
 
         void SetAffixData(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
         uint32 GetAffixData(uint8 slot);
+        Trinity::unique_weak_ptr<Group> GetWeakPtr() const { return m_scriptRef; }
 
     protected:
         bool _setMembersGroup(ObjectGuid guid, uint8 group);
@@ -396,5 +398,8 @@ class TC_GAME_API Group
         uint32              m_affix3;
         uint32              m_affix4;
         TimeTracker         m_leaderOfflineTimer;
+
+        struct NoopGroupDeleter { void operator()(Group*) const { /*noop - not managed*/ } };
+        Trinity::unique_trackable_ptr<Group> m_scriptRef;
 };
 #endif

@@ -1545,7 +1545,8 @@ void Guild::HandleAcceptMember(WorldSession* session)
 void Guild::HandleLeaveMember(WorldSession* session)
 {
     Player* player = session->GetPlayer();
-    bool disband = false;
+
+    sCalendarMgr->RemovePlayerGuildEventsAndSignups(player->GetGUID(), GetId());
 
     // If leader is leaving
     if (_IsLeader(player))
@@ -1557,7 +1558,6 @@ void Guild::HandleLeaveMember(WorldSession* session)
         {
             // Guild is disbanded if leader leaves.
             Disband();
-            disband = true;
         }
     }
     else
@@ -1570,11 +1570,6 @@ void Guild::HandleLeaveMember(WorldSession* session)
 
         SendCommandResult(session, GUILD_COMMAND_QUIT, ERR_GUILD_COMMAND_SUCCESS, m_name);
     }
-
-    sCalendarMgr->RemovePlayerGuildEventsAndSignups(player->GetGUID(), GetId());
-
-    if (disband)
-        delete this;
 }
 
 void Guild::HandleRemoveMember(WorldSession* session, std::string_view name)
@@ -1799,7 +1794,6 @@ void Guild::HandleDisband(WorldSession* session)
     {
         Disband();
         TC_LOG_DEBUG("guild", "Guild Successfully Disbanded");
-        delete this;
     }
 }
 
@@ -2123,13 +2117,8 @@ bool Guild::Validate()
     if (!pLeader)
     {
         CharacterDatabaseTransaction dummy(nullptr);
-        DeleteMember(dummy, m_leaderGuid);
-        // If no more members left, disband guild
-        if (m_members.empty())
-        {
-            Disband();
+        if (DeleteMember(dummy, m_leaderGuid))
             return false;
-        }
     }
     else if (!pLeader->IsRank(GR_GUILDMASTER))
         _SetLeaderGUID(*pLeader);
@@ -2289,7 +2278,7 @@ bool Guild::AddMember(CharacterDatabaseTransaction trans, ObjectGuid guid, uint8
     return true;
 }
 
-void Guild::DeleteMember(CharacterDatabaseTransaction trans, ObjectGuid guid, bool isDisbanding, bool isKicked, bool canDeleteGuild)
+bool Guild::DeleteMember(CharacterDatabaseTransaction trans, ObjectGuid guid, bool isDisbanding, bool isKicked)
 {
     ObjectGuid::LowType lowguid = guid.GetCounter();
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
@@ -2311,9 +2300,7 @@ void Guild::DeleteMember(CharacterDatabaseTransaction trans, ObjectGuid guid, bo
         if (!newLeader)
         {
             Disband();
-            if (canDeleteGuild)
-                delete this;
-            return;
+            return true;
         }
 
         _SetLeaderGUID(*newLeader);
@@ -2346,6 +2333,14 @@ void Guild::DeleteMember(CharacterDatabaseTransaction trans, ObjectGuid guid, bo
     _DeleteMemberFromDB(trans, lowguid);
     if (!isDisbanding)
         _UpdateAccountsNumber();
+
+    if (m_members.empty())
+    {
+        Disband();
+        return true;
+    }
+
+    return false;
 }
 
 bool Guild::ChangeMemberRank(CharacterDatabaseTransaction trans, ObjectGuid guid, uint8 newRank)
