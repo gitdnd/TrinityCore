@@ -2092,7 +2092,7 @@ void Creature::setDeathState(DeathState s)
         {
             if (GetMap()->IsDungeon() || GetMap()->IsRaid())
             {
-                e->OnScoredCreatureDied(map, this);
+                //e->OnScoredCreatureDied(GetMap(), this);
             }
         }
     }

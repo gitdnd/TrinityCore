@@ -412,7 +412,7 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
 
     // At least 1 role must be selected
     if (!(roles & (PLAYER_ROLE_TANK | PLAYER_ROLE_HEALER | PLAYER_ROLE_DAMAGE)))
-        return;
+        return LFG_JOIN_FAILED;
 
     Group* grp = player->GetGroup();
     ObjectGuid guid = player->GetGUID();

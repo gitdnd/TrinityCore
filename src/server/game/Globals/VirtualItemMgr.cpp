@@ -2145,7 +2145,7 @@ uint32 VirtualItemTemplate::GetDBCDisplay()
 {
     // Get the correct display ID
     if (ItemEntry const* dbcitem = sItemStore.LookupEntry(ItemId))
-        return dbcitem->DisplayId;
+        return dbcitem->DisplayInfoID;
 
     return 0;
 }

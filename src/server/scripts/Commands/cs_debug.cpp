@@ -29,7 +29,6 @@ EndScriptData */
 #include "CellImpl.h"
 #include "Channel.h"
 #include "Chat.h"
-#include "DynamicObject.h"
 #include "GameTime.h"
 #include "GossipDef.h"
 #include "GridNotifiersImpl.h"
@@ -51,8 +50,6 @@ EndScriptData */
 #include <limits>
 #include <map>
 #include <set>
-#include "MapManager.h"
-#include "Map.h"
 
 using namespace Trinity::ChatCommands;
 
@@ -127,56 +124,8 @@ public:
         };
         static ChatCommandTable commandTable =
         {
-<<<<<<< HEAD
-            { "setbit",        rbac::RBAC_PERM_COMMAND_DEBUG_SETBIT,        false, &HandleDebugSet32BitCommand,         "" },
-            { "threat",        rbac::RBAC_PERM_COMMAND_DEBUG_THREAT,        false, &HandleDebugThreatListCommand,       "" },
-            { "threatinfo",    rbac::RBAC_PERM_COMMAND_DEBUG_THREATINFO,    false, &HandleDebugThreatInfoCommand,       "" },
-            { "combat",        rbac::RBAC_PERM_COMMAND_DEBUG_COMBAT,        false, &HandleDebugCombatListCommand,       "" },
-            { "anim",          rbac::RBAC_PERM_COMMAND_DEBUG_ANIM,          false, &HandleDebugAnimCommand,             "" },
-            { "arena",         rbac::RBAC_PERM_COMMAND_DEBUG_ARENA,         true,  &HandleDebugArenaCommand,            "" },
-            { "bg",            rbac::RBAC_PERM_COMMAND_DEBUG_BG,            true,  &HandleDebugBattlegroundCommand,     "" },
-            { "getitemstate",  rbac::RBAC_PERM_COMMAND_DEBUG_GETITEMSTATE,  false, &HandleDebugGetItemStateCommand,     "" },
-            { "lootrecipient", rbac::RBAC_PERM_COMMAND_DEBUG_LOOTRECIPIENT, false, &HandleDebugGetLootRecipientCommand, "" },
-            { "getvalue",      rbac::RBAC_PERM_COMMAND_DEBUG_GETVALUE,      false, &HandleDebugGetValueCommand,         "" },
-            { "getitemvalue",  rbac::RBAC_PERM_COMMAND_DEBUG_GETITEMVALUE,  false, &HandleDebugGetItemValueCommand,     "" },
-            { "Mod32Value",    rbac::RBAC_PERM_COMMAND_DEBUG_MOD32VALUE,    false, &HandleDebugMod32ValueCommand,       "" },
-            { "play",          rbac::RBAC_PERM_COMMAND_DEBUG_PLAY,          false, nullptr,                             "", debugPlayCommandTable },
-            { "send",          rbac::RBAC_PERM_COMMAND_DEBUG_SEND,          false, nullptr,                             "", debugSendCommandTable },
-            { "setaurastate",  rbac::RBAC_PERM_COMMAND_DEBUG_SETAURASTATE,  false, &HandleDebugSetAuraStateCommand,     "" },
-            { "setitemvalue",  rbac::RBAC_PERM_COMMAND_DEBUG_SETITEMVALUE,  false, &HandleDebugSetItemValueCommand,     "" },
-            { "setvalue",      rbac::RBAC_PERM_COMMAND_DEBUG_SETVALUE,      false, &HandleDebugSetValueCommand,         "" },
-            { "spawnvehicle",  rbac::RBAC_PERM_COMMAND_DEBUG_SPAWNVEHICLE,  false, &HandleDebugSpawnVehicleCommand,     "" },
-            { "setvid",        rbac::RBAC_PERM_COMMAND_DEBUG_SETVID,        false, &HandleDebugSetVehicleIdCommand,     "" },
-            { "entervehicle",  rbac::RBAC_PERM_COMMAND_DEBUG_ENTERVEHICLE,  false, &HandleDebugEnterVehicleCommand,     "" },
-            { "worldstate",    rbac::RBAC_PERM_COMMAND_DEBUG_WORLDSTATE,    false, &HandleDebugUpdateWorldStateCommand, "" },
-            { "update",        rbac::RBAC_PERM_COMMAND_DEBUG_UPDATE,        false, &HandleDebugUpdateCommand,           "" },
-            { "itemexpire",    rbac::RBAC_PERM_COMMAND_DEBUG_ITEMEXPIRE,    false, &HandleDebugItemExpireCommand,       "" },
-            { "areatriggers",  rbac::RBAC_PERM_COMMAND_DEBUG_AREATRIGGERS,  false, &HandleDebugAreaTriggersCommand,     "" },
-            { "los",           rbac::RBAC_PERM_COMMAND_DEBUG_LOS,           false, &HandleDebugLoSCommand,              "" },
-            { "moveflags",     rbac::RBAC_PERM_COMMAND_DEBUG_MOVEFLAGS,     false, &HandleDebugMoveflagsCommand,        "" },
-            { "transport",     rbac::RBAC_PERM_COMMAND_DEBUG_TRANSPORT,     false, &HandleDebugTransportCommand,        "" },
-            { "loadcells",     rbac::RBAC_PERM_COMMAND_DEBUG_LOADCELLS,     false, &HandleDebugLoadCellsCommand,        "" },
-            { "boundary",      rbac::RBAC_PERM_COMMAND_DEBUG_BOUNDARY,      false, &HandleDebugBoundaryCommand,         "" },
-            { "raidreset",     rbac::RBAC_PERM_COMMAND_INSTANCE_UNBIND,     false, &HandleDebugRaidResetCommand,        "" },
-            { "neargraveyard", rbac::RBAC_PERM_COMMAND_NEARGRAVEYARD,       false, &HandleDebugNearGraveyard,           "" },
-            { "instancespawn", rbac::RBAC_PERM_COMMAND_DEBUG_INSTANCESPAWN, false, &HandleDebugInstanceSpawns,          "" },
-            { "dummy",         rbac::RBAC_PERM_COMMAND_DEBUG_DUMMY,         false, &HandleDebugDummyCommand,            "" },
-            { "asan",          rbac::RBAC_PERM_COMMAND_DEBUG_ASAN,          true,  nullptr,                             "", debugAsanCommandTable },
-            { "guidlimits",    rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugGuidLimitsCommand,       "" },
-            { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
-            { "spawndynobj",   rbac::RBAC_PERM_COMMAND_DEBUG,              false, &HandleSpawnDynamicObject,           "" },
-            { "objectcount",   rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugObjectCountCommand,      "" },
-            { "questreset",    rbac::RBAC_PERM_COMMAND_DEBUG_QUESTRESET,    true,  &HandleDebugQuestResetCommand,       "" },
-            { "spawninstances",rbac::RBAC_PERM_COMMAND_DEBUG,               true,  &HandleDebugSpawnInstancesCommand,   "" }
-        };
-        static std::vector<ChatCommand> commandTable =
-        {
-            { "debug",         rbac::RBAC_PERM_COMMAND_DEBUG,               true,  nullptr,                             "", debugCommandTable },
-            { "wpgps",         rbac::RBAC_PERM_COMMAND_WPGPS,               false, &HandleWPGPSCommand,                 "" },
-=======
             { "debug",              debugCommandTable },
             { "wpgps",              HandleWPGPSCommand,                    rbac::RBAC_PERM_COMMAND_DEBUG,   Console::No },
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         };
         return commandTable;
     }
@@ -1796,20 +1745,11 @@ public:
             map->GetId(), map->GetMapName(), map->GetInstanceId(), uint64(map->GetMaxLowGuid<HighGuid::Unit>()), uint64(map->GetMaxLowGuid<HighGuid::GameObject>()));
     }
 
-<<<<<<< HEAD
-    static bool HandleDebugObjectCountCommand(ChatHandler* handler, CommandArgs* args)
-    {
-        auto mapId = args->TryConsume<uint32>();
-        if (mapId)
-        {
-            sMapMgr->DoForAllMapsWithMapId(mapId.get(),
-=======
     static bool HandleDebugObjectCountCommand(ChatHandler* handler, Optional<uint32> mapId)
     {
         if (mapId)
         {
             sMapMgr->DoForAllMapsWithMapId(mapId.value(),
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
                 [handler](Map* map) -> void
                 {
                     HandleDebugObjectCountMap(handler, map);
@@ -1829,17 +1769,6 @@ public:
         return true;
     }
 
-<<<<<<< HEAD
-    static void HandleDebugObjectCountMap(ChatHandler* handler, Map* map)
-    {
-        handler->PSendSysMessage("Map Id: %u Name: '%s' Instance Id: %u Creatures: " UI64FMTD " GameObjects: " UI64FMTD,
-            map->GetId(), map->GetMapName(), map->GetInstanceId(),
-            uint64(map->GetObjectsStore().Size<Creature>()),
-            uint64(map->GetObjectsStore().Size<GameObject>()));
-    }
-
-    static bool HandleDebugDummyCommand(ChatHandler* handler, CommandArgs* /*args*/)
-=======
     class CreatureCountWorker
     {
     public:
@@ -1895,47 +1824,8 @@ public:
     }
 
     static bool HandleDebugDummyCommand(ChatHandler* handler)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     {
         handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
-        return true;
-    }
-
-    static bool HandleSpawnDynamicObject(ChatHandler* handler, char const* args)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
-        char* spell_str = strtok((char*)args, " ");
-        char* radius_str = args ? strtok(nullptr, " ") : "10";
-        char* type_str = args ? strtok(nullptr, " ") : "0";
-        char* duration_str = args ? strtok(nullptr, " ") : nullptr;
-        uint32 spell = atoi(spell_str);
-        uint32 radius = atoi(radius_str);
-        uint32 type = atoi(type_str);
-        uint32 duration = duration_str ? atoi(duration_str) * MINUTE : 2 * MINUTE;
-        DynamicObject* dynObj = new DynamicObject(false);
-        if (dynObj->CreateDynamicObject(player->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), player, spell, player->GetPosition(), radius, DynamicObjectType(type)))
-            dynObj->SetDuration(duration);
-        else
-        {
-            handler->PSendSysMessage("Dyn Obj spawn failed.");
-            delete dynObj;
-        }
-        return true;
-    }
-
-    static bool HandleDebugSpawnInstancesCommand(ChatHandler* handler, CommandArgs* args)
-    {
-        auto numberOfInstances = args->TryConsume<uint32>();
-        if (numberOfInstances)
-        {
-            for (uint32 i = 0; i < numberOfInstances.get(); ++i)
-            {
-                sMapMgr->CreateMap(handler->GetSession()->GetPlayer()->GetMapId(), handler->GetSession()->GetPlayer());
-                handler->PSendSysMessage("Spawned %u of of %u instances.", i, numberOfInstances.get());
-            }
-        }
         return true;
     }
 };

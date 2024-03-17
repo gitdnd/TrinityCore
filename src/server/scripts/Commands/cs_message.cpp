@@ -124,7 +124,7 @@ public:
         if (message.empty())
             return false;
 
-        std::string name(handler->GetTrinityString(LANG_CONSOLE));
+        std::string name("Console");
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
@@ -137,7 +137,7 @@ public:
         if (message.empty())
             return false;
 
-        std::string name(handler->GetTrinityString(LANG_CONSOLE));
+        std::string name("Console");
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 

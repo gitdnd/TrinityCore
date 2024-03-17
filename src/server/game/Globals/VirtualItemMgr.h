@@ -411,7 +411,7 @@ public:
      * Uses passed base and modifier to generate a new VirtualItemTemplate.
      * Returns the newly created VirtualItemTemplate.
      */
-    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier = VirtualModifier());
+    VirtualItemTemplate* GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier);
 
     /**
      * Used to regenerate item info of virtual items.
@@ -421,28 +421,28 @@ public:
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
+    void GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier) const;
 
     /**
      * Uses passed modifier to generate item level.
      */
-    void GenerateItemLevel(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
+    void GenerateItemLevel(VirtualItemTemplate* output, VirtualModifier& modifier) const;
 
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
+    void GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier) const;
 
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
-    void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier()) const;
+    void GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier) const;
 
     /**
      * Uses passed modifier to select an item set.
      */
-    void GenerateItemSet(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
+    void GenerateItemSet(VirtualItemTemplate* output, VirtualModifier& modifier);
 
     /**
      * Converts a virtual player/group level into a usable item level.
@@ -455,9 +455,9 @@ public:
      */
     static bool IsVirtualTemplate(ItemTemplate const* base);
 
-    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
-    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier());
-    void GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier = VirtualModifier(), bool reRoll = false);
+    void GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier, bool reRoll = false);
+    void GenerateSpells(VirtualItemTemplate* output, VirtualModifier& modifier);
+    void GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier, bool reRoll = false);
     void GenerateAdditonalStat(VirtualItemTemplate* output);
     void UpdateDisenchantId(VirtualItemTemplate* output, VirtualModifier& modifier);
     void InitSeedGen(VirtualModifier& modifier);

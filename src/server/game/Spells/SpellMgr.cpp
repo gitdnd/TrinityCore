@@ -3061,7 +3061,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         // Lich Pet
         ApplySpellFix({ 70050 }, [](SpellInfo* spellInfo)
         {
-            spellInfo->Effects[EFFECT_0].TriggerSpell = 70049;
+            spellInfo->_GetEffect(EFFECT_0).TriggerSpell = 70049;
         });
     }
 

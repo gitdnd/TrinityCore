@@ -760,7 +760,7 @@ class TC_GAME_API Guild
 
         inline uint8 _GetLowestRankId() const { return uint8(m_ranks.size() - 1); }
 
-        inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
+        //inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
         inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
         inline BankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
 

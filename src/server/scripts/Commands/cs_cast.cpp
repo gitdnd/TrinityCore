@@ -164,21 +164,7 @@ public:
         if (!triggerFlags)
             return false;
 
-<<<<<<< HEAD
-        char* triggeredStr = strtok(nullptr, " ");
-        if (triggeredStr)
-        {
-            int l = strlen(triggeredStr);
-            if (strncmp(triggeredStr, "triggered", l) != 0)
-                return false;
-        }
-
-        TriggerCastFlags triggered = (triggeredStr != nullptr) ? TRIGGERED_FULL_DEBUG_MASK : TRIGGERED_NONE;
-
-        target->CastSpell(target, spellId, triggered);
-=======
         target->CastSpell(target, spell->Id, *triggerFlags);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         return true;
     }

@@ -26,7 +26,6 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "GroupMgr.h"
-#include "ItemTemplate.h"
 #include "InstanceSaveMgr.h"
 #include "IpAddress.h"
 #include "IPLocation.h"
@@ -159,38 +158,22 @@ public:
         return true;
     }
 
-<<<<<<< HEAD
-    static bool HandleDevCommand(ChatHandler* handler, Optional<std::string> enable)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-
-        if (!enable)
-=======
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
         Player* player = handler->GetSession()->GetPlayer();
 
         if (!enableArg)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         {
             handler->GetSession()->SendNotification(player->IsDeveloper() ? LANG_DEV_ON : LANG_DEV_OFF);
             return true;
         }
 
-<<<<<<< HEAD
-        if (*enable == "on")
-=======
         if (*enableArg)
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         {
             player->SetDeveloper(true);
             handler->GetSession()->SendNotification(LANG_DEV_ON);
         }
-<<<<<<< HEAD
-        else if (*enable == "off")
-=======
         else
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         {
             player->SetDeveloper(false);
             handler->GetSession()->SendNotification(LANG_DEV_OFF);
@@ -389,19 +372,6 @@ public:
             if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
                 return false;
 
-            for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
-            {
-                Player::BoundInstancesMap& binds = handler->GetSession()->GetPlayer()->GetBoundInstances(Difficulty(i));
-                for (Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)
-                {
-                    InstanceSave* save = itr->second.save;
-                    if (itr->first != handler->GetSession()->GetPlayer()->GetMapId())
-                        handler->GetSession()->GetPlayer()->UnbindInstance(itr, Difficulty(i));
-                    else
-                        ++itr;
-                }
-            }
-
             std::string chrNameLink = handler->playerLink(targetName);
 
             Map* map = target->GetMap();
@@ -481,7 +451,11 @@ public:
             else
                 _player->SaveRecallPosition(); // save only in non-flight case
 
-            _player->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), _player->GetAbsoluteAngle(target), TELE_TO_GM_MODE);
+            // to point to see at target with same orientation
+            float x, y, z;
+            target->GetClosePoint(x, y, z, _player->GetCombatReach(), 1.0f);
+
+            _player->TeleportTo(target->GetMapId(), x, y, z, _player->GetAbsoluteAngle(target), TELE_TO_GM_MODE);
             _player->SetPhaseMask(target->GetPhaseMask(), true);
         }
         else
@@ -1405,9 +1379,7 @@ public:
 
             return true;
         }
-        else if (itemTemplate->Stackable == 1)
-            count = 1;
- 
+
         // Adding items
         uint32 noSpaceForCount = 0;
 
@@ -1424,38 +1396,8 @@ public:
             return false;
         }
 
-        VirtualModifier modifier;
+        Item* item = playerTarget->StoreNewItem(dest, itemId, true, GenerateItemRandomPropertyId(itemId));
 
-        //item id, seed, ilevel, quality, generateSet
-        char const* seedStr = strtok(nullptr, " ");
-        if (seedStr)
-        {
-            if (atoi(seedStr) > 0)
-                modifier.seed = atoi(seedStr);
-
-            char const* ilevelStr = strtok(nullptr, " ");
-            if (ilevelStr)
-            {
-                if(atoi(ilevelStr) > 0)
-                    modifier.ilevel = atoi(ilevelStr);
-
-                char const* qualityStr = strtok(nullptr, " ");
-                if (qualityStr)
-                {
-                    modifier.quality = atoi(qualityStr);
-
-                    char const* setStr = strtok(nullptr, " ");
-                    if (setStr)
-                    {
-                        modifier.generateSet = (atoi(setStr) == 1);
-                    }
-                }
-            }
-            handler->PSendSysMessage("ItemId = %d, seed = %d, ilevel = %d, quality = %d, setOverride = %d", itemId, modifier.seed, modifier.ilevel, (int)modifier.quality, int(modifier.generateSet));
-        }
-
-        Item* item = playerTarget->StoreNewItem3(dest, itemId, true, GenerateItemRandomPropertyId(itemId), GuidSet(), modifier);
-        item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
         // remove binding (let GM give it to another player later)
         if (player == playerTarget)
             for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
@@ -1503,7 +1445,7 @@ public:
             if (msg == EQUIP_ERR_OK)
             {
                 Item* item = playerTarget->StoreNewItem(dest, itemTemplatePair.first, true);
-                item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
+
                 // remove binding (let GM give it to another player later)
                 if (player == playerTarget)
                     item->SetBinding(false);
@@ -1989,8 +1931,7 @@ public:
             if (totalmail >= 1)
                handler->PSendSysMessage(LANG_PINFO_CHR_MAILS, readmail, totalmail);
         }
-        if (target && target->GetSubClass())
-            handler->PSendSysMessage("Subclass: %s", GetClassName(target->GetSubClass(), locale));
+
         return true;
     }
 

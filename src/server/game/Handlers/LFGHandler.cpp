@@ -95,7 +95,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
         return;
     }
     else if (
-        (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() > MAXGROUPSIZE)) ||
+        (groupType == lfg::LfgGroupType::GROUP_5_MAN && (group && group->GetMembersCount() > MAX_GROUP_SIZE)) ||
         (groupType == lfg::LfgGroupType::GROUP_3_MAN && (group && group->GetMembersCount() > MAXSMALLGROUPSIZE)))
     {
         SendNotification("Your group size is bigger than the dungeon allows for.");

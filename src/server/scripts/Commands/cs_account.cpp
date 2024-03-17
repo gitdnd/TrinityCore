@@ -62,20 +62,11 @@ public:
         };
         static ChatCommandTable accountOnlinelistCommandTable =
         {
-<<<<<<< HEAD
-            { "addon",          rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_ADDON,       true,  &HandleAccountSetAddonCommand,     ""       },
-            { "sec",            rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SEC,         true,  nullptr,                "", accountSetSecTable },
-            { "gmlevel",        rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SECLEVEL,    true,  &HandleAccountSetSecLevelCommand,  ""       },  // temp for a transition period
-            { "seclevel",       rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SECLEVEL,    true,  &HandleAccountSetSecLevelCommand,  ""       },
-            { "password",       rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_PASSWORD,    true,  &HandleAccountSetPasswordCommand,  ""       },
-            { "2fa",            rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_2FA,         true,  &HandleAccountSet2FACommand,       ""       },
-=======
             { "",         HandleAccountOnlineListCommand,               LANG_COMMAND_ACC_ONLINELIST_HELP,       rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST,        Console::Yes },
             { "ip",       HandleAccountOnlineListWithIpFilterCommand,   LANG_COMMAND_ACC_ONLINELIST_HELP,       rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST,        Console::Yes },
             { "limit",    HandleAccountOnlineListWithLimitCommand,      LANG_COMMAND_ACC_ONLINELIST_HELP,       rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST,        Console::Yes },
             { "map",      HandleAccountOnlineListWithMapFilterCommand,  LANG_COMMAND_ACC_ONLINELIST_HELP,       rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST,        Console::Yes },
             { "zone",     HandleAccountOnlineListWithZoneFilterCommand, LANG_COMMAND_ACC_ONLINELIST_HELP,       rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST,        Console::Yes },
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         };
         static ChatCommandTable accountCommandTable =
         {
@@ -755,16 +746,8 @@ public:
         if (realmId)
             realmID = *realmId;
 
-<<<<<<< HEAD
-        // handler->getSession() == nullptr only for console
-        uint32 playerSecurity;
-        if (handler->GetSession())
-            playerSecurity = AccountMgr::GetSecurity(handler->GetSession()->GetAccountId(), realmID);
-        else
-=======
         uint32 playerSecurity;
         if (handler->IsConsole())
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             playerSecurity = SEC_CONSOLE;
         else
             playerSecurity = AccountMgr::GetSecurity(handler->GetSession()->GetAccountId(), realmID);
@@ -805,12 +788,8 @@ public:
             return false;
         }
 
-<<<<<<< HEAD
-        sAccountMgr->UpdateAccountAccess(nullptr, accountId, securityLevel, realmID);
-=======
         WorldSession const* session = sWorld->FindSession(accountId);
         sAccountMgr->UpdateAccountAccess(session ? session->GetRBACData() : nullptr, accountId, securityLevel, realmID);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
 
         handler->PSendSysMessage(LANG_YOU_CHANGE_SECURITY, accountName->c_str(), securityLevel);
         return true;

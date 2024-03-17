@@ -482,7 +482,7 @@ public:
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), TimeFormat::ShortText);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), TimeFormat::ShortText);
 
-        handler->PSendSysMessage("---------------------");
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, faction, npcflags, displayid, nativeid);
         if (target->GetCreatureData() && target->GetCreatureData()->spawnGroupData->groupId)
         {
             SpawnGroupTemplateData const* const groupData = target->GetCreatureData()->spawnGroupData;
@@ -523,10 +523,6 @@ public:
         for (Mechanics m : EnumUtils::Iterate<Mechanics>())
             if (m && (mechanicImmuneMask & (1 << (m-1))))
                 handler->PSendSysMessage("* %s (0x%X)", EnumUtils::ToTitle(m), m);
-
-        // Name, spawn, guid, entry, faction, display should be last, this is the most important info to read
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR, npcflags, faction, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, displayid, nativeid, target->GetDungeonLevel());
-        handler->PSendSysMessage("Main Hand Damage: %f/%f\nOff Hand Damage: %f/%f\nRanged Damage: %f/%f", target->GetFloatValue(UNIT_FIELD_MINDAMAGE), target->GetFloatValue(UNIT_FIELD_MAXDAMAGE), target->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE), target->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE), target->GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE), target->GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
 
         return true;
     }
@@ -870,7 +866,7 @@ public:
         if (text.empty())
             return false;
 
-        Unit* creature = handler->getSelectedUnit();
+        Creature* creature = handler->getSelectedCreature();
         if (!creature)
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);

@@ -47,12 +47,6 @@ public:
 
     static bool HandleAchievementAddCommand(ChatHandler* handler, AchievementEntry const* achievementEntry)
     {
-        if (!achievementEntry)
-        {
-            handler->SendSysMessage("Invalid achievement ID.");
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {

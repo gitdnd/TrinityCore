@@ -164,13 +164,7 @@ public:
 
             handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetTrinityString(LANG_OFFLINE), locationName.c_str());
 
-<<<<<<< HEAD
-            CharacterDatabaseTransaction dummy;
-            Player::SavePositionInDB(WorldLocation(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation),
-                sMapMgr->GetZoneId(PHASEMASK_NORMAL, tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid, dummy);
-=======
             Player::SavePositionInDB({ mapId, pos }, sMapMgr->GetZoneId(PHASEMASK_NORMAL, { mapId, pos }), player.GetGUID(), nullptr);
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
         }
 
         return true;

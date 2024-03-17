@@ -134,7 +134,7 @@ void AffixEffect::Apply(Creature* creature, AffixEvent event)
         return;
 
     // If unselectable
-    if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) ||
+    if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
         // if GM trigger npc
         creature->IsTrigger() ||
         // if critter

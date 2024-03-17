@@ -500,7 +500,7 @@ void CreatureAI::Backpedal()
     }
 
     /** If we are too close we are going to reposition ourself. */
-    float MaxRange = me->GetCollisionRadius() + target->GetCollisionRadius();
+    float MaxRange = me->GetBoundingRadius() + target->GetBoundingRadius();
     if (!me->IsInDist(target, MaxRange))
         return;
 

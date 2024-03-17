@@ -1143,7 +1143,6 @@ bool Aura::CanBeSaved() const
     if (GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED))
         return false;
 
-<<<<<<< HEAD
     // Can't be saved - aura handler relies on calculated amount and changes it
     if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
         return false;
@@ -1189,8 +1188,6 @@ bool Aura::CanBeSaved() const
     if (GetId() >= 51534 && GetId() <= 51552)
         return false;
 
-=======
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())
         return false;
@@ -1607,8 +1604,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                 }
                 break;
-<<<<<<< HEAD
-=======
             case SPELLFAMILY_MAGE:
                 switch (GetId())
                 {
@@ -1621,7 +1616,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                 }
                 break;
->>>>>>> 6e14d0566efddb38c3a69c32b0d0fd04b61eb209
             case SPELLFAMILY_WARRIOR:
                 if (!caster)
                     break;
