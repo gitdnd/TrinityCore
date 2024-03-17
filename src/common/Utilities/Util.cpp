@@ -34,7 +34,7 @@
 void Trinity::VerifyOsVersion()
 {
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-    auto isWindowsBuildGreaterOrEqual = [](DWORD build)
+    /*auto isWindowsBuildGreaterOrEqual = [](DWORD build)
     {
         OSVERSIONINFOEX osvi = { sizeof(osvi), 0, 0, build, 0, {0}, 0, 0, 0, 0 };
         ULONGLONG conditionMask = 0;
@@ -49,7 +49,7 @@ void Trinity::VerifyOsVersion()
         GetVersionEx((LPOSVERSIONINFO)&osvi);
         ABORT_MSG("TrinityCore requires Windows 10 19H1 (1903) or Windows Server 2019 (1903) - require build number 10.0.%d but found %d.%d.%d",
             TRINITY_REQUIRED_WINDOWS_BUILD, osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
-    }
+    }*/
 #endif
 }
 
