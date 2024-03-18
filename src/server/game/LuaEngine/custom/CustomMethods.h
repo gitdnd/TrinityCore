@@ -300,6 +300,12 @@ namespace LuaCustom
          return 0;
      }
 
+    int GetElunaMapId(Eluna* E)
+    {
+        E->Push(E->GetBoundMapId());
+        return 1;
+    }
+
     int GetDungeonLevel(Eluna* E, Group* group)
     {
         E->Push(group->GetDungeonLevel());
@@ -1711,7 +1717,7 @@ namespace LuaCustom
         { "DeleteCustomTalentNode", &LuaCustom::DeleteTalentNodeBecauseFoeisAMadMan },
         { "VendorRemoveItem", &LuaCustom::VendorRemoveItem },
         { "AddVendorItem", &LuaCustom::AddVendorItem },
-        
+        { "GetElunaMapId", &LuaCustom::GetElunaMapId },
         { NULL, NULL, METHOD_REG_NONE }
     };
     
