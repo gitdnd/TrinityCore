@@ -1860,6 +1860,8 @@ namespace LuaCustom
 
     inline void RegisterCustomFunctions(Eluna* E)
     {
+        ElunaGlobal::SetMethods(E, GlobalMethods);
+
         ElunaTemplate<Object>::SetMethods(E, ObjectMethods);
 
         ElunaTemplate<WorldObject>::SetMethods(E, ObjectMethods);
