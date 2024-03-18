@@ -648,7 +648,7 @@ bool Map::AddPlayerToMap(Player* player)
     uint32 timeTaken = std::time(0) - now;
     if (timeTaken > 80)
     {
-        TC_LOG_ERROR("network", "Time taken to call sScriptMgr::OnPlayerEnterMap = %u ms", timeTaken);
+        TC_LOG_ERROR("network", "Time taken to call sScriptMgr::OnPlayerEnterMap = {} ms", timeTaken);
     }
     player->ClearInactiveGemSpells();
     return true;

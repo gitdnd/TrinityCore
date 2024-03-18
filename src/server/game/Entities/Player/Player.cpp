@@ -2671,7 +2671,7 @@ void Player::InitTalentForLevel()
     if (newTalentPoints < 0)
     {
         newTalentPoints = 0;
-        TC_LOG_ERROR("entities.player", "Player %s (%u) has more talent points than their level (Level/Talent Level) %u/%u)", GetName().c_str(), GetGUID().GetCounter(), level, m_usedTalentCount);
+        TC_LOG_ERROR("entities.player", "Player {} ({}) has more talent points than their level (Level/Talent Level) {}/{})", GetName().c_str(), GetGUID().GetCounter(), level, m_usedTalentCount);
         ChatHandler(GetSession()).SendSysMessage("Your talent points is greater than your level please contact a developer explaining what you were doing with this issue occured.");
     }
     SetFreeTalentPoints(newTalentPoints);
@@ -6638,7 +6638,7 @@ uint32 Player::TeamForRaceNoOverride(uint8 race)
         case 1: return HORDE;
         case 7: return ALLIANCE;
         }
-        TC_LOG_ERROR("entities.player", "Race ({}) has wrong teamid (%u) in DBC: wrong DBC files?", uint32(race), rEntry->FactionID);
+        TC_LOG_ERROR("entities.player", "Race ({}) has wrong teamid ({}) in DBC: wrong DBC files?", uint32(race), rEntry->FactionID);
     }
     else
         TC_LOG_ERROR("entities.player", "Race ({}) not found in DBC: wrong DBC files?", uint32(race));
@@ -12726,7 +12726,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
         SetQuestObjective(craftingLevelQuest, 0, new_value > 10 ? 10 : new_value);
     }
 
-    TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '%s' (%s), SkillID: %u",
+    TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '{}' ({}), SkillID: {}",
         GetName().c_str(), GetGUID().ToString().c_str(), skillId);
 }
 
@@ -14500,7 +14500,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                                 ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(enchant_amount));
                             else
                                 ApplyStatPctModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, -float(enchant_amount));
-                            TC_LOG_DEBUG("entities.player.items", "+ %u ATTACK_POWER_PCT", enchant_amount);
+                            TC_LOG_DEBUG("entities.player.items", "+ {} ATTACK_POWER_PCT", enchant_amount);
                             break;
                         case ITEM_MOD_RANGED_ATTACK_POWER:
                             HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
@@ -27930,7 +27930,7 @@ void Player::UpdateArmorPassives()
                 if (auto applyAura = Aura::TryRefreshStackOrCreate(createInfo))
                     applyAura->SetStackAmount(count);
                 else
-                    TC_LOG_ERROR("spells", "Error applying armor passive, broken spell %u?", spell);
+                    TC_LOG_ERROR("spells", "Error applying armor passive, broken spell {}?", spell);
             }
         }
     }
@@ -28310,14 +28310,14 @@ uint8 Player::CanLearnCustomTalent(uint32 id)
     if (!nodeInfo) // No.
     {
         if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
-            ChatHandler(GetSession()).PSendSysMessage("Invalid node id %u", id);
+            ChatHandler(GetSession()).PSendSysMessage("Invalid node id {}", id);
         return TALENT_RESPONSE_NO_NODE_INFO;
     }
 
     if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
     {
         if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
-            ChatHandler(GetSession()).PSendSysMessage("Invalid spell id %u", nodeInfo->spellId);
+            ChatHandler(GetSession()).PSendSysMessage("Invalid spell id {}", nodeInfo->spellId);
         return TALENT_RESPONSE_SPELL_NOT_FOUND;
     }
 
