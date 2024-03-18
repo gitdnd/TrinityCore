@@ -45,7 +45,7 @@ VirtualItemMgr::VirtualItemMgr()
         uint32 max = min + block - 1;
         armorGenerator[InventoryType] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
-        TC_LOG_INFO("server.loading", "ItemGenerator Inventory[%d] %d - %d", static_cast<int>(InventoryType), min, max);
+        TC_LOG_INFO("server.loading", "ItemGenerator Inventory[{}] {} - {}", static_cast<int>(InventoryType), min, max);
     }
 
     for (auto subclass : weaponSubclasses)
@@ -54,7 +54,7 @@ VirtualItemMgr::VirtualItemMgr()
         uint32 max = min + block - 1;
         weaponGenerator[subclass] = EntryGenerator(min, min + block - 1);
         ++blockCounter;
-        TC_LOG_INFO("server.loading", "ItemGenerator Weapon[%d] %d - %d", subclass, min, max);
+        TC_LOG_INFO("server.loading", "ItemGenerator Weapon[{}] {} - {}", subclass, min, max);
     }
 }
 
@@ -97,7 +97,7 @@ void VirtualItemMgr::LoadNamesFromDB()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", "Loaded %u available virtual item names in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded {} available virtual item names in {} MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 void VirtualItemMgr::LoadDisplaysFromDB()
@@ -127,7 +127,7 @@ void VirtualItemMgr::LoadDisplaysFromDB()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", "Loaded %u available virtual item displays in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded {} available virtual item displays in {} MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 void VirtualItemMgr::LoadSpellsFromDB()
@@ -167,7 +167,7 @@ void VirtualItemMgr::LoadSpellsFromDB()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", "Loaded %u available virtual item spells in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded {} available virtual item spells in {} MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 void VirtualItemMgr::LoadSetsFromDB()
@@ -203,7 +203,7 @@ void VirtualItemMgr::LoadSetsFromDB()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", "Loaded %u available virtual item sets in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded {} available virtual item sets in {} MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 // Generators
@@ -2047,7 +2047,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
             spell.SpellCategory = 0;
             spell.SpellCategoryCooldown = -1;
             if (QueryResult spellEntry = WorldDatabase.PQuery("SELECT SpellId, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown"
-                " FROM item_generator_legendary_spell_entry WHERE legendaryIndex = %u AND spellIndex = %u", legTemp.legendaryId, i))
+                " FROM item_generator_legendary_spell_entry WHERE legendaryIndex = {} AND spellIndex = {}", legTemp.legendaryId, i))
             {
                 Field* spellFields = spellEntry->Fetch();
                 spell.SpellId = spellFields[0].GetUInt32();
@@ -2063,7 +2063,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         ++count;
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", "Loaded %u available virtual item legendary templates in %u MS.", count, GetMSTimeDiffToNow(beginTime));
+    TC_LOG_INFO("server.loading", "Loaded {} available virtual item legendary templates in {} MS.", count, GetMSTimeDiffToNow(beginTime));
 }
 
 legendaryItemInfo const* VirtualItemMgr::GetLegendaryItemInfo(uint32 id) const
