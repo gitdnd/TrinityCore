@@ -1706,7 +1706,26 @@ namespace LuaCustom
     }
 
     
-    
+
+    int ChannelSpell(Eluna* E, Unit* unit)
+    {
+        Unit* target = E->CHECKOBJ<Unit>(2);
+        uint32 spellId = E->CHECKVAL<uint32>(3);
+
+        unit->SetChannelObjectGuid(target->GetGUID());
+        unit->SetChannelSpellId(spellId);
+
+        return 0;
+    }
+
+    int StopChannel(Eluna* E, Unit* unit)
+    {
+        unit->SetChannelObjectGuid(ObjectGuid::Empty);
+        unit->SetChannelSpellId(0);
+
+        return 0;
+    }
+
     // REGISTERS
     
     ElunaGlobal::ElunaRegister GlobalMethods[] =
@@ -1758,6 +1777,8 @@ namespace LuaCustom
         { "SendUnitSay", &LuaCustom::SendUnitSay },
         { "SendUnitYell", &LuaCustom::SendUnitYell },
         { "MoveJump", &LuaCustom::MoveJump },
+        { "ChannelSpell", &LuaCustom::ChannelSpell },
+        { "StopChannel", &LuaCustom::StopChannel },
         
         { NULL, NULL, METHOD_REG_NONE }
     };
