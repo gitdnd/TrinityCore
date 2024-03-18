@@ -715,7 +715,7 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
         creatureTemplate.flags_extra = fields[62].GetUInt32();
         creatureTemplate.ScriptID = GetScriptId(fields[63].GetString());
 
-        if (QueryResult resistanceResults = WorldDatabase.PQuery("SELECT School, Resistance FROM creature_template_resistance where CreatureID = %u", entry))
+        if (QueryResult resistanceResults = WorldDatabase.PQuery("SELECT School, Resistance FROM creature_template_resistance where CreatureID = {}", entry))
         {
             do
             {
@@ -724,7 +724,7 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
                 creatureTemplate.resistance[school] = resFields[1].GetInt16();
             } while (resistanceResults->NextRow());
         }
-        if (QueryResult spellResults = WorldDatabase.PQuery("SELECT `Index`, Spell FROM creature_template_spell where CreatureID = %u", entry))
+        if (QueryResult spellResults = WorldDatabase.PQuery("SELECT `Index`, Spell FROM creature_template_spell where CreatureID = {}", entry))
         {
             do
             {
@@ -828,7 +828,7 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
         creatureTemplate.SpellSchoolImmuneMask = fields[61].GetUInt32();
         creatureTemplate.flags_extra = fields[62].GetUInt32();
         creatureTemplate.ScriptID = GetScriptId(fields[63].GetString());
-        if (QueryResult resistanceResults = WorldDatabase.PQuery("SELECT School, Resistance FROM creature_template_resistance where CreatureID = %u", entry))
+        if (QueryResult resistanceResults = WorldDatabase.PQuery("SELECT School, Resistance FROM creature_template_resistance where CreatureID = {}", entry))
         {
             do
             {
@@ -837,7 +837,7 @@ void ObjectMgr::LoadCreatureTemplateCustom(Field* fields)
                 creatureTemplate.resistance[school] = resFields[1].GetInt16();
             } while (resistanceResults->NextRow());
         }
-        if (QueryResult spellResults = WorldDatabase.PQuery("SELECT `Index`, Spell FROM creature_template_spell where CreatureID = %u", entry))
+        if (QueryResult spellResults = WorldDatabase.PQuery("SELECT `Index`, Spell FROM creature_template_spell where CreatureID = {}", entry))
         {
             do
             {
@@ -3086,7 +3086,7 @@ void ObjectMgr::LoadInstanceSpawnGroups()
 void ObjectMgr::OnDeleteSpawnData(SpawnData const* data)
 {
     auto templateIt = _spawnGroupDataStore.find(data->spawnGroupData->groupId);
-    ASSERT(templateIt != _spawnGroupDataStore.end(), "Creature data for (%u,%u) is being deleted and has invalid spawn group index %u!", uint32(data->type), data->spawnId, data->spawnGroupData->groupId);
+    ASSERT(templateIt != _spawnGroupDataStore.end(), "Creature data for ({},{}) is being deleted and has invalid spawn group index {}!", uint32(data->type), data->spawnId, data->spawnGroupData->groupId);
     if (templateIt->second.flags & SPAWNGROUP_FLAG_SYSTEM) // system groups don't store their members in the map
         return;
 
@@ -3098,7 +3098,7 @@ void ObjectMgr::OnDeleteSpawnData(SpawnData const* data)
         _spawnGroupMapStore.erase(it);
         return;
     }
-    ABORT_MSG("Spawn data (%u,%u) being removed is member of spawn group %u, but not actually listed in the lookup table for that group!", uint32(data->type), data->spawnId, data->spawnGroupData->groupId);
+    ABORT_MSG("Spawn data ({},{}) being removed is member of spawn group {}, but not actually listed in the lookup table for that group!", uint32(data->type), data->spawnId, data->spawnGroupData->groupId);
 }
 
 void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data)
@@ -3801,7 +3801,7 @@ void ObjectMgr::LoadItemTemplate(uint32 entry)
         //                                            126                 127                     128            129            130            131         132         133
         "GemProperties, RequiredDisenchantSkill, ArmorDamageModifier, duration, ItemLimitCategory, HolidayId, ScriptName, DisenchantID, "
         //                                           134        135            136
-        "FoodType, minMoneyLoot, maxMoneyLoot, flagsCustom FROM item_template where entry = %u", entry);
+        "FoodType, minMoneyLoot, maxMoneyLoot, flagsCustom FROM item_template where entry = {}", entry);
 
     if (!result)
     {
@@ -3848,7 +3848,7 @@ void ObjectMgr::LoadItemTemplate(uint32 entry)
 
         if (itemTemplate.StatsCount > MAX_ITEM_PROTO_STATS)
         {
-            TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has too large value in statscount (%u), replace by hardcoded limit (%u).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
+            TC_LOG_ERROR("sql.sql", "Item (Entry: {}) has too large value in statscount ({}), replace by hardcoded limit ({}).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
             itemTemplate.StatsCount = MAX_ITEM_PROTO_STATS;
         }
 
@@ -3965,7 +3965,7 @@ void ObjectMgr::LoadItemTemplate(uint32 entry)
 
         if (itemTemplate.StatsCount > MAX_ITEM_PROTO_STATS)
         {
-            TC_LOG_ERROR("sql.sql", "Item (Entry: %u) has too large value in statscount (%u), replace by hardcoded limit (%u).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
+            TC_LOG_ERROR("sql.sql", "Item (Entry: {}) has too large value in statscount ({}), replace by hardcoded limit ({}).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
             itemTemplate.StatsCount = MAX_ITEM_PROTO_STATS;
         }
 
@@ -4198,7 +4198,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
 
     } while (result->NextRow());
 
-    TC_LOG_INFO("server.loading", ">> Loaded %u virtual item templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    TC_LOG_INFO("server.loading", ">> Loaded {} virtual item templates in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 
@@ -10449,7 +10449,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     if (maxcount > 0 && incrtime == 0)
     {
         if (player)
-            ChatHandler(player->GetSession()).PSendSysMessage("MaxCount != 0 (%u) but IncrTime == 0", maxcount);
+            ChatHandler(player->GetSession()).PSendSysMessage("MaxCount != 0 ({}) but IncrTime == 0", maxcount);
         else
             TC_LOG_ERROR("sql.sql", "Table `(game_event_)npc_vendor` has `maxcount` ({}) for item {} of vendor (Entry: {}) but `incrtime`=0, ignore", maxcount, item_id, vendor_entry);
         return false;
@@ -11251,7 +11251,7 @@ void ObjectMgr::LoadTalentNodes()
         nodeInfo.Mutex = fields[4].GetUInt32();
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
-        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
+        QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = {}", nodeInfo.Index);
         if (linkQuery)
         {
             std::stringstream ss;
@@ -11275,7 +11275,7 @@ void ObjectMgr::LoadTalentNodes()
             } while (linkQuery->NextRow());
             nodeInfo.all_links.insert(nodeInfo.all_links.end(), nodeInfo.child_links.begin(), nodeInfo.child_links.end());
         }
-        QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
+        QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = {}", nodeInfo.Index);
         if (parentLinkQuery)
         {
             do
@@ -11292,7 +11292,7 @@ void ObjectMgr::LoadTalentNodes()
 
 void ObjectMgr::LoadTalentNodeEntry(uint32 node)
 {
-    QueryResult result = WorldDatabase.PQuery("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info where `index` = %u", node);
+    QueryResult result = WorldDatabase.PQuery("Select `index`, spellId, xOffset, yOffset, mutex, buttonType, flagMask from talent_node_info where `index` = {}", node);
     if (!result)
     {
         //@todo Error.
@@ -11313,7 +11313,7 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
     nodeInfo.flagMask = fields[6].GetUInt32();
     nodeInfo.child_links.clear();
     nodeInfo.all_links.clear();
-    QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = %u", nodeInfo.Index);
+    QueryResult linkQuery = WorldDatabase.PQuery("Select link from talent_node_link where `index` = {}", nodeInfo.Index);
     if (linkQuery)
     {
         std::stringstream ss;
@@ -11337,7 +11337,7 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
         } while (linkQuery->NextRow());
         nodeInfo.all_links.insert(nodeInfo.all_links.end(), nodeInfo.child_links.begin(), nodeInfo.child_links.end());
     }
-    QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = %u", nodeInfo.Index);
+    QueryResult parentLinkQuery = WorldDatabase.PQuery("Select `index` from talent_node_link where `link` = {}", nodeInfo.Index);
     if (parentLinkQuery)
     {
         do
