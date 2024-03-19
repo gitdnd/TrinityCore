@@ -1061,7 +1061,7 @@ float Player::GetPowerRegen(Powers power) const
 
     float regen = GetFloatValue((interrupted ? UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER : UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) + AsUnderlyingType(power));
     if (power != POWER_MANA)
-        regen += (power == POWER_ENERGY || !interrupted) ? powerRegenInfo[AsUnderlyingType(power)].first : 0.f;
+        regen += (power == POWER_ENERGY || !interrupted || power == POWER_FOCUS) ? powerRegenInfo[AsUnderlyingType(power)].first : 0.f;
 
     return regen;
 }
