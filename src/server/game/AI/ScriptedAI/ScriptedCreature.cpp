@@ -290,7 +290,7 @@ void ScriptedAI::ForceCombatStopForCreatureEntry(std::vector<uint32> creatureEnt
 
 Creature* ScriptedAI::DoSpawnCreature(uint32 entry, float offsetX, float offsetY, float offsetZ, float angle, uint32 type, Milliseconds despawntime)
 {
-    return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime);
+    return me->SummonCreature(entry, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, angle, TempSummonType(type), despawntime, me->GetDungeonLevel());
 }
 
 bool ScriptedAI::HealthBelowPct(uint32 pct) const

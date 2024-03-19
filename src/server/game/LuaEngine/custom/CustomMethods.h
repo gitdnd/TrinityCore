@@ -1670,6 +1670,7 @@ namespace LuaCustom
         uint32 spawnType = E->CHECKVAL<uint32>(7, 8);
         uint32 despawnTimer = E->CHECKVAL<uint32>(8, 0);
         int dungeonLevel = E->CHECKVAL<int>(9, 0);
+        bool visibleOnlyToSummoner = E->CHECKVAL<bool>(10, false);
 
         TempSummonType type;
         switch (spawnType)
@@ -1702,7 +1703,7 @@ namespace LuaCustom
             return luaL_argerror(E->L, 7, "valid SpawnType expected");
         }
 
-        E->Push(obj->SummonCreature(entry, x, y, z, o, type, Milliseconds(despawnTimer), dungeonLevel));
+        E->Push(obj->SummonCreature(entry, x, y, z, o, type, Milliseconds(despawnTimer), dungeonLevel, visibleOnlyToSummoner));
         return 1;
     }
 
