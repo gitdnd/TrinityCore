@@ -946,7 +946,7 @@ static std::pair<float, Optional<Rates>> const powerRegenInfo[MAX_POWERS] =
 {
     { 0.f,      RATE_POWER_MANA             }, // POWER_MANA
     { -12.5f,   RATE_POWER_RAGE_LOSS        }, // POWER_RAGE,           -1.25 rage per second
-    { 0.f,      std::nullopt                }, // POWER_FOCUS
+    { 5.f,      RATE_POWER_FOCUS            }, // POWER_FOCUS
     { 10.f,     RATE_POWER_ENERGY           }, // POWER_ENERGY,         +10 energy per second
     { 0.f,      std::nullopt                }, // POWER_HAPPINESS
     { 0.f,      std::nullopt                }, // POWER_RUNE
@@ -1016,7 +1016,7 @@ void Player::UpdatePowerRegen(Powers power)
         }
         case POWER_FOCUS:
         {
-            result_regen += (0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_FOCUS)) * 0.5f;
+            result_regen = powerRegenInfo[AsUnderlyingType(power)].first;
             result_regen_interrupted = 0.f;
 
             result_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, AsUnderlyingType(power));

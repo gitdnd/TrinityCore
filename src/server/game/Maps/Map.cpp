@@ -137,7 +137,7 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
             if (header.mapMagic.asUInt != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
                 TC_LOG_ERROR("maps", "Map file '{}' is from an incompatible map version (%.*s v{}), %.*s v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files. If you still have problems search on forum for error TCE00018.",
                     fileName, 4, header.mapMagic.asChar, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
-            else
+            //else
                 ret = true;
         }
         fclose(pf);
