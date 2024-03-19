@@ -179,7 +179,7 @@ char const* Warden::ApplyPenalty(WardenCheck const* check)
         action = check->Action;
     else
         action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
-    TC_LOG_ERROR("network", "Warden check failed {}, check id {}, {}", check->CheckId, check->Comment);
+    TC_LOG_ERROR("network", "Warden check failed on {}, check id {}, {}", _session->GetPlayerName(), check->CheckId, check->Comment.c_str());
 
     /*switch (action)
     {

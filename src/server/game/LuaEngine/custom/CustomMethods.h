@@ -1760,7 +1760,7 @@ namespace LuaCustom
         return 0;
     }
 
-    int StopChannel(Eluna* E, Unit* unit)
+    int StopChannel(Eluna* /*E*/, Unit* unit)
     {
         unit->SetChannelObjectGuid(ObjectGuid::Empty);
         unit->SetChannelSpellId(0);
