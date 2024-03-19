@@ -188,4 +188,8 @@ void RegisterFunctions(Eluna* E)
     LuaVal::Register(E->L);
 
     LuaCustom::RegisterCustomFunctions(E);
+    //Transport created in CustomMethods.
+    ElunaTemplate<Transport>::SetMethods(E, LuaObject::ObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, LuaWorldObject::WorldObjectMethods);
+    ElunaTemplate<Transport>::SetMethods(E, LuaGameObject::GameObjectMethods);
 }

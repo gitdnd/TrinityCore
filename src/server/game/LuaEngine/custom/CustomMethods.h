@@ -1971,9 +1971,6 @@ namespace LuaCustom
         ElunaTemplate<Transport>::SetMethods(E, TransportMethods);
         ElunaTemplate<Transport>::SetMethods(E, ObjectMethods);
         ElunaTemplate<Transport>::SetMethods(E, WorldObjectMethods);
-        ElunaTemplate<Transport>::SetMethods(E, LuaObject::ObjectMethods);
-        ElunaTemplate<Transport>::SetMethods(E, LuaWorldObject::WorldObjectMethods);
-        ElunaTemplate<Transport>::SetMethods(E, LuaGameObject::GameObjectMethods);
     };
 };
     
