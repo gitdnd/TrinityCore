@@ -179,8 +179,9 @@ char const* Warden::ApplyPenalty(WardenCheck const* check)
         action = check->Action;
     else
         action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    TC_LOG_ERROR("network", "Warden check failed {}, check id {}, {}", check->CheckId, check->Comment);
 
-    switch (action)
+    /*switch (action)
     {
         case WARDEN_ACTION_KICK:
             _session->KickPlayer("Warden::Penalty");
@@ -202,7 +203,7 @@ char const* Warden::ApplyPenalty(WardenCheck const* check)
         case WARDEN_ACTION_LOG:
         default:
             return "None";
-    }
+    }*/
     return EnumUtils::ToTitle(action);
 }
 
