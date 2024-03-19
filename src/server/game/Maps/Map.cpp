@@ -331,6 +331,8 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     MMAP::MMapFactory::createOrGetMMapManager()->loadMapInstance(sWorld->GetDataPath(), GetId(), GetInstanceId());
+    TC_LOG_ERROR("network", "Initalize map dungeon level {}, affixes {} {} {} {}", dungeonLevel, affix1, affix2, affix3, affix4);
+
 }
 
 void Map::InitVisibilityDistance()

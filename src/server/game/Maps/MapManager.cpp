@@ -89,7 +89,7 @@ Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32 affix1, ui
         ASSERT(!true, "weeeeeeeeeeeeeeeeeee");
         return nullptr;
     }
-
+    TC_LOG_ERROR("network", "Create base map dungeon level {}, affixes {} {} {} {}", dungeonLevel, affix1, affix2, affix3, affix4);
     Map* map = FindBaseMap(id);
 
     if (map == nullptr)

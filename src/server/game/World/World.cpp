@@ -2475,7 +2475,7 @@ void World::Update(uint32 diff)
 {
     if (diff > 200)
     {
-        TC_LOG_ERROR("network", "Update diff over 100ms: %u", diff);
+        TC_LOG_ERROR("network", "Update diff over 100ms: {}", diff);
     }
 
     TC_METRIC_TIMER("world_update_time_total");
