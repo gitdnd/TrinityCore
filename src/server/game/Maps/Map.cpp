@@ -299,7 +299,7 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
         if (!IsParentMap() || (IsParentMap() && !Instanceable()))
             eluna = new Eluna(this);
 #endif
-    if (_parent || !Instanceable())
+    if (IsParentMap() || !Instanceable())
         i_dungeonLevel = 0;
 
     if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
