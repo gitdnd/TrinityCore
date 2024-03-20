@@ -3640,7 +3640,7 @@ std::string WorldObject::GetDebugInfo() const
 Eluna* WorldObject::GetEluna() const
 {
     Eluna* e = nullptr;
-    if (const Map * map = GetMap())
+    if (const Map * map = FindMap())
         e = map->GetEluna();
 
     if (!e)
