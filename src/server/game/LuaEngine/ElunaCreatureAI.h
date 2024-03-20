@@ -53,6 +53,8 @@ struct ElunaCreatureAI : CreatureAI
     void UpdateAI(uint32 diff) override
 #endif
     {
+        if (!me->GetEluna())
+            return;
 #ifdef TRINITY
         //Spawns are handled by Creature.cpp - in function Creature::Update() 
 #else
