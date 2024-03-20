@@ -3644,7 +3644,7 @@ Eluna* WorldObject::GetEluna() const
         e = map->GetEluna();
 
     if (!e)
-        TC_LOG_ERROR("eluna", "Object {} ({}, {}) tried getting eluna while not on a map.", GetName().c_str(), GetEntry(), GetGUID().GetCounter());
+        TC_LOG_ERROR("network", "Object {} ({}, {}) tried getting eluna while not on a map.", GetName().c_str(), GetEntry(), GetGUID().GetCounter());
 
     return e;
 }
