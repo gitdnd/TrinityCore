@@ -1875,7 +1875,7 @@ bool GridMap::loadData(char const* filename)
         return false;
     }
 
-    if (header.mapMagic.asUInt == MapMagic.asUInt && header.versionMagic == MapVersionMagic)
+    //if (header.mapMagic.asUInt == MapMagic.asUInt && header.versionMagic == MapVersionMagic)
     {
         // load up area data
         if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))

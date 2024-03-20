@@ -253,8 +253,8 @@ namespace VMAP
         char chunk[8];
         if (!readChunk(rf, chunk, VMAP_MAGIC, 8) || fread(&tiled, sizeof(char), 1, rf) != 1)
         {
-            fclose(rf);
-            return LoadResult::VersionMismatch;
+           // fclose(rf);
+           // return LoadResult::VersionMismatch;
         }
         if (tiled)
         {
@@ -264,8 +264,8 @@ namespace VMAP
                 result = LoadResult::FileNotFound;
             else
             {
-                if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
-                    result = LoadResult::VersionMismatch;
+                //if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
+                    //result = LoadResult::VersionMismatch;
                 fclose(tf);
             }
         }
@@ -286,8 +286,8 @@ namespace VMAP
 
         char chunk[8];
         char tiled = '\0';
-
-        if (readChunk(rf, chunk, VMAP_MAGIC, 8) && fread(&tiled, sizeof(char), 1, rf) == 1 &&
+        readChunk(rf, chunk, VMAP_MAGIC, 8);
+        if (fread(&tiled, sizeof(char), 1, rf) == 1 &&
             readChunk(rf, chunk, "NODE", 4) && iTree.readFromFile(rf))
         {
             iNTreeValues = iTree.primCount();
@@ -363,7 +363,7 @@ namespace VMAP
             char chunk[8];
 
             if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
-                result = false;
+                result = true;
             uint32 numSpawns = 0;
             if (result && fread(&numSpawns, sizeof(uint32), 1, tf) != 1)
                 result = false;
@@ -440,7 +440,7 @@ namespace VMAP
                 bool result = true;
                 char chunk[8];
                 if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
-                    result = false;
+                    result = true;
                 uint32 numSpawns;
                 if (fread(&numSpawns, sizeof(uint32), 1, tf) != 1)
                     result = false;

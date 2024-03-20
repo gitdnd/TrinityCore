@@ -53,8 +53,8 @@ void LoadGameObjectModelList(std::string const& dataPath)
     }
 
     char magic[8];
-    if (fread(magic, 1, 8, model_list_file) != 8
-        || memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
+    //if (fread(magic, 1, 8, model_list_file) != 8
+        //|| memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
     {
         TC_LOG_ERROR("misc", "File '{}' has wrong header, expected {}.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
         fclose(model_list_file);

@@ -141,16 +141,16 @@ namespace MMAP
         if (fread(&fileHeader, sizeof(MmapTileHeader), 1, file) != 1 || fileHeader.mmapMagic != MMAP_MAGIC)
         {
             TC_LOG_ERROR("maps", "MMAP:loadMap: Bad header in mmap {:03}{:02}{:02}.mmtile", mapId, x, y);
-            fclose(file);
-            return false;
+            //fclose(file);
+            //return false;
         }
 
         if (fileHeader.mmapVersion != MMAP_VERSION)
         {
             TC_LOG_ERROR("maps", "MMAP:loadMap: {:03}{:02}{:02}.mmtile was built with generator v{}, expected v{}",
                 mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
-            fclose(file);
-            return false;
+            //fclose(file);
+            //return false;
         }
 
         long pos = ftell(file);
