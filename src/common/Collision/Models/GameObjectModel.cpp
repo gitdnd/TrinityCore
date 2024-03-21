@@ -52,7 +52,7 @@ void LoadGameObjectModelList(std::string const& dataPath)
         return;
     }
 
-    char magic[8];
+    //char magic[8];
     //if (fread(magic, 1, 8, model_list_file) != 8
         //|| memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
     {

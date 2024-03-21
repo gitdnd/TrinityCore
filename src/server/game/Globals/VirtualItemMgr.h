@@ -41,6 +41,7 @@ struct VirtualItemTemplate : ItemTemplate
     VirtualItemTemplate(ItemTemplate const* base) : ItemTemplate(*base), base_entry(base->ItemId)
     {
         FlagsCu &= ~ITEM_FLAGS_CU_VIRTUAL_ITEM_BASE; // virtual item should not be revirtualized?
+        statGroup = STAT_GROUP_RANDOM;
         seed = 0; 
         socketSeed = 0;
         qualitySeed = 0;
@@ -210,7 +211,7 @@ struct displayInfo
 
 struct itemSpellInfo
 {
-    itemSpellInfo() { spellId = 0; }
+    itemSpellInfo() { spellId = 0; minQuality = 0; maxQuality = 0; itemClass = -1; subClass = -1; inventoryType = -1; statGroup = -1; minItemLevel = -1; maxItemLevel = -1; SpellTrigger = 0; SpellCharges = 0; SpellPPMRate = 0.f; SpellCooldown = -1; SpellCategory = 0; SpellCategoryCooldown = -1; }
     itemSpellInfo(uint32 sId, uint32 minQual, uint32 maxQual, int32 iClass, int32 sub, int32 iType, int8 iGroup, int32 minILvL, int32 maxILvL, uint32 sTrig, int32 sCharge, float PPM, int32 CD, uint32 sCat, int32 SCC) : spellId(sId), minQuality(minQual), maxQuality(maxQual),
         itemClass(iClass), subClass(sub), inventoryType(iType), statGroup(iGroup), minItemLevel(minILvL), maxItemLevel(maxILvL), SpellTrigger(sTrig), SpellCharges(sCharge), SpellPPMRate(PPM), SpellCooldown(CD), SpellCategory(sCat), SpellCategoryCooldown(SCC) {}
     uint32 spellId;
@@ -317,7 +318,7 @@ public:
 
 	struct NameInfo
 	{
-		NameInfo() {}
+        NameInfo() { itemType = -1; subclass = -1; inventoryType - 1; array_id = -1; }
 		NameInfo(int32 type, int32 sub, int32 iType, int32 arrid) : itemType(type), subclass(sub), inventoryType(iType), array_id(arrid) {}
 		NameInfo(int32 type, int32 sub, int32 iType, int32 arrid, std::string n) : itemType(type), subclass(sub), inventoryType(iType), array_id(arrid), name(n) {}
 		int32 itemType;
@@ -338,7 +339,7 @@ public:
     {
         friend class VirtualItemMgr;
 
-        VirtualLevelInfo() {}
+        VirtualLevelInfo() { iLevel = 0.f; }
         VirtualLevelInfo(float ilevel) : iLevel(ilevel) {}
         float iLevel;
     };

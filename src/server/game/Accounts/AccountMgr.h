@@ -68,6 +68,7 @@ class TC_GAME_API AccountMgr
 
 
         static uint32 GetIdByEmail(std::string const& email);
+        static uint32 GetIdByEmail(const char* email);
         static std::string GetUsernameById(uint32 id);
 
         static uint32 GetId(std::string_view username);

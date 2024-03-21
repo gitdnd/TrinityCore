@@ -4,6 +4,7 @@
 #include "Base32.h"
 #include "Chat.h"
 #include "CryptoGenerics.h"
+#include "CryptoRandom.h"
 #include "DatabaseEnv.h"
 #include "IpAddress.h"
 #include "IPLocation.h"
@@ -16,8 +17,6 @@
 #include "World.h"
 #include "WorldSession.h"
 #include <unordered_map>
-#include <openssl/rand.h>
-#include <boost/optional/optional_io.hpp>
 
 using namespace Trinity::ChatCommands;
 
@@ -28,26 +27,26 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
-        static std::vector<ChatCommand> discordCommandTable =
+        static ChatCommandTable discordCommandTable =
         {
-            /*{"forgotpassword",         rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_PASSWORD,          true,  &HandlDiscordForgotPasswordCommand,       ""},
-            { "forgotusername",         rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_USERNAME,          true,  &HandlDiscordForgotUsernameCommand,       ""       },
-            { "changepassword",         rbac::RBAC_PERM_COMMAND_DISCORD_CHANGE_PASSWORD,          true,  &HandlDiscordChangePasswordCommand,       ""       },
-            { "setup2fa",               rbac::RBAC_PERM_COMMAND_DISCORD_SETUP_2FA,                true,  &HandlDiscordSetup2FACommand,       ""       },
-            { "registeraccount",        rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCOUNT,         true,  &HandlDiscordRegisterAccountCommand,       ""       },
-            { "registeraccesskey",      rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCESS_KEY,      true,  &HandlDiscordRegisterAccessKeyCommand,       ""       },
-            { "status",                 rbac::RBAC_PERM_COMMAND_DISCORD_ACCOUNT_STATUS,           true,  &HandlDiscordAccountStatusCommand,       ""       },*/
+            { "forgotpassword",          HandlDiscordForgotPasswordCommand,   rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_PASSWORD,       Console::Yes},
+            { "forgotusername",          HandlDiscordForgotUsernameCommand,   rbac::RBAC_PERM_COMMAND_DISCORD_FORGOT_USERNAME,       Console::Yes},
+            { "changepassword",          HandlDiscordChangePasswordCommand,   rbac::RBAC_PERM_COMMAND_DISCORD_CHANGE_PASSWORD,       Console::Yes},
+            { "setup2fa",                HandlDiscordSetup2FACommand,         rbac::RBAC_PERM_COMMAND_DISCORD_SETUP_2FA,             Console::Yes},
+            { "registeraccount",         HandlDiscordRegisterAccountCommand,  rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCOUNT,      Console::Yes},
+            { "registeraccesskey",       HandlDiscordRegisterAccessKeyCommand,rbac::RBAC_PERM_COMMAND_DISCORD_REGISTER_ACCESS_KEY,   Console::Yes},
+            { "status",                  HandlDiscordAccountStatusCommand,    rbac::RBAC_PERM_COMMAND_DISCORD_ACCOUNT_STATUS,        Console::Yes},
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "discord",        rbac::RBAC_PERM_COMMAND_ACCOUNT,                 true,  nullptr,              "",  discordCommandTable },
+            { "discord",  discordCommandTable },
         };
         return commandTable;
     }
 
-    /*static bool HandlDiscordForgotPasswordCommand(ChatHandler* handler, std::string const& discordId)
+    static bool HandlDiscordForgotPasswordCommand(ChatHandler* handler, std::string const& discordId)
     {
-        uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
+        uint32 accountId = GetAccountIdByDiscordId(handler, discordId.c_str());
         if (!accountId)
             return true;
 
@@ -65,9 +64,9 @@ public:
         return true;
     }
 
-    static bool HandlDiscordForgotUsernameCommand(ChatHandler* handler, std::string discordId)
+    static bool HandlDiscordForgotUsernameCommand(ChatHandler* handler, Tail discordId)
     {
-        uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
+        uint32 accountId = GetAccountIdByDiscordId(handler, discordId.data());
         if (!accountId)
             return true;
 
@@ -84,7 +83,7 @@ public:
 
     static bool HandlDiscordChangePasswordCommand(ChatHandler* handler, std::string const& discordId, std::string const& password)
     {
-        uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
+        uint32 accountId = GetAccountIdByDiscordId(handler, discordId.c_str());
         if (!accountId)
              return true;
 
@@ -107,10 +106,6 @@ public:
 
     static bool HandlDiscordSetup2FACommand(ChatHandler* handler, std::string const& discordId, Optional<uint32> token)
     {
-        uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
-        if (!accountId)
-            return true;
-
         auto const& masterKey = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY);
         if (!masterKey.IsAvailable())
         {
@@ -119,6 +114,8 @@ public:
             return false;
         }
 
+        uint32 const accountId = GetAccountIdByDiscordId(handler, discordId.c_str());
+
         { // check if 2FA already enabled
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET);
             stmt->setUInt32(0, accountId);
@@ -126,15 +123,17 @@ public:
 
             if (!result)
             {
-                TC_LOG_ERROR("misc", "Account %u not found in login database when processing .account 2fa setup command.", accountId);
+                TC_LOG_ERROR("misc", "Account {} not found in login database when processing .account 2fa setup command.", accountId);
                 handler->SendSysMessage(LANG_UNKNOWN_ERROR);
-                return true;
+                handler->SetSentErrorMessage(true);
+                return false;
             }
 
             if (!result->Fetch()->IsNull())
             {
                 handler->SendSysMessage(LANG_2FA_ALREADY_SETUP);
-                return true;
+                handler->SetSentErrorMessage(true);
+                return false;
             }
         }
 
@@ -142,7 +141,7 @@ public:
         static std::unordered_map<uint32, Trinity::Crypto::TOTP::Secret> suggestions;
         auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Trinity::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument size_t constructor invokes resize
         if (pair.second) // no suggestion yet, generate random secret
-            RAND_bytes(pair.first->second.data(), pair.first->second.size());
+            Trinity::Crypto::GetRandomBytes(pair.first->second);
 
         if (!pair.second && token) // suggestion already existed and token specified - validate
         {
@@ -160,17 +159,13 @@ public:
                 return true;
             }
             else
-            {
-                //handler->SendSysMessage(LANG_2FA_INVALID_TOKEN);
-                handler->PSendSysMessage("%u was invalid token.", token);
-                return true;
-            }
-                
+                handler->SendSysMessage(LANG_2FA_INVALID_TOKEN);
         }
 
         // new suggestion, or no token specified, output TOTP parameters
         handler->PSendSysMessage(LANG_2FA_SECRET_SUGGESTION, Trinity::Encoding::Base32::Encode(pair.first->second));
-        return true;
+        handler->SetSentErrorMessage(true);
+        return false;
     }
 
     static bool HandlDiscordRegisterAccountCommand(ChatHandler* handler, std::string const& discordId, std::string const& username, std::string const& password)
@@ -207,7 +202,7 @@ public:
 
     static bool HandlDiscordRegisterAccessKeyCommand(ChatHandler* handler, std::string const& discordId, std::string const& key)
     {
-        uint32 accountId = GetAccountIdByDiscordId(handler, discordId);
+        uint32 accountId = GetAccountIdByDiscordId(handler, discordId.c_str());
         if (!accountId)
             return true;
 
@@ -253,7 +248,7 @@ public:
         return true;
     }
 
-    static uint32 GetAccountIdByDiscordId(ChatHandler* handler,  std::string const& discordId)
+    static uint32 GetAccountIdByDiscordId(ChatHandler* handler,  const char* discordId)
     {
         uint32 accountId = AccountMgr::GetIdByEmail(discordId);
 
@@ -264,7 +259,7 @@ public:
         }
 
         return accountId;
-    }*/
+    }
 };
 
 void AddSC_discord_commandscript()
