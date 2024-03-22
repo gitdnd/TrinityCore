@@ -18,8 +18,7 @@
 #ifndef _MMAP_COMMON_H
 #define _MMAP_COMMON_H
 
-#include "Define.h"
-#include <memory>
+#include "Common.h"
 #include <string>
 #include <vector>
 

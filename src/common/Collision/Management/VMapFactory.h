@@ -27,6 +27,7 @@ This is the access point to the VMapManager.
 namespace VMAP
 {
     class VMapManager2;
+    //===========================================================
 
     class TC_COMMON_API VMapFactory
     {

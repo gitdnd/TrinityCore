@@ -17,10 +17,8 @@
 
 #include "dbcfile.h"
 #include "Banner.h"
-#include "Locales.h"
 #include "mpq_libmpq04.h"
 #include "StringFormat.h"
-#include "Util.h"
 
 #include "adt.h"
 #include "wdt.h"
@@ -36,6 +34,7 @@
 
 #include <G3D/Plane.h>
 #include <boost/filesystem.hpp>
+#include <unordered_map>
 
 extern ArchiveSet gOpenArchives;
 
@@ -102,7 +101,7 @@ void CreateDir(boost::filesystem::path const& path)
         return;
 
     if (!fs::create_directory(path))
-        throw std::runtime_error("Unable to create directory" + path.string());
+        throw new std::runtime_error("Unable to create directory" + path.string());
 }
 
 void Usage(char* prg)
@@ -264,7 +263,7 @@ void ReadLiquidTypeTableDBC()
 
 // Map file format data
 static char const* MAP_MAGIC         = "MAPS";
-static uint32 const MAP_VERSION_MAGIC = 10;
+static char const* MAP_VERSION_MAGIC = "v1.9";
 static char const* MAP_AREA_MAGIC    = "AREA";
 static char const* MAP_HEIGHT_MAGIC  = "MHGT";
 static char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -381,7 +380,7 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
     // Prepare map header
     map_fileheader map;
     map.mapMagic = *reinterpret_cast<uint32 const*>(MAP_MAGIC);
-    map.versionMagic = MAP_VERSION_MAGIC;
+    map.versionMagic = *reinterpret_cast<uint32 const*>(MAP_VERSION_MAGIC);
     map.buildMagic = build;
 
     // Get area flags data
@@ -783,10 +782,7 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
                     if (minHeight > h) minHeight = h;
                 }
                 else
-                {
                     liquid_height[y][x] = CONF_use_minHeight;
-                    if (minHeight > CONF_use_minHeight) minHeight = CONF_use_minHeight;
-                }
             }
         }
         map.liquidMapOffset = map.heightMapOffset + map.heightMapSize;
@@ -920,6 +916,7 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
     return true;
 }
 
+
 void ExtractMapsFromMpq(uint32 build)
 {
     std::string mpqFileName;
@@ -937,22 +934,22 @@ void ExtractMapsFromMpq(uint32 build)
     CreateDir(path);
 
     printf("Convert map files\n");
-    for(uint32 z = 0; z < map_count; ++z)
+    for (uint32 z = 0; z < map_count; ++z)
     {
-        printf("Extract %s (%d/%u)                  \n", map_ids[z].name, z+1, map_count);
+        printf("Extract %s (%d/%u)                  \n", map_ids[z].name, z + 1, map_count);
         // Loadup map grid data
 
         mpqMapName = Trinity::StringFormat("World\\Maps\\{}\\{}.wdt", map_ids[z].name, map_ids[z].name);
         WDT_file wdt;
         if (!wdt.loadFile(mpqMapName, false))
         {
-//            printf("Error loading %s map wdt data\n", map_ids[z].name);
+            //            printf("Error loading %s map wdt data\n", map_ids[z].name);
             continue;
         }
 
-        for(uint32 y = 0; y < WDT_MAP_SIZE; ++y)
+        for (uint32 y = 0; y < WDT_MAP_SIZE; ++y)
         {
-            for(uint32 x = 0; x < WDT_MAP_SIZE; ++x)
+            for (uint32 x = 0; x < WDT_MAP_SIZE; ++x)
             {
                 if (!wdt.main->adt_list[y][x].exist)
                     continue;
@@ -962,7 +959,7 @@ void ExtractMapsFromMpq(uint32 build)
                 ConvertADT(mpqFileName, outputFileName, y, x, build);
             }
             // draw progress bar
-            printf("Processing........................%d%%\r", (100 * (y+1)) / WDT_MAP_SIZE);
+            printf("Processing........................%d%%\r", (100 * (y + 1)) / WDT_MAP_SIZE);
         }
     }
     printf("\n");
@@ -1090,7 +1087,7 @@ void LoadLocaleMPQFiles(int const locale)
 
     new MPQArchive(fileName.c_str());
 
-    for(int i = 1; i < 5; ++i)
+    for (int i = 1; i < 5; ++i)
     {
         std::string ext;
         if (i > 1)
@@ -1102,11 +1099,12 @@ void LoadLocaleMPQFiles(int const locale)
     }
 }
 
+
 void LoadCommonMPQFiles()
 {
     std::string fileName;
-    int count = sizeof(CONF_mpq_list)/sizeof(char*);
-    for(int i = 0; i < count; ++i)
+    int count = sizeof(CONF_mpq_list) / sizeof(char*);
+    for (int i = 0; i < count; ++i)
     {
         fileName = Trinity::StringFormat("{}/Data/{}", input_path, CONF_mpq_list[i]);
         if (boost::filesystem::exists(fileName))
@@ -1122,10 +1120,6 @@ inline void CloseMPQFiles()
 
 int main(int argc, char * arg[])
 {
-    Trinity::VerifyOsVersion();
-
-    Trinity::Locale::Init();
-
     Trinity::Banner::Show("Map & DBC Extractor", [](char const* text) { printf("%s\n", text); }, nullptr);
 
     HandleArgs(argc, arg);
@@ -1135,7 +1129,7 @@ int main(int argc, char * arg[])
 
     for (int i = 0; i < LANG_COUNT; i++)
     {
-        std::string filename = Trinity::StringFormat("{}/Data/{}/locale-{}.MPQ", input_path, langs[i], langs[i]);
+        std::string filename = Trinity::StringFormat("%s/Data/%s/locale-%s.MPQ", input_path, langs[i], langs[i]);
         if (boost::filesystem::exists(filename))
         {
             printf("Detected locale: %s\n", langs[i]);

@@ -56,7 +56,7 @@ bool FileLoader::loadFile(std::string const& fileName, bool log)
     if (prepareLoadedData())
         return true;
 
-    printf("Error loading %s", fileName.c_str());
+    printf("Error loading %s\n", fileName.c_str());
     mf.close();
     free();
     return false;
@@ -67,9 +67,15 @@ bool FileLoader::prepareLoadedData()
     // Check version
     version = (file_MVER *) data;
     if (version->fcc != MverMagic.fcc)
+    {
+        printf("verison %d doesn't match magic %d", version->fcc, MverMagic.fcc);
         return false;
+    }
     if (version->ver != FILE_FORMAT_VERSION)
+    {
+        printf("version %d doesn't match file format version %d", version->ver, FILE_FORMAT_VERSION);
         return false;
+    }
     return true;
 }
 

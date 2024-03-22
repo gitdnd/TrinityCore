@@ -12,7 +12,9 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE_SOURCES)
 
-list(APPEND PRIVATE_SOURCES ${sources_windows})
+if(WIN32)
+  list(APPEND PRIVATE_SOURCES ${sources_windows})
+endif()
 
 add_executable(vmap4extractor ${PRIVATE_SOURCES})
 

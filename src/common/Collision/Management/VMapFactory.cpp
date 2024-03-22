@@ -27,7 +27,7 @@ namespace VMAP
     VMapManager2* VMapFactory::createOrGetVMapManager()
     {
         if (gVMapManager == nullptr)
-            gVMapManager= new VMapManager2();
+            gVMapManager= new VMapManager2();                // should be taken from config ... Please change if you like :-)
         return gVMapManager;
     }
 

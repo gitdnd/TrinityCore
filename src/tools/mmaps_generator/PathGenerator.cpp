@@ -17,7 +17,6 @@
 
 #include "Banner.h"
 #include "DBCFileLoader.h"
-#include "Locales.h"
 #include "MapBuilder.h"
 #include "PathCommon.h"
 #include "Timer.h"
@@ -72,19 +71,11 @@ bool checkDirectories(bool debugOutput)
     return true;
 }
 
-int finish(char const* message, int returnValue)
-{
-    printf("%s", message);
-    getchar(); // Wait for user input
-    return returnValue;
-}
-
 bool handleArgs(int argc, char** argv,
                int &mapnum,
                int &tileX,
                int &tileY,
-               Optional<float>& maxAngle,
-               Optional<float>& maxAngleNotSteep,
+               float &maxAngle,
                bool &skipLiquid,
                bool &skipContinents,
                bool &skipJunkMaps,
@@ -97,7 +88,6 @@ bool handleArgs(int argc, char** argv,
                unsigned int& threads)
 {
     char* param = nullptr;
-    [[maybe_unused]] bool allowDebug = false;
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--maxAngle") == 0)
@@ -107,22 +97,10 @@ bool handleArgs(int argc, char** argv,
                 return false;
 
             float maxangle = atof(param);
-            if (maxangle <= 90.f && maxangle >= 0.f)
+            if (maxangle <= 90.f && maxangle >= 45.f)
                 maxAngle = maxangle;
             else
                 printf("invalid option for '--maxAngle', using default\n");
-        }
-        else if (strcmp(argv[i], "--maxAngleNotSteep") == 0)
-        {
-            param = argv[++i];
-            if (!param)
-                return false;
-
-            float maxangle = atof(param);
-            if (maxangle <= 90.f && maxangle >= 0.f)
-                maxAngleNotSteep = maxangle;
-            else
-                printf("invalid option for '--maxAngleNotSteep', using default\n");
         }
         else if (strcmp(argv[i], "--threads") == 0)
         {
@@ -250,10 +228,6 @@ bool handleArgs(int argc, char** argv,
 
             offMeshInputPath = param;
         }
-        else if (strcmp(argv[i], "--allowDebug") == 0)
-        {
-            allowDebug = true;
-        }
         else
         {
             int map = atoi(argv[i]);
@@ -267,16 +241,14 @@ bool handleArgs(int argc, char** argv,
         }
     }
 
-#ifndef NDEBUG
-    if (!allowDebug)
-    {
-        finish("Build mmaps_generator in RelWithDebInfo or Release mode or it will take hours to complete!!!\nUse '--allowDebug' argument if you really want to run this tool in Debug.\n", -2);
-        silent = true;
-        return false;
-    }
-#endif
-
     return true;
+}
+
+int finish(char const* message, int returnValue)
+{
+    printf("%s", message);
+    getchar(); // Wait for user input
+    return returnValue;
 }
 
 std::unordered_map<uint32, uint8> LoadLiquid()
@@ -298,16 +270,12 @@ std::unordered_map<uint32, uint8> LoadLiquid()
 
 int main(int argc, char** argv)
 {
-    Trinity::VerifyOsVersion();
-
-    Trinity::Locale::Init();
-
     Trinity::Banner::Show("MMAP generator", [](char const* text) { printf("%s\n", text); }, nullptr);
 
     unsigned int threads = std::thread::hardware_concurrency();
     int mapnum = -1;
+    float maxAngle = 70.0f;
     int tileX = -1, tileY = -1;
-    Optional<float> maxAngle, maxAngleNotSteep;
     bool skipLiquid = false,
          skipContinents = false,
          skipJunkMaps = true,
@@ -319,7 +287,7 @@ int main(int argc, char** argv)
     char* file = nullptr;
 
     bool validParam = handleArgs(argc, argv, mapnum,
-                                 tileX, tileY, maxAngle, maxAngleNotSteep,
+                                 tileX, tileY, maxAngle,
                                  skipLiquid, skipContinents, skipJunkMaps, skipBattlegrounds,
                                  debugOutput, silent, bigBaseUnit, offMeshInputPath, file, threads);
 
@@ -345,8 +313,8 @@ int main(int argc, char** argv)
     if (_liquidTypes.empty())
         return silent ? -5 : finish("Failed to load LiquidType.dbc", -5);
 
-    MapBuilder builder(maxAngle, maxAngleNotSteep, skipLiquid, skipContinents, skipJunkMaps,
-                       skipBattlegrounds, debugOutput, bigBaseUnit, mapnum, offMeshInputPath, threads);
+    MapBuilder builder(maxAngle, skipLiquid, skipContinents, skipJunkMaps,
+                       skipBattlegrounds, debugOutput, bigBaseUnit, mapnum, offMeshInputPath);
 
     uint32 start = getMSTime();
     if (file)
@@ -354,9 +322,9 @@ int main(int argc, char** argv)
     else if (tileX > -1 && tileY > -1 && mapnum >= 0)
         builder.buildSingleTile(mapnum, tileX, tileY);
     else if (mapnum >= 0)
-        builder.buildMaps(uint32(mapnum));
+        builder.buildMap(uint32(mapnum));
     else
-        builder.buildMaps({});
+        builder.buildAllMaps(threads);
 
     if (!silent)
         printf("Finished. MMAPS were built in %s\n", secsToTimeString(GetMSTimeDiffToNow(start) / 1000).c_str());
