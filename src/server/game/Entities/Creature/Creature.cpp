@@ -799,7 +799,7 @@ void Creature::Update(uint32 diff)
 
             if (IsAIEnabled() && diff >= m_backpedalTime)
             {
-                AI()->Backpedal();
+                //AI()->Backpedal();
                 m_backpedalTime = MOVE_BACKWARDS_CHECK_INTERVAL;
             }
             else
@@ -807,7 +807,7 @@ void Creature::Update(uint32 diff)
 
             if (IsAIEnabled() && diff >= m_encircleTime)
             {
-                AI()->Encircle();
+                //AI()->Encircle();
                 m_encircleTime = urand(MOVE_CIRCLE_CHECK_INTERVAL, MOVE_CIRCLE_CHECK_INTERVAL * 2);
             }
             else
