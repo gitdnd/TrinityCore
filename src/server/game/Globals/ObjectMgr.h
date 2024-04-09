@@ -937,8 +937,8 @@ struct TalentNodeInfo
 {
     uint32 Index;
     uint32 spellId;
-    float xOffset;
-    float yOffset;
+    double xOffset;
+    double yOffset;
     uint32 Mutex;
     uint32 buttonType;
     uint32 flagMask;

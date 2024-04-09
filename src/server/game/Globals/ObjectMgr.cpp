@@ -11246,8 +11246,8 @@ void ObjectMgr::LoadTalentNodes()
         TalentNodeInfo& nodeInfo = _talentNodeStore[entry];
         nodeInfo.Index = entry;
         nodeInfo.spellId = fields[1].GetUInt32();
-        nodeInfo.xOffset = fields[2].GetFloat();
-        nodeInfo.yOffset = fields[3].GetFloat();
+        nodeInfo.xOffset = fields[2].GetDouble();
+        nodeInfo.yOffset = fields[3].GetDouble();
         nodeInfo.Mutex = fields[4].GetUInt32();
         nodeInfo.buttonType = fields[5].GetUInt32();
         nodeInfo.flagMask = fields[6].GetUInt32();
@@ -11306,8 +11306,8 @@ void ObjectMgr::LoadTalentNodeEntry(uint32 node)
     Field* fields = result->Fetch();
     nodeInfo.Index = node;
     nodeInfo.spellId = fields[1].GetUInt32();
-    nodeInfo.xOffset = fields[2].GetFloat();
-    nodeInfo.yOffset = fields[3].GetFloat();
+    nodeInfo.xOffset = fields[2].GetDouble();
+    nodeInfo.yOffset = fields[3].GetDouble();
     nodeInfo.Mutex = fields[4].GetUInt32();
     nodeInfo.buttonType = fields[5].GetUInt32();
     nodeInfo.flagMask = fields[6].GetUInt32();
