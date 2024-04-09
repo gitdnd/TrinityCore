@@ -1,2 +1,0 @@
-ALTER TABLE `instance_template`
-	ADD COLUMN `vLvlMod` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `mapXPRate`;

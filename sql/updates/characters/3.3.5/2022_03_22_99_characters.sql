@@ -1,3 +1,0 @@
-ALTER TABLE `item_template_virtual`
-	ADD COLUMN `customFlags` INT(10) UNSIGNED NOT NULL DEFAULT 0 AFTER `statGroup`,
-	ADD COLUMN `sheath` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `customFlags`;
