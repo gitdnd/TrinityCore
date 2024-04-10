@@ -9,6 +9,7 @@
 #define _ELUNALOADER_H
 
 #include "ElunaUtility.h"
+#include <efsw/efsw.hpp>
 
 extern "C"
 {
@@ -51,6 +52,10 @@ public:
     ScriptList lua_extensions;
     std::vector<LuaScript> combined_scripts;
     std::list<uint32> requiredMaps;
+    // efsw file watcher
+    void InitializeFileWatcher();
+    efsw::FileWatcher lua_fileWatcher;
+    efsw::WatchID lua_scriptWatcher;
 };
 
 #define sElunaLoader ElunaLoader::instance()

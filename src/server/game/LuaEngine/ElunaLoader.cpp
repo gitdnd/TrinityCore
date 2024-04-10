@@ -36,7 +36,35 @@ extern "C" {
 #include <lauxlib.h>
 }
 
-ElunaLoader::ElunaLoader()
+/// File watcher responsible for watching lua scripts
+class ElunaUpdateListener : public efsw::FileWatchListener
+{
+public:
+    ElunaUpdateListener() { }
+    virtual ~ElunaUpdateListener() { }
+
+    void handleFileAction(efsw::WatchID /*watchid*/, std::string const& dir,
+        std::string const& filename, efsw::Action action, std::string oldFilename = "") final override;
+};
+
+static ElunaUpdateListener elunaUpdateListener;
+
+void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir, std::string const& filename, efsw::Action action, std::string oldFilename)
+{
+    auto const path = fs::absolute(filename, dir);
+    if (!path.has_extension())
+        return;
+
+    std::string extension = path.extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
+
+    if (extension != ".lua" && extension != ".ext")
+        return;
+
+    sWorld->QueueCliCommand(new CliCommandHolder(nullptr, Trinity::StringFormat("reload eluna {}", filename), [](void*, std::string_view) {}, [](void*, bool) {}));
+}
+
+ElunaLoader::ElunaLoader() : lua_scriptWatcher(-1)
 {
 }
 
@@ -48,6 +76,11 @@ ElunaLoader* ElunaLoader::instance()
 
 ElunaLoader::~ElunaLoader()
 {
+    if (lua_scriptWatcher >= 0)
+    {
+        lua_fileWatcher.removeWatch(lua_scriptWatcher);
+        lua_scriptWatcher = -1;
+    }
 }
 
 void ElunaLoader::LoadScripts(bool clear /*= true*/)
@@ -195,6 +228,23 @@ void ElunaLoader::ReadFiles(lua_State* L, std::string path)
             }
         }
     }
+}
+
+void ElunaLoader::InitializeFileWatcher()
+{
+    lua_scriptWatcher = lua_fileWatcher.addWatch(lua_folderpath, &elunaUpdateListener, false);
+    if (lua_scriptWatcher >= 0)
+    {
+        ELUNA_LOG_INFO("[Eluna]: Script reloader is listening on \"%s\".",
+            lua_folderpath.c_str());
+    }
+    else
+    {
+        ELUNA_LOG_INFO("[Eluna]: Failed to initialize the script reloader on \"%s\".",
+            lua_folderpath.c_str());
+    }
+
+    lua_fileWatcher.watch();
 }
 
 bool ElunaLoader::CompileScript(lua_State* L, LuaScript& script)

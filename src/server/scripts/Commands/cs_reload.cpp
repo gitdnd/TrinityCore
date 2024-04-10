@@ -50,7 +50,6 @@ EndScriptData */
 #include "Player.h"
 #include "MapManager.h"
 #include "Map.h"
-#include "ElunaLoader.h"
 
 #if TRINITY_COMPILER == TRINITY_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
