@@ -90,7 +90,7 @@ bool Eluna::OnCommand(Player* player, const char* text)
 
             int mapId = mapid_reload_all;
             std::string args = reload.substr(reload_command.length() + reload_command_pos);
-            std::string reloadCase = "world state";
+            std::string reloadCase = "";
             if (!args.empty())
             {
                 char* ok;
@@ -101,7 +101,10 @@ bool Eluna::OnCommand(Player* player, const char* text)
                     reloadCase = "cache";
                     break;
                 case -2:
-                    reloadCase = "all map state";
+                    reloadCase = "all map states";
+                    break;
+                case -1:
+                    reloadCase = "world state";
                     break;
                 default:
                     reloadCase = Trinity::StringFormat("map {} state", mapId);
