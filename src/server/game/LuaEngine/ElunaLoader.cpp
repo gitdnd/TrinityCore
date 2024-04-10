@@ -234,7 +234,7 @@ void ElunaLoader::ReadFiles(lua_State* L, std::string path)
 
 void ElunaLoader::InitializeFileWatcher()
 {
-    lua_scriptWatcher = lua_fileWatcher.addWatch(lua_folderpath, &elunaUpdateListener, false);
+    lua_scriptWatcher = lua_fileWatcher.addWatch(lua_folderpath, &elunaUpdateListener, true);
     if (lua_scriptWatcher >= 0)
     {
         ELUNA_LOG_INFO("[Eluna]: Script reloader is listening on \"%s\".",
