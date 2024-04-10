@@ -57,6 +57,7 @@ void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir
 
     std::string extension = path.extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
+    ELUNA_LOG_INFO("[Eluna]: Found file %s change.", filename.c_str());
 
     if (extension != ".lua" && extension != ".ext")
         return;
@@ -340,7 +341,7 @@ void ElunaLoader::LoadScript(std::string name)
 
     // erase existing script from compiled scripts
     lua_scripts.erase(std::remove_if(lua_scripts.begin(), lua_scripts.end(), [combined_scripts_name](LuaScript const& script) { return script.filename == combined_scripts_name; }), lua_scripts.end());
-    lua_extensions.erase(std::remove_if(lua_scripts.begin(), lua_scripts.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), lua_extensions.end());
+    lua_extensions.erase(std::remove_if(lua_extensions.begin(), lua_extensions.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), lua_extensions.end());
     combined_scripts.erase(std::remove_if(combined_scripts.begin(), combined_scripts.end(), [combined_scripts_name](LuaScript const& script) { return script.filename == combined_scripts_name; }), combined_scripts.end());
     combined_scripts.erase(std::remove_if(combined_scripts.begin(), combined_scripts.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), combined_scripts.end());
 
