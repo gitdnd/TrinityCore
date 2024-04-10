@@ -3220,7 +3220,7 @@ namespace LuaGlobalFunctions
         { "GetStateInstanceId", &LuaGlobalFunctions::GetStateInstanceId },
         { "GetQuest", &LuaGlobalFunctions::GetQuest },
         { "GetPlayerByGUID", &LuaGlobalFunctions::GetPlayerByGUID, METHOD_REG_WORLD }, // World state method only in multistate
-        { "GetPlayerByName", &LuaGlobalFunctions::GetPlayerByName, METHOD_REG_WORLD }, // World state method only in multistate
+        { "GetPlayerByName", &LuaGlobalFunctions::GetPlayerByName/*, METHOD_REG_WORLD*/}, // World state method only in multistate
         { "GetGameTime", &LuaGlobalFunctions::GetGameTime },
         { "GetPlayersInWorld", &LuaGlobalFunctions::GetPlayersInWorld, METHOD_REG_WORLD }, // World state method only in multistate
         { "GetPlayersOnMap", &LuaGlobalFunctions::GetPlayersOnMap, METHOD_REG_MAP }, // Map state method only in multistate
