@@ -51,13 +51,14 @@ static ElunaUpdateListener elunaUpdateListener;
 
 void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir, std::string const& filename, efsw::Action action, std::string oldFilename)
 {
+    ELUNA_LOG_INFO("[Eluna]: Found file %s change.", filename.c_str());
+
     auto const path = fs::absolute(filename, dir);
     if (!path.has_extension())
         return;
 
     std::string extension = path.extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
-    ELUNA_LOG_INFO("[Eluna]: Found file %s change.", filename.c_str());
 
     if (extension != ".lua" && extension != ".ext")
         return;
@@ -241,7 +242,7 @@ void ElunaLoader::InitializeFileWatcher()
     }
     else
     {
-        ELUNA_LOG_INFO("[Eluna]: Failed to initialize the script reloader on \"%s\".",
+        ELUNA_LOG_ERROR("[Eluna]: Failed to initialize the script reloader on \"%s\".",
             lua_folderpath.c_str());
     }
 

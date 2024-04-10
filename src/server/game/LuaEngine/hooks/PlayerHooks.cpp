@@ -90,7 +90,7 @@ bool Eluna::OnCommand(Player* player, const char* text)
 
             int mapId = mapid_reload_all;
             std::string args = reload.substr(reload_command.length() + reload_command_pos);
-            std::string reloadCase = "";
+            std::string reloadCase = "all map states";
             if (!args.empty())
             {
                 char* ok;
