@@ -279,7 +279,7 @@ struct legendaryItemInfo
 
 typedef std::unordered_map<uint32, legendaryItemInfo> LegendaryTemplateContainer;
 
-class VirtualItemMgr
+class TC_GAME_API VirtualItemMgr
 {
     friend class ObjectMgr;
     friend class World;

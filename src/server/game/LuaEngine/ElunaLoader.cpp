@@ -61,7 +61,7 @@ void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir
     if (extension != ".lua" && extension != ".ext")
         return;
 
-    sWorld->QueueCliCommand(new CliCommandHolder(nullptr, Trinity::StringFormat("reload eluna {}", filename), [](void*, std::string_view) {}, [](void*, bool) {}));
+    sWorld->QueueCliCommand(new CliCommandHolder(nullptr, Trinity::StringFormat("reload eluna {}", filename).c_str(), [](void*, std::string_view) {}, [](void*, bool) {}));
 }
 
 ElunaLoader::ElunaLoader() : lua_scriptWatcher(-1)
