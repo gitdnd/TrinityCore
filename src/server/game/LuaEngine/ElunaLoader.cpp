@@ -50,16 +50,19 @@ ElunaLoader::~ElunaLoader()
 {
 }
 
-void ElunaLoader::LoadScripts()
+void ElunaLoader::LoadScripts(bool clear /*= true*/)
 {
     lua_folderpath = sElunaConfig->GetConfig(CONFIG_ELUNA_SCRIPT_PATH);
     const std::string& lua_path_extra = sElunaConfig->GetConfig(CONFIG_ELUNA_REQUIRE_PATH_EXTRA);
     const std::string& lua_cpath_extra = sElunaConfig->GetConfig(CONFIG_ELUNA_REQUIRE_CPATH_EXTRA);
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
-    lua_scripts.clear();
-    lua_extensions.clear();
-    combined_scripts.clear();
+    if (clear)
+    {
+        lua_scripts.clear();
+        lua_extensions.clear();
+        combined_scripts.clear();
+    }
 #ifndef ELUNA_WINDOWS
     if (lua_folderpath[0] == '~')
         if (const char* home = getenv("HOME"))
@@ -187,7 +190,8 @@ void ElunaLoader::ReadFiles(lua_State* L, std::string path)
 
                 // was file, try add
                 std::string filename = dir_iter->path().filename().generic_string();
-                ProcessScript(L, filename, fullpath, mapId);
+                if (lua_scriptname.empty() || lua_scriptname == filename)
+                    ProcessScript(L, filename, fullpath, mapId);
             }
         }
     }
@@ -275,4 +279,22 @@ bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
         return true;
 
     return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
+}
+
+void ElunaLoader::LoadScript(std::string name)
+{
+    lua_scriptname = name;
+
+    std::string combined_scripts_name = lua_scriptname.substr(0, lua_scriptname.find(".lua"));
+    std::string combined_scripts_ext = lua_scriptname.substr(0, lua_scriptname.find(".ext"));
+
+    // erase existing script from compiled scripts
+    lua_scripts.erase(std::remove_if(lua_scripts.begin(), lua_scripts.end(), [combined_scripts_name](LuaScript const& script) { return script.filename == combined_scripts_name; }), lua_scripts.end());
+    lua_extensions.erase(std::remove_if(lua_scripts.begin(), lua_scripts.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), lua_extensions.end());
+    combined_scripts.erase(std::remove_if(combined_scripts.begin(), combined_scripts.end(), [combined_scripts_name](LuaScript const& script) { return script.filename == combined_scripts_name; }), combined_scripts.end());
+    combined_scripts.erase(std::remove_if(combined_scripts.begin(), combined_scripts.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), combined_scripts.end());
+
+    LoadScripts(false);
+
+    lua_scriptname.clear();
 }

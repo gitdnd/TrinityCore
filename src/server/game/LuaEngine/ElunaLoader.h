@@ -30,7 +30,8 @@ public:
     ElunaLoader& operator= (ElunaLoader const&) = delete;
     ElunaLoader& operator= (ElunaLoader&&) = delete;
     static ElunaLoader* instance();
-    void LoadScripts();
+    void LoadScripts(bool clear = true);
+    void LoadScript(std::string name);
     void ReadFiles(lua_State* L, std::string path);
     void CombineLists();
     void ProcessScript(lua_State* L, std::string filename, const std::string& fullpath, int32 mapId);
@@ -43,6 +44,7 @@ public:
     // lua path variable for require() function
     std::string lua_requirepath;
     std::string lua_requirecpath;
+    std::string lua_scriptname;
 
     typedef std::list<LuaScript> ScriptList;
     ScriptList lua_scripts;

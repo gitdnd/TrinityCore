@@ -312,6 +312,7 @@ void Eluna::Report(lua_State* _L)
     const char* msg = lua_tostring(_L, -1);
     ELUNA_LOG_ERROR("%s", msg);
     lua_pop(_L, 1);
+    sWorld->SendGMText(LANG_SYSTEMMESSAGE, msg);
 }
 
 // Borrowed from http://stackoverflow.com/questions/12256455/print-stacktrace-from-c-code-with-embedded-lua
