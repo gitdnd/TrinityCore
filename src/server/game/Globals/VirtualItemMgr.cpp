@@ -259,8 +259,9 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // If seed supplied, skip and assign seed to template.
     if (modifier.seed == 0)
     {
-        SFMTRand sfmt;
-        output->seed = sfmt.RandomUInt32();
+        std::mt19937 generator;
+        uint32 seed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
+        output->seed = seed;
         modifier.seed = output->seed;
     }
     else

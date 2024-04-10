@@ -52,9 +52,9 @@ class spell_item_unlock_bank_slot : public SpellScript
 
         if (slot > 7)
         {
-            WorldPackets::Bank::BuyBankSlotResult packet;
-            packet.Result = ERR_BANKSLOT_FAILED_TOO_MANY;
-            caster->GetSession()->SendPacket(packet.Write());
+            WorldPacket data(SMSG_BUY_BANK_SLOT_RESULT, 4);
+            data << uint32(ERR_BANKSLOT_FAILED_TOO_MANY);
+            caster->GetSession()->SendPacket(&data);
             ChatHandler(caster->GetSession()).PSendSysMessage("You are capped out on bank slots!");
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         }
