@@ -819,5 +819,5 @@ void WorldSession::HandleChatSpy(ObjectGuid sender, ChatMsg type, const char* ms
 {
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
         if (const Channel* chn = cMgr->GetChannel(0, "ChatLog", GetPlayer(), false))
-            chn->ChatSpySay(sender, Trinity::StringFormat("{} {}: {}", EnumUtils::ToString(type), optionalData, msg).c_str(), LANG_UNIVERSAL);
+            chn->ChatSpySay(sender, Trinity::StringFormat("{} {}: {}", EnumUtils::ToString(type).Constant, optionalData, msg).c_str(), LANG_UNIVERSAL);
 }
