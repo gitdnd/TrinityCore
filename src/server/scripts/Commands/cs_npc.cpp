@@ -524,6 +524,7 @@ public:
             if (m && (mechanicImmuneMask & (1 << (m-1))))
                 handler->PSendSysMessage("* %s (0x%X)", EnumUtils::ToTitle(m), m);
 
+        handler->PSendSysMessage("Dungeon level %i.", target->GetDungeonLevel());
         return true;
     }
 
