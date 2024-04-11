@@ -302,7 +302,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!e->OnChat(sender, type, lang, msg))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             sender->Say(msg, Language(lang));
             break;
         }
@@ -323,7 +323,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!e->OnChat(sender, type, LANG_UNIVERSAL, msg))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             sender->TextEmote(msg);
             break;
         }
@@ -344,7 +344,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!e->OnChat(sender, type, lang, msg))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             sender->Yell(msg, Language(lang));
             break;
         }
@@ -396,6 +396,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!e->OnChat(GetPlayer(), type, lang, msg, receiver))
                     return;
 #endif
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str(), Trinity::StringFormat("to {}", receiver->GetName()).c_str());
             GetPlayer()->Whisper(msg, Language(lang), receiver);
             break;
         }
@@ -422,7 +423,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if(!e->OnChat(sender, type, lang, msg, group))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, nullptr, msg);
             group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
@@ -440,7 +441,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         if(!e->OnChat(sender, type, lang, msg, guild))
                             return;
 #endif
-
+                    HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str(), guild->GetName().c_str());
                     guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                 }
             }
@@ -458,7 +459,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         if(!e->OnChat(sender, type, lang, msg, guild))
                             return;
 #endif
-
+                    HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str(), guild->GetName().c_str());
                     guild->BroadcastToGuild(this, true, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                 }
             }
@@ -481,7 +482,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if(!e->OnChat(sender, type, lang, msg, group))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, nullptr, msg);
             group->BroadcastPacket(&data, false);
@@ -504,7 +505,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if(!e->OnChat(sender, type, lang, msg, group))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, nullptr, msg);
             group->BroadcastPacket(&data, false);
@@ -522,7 +523,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if(!e->OnChat(sender, type, lang, msg, group))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             WorldPacket data;
             //in battleground, raid warning is sent only to players in battleground - code is ok
             ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, Language(lang), sender, nullptr, msg);
@@ -542,7 +543,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if(!e->OnChat(sender, type, lang, msg, group))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, nullptr, msg);
             group->BroadcastPacket(&data, false);
@@ -561,7 +562,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if(!e->OnChat(sender, type, lang, msg, group))
                     return;
 #endif
-
+            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str());
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, nullptr, msg);;
             group->BroadcastPacket(&data, false);
@@ -586,6 +587,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     if(!e->OnChat(sender, type, lang, msg, chn))
                         return;
 #endif
+                if(channel != "WorldChat")
+                    HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str(), channel.c_str());
                 chn->Say(sender->GetGUID(), msg, lang);
             }
             break;
@@ -810,4 +813,11 @@ void WorldSession::SendChatRestrictedNotice(ChatRestrictionType restriction)
     WorldPacket data(SMSG_CHAT_RESTRICTED, 1);
     data << uint8(restriction);
     SendPacket(&data);
+}
+
+void WorldSession::HandleChatSpy(ObjectGuid sender, ChatMsg type, const char* msg, const char* optionalData)
+{
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_HORDE))
+        if (const Channel* chn = cMgr->GetChannel(0, "ChatLog", nullptr, false))
+            chn->ChatSpySay(sender, Trinity::StringFormat("{} {}: {}", EnumUtils::ToString(type), optionalData, msg).c_str(), LANG_UNIVERSAL);
 }

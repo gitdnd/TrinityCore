@@ -235,7 +235,7 @@ Channel* ChannelMgr::GetChannel(uint32 channelId, std::string const& name, Playe
             send = true;
     }
 
-    if (send && pkt)
+    if (player && send && pkt)
     {
         std::string channelName = name;
         Channel::GetChannelName(channelName, channelId, player->GetSession()->GetSessionDbcLocale(), zoneEntry);

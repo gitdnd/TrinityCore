@@ -883,3 +883,4 @@ void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escap
     msg.append(body, lastpos, pos - lastpos);
     Send(msg);
 }
+

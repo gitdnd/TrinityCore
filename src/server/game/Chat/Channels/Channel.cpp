@@ -164,10 +164,10 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
     if (GetName() == "ChatLog")
     {
-        if (player->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+        if (player->GetSession()->GetSecurity() < SEC_GAMEMASTER)
         {
-            BannedAppend appender;
-            ChannelNameBuilder<BannedAppend> builder(this, appender);
+            WrongPasswordAppend appender;
+            ChannelNameBuilder<WrongPasswordAppend> builder(this, appender);
             SendToOne(builder, guid);
             return;
         }
@@ -916,4 +916,22 @@ void Channel::SendToOne(Builder& builder, ObjectGuid who) const
 
     if (Player* player = ObjectAccessor::FindConnectedPlayer(who))
         localizer(player);
+}
+
+void Channel::ChatSpySay(ObjectGuid guid, std::string const& what, uint32 lang) const
+{
+    if (what.empty())
+        return;
+
+    // TODO: Add proper RBAC check
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+        lang = LANG_UNIVERSAL;
+
+    auto builder = [&](WorldPacket& data, LocaleConstant locale)
+        {
+            LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(locale);
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, GetName(localeIdx));
+        };
+
+    SendToAll(builder, ObjectGuid::Empty);
 }

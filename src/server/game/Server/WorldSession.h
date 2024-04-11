@@ -1162,6 +1162,7 @@ class TC_GAME_API WorldSession
 
         bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
 
+        void HandleChatSpy(ObjectGuid sender, ChatMsg type, const char* msg, const char* optionalData = "");
     private:
         void ProcessQueryCallbacks();
 
