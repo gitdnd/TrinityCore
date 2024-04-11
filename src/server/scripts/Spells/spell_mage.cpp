@@ -299,8 +299,7 @@ class spell_mage_cold_snap : public SpellScript
         GetCaster()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
             {
                 SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-                return spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
-                    spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0;
+                return (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0;
             }, true);
     }
 
@@ -368,7 +367,7 @@ class spell_mage_dragon_breath : public AuraScript
     {
         // Dont proc with Living Bomb explosion
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (spellInfo && spellInfo->SpellIconID == SPELL_ICON_MAGE_LIVING_BOMB && spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
+        if (spellInfo && spellInfo->SpellIconID == SPELL_ICON_MAGE_LIVING_BOMB && spellInfo->SpellFamilyName == SPELLFAMILY_CLASSLESS)
             return false;
         return true;
     }

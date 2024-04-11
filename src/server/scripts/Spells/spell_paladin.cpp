@@ -127,7 +127,14 @@ enum PaladinSpells
     SPELL_PALADIN_ENDURING_JUDGEMENT             = 40472,
 
     SPELL_PALADIN_GLYPH_OF_HOLY_LIGHT_HEAL       = 54968,
-    SPELL_PALADIN_HOLY_MENDING                   = 64891
+    SPELL_PALADIN_HOLY_MENDING                   = 64891,
+
+    BONUS_HOLY_HEALING = 180048,
+    BONUS_FIRE_HEALING = 180049,
+    BONUS_NATURE_HEALING = 180050,
+    BONUS_FROST_HEALING = 180051,
+    BONUS_SHADOW_HEALING = 180052,
+    BONUS_ARCANE_HEALING = 180052
 };
 
 enum PaladinSpellIcons
@@ -1441,8 +1448,22 @@ class spell_pal_light_s_beacon : public AuraScript
         uint32 heal = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
 
         Unit* beaconTarget = GetCaster();
-        if (!beaconTarget || !beaconTarget->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT, eventInfo.GetActor()->GetGUID()))
+        if (!beaconTarget || !beaconTarget->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT, eventInfo.GetActor()->GetGUID()) || procSpell->IsTargetingArea())
             return;
+
+        //Default is holy
+        //if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
+            //healSpellId = BONUS_HOLY_HEALING;
+        if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
+            healSpellId = BONUS_FIRE_HEALING;
+        else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+            healSpellId = BONUS_NATURE_HEALING;
+        else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+            healSpellId = BONUS_FROST_HEALING;
+        else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+            healSpellId = BONUS_SHADOW_HEALING;
+        else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
+            healSpellId = BONUS_ARCANE_HEALING;
 
         /// @todo: caster must be the healed unit to perform distance checks correctly
         ///        but that will break animation on clientside
