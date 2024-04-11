@@ -817,7 +817,7 @@ void WorldSession::SendChatRestrictedNotice(ChatRestrictionType restriction)
 
 void WorldSession::HandleChatSpy(ObjectGuid sender, ChatMsg type, const char* msg, const char* optionalData)
 {
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_HORDE))
-        if (const Channel* chn = cMgr->GetChannel(0, "ChatLog", nullptr, false))
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
+        if (const Channel* chn = cMgr->GetChannel(0, "ChatLog", GetPlayer(), false))
             chn->ChatSpySay(sender, Trinity::StringFormat("{} {}: {}", EnumUtils::ToString(type), optionalData, msg).c_str(), LANG_UNIVERSAL);
 }
