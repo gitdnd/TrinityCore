@@ -579,6 +579,9 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         float GetFloorZ() const;
         virtual float GetCollisionHeight() const { return 0.0f; }
+        virtual float GetCollisionWidth() const { return GetObjectSize(); }
+        virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
+        float GetObjectSize() const;
 
         float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
         float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
@@ -592,6 +595,7 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
 
         // Event handler
         EventProcessor m_Events;
+
 
     protected:
         std::string m_name;

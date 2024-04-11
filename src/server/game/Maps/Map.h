@@ -28,6 +28,7 @@
 #include "MPSCQueue.h"
 #include "ObjectGuid.h"
 #include "Optional.h"
+#include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "SpawnData.h"
 #include "Timer.h"
@@ -61,6 +62,7 @@ class Unit;
 class Weather;
 class WorldObject;
 class WorldPacket;
+class PathGenerator;
 struct MapDifficulty;
 struct MapEntry;
 struct Position;
@@ -679,6 +681,12 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         WorldLocation graveyardOverride;
 
         void UpscaleMapIfNeeded();
+
+        bool CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator* path, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
+        bool CanReachPositionAndGetValidCoords(WorldObject const* source, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
+        bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
+        bool CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float& destX, float& destY, float& destZ, bool failOnCollision = true) const;
+
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);

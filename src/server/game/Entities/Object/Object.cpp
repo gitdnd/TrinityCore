@@ -3650,6 +3650,12 @@ Eluna* WorldObject::GetEluna() const
 }
 #endif
 
+float WorldObject::GetObjectSize() const
+{
+    return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? GetFloatValue(UNIT_FIELD_COMBATREACH) : DEFAULT_PLAYER_BOUNDING_RADIUS * GetObjectScale();
+}
+
+
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>&, uint32, float) const;
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::deque<GameObject*>&, uint32, float) const;
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::vector<GameObject*>&, uint32, float) const;

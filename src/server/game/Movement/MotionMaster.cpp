@@ -652,10 +652,10 @@ void MotionMaster::MoveBackpedal(Unit* target, float dist)
     point.y = pos.m_positionY + dist * sinf(angle);
     point.z = pos.m_positionZ;
 
-    //if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true))
-    //{
-        //return;
-    //}
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true))
+    {
+        return;
+    }
     std::function<void(Movement::MoveSplineInit&)> initializer = [=, this, target = target->GetGUID()](Movement::MoveSplineInit& init)
         {
             init.MoveTo(point.x, point.y, point.z, false);
@@ -677,8 +677,8 @@ void MotionMaster::MoveEncircle(Unit* target)
     if (!target)
         return;
 
-    const bool instanced = (target->GetMap()->IsDungeon() || target->GetMap()->IsRaid());
-    const uint32 attackers = target->getAttackers().size();
+    //const bool instanced = (target->GetMap()->IsDungeon() || target->GetMap()->IsRaid());
+    //const uint32 attackers = target->getAttackers().size();
 
     /** Limit in dungeons. */
     float radiusReduction = 1.0f;
@@ -718,10 +718,10 @@ void MotionMaster::MoveEncircle(Unit* target)
     target->GetNearPoint(_owner, x, y, z, targetDist, ori);
 
     /** Validate. */
-    //if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, x, y, z, true))
-    //{
-        //return;
-    //}
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, x, y, z, true))
+    {
+        return;
+    }
 
     /** Execute Movement. */
     std::function<void(Movement::MoveSplineInit&)> initializer = [=, this, target = target->GetGUID()](Movement::MoveSplineInit& init)
