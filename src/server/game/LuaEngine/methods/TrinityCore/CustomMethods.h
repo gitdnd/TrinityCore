@@ -1768,6 +1768,30 @@ namespace LuaCustom
 
         return 0;
     }
+
+    int SetTimeSpeed(Eluna* E, Player* player)
+    {
+        auto speed = E->CHECKVAL<float>(2);
+
+        WorldPackets::Misc::LoginSetTimeSpeed loginSetTimeSpeed;
+        loginSetTimeSpeed.NewSpeed = speed;
+        loginSetTimeSpeed.GameTime = *GameTime::GetWowTime();
+        loginSetTimeSpeed.GameTimeHolidayOffset = 0; /// @todo
+        player->SendDirectMessage(loginSetTimeSpeed.Write());
+        return 0;
+    }
+
+    int ResetTimeSpeed(Eluna* /*E*/, Player* player)
+    {
+        static float const TimeSpeed = 0.01666667f;
+        WorldPackets::Misc::LoginSetTimeSpeed loginSetTimeSpeed;
+        loginSetTimeSpeed.NewSpeed = TimeSpeed;
+        loginSetTimeSpeed.GameTime = *GameTime::GetWowTime();
+        loginSetTimeSpeed.GameTimeHolidayOffset = 0; /// @todo
+        player->SendDirectMessage(loginSetTimeSpeed.Write());
+        return 0;
+    }
+
     // REGISTERS
     
     ElunaGlobal::ElunaRegister GlobalMethods[] =
@@ -1869,7 +1893,9 @@ namespace LuaCustom
         { "GetLootPreference", &LuaCustom::GetLootPreference },
         { "QueueGroupWithAffixConfig", &LuaCustom::QueueGroupWithAffixConfig },
         { "SendListInventory", &LuaCustom::SendListInventory },
-        
+        { "SetTimeSpeed", &LuaCustom::SetTimeSpeed },
+        { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
+
         { NULL, NULL, METHOD_REG_NONE }
     };
     
