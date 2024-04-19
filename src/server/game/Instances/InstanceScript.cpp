@@ -48,12 +48,12 @@ BossBoundaryData::~BossBoundaryData()
 InstanceScript::InstanceScript(InstanceMap* map) : instance(map), completedEncounters(0), _instanceSpawnGroups(sObjectMgr->GetSpawnGroupsForInstance(map->GetId()))
 {
 #ifdef TRINITY_API_USE_DYNAMIC_LINKING
-    uint32 scriptId = sObjectMgr->GetInstanceTemplate(map->GetId())->ScriptId;
+    /*uint32 scriptId = sObjectMgr->GetInstanceTemplate(map->GetId())->ScriptId;
     auto const scriptname = sObjectMgr->GetScriptName(scriptId);
     ASSERT(!scriptname.empty());
    // Acquire a strong reference from the script module
    // to keep it loaded until this object is destroyed.
-    module_reference = sScriptMgr->AcquireModuleReferenceOfScriptName(scriptname);
+    module_reference = sScriptMgr->AcquireModuleReferenceOfScriptName(scriptname);*/
 #endif // #ifndef TRINITY_API_USE_DYNAMIC_LINKING
 }
 
