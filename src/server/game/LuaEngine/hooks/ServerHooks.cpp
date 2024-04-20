@@ -380,15 +380,15 @@ void Eluna::OnRemove(Creature* creature)
 void Eluna::OnFreeInstanceId(uint32 instanceId)
 {
     START_HOOK(ON_FREE_INSTANCE);
-    Push(instanceId);
+    HookPush(instanceId);
     CallAllFunctions(ServerEventBindings, key);
 }
 
 void Eluna::OnScoredCreatureDied(Map* map, Creature* creature)
 {
     START_HOOK(ON_SCORED_CREATURE_DIED);
-    Push(map);
-    Push(creature);
+    HookPush(map);
+    HookPush(creature);
     CallAllFunctions(ServerEventBindings, key);
 }
 
