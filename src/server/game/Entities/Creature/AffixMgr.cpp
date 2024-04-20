@@ -139,6 +139,10 @@ void AffixEffect::Apply(Creature* creature, AffixEvent event)
         creature->IsTrigger() ||
         // if critter
         (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
+        // if totem
+        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
+        // if pet
+        creature->IsPet() ||
         // if not alive
         !creature->IsAlive())
         // then do nothing
@@ -150,7 +154,6 @@ void AffixEffect::Apply(Creature* creature, AffixEvent event)
     switch (event)
     {
     case AFFIX_EVENT_LEAVE_COMBAT:
-    case AFFIX_EVENT_UPDATE_ENTRY:
     case AFFIX_EVENT_RESPAWN:
     {
         // Apply target spell or increase stacks up to 4
