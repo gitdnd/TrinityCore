@@ -173,8 +173,6 @@ namespace LuaGroup
     /**
      * Returns a table with the [Player]s in this [Group]
      *
-     * In multistate, this method is only available in the WORLD state
-     *
      * @return table groupPlayers : table of [Player]s
      */
     int GetMembers(Eluna* E, Group* group)
@@ -457,7 +455,7 @@ namespace LuaGroup
     ElunaRegister<Group> GroupMethods[] =
     {
         // Getters
-        { "GetMembers", &LuaGroup::GetMembers, METHOD_REG_WORLD }, // World state method only in multistate
+        { "GetMembers", &LuaGroup::GetMembers },
         { "GetLeaderGUID", &LuaGroup::GetLeaderGUID },
         { "GetGUID", &LuaGroup::GetGUID },
         { "GetMemberGroup", &LuaGroup::GetMemberGroup },
