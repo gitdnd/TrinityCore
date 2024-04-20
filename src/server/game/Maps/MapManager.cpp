@@ -129,7 +129,7 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 
 Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
 {
-    Map* m = CreateBaseMap(id, player ? player->GetGroupOrPlayerItemLevel() : 20);
+    Map* m = CreateBaseMap(id, player ? player->GetCappedGroupOrPlayerItemLevel() : 20);
 
     if (m && m->Instanceable())
         m = ((MapInstanced*)m)->CreateInstanceForPlayer(id, player, loginInstanceId);
