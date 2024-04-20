@@ -644,7 +644,7 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
     InitializeMovementFlags();
 
     LoadCreaturesAddon();
-    ApplyAffixData(AFFIX_EVENT_UPDATE_ENTRY);
+    //ApplyAffixData(AFFIX_EVENT_UPDATE_ENTRY);
     LoadTemplateImmunities();
 
     GetThreatManager().EvaluateSuppressed();
