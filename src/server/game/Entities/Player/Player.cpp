@@ -24967,7 +24967,8 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid guidMember) const
         if (sLFGMgr->IsVoteKickActive(gguid))
             return ERR_PARTY_LFG_BOOT_IN_PROGRESS;
 
-        if (grp->GetMembersCount() <= lfg::LFG_GROUP_KICK_VOTES_NEEDED)
+        // Special handling for Stromgarde (3 player dungeon)
+        if (grp->GetMembersCount() <= lfg::LFG_GROUP_KICK_VOTES_NEEDED || (sLFGMgr->GetDungeonMapId(gguid) == 766 && grp->GetMembersCount() <= 2))
             return ERR_PARTY_LFG_BOOT_TOO_FEW_PLAYERS;
 
         if (state == lfg::LFG_STATE_FINISHED_DUNGEON)
