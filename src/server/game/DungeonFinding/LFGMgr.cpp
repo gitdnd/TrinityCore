@@ -599,7 +599,7 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
         LfgRolesMap rolesMap;
         rolesMap[guid] = roles;
         LFGQueue& queue = GetQueue(guid);
-        queue.AddQueueData(guid, GameTime::GetGameTime(), dungeons, rolesMap, player->GetAverageItemLevel(), affix1, affix2, affix3, affix4);
+        queue.AddQueueData(guid, GameTime::GetGameTime(), dungeons, rolesMap, player->GetCappedItemLevel(), affix1, affix2, affix3, affix4);
 
         if (!isContinue)
         {
@@ -1326,8 +1326,11 @@ void LFGMgr::UpdateBoot(ObjectGuid guid, bool accept)
         }
     }
 
+    // If on stromgarde map (3 player dungeon) then less votes are required
+    auto requiredAgree = GetDungeonMapId(gguid) == 766 ? 2 : LFG_GROUP_KICK_VOTES_NEEDED;
+
     // if we don't have enough votes (agree or deny) do nothing
-    if (agreeNum < LFG_GROUP_KICK_VOTES_NEEDED && (boot.votes.size() - denyNum) >= LFG_GROUP_KICK_VOTES_NEEDED)
+    if (agreeNum < requiredAgree && (boot.votes.size() - denyNum) >= requiredAgree)
         return;
 
     // Send update info to all players
@@ -1340,7 +1343,7 @@ void LFGMgr::UpdateBoot(ObjectGuid guid, bool accept)
     }
 
     SetVoteKick(gguid, false);
-    if (agreeNum == LFG_GROUP_KICK_VOTES_NEEDED)           // Vote passed - Kick player
+    if (agreeNum >= requiredAgree)           // Vote passed - Kick player
     {
         if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
             Player::RemoveFromGroup(group, boot.victim, GROUP_REMOVEMETHOD_KICK_LFG);
