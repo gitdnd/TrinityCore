@@ -3587,7 +3587,7 @@ int Creature::GetDungeonLevel() const
     if (Player const* owner = GetCharmerOrOwnerPlayerOrPlayerItself())
         return owner->GetAverageItemLevel();
 
-    return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetDungeonLevel();
+    return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetCappedDungeonLevel();
 }
 
 void Creature::UpdateDungeonScaling()

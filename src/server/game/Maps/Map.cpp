@@ -5108,7 +5108,17 @@ Eluna *Map::GetEluna() const
 
 int Map::GetCappedDungeonLevel(uint32 softcapMod) const
 {
-    return std::clamp<int>(i_dungeonLevel, 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
+    int maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+    if (i_affix1 > 0)
+        maxLevel += sAffixMgr->GetAffixEffect(i_affix1).GetDungeonLevelBonus();
+    if (i_affix2 > 0)
+        maxLevel += sAffixMgr->GetAffixEffect(i_affix2).GetDungeonLevelBonus();
+    if (i_affix3 > 0)
+        maxLevel += sAffixMgr->GetAffixEffect(i_affix3).GetDungeonLevelBonus();
+    if (i_affix4 > 0)
+        maxLevel += sAffixMgr->GetAffixEffect(i_affix4).GetDungeonLevelBonus();
+    maxLevel += softcapMod;
+    return std::clamp<int>(i_dungeonLevel, 20, maxLevel);
 }
 
 void Map::SetDungeonLevel(int value)

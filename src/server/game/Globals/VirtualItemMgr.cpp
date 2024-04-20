@@ -437,7 +437,16 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
         ilevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
 
     // allow ilevel bonuses to add to the top of crafted max level as well (catalysts)
-    ilevel += modifier.ilevelBonus;
+    if ((ilevel + modifier.ilevelBonus) > 300)
+    {
+        // only award at half rate when > 300 (maxLevel)
+        int maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+        int actualTotal = ilevel + modifier.ilevelBonus;
+        int overshotTotal = actualTotal - maxLevel;
+        ilevel += (overshotTotal * 0.5);
+    }
+    else
+        ilevel += modifier.ilevelBonus;
 
     // If ilevel modifier is set, override all ilevel generation
     if (modifier.ilevel)
