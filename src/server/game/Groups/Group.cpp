@@ -2853,7 +2853,7 @@ void Group::UpdateDungeonLevel()
         Player* player = ObjectAccessor::FindConnectedPlayer(citr->guid);
         if (!player)
             continue;
-        uint32 ilvl = player->GetAverageItemLevel();
+        //uint32 ilvl = player->GetAverageItemLevel();
         //if (ilvl > highestlvl)
             //highestlvl = ilvl;
         //ilvls.push_back(player->GetAverageItemLevel());

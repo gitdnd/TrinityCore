@@ -49,7 +49,7 @@ public:
 
 static ElunaUpdateListener elunaUpdateListener;
 
-void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir, std::string const& filename, efsw::Action action, std::string oldFilename)
+void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir, std::string const& filename, efsw::Action /*action*/, std::string oldFilename)
 {
     auto const path = fs::absolute(filename, dir);
     ELUNA_LOG_INFO("[Eluna]: Found file %s change.", path.string().c_str());

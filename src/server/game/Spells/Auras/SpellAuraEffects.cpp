@@ -5924,7 +5924,7 @@ void AuraEffect::HandleDamageSchoolBonus(AuraApplication const* aurApp, uint8 mo
     target->SetBonusSchoolModifierPct(school, amount);
 }
 
-void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
         return;
@@ -5944,7 +5944,7 @@ void AuraEffect::HandleMagicFind(AuraApplication const* aurApp, uint8 mode, bool
     target->SetMagicFind(amount);
 }
 
-void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
         return;
@@ -5965,7 +5965,7 @@ void AuraEffect::HandleAuraModSpellPowerPercent(AuraApplication const* aurApp, u
     }
 }
 
-void AuraEffect::HandleAuraModSpellPowerbyMana(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleAuraModSpellPowerbyMana(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
         return;

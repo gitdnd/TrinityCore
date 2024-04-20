@@ -26008,7 +26008,7 @@ void Player::CompletedAchievement(uint32 id)
     }
 }
 
-void Player::LearnTalent(uint32 talentId, uint32 talentRank)
+void Player::LearnTalent(uint32 /*talentId*/, uint32 /*talentRank*/)
 {
     // We don't use default talents.
     /*uint32 CurTalentPoints = GetFreeTalentPoints();
