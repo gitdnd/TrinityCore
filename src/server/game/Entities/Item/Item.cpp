@@ -285,6 +285,16 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
         // set the players' loot preference if it is selected
         modifier.lootPreference = owner->GetActiveLootPreference();
 
+        // add ilevel bonus from affix data
+        if (Map* map = owner->GetMap())
+        {
+            // only apply if map, raid, and num players > 1, to avoid exploits
+            if ((map->IsDungeon() || map->IsRaid()) && map->GetPlayers().getSize() > 1)
+            {
+                modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(map->GetAffixSlot(1), map->GetAffixSlot(2), map->GetAffixSlot(3), map->GetAffixSlot(4));
+            }
+        }
+
         if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(itemProto, modifier))
         {
             itemProto = newProto;
