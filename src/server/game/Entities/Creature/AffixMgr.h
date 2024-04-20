@@ -12,7 +12,7 @@ enum AffixEvent
 {
     AFFIX_EVENT_ADD_TO_WORLD = 1,
     AFFIX_EVENT_LEAVE_COMBAT = 2,
-    //AFFIX_EVENT_UPDATE_ENTRY = 3, // Applying this causes double stacking of affixes
+    AFFIX_EVENT_UPDATE_ENTRY = 3,
     AFFIX_EVENT_RESPAWN      = 4,
     AFFIX_EVENT_REACH_HOME   = 5
 };

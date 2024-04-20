@@ -153,6 +153,7 @@ void AffixEffect::Apply(Creature* creature, AffixEvent event)
  
     switch (event)
     {
+    case AFFIX_EVENT_UPDATE_ENTRY:
     case AFFIX_EVENT_LEAVE_COMBAT:
     case AFFIX_EVENT_RESPAWN:
     {

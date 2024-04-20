@@ -644,7 +644,22 @@ bool Creature::UpdateEntry(uint32 entry, CreatureData const* data /*= nullptr*/,
     InitializeMovementFlags();
 
     LoadCreaturesAddon();
-    //ApplyAffixData(AFFIX_EVENT_UPDATE_ENTRY);
+    // Only apply affix data if we don't already have affix spells
+    if (Map* map = GetMap())
+    {
+        bool applyAffixData = true;
+        for (int i = 1; i <= 4; ++i)
+        {
+            uint32 spell = sAffixMgr->GetAffixEffect(map->GetAffixSlot(i)).GetTargetSpell();
+            if (spell > 0 && HasAura(spell))
+            {
+                applyAffixData = false;
+                break;
+            }
+        }
+        if (applyAffixData)
+            ApplyAffixData(AFFIX_EVENT_UPDATE_ENTRY);
+    }
     LoadTemplateImmunities();
 
     GetThreatManager().EvaluateSuppressed();
