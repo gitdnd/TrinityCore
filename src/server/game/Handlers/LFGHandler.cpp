@@ -213,7 +213,7 @@ void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
     bool out;
     recvData >> out;
 
-    if (GetPlayer()->IsInCombat())
+    if (GetPlayer()->IsInCombat() || GetPlayer()->GetTransport())
     {
         SendLfgTeleportError(uint8(7));
         return;
