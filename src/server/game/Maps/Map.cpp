@@ -302,8 +302,8 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     if (IsParentMap() || !Instanceable())
         i_dungeonLevel = 0;
 
-    if (i_dungeonLevel > uint32(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL)));
-        i_dungeonLevel = uint32(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL));
+    if (i_dungeonLevel > int(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL)))
+        i_dungeonLevel = int(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL));
 
     i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(affix1, affix2, affix3, affix4);
 
