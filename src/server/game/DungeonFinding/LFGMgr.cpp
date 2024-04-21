@@ -1327,7 +1327,7 @@ void LFGMgr::UpdateBoot(ObjectGuid guid, bool accept)
     }
 
     // If on stromgarde map (3 player dungeon) then less votes are required
-    auto requiredAgree = GetDungeonMapId(gguid) == 766 ? 2 : LFG_GROUP_KICK_VOTES_NEEDED;
+    auto requiredAgree = GetDungeonMapId(gguid) == 766u ? 2u : LFG_GROUP_KICK_VOTES_NEEDED;
 
     // if we don't have enough votes (agree or deny) do nothing
     if (agreeNum < requiredAgree && (boot.votes.size() - denyNum) >= requiredAgree)
