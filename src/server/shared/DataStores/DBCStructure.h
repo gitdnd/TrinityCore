@@ -1092,14 +1092,14 @@ struct MapEntry
     // Helpers
     uint32 Expansion() const { return ExpansionID; }
 
-    bool IsDungeon() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID; }
-    bool IsNonRaidDungeon() const { return InstanceType == MAP_INSTANCE; }
-    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA; }
+    bool IsDungeon() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || ID == 768; } // 768 The Timeways
+    bool IsNonRaidDungeon() const { return InstanceType == MAP_INSTANCE || ID == 768; } // 768 The Timeways
+    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA || ID == 768; } // 768 The Timeways
     bool IsRaid() const { return InstanceType == MAP_RAID; }
     bool IsBattleground() const { return InstanceType == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return InstanceType == MAP_ARENA; }
     bool IsBattlegroundOrArena() const { return InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA; }
-    bool IsWorldMap() const { return InstanceType == MAP_COMMON; }
+    bool IsWorldMap() const { return InstanceType == MAP_COMMON && ID != 768; } // 768 The Timeways
 
     bool GetEntrancePos(int32 &mapid, float &x, float &y) const
     {
