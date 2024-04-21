@@ -2269,7 +2269,10 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
                 {
                     for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                         if (Player* player = groupRef->GetSource())
+                        {
                             player->SendResetInstanceSuccess(instanceSave->GetMapId());
+                            player->SetPortalLocation(WorldLocation()); // Reset hub portal location
+                        }
                 }
 
                 else

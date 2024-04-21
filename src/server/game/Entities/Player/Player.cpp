@@ -21192,6 +21192,7 @@ void Player::ResetInstances(uint8 method, bool isRaid)
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
+    bool didReset = false;
     for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
     {
         InstanceSave* p = itr->second.save;
@@ -21230,7 +21231,13 @@ void Player::ResetInstances(uint8 method, bool isRaid)
 
         // the following should remove the instance save from the manager and delete it as well
         p->RemovePlayer(this);
+
+        didReset = true;
     }
+
+    // If resetting a dungeon, reset hub portal location
+    if (didReset)
+        SetPortalLocation(WorldLocation());
 }
 
 void Player::SendResetInstanceSuccess(uint32 MapId) const
