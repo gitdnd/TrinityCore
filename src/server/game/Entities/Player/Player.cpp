@@ -16961,7 +16961,12 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid /*= ObjectGuid::E
     {
         killed = GetMap()->GetCreature(guid);
         if (killed && killed->GetEntry())
+        {
             real_entry = killed->GetEntry();
+
+            //Test
+            CustomAutoLoot(killed);
+        }
     }
 
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_CREATURE, real_entry);   // MUST BE CALLED FIRST
@@ -28398,8 +28403,11 @@ GameClient* Player::GetGameClient() const
 
 void Player::CustomAutoLoot(Creature * target)
 {
-    if (!target || target->IsAlive())
+    if (!target || !target->isDead())
+    {
+        Say("No target or target isn't dead.", LANG_UNIVERSAL);
         return;
+    }
 
     SendLoot(target->GetGUID(), LOOT_CORPSE);
 
