@@ -28399,26 +28399,17 @@ GameClient* Player::GetGameClient() const
 void Player::CustomAutoLoot(Creature * target)
 {
     if (!target || !target->isDead())
-    {
-        Say("No target or target isn't dead.", LANG_UNIVERSAL);
         return;
-    }
 
     SendLoot(target->GetGUID(), LOOT_CORPSE);
 
     Loot* loot = &target->loot;
     
     if (loot->isLooted())
-    {
-        target->Say("Player::CustomAutoLoot already looted.", LANG_UNIVERSAL);
         return;
-    }
 
     for (uint8 i = 0; i < loot->items.size(); ++i)
-    {
-        target->Say(Trinity::StringFormat("Player::CustomAutoLoot attempting to store loot {}.", i).c_str(), LANG_UNIVERSAL);
         StoreLootItem(i, loot);
-    }
 
     if(loot->isLooted())
         GetSession()->DoLootRelease(target->GetGUID());
