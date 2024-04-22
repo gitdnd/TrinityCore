@@ -28395,3 +28395,70 @@ GameClient* Player::GetGameClient() const
 {
     return GetSession()->GetGameClient();
 }
+
+void Player::CustomAutoLoot(Creature * target)
+{
+    if (!target || target->IsAlive())
+        return;
+
+    Loot* loot = &target->loot;
+
+    if (loot->isLooted())
+        return;
+
+    for (uint8 i = 0; i < loot->items.size(); ++i)
+    {
+        StoreLootItem(i, loot);
+    }
+
+    loot->NotifyMoneyRemoved();
+    if (Group * group = GetGroup())      //item, pickpocket and players can be looted only single player
+    {
+        std::vector<Player*> playersNear;
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* member = itr->GetSource();
+            if (!member)
+                continue;
+
+            if (IsAtGroupRewardDistance(member))
+                playersNear.push_back(member);
+        }
+
+        uint32 goldPerPlayer = uint32((loot->gold) / (playersNear.size()));
+
+        for (std::vector<Player*>::const_iterator i = playersNear.begin(); i != playersNear.end(); ++i)
+        {
+            (*i)->ModifyMoney(goldPerPlayer);
+            (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, goldPerPlayer);
+
+            WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
+            data << uint32(goldPerPlayer);
+            data << uint8(playersNear.size() <= 1); // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
+            (*i)->SendDirectMessage(&data);
+        }
+    }
+    else
+    {
+        ModifyMoney(loot->gold);
+        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
+
+        WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
+        data << uint32(loot->gold);
+        data << uint8(1);   // "You loot..."
+        GetSession()->SendPacket(&data);
+    }
+
+#ifdef ELUNA
+    if (Eluna* e = GetEluna())
+        e->OnLootMoney(this, loot->gold);
+#endif
+    loot->gold = 0;
+
+    // Delete the money loot record from the DB
+    if (loot->containerID > 0)
+        sLootItemStorage->RemoveStoredMoneyForContainer(loot->containerID);
+
+    if(loot->isLooted())
+        GetSession()->DoLootRelease(target->GetGUID());
+}

@@ -2287,6 +2287,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool HasCustomTalent(uint32 id);
         bool HasTalentWithMask(uint32 mask);
         std::vector<uint32> GetCustomTalents() { return customTalents[GetCurrentTalentLoadout()]; }
+
+        void CustomAutoLoot(Creature* target);
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
