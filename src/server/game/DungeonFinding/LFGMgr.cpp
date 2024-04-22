@@ -1812,7 +1812,9 @@ void LFGMgr::SetAffixData(ObjectGuid guid, uint32* affixes)
 {
     LfgGroupData& data = GroupsStore[guid];
     for (uint8 i = 0; i < MAX_AFFIXES; ++i)
-        data.affixes[i] = affixes[i];
+    {
+        data.affixes[i] = *affixes ? affixes[i] : 0;;
+    }
 }
 
 void LFGMgr::SetState(ObjectGuid guid, LfgState state)

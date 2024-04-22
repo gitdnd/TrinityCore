@@ -633,7 +633,9 @@ LfgCompatibility LFGQueue::CheckCompatibility(GuidList check)
     proposal.leader.Clear();
     proposal.dungeonId = Trinity::Containers::SelectRandomContainerElement(proposalDungeons);
     for (uint8 i = 0; i < MAX_AFFIXES; ++i)
-        proposal.affixes[i] = queue.affixes[i];
+    {
+        proposal.affixes[i] = queue.affixes ? queue.affixes[i] : 0;
+    }
 
 
     bool leader = false;

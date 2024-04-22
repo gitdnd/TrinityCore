@@ -82,7 +82,7 @@ struct LfgQueueData
         isQueued(true)
     {
         for (uint8 i = 0; i < MAX_AFFIXES; ++i)
-            affixes[i] = _affixes[i];
+            affixes[i] = _affixes ? _affixes[i] : 0;
     }
 
     time_t joinTime;                                       ///< Player queue join time (to calculate wait times)

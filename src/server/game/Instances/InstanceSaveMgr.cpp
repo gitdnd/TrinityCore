@@ -189,7 +189,7 @@ InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficult
   m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_canReset(canReset), m_toDelete(false)
 {
     for (uint8 i = 0; i < MAX_AFFIXES; ++i)
-        m_affixes[i] = affixes[i];
+        m_affixes[i] = affixes ? affixes[i] : 0;
 }
 
 InstanceSave::~InstanceSave()

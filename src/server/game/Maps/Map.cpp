@@ -289,8 +289,11 @@ m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transpo
 i_gridExpiry(expiry),
 i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _respawnCheckTimer(0)
 {
+
     for (uint8 i = 0; i < MAX_AFFIXES; ++i)
-        i_affixes[i] = affixes[i];
+    {
+        i_affixes[i] = affixes ? affixes[i] : 0;
+    }
 
     m_parentMap = (_parent ? _parent : this);
     graveyardOverride = WorldLocation();
