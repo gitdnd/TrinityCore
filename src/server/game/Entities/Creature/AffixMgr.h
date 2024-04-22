@@ -44,7 +44,7 @@ public:
     uint8 GetRank(uint8 slot);
 
 private:
-    AffixGroupSlot m_slots[4];
+    AffixGroupSlot m_slots[MAX_AFFIXES];
 };
 
 class AffixItem
@@ -89,7 +89,7 @@ public:
 	AffixItem GetAffixItem(uint32 id);
 	AffixEffect GetAffixEffect(uint32 id);
 
-    int GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
+    int GetDungeonLevelBonus(uint32* affixes);
 
     AffixGroup& GetAffixGroup(Group* group);
     void ClearAffixGroup(Group* group);

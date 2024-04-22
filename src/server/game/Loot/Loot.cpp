@@ -210,7 +210,7 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                             modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
 
-                            modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixSlot(1), member->GetMap()->GetAffixSlot(2), member->GetMap()->GetAffixSlot(3), member->GetMap()->GetAffixSlot(4));
+                            modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
 
                             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;

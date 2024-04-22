@@ -259,10 +259,7 @@ struct LfgProposal
     GuidList queues;                                       /// Queue Ids to remove/readd
     GuidList showorder;                                    /// Show order in update window
     LfgProposalPlayerContainer players;                    /// Players data
-    uint32 affix1;
-    uint32 affix2;
-    uint32 affix3;
-    uint32 affix4;
+    uint32 affixes[MAX_AFFIXES];
 };
 
 /// Stores all rolecheck info of a group that wants to join
@@ -411,7 +408,7 @@ class TC_GAME_API LFGMgr
         /// Sets player lfr comment
         void SetComment(ObjectGuid guid, std::string const& comment);
         /// Join Lfg with selected roles, dungeons and comment
-        LfgJoinResult JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, std::string const& comment, LfgGroupType groupType, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
+        LfgJoinResult JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, std::string const& comment, LfgGroupType groupType, uint32* affixes);
         /// Leaves lfg
         void LeaveLfg(ObjectGuid guid, bool disconnected = false);
 
@@ -441,7 +438,7 @@ class TC_GAME_API LFGMgr
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
         void SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons);
         void DecreaseKicksLeft(ObjectGuid guid);
-        void SetAffixData(ObjectGuid guid, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
+        void SetAffixData(ObjectGuid guid, uint32* affixes);
         void SetState(ObjectGuid guid, LfgState state);
         void SetVoteKick(ObjectGuid gguid, bool active);
         void RemovePlayerData(ObjectGuid guid);

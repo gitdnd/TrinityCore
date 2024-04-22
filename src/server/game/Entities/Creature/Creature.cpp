@@ -2685,17 +2685,9 @@ void Creature::ApplyAffixData(AffixEvent event)
 {
     if (Map* map = GetMap())
     {
-        uint32 affix1 = map->GetAffixSlot(1);
-        uint32 affix2 = map->GetAffixSlot(2);
-        uint32 affix3 = map->GetAffixSlot(3);
-        uint32 affix4 = map->GetAffixSlot(4);
-        if (affix1 > 0 || affix2 > 0 || affix3 > 0 || affix4 > 0)
+        for (uint8 i = 0; i < MAX_AFFIXES; ++i)
         {
-            uint32 affixes[] = { affix1, affix2, affix3, affix4 };
-            for (uint32 id : affixes)
-            {
-                sAffixMgr->GetAffixEffect(id).Apply(this, event);
-            }
+            sAffixMgr->GetAffixEffect(map->GetAffixSlot(i)).Apply(this, event);
         }
     }
 }

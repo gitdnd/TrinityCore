@@ -332,7 +332,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     public:
-        Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent = nullptr);
+        Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent = nullptr);
         virtual ~Map();
 
         MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -466,16 +466,12 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         int GetDungeonLevel() const { return i_dungeonLevel; }
         uint32 GetAffixSlot(uint8 slot)
         {
-            if (slot == 1)
-                return i_affix1;
-            if (slot == 2)
-                return i_affix2;
-            if (slot == 3)
-                return i_affix3;
-            if (slot == 4)
-                return i_affix4;
+            if(slot < MAX_AFFIXES)
+                return i_affixes[slot];
+
             return 0;
         }
+        uint32* GetAffixes() { return i_affixes; }
         int GetCappedDungeonLevel(uint32 softcapMod = 0) const;
         void SetDungeonLevel(int value);
         void UpdateDungeonLevel();
@@ -747,10 +743,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         MapEntry const* i_mapEntry;
         uint8 i_spawnMode;
         int i_dungeonLevel;
-        uint32 i_affix1;
-        uint32 i_affix2;
-        uint32 i_affix3;
-        uint32 i_affix4;
+        uint32 i_affixes[MAX_AFFIXES];
         uint32 i_InstanceId;
         Trinity::unique_weak_ptr<Map> m_weakRef;
         uint32 m_unloadTimer;
@@ -961,7 +954,7 @@ enum InstanceResetMethod
 class TC_GAME_API InstanceMap : public Map
 {
     public:
-        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent, TeamId InstanceTeam);
+        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent, TeamId InstanceTeam);
         ~InstanceMap();
         bool AddPlayerToMap(Player*) override;
         void RemovePlayerFromMap(Player*, bool) override;

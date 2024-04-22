@@ -34,7 +34,7 @@
 #include "LuaEngine.h"
 #endif
 
-MapInstanced::MapInstanced(uint32 id, time_t expiry, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dungeonLevel, affix1, affix2, affix3, affix4)
+MapInstanced::MapInstanced(uint32 id, time_t expiry, int dungeonLevel, uint32* affixes) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dungeonLevel, affixes)
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_GRIDS*sizeof(uint16));
@@ -161,7 +161,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             {
                 map = FindInstanceMap(loginInstanceId);
                 if (!map && pSave && pSave->GetInstanceId() == loginInstanceId)
-                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixSlot(1), pSave->GetAffixSlot(2), pSave->GetAffixSlot(3), pSave->GetAffixSlot(4), player->GetTeamId());
+                    map = CreateInstance(loginInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixes(), player->GetTeamId());
                 return map;
             }
 
@@ -186,7 +186,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             map = FindInstanceMap(newInstanceId);
             // it is possible that the save exists but the map doesn't
             if (!map)
-                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixSlot(1), pSave->GetAffixSlot(2), pSave->GetAffixSlot(3), pSave->GetAffixSlot(4), player->GetTeamId());
+                map = CreateInstance(newInstanceId, pSave, pSave->GetDifficulty(), pSave->GetDungeonLevel(), pSave->GetAffixes(), player->GetTeamId());
         }
         else
         {
@@ -196,26 +196,19 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
 
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
             int dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : player->GetAverageItemLevel();
-            uint32 affix1 = 0, affix2 = 0, affix3 = 0, affix4 = 0;
-            if (Group* group = player->GetGroup())
-            {
-                affix1 = group->GetAffixData(1);
-                affix2 = group->GetAffixData(2);
-                affix3 = group->GetAffixData(3);
-                affix4 = group->GetAffixData(4);
-            }
+
             //Seems it is now possible, but I do not know if it should be allowed
             //ASSERT(!FindInstanceMap(NewInstanceId));
             map = FindInstanceMap(newInstanceId);
             if (!map)
-                map = CreateInstance(newInstanceId, nullptr, diff, dungeonLevel, affix1, affix2, affix3, affix4, player->GetTeamId());
+                map = CreateInstance(newInstanceId, nullptr, diff, dungeonLevel, player->GetGroup() ? player->GetGroup()->GetAffixes() : 0, player->GetTeamId());
         }
     }
 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, TeamId InstanceTeam)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32* affixes, TeamId InstanceTeam)
 {
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
@@ -238,7 +231,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     GetDownscaledMapDifficultyData(GetId(), difficulty);
 
     TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: {} map instance {} for {} created with difficulty {}", save ? "" : "new ", InstanceId, GetId(), static_cast<uint32>(difficulty));
-    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, affix1, affix2, affix3, affix4, this, InstanceTeam);
+    InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, affixes, this, InstanceTeam);
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();

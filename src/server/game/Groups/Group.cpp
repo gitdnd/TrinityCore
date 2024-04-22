@@ -263,11 +263,8 @@ void Group::LoadGroupFromDB(Field* fields)
        m_raidDifficulty = Difficulty(r_diff);
 
     m_masterLooterGuid = ObjectGuid(HighGuid::Player, fields[15].GetUInt32());
-
-    m_affix1 = fields[19].GetUInt32();
-    m_affix2 = fields[20].GetUInt32();
-    m_affix3 = fields[21].GetUInt32();
-    m_affix4 = fields[22].GetUInt32();
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+        m_affixes[i] = fields[19 + i].GetUInt32();
 
     if (m_groupType & GROUPTYPE_LFG)
         sLFGMgr->_LoadFromDB(fields, GetGUID());
@@ -2452,21 +2449,17 @@ void Group::BroadcastGroupUpdate(void)
     }
 }
 
-void Group::SetAffixData(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+void Group::SetAffixData(const uint32* affixes)
 {
-    m_affix1 = affix1;
-    m_affix2 = affix2;
-    m_affix3 = affix3;
-    m_affix4 = affix4;
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+        m_affixes[i] = affixes[i];
+
     if (!isBGGroup() && !isBFGroup())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_AFFIX);
-
-        stmt->setUInt32(0, affix1);
-        stmt->setUInt32(1, affix2);
-        stmt->setUInt32(2, affix3);
-        stmt->setUInt32(3, affix4);
-        stmt->setUInt32(4, m_dbStoreId);
+        for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+            stmt->setUInt32(0 + i, m_affixes[i]);
+        stmt->setUInt32(MAX_AFFIXES, m_dbStoreId);
 
         CharacterDatabase.Execute(stmt);
     }
@@ -2474,14 +2467,8 @@ void Group::SetAffixData(uint32 affix1, uint32 affix2, uint32 affix3, uint32 aff
 
 uint32 Group::GetAffixData(uint8 slot)
 {
-    if (slot == 1)
-        return m_affix1;
-    if (slot == 2)
-        return m_affix2;
-    if (slot == 3)
-        return m_affix3;
-    if (slot == 4)
-        return m_affix4;
+    if (slot < MAX_AFFIXES)
+        return m_affixes[slot];
 
     return 0;
 }

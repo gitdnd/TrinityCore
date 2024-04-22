@@ -74,7 +74,7 @@ void InstanceSaveManager::Unload()
 - adding instance into manager
 - called from InstanceMap::Add, _LoadBoundInstances, LoadGroups
 */
-InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime, bool canReset, bool load)
+InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, uint32* affixes, time_t resetTime, bool canReset, bool load)
 {
     if (InstanceSave* old_save = GetInstanceSave(instanceId))
         return old_save;
@@ -114,7 +114,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
 
     TC_LOG_DEBUG("maps", "InstanceSaveManager::AddInstanceSave: mapid = {}, instanceid = {}", mapId, instanceId);
 
-    InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, dungeonLevel, affix1, affix2, affix3, affix4, resetTime, canReset);
+    InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, dungeonLevel, affixes, resetTime, canReset);
     if (!load)
         save->SaveToDB();
 
@@ -184,9 +184,13 @@ void InstanceSaveManager::UnloadInstanceSave(uint32 InstanceId)
 }
 
 // TODO(Harry): We don't persist affix data
-InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime, bool canReset)
+InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32* affixes, time_t resetTime, bool canReset)
 : m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
-  m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_affix1(affix1), m_affix2(affix2), m_affix3(affix3), m_affix4(affix4), m_canReset(canReset), m_toDelete(false) { }
+  m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_canReset(canReset), m_toDelete(false)
+{
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+        m_affixes[i] = affixes[i];
+}
 
 InstanceSave::~InstanceSave()
 {

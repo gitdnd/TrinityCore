@@ -82,14 +82,14 @@ MapManager* MapManager::instance()
     return &instance;
 }
 
-Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32* affixes)
 {
     if (!sElunaLoader->ShouldMapLoadEluna(id))
     {
         ASSERT(!true, "weeeeeeeeeeeeeeeeeee");
         return nullptr;
     }
-    TC_LOG_ERROR("network", "Create base map dungeon level {}, affixes {} {} {} {}", dungeonLevel, affix1, affix2, affix3, affix4);
+    //TC_LOG_ERROR("network", "Create base map dungeon level {}, affixes {}", dungeonLevel, affixes);
     Map* map = FindBaseMap(id);
 
     if (map == nullptr)
@@ -100,10 +100,10 @@ Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32 affix1, ui
         ASSERT(entry);
 
         if (entry->Instanceable())
-            map = new MapInstanced(id, i_gridCleanUpDelay, dungeonLevel, affix1, affix2, affix3, affix4);
+            map = new MapInstanced(id, i_gridCleanUpDelay, dungeonLevel, affixes);
         else
         {
-            map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, dungeonLevel, affix1, affix2, affix3, affix4);
+            map = new Map(id, i_gridCleanUpDelay, 0, REGULAR_DIFFICULTY, dungeonLevel, affixes);
             map->LoadRespawnTimes();
             map->LoadCorpseData();
         }
