@@ -236,7 +236,7 @@ public:
             player->SendNewItem(item, itemCount, true, false);
         }
         else
-            handler->PSendSysMessage("Error adding item {}", EnumUtils::ToString<InventoryResult>(msg));
+            handler->PSendSysMessage("Error adding item {}", EnumUtils::ToString<InventoryResult>(msg).Constant);
 
         return true;
     }
