@@ -15,6 +15,11 @@
 #include "WorldSession.h"
 #include "TemporarySummon.h"
 #include "World.h"
+#include "VirtualItemMgr.h"
+#include "Item.h"
+#include "SmartEnum.h"
+
+using namespace Trinity::ChatCommands;
 
 class tbsbullshit_commandscript : public CommandScript
 {
@@ -27,7 +32,6 @@ public:
     {
         static std::vector<ChatCommand> tbsBullshitCommandTable =
         {
-            { "aoeloot", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleAOELootCommand, "" },
             { "circlerlaser", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleCirclerLaserCommand, "" },
             { "clone", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleClonePlayerCommand, "" },
             { "clearinventory", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleClearInventory, "" },
@@ -36,6 +40,8 @@ public:
             { "debugstats", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugStatPrint, "" },
             { "settalentloadout", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugSetTalentLoadout, "" },
             { "learncustomtalent", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleDebugLearnTalent, "" },
+            { "addvitem", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleAddVirtualItem, "" },
+
         };
         return tbsBullshitCommandTable;
     }
@@ -177,21 +183,61 @@ public:
         return true;
     }
 
-    static bool HandleAOELootCommand(ChatHandler* handler)
+    static bool HandleAddVirtualItem(ChatHandler* handler, uint32 itemEntry, Optional<uint8> quality, Optional<uint32> itemLevel, Optional<uint32> seed, Optional<int8> statGroup, Optional<bool> isCrafted, Optional<bool> generateSet)
     {
-        float radius = 40.0f;
-        Player* object = handler->GetSession()->GetPlayer();
+        Player* player = handler->GetSession()->GetPlayer();
+        Player* playerTarget = handler->getSelectedPlayer();
+        if (!playerTarget)
+            playerTarget = player;
 
-        // Get Creatures
-        std::list<Creature*> creatureList;
-        Trinity::AnyDeadUnitInObjectRangeCheck go_check(object, radius);
-        Trinity::CreatureListSearcher<Trinity::AnyDeadUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
-        Cell::VisitGridObjects(object, go_search, radius);
-        for (std::list<Creature*>::const_iterator iter = creatureList.begin(); iter != creatureList.end(); ++iter)
+        if (!sVirtualItemMgr.IsVirtualTemplate(sObjectMgr->GetItemTemplate(itemEntry)))
         {
-            Creature* c = (*iter);
-            object->AutoStoreLootNonPersonal(c->GetCreatureTemplate()->lootid, LootTemplates_Creature, true, false, false);
+            handler->PSendSysMessage("{} isn't a valid virtual item.", itemEntry);
+            return true;
         }
+        VirtualModifier mod;
+
+        if(quality)
+            mod.quality = *quality;
+
+        if (itemLevel)
+            mod.ilevel = *itemLevel;
+
+        if (seed)
+            mod.seed = *seed;
+
+        if (statGroup)
+            mod.statgroup = StatGroup(*statGroup);
+
+        if (generateSet)
+            mod.generateSet = *generateSet;
+
+        if (isCrafted)
+        {
+            mod.isCrafted = *isCrafted;
+            mod.lowYield = *isCrafted;
+        }
+
+        uint8 itemCount = 1;
+        uint32 noSpaceForCount = 0;
+        ItemPosCountVec dest;
+        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemEntry, itemCount, &noSpaceForCount);
+        if (msg != EQUIP_ERR_OK)
+            itemCount -= noSpaceForCount;
+
+        if (itemCount == 0 || dest.empty())
+            return 1;
+
+        Item* item = player->StoreNewItem3(dest, itemEntry, true, GenerateItemRandomPropertyId(itemEntry), GuidSet(), mod);
+        if (item)
+        {
+            item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
+
+            player->SendNewItem(item, itemCount, true, false);
+        }
+        else
+            handler->PSendSysMessage("Error adding item {}", EnumUtils::ToString<InventoryResult>(msg));
+
         return true;
     }
 };

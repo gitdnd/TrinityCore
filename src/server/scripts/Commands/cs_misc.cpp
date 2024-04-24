@@ -1271,6 +1271,7 @@ public:
 
         if (count > 0 && item)
         {
+            item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
             player->SendNewItem(item, count, false, true);
             handler->PSendSysMessage(LANG_ADDITEM, itemId, count, handler->GetNameLink(playerTarget).c_str());
             if (player != playerTarget)
