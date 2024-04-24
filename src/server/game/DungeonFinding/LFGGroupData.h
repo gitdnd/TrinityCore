@@ -69,10 +69,7 @@ class TC_GAME_API LfgGroupData
         void SetVoteKick(bool active);
         bool IsVoteKickActive() const;
 
-        uint32 affix1;
-        uint32 affix2;
-        uint32 affix3;
-        uint32 affix4;
+        uint32 affixes[MAX_AFFIXES];
 
     private:
         // General

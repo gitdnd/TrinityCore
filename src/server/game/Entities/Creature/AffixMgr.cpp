@@ -78,14 +78,14 @@ AffixEffect AffixMgr::GetAffixEffect(uint32 id)
     return AffixEffect(0, 0, 0, 0, 0);
 }
 
-int AffixMgr::GetDungeonLevelBonus(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+int AffixMgr::GetDungeonLevelBonus(uint32* affixes)
 {
     int bonus = 0;
-    uint32 affixes[] = {affix1, affix2, affix3, affix4};
-    for (uint32 affix : affixes)
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
     {
-        bonus += GetAffixEffect(affix).GetDungeonLevelBonus();
+        bonus += GetAffixEffect(affixes[i]).GetDungeonLevelBonus();
     }
+
     return bonus;
 }
 

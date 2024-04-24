@@ -3954,6 +3954,8 @@ enum CustomTalentErrorResponses : uint8
 
 };
 
+#define MAX_AFFIXES 4
+
 namespace Trinity
 {
 namespace Impl

@@ -1019,15 +1019,16 @@ namespace LuaCustom
     {
         if (player->GetGroup() && player->GetGroup()->GetMembersCount() == 5)
         {
-            uint32 affix1 = E->CHECKVAL<uint8>(2);
-            uint32 affix2 = E->CHECKVAL<uint8>(3);
-            uint32 affix3 = E->CHECKVAL<uint8>(4);
-            uint32 affix4 = E->CHECKVAL<uint8>(5);
+            uint32 affixes[MAX_AFFIXES];
+
+            for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+                affixes[i] = E->CHECKVAL<uint8>(2 + i);
+
             uint8 roles = lfg::LfgRoles::PLAYER_ROLE_ANY;
             std::set<uint32> dungeons;
             // Random 5 man dungeon
             dungeons.insert(301);
-            int code = sLFGMgr->JoinLfg(player, roles, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affix1, affix2, affix3, affix4);
+            int code = sLFGMgr->JoinLfg(player, roles, dungeons, "Affix", lfg::LfgGroupType::GROUP_5_MAN, affixes);
             E->Push(code);
             return 1;
         }

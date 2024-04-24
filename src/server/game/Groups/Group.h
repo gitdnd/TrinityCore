@@ -354,8 +354,9 @@ class TC_GAME_API Group
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
 
-        void SetAffixData(uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
+        void SetAffixData(const uint32* affixes);
         uint32 GetAffixData(uint8 slot);
+        uint32* GetAffixes() { return m_affixes; }
         Trinity::unique_weak_ptr<Group> GetWeakPtr() const { return m_scriptRef; }
 
     protected:
@@ -393,10 +394,7 @@ class TC_GAME_API Group
         uint32              m_maxEnchantingLevel;
         uint32              m_dbStoreId;                    // Represents the ID used in database (Can be reused by other groups if group was disbanded)
         bool                m_isLeaderOffline;
-        uint32              m_affix1;
-        uint32              m_affix2;
-        uint32              m_affix3;
-        uint32              m_affix4;
+        uint32              m_affixes[MAX_AFFIXES];
         TimeTracker         m_leaderOfflineTimer;
 
         struct NoopGroupDeleter { void operator()(Group*) const { /*noop - not managed*/ } };

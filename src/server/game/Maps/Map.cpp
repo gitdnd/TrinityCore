@@ -280,15 +280,21 @@ void Map::DeleteStateMachine()
     delete si_GridStates[GRID_STATE_REMOVAL];
 }
 
-Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent):
+Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent):
 _creatureToMoveLock(false), _gameObjectsToMoveLock(false), _dynamicObjectsToMoveLock(false),
-i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_dungeonLevel(dungeonLevel), i_affix1(affix1), i_affix2(affix2), i_affix3(affix3), i_affix4(affix4), i_InstanceId(InstanceId),
+i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_dungeonLevel(dungeonLevel), i_InstanceId(InstanceId),
 m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
 m_VisibilityNotifyPeriod(DEFAULT_VISIBILITY_NOTIFY_PERIOD),
 m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
 i_gridExpiry(expiry),
 i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _respawnCheckTimer(0)
 {
+
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+    {
+        i_affixes[i] = affixes ? affixes[i] : 0;
+    }
+
     m_parentMap = (_parent ? _parent : this);
     graveyardOverride = WorldLocation();
 #ifdef ELUNA
@@ -305,7 +311,7 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     if (i_dungeonLevel > int(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL)))
         i_dungeonLevel = int(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL));
 
-    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(affix1, affix2, affix3, affix4);
+    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(i_affixes);
 
     if (auto iTemp = sObjectMgr->GetInstanceTemplate(id))
     {
@@ -331,8 +337,7 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     MMAP::MMapFactory::createOrGetMMapManager()->loadMapInstance(sWorld->GetDataPath(), GetId(), GetInstanceId());
-    TC_LOG_ERROR("network", "Initalize map dungeon level {}, affixes {} {} {} {}", dungeonLevel, affix1, affix2, affix3, affix4);
-
+    //TC_LOG_ERROR("network", "Initalize map dungeon level {}, affixes {}", dungeonLevel, i_affixes);
 }
 
 void Map::InitVisibilityDistance()
@@ -4025,8 +4030,8 @@ template TC_GAME_API void Map::RemoveFromMap(DynamicObject*, bool);
 
 /* ******* Dungeon Instance Maps ******* */
 
-InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, Map* _parent, TeamId InstanceTeam)
-  : Map(id, expiry, InstanceId, SpawnMode, dungeonLevel, affix1, affix2, affix3, affix4, _parent),
+InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent, TeamId InstanceTeam)
+  : Map(id, expiry, InstanceId, SpawnMode, dungeonLevel, affixes, _parent),
     m_resetAfterUnload(false), m_unloadWhenEmpty(false),
     i_data(nullptr), i_script_id(0), i_script_team(InstanceTeam)
 {
@@ -4119,7 +4124,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             if (!mapSave)
             {
                 TC_LOG_DEBUG("maps", "InstanceMap::Add: creating instance save for map {} spawnmode {} with instance id {}", GetId(), GetSpawnMode(), GetInstanceId());
-                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), GetDungeonLevel(), i_affix1, i_affix2, i_affix3, i_affix4, 0, true);
+                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), GetDungeonLevel(), i_affixes, 0, true);
             }
 
             ASSERT(mapSave);
@@ -4533,7 +4538,7 @@ uint32 InstanceMap::GetMaxResetDelay() const
 /* ******* Battleground Instance Maps ******* */
 
 BattlegroundMap::BattlegroundMap(uint32 id, time_t expiry, uint32 InstanceId, Map* _parent, uint8 spawnMode)
-  : Map(id, expiry, InstanceId, spawnMode, 0, 0, 0, 0, 0, _parent), m_bg(nullptr)
+  : Map(id, expiry, InstanceId, spawnMode, 0, 0, _parent), m_bg(nullptr)
 {
     //lets initialize visibility distance for BG/Arenas
     BattlegroundMap::InitVisibilityDistance();
@@ -5109,14 +5114,9 @@ Eluna *Map::GetEluna() const
 int Map::GetCappedDungeonLevel(uint32 softcapMod) const
 {
     int maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
-    if (i_affix1 > 0)
-        maxLevel += sAffixMgr->GetAffixEffect(i_affix1).GetDungeonLevelBonus();
-    if (i_affix2 > 0)
-        maxLevel += sAffixMgr->GetAffixEffect(i_affix2).GetDungeonLevelBonus();
-    if (i_affix3 > 0)
-        maxLevel += sAffixMgr->GetAffixEffect(i_affix3).GetDungeonLevelBonus();
-    if (i_affix4 > 0)
-        maxLevel += sAffixMgr->GetAffixEffect(i_affix4).GetDungeonLevelBonus();
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+        maxLevel += sAffixMgr->GetAffixEffect(i_affixes[i]).GetDungeonLevelBonus();
+
     maxLevel += softcapMod;
     return std::clamp<int>(i_dungeonLevel, 20, maxLevel);
 }

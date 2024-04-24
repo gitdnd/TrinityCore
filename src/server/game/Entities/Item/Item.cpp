@@ -291,7 +291,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
             // only apply if map, raid, and num players > 1, to avoid exploits
             if ((map->IsDungeon() || map->IsRaid()) && map->GetPlayers().getSize() > 1)
             {
-                modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(map->GetAffixSlot(1), map->GetAffixSlot(2), map->GetAffixSlot(3), map->GetAffixSlot(4));
+                modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(map->GetAffixes());
             }
         }
 

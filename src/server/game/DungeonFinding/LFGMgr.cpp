@@ -394,7 +394,7 @@ void LFGMgr::Update(uint32 diff)
    @param[in]     dungeons Dungeons the player/group is applying for
    @param[in]     comment Player selected comment
 */
-LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment, LfgGroupType groupType, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const std::string& comment, LfgGroupType groupType, uint32* affixes)
 {
     if (!player || !player->GetSession() || dungeons.empty())
         return LFG_JOIN_INTERNAL_ERROR;
@@ -571,7 +571,7 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
             dungeons.insert(rDungeonId);
         }
 
-        SetAffixData(gguid, affix1, affix2, affix3, affix4);
+        SetAffixData(gguid,affixes);
 
         SetState(gguid, LFG_STATE_ROLECHECK);
         // Send update to player
@@ -599,7 +599,7 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
         LfgRolesMap rolesMap;
         rolesMap[guid] = roles;
         LFGQueue& queue = GetQueue(guid);
-        queue.AddQueueData(guid, GameTime::GetGameTime(), dungeons, rolesMap, player->GetCappedItemLevel(), affix1, affix2, affix3, affix4);
+        queue.AddQueueData(guid, GameTime::GetGameTime(), dungeons, rolesMap, player->GetCappedItemLevel(), affixes);
 
         if (!isContinue)
         {
@@ -796,7 +796,7 @@ void LFGMgr::UpdateRoleCheck(ObjectGuid gguid, ObjectGuid guid /* = ObjectGuid::
         SetState(gguid, LFG_STATE_QUEUED);
         LFGQueue& queue = GetQueue(gguid);
         LfgGroupData data = GroupsStore[gguid];
-        queue.AddQueueData(gguid, GameTime::GetGameTime(), roleCheck.dungeons, roleCheck.roles, queue.GetItemLevel(gguid), data.affix1, data.affix2, data.affix3, data.affix4);
+        queue.AddQueueData(gguid, GameTime::GetGameTime(), roleCheck.dungeons, roleCheck.roles, queue.GetItemLevel(gguid), data.affixes);
         RoleChecksStore.erase(itRoleCheck);
     }
     else if (roleCheck.state != LFG_ROLECHECK_INITIALITING)
@@ -1021,7 +1021,7 @@ void LFGMgr::MakeNewGroup(LfgProposal const& proposal)
     ASSERT(grp);
     grp->SetDungeonDifficulty(Difficulty(dungeon->difficulty));
     grp->SetDungeonLevel(int(averageLevel));
-    grp->SetAffixData(proposal.affix1, proposal.affix2, proposal.affix3, proposal.affix4);
+    grp->SetAffixData(proposal.affixes);
     ObjectGuid gguid = grp->GetGUID();
     SetDungeon(gguid, dungeon->Entry());
     SetState(gguid, LFG_STATE_DUNGEON);
@@ -1808,14 +1808,13 @@ void LFGMgr::RestoreState(ObjectGuid guid, char const* debugMsg)
     }
 }
 
-void LFGMgr::SetAffixData(ObjectGuid guid, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4)
+void LFGMgr::SetAffixData(ObjectGuid guid, uint32* affixes)
 {
     LfgGroupData& data = GroupsStore[guid];
-
-    data.affix1 = affix1;
-    data.affix2 = affix2;
-    data.affix3 = affix3;
-    data.affix4 = affix4;
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+    {
+        data.affixes[i] = *affixes ? affixes[i] : 0;;
+    }
 }
 
 void LFGMgr::SetState(ObjectGuid guid, LfgState state)

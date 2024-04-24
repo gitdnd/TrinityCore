@@ -48,7 +48,7 @@ class TC_GAME_API InstanceSave
            - any new instance is being generated
            - the first time a player bound to InstanceId logs in
            - when a group bound to the instance is loaded */
-        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime, bool canReset);
+        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32* affixes, time_t resetTime, bool canReset);
 
         /* Unloaded when m_playerList and m_groupList become empty
            or when the instance is reset */
@@ -121,16 +121,11 @@ class TC_GAME_API InstanceSave
         int GetDungeonLevel() const { return m_dungeonLevel; }
         uint32 GetAffixSlot(uint8 slot)
         {
-            if (slot == 1)
-                return m_affix1;
-            if (slot == 2)
-                return m_affix2;
-            if (slot == 3)
-                return m_affix3;
-            if (slot == 4)
-                return m_affix4;
+            if (slot < MAX_AFFIXES)
+                return m_affixes[slot];
             return 0;
         }
+        uint32* GetAffixes() { return m_affixes; }
 
         typedef std::list<Player*> PlayerListType;
         typedef std::list<Group*> GroupListType;
@@ -152,10 +147,7 @@ class TC_GAME_API InstanceSave
         uint32 m_mapid;
         Difficulty m_difficulty;
         int m_dungeonLevel;
-        uint32 m_affix1;
-        uint32 m_affix2;
-        uint32 m_affix3;
-        uint32 m_affix4;
+        uint32 m_affixes[MAX_AFFIXES];
         bool m_canReset;
         bool m_toDelete;
 
@@ -223,7 +215,7 @@ class TC_GAME_API InstanceSaveManager
 
         void Update();
 
-        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, time_t resetTime,
+        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, int dungeonLevel, uint32* affixes, time_t resetTime,
             bool canReset, bool load = false);
         void RemoveInstanceSave(uint32 InstanceId);
         void UnloadInstanceSave(uint32 InstanceId);

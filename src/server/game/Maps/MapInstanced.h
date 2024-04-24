@@ -29,7 +29,7 @@ class TC_GAME_API MapInstanced : public Map
     public:
         typedef std::unordered_map<uint32, Trinity::unique_trackable_ptr<Map>> InstancedMaps;
 
-        MapInstanced(uint32 id, time_t expiry, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4);
+        MapInstanced(uint32 id, time_t expiry, int dungeonLevel, uint32* affixes);
         ~MapInstanced() { }
 
         // functions overwrite Map versions
@@ -64,7 +64,7 @@ class TC_GAME_API MapInstanced : public Map
         virtual void InitVisibilityDistance() override;
 
     private:
-        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32 affix1, uint32 affix2, uint32 affix3, uint32 affix4, TeamId InstanceTeam);
+        InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32* affixes, TeamId InstanceTeam);
         BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
         InstancedMaps m_InstancedMaps;
