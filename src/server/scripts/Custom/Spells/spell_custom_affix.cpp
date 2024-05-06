@@ -266,6 +266,55 @@ class spell_affix_mark_of_the_absolute_chance_aura : public AuraScript
     }
 };
 
+class spell_affix_wild_magic_aura : public AuraScript
+{
+    PrepareAuraScript(spell_affix_wild_magic_aura);
+
+    void OnPeriodicProc(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        auto caster = GetCaster();
+        if (!caster || !caster->ToCreature())
+            return;
+
+        auto aura = aurEff->GetBase();
+        if (!aura)
+            return;
+
+        auto stacks = aura->GetStackAmount();
+
+        if (!roll_chance_i(stacks * 2))
+            return;
+
+        float range = 30.0f;
+
+        std::list<Unit*> unitList;
+        Trinity::AnyUnitInObjectRangeCheck go_check(caster, range);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(caster, unitList, go_check);
+        Cell::VisitGridObjects(caster, go_search, range);
+
+        uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
+        for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
+        {
+            Unit* target = *it;
+            if (caster->CanSeeOrDetect(target))
+            {
+                if (Creature* creature = target->ToCreature())
+                {
+                    if (creature->IsDungeonBoss() || creature->isWorldBoss())
+                        continue;
+                }
+                target->CastSpell(target, spellId);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_affix_wild_magic_aura::OnPeriodicProc, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Affix()
 {
     RegisterSpellScript(spell_affix_avenging_wrath_aura);
@@ -275,4 +324,5 @@ void AddSC_Spells_Custom_Affix()
     RegisterSpellScript(spell_affix_corpse_explosion_aura);
     RegisterSpellScript(spell_affix_mark_of_the_absolute_trigger_aura);
     RegisterSpellScript(spell_affix_mark_of_the_absolute_chance_aura);
+    RegisterSpellScript(spell_affix_wild_magic_aura);
 }
