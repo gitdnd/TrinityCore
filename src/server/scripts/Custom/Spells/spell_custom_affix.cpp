@@ -6,7 +6,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Item.h"
-#include "GridNotifiers.h"
+#include "CellImpl.h"
+#include "GridNotifiersImpl.h"
 #include "TemporarySummon.h"
 
 class spell_affix_avenging_wrath_aura : public AuraScript
