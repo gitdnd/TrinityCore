@@ -302,7 +302,13 @@ class spell_affix_wild_magic_aura : public AuraScript
             {
                 if (Creature* creature = target->ToCreature())
                 {
-                    if (creature->IsDungeonBoss() || creature->isWorldBoss())
+                    if (creature->IsDungeonBoss() ||
+                        creature->isWorldBoss() ||
+                        creature->IsTrigger() ||
+                        creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
+                        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
+                        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
+                        !creature->IsAlive())
                         continue;
                 }
                 target->CastSpell(target, spellId);
