@@ -292,7 +292,7 @@ class spell_affix_wild_magic_aura : public AuraScript
 
         std::list<Player*> plrList;
         Trinity::AnyPlayerInObjectRangeCheck checker(caster, range);
-        Trinity::UnitListSearcher<Trinity::AnyPlayerInObjectRangeCheck> plr_search(caster, plrList, checker);
+        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> plr_search(caster, plrList, checker);
         Cell::VisitGridObjects(caster, plr_search, range);
 
         uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
