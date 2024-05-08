@@ -329,6 +329,24 @@ class spell_affix_wild_magic_aura : public AuraScript
     }
 };
 
+class spell_affix_wild_polymorph_aura : public AuraScript
+{
+    PrepareAuraScript(spell_affix_wild_polymorph_aura);
+
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (!aurEff->GetBase())
+            return;
+
+        aurEff->GetBase()->SetDuration(irand(3000, 8000));
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_affix_wild_polymorph_aura::OnApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAPPLY);
+    }
+};
+
 void AddSC_Spells_Custom_Affix()
 {
     RegisterSpellScript(spell_affix_avenging_wrath_aura);
@@ -339,4 +357,5 @@ void AddSC_Spells_Custom_Affix()
     RegisterSpellScript(spell_affix_mark_of_the_absolute_trigger_aura);
     RegisterSpellScript(spell_affix_mark_of_the_absolute_chance_aura);
     RegisterSpellScript(spell_affix_wild_magic_aura);
+    RegisterSpellScript(spell_affix_wild_polymorph_aura);
 }
