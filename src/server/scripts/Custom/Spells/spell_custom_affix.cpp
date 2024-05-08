@@ -307,7 +307,7 @@ class spell_affix_wild_magic_aura : public AuraScript
                         !creature->IsAlive())
                         continue;
                 }
-                target->CastSpell(target, spellId);
+                target->CastSpell(target, spellId, true);
             }
         }
     }
