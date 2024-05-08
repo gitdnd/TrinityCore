@@ -91,14 +91,16 @@ class spell_affix_barkskin_spores_aura : public AuraScript
 {
     PrepareAuraScript(spell_affix_barkskin_spores_aura);
 
-    void OnPeriodicProc(AuraEffect const* aurEff)
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
+        PreventDefaultAction();
+
         auto caster = GetCaster();
         if (!caster || !caster->ToCreature() || !aurEff->GetBase())
         {
-            PreventDefaultAction();
             return;
         }
+
         auto creature = caster->ToCreature();
         auto aura = aurEff->GetBase();
         for (int i = 0; i < aura->GetStackAmount(); ++i)
@@ -106,22 +108,18 @@ class spell_affix_barkskin_spores_aura : public AuraScript
             if (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS &&
                 (creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_BOSS_MOB) != 0)
             {
-                if (i == 0)
-                    PreventDefaultAction();
-
                 caster->CastSpell(caster, 460178); // boss buff
             }
-            else if (i >= 1)
+            else
             {
-                caster->CastSpell(caster, 460177); // normal buff many times
+                caster->CastSpell(caster, 460177); // normal buff
             }
         }
-        // default normal buff
     }
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_affix_barkskin_spores_aura::OnPeriodicProc, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_affix_barkskin_spores_aura::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
