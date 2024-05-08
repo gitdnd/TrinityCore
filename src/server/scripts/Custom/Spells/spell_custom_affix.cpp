@@ -278,14 +278,20 @@ class spell_affix_wild_magic_aura : public AuraScript
         if (!caster || !caster->ToCreature())
             return;
 
+        caster->Say("Proc 1", LANG_UNIVERSAL);
+
         auto aura = aurEff->GetBase();
         if (!aura)
             return;
 
         auto stacks = aura->GetStackAmount();
 
+        caster->Say("Proc 2", LANG_UNIVERSAL);
+
         if (!roll_chance_i(stacks * 2))
             return;
+
+        caster->Say("Proc 3", LANG_UNIVERSAL);
 
         float range = 30.0f;
 
@@ -298,8 +304,10 @@ class spell_affix_wild_magic_aura : public AuraScript
         for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
         {
             Unit* target = *it;
+            target->Say("Proc 4", LANG_UNIVERSAL);
             if (caster->CanSeeOrDetect(target))
             {
+                caster->Say("Proc 5", LANG_UNIVERSAL);
                 if (Creature* creature = target->ToCreature())
                 {
                     if (creature->IsDungeonBoss() ||
@@ -311,6 +319,7 @@ class spell_affix_wild_magic_aura : public AuraScript
                         !creature->IsAlive())
                         continue;
                 }
+                caster->Say("Proc 6", LANG_UNIVERSAL);
                 target->CastSpell(target, spellId);
             }
         }
