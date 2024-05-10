@@ -299,6 +299,7 @@ class spell_affix_wild_magic_aura : public AuraScript
         for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
         {
             Unit* target = *it;
+            target->Say("I am a potential target!", LANG_UNIVERSAL); // debug
             if (caster->CanSeeOrDetect(target))
             {
                 if (Creature* creature = target->ToCreature())
@@ -317,6 +318,7 @@ class spell_affix_wild_magic_aura : public AuraScript
         }
         for (std::list<Player*>::const_iterator it = plrList.begin(); it != plrList.end(); ++it)
         {
+            (*it)->Say("I am a target!", LANG_UNIVERSAL); // debug
             (*it)->CastSpell(*it, spellId);
         }
     }
