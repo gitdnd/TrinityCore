@@ -290,16 +290,10 @@ class spell_affix_wild_magic_aura : public AuraScript
         Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(caster, unitList, go_check);
         Cell::VisitAllObjects(caster, go_search, range);
 
-        std::list<Player*> plrList;
-        Trinity::AnyPlayerInObjectRangeCheck checker(caster, range);
-        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> plr_search(caster, plrList, checker);
-        Cell::VisitAllObjects(caster, plr_search, range);
-
         uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
         for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
         {
             Unit* target = *it;
-            target->Say("I am a potential target!", LANG_UNIVERSAL); // debug
             if (caster->CanSeeOrDetect(target))
             {
                 if (Creature* creature = target->ToCreature())
@@ -315,11 +309,6 @@ class spell_affix_wild_magic_aura : public AuraScript
                 }
                 target->CastSpell(target, spellId, true);
             }
-        }
-        for (std::list<Player*>::const_iterator it = plrList.begin(); it != plrList.end(); ++it)
-        {
-            (*it)->Say("I am a target!", LANG_UNIVERSAL); // debug
-            (*it)->CastSpell(*it, spellId);
         }
     }
 
@@ -338,12 +327,15 @@ class spell_affix_wild_polymorph_aura : public AuraScript
         if (!aurEff->GetBase())
             return;
 
+        if (GetTarget())
+            GetTarget()->Say("Mod duration!", LANG_UNIVERSAL); // debug
+
         aurEff->GetBase()->SetDuration(irand(3000, 9000));
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_affix_wild_polymorph_aura::OnApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_affix_wild_polymorph_aura::OnApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
