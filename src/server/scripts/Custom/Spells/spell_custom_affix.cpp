@@ -288,12 +288,12 @@ class spell_affix_wild_magic_aura : public AuraScript
         std::list<Unit*> unitList;
         Trinity::AnyUnitInObjectRangeCheck go_check(caster, range);
         Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(caster, unitList, go_check);
-        Cell::VisitGridObjects(caster, go_search, range);
+        Cell::VisitAllObjects(caster, go_search, range);
 
         std::list<Player*> plrList;
         Trinity::AnyPlayerInObjectRangeCheck checker(caster, range);
         Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> plr_search(caster, plrList, checker);
-        Cell::VisitGridObjects(caster, plr_search, range);
+        Cell::VisitAllObjects(caster, plr_search, range);
 
         uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
         for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
