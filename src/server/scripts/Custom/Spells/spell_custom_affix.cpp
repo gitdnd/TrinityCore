@@ -327,10 +327,9 @@ class spell_affix_wild_polymorph_aura : public AuraScript
         if (!aurEff->GetBase())
             return;
 
-        if (GetTarget())
-            GetTarget()->Say("Mod duration!", LANG_UNIVERSAL); // debug
-
-        aurEff->GetBase()->SetDuration(irand(3000, 9000));
+        auto dur = irand(3000, 11000);
+        aurEff->GetBase()->SetMaxDuration(dur);
+        aurEff->GetBase()->SetDuration(dur);
     }
 
     void Register() override
