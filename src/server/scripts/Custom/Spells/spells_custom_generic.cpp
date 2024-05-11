@@ -251,9 +251,9 @@ class spell_igb_cannon_blast : public SpellScript
         if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
         {
             GetCaster()->CastSpell(GetCaster(), 69487, TRIGGERED_FULL_MASK); // SPELL_OVERHEAT
-            if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(0))
-                    sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), 0, passenger); // SAY_OVERHEAT
+            //if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
+            //    if (Unit* passenger = vehicle->GetPassenger(0))
+            //        sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), 0, passenger); // SAY_OVERHEAT
         }
     }
 
@@ -287,7 +287,7 @@ private:
 
     void CalculateDamage(SpellEffIndex /*effIndex*/)
     {
-        SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
+        SetEffectValue(GetEffectValue() + (_energyLeft * 150));
     }
 
     void Register() override
