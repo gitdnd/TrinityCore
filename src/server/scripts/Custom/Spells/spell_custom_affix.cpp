@@ -288,7 +288,7 @@ class spell_affix_wild_magic_aura : public AuraScript
         std::list<Unit*> unitList;
         Trinity::AnyUnitInObjectRangeCheck go_check(caster, range);
         Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> go_search(caster, unitList, go_check);
-        Cell::VisitGridObjects(caster, go_search, range);
+        Cell::VisitAllObjects(caster, go_search, range);
 
         uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
         for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
@@ -327,12 +327,14 @@ class spell_affix_wild_polymorph_aura : public AuraScript
         if (!aurEff->GetBase())
             return;
 
-        aurEff->GetBase()->SetDuration(irand(3000, 8000));
+        auto dur = irand(3000, 11000);
+        aurEff->GetBase()->SetMaxDuration(dur);
+        aurEff->GetBase()->SetDuration(dur);
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_affix_wild_polymorph_aura::OnApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAPPLY);
+        OnEffectApply += AuraEffectApplyFn(spell_affix_wild_polymorph_aura::OnApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
