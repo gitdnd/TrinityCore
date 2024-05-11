@@ -9,6 +9,8 @@
 #include "GridNotifiersImpl.h"
 #include "CharacterCache.h"
 #include "Guild.h"
+#include "CreatureTextMgr.h"
+#include "Vehicle.h"
 
 class spell_gen_between_cast_periodic : public AuraScript
 {
@@ -215,6 +217,135 @@ class spell_gen_subclass : public AuraScript
     }
 };
 
+
+// 69470 - Heat Drain
+// 69487 - Overheat
+class spell_igb_periodic_trigger_with_power_cost : public AuraScript
+{
+    PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost);
+
+    void HandlePeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), aurEff->GetSpellEffectInfo().TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 69399, 70172 - Cannon Blast
+class spell_igb_cannon_blast : public SpellScript
+{
+    PrepareSpellScript(spell_igb_cannon_blast);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void CheckEnergy()
+    {
+        if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
+        {
+            GetCaster()->CastSpell(GetCaster(), 69487, TRIGGERED_FULL_MASK); // SPELL_OVERHEAT
+            if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), 0, passenger); // SAY_OVERHEAT
+        }
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_igb_cannon_blast::CheckEnergy);
+    }
+};
+
+// 69402, 70175 - Incinerating Blast
+class spell_igb_incinerating_blast : public SpellScript
+{
+    PrepareSpellScript(spell_igb_incinerating_blast);
+
+public:
+    spell_igb_incinerating_blast()
+    {
+        _energyLeft = 0;
+    }
+
+private:
+    void StoreEnergy()
+    {
+        _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
+    }
+
+    void RemoveEnergy()
+    {
+        GetCaster()->SetPower(POWER_ENERGY, 0);
+    }
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_igb_incinerating_blast::StoreEnergy);
+        AfterCast += SpellCastFn(spell_igb_incinerating_blast::RemoveEnergy);
+        OnEffectLaunchTarget += SpellEffectFn(spell_igb_incinerating_blast::CalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+
+    uint32 _energyLeft;
+};
+
+// 69487 - Overheat
+class spell_igb_overheat : public AuraScript
+{
+    PrepareAuraScript(spell_igb_overheat);
+
+    bool Load() override
+    {
+        if (GetAura()->GetType() != UNIT_AURA_TYPE)
+            return false;
+        return GetUnitOwner()->IsVehicle();
+    }
+
+    void SendClientControl(uint8 value)
+    {
+        if (Vehicle* vehicle = GetUnitOwner()->GetVehicleKit())
+        {
+            if (Unit* passenger = vehicle->GetPassenger(0))
+            {
+                if (Player* player = passenger->ToPlayer())
+                {
+                    WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
+                    data << GetUnitOwner()->GetPackGUID();
+                    data << uint8(value);
+                    player->SendDirectMessage(&data);
+                }
+            }
+        }
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SendClientControl(0);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SendClientControl(1);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_Spells_Custom_Generic()
 {
     RegisterSpellScript(spell_gen_between_cast_periodic);
@@ -222,4 +353,7 @@ void AddSC_Spells_Custom_Generic()
     RegisterSpellScript(spell_generate_combopoint_all);
     RegisterSpellScript(spell_gen_fly_in_hub);
     RegisterSpellScript(spell_gen_subclass);
+    RegisterSpellScript(spell_igb_cannon_blast);
+    RegisterSpellScript(spell_igb_incinerating_blast);
+    RegisterSpellScript(spell_igb_overheat);
 }
