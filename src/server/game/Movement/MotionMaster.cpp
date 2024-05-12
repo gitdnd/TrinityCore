@@ -656,16 +656,17 @@ void MotionMaster::MoveBackpedal(Unit* target, float dist)
     {
         return;
     }
-    std::function<void(Movement::MoveSplineInit&)> initializer = [=, this, target = target->GetGUID()](Movement::MoveSplineInit& init)
-        {
-            init.MoveTo(point.x, point.y, point.z, false);
-            init.SetFacing(target);
-            init.SetWalk(true);
-            /** Beasts move backwards instead of turning around */
-            if (_owner->ToCreature() && _owner->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_BEAST)
-                init.SetOrientationFixed(true);
-        };
-    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, 0));
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z, false);
+    init.SetFacing(target);
+    init.SetWalk(true);
+
+    /** Beasts move backwards instead of turning around */
+    if (_owner->ToCreature() && _owner->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_BEAST)
+        init.SetOrientationFixed(true);
+
+    init.Launch();
 }
 
 const float fanningRadius = 1.f;
