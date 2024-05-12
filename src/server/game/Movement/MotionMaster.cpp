@@ -729,7 +729,7 @@ void MotionMaster::MoveEncircle(Unit* target)
             init.MoveTo(x, y, z, false, true);
             init.SetWalk(true);
         };
-    Add(new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, 0));
+    Add(new GenericMovementGenerator(std::move(initializer), POINT_MOTION_TYPE, 0));
 }
 
 void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
