@@ -481,7 +481,7 @@ void CreatureAI::Encircle()
     if (targetOfTarget && me == targetOfTarget)
         return;
 
-    //me->GetMotionMaster()->MoveEncircle(target);
+    me->GetMotionMaster()->MoveEncircle(target);
 }
 
 void CreatureAI::Backpedal()

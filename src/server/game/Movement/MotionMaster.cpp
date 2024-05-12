@@ -724,12 +724,10 @@ void MotionMaster::MoveEncircle(Unit* target)
     }
 
     /** Execute Movement. */
-    std::function<void(Movement::MoveSplineInit&)> initializer = [=, this, target = target->GetGUID()](Movement::MoveSplineInit& init)
-        {
-            init.MoveTo(x, y, z, false, true);
-            init.SetWalk(true);
-        };
-    Add(new GenericMovementGenerator(std::move(initializer), POINT_MOTION_TYPE, 0));
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(x, y, z, false, true);
+    init.SetWalk(true);
+    init.Launch();
 }
 
 void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
