@@ -220,6 +220,8 @@ public:
             mod.statgroup = StatGroup(*statGroup);
             handler->PSendSysMessage(" StatGroup = %u", mod.statgroup);
         }
+        else
+            mod.statgroup = STAT_GROUP_RANDOM;
 
         if (generateSet)
         {
