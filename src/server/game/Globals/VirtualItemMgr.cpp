@@ -224,7 +224,7 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateItemDisplay(output, modifier);
 }
 
-void initSeed(uint32& val, std::mt19937 generator)
+void initSeed(uint32& val, std::mt19937& generator)
 {
     if (!val)
         val = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max(), generator);
