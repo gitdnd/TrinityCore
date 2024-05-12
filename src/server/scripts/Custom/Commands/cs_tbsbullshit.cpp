@@ -197,25 +197,41 @@ public:
         }
         VirtualModifier mod;
 
-        if(quality)
+        if (quality)
+        {
             mod.quality = *quality;
+            handler->PSendSysMessage(" Quality = {}", mod.quality);
+        }
 
         if (itemLevel)
+        {
             mod.ilevel = *itemLevel;
+            handler->PSendSysMessage(" ItemLevel = {}", mod.ilevel);
+        }
 
         if (seed)
+        {
             mod.seed = *seed;
+            handler->PSendSysMessage(" Seed = {}", mod.seed);
+        }
 
-        if (statGroup)
+        if (statGroup && statGroup < STAT_GROUP_COUNT)
+        {
             mod.statgroup = StatGroup(*statGroup);
+            handler->PSendSysMessage(" StatGroup = {}", mod.statgroup);
+        }
 
         if (generateSet)
+        {
             mod.generateSet = *generateSet;
+            handler->PSendSysMessage(" GenerateSet = {}", mod.generateSet);
+        }
 
         if (isCrafted)
         {
             mod.isCrafted = *isCrafted;
             mod.lowYield = *isCrafted;
+            handler->PSendSysMessage(" isCrafted = true");
         }
 
         uint8 itemCount = 1;
@@ -234,6 +250,8 @@ public:
             item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
 
             player->SendNewItem(item, itemCount, true, false);
+
+            handler->PSendSysMessage("Added virtual item");
         }
         else
             handler->PSendSysMessage("Error adding item {}", EnumUtils::ToString<InventoryResult>(msg).Constant);
