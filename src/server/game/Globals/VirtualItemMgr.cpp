@@ -233,8 +233,7 @@ void initSeed(uint32& val, std::mt19937 generator)
 void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
 {
     // instantiate RNG
-    std::mt19937 generator;
-    generator.seed(modifier.seed);
+    std::mt19937 generator(modifier.seed);
     initSeed(modifier.socketSeed, generator);
     initSeed(modifier.qualitySeed, generator);
     initSeed(modifier.statSeed, generator);
@@ -346,8 +345,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 
 void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
-    std::mt19937 generator;
-    generator.seed(modifier.statGroupSeed);
+    std::mt19937 generator(modifier.statGroupSeed);
     StatGroup statgroupid;
     StatGroup statgroupbiasid;
 
@@ -411,8 +409,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
 
 void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
-    std::mt19937 generator;
-    generator.seed(modifier.statSeed);
+    std::mt19937 generator(modifier.statSeed);
 
     // decide itemlevel
     // if the modifier for ilevel is manually set (regenerating item as an example) then statically use this item level
@@ -470,8 +467,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
 
 void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
-    std::mt19937 generator;
-    generator.seed(modifier.statSeed);
+    std::mt19937 generator(modifier.statSeed);
     uint32 ilevel = output->ItemLevel;
     // always bind on pickup
     output->Bonding = BIND_WHEN_PICKED_UP;
@@ -632,8 +628,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
-    std::mt19937 generator;
-    generator.seed(modifier.statValueSeed);
+    std::mt19937 generator(modifier.statValueSeed);
 
     // get statgroup id
     StatGroup statgroupid = output->statGroup;
@@ -873,8 +868,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
         return;
     }
 
-    std::mt19937 generator;
-    generator.seed(modifier.nameSeed);
+    std::mt19937 generator(modifier.nameSeed);
 
     std::string fullName = "";
     std::stringstream ss;
@@ -972,8 +966,7 @@ void VirtualItemMgr::GenerateItemName(VirtualItemTemplate* output, VirtualModifi
 
 void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.displaySeed);
+    std::mt19937 generator(modifier.displaySeed);
     uint32 display;
 
     std::vector<displayInfo> displays;
@@ -1037,8 +1030,7 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
 
 itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.spellSeed);
+    std::mt19937 generator(modifier.spellSeed);
 
     std::list<itemSpellInfo> spells;
     bool hasExistingOnUse = false;
@@ -1084,8 +1076,7 @@ itemSpellInfo VirtualItemMgr::GenerateSpell(VirtualItemTemplate* output, Virtual
 
 itemSetInfo VirtualItemMgr::GenerateSet(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.setSeed);
+    std::mt19937 generator(modifier.setSeed);
 
     std::list<itemSetInfo> sets;
     for (itemSetInfo const& someSets : availableItemSets)
@@ -1119,8 +1110,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
         numOfSpell = 1;
     else
     {
-        std::mt19937 generator;
-        generator.seed(modifier.spellSeed);
+        std::mt19937 generator(modifier.spellSeed);
         float randChance = frand(0.f, 100.f, generator);
         if (randChance >= sWorld->getFloatConfig(WorldFloatConfigs(CONFIG_ITEMGEN_SPELL_CHANCE_POOR + output->Quality - 1)))
             numOfSpell = 1;
@@ -1145,8 +1135,7 @@ void VirtualItemMgr::GenerateSpells(VirtualItemTemplate* output, VirtualModifier
 
 void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifier& modifier, bool reRoll)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.socketSeed);
+    std::mt19937 generator(modifier.socketSeed);
 
     // set amount of sockets on the items depending on the quality
     int32 socketCount = 0;
@@ -1246,8 +1235,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
 void VirtualItemMgr::GenerateQuality(VirtualItemTemplate* output, VirtualModifier& modifier, bool /*reRoll*/)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.qualitySeed);
+    std::mt19937 generator(modifier.qualitySeed);
 
     // get initial quality from the template item
     uint32 quality = output->Quality;
@@ -1343,8 +1331,7 @@ void VirtualItemMgr::GenerateAdditonalStat(VirtualItemTemplate* /*output*/)
 
 void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
-    std::mt19937 generator;
-    generator.seed(modifier.setSeed);
+    std::mt19937 generator(modifier.setSeed);
 
     itemSetInfo set = GenerateSet(output, modifier);
 
@@ -2094,8 +2081,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     if (output->Quality != ITEM_QUALITY_LEGENDARY)
         return;
 
-    std::mt19937 generator;
-    generator.seed(modifier.legendarySeed);
+    std::mt19937 generator(modifier.legendarySeed);
     std::list<legendaryItemInfo> legList;
     bool hasExistingOnUse = false;
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
