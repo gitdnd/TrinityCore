@@ -192,7 +192,7 @@ public:
 
         if (!sVirtualItemMgr.IsVirtualTemplate(sObjectMgr->GetItemTemplate(itemEntry)))
         {
-            handler->PSendSysMessage("{} isn't a valid virtual item.", itemEntry);
+            handler->PSendSysMessage("%u isn't a valid virtual item.", itemEntry);
             return true;
         }
         VirtualModifier mod;
@@ -200,31 +200,31 @@ public:
         if (quality)
         {
             mod.quality = *quality;
-            handler->PSendSysMessage(" Quality = {}", mod.quality);
+            handler->PSendSysMessage(" Quality = %u", mod.quality);
         }
 
         if (itemLevel)
         {
             mod.ilevel = *itemLevel;
-            handler->PSendSysMessage(" ItemLevel = {}", mod.ilevel);
+            handler->PSendSysMessage(" ItemLevel = %u", mod.ilevel);
         }
 
         if (seed)
         {
             mod.seed = *seed;
-            handler->PSendSysMessage(" Seed = {}", mod.seed);
+            handler->PSendSysMessage(" Seed = %u", mod.seed);
         }
 
         if (statGroup && statGroup < STAT_GROUP_COUNT)
         {
             mod.statgroup = StatGroup(*statGroup);
-            handler->PSendSysMessage(" StatGroup = {}", mod.statgroup);
+            handler->PSendSysMessage(" StatGroup = %u", mod.statgroup);
         }
 
         if (generateSet)
         {
             mod.generateSet = *generateSet;
-            handler->PSendSysMessage(" GenerateSet = {}", mod.generateSet);
+            handler->PSendSysMessage(" GenerateSet = %u", mod.generateSet);
         }
 
         if (isCrafted)
@@ -254,7 +254,7 @@ public:
             handler->PSendSysMessage("Added virtual item");
         }
         else
-            handler->PSendSysMessage("Error adding item {}", EnumUtils::ToString<InventoryResult>(msg).Constant);
+            handler->PSendSysMessage("Error adding item %s", EnumUtils::ToString<InventoryResult>(msg).Constant);
 
         return true;
     }
