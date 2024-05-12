@@ -244,15 +244,6 @@ void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
     initSeed(modifier.statGroupSeed, generator);
     initSeed(modifier.setSeed, generator);
     initSeed(modifier.legendarySeed, generator);
-
-    // Debug
-    std::uniform_int_distribution<uint32> uid(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
-    modifier.statGroupSeed = uid(generator);
-    if (modifier.statGroupSeed == modifier.setSeed)
-    {
-        std::mt19937 generator_2;
-        modifier.statGroupSeed = uid(generator_2);
-    }
 }
 
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier)
