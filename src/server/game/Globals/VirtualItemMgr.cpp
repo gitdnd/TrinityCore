@@ -245,6 +245,15 @@ void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
     initSeed(modifier.statGroupSeed, generator);
     initSeed(modifier.setSeed, generator);
     initSeed(modifier.legendarySeed, generator);
+
+    // Debug
+    std::uniform_int_distribution<uint32> uid(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    modifier.statGroupSeed = uid(generator);
+    if (modifier.statGroupSeed == modifier.setSeed)
+    {
+        std::mt19937 generator_2;
+        modifier.statGroupSeed = uid(generator_2);
+    }
 }
 
 VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const* base, VirtualModifier& modifier)
@@ -2106,7 +2115,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
             continue;
         if (SelectSkipDebug(itr.second.itemInventoryType, output->InventoryType, "[InventoryType]"))
             continue;
-        if (output->statGroup != STAT_GROUP_RANDOM && SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
+        if (SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
             continue;
         bool skip = false;
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
