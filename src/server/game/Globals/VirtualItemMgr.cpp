@@ -2106,7 +2106,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
             continue;
         if (SelectSkipDebug(itr.second.itemInventoryType, output->InventoryType, "[InventoryType]"))
             continue;
-        if (output->statGroup != STAT_GROUP_RANDOM && SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
+        if (SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
             continue;
         bool skip = false;
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
