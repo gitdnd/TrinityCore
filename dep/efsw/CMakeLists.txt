@@ -1,4 +1,3 @@
-if (BUILD_SHARED_LIBS)
   set(SRCS
     src/efsw/Debug.cpp
     src/efsw/DirectorySnapshot.cpp
@@ -85,6 +84,3 @@ if (BUILD_SHARED_LIBS)
     PROPERTIES
       FOLDER
         "dep")
-else ()
-  add_library(efsw INTERFACE IMPORTED GLOBAL)
-endif ()
