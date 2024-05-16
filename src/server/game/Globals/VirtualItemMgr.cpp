@@ -257,14 +257,7 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     // If no seed supplied, generate a new seed.
     // If seed supplied, skip and assign seed to template.
     if (modifier.seed == 0)
-    {
-
-        SFMTRand sfmt;
-        output->seed = sfmt.RandomUInt32();
-        modifier.seed = output->seed;
-    }
-    else
-        output->seed = modifier.seed;
+        modifier.seed = SFMTRand().RandomUInt32();
 
     InitSeedGen(modifier);
     output->seed = modifier.seed;
