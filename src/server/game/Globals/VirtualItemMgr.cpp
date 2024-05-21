@@ -344,7 +344,7 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
     statgroupid = static_cast<StatGroup>(urand(0, STAT_GROUP_ALL - 1, generator));
 
     // if the player has a loot preference, roll for bias statgroup
-    if (modifier.statgroup == STAT_GROUP_RANDOM && modifier.lootPreference > 0 && modifier.lootPreference < MAX_PREF)
+    if (!modifier.skipPreference  && modifier.statgroup == STAT_GROUP_RANDOM && modifier.lootPreference > 0 && modifier.lootPreference < MAX_PREF)
     {
         // grab available loot preference stat groups
         std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPlayerLootPreference(modifier.lootPreference);
