@@ -233,7 +233,8 @@ void initSeed(uint32& val, std::mt19937& generator)
 void VirtualItemMgr::InitSeedGen(VirtualModifier& modifier)
 {
     // instantiate RNG
-    std::mt19937 generator(modifier.seed);
+    std::mt19937 generator;
+    generator.seed(modifier.seed);
     initSeed(modifier.socketSeed, generator);
     initSeed(modifier.qualitySeed, generator);
     initSeed(modifier.statSeed, generator);
@@ -255,9 +256,14 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
     VirtualItemTemplate* output = new VirtualItemTemplate(base);
 
     // If no seed supplied, generate a new seed.
-    // If seed supplied, skip and assign seed to template.
     if (modifier.seed == 0)
-        modifier.seed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+    {
+        SFMTRand sfmt;
+        output->seed = sfmt.RandomUInt32();
+        modifier.seed = output->seed;
+    }
+    else
+        output->seed = modifier.seed;
 
     InitSeedGen(modifier);
     output->seed = modifier.seed;
