@@ -241,7 +241,7 @@ public:
         if (withPreference)
         {
             mod.lootPreference = 0;
-            handler->PSendSysMessage(" withPreference = %b", withPreference);
+            handler->PSendSysMessage(" withPreference = %b", *withPreference);
         }
             
 
