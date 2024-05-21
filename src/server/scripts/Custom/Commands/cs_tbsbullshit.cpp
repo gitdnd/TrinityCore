@@ -195,7 +195,7 @@ public:
             handler->PSendSysMessage("%u isn't a valid virtual item.", itemEntry);
             return true;
         }
-        VirtualModifier mod;
+        VirtualModifier mod = VirtualModifier();
 
         if (quality)
         {
