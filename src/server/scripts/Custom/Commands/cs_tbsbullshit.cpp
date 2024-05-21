@@ -183,7 +183,7 @@ public:
         return true;
     }
 
-    static bool HandleAddVirtualItem(ChatHandler* handler, uint32 itemEntry, Optional<uint8> quality, Optional<uint32> itemLevel, Optional<uint32> seed, Optional<int8> statGroup, Optional<bool> isCrafted, Optional<bool> generateSet, Optional<bool> skipPref)
+    static bool HandleAddVirtualItem(ChatHandler* handler, uint32 itemEntry, Optional<uint8> quality, Optional<uint32> itemLevel, Optional<uint32> seed, Optional<int8> statGroup, Optional<bool> isCrafted, Optional<bool> generateSet, Optional<bool> withPreference)
     {
         Player* player = handler->GetSession()->GetPlayer();
         Player* playerTarget = handler->getSelectedPlayer();
@@ -236,11 +236,14 @@ public:
             handler->PSendSysMessage(" isCrafted = %b", mod.isCrafted);
         }
 
-        if (skipPref)
+        mod.lootPreference = MAX_PREF;
+
+        if (withPreference)
         {
-            mod.lootPreference = MAX_PREF;
-            handler->PSendSysMessage(" isCrafted = %b", mod.skipPreference);
+            mod.lootPreference = 0;
+            handler->PSendSysMessage(" withPreference = %b", withPreference);
         }
+            
 
         uint8 itemCount = 1;
         uint32 noSpaceForCount = 0;
