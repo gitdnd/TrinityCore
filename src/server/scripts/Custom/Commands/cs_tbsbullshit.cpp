@@ -238,7 +238,7 @@ public:
 
         if (skipPref)
         {
-            mod.skipPreference = *skipPref;
+            mod.lootPreference = MAX_PREF;
             handler->PSendSysMessage(" isCrafted = %b", mod.skipPreference);
         }
 
