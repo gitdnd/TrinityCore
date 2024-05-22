@@ -198,51 +198,32 @@ public:
         VirtualModifier mod = VirtualModifier();
 
         if (quality)
-        {
             mod.quality = *quality;
-            handler->PSendSysMessage(" Quality = %u", mod.quality);
-        }
 
         if (itemLevel)
-        {
             mod.ilevel = *itemLevel;
-            handler->PSendSysMessage(" ItemLevel = %u", mod.ilevel);
-        }
 
         if (seed)
-        {
             mod.seed = *seed;
-            handler->PSendSysMessage(" Seed = %u", mod.seed);
-        }
 
         if (statGroup && statGroup < STAT_GROUP_COUNT)
-        {
             mod.statgroup = StatGroup(*statGroup);
-            handler->PSendSysMessage(" StatGroup = %u", mod.statgroup);
-        }
         else
             mod.statgroup = STAT_GROUP_RANDOM;
 
         if (generateSet)
-        {
             mod.generateSet = *generateSet;
-            handler->PSendSysMessage(" GenerateSet = %u", mod.generateSet);
-        }
 
         if (isCrafted)
         {
             mod.isCrafted = *isCrafted;
             mod.lowYield = *isCrafted;
-            handler->PSendSysMessage(" isCrafted = %b", mod.isCrafted);
         }
 
         mod.lootPreference = MAX_PREF;
 
         if (withPreference)
-        {
             mod.lootPreference = 0;
-            handler->PSendSysMessage(" withPreference = %b", *withPreference);
-        }
             
 
         uint8 itemCount = 1;
@@ -262,7 +243,7 @@ public:
 
             player->SendNewItem(item, itemCount, true, false);
 
-            handler->PSendSysMessage("Added virtual item");
+            handler->PSendSysMessage("Added item %u, quality %u, iLvl %u, seed %u, statgroup %u, crafted %b, set %b, usedPref %b.", itemEntry, mod.quality, mod.ilevel, mod.seed, uint8(mod.statgroup), mod.isCrafted, mod.generateSet, mod.lootPreference == 0);
         }
         else
             handler->PSendSysMessage("Error adding item %s", EnumUtils::ToString<InventoryResult>(msg).Constant);
