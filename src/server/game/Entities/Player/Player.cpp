@@ -28194,6 +28194,13 @@ void Player::LearnCustomTalent(uint32 id)
     CharacterDatabase.Execute(stmt);
 }
 
+uint32 Player::GetTotalTalentPoints() const
+{
+    uint32 totalTP = GetFreeTalentPoints() + m_usedTalentCount;
+
+    return totalTP;
+}
+
 void Player::UnlearnCustomTalent(uint32 id)
 {
     if (!HasCustomTalent(id) || !IsAlive())

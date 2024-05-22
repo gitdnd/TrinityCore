@@ -1461,6 +1461,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetReputation(uint32 factionentry) const;
         std::string const& GetGuildName() const;
         uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
+        uint32 GetTotalTalentPoints() const;
         void SetFreeTalentPoints(uint32 points);
         bool ResetTalents(bool involuntarily = false);
         uint32 ResetTalentsCost() const;
