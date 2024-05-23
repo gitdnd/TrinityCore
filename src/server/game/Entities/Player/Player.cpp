@@ -5411,8 +5411,10 @@ uint32 Player::GetShieldBlockValue() const
     {
         float weaponDPS = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)->GetTemplate()->getDPS();
         AuraEffect const* whirlingBarrier = GetAuraEffect(93179, EFFECT_0);
-
-        value += (weaponDPS * (whirlingBarrier->GetAmount() / 100.f));
+        if (whirlingBarrier)
+        {
+            value += (weaponDPS * (whirlingBarrier->GetAmount() / 100.f));
+        }
     }
 
     return uint32(value);
