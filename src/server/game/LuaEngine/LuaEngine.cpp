@@ -257,6 +257,7 @@ void Eluna::RunScripts()
 
     for (auto it = sElunaLoader->combined_scripts.begin(); it != sElunaLoader->combined_scripts.end(); ++it)
     {
+        uint32 perScriptTime = ElunaUtil::GetCurrTime();
         // if the Eluna state is in compatibility mode, it should load all scripts, including those tagged with a specific map ID
         if (!GetCompatibilityMode())
         {
@@ -289,6 +290,7 @@ void Eluna::RunScripts()
             continue;
         }
         // Stack: require
+        sWorld->SendGMText(Trinity::StringFormat("Script {} executed in {}", it->filename.c_str(), ElunaUtil::GetTimeDiff(perScriptTime)).c_str());
     }
     // Stack: require
     lua_pop(L, 1);
