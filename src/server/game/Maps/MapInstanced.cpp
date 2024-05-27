@@ -210,6 +210,11 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
 
 InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32* affixes, TeamId InstanceTeam)
 {
+    // profiling WorldSession Update stuff
+    uint32 realCurrTime = 0;
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
+
     // load/create a map
     std::lock_guard<std::mutex> lock(_mapLock);
 
@@ -227,27 +232,123 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
         ABORT();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at template lookup: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     // some instances only have one difficulty
     GetDownscaledMapDifficultyData(GetId(), difficulty);
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at GetDownscaledMapDifficultyData: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     TC_LOG_DEBUG("maps", "MapInstanced::CreateInstance: {} map instance {} for {} created with difficulty {}", save ? "" : "new ", InstanceId, GetId(), static_cast<uint32>(difficulty));
     InstanceMap* map = new InstanceMap(GetId(), GetGridExpiry(), InstanceId, difficulty, dungeonLevel, affixes, this, InstanceTeam);
     ASSERT(map->IsDungeon());
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at InstanceMap creation: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     map->LoadRespawnTimes();
     map->LoadCorpseData();
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at RespawnTime or CorpseData load: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     bool load_data = save != nullptr;
     map->CreateInstanceData(load_data);
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at CreateInstanceData: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     if (sWorld->getBoolConfig(CONFIG_INSTANCEMAP_LOAD_GRIDS))
         map->LoadAllCells();
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at LoadAllCells: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     Trinity::unique_trackable_ptr<Map>& ptr = m_InstancedMaps[InstanceId];
     ptr.reset(map);
     map->SetWeakPtr(ptr);
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at weak pointer creation: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     sScriptMgr->OnCreateMap(map);
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Instance: Update diff over threshold at OnCreateMap script hook: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
     return map;
 }
 

@@ -290,13 +290,43 @@ i_gridExpiry(expiry),
 i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _respawnCheckTimer(0)
 {
 
+    // profiling WorldSession Update stuff
+    uint32 realCurrTime = 0;
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
+
     for (uint8 i = 0; i < MAX_AFFIXES; ++i)
     {
         i_affixes[i] = affixes ? affixes[i] : 0;
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Affix init: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     m_parentMap = (_parent ? _parent : this);
     graveyardOverride = WorldLocation();
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Graveyard override: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
 #ifdef ELUNA
     // lua state begins uninitialized
     eluna = nullptr;
@@ -304,6 +334,18 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     if (sElunaConfig->IsElunaEnabled() && !sElunaConfig->IsElunaCompatibilityMode() && sElunaLoader->ShouldMapLoadEluna(id))
         if (!IsParentMap() || (IsParentMap() && !Instanceable()))
             eluna = new Eluna(this);
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Eluna init: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 #endif
     if (IsParentMap() || !Instanceable())
         i_dungeonLevel = 0;
@@ -319,6 +361,18 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
             i_dungeonLevel = iTemp->minDungeonLevel;
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Instance level stuff: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)
@@ -329,14 +383,50 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
         }
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at grid loading: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     _zonePlayerCountMap.clear();
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at visibility distance init: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     MMAP::MMapFactory::createOrGetMMapManager()->loadMapInstance(sWorld->GetDataPath(), GetId(), GetInstanceId());
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at mmap init: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
     //TC_LOG_ERROR("network", "Initalize map dungeon level {}, affixes {}", dungeonLevel, i_affixes);
 }
 
