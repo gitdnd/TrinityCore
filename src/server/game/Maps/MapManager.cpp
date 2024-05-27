@@ -129,10 +129,39 @@ Map* MapManager::FindBaseNonInstanceMap(uint32 mapId) const
 
 Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
 {
+    // profiling WorldSession Update stuff
+    uint32 realCurrTime = 0;
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
+
     Map* m = CreateBaseMap(id, player ? player->GetCappedGroupOrPlayerItemLevel() : 20);
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map: Update diff over threshold at CreateBaseMap: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     if (m && m->Instanceable())
         m = ((MapInstanced*)m)->CreateInstanceForPlayer(id, player, loginInstanceId);
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Map: Update diff over threshold at CreateInstanceForPlayer: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     return m;
 }
