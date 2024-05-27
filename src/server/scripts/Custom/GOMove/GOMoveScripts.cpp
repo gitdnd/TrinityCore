@@ -75,26 +75,12 @@ public:
         return GOMoveCommandTable;
     }
 
-    static bool GOMove_Command(ChatHandler* /*handler*/, const char* /*args*/)
+    static bool GOMove_Command(ChatHandler* handler, uint32 _id, Optional<uint32> guidLow, Optional<uint32> optArg)
     {
-        //if (!args)
-            //return false;
+        uint32 ID = _id;
+        uint32 lowguid = *guidLow ? *guidLow : 0;
+        uint32 ARG = *optArg ? *optArg : 0;
 
-        return false;
-        /*char* ID_t = strtok((char*)args, " ");
-        if (!ID_t)
-            return false;
-        uint32 ID = static_cast<uint32>(atoul(ID_t));
-
-        char* cLowguid = strtok(nullptr, " ");
-        uint32 lowguid = 0;
-        if (cLowguid)
-            lowguid = atoul(cLowguid);
-
-        char* ARG_t = strtok(nullptr, " ");
-        uint32 ARG = 0;
-        if (ARG_t)
-            ARG = static_cast<uint32>(atoul(ARG_t));
 
         WorldSession* session = handler->GetSession();
         if (!session)
@@ -228,7 +214,7 @@ public:
         }
         else
             return false;
-        return true;*/
+        return true;
     }
 };
 

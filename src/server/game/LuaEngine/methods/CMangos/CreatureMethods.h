@@ -704,6 +704,17 @@ namespace LuaCreature
         return 1;
     }
 
+    /**
+     * Returns the [Creature]'s rank as defined in the creature template.
+     *
+     * @return uint32 rank
+     */
+    int GetRank(Eluna* E, Creature* creature)
+    {
+        E->Push(creature->GetCreatureInfo()->Rank);
+        return 1;
+    }
+
 #if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
     /**
      * Returns the [Creature]'s shield block value.
@@ -1205,6 +1216,7 @@ namespace LuaCreature
         { "GetLootRecipientGroup", &LuaCreature::GetLootRecipientGroup },
         { "GetNPCFlags", &LuaCreature::GetNPCFlags },
         { "GetExtraFlags", &LuaCreature::GetExtraFlags },
+        { "GetRank", &LuaCreature::GetRank },
         { "GetDBTableGUIDLow", &LuaCreature::GetDBTableGUIDLow },
         { "GetCreatureFamily", &LuaCreature::GetCreatureFamily },
 #ifndef CATA
