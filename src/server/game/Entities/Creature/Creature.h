@@ -393,6 +393,13 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void ApplyScaledArmor();
         void UpdateDungeonScaling();
         bool IsMarkOfTheAbsoluteEnabled();
+        bool IsAffectedByScaling()
+        {
+            if (IsPet() || IsTrigger() || !IsAlive())
+                return false;
+
+            return true;
+        }
 
         void ExitVehicle(Position const* exitPosition = nullptr) override;
 
