@@ -286,11 +286,11 @@ void Eluna::RunScripts()
         {
             // Successfully called require on the script
             ELUNA_LOG_DEBUG("[Eluna]: Successfully loaded `%s`", it->filepath.c_str());
+            sWorld->SendGMText(Trinity::StringFormat("Script {} executed in {}", it->filename.c_str(), ElunaUtil::GetTimeDiff(perScriptTime)).c_str());
             ++count;
             continue;
         }
         // Stack: require
-        sWorld->SendGMText(Trinity::StringFormat("Script {} executed in {}", it->filename.c_str(), ElunaUtil::GetTimeDiff(perScriptTime)).c_str());
     }
     // Stack: require
     lua_pop(L, 1);
