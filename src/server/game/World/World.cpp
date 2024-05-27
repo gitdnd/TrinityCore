@@ -2479,10 +2479,10 @@ void World::LoadAutobroadcasts()
 /// Update the World !
 void World::Update(uint32 diff)
 {
-    if (diff > 200)
-    {
-        TC_LOG_ERROR("network", "Update diff over 100ms: {}", diff);
-    }
+    // profiling World Update stuff
+    uint32 realCurrTime = 0;
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
 
     TC_METRIC_TIMER("world_update_time_total");
     ///- Update the game time and check for shutdown time
@@ -2500,6 +2500,18 @@ void World::Update(uint32 diff)
             m_timers[i].SetCurrent(0);
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at timer updates: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     ///- Update Who List Storage
     if (m_timers[WUPDATE_WHO_LIST].Passed())
     {
@@ -2507,6 +2519,18 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_WHO_LIST].Reset();
         sWhoListStorageMgr->Update();
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Who List Storage: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     if (IsStopped() || m_timers[WUPDATE_CHANNEL_SAVE].Passed())
     {
@@ -2528,11 +2552,35 @@ void World::Update(uint32 diff)
         CheckQuestResetTimes();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Quest Reset Timers: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     if (currentGameTime > m_NextRandomBGReset)
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Reset random BG"));
         ResetRandomBG();
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Reset Random BG: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     if (currentGameTime > m_NextCalendarOldEventsDeletionTime)
     {
@@ -2540,11 +2588,35 @@ void World::Update(uint32 diff)
         CalendarDeleteOldEvents();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Calendar Delete Old Events: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     if (currentGameTime > m_NextGuildReset)
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Reset guild cap"));
         ResetGuildCap();
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Guild Cap Reset: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     /// <ul><li> Handle auctions when the timer has passed
     if (m_timers[WUPDATE_AUCTIONS].Passed())
@@ -2580,6 +2652,18 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_AHBOT].Reset();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Auction Update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     /// <li> Handle file changes
     if (m_timers[WUPDATE_CHECK_FILECHANGES].Passed())
     {
@@ -2588,11 +2672,35 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_CHECK_FILECHANGES].Reset();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at File Change: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     {
         /// <li> Handle session updates when the timer has passed
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Update sessions"));
         UpdateSessions(diff);
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Session Update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     /// <li> Update uptime table
     if (m_timers[WUPDATE_UPTIME].Passed())
@@ -2631,12 +2739,36 @@ void World::Update(uint32 diff)
         }
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at DB maintenance: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     /// <li> Handle all other objects
     ///- Update objects when the timer has passed (maps, transport, creatures, ...)
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Update maps"));
         sMapMgr->Update(diff);
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Map Update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     if (sWorld->getBoolConfig(CONFIG_AUTOBROADCAST))
     {
@@ -2663,6 +2795,18 @@ void World::Update(uint32 diff)
         sBattlefieldMgr->Update(diff);
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at PVP Update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())
     {
@@ -2681,11 +2825,35 @@ void World::Update(uint32 diff)
         sLFGMgr->Update(diff);
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at LFG Update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Process query callbacks"));
         // execute callbacks from sql queries that were queued recently
         ProcessQueryCallbacks();
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at Async query processing: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     ///- Erase corpses once every 20 minutes
     if (m_timers[WUPDATE_CORPSES].Passed())
@@ -2708,6 +2876,18 @@ void World::Update(uint32 diff)
         m_timers[WUPDATE_EVENTS].Reset();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at game event processing: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     ///- Ping to keep MySQL connections alive
     if (m_timers[WUPDATE_PINGDB].Passed())
     {
@@ -2719,11 +2899,35 @@ void World::Update(uint32 diff)
         WorldDatabase.KeepAlive();
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at DB keepalive: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Update instance reset times"));
         // update the instance reset times
         sInstanceSaveMgr->Update();
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at instance reset: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     // Check for shutdown warning
     if (_guidWarn && !_guidAlert)
@@ -2746,12 +2950,36 @@ void World::Update(uint32 diff)
         sScriptMgr->OnWorldUpdate(diff);
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at world script update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     {
         TC_METRIC_TIMER("world_update_time", TC_METRIC_TAG("type", "Update metrics"));
         // Stats logger update
         sMetric->Update();
         TC_METRIC_VALUE("update_time_diff", diff);
     }
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Update diff over threshold at metric update: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 }
 
 void World::ForceGameEventUpdate()
