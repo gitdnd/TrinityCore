@@ -134,18 +134,7 @@ void AffixEffect::Apply(Creature* creature, AffixEvent event)
         return;
 
     // If unselectable
-    if (creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
-        // if GM trigger npc
-        creature->IsTrigger() ||
-        // if critter
-        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
-        // if totem
-        (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
-        // if pet
-        creature->IsPet() ||
-        // if not alive
-        !creature->IsAlive())
-        // then do nothing
+    if (creature->IsIgnoringAffixes())
         return;
 
     // debug
