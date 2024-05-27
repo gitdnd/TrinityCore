@@ -1094,7 +1094,7 @@ struct MapEntry
 
     bool IsDungeon() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || ID == 768 || ID == 770; } // 768 The Timeways, 770 The Ring of Valor
     bool IsNonRaidDungeon() const { return InstanceType == MAP_INSTANCE || ID == 768; } // 768 The Timeways
-    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA || ID == 768 || ID = 770; } // 768 The Timeways, 770 The Ring of Valor
+    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA || ID == 768 || ID == 770; } // 768 The Timeways, 770 The Ring of Valor
     bool IsRaid() const { return InstanceType == MAP_RAID; }
     bool IsBattleground() const { return InstanceType == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return InstanceType == MAP_ARENA; }
