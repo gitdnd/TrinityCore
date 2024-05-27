@@ -1425,6 +1425,7 @@ namespace LuaCustom
         float x = E->CHECKVAL<float>(2);
         float y = E->CHECKVAL<float>(3);
         map->GridMarkNoUnload(x, y);
+        return 1;
     }
 
     /**
