@@ -350,7 +350,24 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             if (!e->OnPacketReceive(this, *packet))
                                 break;
 #endif
+                        // PROFILING
+                        realPrevTime = getMSTime();
+                        // PROFILING
+
                         opHandle->Call(this, *packet);
+
+                        // PROFILING
+                        realCurrTime = getMSTime();
+                        execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+                        if (execDiff > 100)
+                        {
+                            TC_LOG_ERROR("network", "Session: Update diff over threshold at STATUS_LOGGEDIN: {}, {}", execDiff, packet->GetOpcode());
+                        }
+
+                        realPrevTime = realCurrTime;
+                        // PROFILING
+
                         LogUnprocessedTail(packet);
                     }
                     else
@@ -371,7 +388,23 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!e->OnPacketReceive(this, *packet))
                             break;
 #endif
+                    // PROFILING
+                    realPrevTime = getMSTime();
+                    // PROFILING
+
                     opHandle->Call(this, *packet);
+
+                    // PROFILING
+                    realCurrTime = getMSTime();
+                    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+                    if (execDiff > 100)
+                    {
+                        TC_LOG_ERROR("network", "Session: Update diff over threshold at STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT: {}, {}", execDiff, packet->GetOpcode());
+                    }
+
+                    realPrevTime = realCurrTime;
+                    // PROFILING
                     LogUnprocessedTail(packet);
                 }
                 else
@@ -390,7 +423,23 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!e->OnPacketReceive(this, *packet))
                             break;
 #endif
+                    // PROFILING
+                    realPrevTime = getMSTime();
+                    // PROFILING
+
                     opHandle->Call(this, *packet);
+
+                    // PROFILING
+                    realCurrTime = getMSTime();
+                    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+                    if (execDiff > 100)
+                    {
+                        TC_LOG_ERROR("network", "Session: Update diff over threshold at STATUS_TRANSFER: {}, {}", execDiff, packet->GetOpcode());
+                    }
+
+                    realPrevTime = realCurrTime;
+                    // PROFILING
                     LogUnprocessedTail(packet);
                 }
                 else
@@ -417,7 +466,23 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!e->OnPacketReceive(this, *packet))
                             break;
 #endif
+                    // PROFILING
+                    realPrevTime = getMSTime();
+                    // PROFILING
+
                     opHandle->Call(this, *packet);
+
+                    // PROFILING
+                    realCurrTime = getMSTime();
+                    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+                    if (execDiff > 100)
+                    {
+                        TC_LOG_ERROR("network", "Session: Update diff over threshold at STATUS_AUTHED: {}, {}", execDiff, packet->GetOpcode());
+                    }
+
+                    realPrevTime = realCurrTime;
+                    // PROFILING
                     LogUnprocessedTail(packet);
                 }
                 else
