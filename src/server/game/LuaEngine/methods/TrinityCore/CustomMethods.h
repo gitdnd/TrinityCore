@@ -1420,6 +1420,14 @@ namespace LuaCustom
         return 1;
     }
 
+    int LockAndLoadCell(Eluna* E, Map* map)
+    {
+        float x = E->CHECKVAL<float>(2);
+        float y = E->CHECKVAL<float>(3);
+        map->LoadGrid(x, y);
+        map->GridMarkNoUnload(x, y);
+    }
+
     /**
     * Returns a table with all the current [Player]s in the map
     *
@@ -1944,7 +1952,8 @@ namespace LuaCustom
         { "GetAffixSlotData", &LuaCustom::GetAffixSlotData },
         { "GetPlayers", &LuaCustom::GetPlayers },
         { "GetAreaId", &LuaCustom::GetAreaId },
-        
+        { "LockAndLoadCell", &LuaCustom::LockAndLoadCell },
+
         { NULL, NULL, METHOD_REG_NONE }
     };
 
