@@ -339,10 +339,7 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     realCurrTime = getMSTime();
     execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
 
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Eluna init: {}", execDiff);
-    }
+    TC_LOG_ERROR("network", "Map Init: Eluna init took ms: {}", execDiff);
 
     realPrevTime = realCurrTime;
     // PROFILING
