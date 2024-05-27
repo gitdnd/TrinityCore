@@ -294,6 +294,11 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+    // profiling WorldSession Update stuff
+    uint32 realCurrTime = 0;
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
+
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
@@ -471,6 +476,18 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     TC_METRIC_VALUE("processed_packets", processedPackets);
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Session: Update diff over threshold at packet processing: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
@@ -485,7 +502,31 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         }
     }
 
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Session: Update diff over threshold at ProcessUnsafe: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
+
     ProcessQueryCallbacks();
+
+    // PROFILING
+    realCurrTime = getMSTime();
+    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+
+    if (execDiff > 100)
+    {
+        TC_LOG_ERROR("network", "Session: Update diff over threshold at Query callback: {}", execDiff);
+    }
+
+    realPrevTime = realCurrTime;
+    // PROFILING
 
     //check if we are safe to proceed with logout
     //logout procedure should happen only in World::UpdateSessions() method!!!
