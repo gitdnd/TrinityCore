@@ -101,6 +101,7 @@ void CharacterCache::AddCharacterCacheEntry(ObjectGuid const& guid, uint32 accou
     data.Race = race;
     data.Sex = gender;
     data.Class = playerClass;
+    data.subClass = 0; // @todo save sub class?
     data.Level = level;
     data.GuildId = 0;                           // Will be set in guild loading or guild setting
     for (uint8 i = 0; i < MAX_ARENA_SLOT; ++i)
@@ -180,35 +181,9 @@ void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subCl
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
-    {
-        //Debug
-        sWorld->SendGMText("Error finding character cache");
         return;
-    }
 
-    itr->second.Class = subClass;
-    WorldPackets::Misc::InvalidatePlayer packet(guid);
-    sWorld->SendGlobalMessage(packet.Write(), self);
-    /*WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
-    data << guid.WriteAsPacked();
-
-    data << uint8(0);                               // name known
-    data << itr->second.Name;                         // played name
-    data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(itr->second.Race);
-    data << uint8(itr->second.Sex);
-    data << uint8(subClass);
-
-    /*
-    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
-    {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
-    }
-    else*/
-    //data << uint8(0);                           // Name is not declined
-    //sWorld->SendGlobalMessage(&data);
+    itr->second.subClass = subClass;
 }
 /*
 Getters

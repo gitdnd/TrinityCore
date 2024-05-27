@@ -29,6 +29,7 @@ struct CharacterCacheEntry
     std::string Name;
     uint32 AccountId;
     uint8 Class;
+    uint8 subClass;
     uint8 Race;
     uint8 Sex;
     uint8 Level;
