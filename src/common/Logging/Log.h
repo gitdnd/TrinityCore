@@ -168,4 +168,13 @@ class TC_COMMON_API Log
 #define TC_LOG_FATAL(filterType__, ...) \
     TC_LOG_MESSAGE_BODY(filterType__, LOG_LEVEL_FATAL, __VA_ARGS__)
 
+#define HOT_PROFILE_OUTPUT(start, ...) \
+uint32 end = getMSTime(); \
+execDiff = getMSTimeDiff(start, end); \
+if(execDiff > 100) \
+{ \
+    TC_LOG_ERROR("network", __VA_ARGS__); \
+} \
+start = end;
+
 #endif

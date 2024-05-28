@@ -291,7 +291,6 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
 {
 
     // profiling WorldSession Update stuff
-    uint32 realCurrTime = 0;
     uint32 execDiff = 0;
     uint32 realPrevTime = getMSTime();
 
@@ -301,31 +300,11 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     }
 
     // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
-
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Affix init: {}", execDiff);
-    }
-
-    realPrevTime = realCurrTime;
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at Affix init: {}", execDiff);
     // PROFILING
 
     m_parentMap = (_parent ? _parent : this);
     graveyardOverride = WorldLocation();
-
-    // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
-
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Graveyard override: {}", execDiff);
-    }
-
-    realPrevTime = realCurrTime;
-    // PROFILING
 
 #ifdef ELUNA
     // lua state begins uninitialized
@@ -336,12 +315,8 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
             eluna = new Eluna(this);
 
     // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Eluna init took ms: {}", execDiff);
 
-    TC_LOG_ERROR("network", "Map Init: Eluna init took ms: {}", execDiff);
-
-    realPrevTime = realCurrTime;
     // PROFILING
 #endif
     if (IsParentMap() || !Instanceable())
@@ -358,18 +333,6 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
             i_dungeonLevel = iTemp->minDungeonLevel;
     }
 
-    // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
-
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at Instance level stuff: {}", execDiff);
-    }
-
-    realPrevTime = realCurrTime;
-    // PROFILING
-
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)
@@ -381,15 +344,7 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     }
 
     // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
-
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at grid loading: {}", execDiff);
-    }
-
-    realPrevTime = realCurrTime;
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at grid loading: {}", execDiff);
     // PROFILING
 
     _zonePlayerCountMap.clear();
@@ -397,32 +352,12 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
 
-    // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
-
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at visibility distance init: {}", execDiff);
-    }
-
-    realPrevTime = realCurrTime;
-    // PROFILING
-
     _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
 
     MMAP::MMapFactory::createOrGetMMapManager()->loadMapInstance(sWorld->GetDataPath(), GetId(), GetInstanceId());
 
     // PROFILING
-    realCurrTime = getMSTime();
-    execDiff = getMSTimeDiff(realPrevTime, realCurrTime);
-
-    if (execDiff > 100)
-    {
-        TC_LOG_ERROR("network", "Map Init: Update diff over threshold at mmap init: {}", execDiff);
-    }
-
-    realPrevTime = realCurrTime;
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at mmap init: {}", execDiff);
     // PROFILING
     //TC_LOG_ERROR("network", "Initalize map dungeon level {}, affixes {}", dungeonLevel, i_affixes);
 }
@@ -898,7 +833,14 @@ void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
 
 void Map::Update(uint32 t_diff)
 {
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
+
+
     _dynamicTree.update(t_diff);
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at dynamic tree: {}", execDiff);
+    // PROFILING
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
@@ -911,6 +853,9 @@ void Map::Update(uint32 t_diff)
             session->Update(t_diff, updater);
         }
     }
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at session update: {}", execDiff);
+    // PROFILING
 
     /// process any due respawns
     if (_respawnCheckTimer <= t_diff)
@@ -920,7 +865,9 @@ void Map::Update(uint32 t_diff)
     }
     else
         _respawnCheckTimer -= t_diff;
-
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at respawn {}", execDiff);
+    // PROFILING
     /// update active cells around players and active objects
     resetMarkedCells();
 
@@ -986,6 +933,9 @@ void Map::Update(uint32 t_diff)
                 VisitNearbyCellsOf(unit, grid_object_update, world_object_update);
         }
     }
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at cell update: {}", execDiff);
+    // PROFILING
 
     // non-player active objects, increasing iterator in the loop in case of object removal
     for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
@@ -998,7 +948,9 @@ void Map::Update(uint32 t_diff)
 
         VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
     }
-
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at active update: {}", execDiff);
+    // PROFILING
     for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
     {
         WorldObject* obj = *_transportsUpdateIter;
@@ -1019,6 +971,9 @@ void Map::Update(uint32 t_diff)
         ScriptsProcess();
         i_scriptLock = false;
     }
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at script process: {}", execDiff);
+    // PROFILING
 
     _weatherUpdateTimer.Update(t_diff);
     if (_weatherUpdateTimer.Passed())
@@ -1036,7 +991,14 @@ void Map::Update(uint32 t_diff)
     if (!m_mapRefManager.isEmpty() || !m_activeNonPlayers.empty())
         ProcessRelocationNotifies(t_diff);
 
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at move update: {}", execDiff);
+    // PROFILING
+
     sScriptMgr->OnMapUpdate(this, t_diff);
+    // PROFILING
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at map update script call: {}", execDiff);
+    // PROFILING
 
     TC_METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
         TC_METRIC_TAG("map_id", std::to_string(GetId())),
