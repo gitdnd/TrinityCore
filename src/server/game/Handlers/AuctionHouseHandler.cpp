@@ -263,9 +263,9 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 
     AuctionEntry* AH = new AuctionEntry();
 
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+    //if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
         AH->houseId = AUCTIONHOUSE_NEUTRAL;
-    else
+    /*else
     {
         CreatureData const* auctioneerData = sObjectMgr->GetCreatureData(creature->GetSpawnId());
         if (!auctioneerData)
@@ -287,7 +287,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 
         AuctionHouseEntry const* AHEntry = sAuctionMgr->GetAuctionHouseEntry(auctioneerInfo->faction);
         AH->houseId = AHEntry->ID;
-    }
+    }*/
 
     // Required stack size of auction matches to current item stack size, just move item to auctionhouse
     if (itemsCount == 1 && item->GetCount() == count[0])

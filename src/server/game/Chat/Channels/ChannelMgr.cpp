@@ -109,7 +109,7 @@ ChannelMgr::~ChannelMgr()
     static ChannelMgr allianceChannelMgr(ALLIANCE);
     static ChannelMgr hordeChannelMgr(HORDE);
 
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+    //if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         return &allianceChannelMgr;        // cross-faction
 
     if (team == ALLIANCE)

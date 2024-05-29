@@ -6625,31 +6625,6 @@ void Player::SetFactionForRace(uint8 race)
 {
     m_team = TeamForRace(race);
 
-    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(/*race*/ 1);
-    SetFaction(rEntry ? rEntry->FactionID : 0);
-}
-
-uint32 Player::TeamForRaceNoOverride(uint8 race)
-{
-    if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race))
-    {
-        switch (rEntry->FactionID)
-        {
-        case 1: return HORDE;
-        case 7: return ALLIANCE;
-        }
-        TC_LOG_ERROR("entities.player", "Race ({}) has wrong teamid ({}) in DBC: wrong DBC files?", uint32(race), rEntry->FactionID);
-    }
-    else
-        TC_LOG_ERROR("entities.player", "Race ({}) not found in DBC: wrong DBC files?", uint32(race));
-
-    return ALLIANCE;
-}
-
-void Player::SetFactionForRaceNoOverride(uint8 race)
-{
-    m_team = TeamForRaceNoOverride(race);
-
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
     SetFaction(rEntry ? rEntry->FactionID : 0);
 }

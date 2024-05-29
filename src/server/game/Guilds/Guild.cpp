@@ -1491,11 +1491,11 @@ void Guild::HandleInviteMember(WorldSession* session, std::string_view name)
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
         return;
 
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeam() != player->GetTeam())
+    /*if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeam() != player->GetTeam())
     {
         SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_NOT_ALLIED, name);
         return;
-    }
+    }*/
     // Invited player cannot be in another guild
     if (pInvitee->GetGuildId())
     {
@@ -1534,9 +1534,9 @@ void Guild::HandleInviteMember(WorldSession* session, std::string_view name)
 void Guild::HandleAcceptMember(WorldSession* session)
 {
     Player* player = session->GetPlayer();
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) &&
+    /*if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) &&
         player->GetTeam() != sCharacterCache->GetCharacterTeamByGuid(GetLeaderGUID()))
-        return;
+        return;*/
 
     CharacterDatabaseTransaction trans(nullptr);
     AddMember(trans, player->GetGUID());

@@ -693,7 +693,7 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
         return;
 
     // TODO: Add proper RBAC check
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+    //if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         lang = LANG_UNIVERSAL;
 
     if (!IsOn(guid))
@@ -732,7 +732,7 @@ void Channel::ChatSpySay(ObjectGuid guid, std::string const& what, uint32 lang) 
         return;
 
     // TODO: Add proper RBAC check
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+    //if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         lang = LANG_UNIVERSAL;
 
     auto builder = [&](WorldPacket& data, LocaleConstant locale)

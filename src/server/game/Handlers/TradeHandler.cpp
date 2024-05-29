@@ -691,14 +691,14 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetTeam() != _player->GetTeam() &&
+    /*if (pOther->GetTeam() != _player->GetTeam() &&
         (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) &&
          !GetPlayer()->GetSession()->HasPermission(rbac::RBAC_PERM_ALLOW_TWO_SIDE_TRADE)))
     {
         info.Status = TRADE_STATUS_WRONG_FACTION;
         SendTradeStatus(info);
         return;
-    }
+    }*/
 
     if (!pOther->IsWithinDistInMap(_player, TRADE_DISTANCE, false))
     {
