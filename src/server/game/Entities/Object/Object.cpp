@@ -2749,6 +2749,9 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                     return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
                                          // however client seems to allow mixed group parties, because in 13850 client it works like:
                                          // return GetFactionReactionTo(GetFactionTemplateEntry(), target);
+
+                if (!GetMap()->IsBattlegroundOrArena() && !unit->IsFFAPvP() && !targetUnit->IsFFAPvP())
+                    return REP_FRIENDLY;
             }
 
             // check FFA_PVP
