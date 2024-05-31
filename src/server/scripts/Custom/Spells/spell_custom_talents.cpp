@@ -2593,7 +2593,7 @@ class spell_sanlayn_gift : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_sanlayn_gift::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_sanlayn_gift::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
