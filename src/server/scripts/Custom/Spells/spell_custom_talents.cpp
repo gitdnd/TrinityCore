@@ -2463,6 +2463,29 @@ class spell_druidic_rite : public AuraScript
     }
 };
 
+// 93208 Profane Chemistry
+class spell_profane_chemistry : public AuraScript
+{
+    PrepareAuraScript(spell_profane_chemistry);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 93208 });
+    }
+
+    void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        if (Player* target = GetTarget()->ToPlayer())
+            target->GetSpellHistory()->ModifyCooldown(84000, -12000);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_profane_chemistry::HandleEffectProc, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2529,4 +2552,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_whirling_barrier);
     RegisterSpellScript(spell_field_medic);
     RegisterSpellScript(spell_druidic_rite);
+    RegisterSpellScript(spell_profane_chemistry);
 }
