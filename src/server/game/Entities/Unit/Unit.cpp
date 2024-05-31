@@ -7415,6 +7415,10 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                                     return 100.0f;
                             break;
                         }
+                        // Frostbolt
+                        else if (caster->FindCurrentSpellBySpellId(42842))
+                            if (HasAuraState(AURA_STATE_FROZEN, spellInfo, caster))
+                                crit_chance *= 1.5;
                         break;
                 }
 
