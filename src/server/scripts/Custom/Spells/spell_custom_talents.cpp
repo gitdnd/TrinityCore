@@ -2520,6 +2520,31 @@ class spell_dummy_potion_cdr : public SpellScript
     }
 };
 
+// 84006 Elune's Inspiration
+class spell_elunes_inspiration : public AuraScript
+{
+    PrepareAuraScript(spell_elunes_inspiration);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (!aurEff->GetTotalTicks())
+        {
+            amount = 0;
+            return;
+        }
+
+        if (Unit* caster = GetCaster())
+            amount = int32(CalculatePct(caster->GetCreatePowerValue(POWER_MANA), amount) / aurEff->GetTotalTicks());
+        else
+            amount = 0;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_elunes_inspiration::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_ENERGIZE);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2588,4 +2613,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_druidic_rite);
     RegisterSpellScript(spell_profane_chemistry);
     RegisterSpellScript(spell_dummy_potion_cdr);
+    RegisterSpellScript(spell_elunes_inspiration);
 }
