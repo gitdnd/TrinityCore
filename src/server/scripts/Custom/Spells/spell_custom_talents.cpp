@@ -2545,6 +2545,58 @@ class spell_elunes_inspiration : public AuraScript
     }
 };
 
+// 84001 Felfire (potion)
+class spell_felfire : public AuraScript
+{
+    PrepareAuraScript(spell_felfire);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
+        caster->CastSpell(damageInfo->GetVictim(), 94013, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_felfire::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 84009 Gift of the San'layn (potion)
+class spell_sanlayn_gift : public AuraScript
+{
+    PrepareAuraScript(spell_sanlayn_gift);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
+        caster->CastSpell(caster, 94014, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_sanlayn_gift::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2614,4 +2666,6 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_profane_chemistry);
     RegisterSpellScript(spell_dummy_potion_cdr);
     RegisterSpellScript(spell_elunes_inspiration);
+    RegisterSpellScript(spell_felfire);
+    RegisterSpellScript(spell_sanlayn_gift);
 }
