@@ -2477,12 +2477,46 @@ class spell_profane_chemistry : public AuraScript
     {
         PreventDefaultAction();
         if (Player* target = GetTarget()->ToPlayer())
-            target->GetSpellHistory()->ModifyCooldown(84000, -12000);
+            target->CastSpell(target, 94012);
     }
 
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_profane_chemistry::HandleEffectProc, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER);
+    }
+};
+
+// 94012 Potion Cooldown Refund
+class spell_dummy_potion_cdr : public SpellScript
+{
+    PrepareSpellScript(spell_dummy_potion_cdr);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94012 });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        // Clean this up later
+        if (Unit* unitTarget = GetHitUnit())
+        {
+            unitTarget->GetSpellHistory()->ModifyCooldown(84000, -12000); // Iron Sap
+            unitTarget->GetSpellHistory()->ModifyCooldown(84001, -12000); // Felfire
+            unitTarget->GetSpellHistory()->ModifyCooldown(84002, -12000); // Gronn's Blood
+            unitTarget->GetSpellHistory()->ModifyCooldown(84003, -12000); // Undermine Rocketfuel
+            unitTarget->GetSpellHistory()->ModifyCooldown(84004, -12000); // Magic Essence
+            unitTarget->GetSpellHistory()->ModifyCooldown(84005, -12000); // Arthas' Gift
+            unitTarget->GetSpellHistory()->ModifyCooldown(84006, -12000); // Tyr's Faith
+            unitTarget->GetSpellHistory()->ModifyCooldown(84007, -12000); // Blood of the San'layn
+            unitTarget->GetSpellHistory()->ModifyCooldown(84008, -12000); // Overload
+            unitTarget->GetSpellHistory()->ModifyCooldown(84009, -12000); // Elune's Inspiration
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dummy_potion_cdr::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2553,4 +2587,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_field_medic);
     RegisterSpellScript(spell_druidic_rite);
     RegisterSpellScript(spell_profane_chemistry);
+    RegisterSpellScript(spell_dummy_potion_cdr);
 }
