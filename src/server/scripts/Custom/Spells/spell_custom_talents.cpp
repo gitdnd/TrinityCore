@@ -2501,16 +2501,16 @@ class spell_dummy_potion_cdr : public SpellScript
         // Clean this up later
         if (Unit* unitTarget = GetHitUnit())
         {
-            unitTarget->GetSpellHistory()->ModifyCooldown(84000, -12000); // Iron Sap
-            unitTarget->GetSpellHistory()->ModifyCooldown(84001, -12000); // Felfire
-            unitTarget->GetSpellHistory()->ModifyCooldown(84002, -12000); // Gronn's Blood
-            unitTarget->GetSpellHistory()->ModifyCooldown(84003, -12000); // Undermine Rocketfuel
-            unitTarget->GetSpellHistory()->ModifyCooldown(84004, -12000); // Magic Essence
-            unitTarget->GetSpellHistory()->ModifyCooldown(84005, -12000); // Arthas' Gift
-            unitTarget->GetSpellHistory()->ModifyCooldown(84006, -12000); // Tyr's Faith
-            unitTarget->GetSpellHistory()->ModifyCooldown(84007, -12000); // Blood of the San'layn
-            unitTarget->GetSpellHistory()->ModifyCooldown(84008, -12000); // Overload
-            unitTarget->GetSpellHistory()->ModifyCooldown(84009, -12000); // Elune's Inspiration
+            unitTarget->GetSpellHistory()->ModifyCooldown(84000, -18000); // Iron Sap
+            unitTarget->GetSpellHistory()->ModifyCooldown(84001, -18000); // Felfire
+            unitTarget->GetSpellHistory()->ModifyCooldown(84002, -18000); // Gronn's Blood
+            unitTarget->GetSpellHistory()->ModifyCooldown(84003, -18000); // Undermine Rocketfuel
+            unitTarget->GetSpellHistory()->ModifyCooldown(84004, -18000); // Magic Essence
+            unitTarget->GetSpellHistory()->ModifyCooldown(84005, -18000); // Arthas' Gift
+            unitTarget->GetSpellHistory()->ModifyCooldown(84006, -18000); // Tyr's Faith
+            unitTarget->GetSpellHistory()->ModifyCooldown(84007, -18000); // Blood of the San'layn
+            unitTarget->GetSpellHistory()->ModifyCooldown(84008, -18000); // Overload
+            unitTarget->GetSpellHistory()->ModifyCooldown(84009, -18000); // Elune's Inspiration
         }
     }
 
