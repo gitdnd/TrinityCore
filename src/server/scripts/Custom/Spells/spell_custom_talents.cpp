@@ -2494,7 +2494,7 @@ class spell_profane_chemistry : public AuraScript
         {
             CastSpellExtraArgs args(aurEff);
             args.AddSpellBP0(_spellId);
-            target->CastSpell(target, 94014, args);
+            target->CastSpell(target, 94012, args);
         }        
     }
 
