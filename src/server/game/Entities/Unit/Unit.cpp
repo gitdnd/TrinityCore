@@ -7408,7 +7408,7 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                             break;
                         }
                         // Lava Burst
-                        else if (caster->FindCurrentSpellBySpellId(60043))
+                        else if (spellInfo->Id == 60043)
                         {
                             if (GetAura(49233, caster->GetGUID()))
                                 if (GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)
@@ -7416,9 +7416,12 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                             break;
                         }
                         // Frostbolt
-                        else if (caster->FindCurrentSpellBySpellId(42842))
+                        else if (spellInfo->Id == 42842)
+                        {
                             if (HasAuraState(AURA_STATE_FROZEN, spellInfo, caster))
                                 crit_chance *= 1.5;
+                            break;
+                        }
                         break;
                 }
 
