@@ -7400,7 +7400,6 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                         // Shiv-applied poisons can't crit
                         if (caster->FindCurrentSpellBySpellId(5938))
                             crit_chance = 0.0f;
-
                         // Exorcism
                         else if (spellInfo->GetCategory() == 19)
                         {
@@ -7408,13 +7407,19 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                                 return 100.0f;
                             break;
                         }
-
                         // Lava Burst
-                        else if (spellInfo->SpellFamilyFlags[1] & 0x00001000)
+                        else if (spellInfo->Id == 60043)
                         {
                             if (GetAura(49233, caster->GetGUID()))
                                 if (GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)
                                     return 100.0f;
+                            break;
+                        }
+                        // Frostbolt
+                        else if (spellInfo->Id == 42842)
+                        {
+                            if (HasAuraState(AURA_STATE_FROZEN, spellInfo, caster))
+                                crit_chance *= 1.5;
                             break;
                         }
                         break;

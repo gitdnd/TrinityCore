@@ -2463,6 +2463,140 @@ class spell_druidic_rite : public AuraScript
     }
 };
 
+// 93208 Profane Chemistry
+class spell_profane_chemistry : public AuraScript
+{
+    PrepareAuraScript(spell_profane_chemistry);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 93208 });
+    }
+
+    void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        if (Player* target = GetTarget()->ToPlayer())
+            target->CastSpell(target, 94012);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_profane_chemistry::HandleEffectProc, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER);
+    }
+};
+
+// 94012 Potion Cooldown Refund
+class spell_dummy_potion_cdr : public SpellScript
+{
+    PrepareSpellScript(spell_dummy_potion_cdr);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94012 });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        // Clean this up later
+        if (Unit* unitTarget = GetHitUnit())
+        {
+            unitTarget->GetSpellHistory()->ModifyCooldown(84000, -18000); // Iron Sap
+            unitTarget->GetSpellHistory()->ModifyCooldown(84001, -18000); // Felfire
+            unitTarget->GetSpellHistory()->ModifyCooldown(84002, -18000); // Gronn's Blood
+            unitTarget->GetSpellHistory()->ModifyCooldown(84003, -18000); // Undermine Rocketfuel
+            unitTarget->GetSpellHistory()->ModifyCooldown(84004, -18000); // Magic Essence
+            unitTarget->GetSpellHistory()->ModifyCooldown(84005, -18000); // Arthas' Gift
+            unitTarget->GetSpellHistory()->ModifyCooldown(84006, -18000); // Tyr's Faith
+            unitTarget->GetSpellHistory()->ModifyCooldown(84007, -18000); // Blood of the San'layn
+            unitTarget->GetSpellHistory()->ModifyCooldown(84008, -18000); // Overload
+            unitTarget->GetSpellHistory()->ModifyCooldown(84009, -18000); // Elune's Inspiration
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dummy_potion_cdr::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 84006 Elune's Inspiration
+class spell_elunes_inspiration : public AuraScript
+{
+    PrepareAuraScript(spell_elunes_inspiration);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (!aurEff->GetTotalTicks())
+        {
+            amount = 0;
+            return;
+        }
+
+        if (Unit* caster = GetCaster())
+            amount = int32(CalculatePct(caster->GetCreatePowerValue(POWER_MANA), amount) / aurEff->GetTotalTicks());
+        else
+            amount = 0;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_elunes_inspiration::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_ENERGIZE);
+    }
+};
+
+// 84001 Felfire (potion)
+class spell_felfire : public AuraScript
+{
+    PrepareAuraScript(spell_felfire);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
+        caster->CastSpell(damageInfo->GetVictim(), 94013, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_felfire::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 84009 Gift of the San'layn (potion)
+class spell_sanlayn_gift : public AuraScript
+{
+    PrepareAuraScript(spell_sanlayn_gift);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damageInfo->GetDamage() * bp / 100);
+        caster->CastSpell(caster, 94014, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_sanlayn_gift::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2529,4 +2663,9 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_whirling_barrier);
     RegisterSpellScript(spell_field_medic);
     RegisterSpellScript(spell_druidic_rite);
+    RegisterSpellScript(spell_profane_chemistry);
+    RegisterSpellScript(spell_dummy_potion_cdr);
+    RegisterSpellScript(spell_elunes_inspiration);
+    RegisterSpellScript(spell_felfire);
+    RegisterSpellScript(spell_sanlayn_gift);
 }
