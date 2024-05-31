@@ -2468,20 +2468,39 @@ class spell_profane_chemistry : public AuraScript
 {
     PrepareAuraScript(spell_profane_chemistry);
 
+    uint32 _spellId = 0;
+
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ 93208 });
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        _spellId = spellInfo->Id;
+
+        return true;
+    }
+
     void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
+
         if (Player* target = GetTarget()->ToPlayer())
-            target->CastSpell(target, 94012);
+        {
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(_spellId);
+            target->CastSpell(target, 94014, args);
+        }        
     }
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_profane_chemistry::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_profane_chemistry::HandleEffectProc, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER);
     }
 };
@@ -2501,16 +2520,8 @@ class spell_dummy_potion_cdr : public SpellScript
         // Clean this up later
         if (Unit* unitTarget = GetHitUnit())
         {
-            unitTarget->GetSpellHistory()->ModifyCooldown(84000, -18000); // Iron Sap
-            unitTarget->GetSpellHistory()->ModifyCooldown(84001, -18000); // Felfire
-            unitTarget->GetSpellHistory()->ModifyCooldown(84002, -18000); // Gronn's Blood
-            unitTarget->GetSpellHistory()->ModifyCooldown(84003, -18000); // Undermine Rocketfuel
-            unitTarget->GetSpellHistory()->ModifyCooldown(84004, -18000); // Magic Essence
-            unitTarget->GetSpellHistory()->ModifyCooldown(84005, -18000); // Arthas' Gift
-            unitTarget->GetSpellHistory()->ModifyCooldown(84006, -18000); // Tyr's Faith
-            unitTarget->GetSpellHistory()->ModifyCooldown(84007, -18000); // Blood of the San'layn
-            unitTarget->GetSpellHistory()->ModifyCooldown(84008, -18000); // Overload
-            unitTarget->GetSpellHistory()->ModifyCooldown(84009, -18000); // Elune's Inspiration
+            uint32 spellId = GetEffectValue();
+            unitTarget->GetSpellHistory()->ModifyCooldown(spellId, -18000);
         }
     }
 
