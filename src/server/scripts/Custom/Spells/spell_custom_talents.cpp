@@ -2608,6 +2608,51 @@ class spell_sanlayn_gift : public AuraScript
     }
 };
 
+// Frost Shock Freeze Effect
+class spell_frost_shock_freeze : public AuraScript
+{
+    PrepareAuraScript(spell_frost_shock_freeze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 63685 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Only proc from Frost Shock
+        if (spellInfo->Id == 49236)
+            return true;
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(63685);
+        float minDistance(spellInfo->GetEffect(EFFECT_0).CalcValue(caster));
+
+        Unit* target = eventInfo.GetProcTarget();
+        if (caster->GetDistance(target) < minDistance)
+            return;
+
+        caster->CastSpell(target, 63685, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_frost_shock_freeze::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_frost_shock_freeze::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2679,4 +2724,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_elunes_inspiration);
     RegisterSpellScript(spell_felfire);
     RegisterSpellScript(spell_sanlayn_gift);
+    RegisterSpellScript(spell_frost_shock_freeze);
 }
