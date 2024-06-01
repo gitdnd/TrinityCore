@@ -2676,9 +2676,20 @@ class spell_hot_wrath : public AuraScript
         return false;
     }
 
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        if (!caster)
+            return;
+
+        caster->CastSpell(caster, 94017); // Nature's Grace
+    }
+
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_hot_wrath::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hot_wrath::HandleProc, EFFECT_0, SPELL_AURA_TEMP_LEARN_SPELL);
     }
 };
 
