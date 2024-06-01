@@ -2522,7 +2522,6 @@ class spell_dummy_potion_cdr : public SpellScript
         {
             uint32 spellId = GetEffectValue();
             unitTarget->GetSpellHistory()->ModifyCooldown(spellId, -20000);
-            unitTarget->CastSpell(unitTarget, 94016, true); // set's shared cooldown to proper value
         }
     }
 
