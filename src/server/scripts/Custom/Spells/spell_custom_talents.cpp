@@ -2683,7 +2683,7 @@ class spell_hot_wrath : public AuraScript
         if (!caster)
             return;
 
-        caster->CastSpell(caster, 94017); // Nature's Grace
+        caster->AddAura(94017, caster); // Nature's Grace
     }
 
     void Register() override
