@@ -2649,7 +2649,7 @@ class spell_frost_shock_freeze : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_frost_shock_freeze::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_frost_shock_freeze::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_frost_shock_freeze::HandleProc, EFFECT_0, SPELL_AURA_TEMP_LEARN_SPELL);
     }
 };
 
