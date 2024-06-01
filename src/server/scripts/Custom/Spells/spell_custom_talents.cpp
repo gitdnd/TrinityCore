@@ -2653,6 +2653,35 @@ class spell_frost_shock_freeze : public AuraScript
     }
 };
 
+// Wrath
+class spell_hot_wrath : public AuraScript
+{
+    PrepareAuraScript(spell_hot_wrath);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94017 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Only proc from Wrath
+        if (spellInfo->Id == 48461)
+            return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hot_wrath::CheckProc);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2725,4 +2754,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_felfire);
     RegisterSpellScript(spell_sanlayn_gift);
     RegisterSpellScript(spell_frost_shock_freeze);
+    RegisterSpellScript(spell_hot_wrath);
 }
