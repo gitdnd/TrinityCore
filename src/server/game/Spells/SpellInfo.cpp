@@ -3810,11 +3810,11 @@ bool _isPositiveEffectImpl(SpellInfo const* spellInfo, SpellEffectInfo const& ef
             if (spellInfo->SpellFamilyFlags[2] == 0x00000010) // Ebon Plague
                 return false;
             break;
-        case SPELLFAMILY_CLASSLESS:
+        /*case SPELLFAMILY_CLASSLESS:
             // assortment of judgement related spells
             if (spellInfo->SpellFamilyFlags & flag96(0x208C0000, 0x00000208, 0x00000008))
                 return false;
-            break;
+            break;*/
         default:
             break;
     }
