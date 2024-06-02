@@ -1463,8 +1463,8 @@ void ScriptMgr::OnDestroyMap(Map* map)
 
         if (map->IsBattleground())
         {
-            Battleground* bg = map->ToBattlegroundMap()->GetBG();
-            e->OnBGDestroy(bg, bg->GetTypeID(), bg->GetInstanceID());
+            //Battleground* bg = map->ToBattlegroundMap()->GetBG();
+            //e->OnBGDestroy(bg, bg->GetTypeID(), bg->GetInstanceID());
         }
     }
 #endif
