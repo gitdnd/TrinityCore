@@ -6,6 +6,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Item.h"
+#include "WorldSession.h"
 
 class spell_talent_combulstibolt_aura : public AuraScript
 {
@@ -2714,9 +2715,11 @@ class spell_hot_lightning_bolt : public AuraScript
             if (Player* player = eventInfo.GetActor()->ToPlayer())
             {
                 SpellInfo const* lightningboltPassive = sSpellMgr->AssertSpellInfo(160308);
-                int rollChance = lightningboltPassive->GetEffect(EFFECT_1).CalcValue(player);
+                int32 rollChance = lightningboltPassive->GetEffect(EFFECT_1).CalcValue(player);
+                player->GetSession()->SendNotification("Base success chance: %i", rollChance);
                 int32 castMod = int32(1 / player->GetFloatValue(UNIT_MOD_CAST_SPEED));
                 rollChance += ((castMod - 1) / 2) * 100;
+                player->GetSession()->SendNotification("Current success chance: %i", rollChance);
                 
                 return roll_chance_i(rollChance);
             }                 
