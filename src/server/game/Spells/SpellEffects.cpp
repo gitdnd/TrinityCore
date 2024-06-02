@@ -677,6 +677,22 @@ void Spell::EffectSchoolDMG()
                 }
                 break;
             }
+            case 47838: // Incinerate
+            {
+                uint32 auraCount = 0;
+                Unit::AuraEffectList const& mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                {
+                    // for caster applied auras only
+                    if ((*i)->GetCasterGUID() != unitCaster->GetGUID())
+                        continue;
+
+                    // Fire DoT
+                    if ((*i)->GetSpellInfo()->SchoolMask == 4)
+                        ++auraCount;
+                }
+                damage *= 1 + auraCount / 10;
+            }
             case 17962: // Conflagrate
             {
                 AuraEffect const* aura = nullptr;                // found req. aura for damage calculation
