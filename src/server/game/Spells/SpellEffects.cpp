@@ -677,22 +677,6 @@ void Spell::EffectSchoolDMG()
                 }
                 break;
             }
-            case 47838: // Incinerate
-            {
-                uint32 auraCount = 0;
-                Unit::AuraEffectList const& mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
-                for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
-                {
-                    // for caster applied auras only
-                    if ((*i)->GetCasterGUID() != unitCaster->GetGUID())
-                        continue;
-
-                    // Fire DoT
-                    if ((*i)->GetSpellInfo()->SchoolMask == 4)
-                        ++auraCount;
-                }
-                damage *= 1 + auraCount / 10;
-            }
             case 17962: // Conflagrate
             {
                 AuraEffect const* aura = nullptr;                // found req. aura for damage calculation
@@ -758,11 +742,19 @@ void Spell::EffectSchoolDMG()
             }
             case 47838: // Incinerate
             {
-                if (unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
+                uint32 auraCount = 0;
+                Unit::AuraEffectList const& mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
                 {
-                    if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
-                        damage += damage / 4;
+                    // for caster applied auras only
+                    if ((*i)->GetCasterGUID() != unitCaster->GetGUID())
+                        continue;
+
+                    // Fire DoT
+                    if ((*i)->GetSpellInfo()->SchoolMask == 4)
+                        ++auraCount;
                 }
+                damage *= 1 + auraCount * 0.15f;
                 break;
             }
             case 48577: // Ferocious Bite
