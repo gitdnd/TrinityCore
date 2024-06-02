@@ -166,6 +166,9 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
             xp = xp * std::min(1, (int)std::round((_group->GetDungeonLevel() / player->GetCappedItemLevel()) + 0.2f));
         }
 
+        // Kinda hacky... slight flat XP nerf
+        xp = xp * 0.75;
+
         // 4.2.3. Give XP to player.
         player->GiveXP(xp, _victim, _groupRate);
         if (Pet* pet = player->GetPet())
