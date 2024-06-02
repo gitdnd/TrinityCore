@@ -2717,9 +2717,9 @@ class spell_hot_lightning_bolt : public AuraScript
                 SpellInfo const* lightningboltPassive = sSpellMgr->AssertSpellInfo(160308);
                 int32 rollChance = lightningboltPassive->GetEffect(EFFECT_1).CalcValue(player);
                 player->GetSession()->SendNotification("Base success chance: %i", rollChance);
-                int32 castMod = int32(player->GetFloatValue(UNIT_MOD_CAST_SPEED));
-                player->GetSession()->SendNotification("Current Cast Speed Mod: %i", castMod);
-                rollChance += ((castMod - 1) / 2) * 100;
+                float castMod = player->GetFloatValue(UNIT_MOD_CAST_SPEED);
+                player->GetSession()->SendNotification("Current Cast Speed Mod: %f", castMod);
+                rollChance += ((int32(castMod) - 1) / 2) * 100;
                 player->GetSession()->SendNotification("Current success chance: %i", rollChance);
                 
                 return roll_chance_i(rollChance);
