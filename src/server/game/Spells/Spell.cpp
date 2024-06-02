@@ -8422,6 +8422,8 @@ void Spell::TriggerGlobalCooldown()
     if (Player* modOwner = m_caster->GetSpellModOwner())
     {
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_GLOBAL_COOLDOWN, gcd, this);
+        float castSpeed = m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED);
+        modOwner->GetSession()->SendNotification("Unit_Mod_Cast_Speed: %f", castSpeed);
 
         // HoT: Elune's Grace
         if (modOwner->HasAura(180496))
