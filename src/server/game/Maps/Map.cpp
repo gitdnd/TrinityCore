@@ -839,7 +839,7 @@ void Map::Update(uint32 t_diff)
 
     _dynamicTree.update(t_diff);
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at dynamic tree: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at dynamic tree: {}", execDiff);
     // PROFILING
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
@@ -854,7 +854,7 @@ void Map::Update(uint32 t_diff)
         }
     }
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at session update: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at session update: {}", execDiff);
     // PROFILING
 
     /// process any due respawns
@@ -866,7 +866,7 @@ void Map::Update(uint32 t_diff)
     else
         _respawnCheckTimer -= t_diff;
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at respawn {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at respawn {}", execDiff);
     // PROFILING
     /// update active cells around players and active objects
     resetMarkedCells();
@@ -934,7 +934,7 @@ void Map::Update(uint32 t_diff)
         }
     }
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at cell update: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at cell update: {}", execDiff);
     // PROFILING
 
     // non-player active objects, increasing iterator in the loop in case of object removal
@@ -949,7 +949,7 @@ void Map::Update(uint32 t_diff)
         VisitNearbyCellsOf(obj, grid_object_update, world_object_update);
     }
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at active update: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at active update: {}", execDiff);
     // PROFILING
     for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
     {
@@ -972,7 +972,7 @@ void Map::Update(uint32 t_diff)
         i_scriptLock = false;
     }
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at script process: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at script process: {}", execDiff);
     // PROFILING
 
     _weatherUpdateTimer.Update(t_diff);
@@ -992,12 +992,12 @@ void Map::Update(uint32 t_diff)
         ProcessRelocationNotifies(t_diff);
 
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at move update: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move update: {}", execDiff);
     // PROFILING
 
     sScriptMgr->OnMapUpdate(this, t_diff);
     // PROFILING
-    HOT_PROFILE_OUTPUT(realPrevTime, "Map Init: Update diff over threshold at map update script call: {}", execDiff);
+    HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at map update script call: {}", execDiff);
     // PROFILING
 
     TC_METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
@@ -1362,6 +1362,8 @@ void Map::RemoveDynamicObjectFromMoveList(DynamicObject* dynObj)
 
 void Map::MoveAllCreaturesInMoveList()
 {
+    uint32 execDiff = 0;
+    uint32 realPrevTime = getMSTime();
     _creatureToMoveLock = true;
     for (std::vector<Creature*>::iterator itr = _creaturesToMove.begin(); itr != _creaturesToMove.end(); ++itr)
     {
@@ -1382,20 +1384,33 @@ void Map::MoveAllCreaturesInMoveList()
         // do move or do move to respawn or remove creature if previous all fail
         if (CreatureCellRelocation(c, Cell(c->_newPosition.m_positionX, c->_newPosition.m_positionY)))
         {
+            HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move cell relocate, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
             // update pos
             c->Relocate(c->_newPosition);
+            HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move relocate, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
+
             if (c->IsVehicle())
                 c->GetVehicleKit()->RelocatePassengers();
+            HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move creature passenger relocate, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
+
             //CreatureRelocationNotify(c, new_cell, new_cell.cellCoord());
             c->UpdatePositionData();
+            HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move creature position update, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
+
             c->UpdateObjectVisibility(false);
+            HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move creature visibility update, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
+
         }
         else
         {
+            HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at failed cell relocate, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
+
             // if creature can't be move in new cell/grid (not loaded) move it to repawn cell/grid
             // creature coordinates will be updated and notifiers send
             if (!CreatureRespawnRelocation(c, false))
             {
+                HOT_PROFILE_OUTPUT(realPrevTime, "Map Update: Update diff over threshold at move creature respawn relocation update, creature id/name {}{}: {}", c->GetEntry(), c->GetName(), execDiff);
+
                 // ... or unload (if respawn grid also not loaded)
 #ifdef TRINITY_DEBUG
                 TC_LOG_DEBUG("maps", "Creature {} cannot be move to unloaded respawn grid.", c->GetGUID().ToString());
