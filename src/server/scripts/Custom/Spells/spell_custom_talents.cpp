@@ -2518,7 +2518,6 @@ class spell_dummy_potion_cdr : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        // Clean this up later
         if (Unit* unitTarget = GetHitUnit())
         {
             uint32 spellId = GetEffectValue();
@@ -2701,7 +2700,7 @@ class spell_hot_lightning_bolt : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 94017 });
+        return ValidateSpellInfo({ 94018 });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -2738,6 +2737,53 @@ class spell_hot_lightning_bolt : public AuraScript
     {
         DoCheckProc += AuraCheckProcFn(spell_hot_lightning_bolt::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_hot_lightning_bolt::HandleProc, EFFECT_0, SPELL_AURA_TEMP_LEARN_SPELL);
+    }
+};
+
+// Chain Lightning
+class spell_hot_chain_lightning : public AuraScript
+{
+    PrepareAuraScript(spell_hot_chain_lightning);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94019 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Only proc from Chain Lightning
+        if (spellInfo->Id == 49271)
+            if (Player* player = eventInfo.GetActor()->ToPlayer())
+            {
+                SpellInfo const* lightningboltPassive = sSpellMgr->AssertSpellInfo(160308);
+                int32 rollChance = lightningboltPassive->GetEffect(EFFECT_1).CalcValue(player);
+                float castMod = (1 / player->GetFloatValue(UNIT_MOD_CAST_SPEED));
+                rollChance += int32(((castMod - 1) / 2) * 100);
+
+                return roll_chance_i(rollChance);
+            }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetProcTarget();
+
+        caster->CastSpell(target, 94019, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hot_chain_lightning::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hot_chain_lightning::HandleProc, EFFECT_0, SPELL_AURA_TEMP_LEARN_SPELL);
     }
 };
 
@@ -2815,4 +2861,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_frost_shock_freeze);
     RegisterSpellScript(spell_hot_wrath);
     RegisterSpellScript(spell_hot_lightning_bolt);
+    RegisterSpellScript(spell_hot_chain_lightning);
 }
