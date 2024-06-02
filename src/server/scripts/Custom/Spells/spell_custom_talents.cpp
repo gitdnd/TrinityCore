@@ -2710,7 +2710,7 @@ class spell_hot_lightning_bolt : public AuraScript
             return false;
 
         // Only proc from Lightning Bolt
-        if (spellInfo->Id == 48461)
+        if (spellInfo->Id == 49238)
             if (Player* player = eventInfo.GetActor()->ToPlayer())
             {
                 SpellInfo const* lightningboltPassive = sSpellMgr->AssertSpellInfo(160308);
