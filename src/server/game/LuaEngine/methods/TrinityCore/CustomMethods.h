@@ -1422,8 +1422,8 @@ namespace LuaCustom
 
     int LockAndLoadCell(Eluna* E, Map* map)
     {
-        float x = E->CHECKVAL<float>(2);
-        float y = E->CHECKVAL<float>(3);
+        float x = E->CHECKVAL<int>(2);
+        float y = E->CHECKVAL<int>(3);
         map->GridMarkNoUnload(x, y);
         return 1;
     }
