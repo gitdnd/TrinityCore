@@ -2693,6 +2693,54 @@ class spell_hot_wrath : public AuraScript
     }
 };
 
+// Lightning Bolt
+class spell_hot_lightning_bolt : public AuraScript
+{
+    PrepareAuraScript(spell_hot_lightning_bolt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94017 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Only proc from Lightning Bolt
+        if (spellInfo->Id == 48461)
+            if (Player* player = eventInfo.GetActor()->ToPlayer())
+            {
+                SpellInfo const* lightningboltPassive = sSpellMgr->AssertSpellInfo(160308);
+                int rollChance = lightningboltPassive->GetEffect(EFFECT_1).CalcValue(player);
+                int32 castMod = int32(1 / player->GetFloatValue(UNIT_MOD_CAST_SPEED));
+                rollChance += ((castMod - 1) / 2) * 100;
+                
+                return roll_chance_i(rollChance);
+            }                 
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        if (!caster)
+            return;
+
+        caster->CastSpell(caster, 94018, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hot_lightning_bolt::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hot_lightning_bolt::HandleProc, EFFECT_0, SPELL_AURA_TEMP_LEARN_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2766,4 +2814,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_sanlayn_gift);
     RegisterSpellScript(spell_frost_shock_freeze);
     RegisterSpellScript(spell_hot_wrath);
+    RegisterSpellScript(spell_hot_lightning_bolt);
 }
