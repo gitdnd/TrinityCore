@@ -2787,6 +2787,44 @@ class spell_hot_chain_lightning : public AuraScript
     }
 };
 
+// Riptide
+class spell_hot_riptide : public AuraScript
+{
+    PrepareAuraScript(spell_hot_riptide);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94020 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Only proc from Riptide
+        if (spellInfo->Id == 61301)
+            return true;
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+
+        caster->CastSpell(caster, 94020, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hot_riptide::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hot_riptide::HandleProc, EFFECT_0, SPELL_AURA_TEMP_LEARN_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2862,4 +2900,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_hot_wrath);
     RegisterSpellScript(spell_hot_lightning_bolt);
     RegisterSpellScript(spell_hot_chain_lightning);
+    RegisterSpellScript(spell_hot_riptide);
 }
