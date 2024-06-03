@@ -1071,10 +1071,18 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                     if (damageInfo->attacker && victim && spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
                         if (damageInfo->attacker->HasAura(93173) && victim->HealthBelowPct(50))
                         {
-                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93173, 1);
+                            AuraEffect const* aurEff = damageInfo->attacker->GetAuraEffect(93173, EFFECT_1);
                             float bonus = aurEff->GetAmount();
                             critPctDamageMod += bonus;
                         }
+
+                    // Assassin's Mark
+                    if (victim->HasAura(84108))
+                    {
+                        AuraEffect const* aurEff = victim->GetAuraEffect(84108, EFFECT_1);
+                        float bonus = aurEff->GetAmount();
+                        critPctDamageMod += bonus;
+                    }
 
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_PERCENT_VERSUS
                     critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
@@ -1330,6 +1338,14 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
                 if (damageInfo->Attacker && victim && damageInfo->Attacker->HasAura(93173) && victim->HealthBelowPct(50))
                 {
                     AuraEffect const* aurEff = damageInfo->Attacker->GetAuraEffect(93173, 1);
+                    float bonus = aurEff->GetAmount();
+                    mod += bonus;
+                }
+
+                // Assassin's Mark
+                if (victim->HasAura(84108))
+                {
+                    AuraEffect const* aurEff = victim->GetAuraEffect(84108, EFFECT_1);
                     float bonus = aurEff->GetAmount();
                     mod += bonus;
                 }
@@ -7545,7 +7561,16 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
         crit_mod += (caster->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellProto->GetSchoolMask()) - 1.0f) * 100;
 
         if (victim)
+        {
             crit_mod += caster->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, victim->GetCreatureTypeMask());
+            // Assassin's Mark
+            if (victim->HasAura(84108))
+            {
+                AuraEffect const* aurEff = victim->GetAuraEffect(84108, EFFECT_1);
+                float bonus = aurEff->GetAmount();
+                crit_mod += bonus;
+            }
+        }
 
         if (crit_bonus != 0)
             AddPct(crit_bonus, crit_mod);
