@@ -2883,7 +2883,38 @@ class spell_poachers_mark : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_poachers_mark::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_poachers_mark::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// Warrior's Mark 84107
+class spell_warriors_mark : public AuraScript
+{
+    PrepareAuraScript(spell_warriors_mark);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94023 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp1 = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(bp1);
+        caster->CastSpell(caster, 94023, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warriors_mark::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
@@ -2965,4 +2996,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_hot_riptide);
     RegisterSpellScript(spell_hot_soul_fire);
     RegisterSpellScript(spell_poachers_mark);
+    RegisterSpellScript(spell_warriors_mark);
 }
