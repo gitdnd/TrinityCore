@@ -7422,6 +7422,13 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                                 crit_chance *= 1.5;
                             break;
                         }
+                        // Fire Blast
+                        else if (spellInfo->Id == 42873)
+                        {
+                            if (GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)
+                                return 100.0f;
+                            break;
+                        }
                         break;
                 }
 
