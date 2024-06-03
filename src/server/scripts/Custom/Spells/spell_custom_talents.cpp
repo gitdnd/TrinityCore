@@ -2854,6 +2854,39 @@ class spell_hot_soul_fire : public AuraScript
     }
 };
 
+// Poacher's Mark 84107
+class spell_poachers_mark : public AuraScript
+{
+    PrepareAuraScript(spell_poachers_mark);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94022 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || !damageInfo->GetVictim())
+            return;
+
+        int32 bp0 = GetSpellInfo()->_effects[EFFECT_0].CalcValue();
+        int32 bp1 = GetSpellInfo()->_effects[EFFECT_1].CalcValue();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(bp0);
+        args.AddSpellBP1(bp1);
+        caster->CastSpell(caster, 94022, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_poachers_mark::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2931,4 +2964,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_hot_chain_lightning);
     RegisterSpellScript(spell_hot_riptide);
     RegisterSpellScript(spell_hot_soul_fire);
+    RegisterSpellScript(spell_poachers_mark);
 }
