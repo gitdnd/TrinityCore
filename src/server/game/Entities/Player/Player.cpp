@@ -21844,6 +21844,10 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
                 // special case (skip > 10sec spell casts for instant cast setting)
                 if (op == SPELLMOD_CASTING_TIME && mod->value <= -100 && basevalue >= T(10000))
                     return;
+                // special case for Soul Fire! aura
+                else if (op == SPELLMOD_CASTING_TIME && mod->spellId == 94021)
+                    if (spellId != 47825)
+                        return;
                 else if (!Player::HasSpellModApplied(mod, spell))
                 {
                     // Special case for Surge of Light, do not apply critical chance reduction if others mods was not applied (i.e. procs while casting another spell)
