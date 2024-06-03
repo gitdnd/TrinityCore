@@ -2825,6 +2825,35 @@ class spell_hot_riptide : public AuraScript
     }
 };
 
+// Soul Fire!
+class spell_hot_soul_fire : public AuraScript
+{
+    PrepareAuraScript(spell_hot_soul_fire);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94021 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Only proc from Soul Fire
+        if (spellInfo->Id == 47825)
+            return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hot_soul_fire::CheckProc);
+    }
+};
+
 void AddSC_Spells_Custom_Talents()
 {
     //new spell_dmg_proc_aura();
@@ -2901,4 +2930,5 @@ void AddSC_Spells_Custom_Talents()
     RegisterSpellScript(spell_hot_lightning_bolt);
     RegisterSpellScript(spell_hot_chain_lightning);
     RegisterSpellScript(spell_hot_riptide);
+    RegisterSpellScript(spell_hot_soul_fire);
 }
