@@ -7429,6 +7429,24 @@ float Unit::SpellCritChanceTaken(Unit const* caster, SpellInfo const* spellInfo,
                                 return 100.0f;
                             break;
                         }
+                        // Conflagrate
+                        else if (spellInfo->Id == 17962)
+                        {
+                            uint32 auraCount = 0;
+                            Unit::AuraEffectList const& mPeriodic = GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                            for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                            {
+                                // for caster applied auras only
+                                if ((*i)->GetCasterGUID() != caster->GetGUID())
+                                    continue;
+
+                                // Fire DoT
+                                if ((*i)->GetSpellInfo()->SchoolMask == 4)
+                                    ++auraCount;
+                            }
+                            crit_chance += 25 * auraCount;
+                            break;
+                        }
                         break;
                 }
 

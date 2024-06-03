@@ -677,7 +677,7 @@ void Spell::EffectSchoolDMG()
                 }
                 break;
             }
-            case 17962: // Conflagrate
+            /*case 17962: // Conflagrate
             {
                 AuraEffect const* aura = nullptr;                // found req. aura for damage calculation
 
@@ -725,7 +725,7 @@ void Spell::EffectSchoolDMG()
                     break;
                 }
                 break;
-            }
+            }*/
             case 46968: // Shockwave
             {
                 int32 pct = unitCaster->CalculateSpellDamage(m_spellInfo->GetEffect(EFFECT_2));
