@@ -434,7 +434,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
         ilevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
 
     // allow ilevel bonuses to add to the top of crafted max level as well (catalysts)
-    if ((ilevel + modifier.ilevelBonus) > 300)
+    if ((ilevel + modifier.ilevelBonus) > sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL))
     {
         // only award at half rate when > 300 (maxLevel)
         int maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
@@ -450,8 +450,8 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
         ilevel = modifier.ilevel;
 
     // Hard cap of 325 across all items FIXME
-    if (ilevel > sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL))
-        ilevel = sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL);
+    if (ilevel > sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL))
+        ilevel = sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL);
 
     output->ItemLevel = ilevel;
 }
@@ -833,7 +833,7 @@ void VirtualItemMgr::GenerateVirtualLevelLookupArray()
     float iLevel = 0.0f;
 
     // Generate lookup table for Virtual Levels.
-    for (int i = 0; iLevel < sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL); ++i)
+    for (int i = 0; iLevel < sWorld->getIntConfig(CONFIG_SCALING_MAX_ITEM_LEVEL); ++i)
     {
         iLevel = GenerateItemLevel(i);
         virtual_level_info.insert(std::make_pair(i, VirtualLevelInfo(iLevel)));
@@ -846,7 +846,7 @@ float VirtualItemMgr::GenerateItemLevel(int32 virtualLevel) const
     float x = float(virtualLevel) / 5000.0f;
 
     // Generate a logarithmic value to be used as the correct ilevel for the provided vlevel
-    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + float(sWorld->getIntConfig(CONFIG_MAX_ITEM_LEVEL));
+    float ilevel = ((pow((x + 0.0555f), 2) - 1.0f) / pow((x + 0.0555f), 2)) + float(sWorld->getIntConfig(CONFIG_SCALING_MAX_ITEM_LEVEL));
 
     return ilevel;
 }
