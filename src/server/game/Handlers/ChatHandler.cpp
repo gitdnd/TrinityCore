@@ -396,7 +396,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!e->OnChat(GetPlayer(), type, lang, msg, receiver))
                     return;
 #endif
-            HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str(), Trinity::StringFormat("to {}", receiver->GetName()).c_str());
+            if (receiver != sender)
+                HandleChatSpy(sender->GetGUID(), ChatMsg(type), msg.c_str(), Trinity::StringFormat("to {}", receiver->GetName()).c_str());
             GetPlayer()->Whisper(msg, Language(lang), receiver);
             break;
         }
