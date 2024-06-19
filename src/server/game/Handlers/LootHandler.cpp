@@ -94,6 +94,13 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
+    lootSlot = loot->lootSlotFromIndex(lootSlot, player);
+    if (lootSlot == -1)
+    {
+        TC_LOG_DEBUG("loot", "lootSlotFromIndex returned -1 for player {}", GetPlayer()->GetName().c_str());
+        return;
+    }
+
     player->StoreLootItem(lootSlot, loot);
 
     // If player is removing the last LootItem, delete the empty container.
@@ -449,6 +456,13 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     if (!loot)
         return;
+
+    slotid = loot->lootSlotFromIndex(slotid, GetPlayer());
+    if (slotid == -1)
+    {
+        TC_LOG_DEBUG("loot", "MasterLootItem: lootSlotFromIndex returned -1 for player {}", GetPlayer()->GetName().c_str());
+        return;
+    }
 
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
