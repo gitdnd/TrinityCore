@@ -30,6 +30,7 @@
 #include "QueryPackets.h"
 #include "UpdateMask.h"
 #include "World.h"
+#include "ElunaLoader.h"
 
 void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
@@ -157,6 +158,9 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
     float x = corpseLocation.GetPositionX();
     float y = corpseLocation.GetPositionY();
     float z = corpseLocation.GetPositionZ();
+
+    if (!sElunaLoader->ShouldMapLoadEluna(mapID))
+        return;
 
     // if corpse at different map
     if (mapID != _player->GetMapId())
