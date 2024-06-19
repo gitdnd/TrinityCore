@@ -61,9 +61,9 @@ LootItem::LootItem(LootStoreItem const& li)
     rollWinnerGUID = ObjectGuid::Empty;
 }
 
-bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid ownerGuid) const
+bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid /*ownerGuid*/) const
 {
-    return AllowedForPlayer(player, false, ownerGuid);
+    return AllowedForPlayer(player, false, ObjectGuid::Empty);
 }
 
 bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter) const
@@ -408,7 +408,7 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
         else
             item = &quest_items[i - itemsSize];
 
-        if (!item->is_looted && item->freeforall && item->AllowedForPlayer(player, lootOwnerGUID))
+        if (!item->is_looted && item->freeforall && item->AllowedForPlayer(player))
             if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item->itemid))
                 if (proto->IsCurrencyToken())
                     player->StoreLootItem(i, this);
@@ -422,7 +422,7 @@ NotNormalLootItemList* Loot::FillFFALoot(Player* player)
     for (uint8 i = 0; i < items.size(); ++i)
     {
         LootItem &item = items[i];
-        if (!item.is_looted && item.freeforall && item.AllowedForPlayer(player, lootOwnerGUID))
+        if (!item.is_looted && item.freeforall && item.AllowedForPlayer(player))
         {
             ql->push_back(NotNormalLootItem(i));
             ++unlootedCount;
@@ -449,7 +449,7 @@ NotNormalLootItemList* Loot::FillQuestLoot(Player* player)
     {
         LootItem &item = quest_items[i];
 
-        if (!item.is_looted && (item.AllowedForPlayer(player, lootOwnerGUID) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT))))
+        if (!item.is_looted && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT))))
         {
             ql->push_back(NotNormalLootItem(i));
 
