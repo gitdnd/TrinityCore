@@ -2544,7 +2544,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         //    GiveLevel(level + 1);
         if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
-            ++talent_level;
+            talent_level += 1;
             CastSpell(this, 90299, true); // Talent level up visual
             SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(talent_level));
             InitTalentForLevel();
