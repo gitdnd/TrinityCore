@@ -457,6 +457,13 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!loot)
         return;
 
+    slotid = loot->lootSlotFromIndex(slotid, GetPlayer());
+    if (slotid == -1)
+    {
+        TC_LOG_DEBUG("loot", "MasterLootItem: lootSlotFromIndex returned -1 for player %s", GetPlayer()->GetName().c_str());
+        return;
+    }
+
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
         TC_LOG_DEBUG("loot", "MasterLootItem: Player {} might be using a hack! (slot {}, size {})",
