@@ -94,7 +94,7 @@ void FlightPathMovementGenerator::DoReset(Player* owner)
     init.SetFirstPointId(GetCurrentNode());
     init.SetFly();
     // Flight paths should be slightly faster in the hub
-    init.SetVelocity(owner->GetMapId() == 765 ? PLAYER_FLIGHT_SPEED * 1.6f : PLAYER_FLIGHT_SPEED);
+    init.SetVelocity(owner->GetMapId() == 765 ? PLAYER_FLIGHT_SPEED * 1.4f : PLAYER_FLIGHT_SPEED);
     init.Launch();
 }
 
