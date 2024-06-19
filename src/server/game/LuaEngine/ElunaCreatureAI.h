@@ -169,6 +169,32 @@ struct ElunaCreatureAI : CreatureAI
     //Called at creature death
     void JustDied(Unit* killer) override
     {
+        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
+        {
+            auto map = me->GetMap();
+
+            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+            data << uint32(1); // ENCOUNTER_FRAME_DISENGAGE
+            data << me->GetPackGUID();
+            data << uint8(0);
+            map->SendToPlayers(&data);
+
+            Map::PlayerList const& players = map->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                auto player = itr->GetSource();
+                if (player->GetSession() && !player->IsGameMaster())
+                {
+                    player->RemoveAurasDueToSpell(90191); // Dungeon Death
+                }
+            }
+
+            if (me->GetInstanceScript())
+            {
+                me->GetInstanceScript()->DoUpdateWorldState(304, me->GetInstanceScript()->GetMaxCombatReses());
+            }
+        }
+
 #ifndef CMANGOS
         if (!me->GetEluna()->JustDied(me, killer))
             ScriptedAI::JustDied(killer);
@@ -238,6 +264,27 @@ struct ElunaCreatureAI : CreatureAI
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
+        {
+            auto map = me->GetMap();
+
+            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+            data << uint32(1); // ENCOUNTER_FRAME_DISENGAGE
+            data << me->GetPackGUID();
+            data << uint8(0);
+            map->SendToPlayers(&data);
+
+            Map::PlayerList const& players = map->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                auto player = itr->GetSource();
+                if (player->GetSession() && !player->IsGameMaster())
+                {
+                    player->RemoveAurasDueToSpell(90191); // Dungeon Death
+                }
+            }
+        }
+
 #ifndef CMANGOS
         if (!me->GetEluna()->EnterEvadeMode(me))
             ScriptedAI::EnterEvadeMode();
