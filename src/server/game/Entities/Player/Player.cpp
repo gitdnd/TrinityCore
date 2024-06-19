@@ -28133,9 +28133,9 @@ void Player::DeactivateTalentLoadout()
 void Player::ResetCustomTalents()
 {
     DeactivateTalentLoadout();
-    m_usedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
-    InitTalentForLevel();
     customTalents[GetCurrentTalentLoadout()].clear();
+    m_usedTalentCount = 0;
+    InitTalentForLevel();
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT);
     stmt->setUInt32(0, GetGUID().GetCounter());
     stmt->setUInt32(1, GetCurrentTalentLoadout());
@@ -28152,7 +28152,8 @@ void Player::LearnCustomTalent(uint32 id)
     customTalents[GetCurrentTalentLoadout()].push_back(id);
 
     if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
-        aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
+        if(aura->GetSpellInfo()->StackAmount > 1)
+            aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
     else
     {
         //LearnSpell(nodeInfo->spellId, false);
