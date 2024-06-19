@@ -61,9 +61,9 @@ LootItem::LootItem(LootStoreItem const& li)
     rollWinnerGUID = ObjectGuid::Empty;
 }
 
-bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid ownerGuid) const
+bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid /*ownerGuid*/) const
 {
-    return AllowedForPlayer(player, false);
+    return AllowedForPlayer(player, false, ObjectGuid::Empty);
 }
 
 bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter) const
