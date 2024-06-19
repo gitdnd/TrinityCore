@@ -110,8 +110,8 @@ bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter
     if (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
         return false;
 
-    if (needs_quest && !freeforall && player->GetGroup() && (player->GetGroup()->GetLootMethod() == GROUP_LOOT || player->GetGroup()->GetLootMethod() == ROUND_ROBIN) && !ownerGuid.IsEmpty() && ownerGuid != player->GetGUID())
-        return false;
+    //if (needs_quest && !freeforall && player->GetGroup() && (player->GetGroup()->GetLootMethod() == GROUP_LOOT || player->GetGroup()->GetLootMethod() == ROUND_ROBIN) && !ownerGuid.IsEmpty() && ownerGuid != player->GetGUID())
+    //    return false;
 
     // check quest requirements
     if (!pProto->HasFlag(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && ((needs_quest || (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE)) && !player->HasQuestForItem(itemid)))
