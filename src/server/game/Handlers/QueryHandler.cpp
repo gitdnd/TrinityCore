@@ -159,7 +159,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
     float y = corpseLocation.GetPositionY();
     float z = corpseLocation.GetPositionZ();
 
-    if (!sElunaLoader->ShouldMapLoadEluna(mapID))
+    if (!sElunaLoader->ShouldMapLoadEluna(mapID) || !sElunaLoader->ShouldMapLoadEluna(corpseMapID))
         return;
 
     // if corpse at different map
