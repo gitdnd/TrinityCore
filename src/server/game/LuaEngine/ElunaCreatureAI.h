@@ -7,6 +7,7 @@
 #ifndef _ELUNA_CREATURE_AI_H
 #define _ELUNA_CREATURE_AI_H
 
+#include "InstanceScript.h"
 #include "LuaEngine.h"
 #ifdef CMANGOS
 #include "AI/BaseAI/CreatureAI.h"
