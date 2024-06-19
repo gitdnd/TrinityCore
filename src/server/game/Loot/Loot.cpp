@@ -179,15 +179,6 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
     // Personal loot hack'n slash
     if (canBePersonal)
     {
-        /*
-        LootItem generatedLoot(item);
-        generatedLoot.count = std::min(count, proto->GetMaxStackSize());
-        lootItems.push_back(generatedLoot);
-        count -= proto->GetMaxStackSize();
-
-        // In some cases, a dropped item should be visible/lootable only for some players in group
-        bool canSeeItemInLootWindow = false;
-        */
         if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
         {
             if (Group* group = player->GetGroup())
