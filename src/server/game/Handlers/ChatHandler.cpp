@@ -372,11 +372,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
-                if (GetPlayer()->GetTeam() != receiver->GetTeam() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT))
-                {
-                    SendWrongFactionNotice();
-                    return;
-                }
+                //if (GetPlayer()->GetTeam() != receiver->GetTeam() && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT))
+                //{
+                    //SendWrongFactionNotice();
+                    //return;
+                //}
             }
 
             if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
