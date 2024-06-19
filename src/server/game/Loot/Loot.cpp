@@ -42,7 +42,7 @@
 LootItem::LootItem(LootStoreItem const& li)
 {
     itemid = li.itemid;
-    itemIndex = 0;
+    //itemIndex = 0;
     conditions = li.conditions;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
@@ -297,7 +297,7 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 generatedLoot.itemid = proto->ItemId;
 
             generatedLoot.count = std::min(count, proto->GetMaxStackSize());
-            generatedLoot.itemIndex = lootItems.size();
+            //generatedLoot.itemIndex = lootItems.size();
             lootItems.push_back(generatedLoot);
             count -= proto->GetMaxStackSize();
 
