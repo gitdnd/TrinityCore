@@ -101,6 +101,28 @@ struct ElunaCreatureAI : CreatureAI
     // Called at creature aggro either by MoveInLOS or Attack Start
     void JustEngagedWith(Unit* target) override
     {
+        if (me->GetCreatureTemplate()->rank == 3 || ((me->GetCreatureTemplate()->type_flags & 4) != 0))
+        {
+
+            auto map = me->GetMap();
+
+            WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+            data << uint32(0); // ENCOUNTER_FRAME_ENGAGE
+            data << me->GetPackGUID();
+            data << uint8(0);
+            map->SendToPlayers(&data);
+
+            Map::PlayerList const& players = map->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                auto player = itr->GetSource();
+                if (player->GetSession() && !player->IsGameMaster())
+                {
+                    player->CastSpell(player, 90191); // Dungeon Death
+                }
+        }
+    }
+
         if (!me->GetEluna()->EnterCombat(me, target))
             ScriptedAI::JustEngagedWith(target);
     }
