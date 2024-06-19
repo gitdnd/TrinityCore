@@ -159,7 +159,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
     float y = corpseLocation.GetPositionY();
     float z = corpseLocation.GetPositionZ();
 
-    if (!sElunaLoader->ShouldMapLoadEluna(mapID) || !sElunaLoader->ShouldMapLoadEluna(corpseMapID))
+    if (!sElunaLoader->ShouldMapLoadEluna(mapID))
         return;
 
     // if corpse at different map
@@ -170,6 +170,9 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
         {
             if (corpseMapEntry->IsDungeon() && corpseMapEntry->CorpseMapID >= 0)
             {
+                if (!sElunaLoader->ShouldMapLoadEluna(corpseMapEntry->CorpseMapID))
+                    return;
+
                 // if corpse map have entrance
                 if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->CorpseMapID, _player->GetGroupOrPlayerItemLevel()))
                 {
