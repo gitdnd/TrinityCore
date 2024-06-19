@@ -198,12 +198,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
 
 std::string GmTicket::FormatMessageString() const
 {
-    std::stringstream ss;
-    //ss << Trinity::StringFormat(sObjectMgr->GetTrinityString((LANG_COMMAND_TICKETLISTGUID), LOCALE_enUS), _id);
-    //ss << Trinity::StringFormat(sObjectMgr->GetTrinityString((LANG_COMMAND_TICKETLISTNAME), LOCALE_enUS), _playerName.c_str());
-    //ss << Trinity::StringFormat(sObjectMgr->GetTrinityString((LANG_COMMAND_TICKETLISTMESSAGE), LOCALE_enUS), _message.c_str());
-
-    return ss.str();
+    return Trinity::StringFormat("Ticket {}, Player {}: {}", _id, _playerName.c_str(), _message.c_str());
 }
 
 std::string GmTicket::FormatMessageString(ChatHandler& handler, char const* szClosedName, char const* szAssignedToName, char const* szUnassignedName, char const* szDeletedName, char const* szCompletedName) const
