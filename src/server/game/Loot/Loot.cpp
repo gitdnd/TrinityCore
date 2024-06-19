@@ -598,6 +598,9 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, NotNormalLootIte
     }
     else
     {
+        // TEST HARRY
+        lootSlot = lootSlot - 1;
+
         item = &items[lootSlot];
         is_looted = item->is_looted;
         if (item->freeforall)
