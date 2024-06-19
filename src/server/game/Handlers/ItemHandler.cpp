@@ -999,14 +999,13 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
             if (i != firstPrismatic)
                 return;
-            else
+        }
+        else
+        {
+            if (!(GemProps[i]->Type & itemProto->Socket[i].Color))
             {
-
-                if (!(GemProps[i]->Type & itemProto->Socket[i].Color))
-                {
-                    _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
-                    return;
-                }
+                _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT, itemTarget, nullptr);
+                return;
             }
         }
 
