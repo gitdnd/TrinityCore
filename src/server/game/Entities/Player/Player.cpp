@@ -28153,8 +28153,6 @@ void Player::LearnCustomTalent(uint32 id)
 
     if (Aura* aura = GetAura(nodeInfo->spellId, GetGUID()))
     {
-        this->Say("Updating stack amount!", LANG_UNIVERSAL);
-
         //if (aura->GetSpellInfo()->StackAmount > 1)
             aura->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
     }
@@ -28164,8 +28162,6 @@ void Player::LearnCustomTalent(uint32 id)
         AddTemporarySpell(nodeInfo->spellId);
         if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
         {
-            this->Say("Casting spell!", LANG_UNIVERSAL);
-
             //if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
                 CastSpell(this, nodeInfo->spellId, true);
         }
