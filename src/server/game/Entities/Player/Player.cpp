@@ -28158,7 +28158,7 @@ void Player::LearnCustomTalent(uint32 id)
         //LearnSpell(nodeInfo->spellId, false);
         AddTemporarySpell(nodeInfo->spellId);
         if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
-            if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
+            //if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
                 CastSpell(this, nodeInfo->spellId, true);
     }
 
