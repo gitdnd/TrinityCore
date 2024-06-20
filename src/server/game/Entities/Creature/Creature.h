@@ -96,9 +96,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         }
         uint32 GetCorpseDelay() const { return m_corpseDelay; }
         bool IsRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
-        bool IsCivilian() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN) != 0; }
-        bool IsTrigger() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER) != 0; }
-        bool IsGuard() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD) != 0; }
+        bool IsCivilian() const { return (GetExtraFlags() & CREATURE_FLAG_EXTRA_CIVILIAN) != 0; }
+        bool IsTrigger() const { return (GetExtraFlags() & CREATURE_FLAG_EXTRA_TRIGGER) != 0; }
+        bool IsGuard() const { return (GetExtraFlags() & CREATURE_FLAG_EXTRA_GUARD) != 0; }
         bool IsIgnoringAffixes()
         {
             if (!IsAlive() || IsPet() || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) || IsTrigger() ||
@@ -121,8 +121,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         MovementGeneratorType GetDefaultMovementType() const override { return m_defaultMovementType; }
         void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
 
-        bool IsDungeonBoss() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DUNGEON_BOSS) != 0; }
-        bool IsAffectedByDiminishingReturns() const override { return Unit::IsAffectedByDiminishingReturns() || (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH) != 0; }
+        bool IsDungeonBoss() const { return (GetExtraFlags() & CREATURE_FLAG_EXTRA_DUNGEON_BOSS) != 0; }
+        bool IsAffectedByDiminishingReturns() const override { return Unit::IsAffectedByDiminishingReturns() || (GetExtraFlags() & CREATURE_FLAG_EXTRA_ALL_DIMINISH) != 0; }
 
         Unit* SelectVictim();
 
@@ -260,7 +260,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool HasSearchedAssistance() const { return m_AlreadySearchedAssistance; }
         bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
         bool _IsTargetAcceptable(Unit const* target) const;
-        bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
+        bool CanIgnoreFeignDeath() const { return (GetExtraFlags() & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
 
         void RemoveCorpse(bool setSpawnTime = true, bool destroyForNearbyPlayers = true);
 
@@ -332,7 +332,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
         bool IsReputationGainDisabled() const { return DisableReputationGain; }
-        bool IsDamageEnoughForLootingAndReward() const { return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (m_PlayerDamageReq == 0); }
+        bool IsDamageEnoughForLootingAndReward() const { return (GetExtraFlags() & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (m_PlayerDamageReq == 0); }
         void LowerPlayerDamageReq(uint32 unDamage);
         void ResetPlayerDamageReq() { m_PlayerDamageReq = GetHealth() / 2; }
         uint32 m_PlayerDamageReq;
@@ -403,6 +403,13 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         void ExitVehicle(Position const* exitPosition = nullptr) override;
 
+        uint32 GetExtraFlags() const
+        {
+            if (flagsExtraOverride != GetCreatureTemplate()->flags_extra)
+                return flagsExtraOverride;
+            return  GetCreatureTemplate()->flags_extra;
+        }
+        void SetFlagsExtraOverride(uint32 flags) { flagsExtraOverride = flags; }
     protected:
         bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 entry, CreatureData const* data = nullptr, uint32 vehId = 0);
         bool InitEntry(uint32 entry, CreatureData const* data = nullptr);
@@ -492,6 +499,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         uint8 _markOfTheAbsoluteState;
 
         bool _isMissingCanSwimFlagOutOfCombat;
+        uint32 flagsExtraOverride;
 };
 
 class TC_GAME_API AssistDelayEvent : public BasicEvent

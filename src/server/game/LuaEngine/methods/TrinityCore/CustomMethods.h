@@ -1353,7 +1353,41 @@ namespace LuaCustom
 
         return 1;
     }
-    
+
+    /**
+     * Returns the [Creature]'s Extra flags.
+     *
+     * These are used to control whether the NPC is a civilian, uses pathfinding,
+     *   if it's a guard, etc.
+     *
+     * @return [ExtraFlags] extraFlags
+     */
+    int GetExtraFlags(Eluna* E, Creature* creature)
+    {
+        E->Push(creature->GetExtraFlags());
+        return 1;
+    }
+
+    /**
+     * Returns the [Creature]'s Extra flags.
+     *
+     * These are used to control whether the NPC is a civilian, uses pathfinding,
+     *   if it's a guard, etc.
+     *
+     * @return [ExtraFlags] extraFlags
+     */
+    int GetExtraFlagsFromTemplate(Eluna* E, Creature* creature)
+    {
+        E->Push(creature->GetCreatureTemplate()->flags_extra);
+        return 1;
+    }
+
+    int SetExtraFlags(Eluna* E, Creature* creature)
+    {
+        uint32 flags = E->CHECKVAL<uint32>(2);
+        creature->SetFlagsExtraOverride(flags);
+        return 0;
+    }
     /**
      * Adds an [Item] to a vendor and updates the world database.
      *
@@ -1921,7 +1955,10 @@ namespace LuaCustom
         { "AddQuest", &LuaCustom::AddQuest },
         { "SendMirrorImage", &LuaCustom::SendMirrorToPlayer },
         { "GetAITarget", &LuaCustom::GetAITarget },
-        
+        { "GetFlagsExtra", &LuaCustom::GetExtraFlags },
+        { "GetFlagsExtraFromTemplate", &LuaCustom::GetExtraFlagsFromTemplate },
+        { "SetFlagsExtra", &LuaCustom::SetExtraFlags },
+
         { NULL, NULL, METHOD_REG_NONE }
     };
     

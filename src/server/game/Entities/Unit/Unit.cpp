@@ -1535,7 +1535,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         return;
 
     if (damageInfo->TargetState == VICTIMSTATE_PARRY &&
-        (victim->GetTypeId() != TYPEID_UNIT || (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN) == 0))
+        (victim->GetTypeId() != TYPEID_UNIT || (victim->ToCreature()->GetExtraFlags() & CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN) == 0))
     {
         // Get attack timers
         float offtime  = float(victim->getAttackTimer(OFF_ATTACK));
@@ -2346,7 +2346,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     if (GetLevelForTarget(victim) >= victim->GetLevelForTarget(this) + 4 &&
         // can be from by creature (if can) or from controlled player that considered as creature
         !IsControlledByPlayer() &&
-        !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS))
+        !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetExtraFlags() & CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS))
     {
         // when their weapon skill is 15 or more above victim's defense skill
         tmp = victimDefenseSkill;
@@ -2732,7 +2732,7 @@ float Unit::GetUnitParryChance(WeaponAttackType attType, Unit const* victim) con
     }
     else
     {
-        if (!victim->IsTotem() && !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY))
+        if (!victim->IsTotem() && !(victim->ToCreature()->GetExtraFlags() & CREATURE_FLAG_EXTRA_NO_PARRY))
         {
             chance = 5.0f;
             chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
@@ -2798,7 +2798,7 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
     }
     else
     {
-        if (!victim->IsTotem() && !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
+        if (!victim->IsTotem() && !(victim->ToCreature()->GetExtraFlags() & CREATURE_FLAG_EXTRA_NO_BLOCK))
         {
             chance = 5.0f;
             chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
@@ -2838,7 +2838,7 @@ float Unit::GetUnitCriticalChanceDone(WeaponAttackType attackType) const
     }
     else
     {
-        if (!(ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRIT))
+        if (!(ToCreature()->GetExtraFlags() & CREATURE_FLAG_EXTRA_NO_CRIT))
         {
             chance = 5.0f;
             chance += GetTotalAuraModifier(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT);
@@ -9202,7 +9202,7 @@ bool Unit::ApplyDiminishingToDuration(SpellInfo const* auraSpellInfo, bool trigg
     float mod = 1.0f;
     if (group == DIMINISHING_TAUNT)
     {
-        if (GetTypeId() == TYPEID_UNIT && (ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS))
+        if (GetTypeId() == TYPEID_UNIT && (ToCreature()->GetExtraFlags() & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS))
         {
             DiminishingLevels diminish = previousLevel;
             switch (diminish)
@@ -11540,7 +11540,7 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
             {
                 if (instanceMap->IsRaidOrHeroicDungeon())
                 {
-                    if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
+                    if (creature->GetExtraFlags() & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
                         instanceMap->ToInstanceMap()->PermBindAllPlayers();
                 }
                 else
@@ -13905,7 +13905,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player const* t
                         }
                     }
 
-                    if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
+                    if (creature->GetExtraFlags() & CREATURE_FLAG_EXTRA_TRIGGER)
                         if (target->IsGameMaster() && target->m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GM))
                             displayId = cinfo->GetFirstVisibleModel();
                 }
