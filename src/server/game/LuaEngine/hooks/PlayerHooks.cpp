@@ -78,81 +78,34 @@ bool Eluna::OnCommand(Player* player, const char* text)
         std::string reload = text;
         std::transform(reload.begin(), reload.end(), reload.begin(), ::tolower);
         const std::string reload_command = "reload eluna";
-        const size_t reload_command_pos = reload.find(reload_command);
-        if (reload_command_pos == 0 || reload_command_pos == 1)
+        if (reload.find(reload_command) == 0)
         {
-            bool loadScripts = true;
-            const int mapid_reload_cache_only = -3;
-            const int mapid_reload_all = -2; // reserved for reloading all states (default if no args)
-            const int mapid_reload_global = -1; // reserved for reloading global state
-            // otherwise reload the state of the specific mapid
-            // If a mapid is provided but does not match any map or reserved id then only script storage is loaded
-
-            int mapId = mapid_reload_all;
-            std::string args = reload.substr(reload_command.length() + reload_command_pos);
+            int mapId = RELOAD_ALL_STATES;
             std::string reloadCase = "all map states";
+            std::string args = reload.substr(reload_command.length());
             if (!args.empty())
+                mapId = strtol(args.c_str(), nullptr, 10);
+
+            switch (mapId)
             {
-                char* ok;
-                mapId = strtol(args.c_str(), &ok, 10);
-                switch (mapId)
-                {
-                case -3:
-                    reloadCase = "cache";
-                    break;
-                case -2:
-                    reloadCase = "all map states";
-                    break;
-                case -1:
-                    reloadCase = "world state";
-                    break;
-                default:
-                    reloadCase = Trinity::StringFormat("map {} state", mapId);
-                }
-
-                if (*ok)
-                {
-                    // provided not a number, try loading a single script name
-                    mapId = mapid_reload_all;
-
-                    size_t pos = args.find_first_not_of(' ');
-                    args = args.substr(pos != std::string::npos ? pos : 0);
-
-                    sElunaLoader->LoadScript(args);
-
-                    loadScripts = false;
-                    reloadCase = Trinity::StringFormat("script {}", args.c_str());
-                }
+            case -3:
+                reloadCase = "cache";
+                break;
+            case RELOAD_ALL_STATES:
+                reloadCase = "all map states";
+                break;
+            case -1:
+                reloadCase = "world state";
+                break;
+            default:
+            {
+                if (player)
+                    ChatHandler(player->GetSession()).PSendSysMessage("Invalid eluna reload args {}", mapId);
+                return false;
+            }
             }
 
-            if (loadScripts)
-                sElunaLoader->LoadScripts();
-
-            if (mapid_reload_cache_only != mapId)
-            {
-                if (mapId == mapid_reload_global || mapId == mapid_reload_all)
-#ifdef TRINITY
-                    if (sWorld->GetEluna())
-                        sWorld->GetEluna()->ReloadEluna();
-#else
-                    if (sWorld.GetEluna())
-                        sWorld.GetEluna()->ReloadEluna();
-#endif
-
-#ifdef TRINITY
-                sMapMgr->DoForAllMaps([&](Map* map)
-#else
-                sMapMgr.DoForAllMaps([&](Map* map)
-#endif
-                    {
-                        if (mapId == mapid_reload_all || mapId == static_cast<int>(map->GetId()))
-                        {
-                            if (map->GetEluna())
-                                map->GetEluna()->ReloadEluna();
-                        }
-                    }
-                );
-            }
+            sElunaLoader->ReloadElunaForMap(mapId);
             std::string msg = Trinity::StringFormat("Eluna {} reloaded.", reloadCase);
             sWorld->SendGMText(msg.c_str());
             return false;

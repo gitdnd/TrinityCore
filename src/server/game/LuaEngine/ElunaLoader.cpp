@@ -36,38 +36,28 @@ extern "C" {
 #include <lauxlib.h>
 }
 
-/// File watcher responsible for watching lua scripts
-class ElunaUpdateListener : public efsw::FileWatchListener
-{
-public:
-    ElunaUpdateListener() { }
-    virtual ~ElunaUpdateListener() { }
-
-    void handleFileAction(efsw::WatchID /*watchid*/, std::string const& dir,
-        std::string const& filename, efsw::Action action, std::string oldFilename = "") final override;
-};
-
-static ElunaUpdateListener elunaUpdateListener;
-
-void ElunaUpdateListener::handleFileAction(efsw::WatchID, std::string const& dir, std::string const& filename, efsw::Action /*action*/, std::string oldFilename)
+#ifdef TRINITY
+void ElunaUpdateListener::handleFileAction(efsw::WatchID /*watchid*/, std::string const& dir, std::string const& filename, efsw::Action /*action*/, std::string /*oldFilename*/)
 {
     auto const path = fs::absolute(filename, dir);
-    ELUNA_LOG_INFO("[Eluna]: Found file %s change.", path.string().c_str());
-
     if (!path.has_extension())
         return;
 
-    std::string extension = path.extension().string();
-    std::transform(extension.begin(), extension.end(), extension.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::string ext = path.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return std::tolower(c); });
 
-    if (extension != ".lua" && extension != ".ext")
+    if (ext != ".lua" && ext != ".ext")
         return;
 
-    sWorld->QueueCliCommand(new CliCommandHolder(nullptr, "reload eluna", [](void*, std::string_view) {}, [](void*, bool) {}));
+    sElunaLoader->ReloadElunaForMap(RELOAD_ALL_STATES);
 }
+#endif
 
-ElunaLoader::ElunaLoader() : lua_scriptWatcher(-1)
+ElunaLoader::ElunaLoader()
 {
+#ifdef TRINITY
+    lua_scriptWatcher = -1;
+#endif
 }
 
 ElunaLoader* ElunaLoader::instance()
@@ -78,26 +68,25 @@ ElunaLoader* ElunaLoader::instance()
 
 ElunaLoader::~ElunaLoader()
 {
+#ifdef TRINITY
     if (lua_scriptWatcher >= 0)
     {
         lua_fileWatcher.removeWatch(lua_scriptWatcher);
         lua_scriptWatcher = -1;
     }
+#endif
 }
 
-void ElunaLoader::LoadScripts(bool clear /*= true*/)
+void ElunaLoader::LoadScripts()
 {
     lua_folderpath = sElunaConfig->GetConfig(CONFIG_ELUNA_SCRIPT_PATH);
     const std::string& lua_path_extra = sElunaConfig->GetConfig(CONFIG_ELUNA_REQUIRE_PATH_EXTRA);
     const std::string& lua_cpath_extra = sElunaConfig->GetConfig(CONFIG_ELUNA_REQUIRE_CPATH_EXTRA);
 
     uint32 oldMSTime = ElunaUtil::GetCurrTime();
-    if (clear)
-    {
-        lua_scripts.clear();
-        lua_extensions.clear();
-        combined_scripts.clear();
-    }
+    lua_scripts.clear();
+    lua_extensions.clear();
+    combined_scripts.clear();
 #ifndef ELUNA_WINDOWS
     if (lua_folderpath[0] == '~')
         if (const char* home = getenv("HOME"))
@@ -226,28 +215,10 @@ void ElunaLoader::ReadFiles(lua_State* L, std::string path)
 
                 // was file, try add
                 std::string filename = dir_iter->path().filename().generic_string();
-                if (lua_scriptname.empty() || lua_scriptname == filename)
-                    ProcessScript(L, filename, fullpath, mapId);
+                ProcessScript(L, filename, fullpath, mapId);
             }
         }
     }
-}
-
-void ElunaLoader::InitializeFileWatcher()
-{
-    lua_scriptWatcher = lua_fileWatcher.addWatch(lua_folderpath, &elunaUpdateListener, true);
-    if (lua_scriptWatcher >= 0)
-    {
-        ELUNA_LOG_INFO("[Eluna]: Script reloader is listening on \"%s\".",
-            lua_folderpath.c_str());
-    }
-    else
-    {
-        ELUNA_LOG_ERROR("[Eluna]: Failed to initialize the script reloader on \"%s\".",
-            lua_folderpath.c_str());
-    }
-
-    lua_fileWatcher.watch();
 }
 
 bool ElunaLoader::CompileScript(lua_State* L, LuaScript& script)
@@ -319,6 +290,25 @@ void ElunaLoader::ProcessScript(lua_State* L, std::string filename, const std::s
     ELUNA_LOG_DEBUG("[Eluna]: ProcessScript processed `%s` successfully", fullpath.c_str());
 }
 
+#ifdef TRINITY
+void ElunaLoader::InitializeFileWatcher()
+{
+    lua_scriptWatcher = lua_fileWatcher.addWatch(lua_folderpath, &elunaUpdateListener, true);
+    if (lua_scriptWatcher >= 0)
+    {
+        ELUNA_LOG_INFO("[Eluna]: Script reloader is listening on `%s`.",
+        lua_folderpath.c_str());
+    }
+    else
+    {
+        ELUNA_LOG_INFO("[Eluna]: Failed to initialize the script reloader on `%s`.",
+        lua_folderpath.c_str());
+    }
+
+    lua_fileWatcher.watch();
+}
+#endif
+
 static bool ScriptPathComparator(const LuaScript& first, const LuaScript& second)
 {
     return first.filepath < second.filepath;
@@ -340,20 +330,32 @@ bool ElunaLoader::ShouldMapLoadEluna(uint32 id)
     return (std::find(requiredMaps.begin(), requiredMaps.end(), id) != requiredMaps.end());
 }
 
-void ElunaLoader::LoadScript(std::string name)
+void ElunaLoader::ReloadElunaForMap(int mapId)
 {
-    lua_scriptname = name;
+    // If a mapid is provided but does not match any map or reserved id then only script storage is loaded
+    LoadScripts();
 
-    std::string combined_scripts_name = lua_scriptname.substr(0, lua_scriptname.find(".lua"));
-    std::string combined_scripts_ext = lua_scriptname.substr(0, lua_scriptname.find(".ext"));
+    if (mapId != RELOAD_CACHE_ONLY)
+    {
+        if (mapId == RELOAD_GLOBAL_STATE || mapId == RELOAD_ALL_STATES)
+#ifdef TRINITY
+            if (sWorld->GetEluna())
+                sWorld->GetEluna()->ReloadEluna();
+#else
+            if (sWorld.GetEluna())
+                sWorld.GetEluna()->ReloadEluna();
+#endif
 
-    // erase existing script from compiled scripts
-    lua_scripts.erase(std::remove_if(lua_scripts.begin(), lua_scripts.end(), [combined_scripts_name](LuaScript const& script) { return script.filename == combined_scripts_name; }), lua_scripts.end());
-    lua_extensions.erase(std::remove_if(lua_extensions.begin(), lua_extensions.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), lua_extensions.end());
-    combined_scripts.erase(std::remove_if(combined_scripts.begin(), combined_scripts.end(), [combined_scripts_name](LuaScript const& script) { return script.filename == combined_scripts_name; }), combined_scripts.end());
-    combined_scripts.erase(std::remove_if(combined_scripts.begin(), combined_scripts.end(), [combined_scripts_ext](LuaScript const& script) { return script.filename == combined_scripts_ext; }), combined_scripts.end());
-
-    LoadScripts(false);
-
-    lua_scriptname.clear();
+#ifdef TRINITY
+        sMapMgr->DoForAllMaps([&](Map* map)
+#else
+        sMapMgr.DoForAllMaps([&](Map* map)
+#endif
+            {
+                if (mapId == RELOAD_ALL_STATES || mapId == static_cast<int>(map->GetId()))
+                    if (map->GetEluna())
+                        map->GetEluna()->ReloadEluna();
+            }
+        );
+    }
 }
