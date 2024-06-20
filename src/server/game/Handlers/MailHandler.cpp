@@ -119,9 +119,9 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
         return;
     }
 
-    int32 cost = !sendMail.Info.Attachments.empty() ? 30 * sendMail.Info.Attachments.size() : 30;  // price hardcoded in client
+    int32 cost = 0;  // price hardcoded in client
 
-    int32 reqmoney = cost + sendMail.Info.SendMoney;
+    int32 reqmoney = 0;
 
     // Check for overflow
     if (reqmoney < sendMail.Info.SendMoney)
@@ -135,11 +135,11 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
         if (_player != player)
             return;
 
-        if (!player->HasEnoughMoney(reqmoney) && !player->IsGameMaster())
-        {
-            player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
-            return;
-        }
+        //if (!player->HasEnoughMoney(reqmoney) && !player->IsGameMaster())
+        //{
+            //player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_ENOUGH_MONEY);
+            //return;
+        //}
 
         // do not allow to have more than 100 mails in mailbox.. mails count is in opcode uint8!!! - so max can be 255..
         if (mailsCount > 100)
