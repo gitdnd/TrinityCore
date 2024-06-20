@@ -49,7 +49,7 @@ void ElunaUpdateListener::handleFileAction(efsw::WatchID /*watchid*/, std::strin
     if (ext != ".lua" && ext != ".ext")
         return;
 
-    sElunaLoader->ReloadElunaForMap(RELOAD_ALL_STATES);
+    sWorld->SendGMText(Trinity::StringFormat("Reloaded eluna cache due to detected file change {}.", filename.c_str()).c_str());
 }
 #endif
 

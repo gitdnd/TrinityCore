@@ -88,13 +88,13 @@ bool Eluna::OnCommand(Player* player, const char* text)
 
             switch (mapId)
             {
-            case -3:
+            case RELOAD_CACHE_ONLY:
                 reloadCase = "cache";
                 break;
             case RELOAD_ALL_STATES:
                 reloadCase = "all map states";
                 break;
-            case -1:
+            case RELOAD_GLOBAL_STATE:
                 reloadCase = "world state";
                 break;
             default:
