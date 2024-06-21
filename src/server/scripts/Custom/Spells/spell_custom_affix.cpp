@@ -294,7 +294,7 @@ class spell_affix_wild_magic_aura : public AuraScript
         for (std::list<Unit*>::const_iterator it = unitList.begin(); it != unitList.end(); ++it)
         {
             Unit* target = *it;
-            if (caster->CanSeeOrDetect(target))
+            if (caster->CanSeeOrDetect(target) && caster->IsWithinLOSInMap(target))
             {
                 if (Creature* creature = target->ToCreature())
                 {
