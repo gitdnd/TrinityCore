@@ -318,7 +318,7 @@ public:
 
 	struct NameInfo
 	{
-        NameInfo() { itemType = -1; subclass = -1; inventoryType - 1; array_id = -1; }
+        NameInfo() { itemType = -1; subclass = -1; inventoryType = -1; array_id = -1; }
 		NameInfo(int32 type, int32 sub, int32 iType, int32 arrid) : itemType(type), subclass(sub), inventoryType(iType), array_id(arrid) {}
 		NameInfo(int32 type, int32 sub, int32 iType, int32 arrid, std::string n) : itemType(type), subclass(sub), inventoryType(iType), array_id(arrid), name(n) {}
 		int32 itemType;

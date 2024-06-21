@@ -204,8 +204,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                             }
 
                             // is this calculation what we really want? really need to double check this logic
-                            modifier.plrAvgLvl = playerLevel - 50 > dungeonLevel ? dungeonLevel : playerLevel;
-                            modifier.lowYield = playerLevel - 50 > dungeonLevel ? true : false;
+                            modifier.plrAvgLvl = int32(playerLevel) - 50 > int32(dungeonLevel) ? dungeonLevel : playerLevel;
+                            modifier.lowYield = int32(playerLevel) - 50 > int32(dungeonLevel) ? true : false;
 
                             modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
@@ -270,9 +270,11 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 // if player is in dungeon, override avg level and apply vLvl mod
                 if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
                 {
+                    int cappedDungeonLevel = player->GetMap()->GetCappedDungeonLevel(inst->softcapMod);
+
                     modifier.vLvlMod = inst->vLvlMod;
-                    modifier.plrAvgLvl = uint32(player->GetMap()->GetCappedDungeonLevel(inst->softcapMod));
-                    modifier.lowYield = uint32(player->GetCappedItemLevel(inst->softcapMod)) - 50 > player->GetMap()->GetCappedDungeonLevel(inst->softcapMod) ? true : false;
+                    modifier.plrAvgLvl = uint32(cappedDungeonLevel);
+                    modifier.lowYield = player->GetCappedItemLevel(inst->softcapMod) - 50.0f > float(cappedDungeonLevel) ? true : false;
                 }
             }
 
