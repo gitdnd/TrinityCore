@@ -168,12 +168,24 @@ class spell_affix_corpse_explosion_aura : public AuraScript
     {
         PreventDefaultAction();
         auto caster = GetCaster();
-        if (!caster || !GetSpellInfo())
+        if (!caster || !GetSpellInfo() || !caster->ToCreature())
             return;
 
         auto baseAura = aurEff->GetBase();
         if (!baseAura)
             return;
+
+        if (Creature* creature = caster->ToCreature())
+        {
+            if (creature->IsTrigger() ||
+                creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
+                creature->IsPet() ||
+                (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
+                (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM))
+            {
+                return;
+            }
+        }
 
         if (TempSummon* npc = caster->SummonCreature(60215, caster->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 3s))
         {
