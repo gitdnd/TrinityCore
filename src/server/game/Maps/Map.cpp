@@ -663,6 +663,7 @@ bool Map::AddPlayerToMap(Player* player)
             float z = 9.5f;
             float o = 1.6f;
 
+            player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
             transport->CalculatePassengerPosition(x, y, z, &o);
 
             player->Relocate(x, y, z, o);
