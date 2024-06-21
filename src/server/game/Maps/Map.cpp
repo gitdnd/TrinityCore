@@ -658,7 +658,10 @@ bool Map::AddPlayerToMap(Player* player)
 
         if (transport)
         {
-            float x, y, z, o;
+            float x = 3.9f;
+            float y = -0.3f;
+            float z = 9.5f;
+            float o = 1.6f;
 
             transport->CalculatePassengerPosition(x, y, z, &o);
 
