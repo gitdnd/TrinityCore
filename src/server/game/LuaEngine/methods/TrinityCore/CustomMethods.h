@@ -1835,6 +1835,19 @@ namespace LuaCustom
         return 0;
     }
 
+    int SetCommandState(Eluna* E, Creature* creature)
+    {
+        uint32 state = E->CHECKVAL<uint32>(2);
+
+        if (creature->GetCharmInfo()) {
+            creature->GetCharmInfo()->SetCommandState((CommandStates) state);
+        }
+
+        return 0;
+    }
+
+    //(me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+
     // REGISTERS
     
     ElunaGlobal::ElunaRegister GlobalMethods[] =
@@ -1958,6 +1971,7 @@ namespace LuaCustom
         { "GetFlagsExtra", &LuaCustom::GetExtraFlags },
         { "GetFlagsExtraFromTemplate", &LuaCustom::GetExtraFlagsFromTemplate },
         { "SetFlagsExtra", &LuaCustom::SetExtraFlags },
+        { "SetCommandState", &LuaCustom::SetCommandState },
 
         { NULL, NULL, METHOD_REG_NONE }
     };
