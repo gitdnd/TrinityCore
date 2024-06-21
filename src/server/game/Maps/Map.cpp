@@ -648,7 +648,7 @@ void Map::LoadGrid(float x, float y)
 
 bool Map::AddPlayerToMap(Player* player)
 {
-    // Stromgarde
+    // Stromgarde, force teleport to the ship if it is on the map
     if (GetId() == 766)
     {
         Transport* transport = nullptr;
@@ -657,7 +657,10 @@ bool Map::AddPlayerToMap(Player* player)
             if (Transport* go = itr->second)
             {
                 if (go->GetInstanceId() == player->GetInstanceId())
+                {
                     transport = go;
+                    break;
+                }
             }
         }
 
