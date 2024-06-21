@@ -48,6 +48,23 @@ namespace LuaTransport
         return 1;
     }
 
+    int SendToTransport(Eluna* E, Transport* transport)
+    {
+        WorldObject* player = E->CHECKOBJ<WorldObject>(2);
+
+        if (!player)
+            return;
+
+        float x, y, z, o;
+
+        transport->CalculatePassengerPosition(x, y, z, &o);
+
+        player->Relocate(x, y, z, o);
+        transport->AddPassenger(player);
+
+        return 0;
+    }
+
     ElunaRegister<Transport> TransportMethods[] =
     {
         // Getters
@@ -55,6 +72,7 @@ namespace LuaTransport
         { "AddPassenger", &LuaTransport::AddPassenger },
         { "GetPassengers", &LuaTransport::GetPassengers },
         { "SummonPassenger", &LuaTransport::SummonPassenger },
+        { "SendToTransport", &LuaTransport::SendToTransport },
 
         { NULL, NULL, METHOD_REG_NONE }
     };

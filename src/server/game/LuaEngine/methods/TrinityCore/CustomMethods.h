@@ -1846,8 +1846,6 @@ namespace LuaCustom
         return 0;
     }
 
-    //(me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
-
     // REGISTERS
     
     ElunaGlobal::ElunaRegister GlobalMethods[] =
