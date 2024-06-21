@@ -652,9 +652,14 @@ bool Map::AddPlayerToMap(Player* player)
     if (GetId() == 766)
     {
         Transport* transport = nullptr;
-        if (!HashMapHolder<Transport>::GetContainer().empty())
-            if (Transport* go = HashMapHolder<Transport>::GetContainer().begin()->second)
-                transport = go;
+
+        for (auto itr = HashMapHolder<Transport>::GetContainer().begin(); itr != HashMapHolder<Transport>::GetContainer().end(); ++itr) {
+            if (Transport* go = itr->second)
+            {
+                if (go->GetInstanceId() == player->GetInstanceId())
+                    transport = go;
+            }
+        }
 
         if (transport)
         {
