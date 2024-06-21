@@ -274,10 +274,6 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MapObject(), m_grou
     ResetLootMode(); // restore default loot mode
     m_isTempWorldObject = false;
     _dungeonLevelOverride = 0;
-    if (auto cT = sObjectMgr->GetCreatureTemplate(GetEntry()))
-    {
-        flagsExtraOverride = cT->flags_extra;
-    }
 }
 
 void Creature::AddToWorld()
