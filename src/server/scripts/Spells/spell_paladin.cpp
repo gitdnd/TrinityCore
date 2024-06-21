@@ -1469,7 +1469,7 @@ class spell_pal_light_s_beacon : public AuraScript
         ///        but that will break animation on clientside
         ///        caster in spell packets must be the healing unit
         CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(heal);
+        args.AddSpellBP0(heal /2);
         eventInfo.GetActor()->CastSpell(beaconTarget, healSpellId, args);
     }
 
