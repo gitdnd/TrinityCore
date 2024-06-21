@@ -441,6 +441,10 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
         uint32 actualTotal = ilevel + modifier.ilevelBonus;
         uint32 overshotTotal = ((actualTotal - maxLevel) / 2);
         ilevel += overshotTotal;
+
+        // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
+        if(ilevel > (modifier.dungeonLevel - overshotTotal))
+            ilevel = (modifier.dungeonLevel - overshotTotal);
     }
     else
         ilevel += modifier.ilevelBonus;

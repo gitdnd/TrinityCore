@@ -212,6 +212,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 
                             modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
 
+                            modifier.dungeonLevel = dungeonLevel;
+
                             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
                                 personalProto = newProto;
                         }
@@ -270,10 +272,11 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 // if player is in dungeon, override avg level and apply vLvl mod
                 if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
                 {
-                    int cappedDungeonLevel = player->GetMap()->GetCappedDungeonLevel(inst->softcapMod);
+                    uint32 cappedDungeonLevel = uint32(player->GetMap()->GetCappedDungeonLevel(inst->softcapMod));
 
+                    modifier.dungeonLevel = cappedDungeonLevel;
                     modifier.vLvlMod = inst->vLvlMod;
-                    modifier.plrAvgLvl = uint32(cappedDungeonLevel);
+                    modifier.plrAvgLvl = cappedDungeonLevel;
                     modifier.lowYield = player->GetCappedItemLevel(inst->softcapMod) - 50.0f > float(cappedDungeonLevel) ? true : false;
                 }
             }
