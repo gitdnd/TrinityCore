@@ -648,6 +648,25 @@ void Map::LoadGrid(float x, float y)
 
 bool Map::AddPlayerToMap(Player* player)
 {
+    // Stromgarde
+    if (GetId() == 766)
+    {
+        Transport* transport = nullptr;
+        if (!HashMapHolder<Transport>::GetContainer().empty())
+            if (Transport* go = HashMapHolder<Transport>::GetContainer().begin()->second)
+                transport = go;
+
+        if (transport)
+        {
+            float x, y, z, o;
+
+            transport->CalculatePassengerPosition(x, y, z, &o);
+
+            player->Relocate(x, y, z, o);
+            transport->AddPassenger(player);
+        }
+    }
+
     CellCoord cellCoord = Trinity::ComputeCellCoord(player->GetPositionX(), player->GetPositionY());
     if (!cellCoord.IsCoordValid())
     {
