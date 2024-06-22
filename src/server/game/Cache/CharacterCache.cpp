@@ -177,7 +177,7 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
     itr->second.ArenaTeamId[slot] = arenaTeamId;
 }
 
-void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass, WorldSession* self)
+void CharacterCache::UpdateCharacterSubClass(ObjectGuid const& guid, uint8 subClass, WorldSession* /*self*/)
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())

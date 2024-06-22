@@ -35,7 +35,7 @@ void AffixMgr::LoadDatabaseData()
                     fields[0].GetUInt32(),
                     fields[2].GetUInt32(),
                     fields[3].GetUInt32(),
-                    fields[4].GetInt32(),
+                    fields[4].GetUInt32(),
                     fields[1].GetUInt8()));
         } while (result->NextRow());
     }
@@ -78,9 +78,9 @@ AffixEffect AffixMgr::GetAffixEffect(uint32 id)
     return AffixEffect(0, 0, 0, 0, 0);
 }
 
-int AffixMgr::GetDungeonLevelBonus(uint32* affixes)
+uint32 AffixMgr::GetDungeonLevelBonus(uint32* affixes)
 {
-    int bonus = 0;
+    uint32 bonus = 0;
     for (uint8 i = 0; i < MAX_AFFIXES; ++i)
     {
         bonus += GetAffixEffect(affixes[i]).GetDungeonLevelBonus();
@@ -117,7 +117,7 @@ AffixItem::AffixItem(uint32 id, uint8 rank) :
 // Affix Effect
 ///////////////////////
 
-AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, int dungeonLevelBonus, uint8 rank) :
+AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint32 dungeonLevelBonus, uint8 rank) :
     m_id(id), m_baseSpell(baseSpell), m_targetSpell(targetSpell), m_dungeonLevelBonus(dungeonLevelBonus), m_rank(rank)
 {
 }

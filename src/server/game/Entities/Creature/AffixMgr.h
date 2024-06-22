@@ -63,12 +63,12 @@ private:
 class AffixEffect
 {
 public:
-    AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, int m_dungeonLevelBonus, uint8 rank);
+    AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint32 m_dungeonLevelBonus, uint8 rank);
 
     uint32 const GetId() { return m_id; }
     uint32 const GetBaseSpell() { return m_baseSpell; }
     uint32 const GetTargetSpell() { return m_targetSpell; }
-    int const GetDungeonLevelBonus() { return m_dungeonLevelBonus; }
+    uint32 const GetDungeonLevelBonus() { return m_dungeonLevelBonus; }
     uint8 const GetRank() { return m_rank; }
 
     void Apply(Creature* creature, AffixEvent event);
@@ -77,7 +77,7 @@ private:
     uint32 m_id;
     uint32 m_baseSpell;
     uint32 m_targetSpell;
-    int m_dungeonLevelBonus;
+    uint32 m_dungeonLevelBonus;
     uint8 m_rank;
 };
 
@@ -89,7 +89,7 @@ public:
 	AffixItem GetAffixItem(uint32 id);
 	AffixEffect GetAffixEffect(uint32 id);
 
-    int GetDungeonLevelBonus(uint32* affixes);
+    uint32 GetDungeonLevelBonus(uint32* affixes);
 
     AffixGroup& GetAffixGroup(Group* group);
     void ClearAffixGroup(Group* group);

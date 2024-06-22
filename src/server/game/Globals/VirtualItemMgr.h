@@ -129,6 +129,7 @@ struct VirtualModifier
         generateSet = false;
         lowYield = false;
         ilevelBonus = 0;
+        dungeonLevel = 0;
     }
 
     /**
@@ -161,6 +162,7 @@ struct VirtualModifier
     bool generateSet;
     bool lowYield;
     uint32 ilevelBonus;
+    uint32 dungeonLevel;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.

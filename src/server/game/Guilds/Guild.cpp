@@ -532,7 +532,7 @@ Guild::Member::Member(ObjectGuid::LowType guildId, ObjectGuid guid, uint8 rankId
 void Guild::Member::SetStats(Player* player)
 {
     m_name      = player->GetName();
-    uint32 level = floor(player->GetAverageItemLevel());
+    uint32 level = uint32(player->GetAverageItemLevel());
     if (level > 300)
         level = 300;
     m_level     = level;

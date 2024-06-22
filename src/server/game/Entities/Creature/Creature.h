@@ -73,7 +73,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         void DisappearAndDie() { ForcedDespawn(0); }
 
-        bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data = nullptr, uint32 vehId = 0, bool dynamic = false, int dungeonLevel = 0);
+        bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data = nullptr, uint32 vehId = 0, bool dynamic = false, uint32 dungeonLevel = 0);
         bool LoadCreaturesAddon();
         void ApplyAffixData(AffixEvent event);
         void SelectLevel();
@@ -386,7 +386,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         std::string GetDebugInfo() const override;
 
-        int GetDungeonLevel() const;
+        uint32 GetDungeonLevel() const;
 
         bool blockMirror;
         void ApplyScaledResistances();
@@ -458,7 +458,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsInvisibleDueToDespawn() const override;
         bool CanAlwaysSee(WorldObject const* obj) const override;
 
-        int _dungeonLevelOverride;
+        uint32 _dungeonLevelOverride;
 
     private:
         void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forceRespawnTimer = 0s);
