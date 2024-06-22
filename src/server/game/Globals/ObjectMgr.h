@@ -156,7 +156,6 @@ struct InstanceTemplate
     float mapXPRate;
     uint32 vLvlMod;
     uint32 minDungeonLevel;
-    uint32 softcapMod;
 };
 
 typedef std::unordered_map<uint16, InstanceTemplate> InstanceTemplateContainer;
