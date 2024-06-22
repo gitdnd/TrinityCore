@@ -596,7 +596,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         }
 
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
-        if ((output->statGroup == STAT_GROUP_HEALING || output->statGroup == STAT_GROUP_INT_DPS) && output->InventoryType != INVTYPE_RANGED)
+        if ((output->statGroup == STAT_GROUP_HEALING || output->statGroup == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
             output->Damage[0].DamageMin /= 2.0f;
             output->Damage[0].DamageMax /= 2.0f;
@@ -761,7 +761,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
             if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
             {
-                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED)
+                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED && output->InventoryType != INVTYPE_RANGEDRIGHT)
                     statPoints *= 4.0f;
             }
 
