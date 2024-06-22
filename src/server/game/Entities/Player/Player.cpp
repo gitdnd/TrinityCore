@@ -27983,7 +27983,7 @@ uint32 Player::GetGroupOrPlayerItemLevel()
 {
     if (GetGroup())
         return GetGroup()->GetDungeonLevel();
-    return GetAverageItemLevel();
+    return uint32(GetAverageItemLevel());
 }
 
 uint32 Player::GetCappedGroupOrPlayerItemLevel()

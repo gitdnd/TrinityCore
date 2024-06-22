@@ -386,7 +386,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         std::string GetDebugInfo() const override;
 
-        int GetDungeonLevel() const;
+        uint32 GetDungeonLevel() const;
 
         bool blockMirror;
         void ApplyScaledResistances();
@@ -458,7 +458,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsInvisibleDueToDespawn() const override;
         bool CanAlwaysSee(WorldObject const* obj) const override;
 
-        int _dungeonLevelOverride;
+        uint32 _dungeonLevelOverride;
 
     private:
         void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forceRespawnTimer = 0s);
