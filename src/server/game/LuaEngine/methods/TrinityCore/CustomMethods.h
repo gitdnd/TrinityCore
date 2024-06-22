@@ -1428,6 +1428,21 @@ namespace LuaCustom
         return 1;
     }
 
+     /**
+     * Finds and Returns [Player] by guid if found
+     *
+     * In multistate, this method is only available in the WORLD state
+     *
+     * @param ObjectGuid guid : guid of the [Player], you can get it with [Object:GetGUID]
+     * @return [Player] player
+     */
+    int GetPlayerByGUID(Eluna* E, Map* map)
+    {
+        ObjectGuid guid = E->CHECKVAL<ObjectGuid>(1);
+        E->Push(map->GetPlayer(guid));
+        return 1;
+    }
+
     /**
     * Returns a table with all the current [Player]s in the map
     *
@@ -1965,6 +1980,7 @@ namespace LuaCustom
         { "GetPlayers", &LuaCustom::GetPlayers },
         { "GetAreaId", &LuaCustom::GetAreaId },
         { "LockAndLoadCell", &LuaCustom::LockAndLoadCell },
+        { "GetPlayerByGuid", &LuaCustom::GetPlayerByGUID },
 
         { NULL, NULL, METHOD_REG_NONE }
     };
