@@ -12675,7 +12675,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
         AddItemLevelToSlotCache(slot, newItemLevel);
 
     // Now calculate new skill level based on cached item levels
-    uint32 new_value = GetAverageItemLevel();
+    uint32 new_value = uint32(GetAverageItemLevel());
     if (new_value > 300)
         new_value = 300;
 

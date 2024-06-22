@@ -5488,7 +5488,7 @@ void Spell::SummonGuardian(SpellEffectInfo const& spellEffectInfo, uint32 entry,
 
         uint32 itemLevel = 0;
         if (unitCaster->ToPlayer())
-            itemLevel = unitCaster->ToPlayer()->GetAverageItemLevel();
+            itemLevel = uint32(unitCaster->ToPlayer()->GetAverageItemLevel());
         else if (unitCaster->ToCreature())
             itemLevel = unitCaster->ToCreature()->GetDungeonLevel();
 

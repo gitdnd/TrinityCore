@@ -73,7 +73,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         void DisappearAndDie() { ForcedDespawn(0); }
 
-        bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data = nullptr, uint32 vehId = 0, bool dynamic = false, int dungeonLevel = 0);
+        bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data = nullptr, uint32 vehId = 0, bool dynamic = false, uint32 dungeonLevel = 0);
         bool LoadCreaturesAddon();
         void ApplyAffixData(AffixEvent event);
         void SelectLevel();

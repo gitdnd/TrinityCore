@@ -1089,7 +1089,7 @@ void Creature::Motion_Initialize()
     GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic, int dungeonLevel)
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic, uint32 dungeonLevel)
 {
     ASSERT(map);
     SetMap(map);
@@ -3569,7 +3569,7 @@ void Creature::ApplyScaledArmor()
 uint32 Creature::GetDungeonLevel() const
 {
     if (Player const* owner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        return owner->GetAverageItemLevel();
+        return uint32(owner->GetAverageItemLevel());
 
     return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetCappedDungeonLevel();
 }

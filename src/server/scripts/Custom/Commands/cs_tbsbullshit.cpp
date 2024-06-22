@@ -77,7 +77,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 targetDisplay = target->GetDisplayId();
         uint32 faction = player->GetFaction();
-        uint32 iLvl = player->GetAverageItemLevel();
+        uint32 iLvl = uint32(player->GetAverageItemLevel());
 
         if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && numberOfClones > 10)
             numberOfClones = 10;
