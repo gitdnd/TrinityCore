@@ -34,7 +34,7 @@
 #include "LuaEngine.h"
 #endif
 
-MapInstanced::MapInstanced(uint32 id, time_t expiry, int dungeonLevel, uint32* affixes) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dungeonLevel, affixes)
+MapInstanced::MapInstanced(uint32 id, time_t expiry, uint32 dungeonLevel, uint32* affixes) : Map(id, expiry, 0, DUNGEON_DIFFICULTY_NORMAL, dungeonLevel, affixes)
 {
     // fill with zero
     memset(&GridMapReference, 0, MAX_NUMBER_OF_GRIDS*MAX_NUMBER_OF_GRIDS*sizeof(uint16));
@@ -195,7 +195,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
             newInstanceId = sMapMgr->GenerateInstanceId();
 
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
-            int dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : player->GetAverageItemLevel();
+            uint32 dungeonLevel = player->GetGroup() ? player->GetGroup()->GetDungeonLevel() : uint32(player->GetAverageItemLevel());
 
             //Seems it is now possible, but I do not know if it should be allowed
             //ASSERT(!FindInstanceMap(NewInstanceId));
@@ -208,7 +208,7 @@ Map* MapInstanced::CreateInstanceForPlayer(uint32 mapId, Player* player, uint32 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, int dungeonLevel, uint32* affixes, TeamId InstanceTeam)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, uint32 dungeonLevel, uint32* affixes, TeamId InstanceTeam)
 {
     // profiling WorldSession Update stuff
     uint32 realCurrTime = 0;

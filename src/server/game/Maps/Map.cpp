@@ -281,7 +281,7 @@ void Map::DeleteStateMachine()
     delete si_GridStates[GRID_STATE_REMOVAL];
 }
 
-Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent):
+Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, uint32 dungeonLevel, uint32* affixes, Map* _parent):
 _creatureToMoveLock(false), _gameObjectsToMoveLock(false), _dynamicObjectsToMoveLock(false),
 i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_dungeonLevel(dungeonLevel), i_InstanceId(InstanceId),
 m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
@@ -323,14 +323,17 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     if (IsParentMap() || !Instanceable())
         i_dungeonLevel = 0;
 
-    if (i_dungeonLevel > int(sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL)))
-        i_dungeonLevel = int(sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL));
+    if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL))
+        i_dungeonLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
 
     i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(i_affixes);
 
+    if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL))
+        i_dungeonLevel = sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL);
+
     if (auto iTemp = sObjectMgr->GetInstanceTemplate(id))
     {
-        if (iTemp->minDungeonLevel > uint32(i_dungeonLevel))
+        if (iTemp->minDungeonLevel > i_dungeonLevel)
             i_dungeonLevel = iTemp->minDungeonLevel;
     }
 
@@ -4147,7 +4150,7 @@ template TC_GAME_API void Map::RemoveFromMap(DynamicObject*, bool);
 
 /* ******* Dungeon Instance Maps ******* */
 
-InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent, TeamId InstanceTeam)
+InstanceMap::InstanceMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, uint32 dungeonLevel, uint32* affixes, Map* _parent, TeamId InstanceTeam)
   : Map(id, expiry, InstanceId, SpawnMode, dungeonLevel, affixes, _parent),
     m_resetAfterUnload(false), m_unloadWhenEmpty(false),
     i_data(nullptr), i_script_id(0), i_script_team(InstanceTeam)
@@ -5217,17 +5220,7 @@ Eluna *Map::GetEluna() const
 }
 #endif
 
-int Map::GetCappedDungeonLevel(uint32 softcapMod) const
-{
-    int maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
-    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
-        maxLevel += sAffixMgr->GetAffixEffect(i_affixes[i]).GetDungeonLevelBonus();
-
-    maxLevel += softcapMod;
-    return std::clamp<int>(i_dungeonLevel, 20, maxLevel);
-}
-
-void Map::SetDungeonLevel(int value)
+void Map::SetDungeonLevel(uint32 value)
 {
     i_dungeonLevel = value;
     //std::ostringstream debug;
@@ -5245,7 +5238,7 @@ void Map::SetDungeonLevel(int value)
 void Map::UpdateDungeonLevel()
 {
     const PlayerList& players = GetPlayers();
-    auto level = 0.0f;
+    uint32 level = 0;
     for (auto itr = players.begin(); itr != players.end(); ++itr)
     {
         auto plr = itr->GetSource();
@@ -5257,7 +5250,7 @@ void Map::UpdateDungeonLevel()
     }
     if (level >= 1)
     {
-        if (level != GetCappedDungeonLevel())
+        if (level != GetDungeonLevel())
             SetDungeonLevel(level);
     }
 }
@@ -5266,7 +5259,7 @@ void Map::UpdateDungeonLevel()
 void Map::UpscaleMapIfNeeded()
 {
     const PlayerList& players = GetPlayers();
-    auto level = 0.0f;
+    uint32 level = 0;
     for (auto itr = players.begin(); itr != players.end(); ++itr)
     {
         auto plr = itr->GetSource();
@@ -5277,7 +5270,7 @@ void Map::UpscaleMapIfNeeded()
         }
     }
 
-    if (level > GetCappedDungeonLevel())
+    if (level > GetDungeonLevel())
         SetDungeonLevel(level);
 }
 

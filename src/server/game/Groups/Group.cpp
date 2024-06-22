@@ -2867,7 +2867,7 @@ void Group::UpdateDungeonLevel()
     SetDungeonLevel(std::floor(averageLevel));
 }
 
-int Group::GetCappedDungeonLevel(uint32 softcapMod)
+uint32 Group::GetCappedDungeonLevel()
 {
-    return std::clamp<int>(m_dungeonLevel, 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
+    return std::clamp<uint32>(m_dungeonLevel, 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
 }

@@ -193,15 +193,13 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                         {
                             VirtualModifier modifier = VirtualModifier();
 
-                            uint32 dungeonLevel = uint32(member->GetMap()->GetDungeonLevel());
-                            uint32 playerLevel = uint32(member->GetCappedItemLevel());
-
                             if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
                             {
                                 modifier.vLvlMod = inst->vLvlMod;
-                                // if player is in an instance, we want to increase the softcap if there is a softcap modifier
-                                playerLevel = uint32(member->GetCappedItemLevel(inst->softcapMod));
                             }
+
+                            uint32 dungeonLevel = member->GetMap()->GetDungeonLevel();
+                            uint32 playerLevel = uint32(member->GetCappedItemLevel());
 
                             // is this calculation what we really want? really need to double check this logic
                             modifier.plrAvgLvl = int32(playerLevel) - 50 > int32(dungeonLevel) ? dungeonLevel : playerLevel;
@@ -272,12 +270,12 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 // if player is in dungeon, override avg level and apply vLvl mod
                 if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
                 {
-                    uint32 cappedDungeonLevel = uint32(player->GetMap()->GetCappedDungeonLevel(inst->softcapMod));
+                    uint32 cappedDungeonLevel = player->GetMap()->GetDungeonLevel();
 
                     modifier.dungeonLevel = cappedDungeonLevel;
                     modifier.vLvlMod = inst->vLvlMod;
                     modifier.plrAvgLvl = cappedDungeonLevel;
-                    modifier.lowYield = player->GetCappedItemLevel(inst->softcapMod) - 50.0f > float(cappedDungeonLevel) ? true : false;
+                    modifier.lowYield = player->GetCappedItemLevel() - 50.0f > float(cappedDungeonLevel) ? true : false;
                 }
             }
 

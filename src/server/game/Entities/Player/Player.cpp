@@ -12675,7 +12675,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
         AddItemLevelToSlotCache(slot, newItemLevel);
 
     // Now calculate new skill level based on cached item levels
-    uint32 new_value = GetAverageItemLevel();
+    uint32 new_value = uint32(GetAverageItemLevel());
     if (new_value > 300)
         new_value = 300;
 
@@ -27983,14 +27983,14 @@ uint32 Player::GetGroupOrPlayerItemLevel()
 {
     if (GetGroup())
         return GetGroup()->GetDungeonLevel();
-    return GetAverageItemLevel();
+    return uint32(GetAverageItemLevel());
 }
 
 uint32 Player::GetCappedGroupOrPlayerItemLevel()
 {
     if (GetGroup())
         return GetGroup()->GetCappedDungeonLevel();
-    return GetCappedItemLevel();
+    return uint32(GetCappedItemLevel());
 }
 
 bool Player::IsInstanceBound(uint32 mapId)
@@ -27998,9 +27998,9 @@ bool Player::IsInstanceBound(uint32 mapId)
     return GetBoundInstance(mapId, REGULAR_DIFFICULTY) != nullptr;
 }
 
-float Player::GetCappedItemLevel(uint32 softcapMod) const
+float Player::GetCappedItemLevel() const
 {
-    return std::clamp<float>(GetAverageItemLevel(), 20, (sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) + softcapMod));
+    return std::clamp<float>(GetAverageItemLevel(), 20, sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL));
 }
 
 void Player::ClearInventory()

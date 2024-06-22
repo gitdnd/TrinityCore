@@ -333,7 +333,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     public:
-        Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent = nullptr);
+        Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, uint32 dungeonLevel, uint32* affixes, Map* _parent = nullptr);
         virtual ~Map();
 
         MapEntry const* GetEntry() const { return i_mapEntry; }
@@ -464,7 +464,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         Difficulty GetDifficulty() const { return Difficulty(GetSpawnMode()); }
         bool IsRegularDifficulty() const;
         MapDifficulty const* GetMapDifficulty() const;
-        int GetDungeonLevel() const { return i_dungeonLevel; }
+        uint32 GetDungeonLevel() const { return i_dungeonLevel; }
         uint32 GetAffixSlot(uint8 slot)
         {
             if(slot < MAX_AFFIXES)
@@ -473,8 +473,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
             return 0;
         }
         uint32* GetAffixes() { return i_affixes; }
-        int GetCappedDungeonLevel(uint32 softcapMod = 0) const;
-        void SetDungeonLevel(int value);
+        void SetDungeonLevel(uint32 value);
         void UpdateDungeonLevel();
 
         bool Instanceable() const;
@@ -745,7 +744,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         MapEntry const* i_mapEntry;
         uint8 i_spawnMode;
-        int i_dungeonLevel;
+        uint32 i_dungeonLevel;
         uint32 i_affixes[MAX_AFFIXES];
         uint32 i_InstanceId;
         Trinity::unique_weak_ptr<Map> m_weakRef;
@@ -957,7 +956,7 @@ enum InstanceResetMethod
 class TC_GAME_API InstanceMap : public Map
 {
     public:
-        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, int dungeonLevel, uint32* affixes, Map* _parent, TeamId InstanceTeam);
+        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode, uint32 dungeonLevel, uint32* affixes, Map* _parent, TeamId InstanceTeam);
         ~InstanceMap();
         bool AddPlayerToMap(Player*) override;
         void RemovePlayerFromMap(Player*, bool) override;
