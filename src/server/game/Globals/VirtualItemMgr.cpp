@@ -417,34 +417,39 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
 
     // Mod the virtual item level to allow higher or lower virtual item levels 
     vLevel += irand(-1, 4, generator);
+
     // Add all vLvl mods before generating a new ilevel
-    vLevel += modifier.vLvlMod;
+    vLevel += int32(modifier.vLvlMod);
 
     // Get the new item level based on above modifier virtual level
-    ilevel = round(GenerateItemLevel(vLevel));
+    ilevel = uint32(round(GenerateItemLevel(vLevel)));
 
     // Modify the returned, newly generated iLevel based on quality
-    ilevel += (int32(output->Quality) * 3);
+    ilevel += (output->Quality * 2);
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
     ilevel += irand(-3, 2, generator);
 
+    uint32 softMaxItemLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+
     // if the item is crafted and the generated item level is > soft cap, set ilevel to soft cap
-    if (modifier.isCrafted && ilevel > sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL))
-        ilevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+    if (modifier.isCrafted && ilevel > softMaxItemLevel)
+        ilevel = softMaxItemLevel;
 
     // only award at half rate when > 300 (maxLevel) when the item is not crafted (affixes)
     // allow ilevel bonuses to add to the top of crafted max level (catalysts)
-    if ((ilevel + modifier.ilevelBonus) > sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL) && !modifier.isCrafted)
+    if (!modifier.isCrafted && (ilevel + modifier.ilevelBonus) > softMaxItemLevel)
     {
-        uint32 maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
         uint32 actualTotal = ilevel + modifier.ilevelBonus;
-        uint32 overshotTotal = ((actualTotal - maxLevel) / 2);
+        uint32 overshotTotal = uint32(round((actualTotal - softMaxItemLevel) / 2));
         ilevel += overshotTotal;
 
         // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
-        if(ilevel > (modifier.dungeonLevel - overshotTotal))
-            ilevel = (modifier.dungeonLevel - overshotTotal);
+        if (modifier.dungeonLevel > softMaxItemLevel)
+        {
+            uint32 adjustedDungeonLevel = modifier.dungeonLevel - overshotTotal;
+            ilevel = std::min(ilevel, adjustedDungeonLevel);
+        }
     }
     else
         ilevel += modifier.ilevelBonus;
