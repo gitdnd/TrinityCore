@@ -473,6 +473,7 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
             return 0;
         }
         uint32* GetAffixes() { return i_affixes; }
+        uint32 GetCappedDungeonLevel(uint32 softcapMod = 0) const;
         void SetDungeonLevel(uint32 value);
         void UpdateDungeonLevel();
 

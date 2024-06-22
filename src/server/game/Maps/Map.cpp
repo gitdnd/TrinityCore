@@ -323,13 +323,10 @@ i_scriptLock(false), _respawnTimes(std::make_unique<RespawnListContainer>()), _r
     if (IsParentMap() || !Instanceable())
         i_dungeonLevel = 0;
 
-    if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL))
-        i_dungeonLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
-
-    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(i_affixes);
-
     if (i_dungeonLevel > sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL))
         i_dungeonLevel = sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL);
+
+    i_dungeonLevel += sAffixMgr->GetDungeonLevelBonus(i_affixes);
 
     if (auto iTemp = sObjectMgr->GetInstanceTemplate(id))
     {
@@ -5220,6 +5217,16 @@ Eluna *Map::GetEluna() const
 }
 #endif
 
+uint32 Map::GetCappedDungeonLevel(uint32 softcapMod) const
+{
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+        maxLevel += sAffixMgr->GetAffixEffect(i_affixes[i]).GetDungeonLevelBonus();
+
+    maxLevel += softcapMod;
+    return std::clamp<uint32>(i_dungeonLevel, 20, maxLevel);
+}
+
 void Map::SetDungeonLevel(uint32 value)
 {
     i_dungeonLevel = value;
@@ -5250,7 +5257,7 @@ void Map::UpdateDungeonLevel()
     }
     if (level >= 1)
     {
-        if (level != GetDungeonLevel())
+        if (level != GetCappedDungeonLevel())
             SetDungeonLevel(level);
     }
 }
@@ -5270,7 +5277,7 @@ void Map::UpscaleMapIfNeeded()
         }
     }
 
-    if (level > GetDungeonLevel())
+    if (level > GetCappedDungeonLevel())
         SetDungeonLevel(level);
 }
 

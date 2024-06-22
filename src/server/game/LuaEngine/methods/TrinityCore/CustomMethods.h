@@ -371,7 +371,7 @@ namespace LuaCustom
 
     int GetCappedDungeonLevel(Eluna* E, Map* map)
     {
-        E->Push(map->GetDungeonLevel());
+        E->Push(map->GetCappedDungeonLevel());
         return 1;
     }
 
