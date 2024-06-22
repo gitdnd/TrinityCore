@@ -1428,6 +1428,21 @@ namespace LuaCustom
         return 1;
     }
 
+     /**
+     * Finds and Returns [Player] by guid if found
+     *
+     * In multistate, this method is only available in the WORLD state
+     *
+     * @param ObjectGuid guid : guid of the [Player], you can get it with [Object:GetGUID]
+     * @return [Player] player
+     */
+    int GetPlayerByGUID(Eluna* E, Map* map)
+    {
+        ObjectGuid guid = E->CHECKVAL<ObjectGuid>(1);
+        E->Push(map->GetPlayer(guid));
+        return 1;
+    }
+
     /**
     * Returns a table with all the current [Player]s in the map
     *
@@ -1778,6 +1793,51 @@ namespace LuaCustom
         return 0;
     }
 
+    /**
+     * Returns the threat of a [Unit] in this [Creature]'s threat list.
+     *
+     * @param [Unit] target
+     * @return float threat
+     */
+    int GetThreat(Eluna* E, Unit* creature)
+    {
+        Unit* target = E->CHECKOBJ<Unit>(2);
+
+        E->Push(creature->GetThreatManager().GetThreat(target));
+        return 1;
+    }
+
+    /**
+     * Clear the threat of a [Unit] in this [Creature]'s threat list.
+     *
+     * @param [Unit] target
+     */
+    int ClearThreat(Eluna* E, Unit* creature)
+    {
+        Unit* target = E->CHECKOBJ<Unit>(2);
+
+        creature->GetThreatManager().ClearThreat(target);
+        return 0;
+    }
+
+    /**
+     * Clear the [Creature]'s threat list. This will cause evading.
+     */
+    int ClearThreatList(Eluna* /*E*/, Unit* creature)
+    {
+        creature->GetThreatManager().ClearAllThreat();
+        return 0;
+    }
+
+    /**
+     * Resets the [Creature]'s threat list, setting all threat targets' threat to 0.
+     */
+    int ResetAllThreat(Eluna* /*E*/, Unit* creature)
+    {
+        creature->GetThreatManager().ResetAllThreat();
+        return 0;
+    }
+
     int SetTimeSpeed(Eluna* E, Player* player)
     {
         auto speed = E->CHECKVAL<float>(2);
@@ -1865,7 +1925,11 @@ namespace LuaCustom
         { "MoveJump", &LuaCustom::MoveJump },
         { "ChannelSpell", &LuaCustom::ChannelSpell },
         { "StopChannel", &LuaCustom::StopChannel },
-        
+        { "GetThreat", &LuaCustom::GetThreat },
+        { "ClearThreat", &LuaCustom::ClearThreat },
+        { "ClearThreatList", &LuaCustom::ClearThreatList },
+        { "ResetAllThreat", &LuaCustom::ResetAllThreat },
+
         { NULL, NULL, METHOD_REG_NONE }
     };
     
@@ -1965,6 +2029,7 @@ namespace LuaCustom
         { "GetPlayers", &LuaCustom::GetPlayers },
         { "GetAreaId", &LuaCustom::GetAreaId },
         { "LockAndLoadCell", &LuaCustom::LockAndLoadCell },
+        { "GetPlayerByGuid", &LuaCustom::GetPlayerByGUID },
 
         { NULL, NULL, METHOD_REG_NONE }
     };

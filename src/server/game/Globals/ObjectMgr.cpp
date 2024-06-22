@@ -3768,7 +3768,7 @@ void ObjectMgr::LoadItemTemplates()
 
 void ObjectMgr::LoadItemTemplate(uint32 entry)
 {
-    uint32 oldMSTime = getMSTime();
+    // uint32 oldMSTime = getMSTime();
 
     //                                                 0      1       2               3              4        5        6       7          8         9        10        11           12
     QueryResult result = WorldDatabase.PQuery("SELECT entry, class, subclass, SoundOverrideSubclass, name, displayid, Quality, Flags, FlagsExtra, BuyCount, BuyPrice, SellPrice, InventoryType, "

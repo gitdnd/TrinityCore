@@ -1089,7 +1089,7 @@ void Creature::Motion_Initialize()
     GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic, int dungeonLevel)
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 entry, Position const& pos, CreatureData const* data /*= nullptr*/, uint32 vehId /*= 0*/, bool dynamic, uint32 dungeonLevel)
 {
     ASSERT(map);
     SetMap(map);
@@ -3558,7 +3558,7 @@ void Creature::ApplyScaledArmor()
     float armor = stats->GenerateArmor(GetCreatureTemplate());
     if (IsAffectedByScaling())
     {
-        int dungeonLevel = GetDungeonLevel();
+        uint32 dungeonLevel = GetDungeonLevel();
         if (dungeonLevel > 1 && !IsPet())
             armor += ((float)dungeonLevel / 1000.0f) * armor;
     }
@@ -3566,10 +3566,10 @@ void Creature::ApplyScaledArmor()
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }
 
-int Creature::GetDungeonLevel() const
+uint32 Creature::GetDungeonLevel() const
 {
     if (Player const* owner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        return owner->GetAverageItemLevel();
+        return uint32(owner->GetAverageItemLevel());
 
     return _dungeonLevelOverride > 0 ? _dungeonLevelOverride : GetMap()->GetCappedDungeonLevel();
 }
@@ -3592,7 +3592,7 @@ void Creature::UpdateDungeonScaling()
 
     float weaponBaseMinDamage = stats->GenerateBaseDamage(cInfo);
 
-    int dungeonLevel = GetDungeonLevel();
+    uint32 dungeonLevel = GetDungeonLevel();
 
     if (dungeonLevel)
     {

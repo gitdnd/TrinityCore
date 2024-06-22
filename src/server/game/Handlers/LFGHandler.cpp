@@ -213,7 +213,7 @@ void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
     bool out;
     recvData >> out;
 
-    if (GetPlayer()->IsInCombat() || GetPlayer()->GetTransport())
+    if (GetPlayer()->IsInCombat() || GetPlayer()->GetTransport() || GetPlayer()->HasAura(90191))
     {
         SendLfgTeleportError(uint8(7));
         return;

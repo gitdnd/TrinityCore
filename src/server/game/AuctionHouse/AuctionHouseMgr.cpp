@@ -563,7 +563,7 @@ void AuctionHouseMgr::Update()
     mNeutralAuctions.Update();
 }
 
-AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
+AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 /*factionTemplateId*/)
 {
     uint32 houseid = AUCTIONHOUSE_NEUTRAL; // goblin auction house
 
@@ -586,7 +586,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTem
     return sAuctionHouseStore.LookupEntry(houseid);
 }
 
-AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntryFromHouse(uint8 houseId)
+AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntryFromHouse(uint8 /*houseId*/)
 {
     return sAuctionHouseStore.LookupEntry(AUCTIONHOUSE_NEUTRAL);
     //return (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION)) ? sAuctionHouseStore.LookupEntry(AUCTIONHOUSE_NEUTRAL) : sAuctionHouseStore.LookupEntry(houseId);

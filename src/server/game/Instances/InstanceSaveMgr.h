@@ -48,7 +48,7 @@ class TC_GAME_API InstanceSave
            - any new instance is being generated
            - the first time a player bound to InstanceId logs in
            - when a group bound to the instance is loaded */
-        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32* affixes, time_t resetTime, bool canReset);
+        InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, uint32 dungeonLevel, uint32* affixes, time_t resetTime, bool canReset);
 
         /* Unloaded when m_playerList and m_groupList become empty
            or when the instance is reset */
@@ -118,7 +118,7 @@ class TC_GAME_API InstanceSave
         /* currently it is possible to omit this information from this structure
            but that would depend on a lot of things that can easily change in future */
         Difficulty GetDifficulty() const { return m_difficulty; }
-        int GetDungeonLevel() const { return m_dungeonLevel; }
+        uint32 GetDungeonLevel() const { return m_dungeonLevel; }
         uint32 GetAffixSlot(uint8 slot)
         {
             if (slot < MAX_AFFIXES)
@@ -146,7 +146,7 @@ class TC_GAME_API InstanceSave
         uint32 m_instanceid;
         uint32 m_mapid;
         Difficulty m_difficulty;
-        int m_dungeonLevel;
+        uint32 m_dungeonLevel;
         uint32 m_affixes[MAX_AFFIXES];
         bool m_canReset;
         bool m_toDelete;

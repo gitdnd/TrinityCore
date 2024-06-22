@@ -184,7 +184,7 @@ void InstanceSaveManager::UnloadInstanceSave(uint32 InstanceId)
 }
 
 // TODO(Harry): We don't persist affix data
-InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, int dungeonLevel, uint32* affixes, time_t resetTime, bool canReset)
+InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, uint32 dungeonLevel, uint32* affixes, time_t resetTime, bool canReset)
 : m_resetTime(resetTime), m_instanceid(InstanceId), m_mapid(MapId),
   m_difficulty(difficulty), m_dungeonLevel(dungeonLevel), m_canReset(canReset), m_toDelete(false)
 {
