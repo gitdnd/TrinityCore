@@ -2337,6 +2337,8 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
         else
             ++itr;
     }
+    ClearAffixes();
+    sAffixMgr->ClearAffixGroup(this);
 }
 
 InstanceGroupBind* Group::GetBoundInstance(Player* player)
