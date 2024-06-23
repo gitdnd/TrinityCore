@@ -13484,7 +13484,7 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
         ModifyPower(POWER_RAGE, uint32(addRage * 10));
 
     if (GetTypeId() == TYPEID_PLAYER)
-        ModifyPower(POWER_FOCUS, uint32((addRage / 2) * 10));
+        ModifyPower(POWER_FOCUS, uint32(addRage / 2));
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
