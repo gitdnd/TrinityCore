@@ -804,7 +804,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     }
 
     // Rage from Damage made (only from direct weapon damage)
-    if (attacker && cleanDamage && damagetype == DIRECT_DAMAGE && attacker != victim && attacker->GetPowerType() == POWER_RAGE)
+    if (attacker && cleanDamage && damagetype == DIRECT_DAMAGE && attacker != victim && (attacker->GetPowerType() == POWER_RAGE || attacker->IsPlayer()))
     {
         uint32 weaponSpeedHitFactor;
 
@@ -830,7 +830,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     if (!damage)
     {
         // Rage from absorbed damage
-        if (cleanDamage && cleanDamage->absorbed_damage && victim->GetPowerType() == POWER_RAGE)
+        if (cleanDamage && cleanDamage->absorbed_damage && (victim->GetPowerType() == POWER_RAGE || victim->IsPlayer()))
             victim->RewardRage(cleanDamage->absorbed_damage, 0, false);
 
         return 0;
@@ -932,7 +932,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
         }
 
         // Rage from damage received
-        if (attacker != victim && victim->GetPowerType() == POWER_RAGE)
+        if (attacker != victim && (victim->GetPowerType() == POWER_RAGE || victim->IsPlayer()))
         {
             rage_damage = damage + (cleanDamage ? cleanDamage->absorbed_damage : 0);
             victim->RewardRage(rage_damage, 0, false);
@@ -13467,8 +13467,6 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
     if (attacker)
     {
         addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
-        if(GetTypeId() == TYPEID_PLAYER)
-            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
@@ -13478,14 +13476,15 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
         // Berserker Rage effect
         if (HasAura(18499))
             addRage *= 2.0f;
-        if (GetTypeId() == TYPEID_PLAYER)
-            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
     }
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
-    ModifyPower(POWER_RAGE, uint32(addRage * 10));
+    if (GetTypeId() != TYPEID_PLAYER)
+        ModifyPower(POWER_RAGE, uint32(addRage * 10));
 
+    if (GetTypeId() == TYPEID_PLAYER)
+        ModifyPower(POWER_FOCUS, uint32(addRage / 2));
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
