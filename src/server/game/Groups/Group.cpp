@@ -2473,6 +2473,15 @@ uint32 Group::GetAffixData(uint8 slot)
     return 0;
 }
 
+void Group::ClearAffixes()
+{
+    uint32 blankAffixes[MAX_AFFIXES];
+    for (uint8 i = 0; i < MAX_AFFIXES; ++i)
+    {
+        blankAffixes[i] = 0;
+    }
+    SetAffixData(blankAffixes);
+}
 void Group::ResetMaxEnchantingLevel()
 {
     m_maxEnchantingLevel = 0;
