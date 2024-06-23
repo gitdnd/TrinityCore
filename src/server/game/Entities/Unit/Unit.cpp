@@ -804,7 +804,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     }
 
     // Rage from Damage made (only from direct weapon damage)
-    if (attacker && cleanDamage && damagetype == DIRECT_DAMAGE && attacker != victim && attacker->GetPowerType() == POWER_RAGE)
+    if (attacker && cleanDamage && damagetype == DIRECT_DAMAGE && attacker != victim && (attacker->GetPowerType() == POWER_RAGE || (attacker->GetTypeId() == TYPEID_PLAYER && attacker->GetPowerType() == POWER_FOCUS)))
     {
         uint32 weaponSpeedHitFactor;
 
@@ -830,7 +830,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
     if (!damage)
     {
         // Rage from absorbed damage
-        if (cleanDamage && cleanDamage->absorbed_damage && victim->GetPowerType() == POWER_RAGE)
+        if (cleanDamage && cleanDamage->absorbed_damage && (victim->GetPowerType() == POWER_RAGE || (victim->GetTypeId() == TYPEID_PLAYER && victim->GetPowerType() == POWER_FOCUS)))
             victim->RewardRage(cleanDamage->absorbed_damage, 0, false);
 
         return 0;
@@ -932,7 +932,7 @@ bool Unit::HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel) cons
         }
 
         // Rage from damage received
-        if (attacker != victim && victim->GetPowerType() == POWER_RAGE)
+        if (attacker != victim && (victim->GetPowerType() == POWER_RAGE || (victim->GetTypeId() == TYPEID_PLAYER && victim->GetPowerType() == POWER_FOCUS)))
         {
             rage_damage = damage + (cleanDamage ? cleanDamage->absorbed_damage : 0);
             victim->RewardRage(rage_damage, 0, false);
