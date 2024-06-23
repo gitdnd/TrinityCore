@@ -32,7 +32,8 @@ enum CustomClassSpells
     SPELL_CLASS_SEAL_OF_WINDFURY_RANGED = 97094,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_MAINHAND = 97102,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND = 97103,
-    SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104
+    SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104,
+    SPELL_TALENT_IGNITE = 97307
 };
 
 
@@ -801,6 +802,44 @@ class spell_class_aura_of_steel : public AuraScript
     }
 };
 
+// -94212 - Ignite
+class spell_talent_ignite : public AuraScript
+{
+    PrepareAuraScript(spell_talent_ignite);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_IGNITE });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetDamageInfo() && eventInfo.GetProcTarget();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_TALENT_IGNITE);
+        int32 pct = 20;
+
+        ASSERT(igniteDot->GetMaxTicks() > 0);
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(amount);
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_TALENT_IGNITE, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_talent_ignite::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_ignite::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+
 
 
 void AddSC_Spells_Custom_Class_scripts()
@@ -821,4 +860,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_seal_of_bloodgrip_passive);
     RegisterSpellScript(spell_class_serrated_shot_bleed);
     RegisterSpellScript(spell_class_aura_of_steel);
+    RegisterSpellScript(spell_talent_ignite);
 };
