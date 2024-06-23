@@ -21213,7 +21213,14 @@ void Player::ResetInstances(uint8 method, bool isRaid)
 
     // If resetting a dungeon, reset hub portal location
     if (didReset)
+    {
         SetPortalLocation(WorldLocation());
+        if (Group* grp = GetGroup())
+        {
+            grp->ClearAffixes();
+            sAffixMgr->ClearAffixGroup(grp);
+        }
+    }
 }
 
 void Player::SendResetInstanceSuccess(uint32 MapId) const

@@ -357,6 +357,7 @@ class TC_GAME_API Group
         void SetAffixData(const uint32* affixes);
         uint32 GetAffixData(uint8 slot);
         uint32* GetAffixes() { return m_affixes; }
+        void ClearAffixes();
         Trinity::unique_weak_ptr<Group> GetWeakPtr() const { return m_scriptRef; }
 
     protected:

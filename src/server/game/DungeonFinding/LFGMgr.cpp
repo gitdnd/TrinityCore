@@ -1565,6 +1565,7 @@ void LFGMgr::FinishDungeon(ObjectGuid gguid, const uint32 dungeonId, Map const* 
 
         if (!clearedAffix && player->GetGroup())
         {
+            player->GetGroup()->ClearAffixes();
             sAffixMgr->ClearAffixGroup(player->GetGroup());
         }
     }
