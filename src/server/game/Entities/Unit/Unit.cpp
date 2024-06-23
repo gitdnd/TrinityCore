@@ -13467,8 +13467,6 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
     if (attacker)
     {
         addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
-        if(GetTypeId() == TYPEID_PLAYER)
-            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
@@ -13478,14 +13476,15 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
         // Berserker Rage effect
         if (HasAura(18499))
             addRage *= 2.0f;
-        if (GetTypeId() == TYPEID_PLAYER)
-            ModifyPower(POWER_FOCUS, (addRage / 2) * sWorld->getRate(RATE_POWER_FOCUS));
     }
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
     if (GetTypeId() != TYPEID_PLAYER)
         ModifyPower(POWER_RAGE, uint32(addRage * 10));
+
+    if (GetTypeId() == TYPEID_PLAYER)
+        ModifyPower(POWER_FOCUS, uint32((addRage / 2) * 10));
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
