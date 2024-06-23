@@ -101,10 +101,16 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsGuard() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD) != 0; }
         bool IsIgnoringAffixes()
         {
-            if (!IsAlive() || IsPet() || IsSummon() && IsCharmedOwnedByPlayerOrPlayer() || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) || IsTrigger() ||
-                GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER || GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM)
+            if (!IsAlive() ||
+                IsPet() ||
+                (IsSummon() && IsCharmedOwnedByPlayerOrPlayer()) ||
+                HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
+                IsTrigger() ||
+                GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER ||
+                GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM)
+            {
                 return true;
-
+            }
             return false;
         }
 
@@ -395,7 +401,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsMarkOfTheAbsoluteEnabled();
         bool IsAffectedByScaling()
         {
-            if (IsPet() || IsSummon() && IsCharmedOwnedByPlayerOrPlayer() || IsTrigger() || !IsAlive())
+            if (IsPet() || (IsSummon() && IsCharmedOwnedByPlayerOrPlayer()) || IsTrigger() || !IsAlive())
                 return false;
 
             return true;
