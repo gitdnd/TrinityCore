@@ -410,6 +410,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_groupUpdateTimer.Reset(5000);
 
     talent_level = 0;
+    bonusTalents = 0;
     _averageItemLevel = 1;
     m_canTeleport = false;
     subClass = 0;
@@ -2518,7 +2519,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
     if (victim && victim->GetTypeId() == TYPEID_UNIT && !victim->ToCreature()->hasLootRecipient())
         return;
 
-    uint32 level = GetTalentLevel();
+    uint32 level = GetXPTalentLevel();
 
     sScriptMgr->OnGivePlayerXP(this, xp, victim);
 
@@ -2675,12 +2676,13 @@ bool Player::IsMaxLevel() const
 
 void Player::InitTalentForLevel()
 {
-    uint32 level = GetTalentLevel();
-    int32 newTalentPoints = level - m_usedTalentCount;
+    uint32 level = GetXPTalentLevel();
+    uint32 bonusLevel = GetBonusTalentLevel();
+    int32 newTalentPoints = (level + bonusLevel) - m_usedTalentCount;
     if (newTalentPoints < 0)
     {
         newTalentPoints = 0;
-        TC_LOG_ERROR("entities.player", "Player {} ({}) has more talent points than their level (Level/Talent Level) {}/{})", GetName().c_str(), GetGUID().GetCounter(), level, m_usedTalentCount);
+        TC_LOG_ERROR("entities.player", "Player {} ({}) has more talent points than their level (Level/bonus talents/Talent Level) {}/{})", GetName().c_str(), GetGUID().GetCounter(), level, bonusLevel, m_usedTalentCount);
         ChatHandler(GetSession()).SendSysMessage("Your talent points is greater than your level please contact a developer explaining what you were doing with this issue occured.");
     }
     SetFreeTalentPoints(newTalentPoints);
@@ -2747,7 +2749,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
 
     SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)+10);
-    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetTalentLevel()));
+    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetXPTalentLevel()));
 
     // reset before any aura state sources (health set/aura apply)
     SetUInt32Value(UNIT_FIELD_AURASTATE, 0);
@@ -3911,7 +3913,7 @@ bool Player::ResetTalents(bool involuntarily /*= false*/)
     if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
 
-    uint32 talentPointsForLevel = GetTalentLevel();
+    uint32 talentPointsForLevel = GetTotalTalentLevel();
 
     if (m_usedTalentCount == 0)
     {
@@ -15705,7 +15707,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
-    if (GetTalentLevel() < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+    if (GetXPTalentLevel() < sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         GiveXP(XP, nullptr);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
@@ -17921,6 +17923,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
     lootPreference = fields[74].GetUInt8();
+    //bonusTalents = fields[75].GetUInt32();
     //if (talent_level == 0)
     //    talent_level = 1;
 
@@ -20268,8 +20271,9 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
 
         stmt->setUInt8(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
 
-        stmt->setUInt32(index++, GetTalentLevel());
+        stmt->setUInt32(index++, GetXPTalentLevel());
         stmt->setUInt8(index++, GetActiveLootPreference());
+        //stmt->setUInt32(index++, GetBonusTalentLevel());
 
         // Index
         stmt->setUInt32(index++, GetGUID().GetCounter());
@@ -25683,7 +25687,7 @@ uint32 Player::CalculateTalentsPoints()
         // Give a talent every 5 item levels
         //float ilevel = std::min(300.0f, GetAverageItemLevel());
         //return uint32(std::floor(ilevel / 5.0f));
-        return GetTalentLevel();
+        return GetTotalTalentLevel();
     }
 
     if (GetClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)

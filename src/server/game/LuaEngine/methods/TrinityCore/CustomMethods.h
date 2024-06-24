@@ -739,7 +739,19 @@ namespace LuaCustom
 
     int GetTalentLevel(Eluna* E, Player* player)
     {
-        E->Push(player->GetTalentLevel());
+        E->Push(player->GetXPTalentLevel());
+        return 1;
+    }
+
+    int GetBonusTalentLevel(Eluna* E, Player* player)
+    {
+        E->Push(player->GetBonusTalentLevel());
+        return 1;
+    }
+
+    int GetTotalTalentLevel(Eluna* E, Player* player)
+    {
+        E->Push(player->GetTotalTalentLevel());
         return 1;
     }
 
@@ -1958,6 +1970,8 @@ namespace LuaCustom
         { "ResetInstances", &LuaCustom::ResetInstances },
         { "IsInstanceBound", &LuaCustom::IsInstanceBound },
         { "GetTalentLevel", &LuaCustom::GetTalentLevel },
+        { "GetBonusTalentLevel", &LuaCustom::GetBonusTalentLevel },
+        { "GetTotalTalentLevel", &LuaCustom::GetTotalTalentLevel },
         { "ScrapItem", &LuaCustom::ScrapItem },
         { "GetPortalLocation", &LuaCustom::GetPortalLocation },
         { "SetPortalLocation", &LuaCustom::SetPortalLocation },
