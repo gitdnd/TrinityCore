@@ -20,6 +20,7 @@
 #include "MapTree.h"
 #include "ModelInstance.h"
 #include "ModelIgnoreFlags.h"
+#include "Log.h"
 
 using G3D::Vector3;
 using G3D::Ray;
@@ -408,7 +409,7 @@ namespace VMAP
 
     bool GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const
     {
-        if (triangles.empty() || vertices.empty())
+        if (triangles.empty())
             return false;
 
         GModelRayCallback callback(triangles, vertices);
@@ -474,22 +475,31 @@ namespace VMAP
 
     bool WorldModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
     {
-        // If the caller asked us to ignore certain objects we should check flags
-        if ((ignoreFlags & ModelIgnoreFlags::M2) != ModelIgnoreFlags::Nothing)
+        //remove this as soon as possible this is fucked.
+        try
         {
-            // M2 models are not taken into account for LoS calculation if caller requested their ignoring.
-            if (Flags & MOD_M2)
-                return false;
+            // If the caller asked us to ignore certain objects we should check flags
+            if ((ignoreFlags & ModelIgnoreFlags::M2) != ModelIgnoreFlags::Nothing)
+            {
+                // M2 models are not taken into account for LoS calculation if caller requested their ignoring.
+                if (Flags & MOD_M2)
+                    return false;
+            }
+
+            // small M2 workaround, maybe better make separate class with virtual intersection funcs
+            // in any case, there's no need to use a bound tree if we only have one submodel
+            if (groupModels.size() == 1)
+                return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit);
+
+            WModelRayCallBack isc(groupModels);
+            groupTree.intersectRay(ray, isc, distance, stopAtFirstHit);
+            return isc.hit;
         }
-
-        // small M2 workaround, maybe better make separate class with virtual intersection funcs
-        // in any case, there's no need to use a bound tree if we only have one submodel
-        if (groupModels.size() == 1)
-            return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit);
-
-        WModelRayCallBack isc(groupModels);
-        groupTree.intersectRay(ray, isc, distance, stopAtFirstHit);
-        return isc.hit;
+        catch (...)
+        {
+            TC_LOG_FATAL("maps", "Model {} attempted to crash.", RootWMOID);
+            return false;
+        }
     }
 
     class WModelAreaCallback {

@@ -227,6 +227,7 @@ namespace VMAP
             check = fread(&tileY, sizeof(uint32), 1, dirf);
             if (check == 0) // EoF...
                 break;
+
             if (!ModelSpawn::readFromFile(dirf, spawn))
                 break;
 
@@ -447,7 +448,6 @@ namespace VMAP
 
         READ_OR_RETURN(&mogpflags, sizeof(uint32));
         READ_OR_RETURN(&GroupWMOID, sizeof(uint32));
-
 
         Vector3 vec1, vec2;
         READ_OR_RETURN(&vec1, sizeof(Vector3));
