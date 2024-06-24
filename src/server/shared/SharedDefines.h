@@ -1021,7 +1021,8 @@ enum SpellEffects
     SPELL_EFFECT_PCT_XP_GAIN                        = 174,
     SPELL_EFFECT_XP_GAIN                            = 175,
     SPELL_EFFECT_HONE_VIRTUAL_ITEM                  = 176,
-    TOTAL_SPELL_EFFECTS                             = 177
+    SPELL_EFFECT_ADD_BONUS_TALENT                   = 177,
+    TOTAL_SPELL_EFFECTS                             = 178
 };
 
 // EnumUtils: DESCRIBE THIS

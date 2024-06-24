@@ -6068,6 +6068,15 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                 }
                 break;
             }
+            case SPELL_EFFECT_ADD_BONUS_TALENT:
+            {
+                if (Player* playerTarget = m_caster->ToPlayer())
+                {
+                    if (playerTarget->GetBonusTalentLevel() >= sWorld->getIntConfig(CONFIG_MAX_BONUS_TALENT_LEVEL))
+                        return SPELL_FAILED_HIGHLEVEL;
+                }
+                break;
+            }
             default:
                 break;
         }

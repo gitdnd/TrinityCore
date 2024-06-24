@@ -2505,6 +2505,19 @@ void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool re
     SendDirectMessage(&data);
 }
 
+void Player::AddBonusTalents(uint32 points)
+{
+    uint32 currentPoints = GetBonusTalentLevel();
+    currentPoints += points;
+
+    if (currentPoints >= sWorld->getIntConfig(CONFIG_MAX_BONUS_TALENT_LEVEL))
+        currentPoints = sWorld->getIntConfig(CONFIG_MAX_BONUS_TALENT_LEVEL);
+
+    bonusTalents = currentPoints;
+
+    InitTalentForLevel();
+}
+
 void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 {
     if (xp < 1)

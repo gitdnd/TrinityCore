@@ -244,6 +244,7 @@ SpellEffectHandlerFn SpellEffectHandlers[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectPctXPGain,                                //174 SPELL_EFFECT_PCT_XP_GAIN
     &Spell::EffectXPGain,                                   //175 SPELL_EFFECT_XP_GAIN
     &Spell::EffectHoneVirtualItem,                          //176 SPELL_EFFECT_HONE_VIRTUAL_ITEM
+    &Spell::EffectAddBonusTalent,                           //177 SPELL_EFFECT_ADD_BONUS_TALENT
 };
 
 void Spell::EffectNULL()
@@ -5952,6 +5953,17 @@ void Spell::EffectXPGain()
         return;
 
     unitTarget->ToPlayer()->GiveXP(damage, unitTarget);
+}
+
+void Spell::EffectAddBonusTalent()
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
+        return;
+
+    if (!unitTarget || !unitTarget->IsPlayer())
+        return;
+
+    unitTarget->ToPlayer()->AddBonusTalents(effectInfo->MiscValue);
 }
 
 void Spell::EffectItemLevelUpgrade()

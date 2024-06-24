@@ -287,6 +287,7 @@ class TC_GAME_API Spell
         void EffectXPGain();
         void EffectItemLevelUpgrade();
         void EffectHoneVirtualItem();
+        void EffectAddBonusTalent();
         typedef std::unordered_set<Aura*> UsedSpellMods;
 
         Spell(WorldObject* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, ObjectGuid originalCasterGUID = ObjectGuid::Empty);
