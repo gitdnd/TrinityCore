@@ -825,7 +825,7 @@ float const dodge_cap[MAX_CLASSES] =
 
 void Player::UpdateDodgePercentage()
 {
-    float diminishing = 0.0f, nondiminishing = 0.0f;
+    float diminishing = 0.0f, nondiminishing = 5.0f;
     // GetDodgeFromAgility(diminishing, nondiminishing);
     // Modify value from defense skill (only bonus from defense rating diminishes)
     nondiminishing += (int32(GetSkillValue(SKILL_DEFENSE)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
