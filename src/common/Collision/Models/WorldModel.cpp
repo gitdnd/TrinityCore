@@ -32,7 +32,7 @@ template<> struct BoundsTrait<VMAP::GroupModel>
 
 namespace VMAP
 {
-    bool IntersectTriangle(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points, uint32 numVertices, G3D::Ray const& ray, float& distance)
+    bool IntersectTriangle(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points, uint32 numVertices, G3D::Ray const& ray, float& distance, uint32 modelId)
     {
         static const float EPS = 1e-5f;
 
@@ -40,7 +40,10 @@ namespace VMAP
 
         // TODO(Harry): We should log something out here
         if (tri.idx1 >= numVertices || tri.idx2 >= numVertices || tri.idx0 >= numVertices)
+        {
+            TC_LOG_FATAL("maps", "Model {} attempted to crash.", modelId);
             return false;
+        }
         
         const Vector3 e1 = points[tri.idx1] - points[tri.idx0];
         const Vector3 e2 = points[tri.idx2] - points[tri.idx0];
@@ -399,12 +402,12 @@ namespace VMAP
 
     struct GModelRayCallback
     {
-        GModelRayCallback(std::vector<MeshTriangle> const& tris, const std::vector<Vector3> &vert):
-            vertices(vert.begin()), numVertices(vert.size()), triangles(tris.begin()), hit(false) { }
+        GModelRayCallback(std::vector<MeshTriangle> const& tris, const std::vector<Vector3> &vert, uint32 model):
+            vertices(vert.begin()), numVertices(vert.size()), triangles(tris.begin()), hit(false), modelId(model) { }
 
         bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*pStopAtFirstHit*/)
         {
-            hit = IntersectTriangle(triangles[entry], vertices, numVertices, ray, distance) || hit;
+            hit = IntersectTriangle(triangles[entry], vertices, numVertices, ray, distance, modelId) || hit;
             return hit;
         }
 
@@ -412,14 +415,15 @@ namespace VMAP
         std::vector<MeshTriangle>::const_iterator triangles;
         bool hit;
         uint32 numVertices;
+        uint32 modelId;
     };
 
     bool GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const
     {
         if (triangles.empty())
             return false;
-
-        GModelRayCallback callback(triangles, vertices);
+        
+        GModelRayCallback callback(triangles, vertices, GetWmoID());
         meshTree.intersectRay(ray, callback, distance, stopAtFirstHit);
         return callback.hit;
     }
