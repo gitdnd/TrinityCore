@@ -1710,21 +1710,21 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
             switch (output->InventoryType)
             {
                 case INVTYPE_HEAD:
-                    return 2.13f;
+                    return 1.7f;
                 case INVTYPE_SHOULDERS:
-                    return 2.0f;
+                    return 1.6f;
                 case INVTYPE_CHEST:
-                    return 2.63f;
+                    return 2.1f;
                 case INVTYPE_WAIST:
-                    return 1.95f;
+                    return 1.56f;
                 case INVTYPE_LEGS:
-                    return 2.32f;
+                    return 1.85f;
                 case INVTYPE_FEET:
-                    return 1.82f;
+                    return 1.45f;
                 case INVTYPE_WRISTS:
-                    return 1.17f;
+                    return 0.93f;
                 case INVTYPE_HANDS:
-                    return 1.66f;
+                    return 1.33f;
                 default:
                     return 1.0f;
             }
@@ -1732,21 +1732,21 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
             switch (output->InventoryType)
             {
                 case INVTYPE_HEAD:
-                    return 4.35f;
+                    return 3.26f;
                 case INVTYPE_SHOULDERS:
-                    return 4.0f;
-                case INVTYPE_CHEST:
-                    return 5.34f;
-                case INVTYPE_WAIST:
                     return 3.0f;
+                case INVTYPE_CHEST:
+                    return 4.0f;
+                case INVTYPE_WAIST:
+                    return 2.25f;
                 case INVTYPE_LEGS:
-                    return 4.68f;
+                    return 3.51f;
                 case INVTYPE_FEET:
-                    return 3.69f;
+                    return 2.76f;
                 case INVTYPE_WRISTS:
-                    return 2.35f;
+                    return 1.76f;
                 case INVTYPE_HANDS:
-                    return 3.34f;
+                    return 2.5f;
                 default:
                     return 1.0f;
             }
@@ -1754,26 +1754,26 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
             switch (output->InventoryType)
             {
                 case INVTYPE_HEAD:
-                    return 5.38f;
+                    return 4.04;
                 case INVTYPE_SHOULDERS:
-                    return 5.28f;
+                    return 3.96f;
                 case INVTYPE_CHEST:
-                    return 8.48f;
+                    return 6.36f;
                 case INVTYPE_WAIST:
-                    return 3.73f;
+                    return 2.8f;
                 case INVTYPE_LEGS:
-                    return 6.58f;
+                    return 4.94f;
                 case INVTYPE_FEET:
-                    return 4.55f;
+                    return 3.41f;
                 case INVTYPE_WRISTS:
-                    return 2.9f;
+                    return 2.175f;
                 case INVTYPE_HANDS:
-                    return 4.15f;
+                    return 3.12f;
                 default:
                     return 1.0f;
             }
         case ITEM_SUBCLASS_ARMOR_SHIELD:
-            return 18.2f;
+            return 9.1f;
         default:
             return 1.0f;
     }
