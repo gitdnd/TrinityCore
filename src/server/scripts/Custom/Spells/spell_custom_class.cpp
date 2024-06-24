@@ -33,9 +33,50 @@ enum CustomClassSpells
     SPELL_CLASS_SEAL_OF_BLOODGRIP_MAINHAND = 97102,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND = 97103,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104,
-    SPELL_TALENT_IGNITE = 97307
+    SPELL_TALENT_IGNITE = 97307,
+    SPELL_TALENT_OVERLOAD = 94206
 };
 
+// 94206 - Lightning Overload
+class spell_talent_lightning_overload : public AuraScript
+{
+    PrepareAuraScript(spell_talent_lightning_overload);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_OVERLOAD });
+    }
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        Player* player = eventInfo.GetActor()->ToPlayer();
+        Unit* target = GetTarget();
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+        uint32 spellId = eventInfo.GetSpellInfo()->Id;
+
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        uint32 damage = CalculatePct(damageInfo->GetDamage(), aurEff->GetAmount());
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damage / 2);
+
+        player->CastSpell(eventInfo.GetProcTarget(), spellId, args);
+
+    }
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_lightning_overload::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
 
 
 // 97001 - Seal of Righteousness 
@@ -861,4 +902,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_serrated_shot_bleed);
     RegisterSpellScript(spell_class_aura_of_steel);
     RegisterSpellScript(spell_talent_ignite);
+    RegisterSpellScript(spell_talent_lightning_overload);
 };
