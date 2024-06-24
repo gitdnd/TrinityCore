@@ -32,12 +32,16 @@ template<> struct BoundsTrait<VMAP::GroupModel>
 
 namespace VMAP
 {
-    bool IntersectTriangle(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points, G3D::Ray const& ray, float& distance)
+    bool IntersectTriangle(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points, uint32 numVertices, G3D::Ray const& ray, float& distance)
     {
         static const float EPS = 1e-5f;
 
         // See RTR2 ch. 13.7 for the algorithm.
 
+        // TODO(Harry): We should log something out here
+        if (tri.idx1 >= numVertices || tri.idx2 >= numVertices || tri.idx0 >= numVertices)
+            return false;
+        
         const Vector3 e1 = points[tri.idx1] - points[tri.idx0];
         const Vector3 e2 = points[tri.idx2] - points[tri.idx0];
         const Vector3 p(ray.direction().cross(e2));
@@ -396,15 +400,18 @@ namespace VMAP
     struct GModelRayCallback
     {
         GModelRayCallback(std::vector<MeshTriangle> const& tris, const std::vector<Vector3> &vert):
-            vertices(vert.begin()), triangles(tris.begin()), hit(false) { }
+            vertices(vert.begin()), numVertices(vert.size()), triangles(tris.begin()), hit(false) { }
+
         bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*pStopAtFirstHit*/)
         {
-            hit = IntersectTriangle(triangles[entry], vertices, ray, distance) || hit;
+            hit = IntersectTriangle(triangles[entry], vertices, numVertices, ray, distance) || hit;
             return hit;
         }
+
         std::vector<Vector3>::const_iterator vertices;
         std::vector<MeshTriangle>::const_iterator triangles;
         bool hit;
+        uint32 numVertices;
     };
 
     bool GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const
