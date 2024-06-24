@@ -884,7 +884,8 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_MAX_PLAYER_LEVEL] = sConfigMgr->GetIntDefault("MaxPlayerLevel", DEFAULT_MAX_LEVEL);
 
-    m_int_configs[CONFIG_MAX_TALENT_LEVEL] = sConfigMgr->GetIntDefault("MaxTalentLevel", 150);
+    m_int_configs[CONFIG_MAX_TALENT_LEVEL] = sConfigMgr->GetIntDefault("MaxTalentLevel", 80);
+    m_int_configs[CONFIG_MAX_BONUS_TALENT_LEVEL] = sConfigMgr->GetIntDefault("MaxBonusTalentLevel", 20);
     //CONFIG_SOFT_MAX_ITEM_LEVEL
     m_int_configs[CONFIG_HARD_MAX_ITEM_LEVEL] = sConfigMgr->GetIntDefault("MaxVirtualItemLevel", 350);
     m_int_configs[CONFIG_SCALING_MAX_ITEM_LEVEL] = sConfigMgr->GetIntDefault("ScalingMaxVirtualItemLevel", 325);
