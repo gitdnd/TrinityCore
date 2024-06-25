@@ -1754,7 +1754,7 @@ float VirtualModifier::GetTypeSlotArmorModifier(VirtualItemTemplate* output)
             switch (output->InventoryType)
             {
                 case INVTYPE_HEAD:
-                    return 4.04;
+                    return 4.04f;
                 case INVTYPE_SHOULDERS:
                     return 3.96f;
                 case INVTYPE_CHEST:
