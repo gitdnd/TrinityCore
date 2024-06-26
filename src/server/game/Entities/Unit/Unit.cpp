@@ -2310,7 +2310,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
 
     // 4. GLANCING
     // Max 40% chance to score a glancing blow against mobs of the same or higher level (only players and pets, not for ranged weapons).
-    if ((GetTypeId() == TYPEID_PLAYER || IsPet()) &&
+    /*if ((GetTypeId() == TYPEID_PLAYER || IsPet()) &&
         victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet() &&
         GetLevel() <= victim->GetLevelForTarget(this))
     {
@@ -2325,7 +2325,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         tmp = std::min(tmp, 4000);
         if (tmp > 0 && roll < (sum += tmp))
             return MELEE_HIT_GLANCING;
-    }
+    }*/
 
     // 5. BLOCK
     if (canParryOrBlock)
