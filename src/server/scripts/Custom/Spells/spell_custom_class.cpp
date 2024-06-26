@@ -880,11 +880,76 @@ class spell_talent_ignite : public AuraScript
     }
 };
 
+// 49143 - Frost Strike
+class spell_class_frost_strike_damage_frozen : public SpellScriptLoader
+{
+public:
+    spell_class_frost_strike_damage_frozen() : SpellScriptLoader("spell_class_frost_strike_damage_frozen") { }
 
+    class spell_class_frost_strike_damage_frozen_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_frost_strike_damage_frozen_SpellScript);
 
+        void HandleDamage(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                if (target->HasAuraState(AURA_STATE_FROZEN))
+                {
+                    SetHitDamage(GetHitDamage() * 3);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_class_frost_strike_damage_frozen_SpellScript::HandleDamage, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_frost_strike_damage_frozen_SpellScript();
+    }
+};
+
+// 49184 - Howling Blast
+class spell_class_howling_blast_frozen : public SpellScriptLoader
+{
+public:
+    spell_class_howling_blast_frozen() : SpellScriptLoader("spell_class_howling_blast_frozen") { }
+
+    class spell_class_howling_blast_frozen_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_howling_blast_frozen_SpellScript);
+
+        void HandleOnHit()
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                if (target->HasAuraState(AURA_STATE_FROZEN))
+                {
+                    GetCaster()->CastSpell(target, 55095, true);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_class_howling_blast_frozen_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_howling_blast_frozen_SpellScript();
+    }
+};
 
 void AddSC_Spells_Custom_Class_scripts()
 {
+    new spell_class_howling_blast_frozen();
+    new spell_class_frost_strike_damage_frozen();
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
     RegisterSpellScript(spell_class_seal_of_righteousness);
     RegisterSpellScript(spell_class_seal_of_command);
