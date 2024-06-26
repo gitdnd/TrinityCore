@@ -1918,6 +1918,14 @@ TC_API_EXPORT EnumText EnumUtils<AuraStateType>::ToString(AuraStateType value)
         case AURA_STATE_UNKNOWN19: return { "AURA_STATE_UNKNOWN19", "AURA_STATE_UNKNOWN19", "|" };
         case AURA_STATE_UNKNOWN22: return { "AURA_STATE_UNKNOWN22", "AURA_STATE_UNKNOWN22", "C  t| varius spells (63884, 50240)" };
         case AURA_STATE_HEALTH_ABOVE_75_PERCENT: return { "AURA_STATE_HEALTH_ABOVE_75_PERCENT", "AURA_STATE_HEALTH_ABOVE_75_PERCENT", "C   |" };
+        case AURA_STATE_MANA_BELOW_25_PERCENT: return { "AURA_STATE_MANA_BELOW_25_PERCENT", "AURA_STATE_MANA_BELOW_25_PERCENT", "C   |" };
+        case AURA_STATE_MANA_BELOW_50_PERCENT: return { "AURA_STATE_MANA_BELOW_50_PERCENT", "AURA_STATE_MANA_BELOW_50_PERCENT", "C   |" };
+        case AURA_STATE_MANA_ABOVE_50_PERCENT: return { "AURA_STATE_MANA_ABOVE_50_PERCENT", "AURA_STATE_MANA_ABOVE_50_PERCENT", "C   |" };
+        case AURA_STATE_MANA_ABOVE_75_PERCENT: return { "AURA_STATE_MANA_ABOVE_75_PERCENT", "AURA_STATE_MANA_ABOVE_75_PERCENT", "C   |" };
+        case AURA_STATE_FOCUS_BELOW_25_PERCENT: return { "AURA_STATE_FOCUS_BELOW_25_PERCENT", "AURA_STATE_FOCUS_BELOW_25_PERCENT", "C   |" };
+        case AURA_STATE_FOCUS_BELOW_50_PERCENT: return { "AURA_STATE_FOCUS_BELOW_50_PERCENT", "AURA_STATE_FOCUS_BELOW_50_PERCENT", "C   |" };
+        case AURA_STATE_FOCUS_ABOVE_50_PERCENT: return { "AURA_STATE_FOCUS_ABOVE_50_PERCENT", "AURA_STATE_FOCUS_ABOVE_50_PERCENT", "C   |" };
+        case AURA_STATE_FOCUS_ABOVE_75_PERCENT: return { "AURA_STATE_FOCUS_ABOVE_75_PERCENT", "AURA_STATE_FOCUS_ABOVE_75_PERCENT", "C   |" };
         default: throw std::out_of_range("value");
     }
 }
@@ -1948,6 +1956,14 @@ TC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(size_t index)
         case 15: return AURA_STATE_UNKNOWN19;
         case 16: return AURA_STATE_UNKNOWN22;
         case 17: return AURA_STATE_HEALTH_ABOVE_75_PERCENT;
+        case 18: return AURA_STATE_MANA_BELOW_25_PERCENT;
+        case 19: return AURA_STATE_MANA_BELOW_50_PERCENT;
+        case 20: return AURA_STATE_MANA_ABOVE_50_PERCENT;
+        case 21: return AURA_STATE_MANA_ABOVE_75_PERCENT;
+        case 22: return AURA_STATE_FOCUS_BELOW_25_PERCENT;
+        case 23: return AURA_STATE_FOCUS_BELOW_50_PERCENT;
+        case 24: return AURA_STATE_FOCUS_ABOVE_50_PERCENT;
+        case 25: return AURA_STATE_FOCUS_ABOVE_75_PERCENT;
         default: throw std::out_of_range("index");
     }
 }
@@ -1975,6 +1991,14 @@ TC_API_EXPORT size_t EnumUtils<AuraStateType>::ToIndex(AuraStateType value)
         case AURA_STATE_UNKNOWN19: return 15;
         case AURA_STATE_UNKNOWN22: return 16;
         case AURA_STATE_HEALTH_ABOVE_75_PERCENT: return 17;
+        case AURA_STATE_MANA_BELOW_25_PERCENT: return 18;
+        case AURA_STATE_MANA_BELOW_50_PERCENT: return 19;
+        case AURA_STATE_MANA_ABOVE_50_PERCENT: return 20;
+        case AURA_STATE_MANA_ABOVE_75_PERCENT: return 21;
+        case AURA_STATE_FOCUS_BELOW_25_PERCENT: return 22;
+        case AURA_STATE_FOCUS_BELOW_50_PERCENT: return 23;
+        case AURA_STATE_FOCUS_ABOVE_50_PERCENT: return 24;
+        case AURA_STATE_FOCUS_ABOVE_75_PERCENT: return 25;
         default: throw std::out_of_range("value");
     }
 }
