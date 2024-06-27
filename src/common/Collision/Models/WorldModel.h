@@ -87,7 +87,7 @@ namespace VMAP
             bool GetLiquidLevel(const G3D::Vector3 &pos, float &liqHeight) const;
             uint32 GetLiquidType() const;
             bool writeToFile(FILE* wf);
-            bool readFromFile(FILE* rf);
+            bool readFromFile(FILE* rf, std::string filename);
             const G3D::AABox& GetBound() const { return iBound; }
             uint32 GetMogpFlags() const { return iMogpFlags; }
             uint32 GetWmoID() const { return iGroupWMOID; }
@@ -100,6 +100,7 @@ namespace VMAP
             std::vector<MeshTriangle> triangles;
             BIH meshTree;
             WmoLiquid* iLiquid;
+            std::string fileName;
     };
 
     /*! Holds a model (converted M2 or WMO) in its original coordinate space */
@@ -122,6 +123,7 @@ namespace VMAP
             uint32 RootWMOID;
             std::vector<GroupModel> groupModels;
             BIH groupTree;
+            std::string fileName;
     };
 } // namespace VMAP
 
