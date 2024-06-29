@@ -365,19 +365,8 @@ class TC_GAME_API WorldObject : public Object, public WorldLocation
             // Otherwise both our phases are 1-63, use the normal behaviour
             return (myMask & otherMask) != 0;
         }
-        bool InSamePhase(WorldObject const* obj)
-        {
-            // If looking at chromie in intro quest, return false
-            if (obj && ToPlayer() && obj->ToCreature())
-            {
-                if (obj->ToCreature()->GetEntry() == 50492 && ToPlayer()->IsActiveQuest(60057))
-                {
-                    return false;
-                }
-            }
-            return obj && InSamePhase(obj->GetPhaseMask());
-        }
-        static bool InSamePhase(WorldObject * a, WorldObject * b) { return a && b && b->InSamePhase(a); }
+        bool InSamePhase(WorldObject const* obj) const;
+        static bool InSamePhase(WorldObject const* a, WorldObject const* b) { return a && b && b->InSamePhase(a); }
 
         uint32 GetZoneId() const { return m_zoneId; }
         uint32 GetAreaId() const { return m_areaId; }

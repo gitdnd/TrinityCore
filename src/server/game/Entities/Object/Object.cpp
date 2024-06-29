@@ -3649,6 +3649,19 @@ float WorldObject::GetObjectSize() const
     return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? GetFloatValue(UNIT_FIELD_COMBATREACH) : DEFAULT_PLAYER_BOUNDING_RADIUS * GetObjectScale();
 }
 
+bool WorldObject::InSamePhase(WorldObject const* obj) const
+{
+    // If looking at chromie in intro quest, return false
+    if (obj && ToPlayer() && obj->ToCreature())
+    {
+        if (obj->ToCreature()->GetEntry() == 50492 && ToPlayer()->IsActiveQuest(60057))
+        {
+            return false;
+        }
+    }
+    return obj && InSamePhase(obj->GetPhaseMask());
+}
+
 
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>&, uint32, float) const;
 template TC_GAME_API void WorldObject::GetGameObjectListWithEntryInGrid(std::deque<GameObject*>&, uint32, float) const;
