@@ -353,23 +353,23 @@ class spell_ebb_and_flow_hub : public AuraScript
     void PeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-
-        if (!GetCaster() || !GetCaster()->ToPlayer())
+        Aura* aura = aurEff->GetBase();
+        if (!GetCaster() || !GetCaster()->ToPlayer() || !aura)
             return;
 
         Player* player = GetCaster()->ToPlayer();
-        Aura* aura = aurEff->GetBase();
 
         if (player->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(5874)))
         {
             aura->SetDuration(-1);
             aura->SetMaxDuration(-1);
-            return;
+            player->Say("In speed buff area!", LANG_UNIVERSAL);
         }
         else if (aura->GetDuration() > 3000)
         {
             aura->SetDuration(3000);
             aura->SetMaxDuration(3000);
+            player->Say("Left speed buff area! Reducing duration", LANG_UNIVERSAL);
         }
     }
 
