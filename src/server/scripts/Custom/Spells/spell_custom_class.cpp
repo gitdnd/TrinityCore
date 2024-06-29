@@ -34,7 +34,91 @@ enum CustomClassSpells
     SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND = 97103,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104,
     SPELL_TALENT_IGNITE = 97307,
-    SPELL_TALENT_OVERLOAD = 94206
+    SPELL_TALENT_OVERLOAD = 94206,
+    SPELL_CLASS_HOLY_SLASH = 97316,
+    SPELL_CLASS_FIRE_SLASH = 97317,
+    SPELL_CLASS_LIGHTNING_SLASH = 97318,
+    SPELL_CLASS_FROST_SLASH = 97319,
+    SPELL_CLASS_SHADOW_SLASH = 97320,
+    SPELL_CLASS_ARCANE_SLASH = 97321
+
+};
+
+// 94241 - maelstrom weapon
+class spell_class_maelstrom_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_class_maelstrom_weapon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_CLASS_HOLY_SLASH,
+                SPELL_CLASS_FIRE_SLASH,
+                SPELL_CLASS_LIGHTNING_SLASH,
+                SPELL_CLASS_FROST_SLASH,
+                SPELL_CLASS_SHADOW_SLASH,
+                SPELL_CLASS_ARCANE_SLASH
+            });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        {
+            PreventDefaultAction();
+
+            Player* player = eventInfo.GetActor()->ToPlayer();
+
+            Unit* victim = eventInfo.GetProcTarget();
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            if (!procSpell)
+                return;
+
+
+            uint32 spellId = 0;
+
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
+                spellId = SPELL_CLASS_HOLY_SLASH;
+
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
+            {
+                spellId = SPELL_CLASS_FIRE_SLASH;
+            }
+
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+            {
+                spellId = SPELL_CLASS_LIGHTNING_SLASH;
+            }
+
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+            {
+                spellId = SPELL_CLASS_FROST_SLASH;
+            }
+
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+            {
+                spellId = SPELL_CLASS_SHADOW_SLASH;
+            }
+
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
+            {
+                spellId = SPELL_CLASS_ARCANE_SLASH;
+            }
+
+            player->CastSpell(eventInfo.GetProcTarget(), spellId);
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_class_maelstrom_weapon::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_class_maelstrom_weapon::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
+    }
 };
 
 // 94206 - Lightning Overload
@@ -968,4 +1052,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_aura_of_steel);
     RegisterSpellScript(spell_talent_ignite);
     RegisterSpellScript(spell_talent_lightning_overload);
+    RegisterSpellScript(spell_class_maelstrom_weapon);
 };
