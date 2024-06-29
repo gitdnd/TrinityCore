@@ -493,6 +493,16 @@ void Unit::Update(uint32 p_time)
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, HealthBelowPct(20));
         ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, HealthBelowPct(35));
         ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, HealthAbovePct(75));
+
+        ModifyAuraState(AURA_STATE_MANA_BELOW_25_PERCENT, PowerBelowPct(POWER_MANA, 25));
+        ModifyAuraState(AURA_STATE_MANA_BELOW_50_PERCENT, PowerBelowPct(POWER_MANA, 50));
+        ModifyAuraState(AURA_STATE_MANA_ABOVE_50_PERCENT, PowerAbovePct(POWER_MANA, 50));
+        ModifyAuraState(AURA_STATE_MANA_ABOVE_75_PERCENT, PowerAbovePct(POWER_MANA, 75));
+
+        ModifyAuraState(AURA_STATE_FOCUS_BELOW_25_PERCENT, PowerBelowPct(POWER_FOCUS, 25));
+        ModifyAuraState(AURA_STATE_FOCUS_BELOW_50_PERCENT, PowerBelowPct(POWER_FOCUS, 50));
+        ModifyAuraState(AURA_STATE_FOCUS_ABOVE_50_PERCENT, PowerAbovePct(POWER_FOCUS, 50));
+        ModifyAuraState(AURA_STATE_FOCUS_ABOVE_75_PERCENT, PowerAbovePct(POWER_FOCUS, 75));
     }
 
     UpdateSplineMovement(p_time);
@@ -2310,7 +2320,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
 
     // 4. GLANCING
     // Max 40% chance to score a glancing blow against mobs of the same or higher level (only players and pets, not for ranged weapons).
-    if ((GetTypeId() == TYPEID_PLAYER || IsPet()) &&
+    /*if ((GetTypeId() == TYPEID_PLAYER || IsPet()) &&
         victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet() &&
         GetLevel() <= victim->GetLevelForTarget(this))
     {
@@ -2325,7 +2335,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         tmp = std::min(tmp, 4000);
         if (tmp > 0 && roll < (sum += tmp))
             return MELEE_HIT_GLANCING;
-    }
+    }*/
 
     // 5. BLOCK
     if (canParryOrBlock)

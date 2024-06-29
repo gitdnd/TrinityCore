@@ -1393,7 +1393,15 @@ enum AuraStateType
     //AURA_STATE_UNKNOWN20                  = 20,           //  c  | only (45317 Suicide)
     //AURA_STATE_UNKNOWN21                  = 21,           //     | not used
     AURA_STATE_UNKNOWN22                    = 22,           // C  t| varius spells (63884, 50240)
-    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23            // C   |
+    AURA_STATE_HEALTH_ABOVE_75_PERCENT      = 23,           // C   |
+    AURA_STATE_MANA_BELOW_25_PERCENT        = 24,           // C   |
+    AURA_STATE_MANA_BELOW_50_PERCENT        = 25,           // C   |
+    AURA_STATE_MANA_ABOVE_50_PERCENT        = 26,           // C   |
+    AURA_STATE_MANA_ABOVE_75_PERCENT        = 27,           // C   |
+    AURA_STATE_FOCUS_BELOW_25_PERCENT       = 28,           // C   |
+    AURA_STATE_FOCUS_BELOW_50_PERCENT       = 29,           // C   |
+    AURA_STATE_FOCUS_ABOVE_50_PERCENT       = 30,           // C   |
+    AURA_STATE_FOCUS_ABOVE_75_PERCENT       = 31            // C   |
 };
 
 #define PER_CASTER_AURA_STATE_MASK (\

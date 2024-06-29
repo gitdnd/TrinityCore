@@ -266,7 +266,7 @@ void Player::UpdateArmor()
 
     float value = GetFlatModifierValue(unitMod, BASE_VALUE);    // base armor (from items)
     value *= GetPctModifierValue(unitMod, BASE_PCT);            // armor percent from items
-    value += GetStat(STAT_AGILITY) * 2.0f;                      // armor bonus from stats
+    value += GetStat(STAT_AGILITY);                             // armor bonus from stats
     value += GetFlatModifierValue(unitMod, TOTAL_VALUE);
 
     //add dynamic flat mods
@@ -825,8 +825,8 @@ float const dodge_cap[MAX_CLASSES] =
 
 void Player::UpdateDodgePercentage()
 {
-    float diminishing = 0.0f, nondiminishing = 0.0f;
-    GetDodgeFromAgility(diminishing, nondiminishing);
+    float diminishing = 0.0f, nondiminishing = 5.0f;
+    // GetDodgeFromAgility(diminishing, nondiminishing);
     // Modify value from defense skill (only bonus from defense rating diminishes)
     nondiminishing += (int32(GetSkillValue(SKILL_DEFENSE)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
     diminishing += (GetRatingBonusValue(CR_DEFENSE_SKILL) * 0.04f);

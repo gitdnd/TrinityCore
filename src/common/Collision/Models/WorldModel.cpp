@@ -32,7 +32,7 @@ template<> struct BoundsTrait<VMAP::GroupModel>
 
 namespace VMAP
 {
-    bool IntersectTriangle(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points, uint32 numVertices, G3D::Ray const& ray, float& distance, uint32 modelId)
+    bool IntersectTriangle(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points, uint32 numVertices, G3D::Ray const& ray, float& distance, std::string modelId)
     {
         static const float EPS = 1e-5f;
 
@@ -357,7 +357,7 @@ namespace VMAP
         return result;
     }
 
-    bool GroupModel::readFromFile(FILE* rf)
+    bool GroupModel::readFromFile(FILE* rf, std::string filename)
     {
         char chunk[8];
         bool result = true;
@@ -367,7 +367,7 @@ namespace VMAP
         vertices.clear();
         delete iLiquid;
         iLiquid = nullptr;
-
+        fileName = filename;
         if (result && fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) result = false;
         if (result && fread(&iMogpFlags, sizeof(uint32), 1, rf) != 1) result = false;
         if (result && fread(&iGroupWMOID, sizeof(uint32), 1, rf) != 1) result = false;
@@ -402,12 +402,12 @@ namespace VMAP
 
     struct GModelRayCallback
     {
-        GModelRayCallback(std::vector<MeshTriangle> const& tris, const std::vector<Vector3> &vert, uint32 model):
-            vertices(vert.begin()), numVertices(vert.size()), triangles(tris.begin()), hit(false), modelId(model) { }
+        GModelRayCallback(std::vector<MeshTriangle> const& tris, const std::vector<Vector3> &vert, std::string model):
+            vertices(vert.begin()), numVertices(vert.size()), triangles(tris.begin()), hit(false), modelName(model) { }
 
         bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*pStopAtFirstHit*/)
         {
-            hit = IntersectTriangle(triangles[entry], vertices, numVertices, ray, distance, modelId) || hit;
+            hit = IntersectTriangle(triangles[entry], vertices, numVertices, ray, distance, modelName) || hit;
             return hit;
         }
 
@@ -415,7 +415,7 @@ namespace VMAP
         std::vector<MeshTriangle>::const_iterator triangles;
         bool hit;
         uint32 numVertices;
-        uint32 modelId;
+        std::string modelName;
     };
 
     bool GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const
@@ -423,7 +423,7 @@ namespace VMAP
         if (triangles.empty())
             return false;
         
-        GModelRayCallback callback(triangles, vertices, GetWmoID());
+        GModelRayCallback callback(triangles, vertices, fileName);
         meshTree.intersectRay(ray, callback, distance, stopAtFirstHit);
         return callback.hit;
     }
@@ -591,7 +591,7 @@ namespace VMAP
         FILE* wf = fopen(filename.c_str(), "wb");
         if (!wf)
             return false;
-
+        fileName = filename;
         uint32 chunkSize, count;
         bool result = fwrite(VMAP_MAGIC, 1, 8, wf) == 8;
         if (result && fwrite("WMOD", 1, 4, wf) != 4) result = false;
@@ -624,7 +624,7 @@ namespace VMAP
         FILE* rf = fopen(filename.c_str(), "rb");
         if (!rf)
             return false;
-
+        fileName = filename;
         bool result = true;
         uint32 chunkSize = 0;
         uint32 count = 0;
@@ -644,7 +644,7 @@ namespace VMAP
             if (result) groupModels.resize(count);
             //if (result && fread(&groupModels[0], sizeof(GroupModel), count, rf) != count) result = false;
             for (uint32 i=0; i<count && result; ++i)
-                result = groupModels[i].readFromFile(rf);
+                result = groupModels[i].readFromFile(rf, fileName);
 
             // read group BIH
             if (result && !readChunk(rf, chunk, "GBIH", 4)) result = false;

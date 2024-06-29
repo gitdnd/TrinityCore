@@ -34,7 +34,77 @@ enum CustomClassSpells
     SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND = 97103,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104,
     SPELL_TALENT_IGNITE = 97307,
-    SPELL_TALENT_OVERLOAD = 94206
+    SPELL_TALENT_OVERLOAD = 94206,
+    SPELL_CLASS_HOLY_SLASH = 97316,
+    SPELL_CLASS_FIRE_SLASH = 97317,
+    SPELL_CLASS_LIGHTNING_SLASH = 97318,
+    SPELL_CLASS_FROST_SLASH = 97319,
+    SPELL_CLASS_SHADOW_SLASH = 97320,
+    SPELL_CLASS_ARCANE_SLASH = 97321
+
+};
+
+// 94241 - maelstrom weapon
+class spell_class_maelstrom_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_class_maelstrom_weapon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_CLASS_HOLY_SLASH,
+                SPELL_CLASS_FIRE_SLASH,
+                SPELL_CLASS_LIGHTNING_SLASH,
+                SPELL_CLASS_FROST_SLASH,
+                SPELL_CLASS_SHADOW_SLASH,
+                SPELL_CLASS_ARCANE_SLASH
+            });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        
+            PreventDefaultAction();
+
+            Player* player = eventInfo.GetActor()->ToPlayer();
+
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            if (!procSpell)
+                return;
+
+
+            uint32 spellId = 0;
+
+            if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+            {
+                if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
+                    spellId = SPELL_CLASS_HOLY_SLASH;
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
+                    spellId = SPELL_CLASS_FIRE_SLASH;
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                    spellId = SPELL_CLASS_LIGHTNING_SLASH;
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+                    spellId = SPELL_CLASS_FROST_SLASH;
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+                    spellId = SPELL_CLASS_SHADOW_SLASH;
+                else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
+                    spellId = SPELL_CLASS_ARCANE_SLASH;
+            }
+
+            player->CastSpell(eventInfo.GetProcTarget(), spellId);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_class_maelstrom_weapon::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_class_maelstrom_weapon::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
+    }
 };
 
 // 94206 - Lightning Overload
@@ -880,11 +950,76 @@ class spell_talent_ignite : public AuraScript
     }
 };
 
+// 49143 - Frost Strike
+class spell_class_frost_strike_damage_frozen : public SpellScriptLoader
+{
+public:
+    spell_class_frost_strike_damage_frozen() : SpellScriptLoader("spell_class_frost_strike_damage_frozen") { }
 
+    class spell_class_frost_strike_damage_frozen_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_frost_strike_damage_frozen_SpellScript);
 
+        void HandleDamage(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                if (target->HasAuraState(AURA_STATE_FROZEN))
+                {
+                    SetHitDamage(GetHitDamage() * 3);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_class_frost_strike_damage_frozen_SpellScript::HandleDamage, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_frost_strike_damage_frozen_SpellScript();
+    }
+};
+
+// 49184 - Howling Blast
+class spell_class_howling_blast_frozen : public SpellScriptLoader
+{
+public:
+    spell_class_howling_blast_frozen() : SpellScriptLoader("spell_class_howling_blast_frozen") { }
+
+    class spell_class_howling_blast_frozen_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_howling_blast_frozen_SpellScript);
+
+        void HandleOnHit()
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                if (target->HasAuraState(AURA_STATE_FROZEN))
+                {
+                    GetCaster()->CastSpell(target, 55095, true);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_class_howling_blast_frozen_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_howling_blast_frozen_SpellScript();
+    }
+};
 
 void AddSC_Spells_Custom_Class_scripts()
 {
+    new spell_class_howling_blast_frozen();
+    new spell_class_frost_strike_damage_frozen();
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
     RegisterSpellScript(spell_class_seal_of_righteousness);
     RegisterSpellScript(spell_class_seal_of_command);
@@ -903,4 +1038,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_aura_of_steel);
     RegisterSpellScript(spell_talent_ignite);
     RegisterSpellScript(spell_talent_lightning_overload);
+    RegisterSpellScript(spell_class_maelstrom_weapon);
 };
