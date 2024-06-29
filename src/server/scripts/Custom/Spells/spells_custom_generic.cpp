@@ -365,7 +365,7 @@ class spell_ebb_and_flow_hub : public AuraScript
             aura->SetMaxDuration(-1);
             player->Say("In speed buff area!", LANG_UNIVERSAL);
         }
-        else if (aura->GetDuration() > 3000)
+        else if (aura->GetDuration() > 3000 || aura->GetDuration() <= 0)
         {
             aura->SetDuration(3000);
             aura->SetMaxDuration(3000);
