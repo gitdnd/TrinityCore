@@ -435,6 +435,21 @@ public:
     }
 };
 
+class AreaTrigger_hub_speed_box : public AreaTriggerScript
+{
+public:
+    AreaTrigger_hub_speed_box() : AreaTriggerScript("hub_speed_box")
+    {
+
+    }
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
+    {
+        player->CastSpell(player, 90563, true);
+        return true;
+    }
+};
+
 void AddSC_areatrigger_scripts()
 {
     new AreaTrigger_at_coilfang_waterfall();
@@ -447,4 +462,5 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_area_52_entrance();
     new AreaTrigger_at_frostgrips_hollow();
     new AreaTrigger_hub_fall_box();
+    new AreaTrigger_hub_speed_box();
 }
