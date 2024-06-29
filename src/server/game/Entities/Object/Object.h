@@ -37,7 +37,6 @@
 #include <unordered_map>
 #ifdef ELUNA
 #include "LuaValue.h"
-#include "Player.h"
 #endif
 
 class Corpse;
