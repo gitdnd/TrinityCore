@@ -359,7 +359,10 @@ class spell_ebb_and_flow_hub : public AuraScript
 
         Player* player = GetCaster()->ToPlayer();
 
-        if (player->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(5874)))
+        if (player->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(5874)) ||
+            player->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(5875)) ||
+            player->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(5876)) ||
+            player->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(5877)))
         {
             aura->SetDuration(-1);
             aura->SetMaxDuration(-1);
