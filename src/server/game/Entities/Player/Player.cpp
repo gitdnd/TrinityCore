@@ -15745,8 +15745,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     if (quest->GetBonusTalents())
     {
-        m_questRewardTalentCount += quest->GetBonusTalents();
-        InitTalentForLevel();
+        //m_questRewardTalentCount += quest->GetBonusTalents();
+        //InitTalentForLevel();
+        AddBonusTalents(quest->GetBonusTalents());
     }
 
     if (quest->GetRewArenaPoints())
@@ -17936,7 +17937,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     SetXP(fields[7].GetUInt32());
     talent_level = fields[73].GetUInt32();
     lootPreference = fields[74].GetUInt8();
-    //bonusTalents = fields[75].GetUInt32();
+    bonusTalents = fields[75].GetUInt32();
     //if (talent_level == 0)
     //    talent_level = 1;
 
@@ -20286,7 +20287,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
 
         stmt->setUInt32(index++, GetXPTalentLevel());
         stmt->setUInt8(index++, GetActiveLootPreference());
-        //stmt->setUInt32(index++, GetBonusTalentLevel());
+        stmt->setUInt32(index++, GetBonusTalentLevel());
 
         // Index
         stmt->setUInt32(index++, GetGUID().GetCounter());
