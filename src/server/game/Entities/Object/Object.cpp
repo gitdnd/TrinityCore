@@ -3651,9 +3651,10 @@ float WorldObject::GetObjectSize() const
 
 bool WorldObject::InSamePhase(WorldObject const* obj) const
 {
-    // If looking at chromie in intro quest, return false
-    if (obj && ToPlayer() && obj->ToCreature())
+    // If player is looking at a creature and in a unique phase, special handling
+    if (obj && ToPlayer() && obj->ToCreature() && ToPlayer()->GetPhaseMask() >= 64)
     {
+        // If trying to see Chromie and (quest active)
         if (obj->ToCreature()->GetEntry() == 50492 && (
                 ToPlayer()->IsActiveQuest(60057) ||
                 ToPlayer()->IsActiveQuest(60059)))
