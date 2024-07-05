@@ -3026,12 +3026,9 @@ class spell_gen_profession_research : public SpellScript
                 }
 
                 // Handle Quest - Gem Crafting
-                if (Player* player = caster->ToPlayer())
+                if (caster->IsActiveQuest(60059) && caster->GetReqKillOrCastCurrentCount(60059, 1) == 0)
                 {
-                    if (player->hasQuest(60059) && player->GetReqKillOrCastCurrentCount(60059, 1) == 0)
-                    {
-                        player->AdvanceQuestObjective(1, 0);
-                    }
+                    caster->AdvanceQuestObjective(1, 0);
                 }
             }
         }

@@ -1651,6 +1651,17 @@ void Spell::EffectCreateItem()
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* player = unitTarget->ToPlayer();
+
+    // Handle Quest - Gem Crafting
+    if (player->IsActiveQuest(60059) && player->GetReqKillOrCastCurrentCount(60059, 1) == 0)
+    {
+        player->AdvanceQuestObjective(1, 0);
+    }
+
     DoCreateItem(effectInfo->ItemType);
     ExecuteLogEffectCreateItem(effectInfo->EffectIndex, effectInfo->ItemType);
 }
