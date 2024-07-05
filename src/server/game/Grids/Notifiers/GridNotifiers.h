@@ -680,6 +680,11 @@ namespace Trinity
                     return false;
 
                 float const dist = go->GetGOInfo()->spellFocus.dist;
+
+                // In unique phases, players ignore phase check
+                if (_caster && _caster->ToPlayer() && _caster->ToPlayer()->GetPhaseMask() >= 64)
+                    return go && go->IsInMap(go) && go->IsWithinDist(_caster, dist);
+
                 return go->IsWithinDistInMap(_caster, dist);
             }
 
