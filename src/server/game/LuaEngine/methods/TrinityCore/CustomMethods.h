@@ -1884,16 +1884,6 @@ namespace LuaCustom
         return 0;
     }
 
-    int GetQuestObjectiveStatus(Eluna* E, Player* player)
-    {
-        uint32 questId = E->CHECKVAL<uint32>(2);
-        int slot = E->CHECKVAL<int>(3);
-
-        E->Push(player->GetQuestObjectiveStatus(questId, slot));
-
-        return 1;
-    }
-
     // REGISTERS
     
     ElunaGlobal::ElunaRegister GlobalMethods[] =

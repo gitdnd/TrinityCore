@@ -28439,11 +28439,3 @@ void Player::CustomAutoLoot(Creature * target)
     if(loot->isLooted())
         GetSession()->DoLootRelease(target->GetGUID());
 }
-
-uint16 Player::GetQuestObjectiveStatus(uint32 questId, int slot)
-{
-    if (!hasQuest(questId) || slot < 0 || slot > 3)
-        return 0;
-
-    return m_QuestStatus[questId].CreatureOrGOCount[slot];
-}

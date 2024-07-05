@@ -2293,9 +2293,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::vector<uint32> GetCustomTalents() { return customTalents[GetCurrentTalentLoadout()]; }
 
         void CustomAutoLoot(Creature* target);
-
-        uint16 GetQuestObjectiveStatus(uint32 questId, int slot);
-
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
