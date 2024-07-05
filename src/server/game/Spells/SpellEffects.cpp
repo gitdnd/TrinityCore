@@ -1656,8 +1656,8 @@ void Spell::EffectCreateItem()
 
     Player* player = unitTarget->ToPlayer();
 
-    // Handle Quest - Gem Crafting
-    if (player->IsActiveQuest(60059) && player->GetReqKillOrCastCurrentCount(60059, 1) == 0)
+    // Handle Quest - Gem Crafting, do not reward power gem craft
+    if (effectInfo->ItemType != 59992 && player->IsActiveQuest(60059) && player->GetReqKillOrCastCurrentCount(60059, 1) == 0)
     {
         player->AdvanceQuestObjective(60059, 0);
     }
