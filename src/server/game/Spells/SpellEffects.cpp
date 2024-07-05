@@ -1659,7 +1659,7 @@ void Spell::EffectCreateItem()
     // Handle Quest - Gem Crafting
     if (player->IsActiveQuest(60059) && player->GetReqKillOrCastCurrentCount(60059, 1) == 0)
     {
-        player->AdvanceQuestObjective(1, 0);
+        player->AdvanceQuestObjective(60059, 0);
     }
 
     DoCreateItem(effectInfo->ItemType);
