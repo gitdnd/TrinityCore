@@ -2003,7 +2003,6 @@ namespace LuaCustom
         { "SendListInventory", &LuaCustom::SendListInventory },
         { "SetTimeSpeed", &LuaCustom::SetTimeSpeed },
         { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
-        { "GetQuestObjectiveStatus", &LuaCustom::GetQuestObjectiveStatus },
 
         { NULL, NULL, METHOD_REG_NONE }
     };
