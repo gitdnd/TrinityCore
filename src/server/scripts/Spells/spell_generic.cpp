@@ -3026,6 +3026,11 @@ class spell_gen_profession_research : public SpellScript
                 }
 
                 // Handle Quest - Gem Crafting
+                caster->Say(("I have quest: " + std::to_string(caster->hasQuest(60059))), LANG_UNIVERSAL);
+                if (caster->hasQuest(60059))
+                {
+                    caster->Say(("objective0 = " + std::to_string(caster->GetReqKillOrCastCurrentCount(60059, 1) == 0)), LANG_UNIVERSAL);
+                }
                 if (caster->hasQuest(60059) && caster->GetReqKillOrCastCurrentCount(60059, 1) == 0)
                 {
                     caster->AdvanceQuestObjective(1, 0);
