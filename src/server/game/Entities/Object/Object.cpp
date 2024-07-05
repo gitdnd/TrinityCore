@@ -3654,7 +3654,9 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
     // If looking at chromie in intro quest, return false
     if (obj && ToPlayer() && obj->ToCreature())
     {
-        if (obj->ToCreature()->GetEntry() == 50492 && ToPlayer()->IsActiveQuest(60057))
+        if (obj->ToCreature()->GetEntry() == 50492 && (
+                ToPlayer()->IsActiveQuest(60057) ||
+                ToPlayer()->IsActiveQuest(60059)))
         {
             return false;
         }
