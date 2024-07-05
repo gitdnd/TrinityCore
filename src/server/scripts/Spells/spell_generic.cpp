@@ -3007,9 +3007,11 @@ class spell_gen_profession_research : public SpellScript
             // If the cast spell is the spell for discovering gems, add the discovered gem to the player as well
             if (spellId == SPELL_CRAFTING_BRAWN_DISCOVERY || spellId == SPELL_CRAFTING_WISDOM_DISCOVERY || spellId == SPELL_CRAFTING_CUNNING_DISCOVERY)
             {
+                // Add gem
                 SpellInfo const* discoveredSpellInfo = sSpellMgr->GetSpellInfo(discoveredSpellId);
                 caster->AddItem(discoveredSpellInfo->_effects[EFFECT_0].ItemType, 1);
-                // Achievements for discovery all of a category
+
+                // Achievement handling for discovering all of a category
                 if (HasDiscoveredAllSpells(GetSpellInfo()->Id, caster))
                 {
                     int id = 0;
@@ -3021,6 +3023,12 @@ class spell_gen_profession_research : public SpellScript
                         id = 50084;
                     if (id > 0)
                         caster->CompletedAchievement(id);
+                }
+
+                // Handle Quest - Gem Crafting
+                if (caster->hasQuest(60059) && caster->GetReqKillOrCastCurrentCount(60059, 1) == 0)
+                {
+                    caster->AdvanceQuestObjective(1, 0);
                 }
             }
         }
