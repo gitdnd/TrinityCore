@@ -44,6 +44,76 @@ enum CustomClassSpells
 
 };
 
+// - 94223 Acclimation
+class spell_talent_acclimation : public AuraScript
+{
+    PrepareAuraScript(spell_talent_acclimation);
+
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Player* player = eventInfo.GetActor()->ToPlayer();
+        Unit* victim = eventInfo.GetProcTarget();
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+        uint32 spellId = 0;
+
+        if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG)
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY)
+                spellId = 97323;
+            else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
+                spellId = 97324;
+            else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
+                spellId = 97325;
+            else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
+                spellId = 97326;
+            else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW)
+                spellId = 97327;
+            else if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
+                spellId = 97328;
+
+        }
+        GetTarget()->CastSpell(victim, spellId, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_talent_acclimation::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_acclimation::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 97322 - Spell Eater
+class spell_talent_spelleater : public AuraScript
+{
+    PrepareAuraScript(spell_talent_spelleater);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    {
+        PreventDefaultAction();
+
+        Player* player = GetCaster()->ToPlayer();
+        float ilvl = player->GetAverageItemLevel();
+        int32 bp = std::lroundf(10 + ilvl * 0.05f);
+
+        amount += int32(player->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+    }
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_talent_spelleater::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
+    }
+};
+
 // 94241 - maelstrom weapon
 class spell_class_maelstrom_weapon : public AuraScript
 {
@@ -1039,4 +1109,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_ignite);
     RegisterSpellScript(spell_talent_lightning_overload);
     RegisterSpellScript(spell_class_maelstrom_weapon);
+    RegisterSpellScript(spell_talent_spelleater);
+    RegisterSpellScript(spell_talent_acclimation);
 };
