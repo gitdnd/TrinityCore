@@ -3657,7 +3657,13 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
         // If trying to see Chromie and (quest active)
         if (obj->ToCreature()->GetEntry() == 50492 && (
                 ToPlayer()->IsActiveQuest(60057) ||
-                ToPlayer()->IsActiveQuest(60059)))
+                ToPlayer()->IsActiveQuest(60059) ||
+                ToPlayer()->IsActiveQuest(60060)))
+        {
+            return false;
+        }
+        // If trying to see Alurmi and (quest active)
+        if (obj->ToCreature()->GetEntry() == 60301 && ToPlayer()->IsActiveQuest(60060))
         {
             return false;
         }
