@@ -28197,7 +28197,7 @@ void Player::LearnCustomTalent(uint32 id)
         if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
         {
             //if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
-                CastSpell(this, nodeInfo->spellId, true);
+                CastSpell(this, nodeInfo->spellId, false);
         }
     }
 
@@ -28285,7 +28285,7 @@ void Player::LoadCustomTalentLoadout()
             AddTemporarySpell(nodeInfo->spellId);
             if (const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(nodeInfo->spellId))
                 if (spellInfo->IsPassive() && HandlePassiveSpellLearn(spellInfo))
-                    CastSpell(this, nodeInfo->spellId, true);
+                    CastSpell(this, nodeInfo->spellId, false);
         }
     }
 }
