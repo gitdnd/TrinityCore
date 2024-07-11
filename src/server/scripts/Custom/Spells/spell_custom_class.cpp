@@ -44,6 +44,125 @@ enum CustomClassSpells
 
 };
 
+
+// - 94245 sacred echoes damage
+
+class spell_talent_sacred_echoes_damage : public AuraScript
+{
+    PrepareAuraScript(spell_talent_sacred_echoes_damage);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94247 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = eventInfo.GetProcTarget();
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return;
+
+        uint32 damage = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damage * 10);
+        GetTarget()->CastSpell(victim, 94247, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_talent_sacred_echoes_damage::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_sacred_echoes_damage::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+
+// - 94246 sacred echoes heal
+class spell_talent_sacred_echoes_heal : public AuraScript
+{
+    PrepareAuraScript(spell_talent_sacred_echoes_heal);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94248 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = eventInfo.GetProcTarget();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        uint32 damage = CalculatePct(damageInfo->GetDamage(), aurEff->GetAmount());
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(damage * 10);
+        GetTarget()->CastSpell(victim, 94248, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_talent_sacred_echoes_heal::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_sacred_echoes_heal::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+
+
+// - 94250 wandering affliction
+class spell_talent_wandering_affliction : public AuraScript
+{
+    PrepareAuraScript(spell_talent_wandering_affliction);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 94251 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetProcTarget();
+        if (!roll_chance_f(caster->GetUnitCriticalChanceAgainst(BASE_ATTACK, target)))
+            return;
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(amount * 0.3);
+        caster->CastSpell(target, 94251, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_wandering_affliction::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+
+
+
+
 // - 94223 Acclimation
 class spell_talent_acclimation : public AuraScript
 {
@@ -1111,4 +1230,7 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_maelstrom_weapon);
     RegisterSpellScript(spell_talent_spelleater);
     RegisterSpellScript(spell_talent_acclimation);
+    RegisterSpellScript(spell_talent_sacred_echoes_damage);
+    RegisterSpellScript(spell_talent_sacred_echoes_heal);
+    RegisterSpellScript(spell_talent_wandering_affliction);
 };
