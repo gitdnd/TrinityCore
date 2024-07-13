@@ -7334,6 +7334,11 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     if (spellEffectInfo.MiscValue)
                         if (vTemp->Quality > spellEffectInfo.MiscValue)
                             return SPELL_FAILED_NO_VALID_TARGETS;
+
+                    if (spellEffectInfo.MiscValueB)
+                        if (vTemp->Class != spellEffectInfo.MiscValueB)
+                            return SPELL_FAILED_NO_VALID_TARGETS;
+
                 }
                 break;
             }
