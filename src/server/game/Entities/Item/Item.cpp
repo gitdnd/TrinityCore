@@ -1417,7 +1417,7 @@ void Item::SaveVirtualItemInfo()
         stmt->setUInt8(i++, itemTemplate->Sheath);
         stmt->setUInt32(i++, itemTemplate->legendaryId);
         stmt->setUInt32(i++, itemTemplate->generatedMagicFind);
-        stmt->setFloat(i++, itemTemplate->honePct);
+        stmt->setUInt32(i++, itemTemplate->honeLevel);
 
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);

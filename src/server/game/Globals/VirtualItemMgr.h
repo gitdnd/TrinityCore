@@ -56,7 +56,7 @@ struct VirtualItemTemplate : ItemTemplate
         legendaryId = 0;
         customFlags = 0;
         generatedMagicFind = 0;
-        honePct = 0.f;
+        honeLevel = 0;
         //Bonding = BIND_WHEN_PICKED_UP; // All items MUST be bound on pickup so they can not be mailed and thus failing some cleanup and memory management
     }
 
@@ -93,7 +93,7 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 legendaryId;
     uint32 customFlags;
     uint32 generatedMagicFind;
-    float honePct;
+    uint32 honeLevel;
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
     inline bool HasFlag(ItemFlags flag) const { return (Flags & flag) != 0; }
 };
@@ -124,7 +124,7 @@ struct VirtualModifier
         displayId = 0;
         nameOverride = "";
         magicFind = 0;
-        statPoolPctModifier = 0.f;
+        statPoolPctModifier = 1.0f;
         lootPreference = 0;
         generateSet = false;
         lowYield = false;

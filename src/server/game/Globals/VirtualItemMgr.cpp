@@ -493,12 +493,8 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         // add a random 10% increase or decrease of stats
         armorValue = (float)urand((uint32)(armorValue * 0.9f), (uint32)(armorValue * 1.1f), generator);
 
-        float honePct = modifier.statPoolPctModifier;
-        if (honePct > 0)
-        {
-            honePct = modifier.statPoolPctModifier / 100;
-            armorValue += armorValue * honePct;
-        }
+        // apply stat pool percentage modifiers (ie. honing)
+        armorValue *= modifier.statPoolPctModifier;
 
         // apply armor value to template
         output->Armor = (uint32)armorValue;
@@ -606,14 +602,10 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         float damageBonus = (((output->Quality - 2.0f) / 10.0f) / 2.0f) + 1.0f;
         output->Damage[0].DamageMin *= damageBonus;
         output->Damage[0].DamageMax *= damageBonus;
-        float honePct = modifier.statPoolPctModifier;
-        if (honePct > 0)
-        {
-            honePct = modifier.statPoolPctModifier / 100;
-            output->Damage[0].DamageMin += output->Damage[0].DamageMin * honePct;
-            output->Damage[0].DamageMax += output->Damage[0].DamageMax * honePct;
-        }
 
+        // Apply percent modifiers (ie. honing)
+        output->Damage[0].DamageMin *= modifier.statPoolPctModifier;
+        output->Damage[0].DamageMax *= modifier.statPoolPctModifier;
     }
 
     // TODO: add custom descriptions to legendaries possibly?
@@ -692,12 +684,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     primaryStatSlots = primaryStatSlots > primarystatgroup.size() ? primarystatgroup.size() : primaryStatSlots;
     secondaryStatSlots = secondaryStatSlots > secondarystatgroup.size() ? secondarystatgroup.size() : secondaryStatSlots;
 
-    //Random hone percent in future?
-    //output->honePct = modifier.statPoolPctModifier;
-    float honePct = modifier.statPoolPctModifier;
-    if (honePct > 0)
-        honePct = modifier.statPoolPctModifier / 100;
-
     // if we still have any slots to generate stats for, continue
     if (primaryStatSlots + secondaryStatSlots > 0)
     {
@@ -717,7 +703,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
                 primaryStatMod = leg->primaryStatModifier;
 
-            primaryStatMod += honePct;
+            // apply stat pool percentage modifiers (ie. honing)
+            primaryStatMod *= modifier.statPoolPctModifier;
 
             // select random pool size value based on upper and lower bounds
             float statPoints = frand((pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
@@ -759,16 +746,12 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
             // hard coded behavior for weapons with spell power, except ranged weapons
             // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
-            if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER)
-            {
+            if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER || primarystatgroup[i] == ITEM_MOD_SPELL_HEALING_DONE)
                 if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED && output->InventoryType != INVTYPE_RANGEDRIGHT)
                     statPoints *= 4.0f;
-            }
 
             if (i < primaryStatSlots && primaryStatSlots > 0)
-            {
                 selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
-            }
         }
 
         // generate secondary stat values
@@ -779,7 +762,8 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
                 secondayStatMod = leg->secondaryStatModifier;
 
-            secondayStatMod += honePct;
+            // apply stat pool percentage modifiers (ie. honing)
+            secondayStatMod *= modifier.statPoolPctModifier;
 
             // select random pool size value based on upper and lower bounds
             float statPoints = frand((pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_LOWBOUND)), (pool * sWorld->getFloatConfig(CONFIG_ITEMGEN_STATGEN_HIGHBOUND)), generator);
@@ -1653,6 +1637,8 @@ float VirtualModifier::GetStatRate(ItemModType stat)
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER);
         case ITEM_MOD_SPELL_PENETRATION:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION);
+        case ITEM_MOD_SPELL_HEALING_DONE:
+            return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_SPELL_HEALING_DONE);
         /* Melee stats */
         case ITEM_MOD_EXPERTISE_RATING:
             return sWorld->getFloatConfig(CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING);
@@ -2136,7 +2122,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 
 void VirtualItemMgr::UpdateHoneDisplaySpell(VirtualItemTemplate* output)
 {
-    output->Spells[HONED_SPELL_SLOT].SpellId = 410000 + output->honePct;
+    output->Spells[HONED_SPELL_SLOT].SpellId = 410000 + output->honeLevel;
     output->Spells[HONED_SPELL_SLOT].SpellTrigger = ITEM_SPELLTRIGGER_ON_NO_DELAY_USE;
     output->Spells[HONED_SPELL_SLOT].SpellCharges = -1;
     output->Spells[HONED_SPELL_SLOT].SpellPPMRate = 0.f;
@@ -2161,7 +2147,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_STAMINA,
         ITEM_MOD_INTELLECT,
         ITEM_MOD_SPIRIT,
-        ITEM_MOD_SPELL_POWER
+        ITEM_MOD_SPELL_HEALING_DONE
     };
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_RATING,
@@ -2169,7 +2155,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_MANA_REGENERATION
     };
     stat_group_sockets[STAT_GROUP_HEALING] = {
-        SOCKET_COLOR_BLUE
+        SOCKET_COLOR_GREEN
     };
     // Int DPS Data
     stat_group_primary_stats[STAT_GROUP_INT_DPS] = {

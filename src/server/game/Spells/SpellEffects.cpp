@@ -6049,12 +6049,12 @@ void Spell::EffectHoneVirtualItem()
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
 
-    float honePct = damage + vItem->honePct;
+    uint32 honeLevel = damage + vItem->honeLevel;
 
-    if (honePct > effectInfo->MiscValue) // cap
-        honePct = effectInfo->MiscValue;
+    if (honeLevel > 20) // cap, make this not some magic number
+        honeLevel = 20;
 
-    float honeChance = 100 - ((vItem->honePct / effectInfo->MiscValue) * 100);
+    /*float honeChance = 100 - ((vItem->honePct / effectInfo->MiscValue) * 100);
 
     if (honeChance <= 10.f)
         honeChance = 10.f;
@@ -6074,7 +6074,7 @@ void Spell::EffectHoneVirtualItem()
             sWorld->SendGlobalText(oss.str().c_str(), nullptr, CHAT_MSG_LOOT);
         }
         return;
-    }
+    }*/
 
     itemTarget->ToogleStats(false);
 
@@ -6093,8 +6093,7 @@ void Spell::EffectHoneVirtualItem()
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
 
-
-    modifier.statPoolPctModifier = honePct;
+    modifier.statPoolPctModifier = (100.0f + (float(honeLevel) / 2.0f)) / 100.0f;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
@@ -6106,7 +6105,7 @@ void Spell::EffectHoneVirtualItem()
     //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
     sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
 
-    vItem->honePct = honePct;
+    vItem->honeLevel = honeLevel;
     sVirtualItemMgr.UpdateHoneDisplaySpell(vItem);
 
     vItem->InitializeQueryData();

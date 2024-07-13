@@ -1494,6 +1494,7 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_MANA_REGENERATION] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ManaRegen", 0.4f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellPower", 1.35f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_PENETRATION] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellPenetration", 1.1f);
+    m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_SPELL_HEALING_DONE] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.SpellHealingDone", 1.75f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_EXPERTISE_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ExpertiseRating", 1.0f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_ARMOR_PENETRATION_RATING] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.ArmorPenetration", 1.1f);
     m_float_configs[CONFIG_ITEMGEN_STATWEIGHT_ATTACK_POWER] = sConfigMgr->GetFloatDefault("ItemGenerator.StatWeight.AttackPower", 2.0f);

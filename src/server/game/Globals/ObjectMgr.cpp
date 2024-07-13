@@ -4154,7 +4154,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->legendaryId = fields[i++].GetUInt32();
 
         itemTemplate->generatedMagicFind = fields[i++].GetUInt32();
-        itemTemplate->honePct = fields[i++].GetFloat();
+        itemTemplate->honeLevel = fields[i++].GetUInt32();
 
         itemTemplate->MaxDurability = round(float((itemTemplate->ItemLevel * (itemTemplate->Quality / 10.f)) + 25));;
 
@@ -4185,7 +4185,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
             mod.setSeed = itemTemplate->setSeed;
             mod.legendarySeed = itemTemplate->legendarySeed;
             mod.magicFind = itemTemplate->generatedMagicFind;
-            mod.statPoolPctModifier = itemTemplate->honePct;
+            mod.statPoolPctModifier = (100.0f + (float(itemTemplate->honeLevel) / 2.0f)) / 100.0f;
             mod.ilevel = itemTemplate->ItemLevel;
             sVirtualItemMgr.RegenerateItemInfo(itemTemplate, mod);
             itemTemplate->customFlags &= ~VIRTUAL_ITEM_FLAG_REGENERATE;
