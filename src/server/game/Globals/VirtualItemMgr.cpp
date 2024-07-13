@@ -811,7 +811,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
         float value = selectedStats[i].second;
 
         output->ItemStat[i].ItemStatType = type;
-        output->ItemStat[i].ItemStatValue = value;
+        output->ItemStat[i].ItemStatValue = int32(std::ceil(value));
 
         setStats = std::max(setStats, uint32(i + 1));
     }
