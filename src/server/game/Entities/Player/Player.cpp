@@ -14537,8 +14537,13 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleBaseModFlatValue(SHIELD_BLOCK_VALUE, float(enchant_amount), apply);
                             TC_LOG_DEBUG("entities.player.items", "+ {} BLOCK_VALUE", enchant_amount);
                             break;
-                        case ITEM_MOD_SPELL_HEALING_DONE:   // deprecated
-                        case ITEM_MOD_SPELL_DAMAGE_DONE:    // deprecated
+                        case ITEM_MOD_SPELL_HEALING_DONE:
+                            ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(enchant_amount), apply);
+                            break;
+                        case ITEM_MOD_SPELL_DAMAGE_DONE:
+                            for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+                                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(enchant_amount), apply);
+                            break;
                         default:
                             break;
                     }
