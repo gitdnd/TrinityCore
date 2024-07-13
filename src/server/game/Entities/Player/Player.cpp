@@ -5460,6 +5460,17 @@ float Player::GetMeleeCritFromAgility() const
     return crit*100.0f;
 }
 
+uint32 Player::GetSpellPowerFromPrimaryStats() const
+{
+    uint32 spellPower = 0;
+
+    // get half of intellect and spirit as spell power
+    spellPower += uint32(GetStat(STAT_INTELLECT) / 2.0f);
+    spellPower += uint32(GetStat(STAT_SPIRIT) / 2.0f);
+
+    return spellPower;
+}
+
 void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) const
 {
     // Table for base dodge values

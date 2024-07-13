@@ -1651,6 +1651,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         float OCTRegenMPPerSpirit() const;
         float GetRatingMultiplier(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
+        uint32 GetSpellPowerFromPrimaryStats() const;
         uint32 GetBaseSpellHealingBonus() const { return m_baseSpellHealingBonus; }
         uint32 GetBaseSpellDamageBonus() const { return m_baseSpellDamageBonus; }
         uint32 GetBaseSpellPowerBonus() const { return m_baseSpellPower; }
