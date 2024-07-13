@@ -3503,7 +3503,7 @@ void ObjectMgr::LoadItemTemplates()
                 itemTemplate.ItemStat[j].ItemStatType = 0;
             }
 
-            switch (itemTemplate.ItemStat[j].ItemStatType)
+            /*switch (itemTemplate.ItemStat[j].ItemStatType)
             {
                 case ITEM_MOD_SPELL_HEALING_DONE:
                 case ITEM_MOD_SPELL_DAMAGE_DONE:
@@ -3511,7 +3511,7 @@ void ObjectMgr::LoadItemTemplates()
                     break;
                 default:
                     break;
-            }
+            }*/
         }
 
         for (uint8 j = 0; j < MAX_ITEM_PROTO_DAMAGES; ++j)
