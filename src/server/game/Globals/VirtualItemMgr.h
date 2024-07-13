@@ -490,9 +490,9 @@ private:
          */
         std::vector<SocketColor> const& GetStatGroupSockets(StatGroup group, std::mt19937& generator) const;
         /**
-         * Returns the stat groups for the given players' loot preference.
+         * Returns the stat groups for the given loot preference.
          */
-        std::vector<StatGroup> const& GetPlayerLootPreference(uint8 lootPreference) const;
+        std::vector<StatGroup> const& GetPreferenceStatGroups(uint8 lootPreference) const;
     private:
         std::vector<ItemModType> stat_group_primary_stats[STAT_GROUP_COUNT];
         std::vector<ItemModType> stat_group_secondary_stats[STAT_GROUP_COUNT];
