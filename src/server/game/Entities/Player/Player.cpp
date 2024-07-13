@@ -7688,11 +7688,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 break;
             // deprecated item mods
             case ITEM_MOD_SPELL_HEALING_DONE:
-                ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(val), apply);
+                ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(val), true);
                 break;
             case ITEM_MOD_SPELL_DAMAGE_DONE:
                 for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-                    ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(val), apply);
+                    ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(val), true);
                 break;
         }
     }
@@ -14538,11 +14538,11 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             TC_LOG_DEBUG("entities.player.items", "+ {} BLOCK_VALUE", enchant_amount);
                             break;
                         case ITEM_MOD_SPELL_HEALING_DONE:
-                            ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(enchant_amount), apply);
+                            ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(enchant_amount), true);
                             break;
                         case ITEM_MOD_SPELL_DAMAGE_DONE:
                             for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-                                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(enchant_amount), apply);
+                                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(enchant_amount), true);
                             break;
                         default:
                             break;
