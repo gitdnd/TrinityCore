@@ -1631,6 +1631,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ApplyFeralAPBonus(int32 amount, bool apply);
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateShieldBlockValue();
+        void ApplySpellHealingBonus(int32 amount, bool apply);
+        void ApplySpellDamageBonus(int32 amount, bool apply);
         void ApplySpellPowerBonus(int32 amount, bool apply);
         void UpdateSpellDamageAndHealingBonus();
         void ApplyRatingMod(CombatRating cr, int32 value, bool apply);
@@ -1649,6 +1651,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         float OCTRegenMPPerSpirit() const;
         float GetRatingMultiplier(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
+        uint32 GetBaseSpellHealingBonus() const { return m_baseSpellHealingBonus; }
+        uint32 GetBaseSpellDamageBonus() const { return m_baseSpellDamageBonus; }
         uint32 GetBaseSpellPowerBonus() const { return m_baseSpellPower; }
         int32 GetSpellPenetrationItemMod() const { return m_spellPenetrationItemMod; }
 
@@ -2453,6 +2457,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         float m_auraBaseFlatMod[BASEMOD_END];
         float m_auraBasePctMod[BASEMOD_END];
         int16 m_baseRatingValue[MAX_COMBAT_RATING];
+        uint32 m_baseSpellHealingBonus;
+        uint32 m_baseSpellDamageBonus;
         uint32 m_baseSpellPower;
         uint32 m_baseFeralAP;
         uint32 m_baseManaRegen;

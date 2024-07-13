@@ -343,6 +343,8 @@ Player::Player(WorldSession* session): Unit(true)
     for (uint8 i = 0; i < MAX_COMBAT_RATING; i++)
         m_baseRatingValue[i] = 0;
 
+    m_baseSpellHealingBonus = 0;
+    m_baseSpellDamageBonus = 0;
     m_baseSpellPower = 0;
     m_baseFeralAP = 0;
     m_baseManaRegen = 0;
@@ -7688,11 +7690,10 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 break;
             // deprecated item mods
             case ITEM_MOD_SPELL_HEALING_DONE:
-                ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(val), true);
+                ApplySpellHealingBonus(int32(val), apply);
                 break;
             case ITEM_MOD_SPELL_DAMAGE_DONE:
-                for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-                    ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(val), true);
+                ApplySpellDamageBonus(int32(val), apply);
                 break;
         }
     }
@@ -14538,11 +14539,12 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             TC_LOG_DEBUG("entities.player.items", "+ {} BLOCK_VALUE", enchant_amount);
                             break;
                         case ITEM_MOD_SPELL_HEALING_DONE:
-                            ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, int32(enchant_amount), true);
+                            ApplySpellHealingBonus(int32(enchant_amount), apply);
+                            TC_LOG_DEBUG("entities.player.items", "+ {} SPELL_HEALING_DONE", enchant_amount);
                             break;
                         case ITEM_MOD_SPELL_DAMAGE_DONE:
-                            for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-                                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, int32(enchant_amount), true);
+                            ApplySpellDamageBonus(int32(enchant_amount), apply);
+                            TC_LOG_DEBUG("entities.player.items", "+ {} SPELL_DAMAGE_DONE", enchant_amount);
                             break;
                         default:
                             break;
