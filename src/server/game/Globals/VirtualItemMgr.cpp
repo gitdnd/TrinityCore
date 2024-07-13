@@ -2147,7 +2147,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_STAMINA,
         ITEM_MOD_INTELLECT,
         ITEM_MOD_SPIRIT,
-        ITEM_MOD_SPELL_HEALING_DONE
+        ITEM_MOD_SPELL_DAMAGE_DONE
     };
     stat_group_secondary_stats[STAT_GROUP_HEALING] = {
         ITEM_MOD_HASTE_RATING,
