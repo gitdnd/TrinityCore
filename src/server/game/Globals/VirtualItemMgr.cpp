@@ -337,22 +337,20 @@ VirtualItemTemplate* VirtualItemMgr::GenerateVirtualTemplate(ItemTemplate const*
 void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModifier& modifier) const
 {
     std::mt19937 generator(modifier.statGroupSeed);
-    StatGroup statgroupid;
-    StatGroup statgroupbiasid;
 
     // select a random preference group from all preference groups
     uint8 preferenceid = static_cast<LootPreference>(urand(PREF_NONE + 1, MAX_PREF - 1, generator));
 
     // select a stat group from the selected preference group
     std::vector<StatGroup> const& statgroups = premadeStatGroupData.GetPreferenceStatGroups(preferenceid);
-    statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
+    StatGroup statgroupid = statgroups[urand(0, statgroups.size() - 1, generator)];
 
     // if the player has a loot preference, roll for bias statgroup
     if (modifier.statgroup == STAT_GROUP_RANDOM && modifier.lootPreference > PREF_NONE && modifier.lootPreference < MAX_PREF)
     {
         // grab available loot preference stat groups
         std::vector<StatGroup> const& substatgroups = premadeStatGroupData.GetPreferenceStatGroups(modifier.lootPreference);
-        statgroupbiasid = substatgroups[urand(0, substatgroups.size() - 1, generator)];
+        StatGroup statgroupbiasid = substatgroups[urand(0, substatgroups.size() - 1, generator)];
 
         // Variable stat group bias depending on generated item quality
         uint32 chance = 0;
@@ -373,7 +371,6 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
                 chance = 100;
                 break;
             default:
-                chance = 0;
                 break;
         }
 
