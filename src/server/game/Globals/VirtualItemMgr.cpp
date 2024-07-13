@@ -480,7 +480,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
     if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
     {
         // by default we assume 1 ilevel = 1 armor
-        float armorValue = (float)ilevel;
+        float armorValue = float(ilevel);
 
         // retrieve armor slot and type multiplier
         armorValue *= VirtualModifier::GetTypeSlotArmorModifier(output);;
@@ -491,13 +491,13 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         armorValue *= VirtualModifier::GetQualityStatModifier(output);
 
         // add a random 10% increase or decrease of stats
-        armorValue = (float)urand((uint32)(armorValue * 0.9f), (uint32)(armorValue * 1.1f), generator);
+        armorValue *= frand(0.9f, 1.1f, generator);
 
         // apply stat pool percentage modifiers (ie. honing)
         armorValue *= modifier.statPoolPctModifier;
 
         // apply armor value to template
-        output->Armor = (uint32)armorValue;
+        output->Armor = uint32(armorValue);
     }
 
     // Apply block rating to shields
@@ -614,8 +614,8 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // apply other item data
     
-     //output->MaxDurability = 0; // Disable any form of durability for now
-    output->MaxDurability = round(float((output->ItemLevel * (output->Quality / 10.f)) + 25));
+    output->MaxDurability = 0; // Disable any form of durability for now
+    //output->MaxDurability = round(float((output->ItemLevel * (output->Quality / 10.f)) + 25));
 }
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
