@@ -7331,16 +7331,9 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                     if (vTemp->honeLevel >= 20)
                         return SPELL_FAILED_NO_VALID_TARGETS;
 
-                    if (spellEffectInfo.MiscValueB)
-                    {
-                        if (vTemp->Class != ITEM_CLASS_WEAPON)
+                    if (spellEffectInfo.MiscValue)
+                        if (vTemp->Quality > spellEffectInfo.MiscValue)
                             return SPELL_FAILED_NO_VALID_TARGETS;
-                    }
-                    else
-                    {
-                        if (vTemp->Class != ITEM_CLASS_ARMOR)
-                            return SPELL_FAILED_NO_VALID_TARGETS;
-                    }
                 }
                 break;
             }
