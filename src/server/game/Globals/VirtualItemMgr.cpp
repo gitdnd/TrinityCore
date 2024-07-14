@@ -592,8 +592,6 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
                 output->InventoryType = wType;
         }
 
-
-
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
         if ((output->statGroup == STAT_GROUP_SPI_HEALING || output->statGroup == STAT_GROUP_INT_HEALING || output->statGroup == STAT_GROUP_INT_DPS || output->statGroup == STAT_GROUP_SPI_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
@@ -2286,7 +2284,8 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_PARRY_RATING,
         ITEM_MOD_HIT_RATING,
-        ITEM_MOD_EXPERTISE_RATING
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ATTACK_POWER
     };
     stat_group_sockets[STAT_GROUP_STR_PARRY_TANK] = {
         SOCKET_COLOR_RED
@@ -2317,7 +2316,8 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_DODGE_RATING,
         ITEM_MOD_HIT_RATING,
-        ITEM_MOD_EXPERTISE_RATING
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ATTACK_POWER
     };
     stat_group_sockets[STAT_GROUP_AGI_DODGE_TANK] = {
         SOCKET_COLOR_YELLOW
