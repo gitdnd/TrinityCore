@@ -617,8 +617,8 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // apply other item data
     
-    output->MaxDurability = 0; // Disable any form of durability for now
-    //output->MaxDurability = round(float((output->ItemLevel * (output->Quality / 10.f)) + 25));
+    //output->MaxDurability = 0; // Disable any form of durability for now
+    output->MaxDurability = round(float((output->ItemLevel * (output->Quality / 10.f)) + 25));
 }
 
 void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModifier& modifier) const
@@ -2274,7 +2274,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
     stat_group_sockets[STAT_GROUP_AGI_DPS_NO_EXP] = {
-        SOCKET_COLOR_RED
+        SOCKET_COLOR_YELLOW
     };
 
     // Str Parry Tank Data
