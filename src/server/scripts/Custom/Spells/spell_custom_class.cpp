@@ -45,8 +45,73 @@ enum CustomClassSpells
 };
 
 
-// - 94245 sacred echoes damage
+// 94252 - Secrets of Mana
+class spell_talent_secrets_of_mana : public AuraScript
+{
+    PrepareAuraScript(spell_talent_secrets_of_mana);
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        Player* player = eventInfo.GetActor()->ToPlayer();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+
+        int32 manaCost = procSpell->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
+
+        if (Aura* existingBuff = player->GetAura(94253))
+        {
+            int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+            int32 newAmount = existingAmount + manaCost;
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(newAmount);
+            player->CastSpell(player, 94253, args);
+        }
+        else
+        {
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(manaCost * 0.5);
+            player->CastSpell(player, 94253, args);
+        }
+    }
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_secrets_of_mana::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+
+// 94253 - Secrets of Mana Buff
+class spell_talent_secrets_of_mana_reduction : public AuraScript
+{
+    PrepareAuraScript(spell_talent_secrets_of_mana_reduction);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Unit* player = GetCaster();
+
+        if (Aura* existingBuff = player->GetAura(94253))
+        {
+            int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+            int32 newAmount = existingAmount * 0.9;
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(newAmount);
+
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_secrets_of_mana_reduction::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+
+// - 94245 sacred echoes damage
 class spell_talent_sacred_echoes_damage : public AuraScript
 {
     PrepareAuraScript(spell_talent_sacred_echoes_damage);
@@ -140,8 +205,8 @@ class spell_talent_wandering_affliction : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
         Unit* target = eventInfo.GetProcTarget();
-        if (!roll_chance_f(caster->GetUnitCriticalChanceAgainst(BASE_ATTACK, target)))
-            return;
+        //if (!roll_chance_f(caster->GetUnitCriticalChanceAgainst(BASE_ATTACK, target)))
+        //    return;
 
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
         if (!damageInfo || !damageInfo->GetDamage())
@@ -1233,4 +1298,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_sacred_echoes_damage);
     RegisterSpellScript(spell_talent_sacred_echoes_heal);
     RegisterSpellScript(spell_talent_wandering_affliction);
+    RegisterSpellScript(spell_talent_secrets_of_mana);
+    RegisterSpellScript(spell_talent_secrets_of_mana_reduction);
 };
