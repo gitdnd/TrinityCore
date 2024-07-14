@@ -613,7 +613,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // TODO: add custom descriptions to legendaries possibly?
     // currently used to clean description of base template for crafting etc.
-    output->Description = "Stat Group: " + output->statGroup;
+    output->Description = "Stat Group: " + std::to_string(output->statGroup);
 
     // apply other item data
     
