@@ -380,15 +380,15 @@ void VirtualItemMgr::GenerateStatGroup(VirtualItemTemplate* output, VirtualModif
 
     // override stat group if the item is flagged as a specific type
     if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WARDEN) != 0)
-        statgroupid = STAT_GROUP_STR_TANK;
+        statgroupid = STAT_GROUP_STR_BLOCK_TANK;
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_HISTORIAN) != 0)
-        statgroupid = STAT_GROUP_HEALING;
+        statgroupid = STAT_GROUP_INT_HEALING;
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WEAVER) != 0)
         statgroupid = STAT_GROUP_INT_DPS;
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_WATCHER) != 0)
-        statgroupid = STAT_GROUP_STR_DPS;
+        statgroupid = STAT_GROUP_STR_DPS_NO_EXP;
     else if ((output->FlagsCu & ITEM_FLAGS_CU_VIRT_CLASS_RANGER) != 0)
-        statgroupid = STAT_GROUP_AGI_DPS;
+        statgroupid = STAT_GROUP_AGI_DPS_NO_EXP;
 
     // if the modifier is not set to random (default value), override selected stat group
     if (modifier.statgroup != STAT_GROUP_RANDOM)
@@ -592,8 +592,10 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
                 output->InventoryType = wType;
         }
 
+
+
         // If weapon is a caster weapon, divide damage by 2, unless it's a wand!
-        if ((output->statGroup == STAT_GROUP_HEALING || output->statGroup == STAT_GROUP_INT_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
+        if ((output->statGroup == STAT_GROUP_SPI_HEALING || output->statGroup == STAT_GROUP_INT_HEALING || output->statGroup == STAT_GROUP_INT_DPS || output->statGroup == STAT_GROUP_SPI_DPS) && output->SubClass != ITEM_SUBCLASS_WEAPON_WAND)
         {
             output->Damage[0].DamageMin /= 2.0f;
             output->Damage[0].DamageMax /= 2.0f;
@@ -611,7 +613,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
 
     // TODO: add custom descriptions to legendaries possibly?
     // currently used to clean description of base template for crafting etc.
-    output->Description = "";
+    output->Description = "Stat Group: " + output->statGroup;
 
     // apply other item data
     
@@ -651,10 +653,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
     // get stat pool amount
     uint32 primaryStatSlots = VirtualModifier::GetPrimaryStatSlots(output);
     uint32 secondaryStatSlots = VirtualModifier::GetSecondaryStatSlots(output);
-
-    // since SP is now a primary stat, we need to reduce INT stat groups by -1 to not fill up the tooltips
-    if (secondaryStatSlots > 0 && (statgroupid == STAT_GROUP_INT_DPS || statgroupid == STAT_GROUP_HEALING))
-        secondaryStatSlots = secondaryStatSlots - 1;
 
     // if this is a trinket, randomly select which slot to generate a stat for
     if (output->Class == ITEM_CLASS_ARMOR && output->InventoryType == INVTYPE_TRINKET)
@@ -728,16 +726,20 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
             {
                 switch (statgroupid)
                 {
-                    case STAT_GROUP_HEALING:
+                    case STAT_GROUP_INT_HEALING:
+                    case STAT_GROUP_SPI_HEALING:
                         statPoints *= 0.8f;
                         break;
                     case STAT_GROUP_INT_DPS:
+                    case STAT_GROUP_SPI_DPS:
                         statPoints *= 0.9f;
                         break;
-                    case STAT_GROUP_STR_TANK:
+                    case STAT_GROUP_STR_PARRY_TANK:
+                    case STAT_GROUP_STR_BLOCK_TANK:
                         statPoints *= 1.6f;
                         break;
-                    case STAT_GROUP_AGI_TANK:
+                    case STAT_GROUP_AGI_DODGE_TANK:
+                    case STAT_GROUP_AGI_BLOCK_TANK:
                         statPoints *= 1.4f;
                         break;
                     default:
@@ -1771,7 +1773,8 @@ float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output
 {
     switch (output->statGroup)
     {
-        case STAT_GROUP_STR_TANK:
+        case STAT_GROUP_STR_BLOCK_TANK:
+        case STAT_GROUP_STR_PARRY_TANK:
             switch (output->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -1785,7 +1788,8 @@ float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output
                 default:
                     return 1.0f;
             }
-        case STAT_GROUP_AGI_TANK:
+        case STAT_GROUP_AGI_DODGE_TANK:
+        case STAT_GROUP_AGI_BLOCK_TANK:
             switch (output->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -1799,7 +1803,8 @@ float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output
                 default:
                     return 1.0f;
             }
-        case STAT_GROUP_HEALING:
+        case STAT_GROUP_SPI_HEALING:
+        case STAT_GROUP_INT_HEALING:
             switch (output->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -1813,6 +1818,7 @@ float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output
                     return 1.0f;
             }
         case STAT_GROUP_INT_DPS:
+        case STAT_GROUP_SPI_DPS:
             switch (output->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -1825,7 +1831,8 @@ float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output
                 default:
                     return 1.0f;
             }
-        case STAT_GROUP_STR_DPS:
+        case STAT_GROUP_STR_DPS_NO_HIT:
+        case STAT_GROUP_STR_DPS_NO_EXP:
             switch (output->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -1839,7 +1846,8 @@ float VirtualModifier::GetArmorTypeStatGroupModifier(VirtualItemTemplate* output
                 default:
                     return 1.0f;
             }
-        case STAT_GROUP_AGI_DPS:
+        case STAT_GROUP_AGI_DPS_NO_HIT:
+        case STAT_GROUP_AGI_DPS_NO_EXP:
             switch (output->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -2143,100 +2151,191 @@ uint32 VirtualItemTemplate::GetDBCDisplay()
 
 VirtualItemMgr::StatGroupData::StatGroupData()
 {
-    // Healing Data
-    stat_group_primary_stats[STAT_GROUP_HEALING] = {
+    // Spi Healer Data
+    stat_group_primary_stats[STAT_GROUP_SPI_HEALING] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_INTELLECT,
-        ITEM_MOD_SPIRIT,
-        ITEM_MOD_SPELL_HEALING_DONE
+        ITEM_MOD_SPIRIT
     };
-    stat_group_secondary_stats[STAT_GROUP_HEALING] = {
+    stat_group_secondary_stats[STAT_GROUP_SPI_HEALING] = {
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_MANA_REGENERATION
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_SPELL_HEALING_DONE
     };
-    stat_group_sockets[STAT_GROUP_HEALING] = {
+    stat_group_sockets[STAT_GROUP_SPI_HEALING] = {
         SOCKET_COLOR_GREEN
     };
+
+    // Int Healer Data
+    stat_group_primary_stats[STAT_GROUP_INT_HEALING] = {
+    ITEM_MOD_STAMINA,
+    ITEM_MOD_INTELLECT
+    };
+    stat_group_secondary_stats[STAT_GROUP_INT_HEALING] = {
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_SPELL_HEALING_DONE
+    };
+    stat_group_sockets[STAT_GROUP_INT_HEALING] = {
+        SOCKET_COLOR_GREEN
+    };
+
+    // Spi DPS Data
+    stat_group_primary_stats[STAT_GROUP_SPI_DPS] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_SPIRIT
+    };
+    stat_group_secondary_stats[STAT_GROUP_SPI_DPS] = {
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_SPELL_DAMAGE_DONE
+    };
+    stat_group_sockets[STAT_GROUP_SPI_DPS] = {
+        SOCKET_COLOR_BLUE
+    };
+
     // Int DPS Data
     stat_group_primary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_INTELLECT,
-        ITEM_MOD_SPELL_DAMAGE_DONE
+        ITEM_MOD_INTELLECT
     };
     stat_group_secondary_stats[STAT_GROUP_INT_DPS] = {
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
-        ITEM_MOD_SPELL_PENETRATION
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_SPELL_DAMAGE_DONE
     };
     stat_group_sockets[STAT_GROUP_INT_DPS] = {
         SOCKET_COLOR_BLUE
     };
-    // Str DPS Data
-    stat_group_primary_stats[STAT_GROUP_STR_DPS] = {
+
+    // Str DPS Data No Hit
+    stat_group_primary_stats[STAT_GROUP_STR_DPS_NO_HIT] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_STRENGTH
     };
-    stat_group_secondary_stats[STAT_GROUP_STR_DPS] = {
-        ITEM_MOD_HIT_RATING,
+    stat_group_secondary_stats[STAT_GROUP_STR_DPS_NO_HIT] = {
         ITEM_MOD_CRIT_RATING,
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
-    stat_group_sockets[STAT_GROUP_STR_DPS] = {
+    stat_group_sockets[STAT_GROUP_STR_DPS_NO_HIT] = {
         SOCKET_COLOR_RED
     };
-    // Str Tank Data
-    stat_group_primary_stats[STAT_GROUP_STR_TANK] = {
+
+    // Str DPS Data No Expertise
+    stat_group_primary_stats[STAT_GROUP_STR_DPS_NO_EXP] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_STRENGTH
     };
-    stat_group_secondary_stats[STAT_GROUP_STR_TANK] = {
-        ITEM_MOD_DEFENSE_SKILL_RATING,
-        ITEM_MOD_DODGE_RATING,
-        ITEM_MOD_PARRY_RATING,
+    stat_group_secondary_stats[STAT_GROUP_STR_DPS_NO_EXP] = {
         ITEM_MOD_HIT_RATING,
-        ITEM_MOD_EXPERTISE_RATING,
-        ITEM_MOD_BLOCK_RATING,
-        ITEM_MOD_BLOCK_VALUE
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_ARMOR_PENETRATION_RATING
     };
-    stat_group_sockets[STAT_GROUP_STR_TANK] = {
+    stat_group_sockets[STAT_GROUP_STR_DPS_NO_EXP] = {
         SOCKET_COLOR_RED
     };
-    // Agi DPS Data
-    stat_group_primary_stats[STAT_GROUP_AGI_DPS] = {
+
+    // Agi DPS Data No Hit
+    stat_group_primary_stats[STAT_GROUP_AGI_DPS_NO_HIT] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_AGILITY
     };
-    stat_group_secondary_stats[STAT_GROUP_AGI_DPS] = {
-        ITEM_MOD_HIT_RATING,
+    stat_group_secondary_stats[STAT_GROUP_AGI_DPS_NO_HIT] = {
         ITEM_MOD_CRIT_RATING,
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_ATTACK_POWER,
         ITEM_MOD_ARMOR_PENETRATION_RATING
     };
-    stat_group_sockets[STAT_GROUP_AGI_DPS] = {
+    stat_group_sockets[STAT_GROUP_AGI_DPS_NO_HIT] = {
         SOCKET_COLOR_YELLOW
     };
-    // Agi Tank Data
-    stat_group_primary_stats[STAT_GROUP_AGI_TANK] = {
+
+    // Agi DPS Data No Expertise
+    stat_group_primary_stats[STAT_GROUP_AGI_DPS_NO_EXP] = {
         ITEM_MOD_STAMINA,
         ITEM_MOD_AGILITY
     };
-    stat_group_secondary_stats[STAT_GROUP_AGI_TANK] = {
+    stat_group_secondary_stats[STAT_GROUP_AGI_DPS_NO_EXP] = {
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_ARMOR_PENETRATION_RATING
+    };
+    stat_group_sockets[STAT_GROUP_AGI_DPS_NO_EXP] = {
+        SOCKET_COLOR_RED
+    };
+
+    // Str Parry Tank Data
+    stat_group_primary_stats[STAT_GROUP_STR_PARRY_TANK] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_STR_PARRY_TANK] = {
         ITEM_MOD_DEFENSE_SKILL_RATING,
-        ITEM_MOD_DODGE_RATING,
         ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_EXPERTISE_RATING
+    };
+    stat_group_sockets[STAT_GROUP_STR_PARRY_TANK] = {
+        SOCKET_COLOR_RED
+    };
+
+    // Str Block Tank Data
+    stat_group_primary_stats[STAT_GROUP_STR_BLOCK_TANK] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_STR_BLOCK_TANK] = {
+        ITEM_MOD_DEFENSE_SKILL_RATING,
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_EXPERTISE_RATING,
         ITEM_MOD_BLOCK_RATING,
         ITEM_MOD_BLOCK_VALUE
     };
-    stat_group_sockets[STAT_GROUP_AGI_TANK] = {
+    stat_group_sockets[STAT_GROUP_STR_BLOCK_TANK] = {
+        SOCKET_COLOR_RED
+    };
+
+    // Agi Dodge Tank Data
+    stat_group_primary_stats[STAT_GROUP_AGI_DODGE_TANK] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_STRENGTH
+    };
+    stat_group_secondary_stats[STAT_GROUP_AGI_DODGE_TANK] = {
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_EXPERTISE_RATING
+    };
+    stat_group_sockets[STAT_GROUP_AGI_DODGE_TANK] = {
+        SOCKET_COLOR_YELLOW
+    };
+
+    // Agi Block Tank Data
+    stat_group_primary_stats[STAT_GROUP_AGI_BLOCK_TANK] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY
+    };
+    stat_group_secondary_stats[STAT_GROUP_AGI_BLOCK_TANK] = {
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE
+    };
+    stat_group_sockets[STAT_GROUP_AGI_BLOCK_TANK] = {
         SOCKET_COLOR_YELLOW
     };
     // Stat group for all stats
@@ -2319,20 +2418,26 @@ VirtualItemMgr::StatGroupData::StatGroupData()
 
     //preference stat groups
     preference_stat_groups[PREF_TANK] = {
-        STAT_GROUP_AGI_TANK,
-        STAT_GROUP_STR_TANK
+        STAT_GROUP_STR_PARRY_TANK,
+        STAT_GROUP_STR_BLOCK_TANK,
+        STAT_GROUP_AGI_DODGE_TANK,
+        STAT_GROUP_AGI_BLOCK_TANK
     };
     preference_stat_groups[PREF_HEALER] = {
-        STAT_GROUP_HEALING
+        STAT_GROUP_SPI_HEALING,
+        STAT_GROUP_INT_HEALING
     };
     preference_stat_groups[PREF_DPS_INT] = {
-        STAT_GROUP_INT_DPS
+        STAT_GROUP_INT_DPS,
+        STAT_GROUP_SPI_DPS
     };
     preference_stat_groups[PREF_DPS_STR] = {
-        STAT_GROUP_STR_DPS
+        STAT_GROUP_STR_DPS_NO_HIT,
+        STAT_GROUP_STR_DPS_NO_EXP
     };
     preference_stat_groups[PREF_DPS_AGI] = {
-        STAT_GROUP_AGI_DPS
+        STAT_GROUP_AGI_DPS_NO_HIT,
+        STAT_GROUP_AGI_DPS_NO_EXP
     };
 }
 
