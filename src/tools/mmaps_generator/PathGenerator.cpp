@@ -233,10 +233,6 @@ bool handleArgs(int argc, char** argv,
 
             offMeshInputPath = param;
         }
-        else if (strcmp(argv[i], "--allowDebug") == 0)
-        {
-            allowDebug = true;
-        }
         else if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-?"))
         {
             printf("%s\n", Readme);
