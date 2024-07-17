@@ -1066,8 +1066,9 @@ namespace LuaWorldObject
         uint32 musicid = E->CHECKVAL<uint32>(2);
         Player* player = E->CHECKOBJ<Player>(3, false);
 
-        if (musicid > 0 && !sSoundEntriesStore.LookupEntry(musicid))
-            return 0;
+
+        if (!sSoundEntriesStore.LookupEntry(musicid))
+            musicid = 0;
 
         WorldPackets::Misc::PlayMusic playMusic(musicid);
         const WorldPacket* data = playMusic.Write();
