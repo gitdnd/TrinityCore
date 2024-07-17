@@ -1323,17 +1323,6 @@ void Player::Update(uint32 p_time)
     UpdateEnchantTime(p_time);
     UpdateHomebindTime(p_time);
 
-    if (!_instanceResetTimes.empty())
-    {
-        for (InstanceTimeMap::iterator itr = _instanceResetTimes.begin(); itr != _instanceResetTimes.end();)
-        {
-            if (itr->second < now)
-                _instanceResetTimes.erase(itr++);
-            else
-                ++itr;
-        }
-    }
-
     if (GetClass() == CLASS_DEATH_KNIGHT)
     {
         // Update rune timers
@@ -3864,7 +3853,10 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
     GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
     {
         SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-        return spellInfo->RecoveryTime < 10 * MINUTE * IN_MILLISECONDS && spellInfo->CategoryRecoveryTime < 10 * MINUTE * IN_MILLISECONDS;
+        int32 cooldown = -1;
+        int32 categoryCooldown = -1;
+        SpellHistory::GetCooldownDurations(spellInfo, itr->second.ItemId, &cooldown, nullptr, &categoryCooldown);
+        return cooldown < 10 * MINUTE * IN_MILLISECONDS && categoryCooldown < 10 * MINUTE * IN_MILLISECONDS;
     }, true);
 
     // pet cooldowns
@@ -18088,7 +18080,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[50].GetUInt16());
 
     _LoadBoundInstances(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BOUND_INSTANCES));
-    _LoadInstanceTimeRestrictions(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES));
+
     _LoadBGData(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BG_DATA));
 
     GetSession()->SetPlayer(this);
@@ -19949,19 +19941,6 @@ bool Player::CheckInstanceValidity(bool /*isLogin*/)
     return true;
 }
 
-bool Player::CheckInstanceCount(uint32 instanceId) const
-{
-    if (_instanceResetTimes.size() < sWorld->getIntConfig(CONFIG_MAX_INSTANCES_PER_HOUR))
-        return true;
-    return _instanceResetTimes.find(instanceId) != _instanceResetTimes.end();
-}
-
-void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime)
-{
-    if (_instanceResetTimes.find(instanceId) == _instanceResetTimes.end())
-        _instanceResetTimes.insert(InstanceTimeMap::value_type(instanceId, enterTime + HOUR));
-}
-
 bool Player::_LoadHomeBind(PreparedQueryResult result)
 {
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(GetRace(), GetClass());
@@ -20347,8 +20326,8 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create /* = false
     _SaveEquipmentSets(trans);
     GetSession()->SaveTutorialsData(trans);                 // changed only while character in game
     _SaveGlyphs(trans);
-    _SaveInstanceTimeRestrictions(trans);
     _SaveSlotHighestLevel(trans);
+    GetSession()->SaveInstanceTimeRestrictions(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -26607,14 +26586,14 @@ void Player::SetEquipmentSet(EquipmentSetInfo::EquipmentSetData const& eqSet)
         }
     }
 
-    EquipmentSetInfo& eqSlot = _equipmentSets[eqSet.Guid];
+    uint64 setGuid = (eqSet.Guid != 0) ? eqSet.Guid : sObjectMgr->GenerateEquipmentSetGuid();
 
-    EquipmentSetUpdateState oldState = eqSlot.State;
+    EquipmentSetInfo& eqSlot = _equipmentSets[setGuid];
     eqSlot.Data = eqSet;
 
     if (eqSet.Guid == 0)
     {
-        eqSlot.Data.Guid = sObjectMgr->GenerateEquipmentSetGuid();
+        eqSlot.Data.Guid = setGuid;
 
         WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4 + 1);
         data << uint32(eqSlot.Data.SetID);
@@ -26622,7 +26601,7 @@ void Player::SetEquipmentSet(EquipmentSetInfo::EquipmentSetData const& eqSet)
         SendDirectMessage(&data);
     }
 
-    eqSlot.State = (oldState == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED);
+    eqSlot.State = (eqSlot.State == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED);
 }
 
 void Player::_SaveEquipmentSets(CharacterDatabaseTransaction trans)
@@ -27403,18 +27382,6 @@ std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const
     return itemLevels;
 }
 
-void Player::_LoadInstanceTimeRestrictions(PreparedQueryResult result)
-{
-    if (!result)
-        return;
-
-    do
-    {
-        Field* fields = result->Fetch();
-        _instanceResetTimes.insert(InstanceTimeMap::value_type(fields[0].GetUInt32(), fields[1].GetUInt64()));
-    } while (result->NextRow());
-}
-
 void Player::_LoadPetStable(uint8 petStableSlots, PreparedQueryResult result)
 {
     if (!petStableSlots && !result)
@@ -27461,25 +27428,6 @@ void Player::_LoadPetStable(uint8 petStableSlots, PreparedQueryResult result)
                 m_petStable->UnslottedPets.push_back(std::move(petInfo));
 
         } while (result->NextRow());
-    }
-}
-
-void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
-{
-    if (_instanceResetTimes.empty())
-        return;
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_INSTANCE_LOCK_TIMES);
-    stmt->setUInt32(0, GetSession()->GetAccountId());
-    trans->Append(stmt);
-
-    for (InstanceTimeMap::const_iterator itr = _instanceResetTimes.begin(); itr != _instanceResetTimes.end(); ++itr)
-    {
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES);
-        stmt->setUInt32(0, GetSession()->GetAccountId());
-        stmt->setUInt32(1, itr->first);
-        stmt->setUInt64(2, itr->second);
-        trans->Append(stmt);
     }
 }
 
