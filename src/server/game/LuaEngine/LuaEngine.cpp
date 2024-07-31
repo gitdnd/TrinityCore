@@ -78,7 +78,12 @@ CreatureUniqueBindings(NULL)
 {
     OpenLua();
     eventMgr = new EventMgr(this);
-    RunScripts();
+
+    // if the script cache is ready, run scripts, otherwise flag state for reload
+    if (sElunaLoader->GetCacheState() == SCRIPT_CACHE_READY)
+        RunScripts();
+    else
+        reload = true;
 }
 
 Eluna::~Eluna()
@@ -109,8 +114,11 @@ static int PrecompiledLoader(lua_State* L)
     const char* modname = lua_tostring(L, 1);
     if (modname == NULL)
         return 0;
-    auto it = std::find_if(sElunaLoader->combined_scripts.begin(), sElunaLoader->combined_scripts.end(), [modname](const LuaScript& script) { return script.filename == modname; });
-    if (it == sElunaLoader->combined_scripts.end()) {
+
+    const std::vector<LuaScript>& scripts = sElunaLoader->GetLuaScripts();
+
+    auto it = std::find_if(scripts.begin(), scripts.end(), [modname](const LuaScript& script) { return script.filename == modname; });
+    if (it == scripts.end()) {
         lua_pushfstring(L, "\n\tno precompiled script '%s' found", modname);
         return 1;
     }
@@ -137,16 +145,18 @@ void Eluna::OpenLua()
     // open base lua libraries
     luaL_openlibs(L);
 
-    // open additional lua libraries
-
     // Register methods and functions
     RegisterFunctions(this);
 
+    // get require paths
+    const std::string& requirepath = sElunaLoader->GetRequirePath();
+    const std::string& requirecpath = sElunaLoader->GetRequireCPath();
+
     // Set lua require folder paths (scripts folder structure)
     lua_getglobal(L, "package");
-    lua_pushstring(L, sElunaLoader->lua_requirepath.c_str());
+    lua_pushstring(L, requirepath.c_str());
     lua_setfield(L, -2, "path");
-    lua_pushstring(L, sElunaLoader->lua_requirecpath.c_str());
+    lua_pushstring(L, requirecpath.c_str());
     lua_setfield(L, -2, "cpath");
     // Set package.loaders loader for precompiled scripts
     lua_getfield(L, -1, "loaders");
@@ -255,7 +265,9 @@ void Eluna::RunScripts()
     lua_getglobal(L, "require");
     // Stack: require
 
-    for (auto it = sElunaLoader->combined_scripts.begin(); it != sElunaLoader->combined_scripts.end(); ++it)
+    const std::vector<LuaScript>& scripts = sElunaLoader->GetLuaScripts();
+
+    for (auto it = scripts.begin(); it != scripts.end(); ++it)
     {
         //uint32 perScriptTime = ElunaUtil::GetCurrTime();
         // if the Eluna state is in compatibility mode, it should load all scripts, including those tagged with a specific map ID
@@ -299,7 +311,7 @@ void Eluna::RunScripts()
     OnLuaStateOpen();
 }
 
-#ifndef TRACKABLE_PTR_NAMESPACE
+#if !defined TRACKABLE_PTR_NAMESPACE
 void Eluna::InvalidateObjects()
 {
     ++callstackid;
@@ -969,7 +981,7 @@ int Eluna::Register(uint8 regtype, uint32 entry, ObjectGuid guid, uint32 instanc
     luaL_unref(L, LUA_REGISTRYINDEX, functionRef);
     std::ostringstream oss;
     oss << "regtype " << static_cast<uint32>(regtype) << ", event " << event_id << ", entry " << entry << ", guid " <<
-#ifdef TRINITY
+#if defined ELUNA_TRINITY
         guid.ToHexString()
 #else
         guid.GetRawValue()
@@ -981,14 +993,14 @@ int Eluna::Register(uint8 regtype, uint32 entry, ObjectGuid guid, uint32 instanc
 
 void Eluna::UpdateEluna(uint32 diff)
 {
-    if (reload)
-#ifdef TRINITY
+    if (reload && sElunaLoader->GetCacheState() == SCRIPT_CACHE_READY)
+#if defined ELUNA_TRINITY
         if(!GetQueryProcessor().HasPendingCallbacks())
 #endif
             _ReloadEluna();
 
     eventMgr->globalProcessor->Update(diff);
-#ifdef TRINITY
+#if defined ELUNA_TRINITY
     GetQueryProcessor().ProcessReadyCallbacks();
 #endif
 }
@@ -1003,7 +1015,7 @@ void Eluna::CleanUpStack(int number_of_arguments)
     lua_pop(L, number_of_arguments + 1); // Add 1 because the caller doesn't know about `event_id`.
     // Stack: (empty)
 
-#ifndef TRACKABLE_PTR_NAMESPACE
+#if !defined TRACKABLE_PTR_NAMESPACE
     if (event_level == 0)
         InvalidateObjects();
 #endif

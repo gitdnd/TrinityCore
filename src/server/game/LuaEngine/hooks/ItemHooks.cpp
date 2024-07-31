@@ -63,16 +63,7 @@ bool Eluna::OnUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets)
 
     // Send equip error that shows no message
     // This is a hack fix to stop spell casting visual bug when a spell is not cast on use
-    WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, 18);
-    data << uint8(59); // EQUIP_ERR_NONE / EQUIP_ERR_CANT_BE_DISENCHANTED
-    data << guid;
-    data << ObjectGuid(uint64(0));
-    data << uint8(0);
-#ifdef CMANGOS
-    pPlayer->GetSession()->SendPacket(data);
-#else
-    pPlayer->GetSession()->SendPacket(&data);
-#endif
+    pPlayer->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
     return false;
 }
 
@@ -81,7 +72,7 @@ bool Eluna::OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targ
     START_HOOK_WITH_RETVAL(ITEM_EVENT_ON_USE, pItem->GetEntry(), true);
     HookPush(pPlayer);
     HookPush(pItem);
-#if defined TRINITY || AZEROTHCORE
+#if defined ELUNA_TRINITY
     if (GameObject* target = targets.GetGOTarget())
         HookPush(target);
     else if (Item* target = targets.GetItemTarget())

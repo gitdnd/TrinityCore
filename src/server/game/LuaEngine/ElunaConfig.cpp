@@ -4,9 +4,9 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
-#if defined TRINITY || defined MANGOS
+#if defined ELUNA_TRINITY
 #include "Config.h"
-#elif defined CMANGOS || defined VMANGOS
+#else
 #include "Config/Config.h"
 #endif
 #include "ElunaConfig.h"
@@ -38,24 +38,26 @@ void ElunaConfig::Initialize()
     SetConfig(CONFIG_ELUNA_REQUIRE_PATH_EXTRA, "Eluna.RequirePaths", "");
     SetConfig(CONFIG_ELUNA_REQUIRE_CPATH_EXTRA, "Eluna.RequireCPaths", "");
     SetConfig(CONFIG_ELUNA_SCRIPT_RELOADER, "Eluna.ScriptReloader", false);
+    // Call extra functions
+    TokenizeAllowedMaps();
 }
 
 void ElunaConfig::SetConfig(ElunaConfigBoolValues index, char const* fieldname, bool defvalue)
 {
-#ifdef TRINITY
+#if defined ELUNA_TRINITY
     SetConfig(index, sConfigMgr->GetBoolDefault(fieldname, defvalue));
-#elif defined CMANGOS || defined VMANGOS || defined MANGOS
+#else
     SetConfig(index, sConfig.GetBoolDefault(fieldname, defvalue));
 #endif
 }
 
 void ElunaConfig::SetConfig(ElunaConfigStringValues index, char const* fieldname, std::string defvalue)
 {
-#ifdef TRINITY
+#if defined ELUNA_TRINITY
     SetConfig(index, sConfigMgr->GetStringDefault(fieldname, defvalue));
-#elif CMANGOS
+#elif defined ELUNA_CMANGOS
     SetConfig(index, sConfig.GetStringDefault(fieldname, defvalue));
-#elif defined VMANGOS || defined MANGOS
+#else
     SetConfig(index, sConfig.GetStringDefault(fieldname, defvalue.c_str()));
 #endif
 }
@@ -68,4 +70,41 @@ bool ElunaConfig::IsElunaEnabled()
 bool ElunaConfig::IsElunaCompatibilityMode()
 {
     return GetConfig(CONFIG_ELUNA_COMPATIBILITY_MODE);
+}
+
+bool ElunaConfig::ShouldMapLoadEluna(uint32 id)
+{
+    // if the set is empty (all maps), return true
+    if (m_allowedMaps.empty())
+        return true;
+
+    // Check if the map ID is in the set
+    return (m_allowedMaps.find(id) != m_allowedMaps.end());
+}
+
+void ElunaConfig::TokenizeAllowedMaps()
+{
+    // clear allowed maps
+    m_allowedMaps.clear();
+
+    // read the configuration value into stringstream
+    std::istringstream maps(GetConfig(CONFIG_ELUNA_ONLY_ON_MAPS));
+
+    // tokenize maps and add to allowed maps
+    std::string mapIdStr;
+    while (std::getline(maps, mapIdStr, ','))
+    {
+        // remove spaces
+        mapIdStr.erase(std::remove_if(mapIdStr.begin(), mapIdStr.end(), [](char c) {
+            return std::isspace(static_cast<unsigned char>(c));
+            }), mapIdStr.end());
+
+        try {
+            uint32 mapId = std::stoul(mapIdStr);
+            m_allowedMaps.emplace(mapId);
+        }
+        catch (std::exception&) {
+            ELUNA_LOG_ERROR("[Eluna]: Error tokenizing Eluna.OnlyOnMaps, invalid config value '%s'", mapIdStr.c_str());
+        }
+    }
 }

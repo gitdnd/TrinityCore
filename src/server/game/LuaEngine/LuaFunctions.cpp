@@ -38,7 +38,7 @@ extern "C"
 #include "BattleGroundMethods.h"
 #include "CustomMethods.h"
 
-#ifdef TRACKABLE_PTR_NAMESPACE
+#if defined TRACKABLE_PTR_NAMESPACE
 ElunaConstrainedObjectRef<Aura> GetWeakPtrFor(Aura const* obj) { return { obj->GetWeakPtr(), obj->GetOwner()->GetMap() }; }
 ElunaConstrainedObjectRef<Battleground> GetWeakPtrFor(Battleground const* obj) { return { obj->GetWeakPtr(), obj->GetBgMap() }; }
 ElunaConstrainedObjectRef<Group> GetWeakPtrFor(Group const* obj) { return { obj->GetWeakPtr(), nullptr }; }
@@ -118,7 +118,7 @@ template<> int ElunaTemplate<ObjectGuid>::Equal(lua_State* L) { Eluna* E = Eluna
 template<> int ElunaTemplate<ObjectGuid>::ToString(lua_State* L)
 {
     Eluna* E = Eluna::GetEluna(L);
-#if defined(TRINITY)
+#if defined ELUNA_TRINITY
     E->Push(E->CHECKVAL<ObjectGuid>(1).ToString());
 #else
     E->Push(E->CHECKVAL<ObjectGuid>(1).GetString());
@@ -168,11 +168,9 @@ void RegisterFunctions(Eluna* E)
     ElunaTemplate<Item>::SetMethods(E, LuaObject::ObjectMethods);
     ElunaTemplate<Item>::SetMethods(E, LuaItem::ItemMethods);
 
-#ifndef CLASSIC
-#ifndef TBC
+#if ELUNA_EXPANSION >= WOTLK
     ElunaTemplate<Vehicle>::Register(E, "Vehicle");
     ElunaTemplate<Vehicle>::SetMethods(E, LuaVehicle::VehicleMethods);
-#endif
 #endif
 
     ElunaTemplate<Group>::Register(E, "Group");
