@@ -432,7 +432,7 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
-                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                if (!sElunaConfig->ShouldMapLoadEluna(data->mapId))
                     continue;
 
                 // Log error for pooled object, but still spawn it
@@ -485,7 +485,7 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
-                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                if (!sElunaConfig->ShouldMapLoadEluna(data->mapId))
                     continue;
 
                 // Log error for pooled object, but still spawn it

@@ -84,7 +84,7 @@ MapManager* MapManager::instance()
 
 Map* MapManager::CreateBaseMap(uint32 id, uint32 dungeonLevel, uint32* affixes)
 {
-    if (!sElunaLoader->ShouldMapLoadEluna(id))
+    if (!sElunaConfig->ShouldMapLoadEluna(id))
     {
         ASSERT(!true, "weeeeeeeeeeeeeeeeeee");
         return nullptr;
@@ -299,7 +299,7 @@ bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 
 bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
 {
-    if (!sElunaLoader->ShouldMapLoadEluna(mapid))
+    if (!sElunaConfig->ShouldMapLoadEluna(mapid))
         return false;
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 

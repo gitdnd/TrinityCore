@@ -2423,7 +2423,7 @@ void ObjectMgr::LoadCreatures()
     {
         Field* fields = result->Fetch();
         uint16 mapId = fields[2].GetUInt16();
-        if (!sElunaLoader->ShouldMapLoadEluna(mapId))
+        if (!sElunaConfig->ShouldMapLoadEluna(mapId))
             continue;
         ObjectGuid::LowType guid = fields[0].GetUInt32();
         uint32 entry        = fields[1].GetUInt32();
@@ -2745,7 +2745,7 @@ void ObjectMgr::LoadGameObjects()
     {
         Field* fields = result->Fetch();
         uint16 mapId = fields[2].GetUInt16();
-        if (!sElunaLoader->ShouldMapLoadEluna(mapId))
+        if (!sElunaConfig->ShouldMapLoadEluna(mapId))
             continue;
         ObjectGuid::LowType guid = fields[0].GetUInt32();
         uint32 entry        = fields[1].GetUInt32();
@@ -6868,7 +6868,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
 InstanceTemplate const* ObjectMgr::GetInstanceTemplate(uint32 mapID) const
 {
-    if(!sElunaLoader->ShouldMapLoadEluna(mapID))
+    if(!sElunaConfig->ShouldMapLoadEluna(mapID))
         return nullptr;
 
     InstanceTemplateContainer::const_iterator itr = _instanceTemplateStore.find(uint16(mapID));

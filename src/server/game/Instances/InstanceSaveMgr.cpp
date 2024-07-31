@@ -639,7 +639,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
 {
     // global reset for all instances of the given map
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
-    if (!mapEntry->Instanceable() || !sElunaLoader->ShouldMapLoadEluna(mapid))
+    if (!mapEntry->Instanceable() || !sElunaConfig->ShouldMapLoadEluna(mapid))
         return;
     TC_LOG_DEBUG("misc", "InstanceSaveManager::ResetOrWarnAll: Processing map {} ({}) on difficulty {} (warn? {})", mapEntry->MapName[0], mapid, static_cast<uint32>(difficulty), warn);
 

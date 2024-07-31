@@ -299,7 +299,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
 Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data)
 {
-    if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+    if (!sElunaConfig->ShouldMapLoadEluna(data->mapId))
         return nullptr;
 
     Map* map = GetMap();
@@ -350,7 +350,7 @@ Creature* Transport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData c
 
 GameObject* Transport::CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data)
 {
-    if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+    if (!sElunaConfig->ShouldMapLoadEluna(data->mapId))
         return nullptr;
 
     Map* map = GetMap();

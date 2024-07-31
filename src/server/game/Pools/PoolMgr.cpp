@@ -517,7 +517,7 @@ void PoolMgr::LoadFromDB()
                     continue;
                 }
 
-                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                if (!sElunaConfig->ShouldMapLoadEluna(data->mapId))
                     continue;
 
                 PoolTemplateData* pPoolTemplate = &mPoolTemplate[pool_id];
@@ -590,7 +590,7 @@ void PoolMgr::LoadFromDB()
                     continue;
                 }
 
-                if (!sElunaLoader->ShouldMapLoadEluna(data->mapId))
+                if (!sElunaConfig->ShouldMapLoadEluna(data->mapId))
                     continue;
 
                 PoolTemplateData* pPoolTemplate = &mPoolTemplate[pool_id];

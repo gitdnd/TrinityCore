@@ -1752,7 +1752,7 @@ void World::SetInitialWorldSettings()
 
     std::vector<uint32> mapIds;
     for (uint32 mapId = 0; mapId < sMapStore.GetNumRows(); mapId++)
-        if (sMapStore.LookupEntry(mapId) && sElunaLoader->ShouldMapLoadEluna(mapId))
+        if (sMapStore.LookupEntry(mapId) && sElunaConfig->ShouldMapLoadEluna(mapId))
             mapIds.push_back(mapId);
 
     vmmgr2->InitializeThreadUnsafe(mapIds);
@@ -2383,7 +2383,7 @@ void World::SetInitialWorldSettings()
     {
         sMapMgr->DoForAllMaps([](Map* map)
         {
-            if (sElunaLoader->ShouldMapLoadEluna(map->GetId()))
+            if (sElunaConfig->ShouldMapLoadEluna(map->GetId()))
             {
                 TC_LOG_INFO("server.loading", "Pre-loading base map data for map {}", map->GetId());
                 map->LoadAllCells();
