@@ -32,6 +32,7 @@
 #ifdef ELUNA
 #include "LuaEngine.h"
 #include "ElunaLoader.h"
+#include "ElunaConfig.h"
 #endif
 #include "WorldStatePackets.h"
 

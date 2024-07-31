@@ -32,6 +32,7 @@
 #include "Vehicle.h"
 #include <G3D/Vector3.h>
 #include "ElunaLoader.h"
+#include "ElunaConfig.h"
 
 Transport::Transport() : GameObject(),
     _transportInfo(nullptr), _isMoving(true), _pendingStop(false),

@@ -22,6 +22,7 @@
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "ElunaLoader.h"
+#include "ElunaConfig.h"
 
 ////////////////////////////////////////////////////////////
 // template class ActivePoolData
