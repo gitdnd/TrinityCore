@@ -58,6 +58,7 @@
 #include "World.h"
 #include "VirtualItemMgr.h"
 #include "ElunaLoader.h"
+#include "ElunaConfig.h"
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;

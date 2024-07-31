@@ -31,6 +31,8 @@
 #include "UpdateMask.h"
 #include "World.h"
 #include "ElunaLoader.h"
+#include "ElunaConfig.h"
+
 
 void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
