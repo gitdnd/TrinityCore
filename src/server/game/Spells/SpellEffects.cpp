@@ -1659,7 +1659,7 @@ void Spell::EffectCreateItem()
     // Handle Quest - Gem Crafting, do not reward power gem craft
     if (effectInfo->ItemType != 59992 && player->IsActiveQuest(60057) && player->GetReqKillOrCastCurrentCount(60057, 50496) < 5)
     {
-        player->AdvanceQuestObjective(60057, 0);
+        player->AdvanceQuestObjective(60057, 2);
     }
 
     DoCreateItem(effectInfo->ItemType);
