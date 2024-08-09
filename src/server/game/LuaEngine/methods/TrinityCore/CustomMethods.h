@@ -1884,6 +1884,17 @@ namespace LuaCustom
         return 0;
     }
 
+    int NukePlayerIntroQuestHack(Eluna* /*E*/, Player* player)
+    {
+        if (player->IsActiveQuest(60057))
+        {
+            player->ClearInventory();
+            player->RemoveSpell(25229); // Jewelcrafting
+            player->ResetAchievements();
+        }
+        return 0;
+    }
+
     // REGISTERS
     
     ElunaGlobal::ElunaRegister GlobalMethods[] =
@@ -1993,6 +2004,7 @@ namespace LuaCustom
         { "SendListInventory", &LuaCustom::SendListInventory },
         { "SetTimeSpeed", &LuaCustom::SetTimeSpeed },
         { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
+        { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
 
         { NULL, NULL, METHOD_REG_NONE }
     };
