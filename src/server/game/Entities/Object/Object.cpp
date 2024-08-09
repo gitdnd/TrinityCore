@@ -3652,25 +3652,32 @@ float WorldObject::GetObjectSize() const
 bool WorldObject::InSamePhase(WorldObject const* obj) const
 {
     // If player is looking at a creature and in a unique phase, special handling
-    if (obj && ToPlayer() && obj->ToCreature() && ToPlayer()->GetPhaseMask() >= 64)
+    if (obj && IsPlayer() && obj->IsCreature() && ToPlayer()->GetPhaseMask() >= 64)
     {
-        // If trying to see Chromie and (quest active)
-        if (obj->ToCreature()->GetEntry() == 50492 && (
-                ToPlayer()->IsActiveQuest(60057) ||
-                ToPlayer()->IsActiveQuest(60059) ||
-                ToPlayer()->IsActiveQuest(60060)))
+        uint32 objEntry = obj->GetEntry();
+        const Player* plr = ToPlayer();
+        switch (objEntry)
         {
-            return false;
+        case 50492: // If trying to see Chromie and (quest active)
+        {
+            if (plr->IsActiveQuest(60057) || plr->IsActiveQuest(60059) || plr->IsActiveQuest(60060))
+                return false;
+            break;
         }
-        // If trying to see Alurmi and crafting quest active
-        if (obj->ToCreature()->GetEntry() == 60301 && ToPlayer()->IsActiveQuest(60060))
+        case 60301: // If trying to see Alurmi and crafting quest active
         {
-            return false;
+            if (plr->IsActiveQuest(60060))
+                return false;
+            break;
         }
-        // If trying to see Soridormi and gem intro quest active
-        if (obj->ToCreature()->GetEntry() == 60001 && ToPlayer()->IsActiveQuest(60057))
+        case 60001: // If trying to see Soridormi and gem intro quest active
         {
-            return false;
+            if (plr->IsActiveQuest(60057))
+                return false;
+            break;
+        }
+        default:
+            break;
         }
     }
     return obj && InSamePhase(obj->GetPhaseMask());
