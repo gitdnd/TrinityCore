@@ -2259,6 +2259,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetCanTeleport(bool value) { m_canTeleport = value; }
 
         void ClearInventory();
+        void ClearCurrency();
         void ApplyVirtualItemLegendayEffects(Item* item);
 
         uint32 GetMagicFind() { return magicFind; }

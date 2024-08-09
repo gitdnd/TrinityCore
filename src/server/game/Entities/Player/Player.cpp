@@ -28025,6 +28025,18 @@ void Player::ClearInventory()
     }
 }
 
+void Player::ClearCurrency()
+{
+    for (uint8 i = CURRENCYTOKEN_SLOT_START; i < CURRENCYTOKEN_SLOT_END; i++)
+    {
+        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            uint32 count = pItem->GetCount();
+            DestroyItemCount(pItem, count, true);
+        }
+    }
+}
+
 void Player::ApplyVirtualItemLegendayEffects(Item* item)
 {
     if (item->GetTemplate()->Quality != ITEM_QUALITY_LEGENDARY)
