@@ -3662,8 +3662,13 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
         {
             return false;
         }
-        // If trying to see Alurmi and (quest active)
+        // If trying to see Alurmi and crafting quest active
         if (obj->ToCreature()->GetEntry() == 60301 && ToPlayer()->IsActiveQuest(60060))
+        {
+            return false;
+        }
+        // If trying to see Soridormi and gem intro quest active
+        if (obj->ToCreature()->GetEntry() == 60001 && ToPlayer()->IsActiveQuest(60057))
         {
             return false;
         }
