@@ -1887,6 +1887,7 @@ namespace LuaCustom
     int NukePlayerIntroQuestHack(Eluna* /*E*/, Player* player)
     {
         player->ClearInventory();
+        player->ClearCurrency();
         player->RemoveSpell(25229); // Jewelcrafting
         player->ResetAchievements();
         return 0;
