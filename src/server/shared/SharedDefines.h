@@ -3963,6 +3963,11 @@ enum CustomTalentErrorResponses : uint8
 
 };
 
+enum CustomHardCodedQuestIds : uint32
+{
+    QUEST_INTRO_COMPLETE = 60007,
+};
+
 #define MAX_AFFIXES 4
 
 namespace Trinity

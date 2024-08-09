@@ -117,7 +117,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
         return;
     }
 
-    if (_player->GetQuestStatus(60007) != QUEST_STATUS_REWARDED)
+    if (_player->GetQuestStatus(QUEST_INTRO_COMPLETE) != QUEST_STATUS_REWARDED)
     {
         SendNotification("You cannot que for a dungeon without completing 'Power Shards and Jewelcrafting'.");
         return;

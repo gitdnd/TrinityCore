@@ -27,6 +27,9 @@
 
 bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
 {
+    if (_player->GetQuestStatus(QUEST_INTRO_COMPLETE) != QUEST_STATUS_REWARDED)
+        return false;
+
     // bankerGUID parameter is optional, set to 0 by default.
     if (!bankerGUID)
         bankerGUID = m_currentBankerGUID;
