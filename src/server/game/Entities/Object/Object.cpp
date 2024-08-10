@@ -3666,7 +3666,7 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
         }
         case 60301: // If trying to see Alurmi and crafting quest active
         {
-            if (plr->IsActiveQuest(60060))
+            if (plr->IsActiveQuest(60059))
                 return false;
             break;
         }
