@@ -45,6 +45,73 @@ enum CustomClassSpells
 };
 
 
+// 94258 - blood drive
+class spell_talent_blood_drive : public AuraScript
+{
+    PrepareAuraScript(spell_talent_blood_drive);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        Player* player = eventInfo.GetActor()->ToPlayer();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();;
+        if (!procSpell)
+            return;
+
+        int32 healthCost = procSpell->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
+
+        if (procSpell->PowerType == POWER_HEALTH)
+        {
+            if (Aura* existingBuff = player->GetAura(94259))
+            {
+                int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+                int32 newAmount = existingAmount + healthCost;
+                CastSpellExtraArgs args(aurEff);
+                args.AddSpellBP0(newAmount);
+                player->CastSpell(player, 94259, args);
+            }
+            else
+            {
+                CastSpellExtraArgs args(aurEff);
+                args.AddSpellBP0(healthCost * 0.5);
+                player->CastSpell(player, 94259, args);
+            }
+        }
+    }
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_blood_drive::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 94259 - Blood Drive Buff
+class spell_blood_drive_reduction : public AuraScript
+{
+    PrepareAuraScript(spell_blood_drive_reduction);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Unit* player = GetCaster();
+
+        if (Aura* existingBuff = player->GetAura(94259))
+        {
+            int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+            int32 newAmount = existingAmount * 0.9;
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(newAmount);
+
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_drive_reduction::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 // 94252 - Secrets of Mana
 class spell_talent_secrets_of_mana : public AuraScript
 {
@@ -1300,4 +1367,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_wandering_affliction);
     RegisterSpellScript(spell_talent_secrets_of_mana);
     RegisterSpellScript(spell_talent_secrets_of_mana_reduction);
+    RegisterSpellScript(spell_talent_blood_drive);
+    RegisterSpellScript(spell_blood_drive_reduction);
 };
