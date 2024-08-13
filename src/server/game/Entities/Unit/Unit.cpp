@@ -7894,6 +7894,19 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
             TakenTotalMod *= 1.2f;
     }
 
+    // 94260 Tree Sentinel -kaleid
+    if (caster->GetAura(94260))
+    {
+        if (caster == this)
+            TakenTotalMod *= 1.3f;
+        else
+            TakenTotalMod *= 0.5f;
+    }
+    if (this->GetAura(94260) && caster != this)
+    {
+        TakenTotalMod *= 0.5f;
+    }
+
     if (damagetype == DOT)
     {
         // Healing over time taken percent
