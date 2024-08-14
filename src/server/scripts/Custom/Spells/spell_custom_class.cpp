@@ -45,6 +45,87 @@ enum CustomClassSpells
 };
 
 
+// 94261 - Left Handed
+class spell_talent_left_handed : public AuraScript
+{
+    PrepareAuraScript(spell_talent_left_handed);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Player* player = eventInfo.GetActor()->ToPlayer();
+        uint32 spellIcon = eventInfo.GetSpellInfo()->SpellIconID;
+        uint32 spellId = 0;
+
+        for (uint32 id = 97700; id < 97800; ++id)
+        {
+            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(id);
+            if (spellInfo && spellInfo->SpellIconID == spellIcon)
+            {
+                spellId = id;
+                break;
+            }
+        }
+
+        if (spellId != 0)
+        {
+            player->CastSpell(eventInfo.GetProcTarget(), spellId, true);
+        }
+    }
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_talent_left_handed::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_left_handed::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+
+// 94261 - Left Handed Passive
+class spell_talent_left_handed_passive : public SpellScriptLoader
+{
+public:
+    spell_talent_left_handed_passive() : SpellScriptLoader("spell_talent_left_handed_passive") { }
+
+    class spell_talent_left_handed_passive_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_talent_left_handed_passive_AuraScript);
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                {
+                    caster->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT, 0.5f);
+                }
+            }
+        }
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                {
+                    caster->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT, 1.f);;
+                }
+            }
+        }
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_talent_left_handed_passive_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_talent_left_handed_passive_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_talent_left_handed_passive_AuraScript();
+    }
+
+};
+
 // 94258 - blood drive
 class spell_talent_blood_drive : public AuraScript
 {
@@ -1342,6 +1423,7 @@ void AddSC_Spells_Custom_Class_scripts()
     new spell_class_howling_blast_frozen();
     new spell_class_frost_strike_damage_frozen();
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
+    new spell_talent_left_handed_passive();
     RegisterSpellScript(spell_class_seal_of_righteousness);
     RegisterSpellScript(spell_class_seal_of_command);
     RegisterSpellScript(spell_class_seal_of_rockbiter);
@@ -1369,4 +1451,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_secrets_of_mana_reduction);
     RegisterSpellScript(spell_talent_blood_drive);
     RegisterSpellScript(spell_blood_drive_reduction);
+    RegisterSpellScript(spell_talent_left_handed);
 };
