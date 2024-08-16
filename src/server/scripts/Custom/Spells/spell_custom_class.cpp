@@ -157,7 +157,7 @@ class spell_talent_blood_drive : public AuraScript
             else
             {
                 CastSpellExtraArgs args(aurEff);
-                args.AddSpellBP0(healthCost * 0.5);
+                args.AddSpellBP0(healthCost * 0.2);
                 player->CastSpell(player, 94259, args);
             }
         }
