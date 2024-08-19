@@ -921,10 +921,16 @@ class spell_class_seal_of_flametongue_passive : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            Player* player = GetCaster()->ToPlayer();
-            float ilvl = player->GetAverageItemLevel();
-            int32 bp = std::lroundf(50 + ilvl * 0.5f);
-            amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+            if (Player* player = caster->ToPlayer())
+            {
+                float ilvl = player->GetAverageItemLevel();
+                int32 bp = std::lroundf(50 + ilvl * 0.5f);
+                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+            }
+            else
+            {
+                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), 50));
+            }
         }
     }
 
@@ -1199,7 +1205,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
     {
         PreventDefaultAction();
 
-        Player* player = eventInfo.GetActor()->ToPlayer();
+
 
         uint32 spellId = 0;
 
@@ -1222,7 +1228,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
             spellId = SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED;
         }
 
-        player->CastSpell(eventInfo.GetProcTarget(), spellId);
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), spellId);
     }
 
     void Register() override
@@ -1240,10 +1246,16 @@ class spell_class_seal_of_bloodgrip_passive : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            Player* player = GetCaster()->ToPlayer();
-            float ilvl = player->GetAverageItemLevel();
-            int32 bp = std::lroundf(25 + ilvl * 0.25f);
-            amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+            if (Player* player = caster->ToPlayer())
+            {
+                float ilvl = player->GetAverageItemLevel();
+                int32 bp = std::lroundf(25 + ilvl * 0.25f);
+                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+            }
+            else
+            {
+                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), 50));
+            }
         }
     }
 
