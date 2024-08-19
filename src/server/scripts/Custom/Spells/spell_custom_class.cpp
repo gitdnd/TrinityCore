@@ -1418,6 +1418,104 @@ public:
     }
 };
 
+enum DancingRuneWeaponMisc
+{
+    DATA_INITIAL_TARGET_GUID = 1,
+};
+enum DeathKnightMisc
+{
+    NPC_DK_DANCING_RUNE_WEAPON = 27893,
+
+};
+
+
+// 94263 - Dancing Rune Weapon
+class spell_talent_dancing_rune_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_talent_dancing_rune_weapon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({           });
+    }
+
+    void HandleTarget(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        std::list<Creature*> runeWeapons;
+        caster->GetAllMinionsByEntry(runeWeapons, NPC_DK_DANCING_RUNE_WEAPON);
+        for (Creature* temp : runeWeapons)
+        {
+            if (temp->IsAIEnabled())
+                temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
+            temp->GetThreatManager().RegisterRedirectThreat(GetId(), caster->GetGUID(), 100);
+
+            Unit* owner = GetUnitOwner();
+
+
+            // Check for aura on caster and apply to rune weapon
+            for (uint32 spellId = 97000; spellId <= 97201; ++spellId)
+            {
+                if (caster->HasAura(spellId))
+                {
+                    temp->CastSpell(temp, spellId, true);  // Apply the aura to the rune weapon
+                }
+            }
+        }
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        uint32 spellId = 97000; spellId <= 97201; ++spellId;
+
+        uint32 spellOId = eventInfo.GetSpellInfo()->Id;
+
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+        {
+            if (spellOId = spellId |
+                procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW |
+                procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY |
+                eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
+
+                return true;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* owner = GetUnitOwner();
+        if (!owner)
+            return;
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        Unit* runeWeapon = nullptr;
+        for (auto itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end() && !runeWeapon; itr++)
+            if ((*itr)->GetEntry() == NPC_DK_DANCING_RUNE_WEAPON)
+                runeWeapon = *itr;
+
+        if (!runeWeapon)
+            return;
+
+        if (runeWeapon->IsInCombat() && runeWeapon->GetVictim())
+            runeWeapon->CastSpell(runeWeapon->GetVictim(), procSpell->Id, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_talent_dancing_rune_weapon::HandleTarget, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        DoCheckProc += AuraCheckProcFn(spell_talent_dancing_rune_weapon::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_dancing_rune_weapon::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_howling_blast_frozen();
@@ -1452,4 +1550,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_blood_drive);
     RegisterSpellScript(spell_blood_drive_reduction);
     RegisterSpellScript(spell_talent_left_handed);
+    RegisterSpellScript(spell_talent_dancing_rune_weapon);
 };
