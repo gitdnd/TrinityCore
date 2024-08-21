@@ -1465,29 +1465,36 @@ class spell_talent_dancing_rune_weapon : public AuraScript
                 temp->AI()->SetGUID(GetTarget()->GetGUID(), DATA_INITIAL_TARGET_GUID);
             temp->GetThreatManager().RegisterRedirectThreat(GetId(), caster->GetGUID(), 100);
 
-            Unit* owner = GetUnitOwner();
 
 
-            // Check for aura on caster and apply to rune weapon
-            for (uint32 spellId = 97000; spellId <= 97201; ++spellId)
+            Aura* matchingAura = nullptr;
+            for (auto const& auraPair : caster->GetAppliedAuras())
             {
-                if (caster->HasAura(spellId))
+                Aura* aura = auraPair.second->GetBase();
+                SpellInfo const* spellInfo = aura->GetSpellInfo();
+
+                if (spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_SEAL)
                 {
-                    temp->CastSpell(temp, spellId, true);  // Apply the aura to the rune weapon
+                    matchingAura = aura;
+                    break;
                 }
+            }
+
+            if (matchingAura)
+            {
+                uint32 spellId = matchingAura->GetId();
+                temp->CastSpell(temp, spellId, true);
             }
         }
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        uint32 spellId = 97000; spellId <= 97201; ++spellId;
 
-        uint32 spellOId = eventInfo.GetSpellInfo()->Id;
 
         if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
-            if (spellOId = spellId |
+            if (procSpell->GetSpellSpecific() == SPELL_SPECIFIC_SEAL |
                 procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW |
                 procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY |
                 eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
