@@ -635,12 +635,10 @@ class spell_class_seal_of_command : public AuraScript
     {
         PreventDefaultAction();
 
-        Player* player = eventInfo.GetActor()->ToPlayer();
 
 
         //checking proc type
         uint32 spellId = 0;
-        //WeaponAttackType attType = BASE_ATTACK;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_MAINHAND_ATTACK)
             spellId = SPELL_CLASS_SEAL_OF_COMMAND_MH;
@@ -659,7 +657,7 @@ class spell_class_seal_of_command : public AuraScript
         {
             spellId = SPELL_CLASS_SEAL_OF_COMMAND_RANGED;
         }
-        player->CastSpell(eventInfo.GetProcTarget(), spellId);
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), spellId);
     }
 
     void Register() override
