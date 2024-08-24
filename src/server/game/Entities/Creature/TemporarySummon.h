@@ -25,6 +25,7 @@ enum PetEntry : uint32
     // Death Knight pets
     PET_GHOUL           = 26125,
     PET_RISEN_ALLY      = 30230,
+    PET_DANCINGR_RUNE_WEAPON = 27893,
 
     // Shaman pet
     PET_SPIRIT_WOLF     = 29264
@@ -83,6 +84,7 @@ class TC_GAME_API Minion : public TempSummon
         // Death Knight pets
         bool IsPetGhoul() const { return GetEntry() == PET_GHOUL; } // Ghoul may be guardian or pet
         bool IsRisenAlly() const { return GetEntry() == PET_RISEN_ALLY; }
+        bool IsRuneWeapon() const { return GetEntry() == PET_DANCINGR_RUNE_WEAPON; }
 
         // Shaman pet
         bool IsSpiritWolf() const { return GetEntry() == PET_SPIRIT_WOLF; } // Spirit wolf from feral spirits
