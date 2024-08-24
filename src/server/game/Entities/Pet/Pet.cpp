@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "PetPackets.h"
 #include "Player.h"
+#include "Item.h"
 #include "QueryHolder.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -1103,6 +1104,22 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBonusDamage(int32(GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - 30 - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel - 30 + (petlevel / 4)));
+                    break;
+                }
+                case 27893: // Custom Rune Weapon
+                {
+                    Player* player = GetOwner()->ToPlayer();
+                    Item* mainHandItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+
+                    float weaponSpeed = mainHandItem->GetTemplate()->Delay;
+                    const ItemTemplate* itemTemplate = mainHandItem->GetTemplate();
+                    float minDamage = itemTemplate->Damage[0].DamageMin;
+                    float maxDamage = itemTemplate->Damage[0].DamageMax;
+
+
+                    SetAttackTime(BASE_ATTACK, weaponSpeed);
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(minDamage * 0.2));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(maxDamage * 0.2));
                     break;
                 }
                 default:
