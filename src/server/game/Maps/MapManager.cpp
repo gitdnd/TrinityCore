@@ -134,6 +134,7 @@ Map* MapManager::CreateMap(uint32 id, Player* player, uint32 loginInstanceId)
     uint32 execDiff = 0;
     uint32 realPrevTime = getMSTime();
 
+    // TODO: Allow raid > 300?
     Map* m = CreateBaseMap(id, player ? player->GetCappedGroupOrPlayerItemLevel() : 20);
 
     // PROFILING
