@@ -3965,7 +3965,7 @@ enum CustomTalentErrorResponses : uint8
 
 enum CustomHardCodedQuestIds : uint32
 {
-    QUEST_INTRO_COMPLETE = 60007,
+    QUEST_INTRO_COMPLETE = 60057,
 };
 
 #define MAX_AFFIXES 4
