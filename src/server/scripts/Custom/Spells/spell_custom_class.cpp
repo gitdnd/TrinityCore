@@ -40,7 +40,10 @@ enum CustomClassSpells
     SPELL_CLASS_LIGHTNING_SLASH = 97318,
     SPELL_CLASS_FROST_SLASH = 97319,
     SPELL_CLASS_SHADOW_SLASH = 97320,
-    SPELL_CLASS_ARCANE_SLASH = 97321
+    SPELL_CLASS_ARCANE_SLASH = 97321,
+    SPELL_TALENT_SECRETS_OF_MANA = 94252,
+    SPELL_TALENT_SECRETS_OF_MANA_BUFF = 94253,
+    SPELL_TALENT_BLOOD_DRIVE_BUFF = 94259
 
 };
 
@@ -144,21 +147,22 @@ class spell_talent_blood_drive : public AuraScript
 
         int32 healthCost = procSpell->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
 
+
         if (procSpell->PowerType == POWER_HEALTH)
         {
-            if (Aura* existingBuff = player->GetAura(94259))
+            if (Aura* existingBuff = player->GetAura(SPELL_TALENT_BLOOD_DRIVE_BUFF))
             {
                 int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
-                int32 newAmount = existingAmount + healthCost;
+                int32 newAmount = std::lroundf(existingAmount + healthCost * 0.2f);
                 CastSpellExtraArgs args(aurEff);
                 args.AddSpellBP0(newAmount);
-                player->CastSpell(player, 94259, args);
+                player->CastSpell(player, SPELL_TALENT_BLOOD_DRIVE_BUFF, args);
             }
             else
             {
                 CastSpellExtraArgs args(aurEff);
-                args.AddSpellBP0(healthCost * 0.2);
-                player->CastSpell(player, 94259, args);
+                args.AddSpellBP0(healthCost * 0.2f);
+                player->CastSpell(player, SPELL_TALENT_BLOOD_DRIVE_BUFF, args);
             }
         }
     }
@@ -177,7 +181,7 @@ class spell_blood_drive_reduction : public AuraScript
     {
         Unit* player = GetCaster();
 
-        if (Aura* existingBuff = player->GetAura(94259))
+        if (Aura* existingBuff = player->GetAura(SPELL_TALENT_BLOOD_DRIVE_BUFF))
         {
             int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
             int32 newAmount = existingAmount * 0.9;
@@ -211,19 +215,24 @@ class spell_talent_secrets_of_mana : public AuraScript
 
         int32 manaCost = procSpell->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
 
-        if (Aura* existingBuff = player->GetAura(94253))
+        if (procSpell->PowerType == POWER_MANA)
         {
-            int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
-            int32 newAmount = existingAmount + manaCost;
-            CastSpellExtraArgs args(aurEff);
-            args.AddSpellBP0(newAmount);
-            player->CastSpell(player, 94253, args);
-        }
-        else
-        {
-            CastSpellExtraArgs args(aurEff);
-            args.AddSpellBP0(manaCost * 0.5);
-            player->CastSpell(player, 94253, args);
+            // Find existing buff
+            if (Aura* existingBuff = player->GetAura(SPELL_TALENT_SECRETS_OF_MANA_BUFF))
+            {
+                int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+                int32 newAmount = std::lroundf(existingAmount + manaCost * 0.5f);
+                CastSpellExtraArgs args(aurEff);
+                args.AddSpellBP0(newAmount);
+                player->CastSpell(player, SPELL_TALENT_SECRETS_OF_MANA_BUFF, args);
+            }
+            else
+            {
+                // Cast new buff with initial amount
+                CastSpellExtraArgs args(aurEff);
+                args.AddSpellBP0(manaCost * 0.5f);
+                player->CastSpell(player, SPELL_TALENT_SECRETS_OF_MANA_BUFF, args);
+            }
         }
     }
     void Register() override
@@ -242,14 +251,13 @@ class spell_talent_secrets_of_mana_reduction : public AuraScript
     {
         Unit* player = GetCaster();
 
-        if (Aura* existingBuff = player->GetAura(94253))
+        if (Aura* existingBuff = player->GetAura(SPELL_TALENT_SECRETS_OF_MANA_BUFF))
         {
             int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
             int32 newAmount = existingAmount * 0.9;
             existingBuff->GetEffect(EFFECT_0)->ChangeAmount(newAmount);
 
         }
-
     }
 
     void Register() override
@@ -746,7 +754,7 @@ class spell_class_seal_of_spellblade : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        //Unit* caster = eventInfo.GetActor();
+        Unit* caster = eventInfo.GetActor();
         return eventInfo.GetProcTarget() != nullptr;
 
     }
@@ -758,26 +766,53 @@ class spell_class_seal_of_spellblade : public AuraScript
         Unit* victim = eventInfo.GetProcTarget();
 
         // Taking Arcane Spell Power of the Caster
-        int32 spa = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_ARCANE);
-        spa += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_ARCANE);
+        int32 spA = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_ARCANE);
+        spA += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_ARCANE);
 
 
         int32 mana = GetTarget()->GetMaxPower(POWER_MANA);
-        int32 currentmana = GetTarget()->GetPower(POWER_MANA);
+        int32 currentMana = GetTarget()->GetPower(POWER_MANA);
 
-        // Damage calculation of the hit
-        int32 bp = std::lroundf(((0.01f * spa) + 0.02f * mana) * (1.f + currentmana * 0.00001f));
+        // Damage calc of the hit
+        int32 bp = std::lroundf(((0.01f * spA) + 0.02f * mana) * (1.f + currentMana * 0.00001f));
 
-        // Damage reduction when below 300 mana
-        if (currentmana < 300)
-        {
-            bp = std::lroundf(((0.01f * spa) + 0.02f * mana) * (currentmana / 300.f));
-        }
+        // Mana Burn calc
+        int32 manaCost = std::lroundf((float)250 * currentMana / mana);
+        int32 powerCostMod = GetTarget()->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT, SPELL_SCHOOL_MASK_ARCANE);
+        int32 finalManaCost = std::lroundf(manaCost * (1.f + (float)powerCostMod / 100));
+
+
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
+        CastSpellExtraArgs args2(aurEff);
+        args2.AddSpellMod(SpellValueMod(SPELLVALUE_BASE_POINT1), finalManaCost);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_SPELLBLADE, args);
-    }
+        GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_SPELLBLADE, args2);
 
+
+        // Secrets of Mana interaction
+        if (Aura* secretsOfManaBuff = GetTarget()->GetAura(SPELL_TALENT_SECRETS_OF_MANA))
+        {
+            int32 secretsOfManaArcanePower = std::lroundf(finalManaCost * 0.5f);
+
+            if (Aura* existingBuff = GetTarget()->GetAura(SPELL_TALENT_SECRETS_OF_MANA_BUFF))
+            {
+                int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+                int32 newAmount = existingAmount + secretsOfManaArcanePower;
+
+                CastSpellExtraArgs secretsArgs(aurEff);
+                secretsArgs.AddSpellBP0(newAmount);
+                GetTarget()->CastSpell(GetTarget(), SPELL_TALENT_SECRETS_OF_MANA_BUFF, secretsArgs);
+            }
+            else
+            {
+                CastSpellExtraArgs secretsArgs(aurEff);
+                secretsArgs.AddSpellBP0(secretsOfManaArcanePower);
+                GetTarget()->CastSpell(GetTarget(), SPELL_TALENT_SECRETS_OF_MANA_BUFF, secretsArgs);
+            }
+        }
+
+    }
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_class_seal_of_spellblade::CheckProc);
