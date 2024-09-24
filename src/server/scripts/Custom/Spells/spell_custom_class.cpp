@@ -43,10 +43,69 @@ enum CustomClassSpells
     SPELL_CLASS_ARCANE_SLASH = 97321,
     SPELL_TALENT_SECRETS_OF_MANA = 94252,
     SPELL_TALENT_SECRETS_OF_MANA_BUFF = 94253,
-    SPELL_TALENT_BLOOD_DRIVE_BUFF = 94259
+    SPELL_TALENT_BLOOD_DRIVE_BUFF = 94259,
+    SPELL_TALENT_ENERGY_SHIELD_BUFF = 94275
 
 };
 
+// 94275 - energy shield
+class spell_talent_energy_shield : public AuraScript
+{
+    PrepareAuraScript(spell_talent_energy_shield);
+
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        if (Aura* aura = GetAura())
+        {
+            AuraEffect* periodicEffect = aura->GetEffect(EFFECT_1);
+            if (periodicEffect)
+            {
+                periodicEffect->SetAmplitude(5000);
+                periodicEffect->ResetTicks();
+            }
+        }
+    }
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        int32 totalMana = caster->GetPower(POWER_MANA);
+        int32 mp5 = caster->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * 5;
+
+        if (Aura* aura = GetAura())
+        {
+            AuraEffect* periodicEffect = aura->GetEffect(EFFECT_1);
+            if (periodicEffect->GetTickNumber() % 2 == 0)
+            {
+                periodicEffect->SetAmplitude(1000);
+            }
+        }
+        if (Aura* existingBuff = caster->GetAura(SPELL_TALENT_ENERGY_SHIELD_BUFF))
+        {
+            int32 existingAmount = existingBuff->GetEffect(EFFECT_0)->GetAmount();
+            int32 newAmount = existingAmount + mp5;
+            if (existingAmount >= totalMana * 0.3f - mp5)
+            {
+                existingBuff->GetEffect(EFFECT_0)->ChangeAmount(totalMana * 0.3f);
+            }
+            else
+            {
+                existingBuff->GetEffect(EFFECT_0)->ChangeAmount(newAmount);
+            }
+        }
+        else
+        {
+            CastSpellExtraArgs args(aurEff);
+            args.AddSpellBP0(mp5);
+            caster->CastSpell(caster, SPELL_TALENT_ENERGY_SHIELD_BUFF, args);
+        }
+    }
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_energy_shield::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_talent_energy_shield::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
 
 // 94261 - Left Handed
 class spell_talent_left_handed : public AuraScript
@@ -1603,4 +1662,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_blood_drive_reduction);
     RegisterSpellScript(spell_talent_left_handed);
     RegisterSpellScript(spell_talent_dancing_rune_weapon);
+    RegisterSpellScript(spell_talent_energy_shield);
 };

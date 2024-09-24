@@ -51,6 +51,7 @@ class TC_GAME_API AuraEffect
         SpellEffIndex GetEffIndex() const { return m_spellEffectInfo.EffectIndex; }
         int32 GetBaseAmount() const { return m_baseAmount; }
         int32 GetAmplitude() const { return _amplitude; }
+        void SetAmplitude(int32 amplitude) { _amplitude = amplitude; }
 
         int32 GetMiscValueB() const { return GetSpellEffectInfo().MiscValueB; }
         int32 GetMiscValue() const { return GetSpellEffectInfo().MiscValue; }
