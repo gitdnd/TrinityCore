@@ -100,10 +100,21 @@ class spell_talent_energy_shield : public AuraScript
             caster->CastSpell(caster, SPELL_TALENT_ENERGY_SHIELD_BUFF, args);
         }
     }
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (Aura* existingBuff = caster->GetAura(SPELL_TALENT_ENERGY_SHIELD_BUFF))
+        {
+            {
+                caster->RemoveAura(SPELL_TALENT_ENERGY_SHIELD_BUFF);;
+            }
+        }
+    }
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_energy_shield::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         OnEffectProc += AuraEffectProcFn(spell_talent_energy_shield::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_energy_shield::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
