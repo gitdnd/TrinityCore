@@ -25143,6 +25143,15 @@ void Player::SetCanBlock(bool value)
     UpdateBlockPercentage();
 }
 
+void Player::SetCanDodge(bool value)
+{
+    if (m_canDodge == value)
+        return;
+
+    m_canDodge = value;
+    UpdateDodgePercentage();
+}
+
 bool ItemPosCount::isContainedIn(std::vector<ItemPosCount> const& vec) const
 {
     for (ItemPosCountVec::const_iterator itr = vec.begin(); itr != vec.end(); ++itr)

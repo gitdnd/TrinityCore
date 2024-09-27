@@ -1854,6 +1854,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetCanParry(bool value);
         bool CanBlock() const { return m_canBlock; }
         void SetCanBlock(bool value);
+        bool CanDodge() const { return m_canDodge; }
+        void SetCanDodge(bool value);
         bool CanTitanGrip() const { return m_canTitanGrip; }
         void SetCanTitanGrip(bool value, uint32 penaltySpellId = 0);
         void CheckTitanGripPenalty();
@@ -2502,6 +2504,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 m_ArmorProficiency;
         bool m_canParry;
         bool m_canBlock;
+        bool m_canDodge;
         bool m_canTitanGrip;
         uint32 m_titanGripPenaltySpellId;
         uint8 m_swingErrorMsg;

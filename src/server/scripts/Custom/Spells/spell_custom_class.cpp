@@ -44,8 +44,42 @@ enum CustomClassSpells
     SPELL_TALENT_SECRETS_OF_MANA = 94252,
     SPELL_TALENT_SECRETS_OF_MANA_BUFF = 94253,
     SPELL_TALENT_BLOOD_DRIVE_BUFF = 94259,
-    SPELL_TALENT_ENERGY_SHIELD_BUFF = 94276
+    SPELL_TALENT_ENERGY_SHIELD_BUFF = 94276,
+    SPELL_TALENT_CHAMPION = 94278
 
+};
+
+// 94278 - champion
+class spell_talent_champion : public AuraScript
+{
+    PrepareAuraScript(spell_talent_champion);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        player->SetCanDodge(false);
+    }
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        player->SetCanDodge(true);
+    }
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        int32 dodgeRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 2);
+        int32 defRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 1);
+        if (Aura* existingBuff = player->GetAura(SPELL_TALENT_CHAMPION))
+        {
+            existingBuff->GetEffect(EFFECT_2)->ChangeAmount(dodgeRating + defRating * 0.2);
+        }
+    }
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_talent_champion::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_champion::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_champion::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+    }
 };
 
 // 94275 - energy shield
@@ -1674,4 +1708,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_left_handed);
     RegisterSpellScript(spell_talent_dancing_rune_weapon);
     RegisterSpellScript(spell_talent_energy_shield);
+    RegisterSpellScript(spell_talent_champion);
 };
