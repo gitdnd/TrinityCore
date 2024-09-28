@@ -219,6 +219,7 @@ class TC_GAME_API Spell
         void EffectSummonObject();
         void EffectResurrect();
         void EffectParry();
+        void EffectDodge();
         void EffectBlock();
         void EffectLeap();
         void EffectTransmitted();
