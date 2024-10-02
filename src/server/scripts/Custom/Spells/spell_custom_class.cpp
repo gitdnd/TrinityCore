@@ -45,8 +45,97 @@ enum CustomClassSpells
     SPELL_TALENT_SECRETS_OF_MANA_BUFF = 94253,
     SPELL_TALENT_BLOOD_DRIVE_BUFF = 94259,
     SPELL_TALENT_ENERGY_SHIELD_BUFF = 94276,
-    SPELL_TALENT_CHAMPION = 94278
+    SPELL_TALENT_CHAMPION = 94278,
+    SPELL_TOTEM_TOTEM_WITHDRAWAL = 94280
 
+};
+
+// 94279 - Turret Totems
+class spell_talent_turret_totems : public AuraScript
+{
+    PrepareAuraScript(spell_talent_turret_totems);
+
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        Unit* target = eventInfo.GetProcTarget();
+        if (!procSpell)
+            return;
+
+        Unit* caster = GetCaster();
+        if (Creature* fireTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[1]))
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE && fireTotem->IsTotem() && caster->GetDistance(fireTotem) <= 5.0f)
+
+                fireTotem->CastSpell(target, procSpell->Id, true);
+        }
+        if (Creature* earthTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[2]))
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE && earthTotem->IsTotem() && caster->GetDistance(earthTotem) <= 5.0f)
+
+                earthTotem->CastSpell(target, procSpell->Id, true);
+        }
+        if (Creature* waterTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[3]))
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST && waterTotem->IsTotem() && caster->GetDistance(waterTotem) <= 5.0f)
+
+                waterTotem->CastSpell(target, procSpell->Id, true);
+        }
+        if (Creature* airTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[4]))
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE && airTotem->IsTotem() && caster->GetDistance(airTotem) <= 5.0f)
+
+                airTotem->CastSpell(target, procSpell->Id, true);
+        }
+
+    }
+    bool IsNearTotem(Unit* caster)
+    {
+        for (int i = 1; i <= 4; ++i)
+        {
+            if (Creature* totem = caster->GetMap()->GetCreature(caster->m_SummonSlot[i]))
+            {
+                if (totem && totem->IsTotem() && caster->GetDistance(totem) <= 5.0f)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    void OnTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (!IsNearTotem(caster))
+        {
+            if (!caster->HasAura(SPELL_TOTEM_TOTEM_WITHDRAWAL))
+                caster->CastSpell(caster, SPELL_TOTEM_TOTEM_WITHDRAWAL, true);
+        }
+        else
+        {
+            if (caster->HasAura(SPELL_TOTEM_TOTEM_WITHDRAWAL))
+                caster->RemoveAura(SPELL_TOTEM_TOTEM_WITHDRAWAL);
+        }
+    }
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (Aura* existingBuff = caster->GetAura(SPELL_TOTEM_TOTEM_WITHDRAWAL))
+        {
+            {
+                caster->RemoveAura(SPELL_TOTEM_TOTEM_WITHDRAWAL);;
+            }
+        }
+    }
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_turret_totems::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_turret_totems::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_turret_totems::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 // 94278 - champion
@@ -1709,4 +1798,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_dancing_rune_weapon);
     RegisterSpellScript(spell_talent_energy_shield);
     RegisterSpellScript(spell_talent_champion);
+    RegisterSpellScript(spell_talent_turret_totems);
 };
