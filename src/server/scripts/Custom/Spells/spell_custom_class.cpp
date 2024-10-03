@@ -58,7 +58,7 @@ class spell_talent_turret_totems : public AuraScript
     Creature* GetTotem(Unit* caster, uint8 slot)
     {
         Creature* cre = caster->GetMap()->GetCreature(caster->m_SummonSlot[i]);
-        if (cre && cre->IsTotem() && caster->GetDistance(fireTotem) <= 5.0f)
+        if (cre && cre->IsTotem() && caster->GetDistance(cre) <= 5.0f)
             return cre;
         return nullptr;
     }
