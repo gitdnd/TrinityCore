@@ -55,6 +55,13 @@ class spell_talent_turret_totems : public AuraScript
 {
     PrepareAuraScript(spell_talent_turret_totems);
 
+    Creature* GetTotem(Unit* caster, uint8 slot)
+    {
+        Creature* cre = caster->GetMap()->GetCreature(caster->m_SummonSlot[i]);
+        if (cre && cre->IsTotem() && caster->GetDistance(fireTotem) <= 5.0f)
+            return cre;
+        return nullptr;
+    }
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
@@ -64,35 +71,35 @@ class spell_talent_turret_totems : public AuraScript
             return;
 
         Unit* caster = GetCaster();
-        if (Creature* fireTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[1]))
+        if (Creature* fireTotem = GetTotem(caster, SUMMON_SLOT_TOTEM_FIRE))
         {
-            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE && fireTotem->IsTotem() && caster->GetDistance(fireTotem) <= 5.0f)
-
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE)
                 fireTotem->CastSpell(target, procSpell->Id, true);
         }
-        if (Creature* earthTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[2]))
-        {
-            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE && earthTotem->IsTotem() && caster->GetDistance(earthTotem) <= 5.0f)
 
+        if (Creature* earthTotem = GetTotem(caster, SUMMON_SLOT_TOTEM_EARTH))
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
                 earthTotem->CastSpell(target, procSpell->Id, true);
         }
-        if (Creature* waterTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[3]))
-        {
-            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST && waterTotem->IsTotem() && caster->GetDistance(waterTotem) <= 5.0f)
 
+        if (Creature* waterTotem = GetTotem(caster, SUMMON_SLOT_TOTEM_WATER))
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST)
                 waterTotem->CastSpell(target, procSpell->Id, true);
         }
-        if (Creature* airTotem = caster->GetMap()->GetCreature(caster->m_SummonSlot[4]))
-        {
-            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE && airTotem->IsTotem() && caster->GetDistance(airTotem) <= 5.0f)
 
+        if (Creature* airTotem = GetTotem(caster, SUMMON_SLOT_TOTEM_AIR)
+        {
+            if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
                 airTotem->CastSpell(target, procSpell->Id, true);
         }
 
     }
+
     bool IsNearTotem(Unit* caster)
     {
-        for (int i = 1; i <= 4; ++i)
+        for (uint8 i = SUMMON_SLOT_TOTEM_FIRE; i < MAX_TOTEM_SLOT; ++i)
         {
             if (Creature* totem = caster->GetMap()->GetCreature(caster->m_SummonSlot[i]))
             {
@@ -103,6 +110,7 @@ class spell_talent_turret_totems : public AuraScript
 
         return false;
     }
+
     void OnTick(AuraEffect const* /*aurEff*/)
     {
         Unit* caster = GetCaster();
@@ -120,16 +128,14 @@ class spell_talent_turret_totems : public AuraScript
                 caster->RemoveAura(SPELL_TOTEM_TOTEM_WITHDRAWAL);
         }
     }
+
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* caster = GetCaster();
         if (Aura* existingBuff = caster->GetAura(SPELL_TOTEM_TOTEM_WITHDRAWAL))
-        {
-            {
-                caster->RemoveAura(SPELL_TOTEM_TOTEM_WITHDRAWAL);;
-            }
-        }
+            caster->RemoveAura(SPELL_TOTEM_TOTEM_WITHDRAWAL);;
     }
+
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_talent_turret_totems::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
