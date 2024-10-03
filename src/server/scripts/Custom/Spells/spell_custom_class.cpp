@@ -57,7 +57,7 @@ class spell_talent_turret_totems : public AuraScript
 
     Creature* GetTotem(Unit* caster, uint8 slot)
     {
-        Creature* cre = caster->GetMap()->GetCreature(caster->m_SummonSlot[i]);
+        Creature* cre = caster->GetMap()->GetCreature(caster->m_SummonSlot[slot]);
         if (cre && cre->IsTotem() && caster->GetDistance(cre) <= 5.0f)
             return cre;
         return nullptr;
@@ -89,7 +89,7 @@ class spell_talent_turret_totems : public AuraScript
                 waterTotem->CastSpell(target, procSpell->Id, true);
         }
 
-        if (Creature* airTotem = GetTotem(caster, SUMMON_SLOT_TOTEM_AIR)
+        if (Creature* airTotem = GetTotem(caster, SUMMON_SLOT_TOTEM_AIR))
         {
             if (procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
                 airTotem->CastSpell(target, procSpell->Id, true);
@@ -1726,9 +1726,9 @@ class spell_talent_dancing_rune_weapon : public AuraScript
 
         if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
-            if (procSpell->GetSpellSpecific() == SPELL_SPECIFIC_SEAL |
-                procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW |
-                procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY |
+            if (procSpell->GetSpellSpecific() == SPELL_SPECIFIC_SEAL ||
+                procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW ||
+                procSpell->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY ||
                 eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
 
                 return true;
