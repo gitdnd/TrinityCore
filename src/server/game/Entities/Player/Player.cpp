@@ -22641,13 +22641,12 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    bool success = crItem->maxcount != 0;
     // Honeymint Tea
-    if (success && pProto->ItemId == 33445 && HasActiveSpell(60063) && GetReqKillOrCastCurrentCount(60063, 60007) == 0)
+    if (item == 33445 && HasActiveSpell(60063) && GetReqKillOrCastCurrentCount(60063, 60007) == 0)
     {
         AdvanceQuestObjective(60063, 0);
     }
-    return success;
+    return crItem->maxcount != 0;
 }
 
 uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
