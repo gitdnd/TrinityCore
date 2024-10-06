@@ -437,7 +437,7 @@ public:
             {
                 player->NearTeleportTo(75.1375f, 572.9322f, 731.48f, 3.432374f);
             }
-            return;
+            return true;
         }
 
         player->ClearInCombat();
