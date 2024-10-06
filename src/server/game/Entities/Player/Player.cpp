@@ -22642,7 +22642,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
     }
 
     // Honeymint Tea
-    if (item == 33445 && HasActiveSpell(60063) && GetReqKillOrCastCurrentCount(60063, 60007) == 0)
+    if (item == 33445 && IsActiveQuest(60063) && GetReqKillOrCastCurrentCount(60063, 60007) == 0)
     {
         AdvanceQuestObjective(60063, 0);
     }
