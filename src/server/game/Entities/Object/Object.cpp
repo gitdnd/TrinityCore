@@ -3676,6 +3676,12 @@ bool WorldObject::InSamePhase(WorldObject const* obj) const
                 return false;
             break;
         }
+        case 50500: // If trying to see the ogre in the continuum (seize the opportunity quest)
+        {
+            if (plr->IsActiveQuest(60064))
+                return false;
+            break;
+        }
         default:
             break;
         }
