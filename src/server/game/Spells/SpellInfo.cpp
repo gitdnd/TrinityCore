@@ -2124,7 +2124,7 @@ void SpellInfo::_LoadSpellSpecific()
 {
     _spellSpecific = [this]() -> SpellSpecificType
     {
-        if (Id == 43046 || Id == 7301 || Id == 43008 || Id == 43024 || Id == 25780 || Id == 49071 Id == 47889 || Id == 47893)
+        if (Id == 43046 || Id == 7301 || Id == 43008 || Id == 43024 || Id == 25780 || Id == 49071 || Id == 47889 || Id == 47893)
             return SPELL_SPECIFIC_MAGE_ARMOR;
 
         // Arcane brillance and Arcane intelect (normal check fails because of flags difference)
