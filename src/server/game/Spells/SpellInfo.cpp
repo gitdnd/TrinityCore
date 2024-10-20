@@ -2124,7 +2124,7 @@ void SpellInfo::_LoadSpellSpecific()
 {
     _spellSpecific = [this]() -> SpellSpecificType
     {
-        if (Id == 43046 || Id == 7301 || Id == 43008 || Id == 43024)
+        if (Id == 43046 || Id == 7301 || Id == 43008 || Id == 43024 || Id == 25780 || Id == 49071 || Id == 47889 || Id == 47893)
             return SPELL_SPECIFIC_MAGE_ARMOR;
 
         // Arcane brillance and Arcane intelect (normal check fails because of flags difference)
@@ -2137,7 +2137,7 @@ void SpellInfo::_LoadSpellSpecific()
         if (Id == 12292) // Death Wish
             return SPELL_SPECIFIC_WARRIOR_ENRAGE;
 
-        // Warlock (Demon Armor | Demon Skin | Fel Armor)
+        // Warlock (Demon Armor | Demon Skin | Fel Armor) currently unused - kaleid
         if (Id == 47889 || Id == 696 || Id == 47893)
             return SPELL_SPECIFIC_WARLOCK_ARMOR;
 
@@ -2149,7 +2149,7 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT;
 
         // only hunter aspects have this (but not all aspects in hunter family)
-        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 49071 || Id == 13165)
+        if (Id == 13161 || Id == 5118 || Id == 61847 || Id == 27044 || Id == 13163 || Id == 13159 || Id == 34074 || Id == 13165)
             return SPELL_SPECIFIC_ASPECT;
 
         // Judgement of Wisdom, Judgement of Light, Judgement of Justice
@@ -2171,7 +2171,7 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_HAND;
 
         // only paladin auras have this (for palaldin class family)
-        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943 || Id == 96001 || Id == 96011 || Id == 96021 || Id == 96031 || Id == 96041 || Id == 96051 || Id == 96061 || Id == 96071 || Id == 96081 || Id == 96091 || Id == 96101)
+        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943 || Id == 96001 || Id == 96011 || Id == 96021 || Id == 96031 || Id == 96041 || Id == 96051 || Id == 96061 || Id == 96071 || Id == 96081 || Id == 96091 || Id == 96101 || Id == 460191)
             return SPELL_SPECIFIC_AURA;
 
         switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
