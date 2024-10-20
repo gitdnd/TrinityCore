@@ -1348,6 +1348,7 @@ class spell_class_seal_of_windfury : public AuraScript
         PreventDefaultAction();
 
         Player* player = eventInfo.GetActor()->GetCharmerOrOwnerPlayerOrPlayerItself();
+        Unit* caster = eventInfo.GetActor();
 
         if (!player)
             return;
@@ -1361,18 +1362,18 @@ class spell_class_seal_of_windfury : public AuraScript
 
         // Weapon dmg calculations mh
         //float ap = player->GetTotalAttackPowerValue(BASE_ATTACK);
-        int32 mws = player->GetAttackTime(BASE_ATTACK);
+        int32 mws = caster->GetAttackTime(BASE_ATTACK);
         mws /= 1000.0f;
         float mhdmg = (extraAttackPower / 14.f * mws);
 
         // Weapon dmg calculations oh
-        int32 omws = player->GetAttackTime(OFF_ATTACK);
+        int32 omws = caster->GetAttackTime(OFF_ATTACK);
         omws /= 1000.0f;
         float ohdmg = (extraAttackPower / 14.f * omws);
 
         //Weapon dmg calculations ranged
         //float rap = player->GetTotalAttackPowerValue(RANGED_ATTACK);
-        int32 rws = player->GetAttackTime(RANGED_ATTACK);
+        int32 rws = caster->GetAttackTime(RANGED_ATTACK);
         rws /= 1000.0f;
         float rdmg = (extraAttackPower / 14.f * rws);
 
@@ -1407,7 +1408,7 @@ class spell_class_seal_of_windfury : public AuraScript
         args.AddSpellBP0(amount);
         // Attack twice
         for (uint8 i = 0; i < 2; ++i)
-            player->CastSpell(eventInfo.GetProcTarget(), spellId, args);
+            caster->CastSpell(eventInfo.GetProcTarget(), spellId, args);
     }
 
     void Register() override
