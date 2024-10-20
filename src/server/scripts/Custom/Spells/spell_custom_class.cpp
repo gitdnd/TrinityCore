@@ -1347,8 +1347,10 @@ class spell_class_seal_of_windfury : public AuraScript
     {
         PreventDefaultAction();
 
-        Player* player = eventInfo.GetActor()->ToPlayer();
+        Player* player = eventInfo.GetActor()->GetCharmerOrOwnerPlayerOrPlayerItself();
 
+        if (!player)
+            return;
 
         float ilvl = player->GetAverageItemLevel();
 
