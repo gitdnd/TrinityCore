@@ -5528,10 +5528,12 @@ void Spell::SummonGuardian(SpellEffectInfo const& spellEffectInfo, uint32 entry,
 
         if (summon->GetEntry() == 27893)
         {
-            if (uint32 weapon = unitCaster->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID))
+            //if (uint32 weapon = unitCaster->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID))
+            Player* player = unitCaster->ToPlayer();
+            if (Item* weapon = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
             {
                 summon->SetDisplayId(11686); // modelid2
-                summon->SetVirtualItem(0, weapon);
+                summon->SetVirtualItem(0, weapon->GetEntry());
             }
             else
                 summon->SetDisplayId(1126); // modelid1

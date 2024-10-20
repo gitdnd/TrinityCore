@@ -2963,7 +2963,8 @@ enum ProfessionResearch
     SPELL_NORTHREND_INSCRIPTION_RESEARCH = 61177,
     SPELL_CRAFTING_BRAWN_DISCOVERY = 170000,
     SPELL_CRAFTING_WISDOM_DISCOVERY = 170001,
-    SPELL_CRAFTING_CUNNING_DISCOVERY = 170002
+    SPELL_CRAFTING_CUNNING_DISCOVERY = 170002,
+    SPELL_CRAFTING_HARMONY_DISCOVERY = 170004
 };
 
 class spell_gen_profession_research : public SpellScript
@@ -3005,7 +3006,10 @@ class spell_gen_profession_research : public SpellScript
             caster->LearnSpell(discoveredSpellId, false);
 
             // If the cast spell is the spell for discovering gems, add the discovered gem to the player as well
-            if (spellId == SPELL_CRAFTING_BRAWN_DISCOVERY || spellId == SPELL_CRAFTING_WISDOM_DISCOVERY || spellId == SPELL_CRAFTING_CUNNING_DISCOVERY)
+            if (spellId == SPELL_CRAFTING_BRAWN_DISCOVERY ||
+                spellId == SPELL_CRAFTING_WISDOM_DISCOVERY ||
+                spellId == SPELL_CRAFTING_CUNNING_DISCOVERY ||
+                spellId == SPELL_CRAFTING_HARMONY_DISCOVERY)
             {
                 // Add gem
                 SpellInfo const* discoveredSpellInfo = sSpellMgr->GetSpellInfo(discoveredSpellId);
@@ -3021,6 +3025,8 @@ class spell_gen_profession_research : public SpellScript
                         id = 50083;
                     else if (spellId == SPELL_CRAFTING_WISDOM_DISCOVERY)
                         id = 50084;
+                    else if (spellId == SPELL_CRAFTING_HARMONY_DISCOVERY)
+                        id = 50088;
                     if (id > 0)
                         caster->CompletedAchievement(id);
                 }

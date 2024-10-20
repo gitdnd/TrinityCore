@@ -5067,11 +5067,20 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
         SetCanSeePhaseOne(true);
         SetCanSeeUniquePhase(false);
 
+        // Old Hub
+        /*
         uint32 mapId = 765;
         float x = 56.48f;
         float y = 539.11f;
         float z = 715.5f;
         float o = 4.305573f;
+        */
+        // New Hub
+        uint32 mapId = 775;
+        float x = 75.1375f;
+        float y = 572.9322f;
+        float z = 731.48f;
+        float o = 3.432374f;
 
         if (GetMap()->graveyardOverride.GetMapId() != MAPID_INVALID)
         {
@@ -22632,6 +22641,11 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
+    // Honeymint Tea
+    if (item == 33445 && IsActiveQuest(60063) && GetReqKillOrCastCurrentCount(60063, 60007) == 0)
+    {
+        AdvanceQuestObjective(60063, 0);
+    }
     return crItem->maxcount != 0;
 }
 

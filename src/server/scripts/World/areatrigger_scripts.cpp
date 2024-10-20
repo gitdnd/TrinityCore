@@ -426,11 +426,33 @@ public:
 
     bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
     {
+        bool isOldHub = player->GetMapId() == 765;
+        if (!player->IsAlive())
+        {
+            if (isOldHub)
+            {
+                player->NearTeleportTo(57.43f, 539.048f, 715.4f, 4.017f);
+            }
+            else
+            {
+                player->NearTeleportTo(75.1375f, 572.9322f, 731.48f, 3.432374f);
+            }
+            return true;
+        }
+
         player->ClearInCombat();
-        player->ActivateTaxiPathTo(1982);
+        if (isOldHub)
+        {
+            player->ActivateTaxiPathTo(1982);
+        }
+        else
+        {
+            player->ActivateTaxiPathTo(1983);
+        }
         auto achievement = AchievementGlobalMgr::instance()->GetAchievement(50085);
         if (achievement)
             player->CompletedAchievement(achievement);
+
         return true;
     }
 };
