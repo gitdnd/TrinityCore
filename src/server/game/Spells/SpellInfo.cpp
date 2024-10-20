@@ -2171,7 +2171,7 @@ void SpellInfo::_LoadSpellSpecific()
             return SPELL_SPECIFIC_HAND;
 
         // only paladin auras have this (for palaldin class family)
-        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943 || Id == 96001 || Id == 96011 || Id == 96021 || Id == 96031 || Id == 96041 || Id == 96051 || Id == 96061 || Id == 96071 || Id == 96081 || Id == 96091 || Id == 96101)
+        if (Id == 19746 || Id == 32223 || Id == 48942 || Id == 48947 || Id == 48945 || Id == 54043 || Id == 48943 || Id == 96001 || Id == 96011 || Id == 96021 || Id == 96031 || Id == 96041 || Id == 96051 || Id == 96061 || Id == 96071 || Id == 96081 || Id == 96091 || Id == 96101 || Id == 460191)
             return SPELL_SPECIFIC_AURA;
 
         switch (SpellFamilyName) // Checks familyflags. Noting it here -Itswicky
