@@ -482,16 +482,8 @@ public:
 
     bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
     {
-        if (player->IsAlive())
-        {
-            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
-            player->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, player->GetMaxHealth());
-            // player can be alive if GM/etc
-            // change the death state to CORPSE to prevent the death timer from
-            // starting in the next player update
-            if (player->IsAlive())
-                player->KillPlayer();
-        }
+        player->CastSpell(player, 51347, true); // teleport visual
+        player->NearTeleportTo(-16.311f, 801.48f, 750.72f, 4.712f);
         return true;
     }
 };
