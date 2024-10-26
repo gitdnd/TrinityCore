@@ -472,6 +472,30 @@ public:
     }
 };
 
+class AreaTrigger_hub_fall_to_death : public AreaTriggerScript
+{
+public:
+    AreaTrigger_hub_fall_to_death() : AreaTriggerScript("hub_fall_to_death")
+    {
+
+    }
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
+    {
+        if (player->IsAlive())
+        {
+            player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
+            player->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, player->GetMaxHealth());
+            // player can be alive if GM/etc
+            // change the death state to CORPSE to prevent the death timer from
+            // starting in the next player update
+            if (player->IsAlive())
+                player->KillPlayer();
+        }
+        return true;
+    }
+};
+
 void AddSC_areatrigger_scripts()
 {
     new AreaTrigger_at_coilfang_waterfall();
@@ -485,4 +509,5 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_frostgrips_hollow();
     new AreaTrigger_hub_fall_box();
     new AreaTrigger_hub_speed_box();
+    new AreaTrigger_hub_fall_to_death();
 }
