@@ -23,7 +23,7 @@ namespace LuaItem
         return 1;
     }
 
-#if (!defined(TBC) && !defined(CLASSIC))
+#if ELUNA_EXPANSION >= EXP_WOTLK
     /**
      * Returns 'true' if the [Item] is account bound, 'false' otherwise
      *
@@ -83,7 +83,7 @@ namespace LuaItem
         return 1;
     }
 
-#ifndef CLASSIC
+#if ELUNA_EXPANSION >= EXP_TBC
     /**
      * Returns 'true' if the [Item] is a currency token, 'false' otherwise
      *
@@ -125,7 +125,7 @@ namespace LuaItem
      */
     int CanBeTraded(Eluna* E, Item* item)
     {
-#if (defined(TBC) || defined(CLASSIC))
+#if ELUNA_EXPANSION <= EXP_TBC
         E->Push(item->CanBeTraded());
 #else
         bool mail = E->CHECKVAL<bool>(2, false);
@@ -192,7 +192,7 @@ namespace LuaItem
         return 1;
     }
 
-#if defined(WOTLK)
+#if ELUNA_EXPANSION == EXP_WOTLK
     /**
      * Returns 'true' if the [Item] is a weapon vellum, 'false' otherwise
      *
@@ -259,10 +259,10 @@ namespace LuaItem
         if (ItemLocale const* il = eObjectMgr->GetItemLocale(temp->ItemId))
             ObjectMgr::GetLocaleString(il->Name, static_cast<LocaleConstant>(locale), name);
 
-#ifndef CLASSIC
+#if ELUNA_EXPANSION >= EXP_TBC
         if (int32 itemRandPropId = item->GetItemRandomPropertyId())
         {
-#if defined(CATA)
+#if ELUNA_EXPANSION == EXP_CATA
             char* suffix = NULL;
 #else
             char* const* suffix = NULL;
@@ -291,7 +291,7 @@ namespace LuaItem
         oss << "|c" << std::hex << ItemQualityColors[temp->Quality] << std::dec <<
             "|Hitem:" << temp->ItemId << ":" <<
             item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT) << ":" <<
-#ifndef CLASSIC
+#if ELUNA_EXPANSION >= EXP_TBC
             item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT) << ":" <<
             item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2) << ":" <<
             item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3) << ":" <<
@@ -491,7 +491,7 @@ namespace LuaItem
         return 1;
     }
 
-#if (!defined(TBC) && !defined(CLASSIC))
+#if ELUNA_EXPANSION > EXP_TBC
     /**
     * Returns the flags2 of the [Item]
     *
@@ -603,7 +603,7 @@ namespace LuaItem
         return 1;
     }
 
-#ifdef WOTLK
+#if ELUNA_EXPANSION == EXP_WOTLK
     int GetStatsCount(Eluna* E, Item* item)
     {
         E->Push(item->GetTemplate()->StatsCount);
@@ -622,7 +622,7 @@ namespace LuaItem
         return 1;
     }
 
-#ifndef CLASSIC
+#if ELUNA_EXPANSION >= EXP_TBC
     int GetRandomSuffix(Eluna* E, Item* item)
     {
         E->Push(item->GetTemplate()->RandomSuffix);
@@ -790,10 +790,10 @@ namespace LuaItem
         { "GetDisplayId", &LuaItem::GetDisplayId },
         { "GetQuality", &LuaItem::GetQuality },
         { "GetFlags", &LuaItem::GetFlags },
-#if (!defined(TBC) && !defined(CLASSIC))
+#if ELUNA_EXPANSION > EXP_TBC
         { "GetFlags2", &LuaItem::GetFlags2 },
 #else
-        { "GetFlags2", nullptr, METHOD_REG_NONE },
+        { "GetFlags2", METHOD_REG_NONE },
 #endif
         { "GetExtraFlags", &LuaItem::GetExtraFlags },
         { "GetBuyCount", &LuaItem::GetBuyCount },
@@ -807,15 +807,15 @@ namespace LuaItem
         { "GetRandomProperty", &LuaItem::GetRandomProperty },
         { "GetItemSet", &LuaItem::GetItemSet },
         { "GetBagSize", &LuaItem::GetBagSize },
-#if defined(TBC) || defined(WOTLK)
+#if ELUNA_EXPANSION >= EXP_TBC
         { "GetRandomSuffix", &LuaItem::GetRandomSuffix },
 #else
-        { "GetRandomSuffix", nullptr, METHOD_REG_NONE },
+        { "GetRandomSuffix", METHOD_REG_NONE },
 #endif
-#if defined(WOTLK)
+#if ELUNA_EXPANSION == EXP_WOTLK
         { "GetStatsCount", &LuaItem::GetStatsCount },
 #else
-        { "GetStatsCount", nullptr, METHOD_REG_NONE },
+        { "GetStatsCount", METHOD_REG_NONE },
 #endif
 
         // Setters
@@ -840,27 +840,28 @@ namespace LuaItem
         { "IsConjuredConsumable", &LuaItem::IsConjuredConsumable },
         { "SetEnchantment", &LuaItem::SetEnchantment },
         { "ClearEnchantment", &LuaItem::ClearEnchantment },
-#if defined(TBC) || defined(WOTLK)
+#if ELUNA_EXPANSION >= EXP_TBC
         { "IsCurrencyToken", &LuaItem::IsCurrencyToken },
 #else
-        { "IsCurrencyToken", nullptr, METHOD_REG_NONE },
+        { "IsCurrencyToken", METHOD_REG_NONE },
 #endif
-#if defined(WOTLK)
+#if ELUNA_EXPANSION >= EXP_WOTLK
         { "IsBoundAccountWide", &LuaItem::IsBoundAccountWide },
+#else
+        { "IsBoundAccountWide", METHOD_REG_NONE },
+#endif
+#if ELUNA_EXPANSION == EXP_WOTLK
         { "IsWeaponVellum", &LuaItem::IsWeaponVellum },
         { "IsArmorVellum", &LuaItem::IsArmorVellum },
 #else
-        { "IsBoundAccountWide", nullptr, METHOD_REG_NONE },
-        { "IsWeaponVellum", nullptr, METHOD_REG_NONE },
-        { "IsArmorVellum", nullptr, METHOD_REG_NONE },
+        { "IsWeaponVellum", METHOD_REG_NONE },
+        { "IsArmorVellum", METHOD_REG_NONE },
 #endif
         // Other
         { "SaveToDB", &LuaItem::SaveToDB },
 
         // Not implemented methods
-        { "IsRefundExpired", nullptr, METHOD_REG_NONE }, // not implemented
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "IsRefundExpired", METHOD_REG_NONE } // not implemented
     };
 };
 #endif

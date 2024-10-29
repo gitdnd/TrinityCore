@@ -1935,7 +1935,7 @@ namespace LuaUnit
         float maxHeight = E->CHECKVAL<float>(6);
         uint32 id = E->CHECKVAL<uint32>(7, 0);
 
-#if WOTLK
+#if ELUNA_EXPANSION >= EXP_WOTLK
         unit->GetMotionMaster()->MoveJump(x, y, z, zSpeed, maxHeight, id);
 #else
         Position pos(x, y, z);
@@ -2178,7 +2178,12 @@ namespace LuaUnit
 
         for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
+#if ELUNA_EXPANSION == EXP_CATA
+            SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(i));
+            uint8 eff = spellEffect->Effect;
+#else
             uint8 eff = spellEntry->Effect[i];
+#endif
             if (eff >= TOTAL_SPELL_EFFECTS)
                 continue;
 
@@ -2418,6 +2423,71 @@ namespace LuaUnit
         return 0;
     }
 
+    /**
+    * Returns whether or not the [Unit] can have stat modifiers applied.
+    *
+    * @return bool canModifyStats
+    */
+    int CanModifyStats(Eluna* E, Unit* unit)
+    {
+        E->Push(unit->CanModifyStats());
+        return 1;
+    }
+
+    /**
+    * Modifies a flat amount of a specific stat of the [Unit]
+    *
+    * <pre>
+    * enum UnitModifierFlatType
+    * {
+    *      BASE_VALUE = 0,
+    *      TOTAL_VALUE = 1
+    * };
+    * </pre>
+    *
+    * @param uint32 statType : The stat to modify
+    * @param [UnitModifierFlatType] modType : The type of modifier to apply
+    * @param float value : The value to apply to the stat
+    * @param bool apply = true : True applies a positive modifier, false applies a negative
+    */
+    int AddFlatStatModifier(Eluna* E, Unit* unit)
+    {
+        uint32 statType = E->CHECKVAL<uint32>(2);
+        uint8 modType = E->CHECKVAL<uint8>(3);
+        float value = E->CHECKVAL<float>(4);
+        bool apply = E->CHECKVAL<bool>(5, true);
+        UnitModifierType type = (modType == 0) ? BASE_VALUE : TOTAL_VALUE;
+
+        unit->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + statType), (UnitModifierType)type, value, apply);
+        return 0;
+    }
+
+    /**
+    * Modifies a percentage amount of a specific stat of the [Unit]
+    *
+    * <pre>
+    * enum UnitModifierPctType
+    * {
+    *      BASE_PCT = 0,
+    *      TOTAL_PCT = 1
+    * };
+    * </pre>
+    *
+    * @param uint32 statType : The stat to modify
+    * @param [UnitModifierPctType] modType : The type of modifier to apply
+    * @param float value : The value to apply to the stat
+    */
+    int AddPctStatModifier(Eluna* E, Unit* unit)
+    {
+        uint32 statType = E->CHECKVAL<uint32>(2);
+        uint8 modType = E->CHECKVAL<uint8>(3);
+        float value = E->CHECKVAL<float>(4);
+        UnitModifierType type = (modType == 0) ? BASE_PCT : TOTAL_PCT;
+
+        unit->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + statType), (UnitModifierType)type, value, true);
+        return 0;
+    }
+
     ElunaRegister<Unit> UnitMethods[] =
     {
         // Getters
@@ -2464,8 +2534,8 @@ namespace LuaUnit
         { "GetVehicleKit", &LuaUnit::GetVehicleKit },
         { "GetCritterGUID", &LuaUnit::GetCritterGUID },
 #else
-        { "GetVehicleKit", nullptr, METHOD_REG_NONE },
-        { "GetCritterGUID", nullptr, METHOD_REG_NONE },
+        { "GetVehicleKit", METHOD_REG_NONE },
+        { "GetCritterGUID", METHOD_REG_NONE },
 #endif
 
         // Setters
@@ -2500,9 +2570,9 @@ namespace LuaUnit
         { "SetSanctuary", &LuaUnit::SetSanctuary },
         { "SetCritterGUID", &LuaUnit::SetCritterGUID },
 #else
-        { "SetFFA", nullptr, METHOD_REG_NONE },
-        { "SetSanctuary", nullptr, METHOD_REG_NONE },
-        { "SetCritterGUID", nullptr, METHOD_REG_NONE },
+        { "SetFFA", METHOD_REG_NONE },
+        { "SetSanctuary", METHOD_REG_NONE },
+        { "SetCritterGUID", METHOD_REG_NONE },
 #endif
 
         // Boolean
@@ -2547,8 +2617,9 @@ namespace LuaUnit
 #if !defined(CLASSIC)
         { "IsOnVehicle", &LuaUnit::IsOnVehicle },
 #else
-        { "IsOnVehicle", nullptr, METHOD_REG_NONE },
+        { "IsOnVehicle", METHOD_REG_NONE },
 #endif
+        { "CanModifyStats", &LuaUnit::CanModifyStats },
 
         // Other
         { "AddAura", &LuaUnit::AddAura },
@@ -2594,31 +2665,31 @@ namespace LuaUnit
 #if !defined(CLASSIC)
         { "RemoveArenaAuras", &LuaUnit::RemoveArenaAuras },
 #else
-        { "RemoveArenaAuras", nullptr, METHOD_REG_NONE },
+        { "RemoveArenaAuras", METHOD_REG_NONE },
 #endif
 #if (!defined(TBC) && !defined(CLASSIC))
         { "MoveJump", &LuaUnit::MoveJump },
 #else
-        { "MoveJump", nullptr, METHOD_REG_NONE },
+        { "MoveJump", METHOD_REG_NONE },
 #endif
+        { "AddFlatStatModifier", &LuaUnit::AddFlatStatModifier },
+        { "AddPctStatModifier", &LuaUnit::AddPctStatModifier },
 
         // Not implemented mehtods
-        { "GetVehicle", nullptr, METHOD_REG_NONE }, // not implemented
-        { "SetStunned", nullptr, METHOD_REG_NONE }, // not implemented
-        { "SetCanFly", nullptr, METHOD_REG_NONE }, // not implemented
-        { "SetVisible", nullptr, METHOD_REG_NONE }, // not implemented
-        { "IsVisible", nullptr, METHOD_REG_NONE }, // not implemented,
-        { "IsMoving", nullptr, METHOD_REG_NONE }, // not implemented
-        { "IsFlying", nullptr, METHOD_REG_NONE }, // not implemented
-        { "RestoreDisplayId", nullptr, METHOD_REG_NONE }, // not implemented
-        { "RestoreFaction", nullptr, METHOD_REG_NONE }, // not implemented
-        { "RemoveBindSightAuras", nullptr, METHOD_REG_NONE }, // not implemented
-        { "RemoveCharmAuras", nullptr, METHOD_REG_NONE }, // not implemented
-        { "DisableMelee", nullptr, METHOD_REG_NONE }, // not implemented
-        { "SummonGuardian", nullptr, METHOD_REG_NONE }, // not implemented
-        { "SetImmuneTo", nullptr, METHOD_REG_NONE }, // not implemented
-
-        { NULL, NULL }
+        { "GetVehicle", METHOD_REG_NONE }, // not implemented
+        { "SetStunned", METHOD_REG_NONE }, // not implemented
+        { "SetCanFly", METHOD_REG_NONE }, // not implemented
+        { "SetVisible", METHOD_REG_NONE }, // not implemented
+        { "IsVisible", METHOD_REG_NONE }, // not implemented,
+        { "IsMoving", METHOD_REG_NONE }, // not implemented
+        { "IsFlying", METHOD_REG_NONE }, // not implemented
+        { "RestoreDisplayId", METHOD_REG_NONE }, // not implemented
+        { "RestoreFaction", METHOD_REG_NONE }, // not implemented
+        { "RemoveBindSightAuras", METHOD_REG_NONE }, // not implemented
+        { "RemoveCharmAuras", METHOD_REG_NONE }, // not implemented
+        { "DisableMelee", METHOD_REG_NONE }, // not implemented
+        { "SummonGuardian", METHOD_REG_NONE }, // not implemented
+        { "SetImmuneTo", METHOD_REG_NONE }, // not implemented
     };
 };
 #endif

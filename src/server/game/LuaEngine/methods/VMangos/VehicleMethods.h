@@ -6,8 +6,7 @@
 
 #ifndef VEHICLEMETHODS_H
 #define VEHICLEMETHODS_H
-#ifndef CLASSIC
-#ifndef TBC
+#if ELUNA_EXPANSION >= EXP_WOTLK
 
 /***
  * Inherits all methods from: none
@@ -117,12 +116,9 @@ namespace LuaVehicle
 
         // Other
         { "AddPassenger", &LuaVehicle::AddPassenger },
-        { "RemovePassenger", &LuaVehicle::RemovePassenger },
-
-        { NULL, NULL }
+        { "RemovePassenger", &LuaVehicle::RemovePassenger }
     };
 }
 
-#endif // CLASSIC
-#endif // TBC
+#endif // Expansion WotLK or higher
 #endif // VEHICLEMETHODS_H

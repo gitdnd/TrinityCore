@@ -121,7 +121,7 @@ namespace LuaGuild
         return 1;
     }
 
-#if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
+#if ELUNA_EXPANSION <= EXP_WOTLK
     /**
      * Sets the leader of this [Guild]
      *
@@ -136,7 +136,7 @@ namespace LuaGuild
     }
 #endif
 
-#ifndef CLASSIC
+#if ELUNA_EXPANSION >= EXP_TBC
     /**
      * Sets the information of the bank tab specified
      *
@@ -252,16 +252,16 @@ namespace LuaGuild
         { "GetMemberCount", &LuaGuild::GetMemberCount },
 
         // Setters
-#if defined(TBC) || defined(WOTLK)
+#if ELUNA_EXPANSION >= EXP_TBC
         { "SetBankTabText", &LuaGuild::SetBankTabText, METHOD_REG_WORLD }, // World state method only in multistate
 #else
-        { "SetBankTabText", nullptr, METHOD_REG_NONE },
+        { "SetBankTabText", METHOD_REG_NONE },
 #endif
         { "SetMemberRank", &LuaGuild::SetMemberRank, METHOD_REG_WORLD }, // World state method only in multistate
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         { "SetLeader", &LuaGuild::SetLeader, METHOD_REG_WORLD }, // World state method only in multistate
 #else
-        { "SetLeader", nullptr, METHOD_REG_NONE },
+        { "SetLeader", METHOD_REG_NONE },
 #endif
 
         // Other
@@ -269,9 +269,7 @@ namespace LuaGuild
         { "SendPacketToRanked", &LuaGuild::SendPacketToRanked },
         { "Disband", &LuaGuild::Disband, METHOD_REG_WORLD }, // World state method only in multistate
         { "AddMember", &LuaGuild::AddMember, METHOD_REG_WORLD }, // World state method only in multistate
-        { "DeleteMember", &LuaGuild::DeleteMember, METHOD_REG_WORLD }, // World state method only in multistate
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "DeleteMember", &LuaGuild::DeleteMember, METHOD_REG_WORLD } // World state method only in multistate
     };
 };
 #endif

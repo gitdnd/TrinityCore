@@ -107,7 +107,7 @@ namespace LuaBattleGround
      */
     int GetInstanceId(Eluna* E, BattleGround* bg)
     {
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         E->Push(bg->GetInstanceId());
 #else
         E->Push(bg->GetInstanceID());
@@ -245,9 +245,7 @@ namespace LuaBattleGround
         { "GetMaxPlayersPerTeam", &LuaBattleGround::GetMaxPlayersPerTeam },
         { "GetMinPlayersPerTeam", &LuaBattleGround::GetMinPlayersPerTeam },
         { "GetWinner", &LuaBattleGround::GetWinner },
-        { "GetStatus", &LuaBattleGround::GetStatus },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetStatus", &LuaBattleGround::GetStatus }
     };
 };
 #endif

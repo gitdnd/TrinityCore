@@ -34,7 +34,7 @@ namespace LuaWorldObject
         return 1;
     }
 
-#if (!defined(TBC) && !defined(CLASSIC))
+#if ELUNA_EXPANSION > EXP_TBC
     /**
      * Returns the current phase of the [WorldObject]
      *
@@ -1060,7 +1060,7 @@ namespace LuaWorldObject
             return 0;
 
         if (player)
-#ifdef CATA
+#if ELUNA_EXPANSION == EXP_CATA
             obj->PlayDirectSound(soundId, player);
 #else
             obj->PlayDirectSound(soundId, PlayPacketParameters(PLAY_TARGET, (Player const*)player));
@@ -1090,7 +1090,7 @@ namespace LuaWorldObject
             return 0;
 
         if (player)
-#ifdef CATA
+#if ELUNA_EXPANSION == EXP_CATA
             obj->PlayDistanceSound(soundId, player);
 #else
             obj->PlayDistanceSound(soundId, PlayPacketParameters(PLAY_TARGET, (Player const*)player));
@@ -1154,12 +1154,12 @@ namespace LuaWorldObject
         { "GetExactDistance2d", &LuaWorldObject::GetExactDistance2d },
         { "GetRelativePoint", &LuaWorldObject::GetRelativePoint },
         { "GetAngle", &LuaWorldObject::GetAngle },
-#if defined(WOTLK)
+#if ELUNA_EXPANSION > EXP_TBC
         { "GetPhaseMask", &LuaWorldObject::GetPhaseMask },
         { "SetPhaseMask", &LuaWorldObject::SetPhaseMask },
 #else
-        { "GetPhaseMask", nullptr, METHOD_REG_NONE },
-        { "SetPhaseMask", nullptr, METHOD_REG_NONE },
+        { "GetPhaseMask", METHOD_REG_NONE },
+        { "SetPhaseMask", METHOD_REG_NONE },
 #endif
 
         // Boolean
@@ -1185,9 +1185,7 @@ namespace LuaWorldObject
         { "PlayMusic", &LuaWorldObject::PlayMusic },
         { "PlayDirectSound", &LuaWorldObject::PlayDirectSound },
         { "PlayDistanceSound", &LuaWorldObject::PlayDistanceSound },
-        { "Data", &LuaWorldObject::Data },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "Data", &LuaWorldObject::Data }
     };
 };
 #endif

@@ -36,7 +36,7 @@ namespace LuaGroup
         return 1;
     }
 
-#if !(defined(CLASSIC) || defined(TBC))
+#if ELUNA_EXPANSION >= EXP_WOTLK
     /**
      * Returns 'true' if the [Group] is a LFG group
      *
@@ -200,7 +200,7 @@ namespace LuaGroup
      */
     int GetGUID(Eluna* E, Group* group)
     {
-#ifdef CLASSIC
+#if ELUNA_EXPANSION == EXP_CLASSIC
         E->Push(group->GetId());
 #else
         E->Push(group->GET_GUID());
@@ -361,7 +361,7 @@ namespace LuaGroup
         if (icon >= TARGETICONCOUNT)
             return luaL_argerror(E->L, 2, "valid target icon expected");
 
-#if (defined(CLASSIC) || defined(TBC))
+#if ELUNA_EXPANSION <= EXP_TBC
         group->SetTargetIcon(icon, target);
 #else
         group->SetTargetIcon(icon, setter, target);
@@ -402,10 +402,10 @@ namespace LuaGroup
         { "IsAssistant", &LuaGroup::IsAssistant },
         { "SameSubGroup", &LuaGroup::SameSubGroup },
         { "HasFreeSlotSubGroup", &LuaGroup::HasFreeSlotSubGroup },
-#if defined WOTLK
+#if ELUNA_EXPANSION == EXP_WOTLK
         { "IsLFGGroup", &LuaGroup::IsLFGGroup },
 #else
-        { "IsLFGGroup", nullptr, METHOD_REG_NONE },
+        { "IsLFGGroup", METHOD_REG_NONE },
 #endif
 
         // Other
@@ -413,12 +413,10 @@ namespace LuaGroup
         { "ConvertToRaid", &LuaGroup::ConvertToRaid, METHOD_REG_WORLD }, // World state method only in multistate
 
         // Not implemented methods
-        { "IsBFGroup", nullptr, METHOD_REG_NONE },   // not implemented
-        { "ConvertToLFG", nullptr, METHOD_REG_NONE },    // not implemented
-        { "GetMemberFlags", nullptr, METHOD_REG_NONE },    // not implemented
-        { "SetMemberFlag", nullptr, METHOD_REG_NONE },    // not implemented
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "IsBFGroup", METHOD_REG_NONE },   // not implemented
+        { "ConvertToLFG", METHOD_REG_NONE },    // not implemented
+        { "GetMemberFlags", METHOD_REG_NONE },    // not implemented
+        { "SetMemberFlag", METHOD_REG_NONE }    // not implemented
     };
 };
 

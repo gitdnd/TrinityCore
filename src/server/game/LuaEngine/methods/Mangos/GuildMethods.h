@@ -115,7 +115,6 @@ namespace LuaGuild
         return 1;
     }
 
-#if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
     /**
      * Sets the leader of this [Guild]
      *
@@ -128,7 +127,6 @@ namespace LuaGuild
         guild->SetLeader(player->GET_GUID());
         return 0;
     }
-#endif
 
 #ifndef CLASSIC
     /**
@@ -251,7 +249,7 @@ namespace LuaGuild
 #ifndef CLASSIC
         { "SetBankTabText", &LuaGuild::SetBankTabText, METHOD_REG_WORLD }, // World state method only in multistate
 #else
-        { "SetBankTabText", nullptr,  METHOD_REG_NONE},
+        { "SetBankTabText",  METHOD_REG_NONE},
 #endif
 
         // Other
@@ -259,9 +257,7 @@ namespace LuaGuild
         { "SendPacketToRanked", &LuaGuild::SendPacketToRanked },
         { "Disband", &LuaGuild::Disband, METHOD_REG_WORLD }, // World state method only in multistate
         { "AddMember", &LuaGuild::AddMember, METHOD_REG_WORLD }, // World state method only in multistate
-        { "DeleteMember", &LuaGuild::DeleteMember, METHOD_REG_WORLD }, // World state method only in multistate
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "DeleteMember", &LuaGuild::DeleteMember, METHOD_REG_WORLD } // World state method only in multistate
     };
 };
 #endif

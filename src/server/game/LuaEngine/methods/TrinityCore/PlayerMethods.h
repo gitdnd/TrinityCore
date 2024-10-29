@@ -10,6 +10,7 @@
 #include "LuaValue.h"
 #include "NPCPackets.h"
 #include "PartyPackets.h"
+#include "Unit.h"
 #include <boost/callable_traits/args.hpp>
 
 /***
@@ -1971,7 +1972,24 @@ namespace LuaPlayer
     {
         int32 pType = E->CHECKVAL<int32>(2);
 
-        player->SetMovement((PlayerMovementType)pType);
+        switch (pType)
+        {
+            case 1: // MOVE_ROOT
+                player->SetRooted(true);
+                break;
+            case 2: // MOVE_UNROOT
+                player->SetRooted(false);
+                break;
+            case 3: // MOVE_WATER_WALK
+                player->SetWaterWalking(true);
+                break;
+            case 4: // MOVE_LAND_WALK
+                player->SetWaterWalking(false);
+                break;
+            default:
+                break;
+        }
+
         return 0;
     }
 
@@ -3973,22 +3991,20 @@ namespace LuaPlayer
         { "SendMovieStart", &LuaPlayer::SendMovieStart },
 
         // Not implemented methods
-        { "GetHonorStoredKills", nullptr, METHOD_REG_NONE }, // classic only
-        { "GetRankPoints", nullptr, METHOD_REG_NONE }, // classic only
-        { "GetHonorLastWeekStandingPos", nullptr, METHOD_REG_NONE }, // classic only
+        { "GetHonorStoredKills", METHOD_REG_NONE }, // classic only
+        { "GetRankPoints", METHOD_REG_NONE }, // classic only
+        { "GetHonorLastWeekStandingPos", METHOD_REG_NONE }, // classic only
 
-        { "SetHonorStoredKills", nullptr, METHOD_REG_NONE }, // classic only
-        { "SetRankPoints", nullptr, METHOD_REG_NONE }, // classic only
-        { "SetHonorLastWeekStandingPos", nullptr, METHOD_REG_NONE }, // classic only
+        { "SetHonorStoredKills", METHOD_REG_NONE }, // classic only
+        { "SetRankPoints", METHOD_REG_NONE }, // classic only
+        { "SetHonorLastWeekStandingPos", METHOD_REG_NONE }, // classic only
 
-        { "CanFlyInZone", nullptr, METHOD_REG_NONE }, // not implemented
+        { "CanFlyInZone", METHOD_REG_NONE }, // not implemented
 
-        { "UpdateHonor", nullptr, METHOD_REG_NONE }, // classic only
-        { "ResetHonor", nullptr, METHOD_REG_NONE }, // classic only
-        { "ClearHonorInfo", nullptr, METHOD_REG_NONE }, // classic only
-        { "GainSpellComboPoints", nullptr, METHOD_REG_NONE }, // not implemented
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "UpdateHonor", METHOD_REG_NONE }, // classic only
+        { "ResetHonor", METHOD_REG_NONE }, // classic only
+        { "ClearHonorInfo", METHOD_REG_NONE }, // classic only
+        { "GainSpellComboPoints", METHOD_REG_NONE } // not implemented
     };
 };
 #endif

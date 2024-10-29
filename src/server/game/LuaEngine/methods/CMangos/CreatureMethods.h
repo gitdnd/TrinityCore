@@ -26,7 +26,7 @@ namespace LuaCreature
         return 1;
     }
 
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
     /**
      * Returns `true` if the [Creature] is set to not give reputation when killed,
      *   and returns `false` otherwise.
@@ -66,7 +66,7 @@ namespace LuaCreature
     {
         bool mustBeDead = E->CHECKVAL<bool>(2, false);
 
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         E->Push(creature->IsTargetableForAttack(mustBeDead));
 #else
         E->Push(creature->isTargetableForAttack(mustBeDead));
@@ -715,7 +715,7 @@ namespace LuaCreature
         return 1;
     }
 
-#if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
+#if ELUNA_EXPANSION < EXP_CATA
     /**
      * Returns the [Creature]'s shield block value.
      *
@@ -827,7 +827,7 @@ namespace LuaCreature
         return 0;
     }
 
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
     /**
      * Sets whether the [Creature] gives reputation or not.
      *
@@ -1056,7 +1056,7 @@ namespace LuaCreature
         uint32 entry = E->CHECKVAL<uint32>(2);
         uint32 dataGuidLow = E->CHECKVAL<uint32>(3, 0);
 
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         creature->UpdateEntry(entry, dataGuidLow ? eObjectMgr->GetCreatureData(dataGuidLow) : NULL);
 #else
         creature->UpdateEntry(entry, ALLIANCE, dataGuidLow ? eObjectMgr->GetCreatureData(dataGuidLow) : NULL);
@@ -1160,7 +1160,7 @@ namespace LuaCreature
         SpellEntry const* spellEntry = GetSpellStore()->LookupEntry<SpellEntry>(spell);
         creature->AddThreat(victim, threat, false, (SpellSchoolMask)schoolMask, spellEntry);
 
-#ifdef CLASSIC
+#if ELUNA_EXPANSION == EXP_CLASSIC
         creature->AddThreat(victim, threat, false, spellEntry ? GetSchoolMask(spellEntry->School) : SPELL_SCHOOL_MASK_NONE, spellEntry);
 #else
         creature->AddThreat(victim, threat, false, spellEntry ? static_cast<SpellSchoolMask>(spellEntry->SchoolMask) : SPELL_SCHOOL_MASK_NONE, spellEntry);
@@ -1219,10 +1219,10 @@ namespace LuaCreature
         { "GetRank", &LuaCreature::GetRank },
         { "GetDBTableGUIDLow", &LuaCreature::GetDBTableGUIDLow },
         { "GetCreatureFamily", &LuaCreature::GetCreatureFamily },
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         { "GetShieldBlockValue", &LuaCreature::GetShieldBlockValue },
 #else
-        { "GetShieldBlockValue", nullptr, METHOD_REG_NONE },
+        { "GetShieldBlockValue", METHOD_REG_NONE },
 #endif
 
         // Setters
@@ -1240,10 +1240,10 @@ namespace LuaCreature
         { "SetWalk", &LuaCreature::SetWalk },
         { "SetHomePosition", &LuaCreature::SetHomePosition },
         { "SetEquipmentSlots", &LuaCreature::SetEquipmentSlots },
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         { "SetDisableReputationGain", &LuaCreature::SetDisableReputationGain },
 #else
-        { "SetDisableReputationGain", nullptr, METHOD_REG_NONE },
+        { "SetDisableReputationGain", METHOD_REG_NONE },
 #endif
 
         // Boolean
@@ -1268,10 +1268,10 @@ namespace LuaCreature
         { "HasQuest", &LuaCreature::HasQuest },
         { "HasSpellCooldown", &LuaCreature::HasSpellCooldown },
         { "CanFly", &LuaCreature::CanFly },
-#ifndef CATA
+#if ELUNA_EXPANSION < EXP_CATA
         { "IsReputationGainDisabled", &LuaCreature::IsReputationGainDisabled },
 #else
-        { "IsReputationGainDisabled", nullptr, METHOD_REG_NONE },
+        { "IsReputationGainDisabled", METHOD_REG_NONE },
 #endif
 
         // Other
@@ -1291,26 +1291,24 @@ namespace LuaCreature
         { "RemoveFromWorld", &LuaCreature::RemoveFromWorld },
         
         // Not implemented methods
-        { "GetWaypointPath", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "GetLootMode", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "SetRegeneratingHealth", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "SetLootMode", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "SetReactState", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "IsDungeonBoss", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "IsTrigger", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "CanStartAttack", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "IsDamageEnoughForLootingAndReward", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "HasLootMode", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "AddLootMode", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "ResetLootMode", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "RemoveLootMode", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "GetThreat", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "ClearThreat", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "ResetAllThreat", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "FixateTarget", nullptr, METHOD_REG_NONE }, // TC/Acore
-        { "ClearFixate", nullptr, METHOD_REG_NONE }, // TC/Acore
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetWaypointPath", METHOD_REG_NONE }, // TC/Acore
+        { "GetLootMode", METHOD_REG_NONE }, // TC/Acore
+        { "SetRegeneratingHealth", METHOD_REG_NONE }, // TC/Acore
+        { "SetLootMode", METHOD_REG_NONE }, // TC/Acore
+        { "SetReactState", METHOD_REG_NONE }, // TC/Acore
+        { "IsDungeonBoss", METHOD_REG_NONE }, // TC/Acore
+        { "IsTrigger", METHOD_REG_NONE }, // TC/Acore
+        { "CanStartAttack", METHOD_REG_NONE }, // TC/Acore
+        { "IsDamageEnoughForLootingAndReward", METHOD_REG_NONE }, // TC/Acore
+        { "HasLootMode", METHOD_REG_NONE }, // TC/Acore
+        { "AddLootMode", METHOD_REG_NONE }, // TC/Acore
+        { "ResetLootMode", METHOD_REG_NONE }, // TC/Acore
+        { "RemoveLootMode", METHOD_REG_NONE }, // TC/Acore
+        { "GetThreat", METHOD_REG_NONE }, // TC/Acore
+        { "ClearThreat", METHOD_REG_NONE }, // TC/Acore
+        { "ResetAllThreat", METHOD_REG_NONE }, // TC/Acore
+        { "FixateTarget", METHOD_REG_NONE }, // TC/Acore
+        { "ClearFixate", METHOD_REG_NONE } // TC/Acore
     };
 };
 #endif

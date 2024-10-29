@@ -78,15 +78,7 @@ namespace LuaGlobalFunctions
      */
     int GetCoreExpansion(Eluna* E)
     {
-#ifdef CLASSIC
-        E->Push(0);
-#elif defined(TBC)
-        E->Push(1);
-#elif defined(WOTLK)
-        E->Push(2);
-#elif defined(CATA)
-        E->Push(3);
-#endif
+        E->Push(ELUNA_EXPANSION);
         return 1;
     }
 
@@ -1756,8 +1748,11 @@ namespace LuaGlobalFunctions
 
         auto const itemlist = items->m_items;
         for (auto itr = itemlist.begin(); itr != itemlist.end(); ++itr)
+#if ELUNA_EXPANSION == EXP_CATA
+            eObjectMgr->RemoveVendorItem(entry, (*itr)->item, (*itr)->type);
+#else
             eObjectMgr->RemoveVendorItem(entry, (*itr)->item);
-
+#endif
         return 0;
     }
 
@@ -2923,7 +2918,7 @@ namespace LuaGlobalFunctions
         return 0;
     }
 
-    ElunaGlobal::ElunaRegister GlobalMethods[] =
+    ElunaRegister<> GlobalMethods[] =
     {
         // Hooks
         { "RegisterPacketEvent", &LuaGlobalFunctions::RegisterPacketEvent },
@@ -2974,7 +2969,7 @@ namespace LuaGlobalFunctions
         { "GetPlayerByName", &LuaGlobalFunctions::GetPlayerByName, METHOD_REG_WORLD }, // World state method only in multistate
         { "GetGameTime", &LuaGlobalFunctions::GetGameTime },
         { "GetPlayersInWorld", &LuaGlobalFunctions::GetPlayersInWorld, METHOD_REG_WORLD }, // World state method only in multistate
-        { "GetPlayersOnMap", nullptr, METHOD_REG_NONE }, // Map state method only in multistate TODO
+        { "GetPlayersOnMap", METHOD_REG_NONE }, // Map state method only in multistate TODO
         { "GetGuildByName", &LuaGlobalFunctions::GetGuildByName },
         { "GetGuildByLeaderGUID", &LuaGlobalFunctions::GetGuildByLeaderGUID },
         { "GetPlayerCount", &LuaGlobalFunctions::GetPlayerCount },
@@ -3037,11 +3032,9 @@ namespace LuaGlobalFunctions
         { "StopGameEvent", &LuaGlobalFunctions::StopGameEvent },
 
         // unimplemented
-        { "WorldDBQueryAsync", nullptr, METHOD_REG_NONE },
-        { "CharDBQueryAsync", nullptr, METHOD_REG_NONE },
-        { "AuthDBQueryAsync", nullptr, METHOD_REG_NONE },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "WorldDBQueryAsync", METHOD_REG_NONE },
+        { "CharDBQueryAsync", METHOD_REG_NONE },
+        { "AuthDBQueryAsync", METHOD_REG_NONE }
     };
 }
 #endif

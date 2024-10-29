@@ -57,7 +57,7 @@ namespace LuaQuest
         return 1;
     }
 
-#ifndef CLASSIC
+#if ELUNA_EXPANSION >= EXP_TBC
     /**
      * Returns 'true' if the [Quest] is a daily quest, false otherwise.
      *
@@ -185,17 +185,15 @@ namespace LuaQuest
 
         // Boolean
         { "HasFlag", &LuaQuest::HasFlag },
-#if defined(TBC) || defined(WOTLK)
+#if ELUNA_EXPANSION >= EXP_TBC
         { "IsDaily", &LuaQuest::IsDaily },
 #else
-        { "IsDaily", nullptr, METHOD_REG_NONE },
+        { "IsDaily", METHOD_REG_NONE },
 #endif
         { "IsRepeatable", &LuaQuest::IsRepeatable },
 
         // Not implemented methods
-        { "GetMaxLevel", nullptr, METHOD_REG_NONE },  // not implemented
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetMaxLevel", METHOD_REG_NONE } // not implemented
     };
 };
 #endif

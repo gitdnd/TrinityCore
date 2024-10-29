@@ -701,7 +701,6 @@ namespace LuaCreature
         return 1;
     }
 
-#if defined(CLASSIC) || defined(TBC) || defined(WOTLK)
     /**
      * Returns the [Creature]'s shield block value.
      *
@@ -709,10 +708,13 @@ namespace LuaCreature
      */
     int GetShieldBlockValue(Eluna* E, Creature* creature)
     {
+#if ELUNA_EXPANSION == EXP_CATA
+        E->Push(creature->GetShieldBlockDamageValue());
+#else
         E->Push(creature->GetShieldBlockValue());
+#endif
         return 1;
     }
-#endif
 
     /**
      * Returns the guid of the [Creature] that is used as the ID in the database
@@ -1192,23 +1194,21 @@ namespace LuaCreature
         { "UpdateEntry", &LuaCreature::UpdateEntry },
 
         // Not implemented methods
-        { "GetWaypointPath", nullptr, METHOD_REG_NONE },   // not implemented
-        { "GetLootMode", nullptr, METHOD_REG_NONE },   // not implemented
-        { "SetRegeneratingHealth", nullptr, METHOD_REG_NONE },   // not implemented
-        { "SetLootMode", nullptr, METHOD_REG_NONE },   // not implemented
-        { "SetReactState", nullptr, METHOD_REG_NONE },   // not implemented
-        { "IsDungeonBoss", nullptr, METHOD_REG_NONE },   // not implemented
-        { "IsTrigger", nullptr, METHOD_REG_NONE },   // not implemented
-        { "CanStartAttack", nullptr, METHOD_REG_NONE },   // not implemented
-        { "IsDamageEnoughForLootingAndReward", nullptr, METHOD_REG_NONE },   // not implemented
-        { "HasLootMode", nullptr, METHOD_REG_NONE },   // not implemented
-        { "AddLootMode", nullptr, METHOD_REG_NONE },   // not implemented
-        { "ResetLootMode", nullptr, METHOD_REG_NONE },   // not implemented
-        { "RemoveLootMode", nullptr, METHOD_REG_NONE },   // not implemented
-        { "RemoveFromWorld", nullptr, METHOD_REG_NONE }, // not implemented
-        { "GetRank", nullptr, METHOD_REG_NONE }, // not implemented
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetWaypointPath", METHOD_REG_NONE },   // not implemented
+        { "GetLootMode", METHOD_REG_NONE },   // not implemented
+        { "SetRegeneratingHealth", METHOD_REG_NONE },   // not implemented
+        { "SetLootMode", METHOD_REG_NONE },   // not implemented
+        { "SetReactState", METHOD_REG_NONE },   // not implemented
+        { "IsDungeonBoss", METHOD_REG_NONE },   // not implemented
+        { "IsTrigger", METHOD_REG_NONE },   // not implemented
+        { "CanStartAttack", METHOD_REG_NONE },   // not implemented
+        { "IsDamageEnoughForLootingAndReward", METHOD_REG_NONE },   // not implemented
+        { "HasLootMode", METHOD_REG_NONE },   // not implemented
+        { "AddLootMode", METHOD_REG_NONE },   // not implemented
+        { "ResetLootMode", METHOD_REG_NONE },   // not implemented
+        { "RemoveLootMode", METHOD_REG_NONE },   // not implemented
+        { "RemoveFromWorld", METHOD_REG_NONE }, // not implemented
+        { "GetRank", METHOD_REG_NONE } // not implemented
     };
 };
 #endif
