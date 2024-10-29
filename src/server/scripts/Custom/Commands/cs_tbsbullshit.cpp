@@ -70,7 +70,7 @@ public:
 
         for (uint32 i = 0; i < numberOfClones; ++i)
         {
-            if (TempSummon* clone = player->GetMap()->SummonCreature(82002, player->GetRandomNearPosition(5.f), sSummonPropertiesStore.LookupEntry(1021), 10 * MINUTE * IN_MILLISECONDS, player, 0, 0, iLvl))
+            if (TempSummon* clone = player->GetMap()->SummonCreature(82002, player->GetRandomNearPosition(5.f), sSummonPropertiesStore.LookupEntry(1021), 10 * MINUTE * IN_MILLISECONDS, player, 0, 0, ObjectGuid::Empty, iLvl))
             {
                 clone->SetDisplayId(targetDisplay);
                 clone->SetFaction(faction);
