@@ -1739,7 +1739,7 @@ namespace LuaCustom
             return luaL_argerror(E->L, 7, "valid SpawnType expected");
         }
 
-        E->Push(obj->SummonCreature(entry, x, y, z, o, type, Milliseconds(despawnTimer), dungeonLevel, visibleOnlyToSummoner));
+        E->Push(obj->SummonCreature(entry, x, y, z, o, type, Milliseconds(despawnTimer), visibleOnlyToSummoner ? obj->GetGUID() : ObjectGuid::Empty, dungeonLevel));
         return 1;
     }
 
@@ -1895,7 +1895,7 @@ namespace LuaCustom
 
     // REGISTERS
     
-    ElunaGlobal::ElunaRegister GlobalMethods[] =
+    ElunaRegister<> GlobalMethods[] =
     {
         { "GetCustomTalentStorage", &LuaCustom::GetCustomTalentStorage },
         { "GetCustomTalent", &LuaCustom::GetCustomTalent },
@@ -1904,14 +1904,11 @@ namespace LuaCustom
         { "VendorRemoveItem", &LuaCustom::VendorRemoveItem },
         { "AddVendorItem", &LuaCustom::AddVendorItem },
         { "GetElunaMapId", &LuaCustom::GetElunaMapId },
-        { NULL, NULL, METHOD_REG_NONE }
     };
     
     ElunaRegister<Object> ObjectMethods[] =
     {
-        { "ToTransport", &LuaCustom::ToTransport },
-        
-        { NULL, NULL, METHOD_REG_NONE }
+        { "ToTransport", &LuaCustom::ToTransport }
     };
     
     ElunaRegister<WorldObject> WorldObjectMethods[] =
@@ -1925,9 +1922,7 @@ namespace LuaCustom
         { "SpawnCreature", &LuaCustom::SpawnCreature },
         { "GetNearObject", &LuaCustom::GetNearObject },
         { "GetPlayersInRange", &LuaCustom::GetPlayersInRange },
-        { "GetNearestPlayer", &LuaCustom::GetNearestPlayer },
-        
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetNearestPlayer", &LuaCustom::GetNearestPlayer }
     };
     
     ElunaRegister<Unit> UnitMethods[] =
@@ -1949,9 +1944,7 @@ namespace LuaCustom
         { "GetThreat", &LuaCustom::GetThreat },
         { "ClearThreat", &LuaCustom::ClearThreat },
         { "ClearThreatList", &LuaCustom::ClearThreatList },
-        { "ResetAllThreat", &LuaCustom::ResetAllThreat },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "ResetAllThreat", &LuaCustom::ResetAllThreat }
     };
     
     ElunaRegister<Player> PlayerMethods[] =
@@ -2002,9 +1995,7 @@ namespace LuaCustom
         { "SendListInventory", &LuaCustom::SendListInventory },
         { "SetTimeSpeed", &LuaCustom::SetTimeSpeed },
         { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
-        { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack }
     };
     
     ElunaRegister<Creature> CreatureMethods[] =
@@ -2020,16 +2011,12 @@ namespace LuaCustom
         { "AddQuest", &LuaCustom::AddQuest },
         { "SendMirrorImage", &LuaCustom::SendMirrorToPlayer },
         { "GetAITarget", &LuaCustom::GetAITarget },
-        { "SetCommandState", &LuaCustom::SetCommandState },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "SetCommandState", &LuaCustom::SetCommandState }
     };
     
     ElunaRegister<Item> ItemMethods[] =
     {
-        { "GetDisenchantId", &LuaCustom::GetDisenchantId },
-        
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetDisenchantId", &LuaCustom::GetDisenchantId }
     };
     
     ElunaRegister<Group> GroupMethods[] =
@@ -2037,9 +2024,7 @@ namespace LuaCustom
         { "GetDungeonLevel", &LuaCustom::GetDungeonLevel },
         { "GetCappedDungeonLevel", &LuaCustom::GetCappedDungeonLevel },
         { "GetAffixGroup", &LuaCustom::GetAffixGroup },
-        { "SetAffixSlot", &LuaCustom::SetAffixSlot },
-        
-        { NULL, NULL, METHOD_REG_NONE }
+        { "SetAffixSlot", &LuaCustom::SetAffixSlot }
     };
     
     ElunaRegister<Map> MapMethods[] =
@@ -2053,9 +2038,7 @@ namespace LuaCustom
         { "GetPlayers", &LuaCustom::GetPlayers },
         { "GetAreaId", &LuaCustom::GetAreaId },
         { "LockAndLoadCell", &LuaCustom::LockAndLoadCell },
-        { "GetPlayerByGuid", &LuaCustom::GetPlayerByGUID },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "GetPlayerByGuid", &LuaCustom::GetPlayerByGUID }
     };
 
     ElunaRegister<Transport> TransportMethods[] =
@@ -2064,14 +2047,12 @@ namespace LuaCustom
         { "EnableMovement", &EnableMovement },
         { "AddPassenger", &AddPassenger },
         { "GetPassengers", &GetPassengers },
-        { "SummonPassenger", &SummonPassenger },
-
-        { NULL, NULL, METHOD_REG_NONE }
+        { "SummonPassenger", &SummonPassenger }
     };
 
     inline void RegisterCustomFunctions(Eluna* E)
     {
-        ElunaGlobal::SetMethods(E, GlobalMethods);
+        ElunaTemplate<>::SetMethods(E, GlobalMethods);
 
         ElunaTemplate<Object>::SetMethods(E, ObjectMethods);
 

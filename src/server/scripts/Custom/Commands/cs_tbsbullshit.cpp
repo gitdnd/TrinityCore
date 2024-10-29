@@ -32,7 +32,6 @@ public:
     {
         static std::vector<ChatCommand> tbsBullshitCommandTable =
         {
-            { "circlerlaser", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleCirclerLaserCommand, "" },
             { "clone", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleClonePlayerCommand, "" },
             { "clearinventory", rbac::RBAC_PERM_COMMAND_ADDITEM, false, &HandleClearInventory, "" },
             { "knockback", rbac::RBAC_PERM_COMMAND_DEV, false, &HandleKnockbackCommand, "" },
@@ -44,20 +43,6 @@ public:
 
         };
         return tbsBullshitCommandTable;
-    }
-
-    static bool HandleCirclerLaserCommand(ChatHandler* handler, float radius, uint8 step)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        if (Creature* master = player->SummonCreature(82001, player->GetPosition(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*60s))
-        {
-            if (Creature* slave = player->SummonCreature(82001, master->GetRandomNearPosition(5.0f), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*60s))
-            {
-                master->CastSpell(slave, 82000, true);
-                slave->GetMotionMaster()->MoveCirclePath(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), radius, roll_chance_f(50.f), step);
-            }
-        }
-        return true;
     }
 
     static bool HandleClearInventory(ChatHandler* handler)

@@ -1507,6 +1507,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetActiveSpec(uint8 spec) { _talentMgr->ActiveSpec = spec; }
         uint8 GetSpecsCount() const { return _talentMgr->SpecsCount; }
         void SetSpecsCount(uint8 count) { _talentMgr->SpecsCount = count; }
+        void AddBonusTalents(uint32 points);
 
         bool ResetTalents(bool involuntarily = false);
         uint32 ResetTalentsCost() const;
