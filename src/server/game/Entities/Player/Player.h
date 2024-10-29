@@ -1494,9 +1494,19 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         // Talents
         uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
-        uint32 GetTotalTalentPoints() const;
         void SetFreeTalentPoints(uint32 points);
-        void AddBonusTalents(uint32 points);
+        uint32 GetUsedTalentCount() const { return _talentMgr->UsedTalentCount; }
+        void SetUsedTalentCount(uint32 talents) { _talentMgr->UsedTalentCount = talents; }
+        uint32 GetQuestRewardedTalentCount() const { return _talentMgr->QuestRewardedTalentCount; }
+        void AddQuestRewardedTalentCount(uint32 points) { _talentMgr->QuestRewardedTalentCount += points; }
+        uint32 GetTalentResetCost() const { return _talentMgr->ResetTalentsCost; }
+        void SetTalentResetCost(uint32 cost) { _talentMgr->ResetTalentsCost = cost; }
+        time_t GetTalentResetTime() const { return _talentMgr->ResetTalentsTime; }
+        void SetTalentResetTime(time_t time_) { _talentMgr->ResetTalentsTime = time_; }
+        uint8 GetActiveSpec() const { return _talentMgr->ActiveSpec; }
+        void SetActiveSpec(uint8 spec) { _talentMgr->ActiveSpec = spec; }
+        uint8 GetSpecsCount() const { return _talentMgr->SpecsCount; }
+        void SetSpecsCount(uint8 count) { _talentMgr->SpecsCount = count; }
 
         bool ResetTalents(bool involuntarily = false);
         uint32 ResetTalentsCost() const;
@@ -1510,8 +1520,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendTameFailure(uint8 result);
         bool AddTalent(uint32 spellId, uint8 spec, bool learning);
         bool HasTalent(uint32 spell_id, uint8 spec) const;
-
         uint32 CalculateTalentsPoints() const;
+        uint32 GetTotalTalentPoints() const;
 
         // Dual Spec
         void UpdateSpecCount(uint8 count);
@@ -2288,7 +2298,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ClearInactiveGemSpells();
         uint32 GetXPTalentLevel() { return talent_level; }
         uint32 GetBonusTalentLevel() { return bonusTalents; }
-        uint32 GetTotalTalentLevel() { return talent_level + bonusTalents; }
+        uint32 GetTotalTalentLevel() const { return talent_level + bonusTalents; }
         bool IsInstanceBound(uint32 mapId);
 
         bool CanTeleport() { return m_canTeleport; }

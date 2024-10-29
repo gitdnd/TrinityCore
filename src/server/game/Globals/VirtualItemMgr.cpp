@@ -478,7 +478,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         output->Flags += ITEM_FLAG_IS_BOUND_TO_ACCOUNT;
 
     // decide armor, if item class is armor and not of type misc, armor should always be applied.
-    if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISC)
+    if (output->Class == ITEM_CLASS_ARMOR && output->SubClass != ITEM_SUBCLASS_ARMOR_MISCELLANEOUS)
     {
         // by default we assume 1 ilevel = 1 armor
         float armorValue = float(ilevel);
@@ -546,7 +546,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
                 output->Damage[0].DamageType = 0;
                 break;
             }
-            case ITEM_SUBCLASS_WEAPON_FIST:
+            case ITEM_SUBCLASS_WEAPON_FIST_WEAPON:
             {
                 output->Delay = (urand(15, 27, generator) * 100);
                 output->Damage[0].DamageMin = ((0.83f * float(ilevel)) * 0.85f) * (float(output->Delay) / 1000.0f);
@@ -585,7 +585,7 @@ void VirtualItemMgr::GenerateBaseStats(VirtualItemTemplate* output, VirtualModif
         }
 
         // fist weapons need to either be main or offhand, special case for this
-        if (output->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
+        if (output->SubClass == ITEM_SUBCLASS_WEAPON_FIST_WEAPON)
         {
             uint32 wType = urand(0, 1, generator) > 0 ? INVTYPE_WEAPONMAINHAND : INVTYPE_WEAPONOFFHAND;
             if (output->InventoryType == INVTYPE_WEAPON)

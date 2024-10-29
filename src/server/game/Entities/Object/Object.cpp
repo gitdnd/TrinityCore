@@ -1890,7 +1890,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, ObjectGuid privateObjectOwner /*= ObjectGuid::Empty*/, int dungeonLevel, bool visibleBySummonerOnly /*= false*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, ObjectGuid privateObjectOwner /*= ObjectGuid::Empty*/, int dungeonLevel /*= 0*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2030,11 +2030,11 @@ void WorldObject::ClearZoneScript()
     m_zoneScript = nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, uint32 vehId /*= 0*/, uint32 spellId /*= 0*/, ObjectGuid privateObjectOwner /*= ObjectGuid::Empty*/, int dungeonLevel, bool visibleBySummonerOnly /*= false*/)
+TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, uint32 vehId /*= 0*/, uint32 spellId /*= 0*/, ObjectGuid privateObjectOwner /*= ObjectGuid::Empty*/, int dungeonLevel)
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime.count(), this, spellId, vehId, privateObjectOwner, dungeonLevel, visibleBySummonerOnly))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, nullptr, despawnTime.count(), this, spellId, vehId, privateObjectOwner, dungeonLevel))
         {
             summon->SetTempSummonType(despawnType);
             return summon;
@@ -2044,13 +2044,13 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempS
     return nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, ObjectGuid privateObjectOwner /*= ObjectGuid::Empty*/, int dungeonLevel, bool visibleBySummonerOnly /*= false*/)
+TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float o /*= 0*/, TempSummonType despawnType /*= TEMPSUMMON_MANUAL_DESPAWN*/, Milliseconds despawnTime /*= 0s*/, ObjectGuid privateObjectOwner /*= ObjectGuid::Empty*/, int dungeonLevel)
 {
     if (!x && !y && !z)
         GetClosePoint(x, y, z, GetCombatReach());
     if (!o)
         o = GetOrientation();
-    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, 0, 0, privateObjectOwner, dungeonLevel, visibleBySummonerOnly);
+    return SummonCreature(id, { x,y,z,o }, despawnType, despawnTime, 0, 0, privateObjectOwner, dungeonLevel);
 }
 
 GameObject* WorldObject::SummonGameObject(uint32 entry, Position const& pos, QuaternionData const& rot, Seconds respawnTime, GOSummonType summonType)

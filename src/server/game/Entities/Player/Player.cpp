@@ -2665,11 +2665,11 @@ void Player::InitTalentForLevel()
 {
     uint32 level = GetXPTalentLevel();
     uint32 bonusLevel = GetBonusTalentLevel();
-    int32 newTalentPoints = (level + bonusLevel) - m_usedTalentCount;
+    int32 newTalentPoints = (level + bonusLevel) - GetUsedTalentCount();
     if (newTalentPoints < 0)
     {
         newTalentPoints = 0;
-        TC_LOG_ERROR("entities.player", "Player {} ({}) has more talent points than their level (Level/bonus talents/Talent Level) {}/{})", GetName().c_str(), GetGUID().GetCounter(), level, bonusLevel, m_usedTalentCount);
+        TC_LOG_ERROR("entities.player", "Player {} ({}) has more talent points than their level (Level/bonus talents/Talent Level) {}/{})", GetName().c_str(), GetGUID().GetCounter(), level, bonusLevel, GetUsedTalentCount());
         ChatHandler(GetSession()).SendSysMessage("Your talent points is greater than your level please contact a developer explaining what you were doing with this issue occured.");
     }
     SetFreeTalentPoints(newTalentPoints);
@@ -18464,7 +18464,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     PreparedQueryResult usedTalentResult = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
     if (usedTalentResult)
     {
-        m_usedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
+        _talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
     }
     InitTalentForLevel();
     LearnDefaultSkills();
@@ -25680,7 +25680,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         SendEquipError(msg, nullptr, nullptr, item->itemid);
 }
 
-uint32 Player::CalculateTalentsPoints()
+uint32 Player::CalculateTalentsPoints() const
 {
     uint32 baseForLevel = GetLevel() < 10 ? 0 : GetLevel() - 9;
 
@@ -27914,7 +27914,7 @@ void Player::RemoveArmorPassives()
 
 void Player::IncreaseUsedTalentCount()
 {
-    ++m_usedTalentCount;
+    ++_talentMgr->UsedTalentCount;
     InitTalentForLevel();
 }
 
@@ -28141,7 +28141,7 @@ void Player::ResetCustomTalents()
 {
     DeactivateTalentLoadout();
     customTalents[GetCurrentTalentLoadout()].clear();
-    m_usedTalentCount = 0;
+    _talentMgr->UsedTalentCount = 0;
     InitTalentForLevel();
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT);
     stmt->setUInt32(0, GetGUID().GetCounter());
@@ -28176,7 +28176,7 @@ void Player::LearnCustomTalent(uint32 id)
 
  
     SetFreeTalentPoints(GetFreeTalentPoints() - 1);
-    m_usedTalentCount += 1;
+    _talentMgr->UsedTalentCount += 1;
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_CUSTOM_TALENT);
     stmt->setUInt32(0, GetGUID().GetCounter());
@@ -28187,7 +28187,7 @@ void Player::LearnCustomTalent(uint32 id)
 
 uint32 Player::GetTotalTalentPoints() const
 {
-    uint32 totalTP = GetFreeTalentPoints() + m_usedTalentCount;
+    uint32 totalTP = GetFreeTalentPoints() + _talentMgr->UsedTalentCount;
 
     return totalTP;
 }
@@ -28212,7 +28212,7 @@ void Player::UnlearnCustomTalent(uint32 id)
 
 
     SetFreeTalentPoints(GetFreeTalentPoints() + 1);
-    m_usedTalentCount -= 1;
+    _talentMgr->UsedTalentCount -= 1;
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_BY_LOADOUT);
     stmt->setUInt32(0, GetGUID().GetCounter());
@@ -28368,7 +28368,7 @@ void Player::SetTalentLoadout(uint32 val)
     DeactivateTalentLoadout();
     currentTalentLoadout = val;
     LoadCustomTalentLoadout();
-    m_usedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    _talentMgr->UsedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
     InitTalentForLevel();
 
     {

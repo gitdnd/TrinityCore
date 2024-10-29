@@ -5515,7 +5515,7 @@ void Spell::SummonGuardian(SpellEffectInfo const& spellEffectInfo, uint32 entry,
         else if (unitCaster->ToCreature())
             itemLevel = unitCaster->ToCreature()->GetDungeonLevel();
 
-        TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, unitCaster, m_spellInfo->Id, 0, itemLevel);
+        TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, unitCaster, m_spellInfo->Id, 0, ObjectGuid::Empty, itemLevel);
         if (!summon)
             return;
 
