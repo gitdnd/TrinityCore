@@ -8523,7 +8523,7 @@ bool Spell::HasCastWhileMovingOverride() const
         Unit::AuraEffectList const& castWhileMoving = uCaster->GetAuraEffectsByType(SPELL_AURA_CAST_WHILE_MOVING_OVERRIDE);
         for (Unit::AuraEffectList::const_iterator i = castWhileMoving.begin(); i != castWhileMoving.end(); ++i)
         {
-            if ((*i)->IsAffectedOnSpell(m_spellInfo))
+            if ((*i)->IsAffectingSpell(m_spellInfo))
             {
                 found = true;
                 break;
