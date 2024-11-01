@@ -3958,9 +3958,6 @@ bool Player::ResetTalents(bool involuntarily /*= false*/)
     if (involuntarily)
         SendDirectMessage(WorldPackets::Talents::InvoluntarilyReset(false).Write());
 
-    // No longer used, should be removed
-    // RemoveArmorPassives();
-
     return true;
 }
 
@@ -12405,9 +12402,6 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem, true);
 
-        // No longer used, should be removed
-        // UpdateArmorPassives();
-
         return pItem;
     }
     else
@@ -12446,9 +12440,6 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
             ApplyItemObtainSpells(pItem2, true);
-
-        // No longer used, should be removed
-        // UpdateArmorPassives();
 
         return pItem2;
     }
@@ -12570,8 +12561,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             e->OnItemEquip(this, pItem2, slot);
         }
 #endif
-        // No longer used, should be removed
-        // UpdateArmorPassives();
         return pItem2;
     }
 
@@ -12594,8 +12583,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         e->OnItemEquip(this, pItem, slot);
     }
 #endif
-    // No longer used, should be removed
-    // UpdateArmorPassives();
     return pItem;
 }
 
@@ -26122,9 +26109,7 @@ bool Player::LearnTalent(uint32 /*talentId*/, uint32 /*talentRank*/)
 #ifdef ELUNA
     if (Eluna* e = GetEluna())
         e->OnLearnTalents(this, talentId, talentRank, spellid);
-#endif
-    // No longer used, should be removed
-    // UpdateArmorPassives();*/
+#endif*/
 
 }
 
@@ -26860,9 +26845,6 @@ void Player::ActivateSpec(uint8 spec)
     if (spec > GetSpecsCount())
         return;
 
-    // No longer used, should be removed
-    // RemoveArmorPassives();
-
     if (IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
 
@@ -27024,8 +27006,6 @@ void Player::ActivateSpec(uint8 spec)
         aurEff->HandleShapeshiftBoosts(this, false);
         aurEff->HandleShapeshiftBoosts(this, true);
     }
-    // No longer used, should be removed
-    // UpdateArmorPassives();
 }
 
 void Player::LoadActions(PreparedQueryResult result)
@@ -27858,61 +27838,6 @@ uint8 Player::GetEquippedItemsOfArmorType(uint8 type)
     return count;
 }
 
-// No longer used, should be removed
-void Player::UpdateArmorPassives()
-{
-#define CHECK_TALENT(a,b,c,d) if (HasSpell(a)) \
-    { \
-    count = GetEquippedItemsOfArmorType(b) + GetEquippedItemsOfArmorType(c); \
-    spell = d; \
-    }
-    uint8 count = 0;
-    uint32 spell = 0;
-
-    CHECK_TALENT(180000, ITEM_SUBCLASS_ARMOR_MAIL, ITEM_SUBCLASS_ARMOR_PLATE, SUBCLASS_SPELL_WARDEN);
-    CHECK_TALENT(180001, ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER, SUBCLASS_SPELL_HISTORIAN);
-    CHECK_TALENT(180002, ITEM_SUBCLASS_ARMOR_CLOTH, ITEM_SUBCLASS_ARMOR_LEATHER, SUBCLASS_SPELL_WEAVER);
-    CHECK_TALENT(180003, ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_PLATE, SUBCLASS_SPELL_WATCHER);
-    CHECK_TALENT(180004, ITEM_SUBCLASS_ARMOR_LEATHER, ITEM_SUBCLASS_ARMOR_MAIL, SUBCLASS_SPELL_RANGER);
-    
-    if (count > 0)
-    {
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
-        {
-            if (count > uint8(spellInfo->StackAmount))
-                count = uint8(spellInfo->StackAmount);
-          
-            if (auto aura = GetAura(spell))
-                aura->SetStackAmount(count);
-            else
-            {
-                AuraCreateInfo createInfo(spellInfo, MAX_EFFECT_MASK, this);
-                createInfo.SetCaster(this);
-
-                if (auto applyAura = Aura::TryRefreshStackOrCreate(createInfo))
-                    applyAura->SetStackAmount(count);
-                else
-                    TC_LOG_ERROR("spells", "Error applying armor passive, broken spell {}?", spell);
-            }
-        }
-    }
-    else
-    {
-        if(spell != 0)
-            RemoveAura(spell);
-    }
-#undef CHECK_TALENT
-}
-
-// No longer used, should be removed
-void Player::RemoveArmorPassives()
-{
-    uint32 spells[5] = { SUBCLASS_SPELL_WARDEN, SUBCLASS_SPELL_HISTORIAN, SUBCLASS_SPELL_WEAVER, SUBCLASS_SPELL_WATCHER, SUBCLASS_SPELL_RANGER };
-
-    for (uint8 i = 0; i < 5; ++i)
-        RemoveAura(spells[i]);
-}
-
 void Player::IncreaseUsedTalentCount()
 {
     ++_talentMgr->UsedTalentCount;
@@ -28222,6 +28147,7 @@ void Player::UnlearnCustomTalent(uint32 id)
     CharacterDatabase.Execute(stmt);
 }
 
+//@todo: optimize this to only check stackable nodes.
 uint32 Player::GetTalentStackCount(uint32 spellId)
 {
     uint32 count = 0;

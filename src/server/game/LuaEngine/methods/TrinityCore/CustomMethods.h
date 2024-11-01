@@ -625,18 +625,6 @@ namespace LuaCustom
         return payload.size() * 2;
     }
 
-    int UpdateTalentPassives(Eluna* /*E*/, Player* /*player*/)
-    {
-        //player->UpdateArmorPassives();
-        return 0;
-    }
-
-    int RemoveTalentPassives(Eluna* /*E*/, Player* /*player*/)
-    {
-        //player->RemoveArmorPassives();
-        return 0;
-    }
-
     int IsStackingSpell(Eluna* E, Player* /*player*/)
     {
         uint32 spell = E->CHECKVAL<uint32>(2);
@@ -1963,8 +1951,6 @@ namespace LuaCustom
         { "AdvanceQuestObjective", &LuaCustom::AdvanceQuestObjective },
         { "GetRequiredQuestObjectiveCount", &LuaCustom::GetRequiredQuestObjectiveCount },
         { "GetItemLevelPayload", &LuaCustom::GetItemLevelPayload },
-        { "UpdateTalentPassives", &LuaCustom::UpdateTalentPassives },
-        { "RemoveTalentPassives", &LuaCustom::RemoveTalentPassives },
         { "IsStackingSpell", &LuaCustom::IsStackingSpell },
         { "IncreaseSpellAuraStack", &LuaCustom::IncreaseSpellAuraStack },
         { "IncreaseUsedTalentCount", &LuaCustom::IncreaseUsedTalentCount },

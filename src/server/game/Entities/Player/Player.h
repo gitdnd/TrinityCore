@@ -2283,8 +2283,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         //Custom:
         uint8 GetEquippedItemsOfArmorType(uint8 type);
-        void UpdateArmorPassives();
-        void RemoveArmorPassives();
         bool HasGemSpell(uint32 spell) { return m_GemSpells.find(spell) != m_GemSpells.end(); }
         void AddGemSpell(uint32 spell, uint32 aura) { m_GemSpells.insert(std::make_pair(spell, aura)); }
         void RemoveGemSpell(uint32 spell) { m_GemSpells.erase(spell); }
