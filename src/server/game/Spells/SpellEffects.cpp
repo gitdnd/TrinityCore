@@ -1283,7 +1283,7 @@ void Spell::EffectCommandTotemCreature(SpellEffIndex effIndex)
         case 4:
             charmed->AttackStop();
             charmed->InterruptNonMeleeSpells(false);
-            charmed->GetMotionMaster()->MoveFollow(unitCaster, PET_FOLLOW_DIST, charmed->GetFollowAngle());
+            charmed->GetMotionMaster()->MoveFollow(unitCaster, RandomPetFollowDist(), charmed->GetFollowAngle());
             info->SetCommandState(COMMAND_FOLLOW);
             info->SetIsCommandAttack(false);
             info->SetIsAtStay(false);
@@ -4693,7 +4693,7 @@ void Spell::EffectResurrectPet()
         // Reposition the pet's corpse before reviving so as not to grab aggro
         // We can use a different, more accurate version of GetClosePoint() since we have a pet
         float x, y, z; // Will be used later to reposition the pet if we have one
-        player->GetClosePoint(x, y, z, pet->GetCombatReach(), PET_FOLLOW_DIST, pet->GetFollowAngle());
+        player->GetClosePoint(x, y, z, pet->GetCombatReach(), RandomPetFollowDist(), pet->GetFollowAngle());
         pet->NearTeleportTo(x, y, z, player->GetOrientation());
         pet->Relocate(x, y, z, player->GetOrientation()); // This is needed so SaveStayPosition() will get the proper coords.
     }

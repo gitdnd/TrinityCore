@@ -63,11 +63,41 @@ private:
 public:
     bool operator==(Position const& a) const;
 
-    void Relocate(float x, float y) { m_positionX = x; m_positionY = y; }
-    void Relocate(float x, float y, float z) { Relocate(x, y); m_positionZ = z; }
-    void Relocate(float x, float y, float z, float o) { Relocate(x, y, z); SetOrientation(o); }
-    void Relocate(Position const& pos) { *this = pos; }
-    void Relocate(Position const* pos) { *this = *pos; }
+  virtual void Relocate(float x, float y)
+  {
+        m_positionX = x;
+        m_positionY = y;
+  }
+
+  virtual void Relocate(float x, float y, float z)
+  {
+        Relocate(x, y);
+        m_positionZ = z;
+  }
+
+  virtual void Relocate(float x, float y, float z, float orientation)
+  {
+        Relocate(x, y, z);
+        SetOrientation(orientation);
+  }
+
+  virtual void Relocate(const Position& pos)
+  {
+        Relocate(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation);
+  }
+
+  virtual void Relocate(const Position* pos)
+  {
+        Relocate(pos->m_positionX, pos->m_positionY, pos->m_positionZ, pos->m_orientation);
+  }
+
+  void RelocatePolarOffset(float angle, float dist, float z = 0.0f);
+  void RelocateOffset(const Position& offset);
+  virtual void SetOrientation(float orientation)
+  {
+        m_orientation = orientation;
+  }
+
 
     void RelocateOffset(Position const& offset);
 

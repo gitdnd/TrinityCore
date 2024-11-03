@@ -408,7 +408,7 @@ class TC_GAME_API Spell
         void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGoTarget, Corpse* pCorpseTarget, SpellEffectInfo const& spellEffectInfo, SpellEffectHandleMode mode);
         void HandleThreatSpells();
 
-        SpellInfo const* const m_spellInfo;
+        const SpellInfo* m_spellInfo;
         Item* m_CastItem;
         ObjectGuid m_castItemGUID;
         uint32 m_castItemEntry;

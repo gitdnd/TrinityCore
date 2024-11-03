@@ -401,13 +401,45 @@ Unit::Unit(bool isWorldObject) :
     _isCombatDisallowed = false;
 
     _lastExtraAttackSpell = 0;
+
+
+    m_realDodge = 0.0f;
+    m_realParry = 0.0f;
+
+
+    for (uint8 i = 0; i < BASEMOD_END; ++i)
+    {
+        m_auraBaseMod[i][FLAT_MOD] = 0.0f;
+        m_auraBaseMod[i][PCT_MOD]  = 1.0f;
+    }
+
+    for (uint8 i = 0; i < MAX_COMBAT_RATING; i++)
+        m_baseRatingValue[i] = 0;
+
+    m_baseSpellPower          = 0;
+    m_baseFeralAP             = 0;
+    m_baseManaRegen           = 0;
+    m_baseHealthRegen         = 0;
+    m_spellPenetrationItemMod = 0;
+
+    m_weight = 0;
+
+    m_runes = nullptr;
+
+    m_valuesCount = PLAYER_END; // REMEMBER TO OPTIMIZE THIS LATER CUZ I SURE WONT RIGHT NOW LMAO
+
+    m_baseSpellPowerSchool.resize(MAX_SPELL_SCHOOL);
+    m_derivedSpellPowerSchool.resize(MAX_SPELL_SCHOOL);
+
+    InitRunes();
 }
 
 ////////////////////////////////////////////////////////////
 // Methods of class Unit
 Unit::~Unit()
 {
-    // set current spells as deletable
+    if (OnMovePacketAura)
+        RemoveAura(OnMovePacketAura);
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
         if (m_currentSpells[i])
         {
@@ -437,6 +469,15 @@ Unit::~Unit()
     ASSERT(!_gameClientMovingMe || _gameClientMovingMe->GetBasePlayer() == this);
 }
 
+void Unit::Relocate(float x, float y)
+{
+    m_positionXprev = m_positionX;
+    m_positionYprev = m_positionY;
+    Position::Relocate(x, y);
+
+    if (OnMovePacketAura)
+        OnMovePacketAura->CallScriptOnMovementPacket();
+}
 void Unit::Update(uint32 p_time)
 {
     // @tswow-begin
@@ -8757,7 +8798,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype)
                     float ownerSpeed = followed->GetSpeedRate(mtype);
                     if (speed < ownerSpeed || creature->IsWithinDist3d(followed, 10.0f))
                         speed = ownerSpeed;
-                    speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - PET_FOLLOW_DIST) * 0.05f), 1.3f);
+                    speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - RandomPetFollowDist()) * 0.05f), 1.3f);
                 }
             }
         }
@@ -9422,6 +9463,73 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
         default:
         case UNIT_MOD_MANA:        return POWER_MANA;
     }
+}
+
+void Unit::AddRunePower(uint8 index)
+{
+    if (Player* player = ToPlayer())
+    {
+        WorldPacket data(SMSG_ADD_RUNE_POWER, 4);
+        data << uint32(1 << index); // mask (0x00-0x3F probably)
+        player->GetSession()->SendPacket(&data);
+    }
+}
+
+static RuneType runeSlotTypes[MAX_RUNES] = {
+    /*0*/ RUNE_DEATH,
+    /*1*/ RUNE_DEATH,
+    /*2*/ RUNE_DEATH,
+    /*3*/ RUNE_DEATH,
+    /*4*/ RUNE_DEATH,
+    /*5*/ RUNE_DEATH};
+
+void Unit::InitRunes()
+{
+    m_runes = new Runes;
+
+    m_runes->runeState    = 0;
+    m_runes->lastUsedRune = RUNE_DEATH;
+
+    for (uint8 i = 0; i < MAX_RUNES; ++i)
+    {
+        SetRuneStartCooldown(i, 0); // reset cooldowns
+        SetRuneCooldown(i, 0);      // reset cooldowns
+        SetGracePeriod(i, 0);       // xinef: reset grace period
+        m_runes->SetRuneState(i);
+
+        if (Player* player = ToPlayer())
+        {
+            WorldPacket data(SMSG_CONVERT_RUNE, 2);
+            data << uint8(i);
+            data << uint8(RUNE_DEATH);
+            player->GetSession()->SendPacket(&data);
+
+            ResyncRunes(MAX_RUNES);
+        }
+    }
+}
+
+bool Unit::IsBaseRuneSlotsOnCooldown() const
+{
+    for (uint8 i = 0; i < ; ++i)
+        if (GetRuneCooldown(i) == 0)
+            return false;
+
+    return true;
+}
+
+uint32 Unit::GetRuneDefaultCooldown(uint8 index, bool skipGrace)
+{
+    uint32 cooldown = RUNE_DEFAULT_COOLDOWN;
+
+    AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
+    for (AuraEffectList::const_iterator i = regenAura.begin(); i != regenAura.end(); ++i)
+    {
+        if ((*i)->GetMiscValue() == POWER_RUNE)
+            cooldown = cooldown * (100 - (*i)->GetAmount()) / 100;
+    }
+
+    return cooldown;
 }
 
 float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const

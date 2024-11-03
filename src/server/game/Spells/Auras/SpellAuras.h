@@ -296,7 +296,7 @@ class TC_GAME_API Aura
         void _DeleteRemovedApplications();
 
     protected:
-        SpellInfo const* const m_spellInfo;
+        const SpellInfo* m_spellInfo;
         ObjectGuid const m_casterGuid;
         ObjectGuid const m_castItemGuid;                    // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t const m_applyTime;

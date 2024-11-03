@@ -945,7 +945,7 @@ public:
                 handler->PSendSysMessage(" - %02zu spells may have redirects registered", redirectRegistry.size());
                 for (auto const& outerPair : redirectRegistry) // (spellId, (guid, pct))
                 {
-                    SpellInfo const* const spell = sSpellMgr->GetSpellInfo(outerPair.first);
+                    const SpellInfo* spell = sSpellMgr->GetSpellInfo(outerPair.first);
                     handler->PSendSysMessage(" |-- #%06u %s (%zu entries):", outerPair.first, spell ? spell->SpellName[0] : "<unknown>", outerPair.second.size());
                     for (auto const& innerPair : outerPair.second) // (guid, pct)
                     {

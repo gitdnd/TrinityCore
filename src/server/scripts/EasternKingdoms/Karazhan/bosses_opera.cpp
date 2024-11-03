@@ -1257,6 +1257,7 @@ public:
                         Julianne->setDeathState(JUST_DIED);
                         Julianne->CombatStop(true);
                         Julianne->ReplaceAllDynamicFlags(UNIT_DYNFLAG_LOOTABLE);
+
                     }
                     return;
                 }

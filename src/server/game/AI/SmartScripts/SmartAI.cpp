@@ -428,7 +428,7 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 
     if (Unit* owner = me->GetCharmerOrOwner())
     {
-        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+        me->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), RandomPetFollowAngle());
         me->ClearUnitState(UNIT_STATE_EVADE);
     }
     else if (HasEscortState(SMART_ESCORT_ESCORTING))
@@ -697,7 +697,7 @@ void SmartAI::OnCharmed(bool isNew)
     _charmed = charmed;
 
     if (charmed && !me->isPossessed() && !me->IsVehicle())
-        me->GetMotionMaster()->MoveFollow(me->GetCharmer(), PET_FOLLOW_DIST, me->GetFollowAngle());
+        me->GetMotionMaster()->MoveFollow(me->GetCharmer(), RandomPetFollowDist(), me->GetFollowAngle());
 
     if (!charmed && !me->IsInEvadeMode())
     {

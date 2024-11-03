@@ -1851,7 +1851,7 @@ public:
         {
             Initialize();
             if (Unit* owner = me->GetOwner())
-                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                me->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), RandomPetFollowAngle());
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }

@@ -136,12 +136,13 @@ struct PlayerSpell
     bool active            : 1;                             // show in spellbook
     bool dependent         : 1;                             // learned as result another spell learn, skill grow, quest reward, etc
     bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
+    uint8 development = 1;
 };
 
 struct PlayerTalent
 {
-    PlayerSpellState state;
-    uint8 spec;
+    PlayerSpellState state;;
+    uint8 development = 1;
 };
 
 // Spell modifier (used for modify other spells)
@@ -172,7 +173,7 @@ typedef std::map<uint8, PresetData> PresetMapType;
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
 typedef std::unordered_map<uint32, PlayerSpell> PlayerSpellMap;
-typedef std::unordered_set<SpellModifier*> SpellModContainer;
+
 
 typedef std::unordered_map<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
@@ -275,43 +276,7 @@ struct Areas
     float y2;
 };
 
-enum RuneCooldowns
-{
-    RUNE_BASE_COOLDOWN  = 10000,
-    RUNE_MISS_COOLDOWN  = 1500     // cooldown applied on runes when the spell misses
-};
 
-enum RuneType : uint8
-{
-    RUNE_BLOOD      = 0,
-    RUNE_UNHOLY     = 1,
-    RUNE_FROST      = 2,
-    RUNE_DEATH      = 3,
-    NUM_RUNE_TYPES  = 4
-};
-
-struct RuneInfo
-{
-    uint8 BaseRune;
-    uint8 CurrentRune;
-    uint32 Cooldown;
-    std::unordered_set<AuraEffect const*> ConvertAuras;
-};
-
-struct Runes
-{
-    RuneInfo runes[MAX_RUNES];
-    uint8 runeState;                                        // mask of available runes
-    RuneType lastUsedRune;
-
-    void SetRuneState(uint8 index, bool set = true)
-    {
-        if (set)
-            runeState |= (1 << index);                      // usable
-        else
-            runeState &= ~(1 << index);                     // on cooldown
-    }
-};
 
 struct EnchantDuration
 {
@@ -758,6 +723,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS,
     PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS,
+    PLAYER_LOGIN_QUERY_LOAD_DEVELOPMENT_POINTS,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -925,6 +891,38 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
+        void SetCombatReach(float val) const
+        {
+        float bonusCombatReach;
+
+        auto wep1 = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+        if (wep1)
+        {
+            switch (wep1->GetSkill())
+            {
+                case SKILL_AXES:
+                case SKILL_SWORDS:
+                case SKILL_MACES:
+                    bonusCombatReach = 1.0f;
+                case SKILL_FISHING:
+                case SKILL_2H_AXES:
+                case SKILL_2H_SWORDS:
+                case SKILL_2H_MACES:
+                    bonusCombatReach = 2.f;
+                case SKILL_POLEARMS:
+                case SKILL_STAVES:
+                    bonusCombatReach = 4.0f;
+                case SKILL_DAGGERS:
+                case SKILL_FIST_WEAPONS:
+                default:
+                    bonusCombatReach = 1.f;
+            }
+        }
+        else
+            bonusCombatReach = 0.0f;
+        m_floatValues[UNIT_FIELD_COMBATREACH] = val + bonusCombatReach;
+        }
+
         void SetObjectScale(float scale) override;
 
         bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
@@ -954,8 +952,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         bool CanInteractWithQuestGiver(Object* questGiver) const;
         Creature* GetNPCIfCanInteractWith(ObjectGuid const& guid, NPCFlags npcFlags) const;
-        GameObject* GetGameObjectIfCanInteractWith(ObjectGuid const& guid) const;
-        GameObject* GetGameObjectIfCanInteractWith(ObjectGuid const& guid, GameobjectTypes type) const;
+        GameObject* GetGameObjectIfCanInteractWith(ObjectGuid const& guid);
+        GameObject* GetGameObjectIfCanInteractWith(ObjectGuid const& guid, GameobjectTypes type);
 
         void ToggleAFK();
         void ToggleDND();
@@ -1088,6 +1086,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
         Item* GetItemByGuid(ObjectGuid guid) const;
+        [[nodiscard]] Item* GetItemByGuidCounter(uint32 guid) const;
         Item* GetItemByEntry(uint32 entry) const;
         Item* GetItemByPos(uint16 pos) const;
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
@@ -1233,6 +1232,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 GetGossipTextId(uint32 menuId, WorldObject* source);
         uint32 GetGossipTextId(WorldObject* source);
+        void GossipEnd(Object* obj, uint32 action);
         static uint32 GetDefaultGossipMenuForSource(WorldObject* source);
 
         /*********************************************************/
@@ -1472,8 +1472,12 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void AddTemporarySpell(uint32 spellId);
         void RemoveTemporarySpell(uint32 spellId);
         void SetReputation(uint32 factionentry, uint32 value);
+        void AddReputation(uint32 factionentry, float value);
         uint32 GetReputation(uint32 factionentry) const;
+
+
         std::string const& GetGuildName() const;
+
         uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
         void SetFreeTalentPoints(uint32 points);
         bool ResetTalents(bool involuntarily = false);
@@ -1495,24 +1499,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 CalculateTalentsPoints() const;
 
-        // Dual Spec
-        void UpdateSpecCount(uint8 count);
-        uint32 GetActiveSpec() const { return m_activeSpec; }
-        void SetActiveSpec(uint8 spec){ m_activeSpec = spec; }
-        uint8 GetSpecsCount() const { return m_specsCount; }
-        void SetSpecsCount(uint8 count) { m_specsCount = count; }
-        void ActivateSpec(uint8 spec);
+
         void LoadActions(PreparedQueryResult result);
-
-        void InitGlyphsForLevel();
-        void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
-        uint32 GetGlyphSlot(uint8 slot) { return GetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot); }
-        void SetGlyph(uint8 slot, uint32 glyph);
-        uint32 GetGlyph(uint8 slot) { return m_Glyphs[m_activeSpec][slot]; }
-
-        uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
-        void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
-        void InitPrimaryProfessions();
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }
         PlayerSpellMap      & GetSpellMap()       { return m_spells; }
@@ -1631,66 +1619,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 GetBaseDefenseSkillValue() const { return GetBaseSkillValue(SKILL_DEFENSE); }
         uint32 GetBaseWeaponSkillValue(WeaponAttackType attType) const;
-
-        float GetHealthBonusFromStamina();
-        float GetManaBonusFromIntellect();
-
-        bool UpdateStats(Stats stat) override;
-        bool UpdateAllStats() override;
-        void ApplySpellPenetrationBonus(int32 amount, bool apply);
-        void UpdateResistances(uint32 school) override;
-        void UpdateArmor() override;
-        void UpdateMaxHealth() override;
-        void UpdateMaxPower(Powers power) override;
-        void ApplyFeralAPBonus(int32 amount, bool apply);
-        void UpdateAttackPowerAndDamage(bool ranged = false) override;
-        void UpdateShieldBlockValue();
-        void ApplySpellPowerBonus(int32 amount, bool apply);
-        void UpdateSpellDamageAndHealingBonus();
-        void ApplyRatingMod(CombatRating cr, int32 value, bool apply);
-        void UpdateRating(CombatRating cr);
-        void UpdateAllRatings();
-
-        void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) const override;
-
-        void UpdateDefenseBonusesMod();
-        void RecalculateRating(CombatRating cr) { ApplyRatingMod(cr, 0, true);}
-        float GetMeleeCritFromAgility() const;
-        void GetDodgeFromAgility(float &diminishing, float &nondiminishing) const;
-        float GetMissPercentageFromDefense() const;
-        float GetSpellCritFromIntellect() const;
-        float OCTRegenHPPerSpirit() const;
-        float OCTRegenMPPerSpirit() const;
-        float GetRatingMultiplier(CombatRating cr) const;
-        float GetRatingBonusValue(CombatRating cr) const;
-        uint32 GetBaseSpellPowerBonus() const { return m_baseSpellPower; }
-        int32 GetSpellPenetrationItemMod() const { return m_spellPenetrationItemMod; }
-
-        bool CanApplyResilience() const override { return true; }
-
-        float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
-        void UpdateBlockPercentage();
-        void UpdateCritPercentage(WeaponAttackType attType);
-        void UpdateAllCritPercentages();
-        void UpdateParryPercentage();
-        void UpdateDodgePercentage();
-        void UpdateMeleeHitChances();
-        void UpdateRangedHitChances();
-        void UpdateSpellHitChances();
-
-        void UpdateAllSpellCritChances();
-        void UpdateSpellCritChance(uint32 school);
-        void UpdateArmorPenetration(int32 amount);
-        void UpdateExpertise(WeaponAttackType attType);
-        void ApplyManaRegenBonus(int32 amount, bool apply);
-        void ApplyHealthRegenBonus(int32 amount, bool apply);
-        void UpdatePowerRegen(Powers power);
-        void UpdateRuneRegen(RuneType rune);
-        float GetPowerRegen(Powers power) const;
-        uint32 GetRuneTimer(uint8 index) const { return m_runeGraceCooldown[index]; }
-        void SetRuneTimer(uint8 index, uint32 timer) { m_runeGraceCooldown[index] = timer; }
-        uint32 GetLastRuneGraceTimer(uint8 index) const { return m_lastRuneGraceTimers[index]; }
-        void SetLastRuneGraceTimer(uint8 index, uint32 timer) { m_lastRuneGraceTimers[index] = timer; }
 
         ObjectGuid GetLootGUID() const { return m_lootGuid; }
         void SetLootGUID(ObjectGuid guid) { m_lootGuid = guid; }
@@ -1812,7 +1740,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource);
         bool isHonorOrXPTarget(Unit* victim) const;
 
-        bool GetsRecruitAFriendBonus(bool forXP);
         uint8 GetGrantableLevels() const { return m_grantableLevels; }
         void SetGrantableLevels(uint8 val) { m_grantableLevels = val; }
 
@@ -1863,8 +1790,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SendCorpseReclaimDelay(uint32 delay) const;
 
         uint32 GetShieldBlockValue() const override;                 // overwrite Unit version (virtual)
-        bool CanParry() const { return m_canParry; }
-        void SetCanParry(bool value);
+
         bool CanBlock() const { return m_canBlock; }
         void SetCanBlock(bool value);
         bool CanTitanGrip() const { return m_canTitanGrip; }
@@ -1874,20 +1800,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void SetRegularAttackTime();
 
-        void HandleBaseModFlatValue(BaseModGroup modGroup, float amount, bool apply);
-        void ApplyBaseModPctValue(BaseModGroup modGroup, float pct);
-
-        void SetBaseModFlatValue(BaseModGroup modGroup, float val);
-        void SetBaseModPctValue(BaseModGroup modGroup, float val);
-
-        void UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchantSlot = -1) override;
-        void UpdateBaseModGroup(BaseModGroup modGroup);
-
-        float GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const;
-        float GetTotalBaseModValue(BaseModGroup modGroup) const;
-
-        void _ApplyAllStatBonuses();
-        void _RemoveAllStatBonuses();
 
         void ResetAllPowers();
 
@@ -1907,10 +1819,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _ApplyItemMods(Item* item, uint8 slot, bool apply, bool updateItemAuras = true);
         void _RemoveAllItemMods();
         void _ApplyAllItemMods();
-        void _ApplyAllLevelScaleItemMods(bool apply);
+
         ScalingStatDistributionEntry const* GetScalingStatDistributionFor(ItemTemplate const& itemTemplate) const;
         ScalingStatValuesEntry const* GetScalingStatValuesFor(ItemTemplate const& itemTemplate) const;
-        void _ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply, bool only_level_scale = false);
+        void _ApplyItemBonuses(Item* proto, ItemTemplate const* proto, uint8 slot, bool apply,
+                               bool only_level_scale = false);
         void _ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, bool apply);
         void _ApplyAmmoBonuses();
         bool EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot) const;
@@ -2172,29 +2085,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool isAllowedToLoot(Creature const* creature) const;
 
         DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
-        uint8 GetRunesState() const { return m_runes->runeState; }
-        // @tswow-begin
-        bool HasRunes() const { return sObjectMgr->_classHasRunes[GetClass()-1] & (1 << (GetRace() - 1)); }
-        // @tswow-end
-        RuneType GetBaseRune(uint8 index) const { return RuneType(m_runes->runes[index].BaseRune); }
-        RuneType GetCurrentRune(uint8 index) const { return RuneType(m_runes->runes[index].CurrentRune); }
-        uint32 GetRuneCooldown(uint8 index) const { return m_runes->runes[index].Cooldown; }
-        uint32 GetRuneBaseCooldown(uint8 index);
-        bool IsBaseRuneSlotsOnCooldown(RuneType runeType) const;
-        RuneType GetLastUsedRune() const { return m_runes->lastUsedRune; }
-        void SetLastUsedRune(RuneType type) { m_runes->lastUsedRune = type; }
-        void SetBaseRune(uint8 index, RuneType baseRune) { m_runes->runes[index].BaseRune = baseRune; }
-        void SetCurrentRune(uint8 index, RuneType currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
-        void SetRuneCooldown(uint8 index, uint32 cooldown, bool casted = false);
-        void SetRuneConvertAura(uint8 index, AuraEffect const* aura);
-        void RemoveRuneConvertAura(uint8 index, AuraEffect const* aura);
-        void AddRuneByAuraEffect(uint8 index, RuneType newType, AuraEffect const* aura);
-        void RemoveRunesByAuraEffect(AuraEffect const* aura);
-        void RestoreBaseRune(uint8 index);
-        void ConvertRune(uint8 index, RuneType newType);
-        void ResyncRunes() const;
-        void AddRunePower(uint8 index) const;
-        void InitRunes();
+
 
         void SendRespondInspectAchievements(Player* player) const;
         bool HasAchieved(uint32 achievementId) const;
@@ -2294,7 +2185,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void _LoadActions(PreparedQueryResult result);
         void _LoadAuras(PreparedQueryResult result, uint32 timediff);
-        void _LoadGlyphAuras();
         void _LoadBoundInstances(PreparedQueryResult result);
         void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
         void _LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mailItemsResult);
@@ -2314,7 +2204,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _LoadArenaTeamInfo(PreparedQueryResult result);
         void _LoadEquipmentSets(PreparedQueryResult result);
         void _LoadBGData(PreparedQueryResult result);
-        void _LoadGlyphs(PreparedQueryResult result);
         void _LoadTalents(PreparedQueryResult result);
         void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
 
@@ -2335,7 +2224,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void _SaveSpells(CharacterDatabaseTransaction trans);
         void _SaveEquipmentSets(CharacterDatabaseTransaction trans);
         void _SaveBGData(CharacterDatabaseTransaction trans);
-        void _SaveGlyphs(CharacterDatabaseTransaction trans) const;
         void _SaveTalents(CharacterDatabaseTransaction trans);
         void _SaveStats(CharacterDatabaseTransaction trans) const;
 
@@ -2386,26 +2274,18 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         PlayerMails m_mail;
         PlayerSpellMap m_spells;
-        PlayerTalentMap* m_talents[MAX_TALENT_SPECS];
+        PlayerTalentMap* m_talents;
         uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
 
-        uint8 m_activeSpec;
-        uint8 m_specsCount;
 
-        uint32 m_Glyphs[MAX_TALENT_SPECS][MAX_GLYPH_SLOT_INDEX];
 
         ActionButtonList m_actionButtons;
 
         float m_auraBaseFlatMod[BASEMOD_END];
         float m_auraBasePctMod[BASEMOD_END];
         int16 m_baseRatingValue[MAX_COMBAT_RATING];
-        uint32 m_baseSpellPower;
-        uint32 m_baseFeralAP;
-        uint32 m_baseManaRegen;
-        uint32 m_baseHealthRegen;
-        int32 m_spellPenetrationItemMod;
+        int16 m_derivedCombatRatings[MAX_COMBAT_RATING];
 
-        SpellModContainer m_spellMods[MAX_SPELLMOD];
 
         EnchantDurationList m_enchantDuration;
         ItemDurationList m_itemDuration;
@@ -2442,7 +2322,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         uint32 m_WeaponProficiency;
         uint32 m_ArmorProficiency;
-        bool m_canParry;
         bool m_canBlock;
         bool m_canTitanGrip;
         uint32 m_titanGripPenaltySpellId;
@@ -2485,8 +2364,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         WorldLocation m_recall_location;
 
         DeclinedName *m_declinedname;
-        Runes *m_runes;
+
         EquipmentSetContainer _equipmentSets;
+
 
         bool CanAlwaysSee(WorldObject const* obj) const override;
 
@@ -2576,6 +2456,128 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         // @tswow-begin
         friend class TSPlayer;
         // @tswow-end
+
+        /*
+        //  ELK
+        */
+
+        bool m_falling;
+
+        uint32 quedSpell = 0;
+
+
+        uint8 doubleJumps    = 0;
+        uint8 doubleJumpsMax = 1;
+
+      public:
+        uint8 CanDoubleJump()
+        {
+            return doubleJumps < doubleJumpsMax;
+        }
+        void AddDoubleJump()
+        {
+            doubleJumps++;
+        }
+        void ModDoubleJumpMax(uint8 amount)
+        {
+            doubleJumpsMax += amount;
+        }
+
+        void SetQuedSpell(uint32 spell)
+        {
+            quedSpell = spell;
+        }
+        uint32 GetQuedSpell()
+        {
+            return quedSpell;
+        }   
+        bool GetChestFlag(ChestFlags index)
+        {
+            return m_chestFlag[index];
+        }
+        void AddChestFlag(ChestFlags index)
+        {
+            m_chestFlag[index] = true;
+        }
+        void AddGossip() {}
+
+
+        inline const static std::map<uint32, uint32> petFakeReal = {{4449, 2486}};
+        static const uint32 GetPetFakeReal(uint32 entry)
+        {
+            auto it = Player::petFakeReal.find(entry);
+            if (it != Player::petFakeReal.end())
+                return it->second;
+            return entry;
+        }
+
+
+        /*
+        Consider: Cast time, Cooldown, Channel time, Targeting
+        If Y has targeting, X must have targeting
+        If Y spell has cast time, Y mana cost goes up by 100% per 1s.
+        If X has channel time, Y is checked on each tick.
+        Y cannot have channel time.
+        If X is not targeted and Y is ground targeted, Y will cast on top of player character.
+        If Y has cooldown, it will only try to crit off cooldown.
+        */
+
+        bool AddCritCast(uint32 X, uint32 Y)
+        {
+            PlayerTalentMap::const_iterator itrX = m_talents.find(X);
+            if (itrX != m_talents.end())
+                return false;
+            PlayerTalentMap::const_iterator itrY = m_talents.find(Y);
+            if (itrY != m_talents.end())
+                return false;
+            const SpellInfo* infoX = sSpellMgr->GetSpellInfo(X);
+            if (!infoX)
+                return false;
+            const SpellInfo* infoY = sSpellMgr->GetSpellInfo(Y);
+            if (!infoY)
+                return false;
+            if (infoY->NeedsExplicitUnitTarget() && !infoX->NeedsExplicitUnitTarget())
+                return false;
+            if (infoY->IsChanneled())
+                return false;
+
+            itrY->second->CritCast = 0;
+            itrX->second->CritCast = Y;
+
+            return true;
+        }
+        uint32 GetCritCast(uint32 id)
+        {
+            PlayerTalentMap::const_iterator itr = m_talents.find(id);
+            if (itr == m_talents.end())
+                return 0;
+            return itr->second->CritCast;
+        }
+        const SpellInfo* AttackReplacer  = nullptr;
+        const SpellInfo* DeflectReplacer = nullptr;
+
+        void CheckReplacers()
+        {
+            AttackReplacer  = nullptr;
+            DeflectReplacer = nullptr;
+            for (AuraApplicationMap::const_iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
+            {
+                if (!AttackReplacer)
+                {
+                uint32 aR = iter->second->GetBase()->GetSpellInfo()->AttackReplacer;
+                if (aR)
+                    AttackReplacer = sSpellMgr->GetSpellInfo(aR);
+                }
+                if (!DeflectReplacer)
+                {
+                uint32 dR = iter->second->GetBase()->GetSpellInfo()->DeflectReplacer;
+                if (dR)
+                    DeflectReplacer = sSpellMgr->GetSpellInfo(dR);
+                }
+                if (AttackReplacer && DeflectReplacer)
+                return;
+            }
+        }
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

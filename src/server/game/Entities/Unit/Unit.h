@@ -431,7 +431,7 @@ class TC_GAME_API DamageInfo
         Unit* const m_attacker;
         Unit* const m_victim;
         uint32 m_damage;
-        SpellInfo const* const m_spellInfo;
+        const SpellInfo* m_spellInfo;
         SpellSchoolMask const m_schoolMask;
         DamageEffectType const m_damageType;
         WeaponAttackType m_attackType;
@@ -466,7 +466,59 @@ class TC_GAME_API DamageInfo
         uint32 GetBlock() const { return m_block; }
 
         uint32 GetHitMask() const;
+
+        void SetSpellInfo(const SpellInfo* spellInfo)
+        {
+            m_spellInfo = spellInfo;
+        }
 };
+
+
+// Spell modifier (used for modify other spells)
+enum SpellModifierModes : uint8
+{
+    SPELL_MODIFIER_NORMAL,
+    SPELL_MODIFIER_SPELL_SCHOOL,
+    SPELL_MODIFIER_SPELL_TARGET,
+};
+// Note: SPELLMOD_* values is aura types in fact
+enum SpellModType
+{
+    SPELLMOD_FLAT = 107, // SPELL_AURA_ADD_FLAT_MODIFIER
+    SPELLMOD_PCT  = 108  // SPELL_AURA_ADD_PCT_MODIFIER
+};
+
+struct SpellModifier
+{
+        SpellModifier(Aura* _ownerAura = nullptr)
+        : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0), mask(), ownerAura(_ownerAura)
+        {
+        }
+        SpellModOp op : 8;
+        SpellModType type : 8;
+        int16 charges : 16;
+        int32 value{0};
+        flag96 mask;
+        uint32 spellId{0};
+        uint32 spellTargetId;
+        SpellSchoolMask spellSchools;
+        uint8 mode = SPELL_MODIFIER_NORMAL;
+        Aura* const ownerAura;
+        void SetSpellSchool(SpellSchoolMask school)
+        {
+            spellSchools = school;
+            mode         = SPELL_MODIFIER_SPELL_SCHOOL;
+        }
+        void SetSpellTarget(uint32 spell)
+        {
+            spellTargetId = spell;
+            mode          = SPELL_MODIFIER_SPELL_TARGET;
+        }
+};
+
+typedef std::list<SpellModifier*> SpellModList;
+
+
 
 class TC_GAME_API HealInfo
 {
@@ -476,7 +528,7 @@ class TC_GAME_API HealInfo
         uint32 _heal;
         uint32 _effectiveHeal;
         uint32 _absorb;
-        SpellInfo const* const _spellInfo;
+        const SpellInfo* _spellInfo;
         SpellSchoolMask const _schoolMask;
         uint32 _hitMask;
 
@@ -496,6 +548,51 @@ class TC_GAME_API HealInfo
 
         uint32 GetHitMask() const;
 };
+
+
+// Spell modifier (used for modify other spells)
+enum SpellModifierModes : uint8
+{
+    SPELL_MODIFIER_NORMAL,
+    SPELL_MODIFIER_SPELL_SCHOOL,
+    SPELL_MODIFIER_SPELL_TARGET,
+};
+// Note: SPELLMOD_* values is aura types in fact
+enum SpellModType
+{
+    SPELLMOD_FLAT = 107, // SPELL_AURA_ADD_FLAT_MODIFIER
+    SPELLMOD_PCT  = 108  // SPELL_AURA_ADD_PCT_MODIFIER
+};
+
+struct SpellModifier
+{
+        SpellModifier(Aura* _ownerAura = nullptr)
+        : op(SPELLMOD_DAMAGE), type(SPELLMOD_FLAT), charges(0), mask(), ownerAura(_ownerAura)
+        {
+        }
+        SpellModOp op : 8;
+        SpellModType type : 8;
+        int16 charges : 16;
+        int32 value{0};
+        flag96 mask;
+        uint32 spellId{0};
+        uint32 spellTargetId;
+        SpellSchoolMask spellSchools;
+        uint8 mode = SPELL_MODIFIER_NORMAL;
+        Aura* const ownerAura;
+        void SetSpellSchool(SpellSchoolMask school)
+        {
+        spellSchools = school;
+        mode         = SPELL_MODIFIER_SPELL_SCHOOL;
+        }
+        void SetSpellTarget(uint32 spell)
+        {
+        spellTargetId = spell;
+        mode          = SPELL_MODIFIER_SPELL_TARGET;
+        }
+};
+
+typedef std::list<SpellModifier*> SpellModList;
 
 class TC_GAME_API ProcEventInfo
 {
@@ -543,7 +640,7 @@ struct CalcDamageInfo
 
     struct
     {
-        uint32 DamageSchoolMask;
+        uint32 DamageSchoolMask = 0;
         uint32 Damage;
         uint32 Absorb;
         uint32 Resist;
@@ -616,6 +713,30 @@ enum CurrentSpellTypes : uint8
 #define UNIT_ACTION_BUTTON_ACTION(X) (uint32(X) & 0x00FFFFFF)
 #define UNIT_ACTION_BUTTON_TYPE(X)   ((uint32(X) & 0xFF000000) >> 24)
 #define MAKE_UNIT_ACTION_BUTTON(A, T) (uint32(A) | (uint32(T) << 24))
+
+
+
+
+struct RuneInfo
+{
+    uint32 StartCooldown;
+    uint32 Cooldown;
+};
+
+struct Runes
+{
+    int8 runeCount              = 0;
+    std::vector<RuneInfo> runes = {};
+    uint16 runeState;
+
+    void SetRuneState(uint16 index, bool set = true)
+    {
+        if (set)
+                runeState |= (1 << index); // usable
+        else
+                runeState &= ~(1 << index); // on cooldown
+    }
+};
 
 struct UnitActionBarEntry
 {
@@ -768,6 +889,17 @@ struct PositionUpdateInfo
 
 class TC_GAME_API Unit : public WorldObject
 {
+
+protected:
+    void _Create(const ObjectGuid::LowType& guidlow, const uint32& entry, const HighGuid& guidhigh);
+    float m_positionXprev = 0;
+    float m_positionYprev = 0;
+    float m_positionZprev = 0;
+
+    float m_orientationprev = 0;
+
+
+
     friend class WorldSession;
     public:
         typedef std::set<Unit*> AttackerSet;
@@ -795,6 +927,48 @@ class TC_GAME_API Unit : public WorldObject
         typedef std::map<uint8, AuraApplication*> VisibleAuraMap;
 
         virtual ~Unit();
+
+        
+    void Relocate(float x, float y);
+        void Relocate(float x, float y, float z)
+        {
+        m_positionZprev = m_positionZ;
+        Position::Relocate(x, y, z);
+        }
+        virtual void Relocate(float x, float y, float z, float orientation)
+        {
+        Relocate(x, y, z);
+        SetOrientation(orientation);
+        }
+
+        virtual void Relocate(const Position& pos)
+        {
+        Relocate(pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation);
+        }
+
+        virtual void Relocate(const Position* pos)
+        {
+        Relocate(pos->m_positionX, pos->m_positionY, pos->m_positionZ, pos->m_orientation);
+        }
+
+        void GetOldPosition(float& x, float& y, float& z) const
+        {
+        x = m_positionXprev;
+        y = m_positionYprev;
+        z = m_positionZprev;
+        }
+        virtual void SetOrientation(float orientation)
+        {
+        if (!HasUnitState(UNIT_STATE_CANNOT_TURN))
+        {
+                m_orientationprev = m_orientation;
+                m_orientation     = orientation;
+        }
+        }
+        float GetOldOrientation()
+        {
+        return m_orientationprev;
+        }
 
         bool IsAIEnabled() const { return (i_AI != nullptr); }
         void AIUpdateTick(uint32 diff);
@@ -944,7 +1118,9 @@ class TC_GAME_API Unit : public WorldObject
         void SetMaxPower(Powers power, uint32 val);
         inline void SetFullPower(Powers power) { SetPower(power, GetMaxPower(power)); }
         // returns the change in power
-        int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true);
+        int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true,
+                          PowerChangeReason reason              = PowerChangeReason::REASON_NONE,
+                          std::variant<Spell*, Aura*> reasonObj = (Aura*)nullptr);
 
         uint32 GetAttackTime(WeaponAttackType att) const;
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME + int32(att), val * m_modAttackSpeedPct[att]); }
@@ -1535,14 +1711,152 @@ class TC_GAME_API Unit : public WorldObject
         Powers GetPowerTypeByAuraGroup(UnitMods unitMod) const;
         bool CanModifyStats() const { return m_canModifyStats; }
         void SetCanModifyStats(bool modifyStats) { m_canModifyStats = modifyStats; }
-        virtual bool UpdateStats(Stats stat) = 0;
-        virtual bool UpdateAllStats() = 0;
-        virtual void UpdateResistances(uint32 school) = 0;
-        virtual void UpdateAllResistances();
-        virtual void UpdateArmor() = 0;
-        virtual void UpdateMaxHealth() = 0;
-        virtual void UpdateMaxPower(Powers power) = 0;
-        virtual void UpdateAttackPowerAndDamage(bool ranged = false) = 0;
+
+        
+        float GetHealthBonusFromStamina(int32 health);
+        float GetManaBonusFromIntellect(int32 mana);
+
+        void ApplySpellPenetrationBonus(int32 amount, bool apply);
+        void UpdateShieldBlockValue();
+        void ApplySpellPowerBonus(int32 amount, bool apply);
+        void UpdateSpellDamageAndHealingBonus();
+        void ApplyRatingMod(CombatRating cr, int32 value, bool apply, bool derived);
+        void UpdateRating(CombatRating cr);
+        void UpdateAllRatings();
+
+        void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage,
+                                   float& maxDamage, uint8 damageIndex) const override;
+
+        void UpdateDefenseBonusesMod();
+        void RecalculateRating(CombatRating cr)
+        {
+            ApplyRatingMod(cr, 0, true);
+        }
+        float GetMeleeCritFromAgility() const;
+        void GetDodgeFromAgility(float& diminishing, float& nondiminishing) const;
+        float GetMissPercentageFromDefense() const;
+        float GetSpellCritFromIntellect() const;
+        float OCTRegenHPPerSpirit() const;
+        float OCTRegenMPPerSpirit() const;
+        float GetRatingMultiplier(CombatRating cr) const;
+        float GetRatingBonusValue(CombatRating cr) const;
+        uint32 GetBaseSpellPowerBonus() const
+        {
+            return m_baseSpellPower;
+        }
+        int32 GetSpellPenetrationItemMod() const
+        {
+            return m_spellPenetrationItemMod;
+        }
+
+        bool CanApplyResilience() const override
+        {
+            return true;
+        }
+
+        float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
+        void UpdateBlockPercentage();
+        void UpdateCritPercentage(WeaponAttackType attType);
+        void UpdateAllCritPercentages();
+        void UpdateParryPercentage();
+        void UpdateDodgePercentage();
+        void UpdateMeleeHitChances();
+        void UpdateRangedHitChances();
+        void UpdateSpellHitChances();
+
+        void UpdateAllSpellCritChances();
+        void UpdateSpellCritChance(uint32 school);
+        void UpdateArmorPenetration(int32 amount);
+        void UpdateExpertise(WeaponAttackType attType);
+        void ApplyManaRegenBonus(int32 amount, bool apply);
+        void ApplyHealthRegenBonus(int32 amount, bool apply);
+        void UpdatePowerRegen(Powers power);
+        void UpdateRuneRegen(RuneType rune);
+        float GetPowerRegen(Powers power) const;
+        uint32 GetRuneTimer(uint8 index) const
+        {
+            return m_runeGraceCooldown[index];
+        }
+        void SetRuneTimer(uint8 index, uint32 timer)
+        {
+            m_runeGraceCooldown[index] = timer;
+        }
+        uint32 GetLastRuneGraceTimer(uint8 index) const
+        {
+            return m_lastRuneGraceTimers[index];
+        }
+        void SetLastRuneGraceTimer(uint8 index, uint32 timer)
+        {
+            m_lastRuneGraceTimers[index] = timer;
+        }
+
+        void HandleBaseModFlatValue(BaseModGroup modGroup, float amount, bool apply);
+        void ApplyBaseModPctValue(BaseModGroup modGroup, float pct);
+
+        void SetBaseModFlatValue(BaseModGroup modGroup, float val);
+        void SetBaseModPctValue(BaseModGroup modGroup, float val);
+
+        void UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchantSlot = -1) override;
+        void UpdateBaseModGroup(BaseModGroup modGroup);
+
+        float GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const;
+        float GetTotalBaseModValue(BaseModGroup modGroup) const;
+
+        void _ApplyAllStatBonuses();
+        void _RemoveAllStatBonuses();
+
+        
+    [[nodiscard]] uint8 GetAvailableRunes() const
+        {
+            uint8 available = 0;
+            for (int i = 0; i < MAX_RUNES; i++)
+                if (!m_runes->runes[i].Cooldown)
+                    available++;
+            return available;
+        }
+        [[nodiscard]] uint8 GetRunesState() const
+        {
+            return m_runes->runeState;
+        }
+        [[nodiscard]] uint32 GetGracePeriod(uint8 index) const
+        {
+            return m_runes->runes[index].GracePeriod;
+        }
+        uint32 GetRuneDefaultCooldown(uint8 index, bool skipGrace);
+        [[nodiscard]] bool IsBaseRuneSlotsOnCooldown() const;
+        [[nodiscard]] uint32 GetRuneCooldown(uint8 index) const
+        {
+            return m_runes->runes[index].Cooldown;
+        }
+        void ReduceRuneCooldown(uint8 index, uint32 cooldown)
+        {
+            if (m_runes->runes[index].Cooldown > cooldown)
+                m_runes->runes[index].Cooldown -= cooldown;
+            else
+                m_runes->runes->Cooldown = 0;
+        }
+        void SetRuneCooldown(uint8 index, uint32 cooldown)
+        {
+            m_runes->runes[index].Cooldown = cooldown;
+            m_runes->SetRuneState(index, (cooldown == 0));
+        }
+        [[nodiscard]] uint32 GetRuneStartCooldown(uint8 index) const
+        {
+            return m_runes->runes[index].StartCooldown;
+        }
+        void SetRuneStartCooldown(uint8 index, uint32 startCooldown)
+        {
+            m_runes->runes[index].StartCooldown = startCooldown + 1;
+        }
+        void SetGracePeriod(uint8 index, uint32 period)
+        {
+            m_runes->runes[index].GracePeriod = period;
+        }
+        virtual void ResyncRunes(uint8 count){};
+        void AddRunePower(uint8 index);
+        void InitRunes();
+
+
         void SetAttackPower(int32 attackPower) { SetInt32Value(UNIT_FIELD_ATTACK_POWER, attackPower); }
         void SetAttackPowerModPos(int32 attackPowerMod) { SetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 0, attackPowerMod); }
         void SetAttackPowerModNeg(int32 attackPowerMod) { SetInt16Value(UNIT_FIELD_ATTACK_POWER_MODS, 1, attackPowerMod); }

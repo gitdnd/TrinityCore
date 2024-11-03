@@ -690,11 +690,16 @@ enum SpellAttr7 : uint32
     SPELL_ATTR7_CLIENT_INDICATOR                 = 0x80000000  // TITLE Client indicator (client only)
 };
 
-#define MIN_TALENT_SPEC         0
-#define MAX_TALENT_SPEC         1
-#define MIN_TALENT_SPECS        1
-#define MAX_TALENT_SPECS        2
-#define MAX_GLYPH_SLOT_INDEX    6
+
+enum class PowerChangeReason : uint8
+{
+    REASON_NONE,
+    REASON_SPELL_COST,
+    REASON_AURA_EFFECT,
+    REASON_REGENERATION,
+    REASON_SPELL_GENERATED,
+    REASON_ATTACK_GENERATED,
+};
 
 // Custom values
 enum SpellClickUserTypes

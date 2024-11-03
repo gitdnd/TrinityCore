@@ -110,7 +110,7 @@ class TC_GAME_API AuraEffect
     private:
         Aura* const m_base;
 
-        SpellInfo const* const m_spellInfo;
+        const SpellInfo* m_spellInfo;
         SpellEffectInfo const& m_spellEffectInfo;
         int32 const m_baseAmount;
 

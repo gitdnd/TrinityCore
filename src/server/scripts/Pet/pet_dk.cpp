@@ -241,7 +241,7 @@ struct npc_pet_dk_rune_weapon : ScriptedAI
         if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
         {
             me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+            me->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), me->GetFollowAngle());
         }
     }
 
