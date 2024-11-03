@@ -9,6 +9,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "ItemTemplate.h"
+#include "Creature.h"
 
 
 enum CustomClassSpells
@@ -46,7 +47,11 @@ enum CustomClassSpells
     SPELL_TALENT_BLOOD_DRIVE_BUFF = 94259,
     SPELL_TALENT_ENERGY_SHIELD_BUFF = 94276,
     SPELL_TALENT_CHAMPION = 94278,
-    SPELL_TOTEM_TOTEM_WITHDRAWAL = 94280
+    SPELL_TOTEM_TOTEM_WITHDRAWAL = 94280,
+    SPELL_TALENT_RUNE_WEAPON = 94263,
+    SPELL_TALENT_RUNE_WEAPON_HIDDEN_PASSIVE = 94282,
+    SPELL_TALENT_RUNE_DEBUFF = 94281,
+    SPELL_TALENT_RUNE_WEAPON_DRAIN = 94283
 
 };
 
@@ -1769,6 +1774,76 @@ class spell_talent_dancing_rune_weapon : public AuraScript
     }
 };
 
+// 94282 - DRW Hidden Passive
+class spell_talent_drw_passive : public AuraScript
+
+{
+    PrepareAuraScript(spell_talent_drw_passive);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        int32 currentFocus = GetTarget()->GetPower(POWER_FOCUS);
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        std::list<Creature*> minions;
+        caster->GetAllMinionsByEntry(minions, NPC_DK_DANCING_RUNE_WEAPON);
+        for (Creature* minion : minions)
+        {
+            if (Aura* existingBuff = caster->GetAura(SPELL_TALENT_RUNE_WEAPON))
+                if (currentFocus < 15)
+                {
+                    minion->DespawnOrUnsummon();
+                    caster->RemoveAura(SPELL_TALENT_RUNE_WEAPON);
+                    caster->RemoveAura(SPELL_TALENT_RUNE_WEAPON_HIDDEN_PASSIVE);
+                }
+                else
+                {
+                    caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
+                }
+        }
+    }
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_drw_passive::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+
+// 94281 - DRW Debuff
+class spell_talent_drw_debuff : public AuraScript
+{
+    PrepareAuraScript(spell_talent_drw_debuff);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        if (Aura* existingBuff = caster->GetAura(SPELL_TALENT_RUNE_WEAPON))
+        {
+            caster->RemoveAura(SPELL_TALENT_RUNE_DEBUFF);
+        }
+        else
+        {
+            caster->CastSpell(caster, SPELL_TALENT_RUNE_DEBUFF, true);
+        }
+    }
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (Aura* existingBuff = caster->GetAura(SPELL_TALENT_RUNE_DEBUFF))
+        {
+            {
+                caster->RemoveAura(SPELL_TALENT_RUNE_DEBUFF);
+            }
+        }
+    }
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_drw_debuff::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_drw_debuff::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
 
 void AddSC_Spells_Custom_Class_scripts()
 {
@@ -1808,4 +1883,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_energy_shield);
     RegisterSpellScript(spell_talent_champion);
     RegisterSpellScript(spell_talent_turret_totems);
+    RegisterSpellScript(spell_talent_drw_passive);
+    RegisterSpellScript(spell_talent_drw_debuff);
 };
