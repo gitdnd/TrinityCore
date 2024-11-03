@@ -1800,7 +1800,8 @@ class spell_talent_drw_passive : public AuraScript
                 }
                 else
                 {
-                    caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
+                    //caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
+                    caster->ModifyPower(POWER_FOCUS, -15); // Power Burn band aid :(
                 }
         }
     }
