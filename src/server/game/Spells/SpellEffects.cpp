@@ -1296,7 +1296,7 @@ void Spell::EffectPowerBurn()
         return;
 
     Powers powerType = Powers(effectInfo->MiscValue);
-    if (!unitTarget || !unitTarget->IsAlive() || unitTarget->GetPowerType() != powerType || damage < 0)
+    if (!unitTarget || !unitTarget->IsAlive() || unitTarget->GetPowerType() != powerType && powerType != POWER_FOCUS || damage < 0)
         return;
 
     Unit* unitCaster = GetUnitCasterForEffectHandlers();
