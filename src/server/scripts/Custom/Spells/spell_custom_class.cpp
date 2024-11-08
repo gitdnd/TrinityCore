@@ -1295,8 +1295,7 @@ public:
             Unit* caster = eventInfo.GetActor();
             Unit* target = eventInfo.GetProcTarget();
 
-            // get current aura on target, if any. SPELLFAMILY_ROGUE and 0x00000800 probably has to be changed.
-            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_CLASSLESS, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
+            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_CLASSLESS, 0x00082200, 0x00001000, 0x00000000, caster->GetGUID());
             if (!sealDot)
                 return;
 
@@ -1800,8 +1799,7 @@ class spell_talent_drw_passive : public AuraScript
                 }
                 else
                 {
-                    //caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
-                    caster->ModifyPower(POWER_FOCUS, -15); // Power Burn band aid :(
+                    caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
                 }
         }
     }
