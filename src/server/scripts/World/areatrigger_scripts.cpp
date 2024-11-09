@@ -505,22 +505,15 @@ public:
         bool isHorde = trigger->ID >= 5884 && trigger->ID <= 5887;
         uint32 questId = isAlliance ? 60073 : 60074;
 
-        std::string str = "A: " + std::to_string(isAlliance) + ", H: " + std::to_string(isHorde);
-        sWorld->SendGlobalText(str.c_str(), nullptr);
-
         // Alliance quest
         if ((isAlliance || isHorde) && player->IsActiveQuest(questId))
         {
             uint32 index = trigger->ID - 5880;
             index = index >= 4 ? index - 4 : index;
 
-            sWorld->SendGlobalText((std::to_string(index) + " = index").c_str(), nullptr);
-
             // 50514 - 50517 = busts
             if (player->GetReqKillOrCastCurrentCount(questId, 50514 + index) == 0)
             {
-                sWorld->SendGlobalText("Advancing quest", nullptr);
-
                 player->AdvanceQuestObjective(questId, index);
             }
         }
