@@ -69,6 +69,7 @@ class spell_talent_titans_grip : public AuraScript
     {
         Player* player = GetCaster()->ToPlayer();
         player->SetCanTitanGrip(false);
+        player->AutoUnequipOffhandIfNeed(true);
     }
     void Register() override
     {
