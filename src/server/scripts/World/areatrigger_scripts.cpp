@@ -512,6 +512,7 @@ public:
         if ((isAlliance || isHorde) && player->IsActiveQuest(questId))
         {
             uint32 index = trigger->ID - 5880;
+            index = index >= 4 ? index - 4 : index;
 
             sWorld->SendGlobalText((std::to_string(index) + " = index").c_str(), nullptr);
 
