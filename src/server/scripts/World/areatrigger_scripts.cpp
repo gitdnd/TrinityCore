@@ -499,7 +499,7 @@ public:
     bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
     {
         if (!player)
-            return;
+            return true;
 
         bool isAlliance = trigger->ID >= 5880 && trigger->ID <= 5883;
         bool isHorde = trigger->ID >= 5884 && trigger->ID <= 5887;
