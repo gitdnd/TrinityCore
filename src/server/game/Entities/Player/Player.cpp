@@ -7994,8 +7994,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         // no spell
         if (spellData.SpellId <= 0)
             continue;
-
-        if (!apply && spellData.SpellId == 46917 && m_canTitanGrip)
+        // og tg id: 46917
+        if (!apply && spellData.SpellId == 94540 && m_canTitanGrip)
         {
             RemoveAurasDueToSpell(m_titanGripPenaltySpellId);
             SetCanTitanGrip(false);
