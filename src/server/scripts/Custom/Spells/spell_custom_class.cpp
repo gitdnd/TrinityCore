@@ -55,6 +55,28 @@ enum CustomClassSpells
 
 };
 
+// 94540 - tg, the talent system doesn't provide a sufficient way to unlearn it atm
+class spell_talent_titans_grip : public AuraScript
+{
+    PrepareAuraScript(spell_talent_titans_grip);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        player->SetCanTitanGrip(true);
+    }
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        player->SetCanTitanGrip(false);
+    }
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_talent_titans_grip::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_titans_grip::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 // 94279 - Turret Totems
 class spell_talent_turret_totems : public AuraScript
 {
@@ -1882,6 +1904,7 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_energy_shield);
     RegisterSpellScript(spell_talent_champion);
     RegisterSpellScript(spell_talent_turret_totems);
+    RegisterSpellScript(spell_talent_titans_grip);
     RegisterSpellScript(spell_talent_drw_passive);
     RegisterSpellScript(spell_talent_drw_debuff);
 };
