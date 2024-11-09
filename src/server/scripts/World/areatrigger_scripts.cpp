@@ -488,6 +488,36 @@ public:
     }
 };
 
+class AreaTrigger_busk_statue_quest_trigger : public AreaTriggerScript
+{
+public:
+    AreaTrigger_busk_statue_quest_trigger() : AreaTriggerScript("busk_statue_quest_trigger")
+    {
+
+    }
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
+    {
+        if (!player)
+            return;
+
+        bool isAlliance = trigger->ID >= 5880 && trigger->ID <= 5883;
+        bool isHorde = trigger->ID >= 5884 && trigger->ID <= 5887;
+        uint32 questId = isAlliance ? 60073 : 60074;
+        // Alliance quest
+        if ((isAlliance || isHorde) && player->IsActiveQuest(questId))
+        {
+            uint32 index = trigger->ID - 5880;
+            // 50514 - 50517 = busts
+            if (player->GetReqKillOrCastCurrentCount(questId, 50514 + index) == 0)
+            {
+                player->AdvanceQuestObjective(questId, index);
+            }
+        }
+        return true;
+    }
+};
+
 void AddSC_areatrigger_scripts()
 {
     new AreaTrigger_at_coilfang_waterfall();
@@ -502,4 +532,5 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_hub_fall_box();
     new AreaTrigger_hub_speed_box();
     new AreaTrigger_hub_fall_to_death();
+    new AreaTrigger_busk_statue_quest_trigger();
 }
