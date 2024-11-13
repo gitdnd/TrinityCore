@@ -447,7 +447,11 @@ public:
         }
         else
         {
-            player->ActivateTaxiPathTo(1983);
+            const float x1 = 122.0f, y1 = 661.0f, x2 = -200.0f, y2 = 363.0f;
+            float dist1 = player->GetDistance2d(x1, y1);
+            float dist2 = player->GetDistance2d(x2, y2);
+            uint32 path = dist1 < dist2 ? 1983u : 1984u;
+            player->ActivateTaxiPathTo(path);
         }
         auto achievement = AchievementGlobalMgr::instance()->GetAchievement(50085);
         if (achievement)
