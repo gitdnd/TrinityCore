@@ -447,9 +447,8 @@ public:
         }
         else
         {
-            const float x1 = 122.0f, y1 = 661.0f, x2 = -200.0f, y2 = 363.0f;
-            float dist1 = player->GetDistance2d(x1, y1);
-            float dist2 = player->GetDistance2d(x2, y2);
+            float dist1 = player->GetDistance2d(_x1, _y1);
+            float dist2 = player->GetDistance2d(_x2, _y2);
             uint32 path = dist1 < dist2 ? 1983u : 1984u;
             player->ActivateTaxiPathTo(path);
         }
@@ -459,6 +458,9 @@ public:
 
         return true;
     }
+private:
+    // First coords of each taxi path
+    const float _x1 = 122.0f, _y1 = 661.0f, _x2 = -200.0f, _y2 = 363.0f;
 };
 
 class AreaTrigger_hub_speed_box : public AreaTriggerScript
