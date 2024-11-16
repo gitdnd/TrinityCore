@@ -51,8 +51,81 @@ enum CustomClassSpells
     SPELL_TALENT_RUNE_WEAPON = 94263,
     SPELL_TALENT_RUNE_WEAPON_HIDDEN_PASSIVE = 94282,
     SPELL_TALENT_RUNE_DEBUFF = 94281,
-    SPELL_TALENT_RUNE_WEAPON_DRAIN = 94283
+    SPELL_TALENT_RUNE_WEAPON_DRAIN = 94283,
+    SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC = 94286,
+    SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY = 94287
 
+};
+
+// 94285 - Druid of the Mycelium
+class spell_talent_druid_of_the_mycelium : public AuraScript
+{
+    PrepareAuraScript(spell_talent_druid_of_the_mycelium);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        if (!roll_chance_f(caster->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + 3)))
+            return;
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return;
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()));
+        eventInfo.GetActor()->CastSpell(nullptr, SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_druid_of_the_mycelium::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 94287 - Druid of the Mycelium (Proc)
+class spell_talent_druid_of_the_mycelium_proc : public SpellScript
+{
+    PrepareSpellScript(spell_talent_druid_of_the_mycelium_proc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.size() < 2)
+            return;
+
+        targets.sort(Trinity::HealthPctOrderPred());
+
+        WorldObject* target = targets.front();
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(GetEffectValue());
+        GetCaster()->CastSpell(target, SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC, args);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_talent_druid_of_the_mycelium_proc::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+        OnEffectHitTarget += SpellEffectFn(spell_talent_druid_of_the_mycelium_proc::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
 };
 
 // 94540 - tg, the talent system doesn't provide a sufficient way to unlearn it atm
@@ -1906,6 +1979,8 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_champion);
     RegisterSpellScript(spell_talent_turret_totems);
     RegisterSpellScript(spell_talent_titans_grip);
+    RegisterSpellScript(spell_talent_druid_of_the_mycelium_proc);
+    RegisterSpellScript(spell_talent_druid_of_the_mycelium);
     RegisterSpellScript(spell_talent_drw_passive);
     RegisterSpellScript(spell_talent_drw_debuff);
 };
