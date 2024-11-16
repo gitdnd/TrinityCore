@@ -1396,7 +1396,7 @@ public:
                 return;
 
             uint8 const stacks = sealDot->GetBase()->GetStackAmount();
-            uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount;
+            uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount > 0 ? sealDot->GetSpellInfo()->StackAmount : 1;
 
             if (stacks < maxStacks && !(eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS))
                 return;
