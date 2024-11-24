@@ -2290,9 +2290,23 @@ namespace LuaUnit
      *
      *     Note: talents and racials are also auras, use with caution
      */
-    int RemoveAllAuras(Eluna* /*E*/, Unit* unit)
+    int RemoveAllAuras(Eluna* E, Unit* unit)
     {
+        bool resetAffix = E->CHECKVAL<bool>(2, false);
+
         unit->RemoveAllAuras();
+
+        // The default behaviour for scripts should be to not remove affix data, so reapply after removing
+        // It is harder to stop the remove all auras call not remove affix data, it loops until all auras are removed
+        if (unit->ToCreature() && !resetAffix)
+        {
+            for (int i = 0; i < MAX_AFFIXES; ++i)
+            {
+                uint32 affixId = unit->GetMap()->GetAffixSlot(i);
+                sAffixMgr->GetAffixEffect(affixId).Apply(unit->ToCreature(), AFFIX_EVENT_LEAVE_COMBAT);
+            }
+        }
+
         return 0;
     }
 
