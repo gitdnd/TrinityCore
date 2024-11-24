@@ -312,6 +312,25 @@ void Group::ConvertToLFG()
     SendUpdate();
 }
 
+void Group::RevertFromLFG()
+{
+    uint8 newFlags = m_groupType & ~GROUPTYPE_LFG;
+    newFlags = newFlags & ~GROUPTYPE_LFG_RESTRICTED;
+    m_groupType = GroupType(newFlags);
+    m_lootMethod = NEED_BEFORE_GREED;
+    if (!isBGGroup() && !isBFGroup())
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_TYPE);
+
+        stmt->setUInt8(0, uint8(m_groupType));
+        stmt->setUInt32(1, m_dbStoreId);
+
+        CharacterDatabase.Execute(stmt);
+    }
+
+    SendUpdate();
+}
+
 void Group::ConvertToRaid()
 {
     m_groupType = GroupType(m_groupType | GROUPTYPE_RAID);
@@ -2340,6 +2359,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
     ClearAffixes();
     sAffixMgr->ClearAffixGroup(this);
     sLFGMgr->RemoveGroupData(GetGUID());
+    RevertFromLFG();
 }
 
 InstanceGroupBind* Group::GetBoundInstance(Player* player)
