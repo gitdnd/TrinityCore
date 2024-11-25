@@ -119,7 +119,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
 
     if (_player->GetQuestStatus(QUEST_INTRO_COMPLETE) != QUEST_STATUS_REWARDED)
     {
-        SendNotification("You cannot que for a dungeon without completing 'Power Shards and Jewelcrafting'.");
+        SendNotification("You cannot queue for a dungeon without completing the quest 'Finding Your Place'.");
         return;
     }
 
