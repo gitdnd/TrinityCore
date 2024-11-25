@@ -465,7 +465,7 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
                 {
                     if (!plrg->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
                         joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
-                    if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
+                    else if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                         joinData.result = LFG_JOIN_PARTY_DESERTER;
                     else if (!isContinue && plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
                         joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
@@ -473,7 +473,7 @@ LfgJoinResult LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeo
                         joinData.result = LFG_JOIN_USING_BG_SYSTEM;
                     else if (plrg->HasAura(9454)) // check Freeze debuff
                         joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
-                    else if(plrg->GetQuestStatus(60007) != QUEST_STATUS_REWARDED)
+                    else if(plrg->GetQuestStatus(QUEST_INTRO_COMPLETE) != QUEST_STATUS_REWARDED)
                         joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
                     ++memberCount;
                     players.insert(plrg->GetGUID());
