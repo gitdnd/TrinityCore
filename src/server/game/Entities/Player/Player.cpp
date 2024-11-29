@@ -28146,17 +28146,8 @@ bool Player::UnlearnCustomTalent(uint32 id)
         return false;
 
     // Cannot unlearn a talent if one ahead of it has already been learnt
-    if (!nodeInfo->child_links.empty())
-    {
-        for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
-        {
-            if (HasCustomTalent(*itr) && !(nodeInfo->flagMask & 1))
-            {
-                GetSession()->SendAreaTriggerMessage(("Node ID conflicts: " + std::to_string(*itr)).c_str());
-                return false;
-            }
-        }
-    }
+    if (!CanStillReachRootTalentNode(nodeInfo))
+        return false;
 
     customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
 
@@ -28182,6 +28173,27 @@ bool Player::UnlearnCustomTalent(uint32 id)
     CharacterDatabase.Execute(stmt);
 
     return true;
+}
+
+bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
+{
+    // Found learnt root node
+    if (HasCustomTalent(nodeInfo->Index) && (nodeInfo->flagMask & 4))
+        return true;
+
+    for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
+    {
+        const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (nodeInfo)
+        {
+            // If we have learnt the child and it can reach a learnt path to root, return true
+            if (HasCustomTalent(childNodeInfo->Index) && CanStillReachRootTalentNode(childNodeInfo))
+                return true;
+        }
+    }
+
+    // No valid paths
+    return false;
 }
 
 //@todo: optimize this to only check stackable nodes.
