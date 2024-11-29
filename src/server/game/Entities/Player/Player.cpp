@@ -28204,7 +28204,7 @@ bool Player::UnlearnCustomTalent(uint32 id)
     return true;
 }
 
-bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32> visited)
+bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited)
 {
     // Skip any nodes already visited
     if (std::find(visited.begin(), visited.end(), nodeInfo->Index) != visited.end())
