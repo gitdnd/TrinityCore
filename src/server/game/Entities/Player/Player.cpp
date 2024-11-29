@@ -28158,15 +28158,20 @@ bool Player::UnlearnCustomTalent(uint32 id)
             }
         }
     }
-    // Otherwise we check all learnt nodes for a path to root. If none exist without this node we cannot unlearn
+    // Regular node being unlearnt
     else
     {
+        // Check each connected node
         for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
         {
+            std::vector<uint32> visited;
+            visited.push_back(nodeInfo->Index);
             const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+            // If we know the talent that is connected
+            // check if there will still be a valid path back to the root
             if (nodeInfo &&
                 HasCustomTalent(childNodeInfo->Index) &&
-                !CanStillReachRootTalentNode(childNodeInfo, nodeInfo->Index))
+                !CanStillReachRootTalentNode(childNodeInfo, visited))
             {
                 return false;
             }
@@ -28199,11 +28204,13 @@ bool Player::UnlearnCustomTalent(uint32 id)
     return true;
 }
 
-bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, uint32 excludeIndex)
+bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32> visited)
 {
-    // Skip the exclude index, it cannot be part of the path
-    if (nodeInfo->Index == excludeIndex)
+    // Skip any nodes already visited
+    if (std::find(visited.begin(), visited.end(), nodeInfo->Index) != visited.end())
         return false;
+
+    visited.push_back(nodeInfo->Index);
 
     // If root node it's always reachable
     if (nodeInfo->flagMask & 4)
@@ -28213,7 +28220,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, uint32 
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         // If learnt child, and it cannot reach a learnt path to root
-        if (nodeInfo && HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo, excludeIndex))
+        if (childNodeInfo && HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo, visited))
         {
             return true;
         }
