@@ -28169,7 +28169,7 @@ bool Player::UnlearnCustomTalent(uint32 id)
             if (nodeInfo &&
                 !(nodeInfo->flagMask & 1) && // not hidden
                 HasCustomTalent(childNodeInfo->Index) &&
-                !CanStillReachRootTalentNode(childNodeInfo))
+                !CanStillReachRootTalentNode(childNodeInfo, nodeInfo->Index)
             {
                 return false;
             }
@@ -28202,20 +28202,24 @@ bool Player::UnlearnCustomTalent(uint32 id)
     return true;
 }
 
-bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
+bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, uint32 excludeIndex)
 {
+    // Skip the exclude index
+    if (nodeInfo->Index == excludeIndex)
+        return true;
+
     // If root node return true
     if (nodeInfo->flagMask & 4)
         return true;
 
-    for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
+    for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         if (nodeInfo)
         {
-            // If learnt child, and it can reach a learnt path to root, return true
-            if (HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo))
-                return true;
+            // If learnt child, and it cannot reach a learnt path to root
+            if (HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo))
+                return false;
         }
     }
     for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
@@ -28223,14 +28227,14 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         if (nodeInfo)
         {
-            // If learnt child, and it can reach a learnt path to root, return true
-            if (HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo))
-                return true;
+            // If learnt child, and it cannot reach a learnt path to root, return true
+            if (HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo))
+                return false;
         }
     }
 
-    // No valid paths
-    return false;
+    // All valid paths
+    return true;
 }
 
 //@todo: optimize this to only check stackable nodes.
