@@ -28130,9 +28130,33 @@ bool Player::UnlearnCustomTalent(uint32 id)
         return false;
     }
 
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+    if (!nodeInfo)
+    {
+        return false;
+    }
+
+    if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+    {
+        return false;
+    }
+
+    // Cannot unlearn hidden talents
+    if ((nodeInfo->flagMask & 1))
+        return false;
+
+    // Cannot unlearn a talent if one ahead of it has already been learnt
+    if (!nodeInfo->child_links.empty())
+    {
+        for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
+        {
+            if (HasCustomTalent(*itr))
+                return false;
+        }
+    }
+
     customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
 
-    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
     if (Aura* aur = GetAura(nodeInfo->spellId, GetGUID()))
     {
         if (aur->GetStackAmount() > 1)
@@ -28217,7 +28241,6 @@ void Player::LoadCustomTalents(PreparedQueryResult result)
 
 uint8 Player::CanLearnCustomTalent(uint32 id)
 {
-    //@todo provide reason for ui feedback?
     if (GetFreeTalentPoints() <= 0)
         return TALENT_RRESPONSE_NOT_ENOUGH_POINTS;
 
