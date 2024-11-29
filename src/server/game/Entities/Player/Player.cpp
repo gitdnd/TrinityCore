@@ -28169,7 +28169,7 @@ bool Player::UnlearnCustomTalent(uint32 id)
             if (nodeInfo &&
                 !(nodeInfo->flagMask & 1) && // not hidden
                 HasCustomTalent(childNodeInfo->Index) &&
-                !CanStillReachRootTalentNode(childNodeInfo, nodeInfo->Index)
+                !CanStillReachRootTalentNode(childNodeInfo, nodeInfo->Index))
             {
                 return false;
             }
