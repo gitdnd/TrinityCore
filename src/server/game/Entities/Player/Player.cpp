@@ -28208,6 +28208,16 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
     if (nodeInfo->flagMask & 4)
         return true;
 
+    for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
+    {
+        const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+        if (nodeInfo)
+        {
+            // If learnt child, and it can reach a learnt path to root, return true
+            if (HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo))
+                return true;
+        }
+    }
     for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
