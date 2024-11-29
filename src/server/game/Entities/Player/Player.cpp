@@ -28150,8 +28150,11 @@ bool Player::UnlearnCustomTalent(uint32 id)
     {
         for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
         {
-            if (HasCustomTalent(*itr))
+            if (HasCustomTalent(*itr) && !(nodeInfo->flagMask & 1))
+            {
+                GetSession()->SendAreaTriggerMessage(("Node ID conflicts: " + std::to_string(*itr)).c_str());
                 return false;
+            }
         }
     }
 
