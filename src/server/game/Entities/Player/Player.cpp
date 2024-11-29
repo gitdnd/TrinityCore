@@ -28218,7 +28218,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, uint32 
         if (nodeInfo)
         {
             // If learnt child, and it cannot reach a learnt path to root
-            if (HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo))
+            if (HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo, excludeIndex))
                 return false;
         }
     }
@@ -28228,7 +28228,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, uint32 
         if (nodeInfo)
         {
             // If learnt child, and it cannot reach a learnt path to root, return true
-            if (HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo))
+            if (HasCustomTalent(*itr) && !CanStillReachRootTalentNode(childNodeInfo, excludeIndex))
                 return false;
         }
     }
