@@ -28187,17 +28187,21 @@ bool Player::UnlearnCustomTalent(uint32 id)
 
 bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
 {
-    // Found learnt root node
-    if (HasCustomTalent(nodeInfo->Index) && (nodeInfo->flagMask & 4))
+    // If root node return true
+    if (nodeInfo->flagMask & 4)
         return true;
+
+    // If not visible return false
+    if (!(nodeInfo->flagMask & 1))
+        return false;
 
     for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         if (nodeInfo)
         {
-            // If visible, and learnt the child, and it can reach a learnt path to root, return true
-            if ((nodeInfo->flagMask & 1) && HasCustomTalent(childNodeInfo->Index) && CanStillReachRootTalentNode(childNodeInfo))
+            // If learnt child, and it can reach a learnt path to root, return true
+            if (HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo))
                 return true;
         }
     }
