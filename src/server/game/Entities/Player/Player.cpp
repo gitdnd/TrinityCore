@@ -28118,15 +28118,23 @@ uint32 Player::GetTotalTalentPoints() const
     return totalTP;
 }
 
-void Player::UnlearnCustomTalent(uint32 id)
+bool Player::UnlearnCustomTalent(uint32 id)
 {
     if (!HasCustomTalent(id) || !IsAlive())
-        return;
+        return false;
+
+    // Cannot unlearn talents outside of the continuum
+    if (GetMapId() != 775)
+    {
+        GetSession()->SendAreaTriggerMessage("|cffff2020You can only unlearn talents inside the Continuum.|r");
+        return false;
+    }
 
     customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
 
     const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
     if (Aura* aur = GetAura(nodeInfo->spellId, GetGUID()))
+    {
         if (aur->GetStackAmount() > 1)
             aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
         else
@@ -28135,7 +28143,7 @@ void Player::UnlearnCustomTalent(uint32 id)
             RemoveTemporarySpell(nodeInfo->spellId);
             RemoveOwnedAura(nodeInfo->spellId, GetGUID());
         }
-
+    }
 
     SetFreeTalentPoints(GetFreeTalentPoints() + 1);
     _talentMgr->UsedTalentCount -= 1;
@@ -28145,6 +28153,8 @@ void Player::UnlearnCustomTalent(uint32 id)
     stmt->setUInt32(1, id);
     stmt->setUInt32(2, GetCurrentTalentLoadout());
     CharacterDatabase.Execute(stmt);
+
+    return true;
 }
 
 //@todo: optimize this to only check stackable nodes.

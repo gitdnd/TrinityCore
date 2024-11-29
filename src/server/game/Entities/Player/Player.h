@@ -2330,7 +2330,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ResetCustomTalents();
         void DeactivateTalentLoadout();
         void LearnCustomTalent(uint32 id);
-        void UnlearnCustomTalent(uint32 id);
+        bool UnlearnCustomTalent(uint32 id);
         uint32 GetTalentStackCount(uint32 spellId);
         void LoadCustomTalentLoadout();
         void LoadCustomTalents(PreparedQueryResult result);

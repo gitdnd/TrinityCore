@@ -947,8 +947,8 @@ namespace LuaCustom
     int UnlearnCustomTalent(Eluna* E, Player* player)
     {
         uint32 node = E->CHECKVAL<uint32>(2);
-        player->UnlearnCustomTalent(node);
-        return 0;
+        E->Push(player->UnlearnCustomTalent(node));
+        return 1;
     }
 
     int ResetCustomTalent(Eluna* /*E*/, Player* player)
