@@ -28145,8 +28145,18 @@ bool Player::UnlearnCustomTalent(uint32 id)
     if ((nodeInfo->flagMask & 1))
         return false;
 
-    // Cannot unlearn a talent if one ahead of it has already been learnt
-    if (!CanStillReachRootTalentNode(nodeInfo))
+    // If this is a root node we treat it slightly differently. Check if any linked node is learnt in the other direction, if it is then we cannot unlearn
+    if ((nodeInfo->flagMask & 4))
+    {
+        for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
+        {
+            const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+            if (nodeInfo && HasCustomTalent(childNodeInfo->Index) && !(nodeInfo->flagMask & 1))
+                return false;
+        }
+    }
+    // Otherwise we check all child nodes for a path to root. If none exist without this node we cannot unlearn
+    else if (!CanStillReachRootTalentNode(nodeInfo))
         return false;
 
     customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
@@ -28186,8 +28196,8 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         if (nodeInfo)
         {
-            // If we have learnt the child and it can reach a learnt path to root, return true
-            if (HasCustomTalent(childNodeInfo->Index) && CanStillReachRootTalentNode(childNodeInfo))
+            // If visible, and learnt the child, and it can reach a learnt path to root, return true
+            if ((nodeInfo->flagMask & 1) && HasCustomTalent(childNodeInfo->Index) && CanStillReachRootTalentNode(childNodeInfo))
                 return true;
         }
     }
