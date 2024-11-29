@@ -28148,21 +28148,31 @@ bool Player::UnlearnCustomTalent(uint32 id)
     // If this is a root node we treat it slightly differently. Check if any linked node is learnt in the other direction, if it is then we cannot unlearn
     if ((nodeInfo->flagMask & 4))
     {
-        for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
+        // Must be all links?
+        for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
         {
             const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
-            if (nodeInfo && HasCustomTalent(childNodeInfo->Index) && !(nodeInfo->flagMask & 1))
+            if (nodeInfo &&
+                HasCustomTalent(childNodeInfo->Index) &&
+                !(nodeInfo->flagMask & 1)) // not hidden
+            {
                 return false;
+            }
         }
     }
-    // Otherwise we check all child nodes for a path to root. If none exist without this node we cannot unlearn
+    // Otherwise we check all learnt nodes for a path to root. If none exist without this node we cannot unlearn
     else
     {
         for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
         {
             const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
-            if (nodeInfo && HasCustomTalent(childNodeInfo->Index) && !CanStillReachRootTalentNode(childNodeInfo))
+            if (nodeInfo &&
+                !(nodeInfo->flagMask & 1) && // not hidden
+                HasCustomTalent(childNodeInfo->Index) &&
+                !CanStillReachRootTalentNode(childNodeInfo))
+            {
                 return false;
+            }
         }
     }
 
@@ -28198,7 +28208,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo)
     if (nodeInfo->flagMask & 4)
         return true;
 
-    for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
+    for (auto itr = nodeInfo->child_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         if (nodeInfo)
