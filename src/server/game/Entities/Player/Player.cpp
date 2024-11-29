@@ -28212,7 +28212,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, uint32 
     if (nodeInfo->flagMask & 4)
         return true;
 
-    for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->child_links.end(); ++itr)
+    for (auto itr = nodeInfo->parent_links.begin(); itr != nodeInfo->parent_links.end(); ++itr)
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         if (nodeInfo)
