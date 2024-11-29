@@ -53,6 +53,7 @@ struct ScalingStatDistributionEntry;
 struct ScalingStatValuesEntry;
 struct TrainerSpell;
 struct VendorItem;
+struct TalentNodeInfo;
 
 class AchievementMgr;
 class Bag;
