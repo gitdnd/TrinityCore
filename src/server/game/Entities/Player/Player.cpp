@@ -28171,7 +28171,7 @@ bool Player::UnlearnCustomTalent(uint32 id)
             // check if there will still be a valid path back to the root
             if (nodeInfo &&
                 HasCustomTalent(childNodeInfo->Index) &&
-                !CanStillReachRootTalentNode(childNodeInfo, visited))
+                !CanStillReachRootTalentNode(childNodeInfo, visited, 1))
             {
                 return false;
             }
@@ -28204,8 +28204,12 @@ bool Player::UnlearnCustomTalent(uint32 id)
     return true;
 }
 
-bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited)
+bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited, uint32 depth)
 {
+    // Safety check
+    if (depth > 150)
+        return;
+
     // Skip any nodes already visited
     if (std::find(visited.begin(), visited.end(), nodeInfo->Index) != visited.end())
         return false;
@@ -28220,7 +28224,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::ve
     {
         const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
         // If learnt child, and it cannot reach a learnt path to root
-        if (childNodeInfo && HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo, visited))
+        if (childNodeInfo && HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo, visited, depth + 1))
         {
             return true;
         }
