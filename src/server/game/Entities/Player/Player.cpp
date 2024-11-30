@@ -28208,7 +28208,7 @@ bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::ve
 {
     // Safety check
     if (depth > 150)
-        return;
+        return false;
 
     // Skip any nodes already visited
     if (std::find(visited.begin(), visited.end(), nodeInfo->Index) != visited.end())
