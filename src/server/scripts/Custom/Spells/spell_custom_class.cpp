@@ -53,8 +53,81 @@ enum CustomClassSpells
     SPELL_TALENT_RUNE_DEBUFF = 94281,
     SPELL_TALENT_RUNE_WEAPON_DRAIN = 94283,
     SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC = 94286,
-    SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY = 94287
+    SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY = 94287,
+    SPELL_TALENT_BASILISK_BITE_PASSIVE = 94288,
+    SPELL_TALENT_BASILISK_BITE = 97331
 
+};
+
+// 94288 - Basilisk Bite
+class spell_talent_basilisk_bite : public AuraScript
+{
+    PrepareAuraScript(spell_talent_basilisk_bite);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_BASILISK_BITE,SPELL_TALENT_BASILISK_BITE_PASSIVE });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = eventInfo.GetProcTarget();
+
+        if (!caster || !target)
+            return;
+
+        if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_RANGED_AUTO_ATTACK || eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS)
+        {
+            if (!roll_chance_f(50))
+                return;
+        }
+        else
+        {
+            if (!roll_chance_f(25))
+                return;
+        }
+
+        int32 totalDamage = 0;
+        Unit::AuraApplicationMap const& auras = target->GetAppliedAuras();
+        for (auto const& auraPair : auras)
+        {
+            Aura* aura = auraPair.second->GetBase();
+            if (!aura || aura->GetCasterGUID() != caster->GetGUID())
+                continue;
+
+            SpellInfo const* spellInfo = aura->GetSpellInfo();
+            if (!spellInfo)
+                continue;
+
+            flag96 familyFlag = aura->GetSpellInfo()->SpellFamilyFlags;
+            if (familyFlag[0] & 0x00080000 || familyFlag[0] & 0x01000000)
+            {
+                for (uint8 i = 0; i < 3; ++i)
+                {
+                    if (AuraEffect const* effect = aura->GetEffect(i))
+                    {
+                        totalDamage += effect->GetAmount() * effect->GetRemainingTicks();
+                    }
+                }
+            }
+        }
+        Aura* basiliskPAssive = caster->GetAura(SPELL_TALENT_BASILISK_BITE_PASSIVE);
+        int32 percDamage = basiliskPAssive->GetEffect(EFFECT_0)->GetAmount();
+        ApplyPct(totalDamage, percDamage);
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(totalDamage);
+        GetTarget()->CastSpell(target, SPELL_TALENT_BASILISK_BITE, args);
+    }
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_talent_basilisk_bite::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_talent_basilisk_bite::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
 };
 
 // 94285 - Druid of the Mycelium
@@ -1983,4 +2056,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_druid_of_the_mycelium);
     RegisterSpellScript(spell_talent_drw_passive);
     RegisterSpellScript(spell_talent_drw_debuff);
+    RegisterSpellScript(spell_talent_basilisk_bite);
 };
