@@ -2366,7 +2366,10 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     stat_group_sockets[STAT_GROUP_ALL] = {
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_RED,
-        SOCKET_COLOR_BLUE
+        SOCKET_COLOR_BLUE,
+        SOCKET_COLOR_ORANGE,
+        SOCKET_COLOR_YELLOW,
+        SOCKET_COLOR_GREEN
     };
 
     // Stat group for all stats, used for special effects like legendary effect
