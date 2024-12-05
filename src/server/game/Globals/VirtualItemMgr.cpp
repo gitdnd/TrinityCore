@@ -2367,7 +2367,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_RED,
         SOCKET_COLOR_BLUE,
-        SOCKET_COLOR_ORANGE,
+        //SOCKET_COLOR_ORANGE, // Not Used
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_GREEN
     };
