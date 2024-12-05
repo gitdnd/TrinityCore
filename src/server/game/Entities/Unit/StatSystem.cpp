@@ -319,7 +319,7 @@ float Player::GetManaBonusFromIntellect()
     float baseInt = std::min(20.0f, intellect);
     float moreInt = intellect - baseInt;
 
-    return baseInt + (moreInt * 15.0f);
+    return baseInt + (moreInt * 10.0f);
 }
 
 void Player::UpdateMaxHealth()
