@@ -2121,7 +2121,7 @@ void Player::Regenerate(Powers power)
         else
             m_powerFraction[power] = addvalue - integerValue;
     }
-    if (m_regenTimerCount >= 500 || curValue >= maxValue || curValue <= 0)
+    if ((power == POWER_FOCUS && m_regenTimerCount >= 500) || m_regenTimerCount >= 2000 || curValue >= maxValue || curValue <= 0)
         SetPower(power, curValue, true, true);
     else
         UpdateUInt32Value(UNIT_FIELD_POWER1 + AsUnderlyingType(power), curValue);
@@ -7994,8 +7994,8 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         // no spell
         if (spellData.SpellId <= 0)
             continue;
-
-        if (!apply && spellData.SpellId == 46917 && m_canTitanGrip)
+        // og tg id: 46917
+        if (!apply && spellData.SpellId == 94540 && m_canTitanGrip)
         {
             RemoveAurasDueToSpell(m_titanGripPenaltySpellId);
             SetCanTitanGrip(false);
@@ -28118,15 +28118,70 @@ uint32 Player::GetTotalTalentPoints() const
     return totalTP;
 }
 
-void Player::UnlearnCustomTalent(uint32 id)
+bool Player::UnlearnCustomTalent(uint32 id)
 {
     if (!HasCustomTalent(id) || !IsAlive())
-        return;
+        return false;
+
+    // Cannot unlearn talents outside of the continuum
+    if (GetMapId() != 775)
+    {
+        GetSession()->SendAreaTriggerMessage("|cffff2020You can only unlearn talents inside the Continuum.|r");
+        return false;
+    }
+
+    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
+    if (!nodeInfo)
+    {
+        return false;
+    }
+
+    if (!sSpellMgr->GetSpellInfo(nodeInfo->spellId))
+    {
+        return false;
+    }
+
+    // Cannot unlearn hidden talents
+    if ((nodeInfo->flagMask & 1))
+        return false;
+
+    // If this is a root node we treat it slightly differently. Check if any linked node is learnt in the other direction, if it is then we cannot unlearn
+    if ((nodeInfo->flagMask & 4))
+    {
+        // Must be all links
+        for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
+        {
+            const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+            if (nodeInfo && HasCustomTalent(childNodeInfo->Index))
+            {
+                return false;
+            }
+        }
+    }
+    // Regular node being unlearnt
+    else
+    {
+        // Check each connected node
+        for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
+        {
+            std::vector<uint32> visited;
+            visited.push_back(nodeInfo->Index);
+            const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+            // If we know the talent that is connected
+            // check if there will still be a valid path back to the root
+            if (nodeInfo &&
+                HasCustomTalent(childNodeInfo->Index) &&
+                !CanStillReachRootTalentNode(childNodeInfo, visited, 1))
+            {
+                return false;
+            }
+        }
+    }
 
     customTalents[GetCurrentTalentLoadout()].erase(find(customTalents[GetCurrentTalentLoadout()].begin(), customTalents[GetCurrentTalentLoadout()].end(), id));
 
-    const TalentNodeInfo* nodeInfo = sObjectMgr->GetTalentNode(id);
     if (Aura* aur = GetAura(nodeInfo->spellId, GetGUID()))
+    {
         if (aur->GetStackAmount() > 1)
             aur->SetStackAmount(GetTalentStackCount(nodeInfo->spellId));
         else
@@ -28135,7 +28190,7 @@ void Player::UnlearnCustomTalent(uint32 id)
             RemoveTemporarySpell(nodeInfo->spellId);
             RemoveOwnedAura(nodeInfo->spellId, GetGUID());
         }
-
+    }
 
     SetFreeTalentPoints(GetFreeTalentPoints() + 1);
     _talentMgr->UsedTalentCount -= 1;
@@ -28145,6 +28200,38 @@ void Player::UnlearnCustomTalent(uint32 id)
     stmt->setUInt32(1, id);
     stmt->setUInt32(2, GetCurrentTalentLoadout());
     CharacterDatabase.Execute(stmt);
+
+    return true;
+}
+
+bool Player::CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited, uint32 depth)
+{
+    // Safety check
+    if (depth > 150)
+        return false;
+
+    // Skip any nodes already visited
+    if (std::find(visited.begin(), visited.end(), nodeInfo->Index) != visited.end())
+        return false;
+
+    visited.push_back(nodeInfo->Index);
+
+    // If root node it's always reachable
+    if (nodeInfo->flagMask & 4)
+        return true;
+
+    for (auto itr = nodeInfo->all_links.begin(); itr != nodeInfo->all_links.end(); ++itr)
+    {
+        const TalentNodeInfo* childNodeInfo = sObjectMgr->GetTalentNode(*itr);
+        // If learnt child, and it cannot reach a learnt path to root
+        if (childNodeInfo && HasCustomTalent(*itr) && CanStillReachRootTalentNode(childNodeInfo, visited, depth + 1))
+        {
+            return true;
+        }
+    }
+
+    // No valid paths to root found
+    return false;
 }
 
 //@todo: optimize this to only check stackable nodes.
@@ -28207,7 +28294,6 @@ void Player::LoadCustomTalents(PreparedQueryResult result)
 
 uint8 Player::CanLearnCustomTalent(uint32 id)
 {
-    //@todo provide reason for ui feedback?
     if (GetFreeTalentPoints() <= 0)
         return TALENT_RRESPONSE_NOT_ENOUGH_POINTS;
 

@@ -51,8 +51,104 @@ enum CustomClassSpells
     SPELL_TALENT_RUNE_WEAPON = 94263,
     SPELL_TALENT_RUNE_WEAPON_HIDDEN_PASSIVE = 94282,
     SPELL_TALENT_RUNE_DEBUFF = 94281,
-    SPELL_TALENT_RUNE_WEAPON_DRAIN = 94283
+    SPELL_TALENT_RUNE_WEAPON_DRAIN = 94283,
+    SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC = 94286,
+    SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY = 94287
 
+};
+
+// 94285 - Druid of the Mycelium
+class spell_talent_druid_of_the_mycelium : public AuraScript
+{
+    PrepareAuraScript(spell_talent_druid_of_the_mycelium);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        if (!roll_chance_f(caster->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + 3)))
+            return;
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return;
+
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(CalculatePct(healInfo->GetHeal(), aurEff->GetAmount()));
+        eventInfo.GetActor()->CastSpell(nullptr, SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_druid_of_the_mycelium::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 94287 - Druid of the Mycelium (Proc)
+class spell_talent_druid_of_the_mycelium_proc : public SpellScript
+{
+    PrepareSpellScript(spell_talent_druid_of_the_mycelium_proc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.size() < 2)
+            return;
+
+        targets.sort(Trinity::HealthPctOrderPred());
+
+        WorldObject* target = targets.front();
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+        args.AddSpellBP0(GetEffectValue());
+        GetCaster()->CastSpell(target, SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC, args);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_talent_druid_of_the_mycelium_proc::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+        OnEffectHitTarget += SpellEffectFn(spell_talent_druid_of_the_mycelium_proc::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 94540 - tg, the talent system doesn't provide a sufficient way to unlearn it atm
+class spell_talent_titans_grip : public AuraScript
+{
+    PrepareAuraScript(spell_talent_titans_grip);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        player->SetCanTitanGrip(true);
+    }
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Player* player = GetCaster()->ToPlayer();
+        player->SetCanTitanGrip(false);
+        player->AutoUnequipOffhandIfNeed(true);
+    }
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_talent_titans_grip::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_titans_grip::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 // 94279 - Turret Totems
@@ -1295,13 +1391,12 @@ public:
             Unit* caster = eventInfo.GetActor();
             Unit* target = eventInfo.GetProcTarget();
 
-            // get current aura on target, if any. SPELLFAMILY_ROGUE and 0x00000800 probably has to be changed.
-            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_CLASSLESS, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
+            AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_CLASSLESS, 0x00082200, 0x00001000, 0x00000000, caster->GetGUID());
             if (!sealDot)
                 return;
 
             uint8 const stacks = sealDot->GetBase()->GetStackAmount();
-            uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount;
+            uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount > 0 ? sealDot->GetSpellInfo()->StackAmount : 1;
 
             if (stacks < maxStacks && !(eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS))
                 return;
@@ -1800,8 +1895,7 @@ class spell_talent_drw_passive : public AuraScript
                 }
                 else
                 {
-                    //caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
-                    caster->ModifyPower(POWER_FOCUS, -15); // Power Burn band aid :(
+                    caster->CastSpell(caster, SPELL_TALENT_RUNE_WEAPON_DRAIN, true);
                 }
         }
     }
@@ -1884,6 +1978,9 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_energy_shield);
     RegisterSpellScript(spell_talent_champion);
     RegisterSpellScript(spell_talent_turret_totems);
+    RegisterSpellScript(spell_talent_titans_grip);
+    RegisterSpellScript(spell_talent_druid_of_the_mycelium_proc);
+    RegisterSpellScript(spell_talent_druid_of_the_mycelium);
     RegisterSpellScript(spell_talent_drw_passive);
     RegisterSpellScript(spell_talent_drw_debuff);
 };

@@ -207,17 +207,23 @@ class spell_item_floating_cult_thesis : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        caster->ResetInstances(INSTANCE_RESET_ALL, false);
         Group* group = caster->GetGroup();
         if (!group || group->GetMembersCount() != 2)
         {
             return;
         }
+        // First pass to reset instances regardless of distance
+        caster->ResetInstances(INSTANCE_RESET_ALL, false);
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            if (itr->GetSource() && itr->GetSource()->GetDistance2d(caster) < 50.0f)
-            {
+            if (itr->GetSource())
                 itr->GetSource()->ResetInstances(INSTANCE_RESET_ALL, false);
+        }
+        // Second pass to actually do the teleport
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (itr->GetSource() && itr->GetSource()->GetDistance2d(caster) < 100.0f)
+            {
                 itr->GetSource()->TeleportTo(769, 12163.0f, 15235.968f, 857.5f, 1.6f);
             }
         }

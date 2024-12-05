@@ -447,7 +447,10 @@ public:
         }
         else
         {
-            player->ActivateTaxiPathTo(1983);
+            float dist1 = player->GetDistance2d(_x1, _y1);
+            float dist2 = player->GetDistance2d(_x2, _y2);
+            uint32 path = dist1 < dist2 ? 1983u : 1984u;
+            player->ActivateTaxiPathTo(path);
         }
         auto achievement = AchievementGlobalMgr::instance()->GetAchievement(50085);
         if (achievement)
@@ -455,6 +458,9 @@ public:
 
         return true;
     }
+private:
+    // First coords of each taxi path
+    const float _x1 = 122.0f, _y1 = 661.0f, _x2 = -200.0f, _y2 = 363.0f;
 };
 
 class AreaTrigger_hub_speed_box : public AreaTriggerScript
@@ -488,6 +494,39 @@ public:
     }
 };
 
+class AreaTrigger_busk_statue_quest_trigger : public AreaTriggerScript
+{
+public:
+    AreaTrigger_busk_statue_quest_trigger() : AreaTriggerScript("busk_statue_quest_trigger")
+    {
+
+    }
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger) override
+    {
+        if (!player)
+            return true;
+
+        bool isAlliance = trigger->ID >= 5880 && trigger->ID <= 5883;
+        bool isHorde = trigger->ID >= 5884 && trigger->ID <= 5887;
+        uint32 questId = isAlliance ? 60073 : 60074;
+
+        // Alliance quest
+        if ((isAlliance || isHorde) && player->IsActiveQuest(questId))
+        {
+            uint32 index = trigger->ID - 5880;
+            index = index >= 4 ? index - 4 : index;
+
+            // 50514 - 50517 = busts
+            if (player->GetReqKillOrCastCurrentCount(questId, 50514 + index) == 0)
+            {
+                player->AdvanceQuestObjective(questId, index);
+            }
+        }
+        return true;
+    }
+};
+
 void AddSC_areatrigger_scripts()
 {
     new AreaTrigger_at_coilfang_waterfall();
@@ -502,4 +541,5 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_hub_fall_box();
     new AreaTrigger_hub_speed_box();
     new AreaTrigger_hub_fall_to_death();
+    new AreaTrigger_busk_statue_quest_trigger();
 }

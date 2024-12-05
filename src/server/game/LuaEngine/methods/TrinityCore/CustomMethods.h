@@ -947,8 +947,8 @@ namespace LuaCustom
     int UnlearnCustomTalent(Eluna* E, Player* player)
     {
         uint32 node = E->CHECKVAL<uint32>(2);
-        player->UnlearnCustomTalent(node);
-        return 0;
+        E->Push(player->UnlearnCustomTalent(node));
+        return 1;
     }
 
     int ResetCustomTalent(Eluna* /*E*/, Player* player)
@@ -962,6 +962,12 @@ namespace LuaCustom
         uint32 loadout = E->CHECKVAL<uint32>(2);
         player->SetTalentLoadout(loadout);
         return 0;
+    }
+
+    int GetCurrentTalentLoadout(Eluna* E, Player* player)
+    {
+        E->Push(player->GetCurrentTalentLoadout());
+        return 1;
     }
 
     int GetCustomTalents(Eluna* E, Player* player)
@@ -1971,6 +1977,7 @@ namespace LuaCustom
         { "UnlearnCustomTalent", &LuaCustom::UnlearnCustomTalent },
         { "ResetCustomTalent", &LuaCustom::ResetCustomTalent },
         { "SetTalentLoadout", &LuaCustom::SetTalentLoadout },
+        { "GetCurrentTalentLoadout", &LuaCustom::GetCurrentTalentLoadout },
         { "GetCustomTalents", &LuaCustom::GetCustomTalents },
         { "CanLearnCustomTalent", &LuaCustom::CanLearnCustomTalent },
         { "GetMagicFind", &LuaCustom::GetMagicFind },

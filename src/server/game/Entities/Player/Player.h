@@ -53,6 +53,7 @@ struct ScalingStatDistributionEntry;
 struct ScalingStatValuesEntry;
 struct TrainerSpell;
 struct VendorItem;
+struct TalentNodeInfo;
 
 class AchievementMgr;
 class Bag;
@@ -2330,7 +2331,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ResetCustomTalents();
         void DeactivateTalentLoadout();
         void LearnCustomTalent(uint32 id);
-        void UnlearnCustomTalent(uint32 id);
+        bool UnlearnCustomTalent(uint32 id);
         uint32 GetTalentStackCount(uint32 spellId);
         void LoadCustomTalentLoadout();
         void LoadCustomTalents(PreparedQueryResult result);
@@ -2338,6 +2339,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool HasCustomTalent(uint32 id);
         bool HasTalentWithMask(uint32 mask);
         std::vector<uint32> GetCustomTalents() { return customTalents[GetCurrentTalentLoadout()]; }
+        bool CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited, uint32 depth);
 
         void CustomAutoLoot(Creature* target);
     protected:

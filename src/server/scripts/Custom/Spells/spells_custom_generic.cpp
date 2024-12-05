@@ -144,8 +144,14 @@ class spell_gen_fly_in_hub : public AuraScript
     void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         //@todo:Make a function to grab flyable maps
-        if (GetCaster()->GetMapId() != 765 || !GetCaster()->HasSpell(450010))
+        uint32 mapId = GetCaster()->GetMapId();
+        // If not in old hub and not in new hob, or no flying spell
+        if ((mapId != 765 && mapId != 775) ||
+            // Timeless flying
+            !GetCaster()->HasSpell(450010))
+        {
             PreventDefaultAction();
+        }
     }
 
     void Register() override
