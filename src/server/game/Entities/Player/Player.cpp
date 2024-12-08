@@ -27285,9 +27285,10 @@ float Player::UpdateCachedItemLevel(bool /*isLogin*/)
 
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
-        // don't check tabard, ranged, offhand or shirt
+        // don't check tabard, finger2, trinket2, offhand, or shirt
         if (i == EQUIPMENT_SLOT_TABARD ||
-            i == EQUIPMENT_SLOT_RANGED ||
+            i == EQUIPMENT_SLOT_FINGER2 ||
+            i == EQUIPMENT_SLOT_TRINKET2 ||
             i == EQUIPMENT_SLOT_OFFHAND ||
             i == EQUIPMENT_SLOT_BODY ||
             // If item in slot and is not equipped
@@ -27330,9 +27331,10 @@ std::vector<std::pair<uint8, uint32>> Player::GetItemLevelPayload() const
     std::vector<std::pair<uint8, uint32>> itemLevels;
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
-        // don't check tabard, ranged, offhand or shirt
+        // don't check tabard, finger2, trinket2, offhand, or shirt
         if (i == EQUIPMENT_SLOT_TABARD ||
-            i == EQUIPMENT_SLOT_RANGED ||
+            i == EQUIPMENT_SLOT_FINGER2 ||
+            i == EQUIPMENT_SLOT_TRINKET2 ||
             i == EQUIPMENT_SLOT_OFFHAND ||
             i == EQUIPMENT_SLOT_BODY ||
             // If item in slot and is not equipped
