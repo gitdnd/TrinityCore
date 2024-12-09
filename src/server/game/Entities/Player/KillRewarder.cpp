@@ -136,7 +136,7 @@ inline void KillRewarder::_RewardHonor(Player* player)
 inline void KillRewarder::_RewardXP(Player* player, float rate)
 {
     uint32 xp(_xp);
-    if (_group)
+    /*if (_group)
     {
         // 4.2.1. If player is in group, adjust XP:
         //        * set to 0 if player's level is more than maximum level of not gray member;
@@ -148,7 +148,7 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
             uint32(xp * rate / 2) + 1;      // Reward only HALF of XP if some of group members are gray.
         else
             xp = 0;
-    }
+    }*/
     if (xp)
     {
         if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
