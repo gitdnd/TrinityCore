@@ -922,7 +922,10 @@ void MotionMaster::MoveJump(float x, float y, float z, float o, float speedXY, f
         init.SetParabolic(max_height, 0);
         init.SetVelocity(speedXY);
         if (hasOrientation)
+        {
+            init.SetOrientationFixed(true);
             init.SetFacing(o);
+        }
     };
 
     GenericMovementGenerator* movement = new GenericMovementGenerator(std::move(initializer), EFFECT_MOTION_TYPE, id);
