@@ -156,8 +156,8 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
         xp *= player->GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_PCT);
 
-        // HoT Custom, scale xp based on player level
-        xp = std::round(player->GetCappedItemLevel() * (xp / 66.0f));
+        // HoT Custom, scale xp based on map level
+        xp = std::round(player->GetMap()->GetDungeonLevel() * (static_cast<float>(xp) / 66.0f));
 
         if (_group)
         {
