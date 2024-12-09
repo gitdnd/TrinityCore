@@ -230,18 +230,27 @@ class spell_affix_mark_of_the_absolute_trigger_aura : public AuraScript
             return;
         }
 
+        CastSpellExtraArgs args;
+        args.SetTriggerFlags(TRIGGERED_FULL_MASK);
+
         if (roll_chance_i(40))
         {
             // Anti-magic Shell
             CastSpellExtraArgs args;
             args.SetTriggerFlags(TRIGGERED_FULL_MASK);
-            caster->CastSpell(caster, 7121, args);
+            caster->CastSpell(caster, 90576, args);
         }
 
         if (roll_chance_i(50))
         {
             // Frostbolt Volley
-            caster->CastSpell(caster, 460186);
+            caster->CastSpell(caster, 460186, args);
+        }
+
+        if (roll_chance_i(25))
+        {
+            // Arcane Explosion
+            caster->CastSpell(caster, 90577, args);
         }
     }
 
