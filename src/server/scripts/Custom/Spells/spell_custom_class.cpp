@@ -55,8 +55,39 @@ enum CustomClassSpells
     SPELL_TALENT_DRUID_OF_THE_MYCELIUM_PROC = 94286,
     SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY = 94287,
     SPELL_TALENT_BASILISK_BITE_PASSIVE = 94288,
-    SPELL_TALENT_BASILISK_BITE = 97331
+    SPELL_TALENT_BASILISK_BITE = 97331,
+    SPELL_TALENT_CRUICIBLE_OF_FAITH = 94290
 
+};
+
+// 94289 - Crucible of Faith
+class spell_talent_cruicible_of_faith : public AuraScript
+{
+    PrepareAuraScript(spell_talent_cruicible_of_faith);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        Player* player = caster->ToPlayer();
+        int32 spirit = player->GetStat(STAT_SPIRIT);
+        int32 healCritChance = player->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + 1);
+
+
+        if (Aura* existingBuff = player->GetAura(SPELL_TALENT_CRUICIBLE_OF_FAITH))
+        {
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(spirit * 0.01);
+            existingBuff->GetEffect(EFFECT_1)->ChangeAmount(healCritChance * -1);
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_cruicible_of_faith::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+    }
 };
 
 // 94288 - Basilisk Bite
@@ -2057,4 +2088,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_drw_passive);
     RegisterSpellScript(spell_talent_drw_debuff);
     RegisterSpellScript(spell_talent_basilisk_bite);
+    RegisterSpellScript(spell_talent_cruicible_of_faith);
 };
