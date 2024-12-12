@@ -1732,6 +1732,7 @@ public:
 
                     CastSpellExtraArgs args(aurEff);
                     args.AddSpellMod(SPELLVALUE_BASE_POINT0, attackspeedbonus);
+                    args.AddSpellMod(SPELLVALUE_BASE_POINT2, agility);
                     target->CastSpell(target, 180521, args);
 
                     agility_save = agility;
@@ -1794,15 +1795,15 @@ public:
                         }
 
                         CastSpellExtraArgs args2(aurEff);
-                        args2.AddSpellMod(SPELLVALUE_BASE_POINT0, strength * 2);
-                        args2.AddSpellMod(SPELLVALUE_BASE_POINT1, agility * 2);
-                        args2.AddSpellMod(SPELLVALUE_BASE_POINT2, stamina * 2);
+                        //args2.AddSpellMod(SPELLVALUE_BASE_POINT0, strength * 2);
+                        args2.AddSpellMod(SPELLVALUE_BASE_POINT1, agility * 3);
+                        //args2.AddSpellMod(SPELLVALUE_BASE_POINT2, stamina * 2);
                         target->CastSpell(target, 180522, args2);
 
-                        CastSpellExtraArgs args3(aurEff);
-                        args3.AddSpellMod(SPELLVALUE_BASE_POINT0, intellect * 2);
-                        args3.AddSpellMod(SPELLVALUE_BASE_POINT1, spirit * 2);
-                        target->CastSpell(target, 180523, args3);
+                        //CastSpellExtraArgs args3(aurEff);
+                        //args3.AddSpellMod(SPELLVALUE_BASE_POINT0, intellect * 2);
+                        //args3.AddSpellMod(SPELLVALUE_BASE_POINT1, spirit * 2);
+                        //target->CastSpell(target, 180523, args3);
 
                         gloves_save = gloves;
                         agility_save = target->GetStat(STAT_AGILITY);
