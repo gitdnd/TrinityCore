@@ -60,6 +60,32 @@ enum CustomClassSpells
 
 };
 
+// 94291 - Blessed Life
+class spell_talent_blessed_life : public AuraScript
+{
+    PrepareAuraScript(spell_talent_blessed_life);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = eventInfo.GetProcTarget();
+        Unit* caster = GetCaster();
+        Player* player = caster->ToPlayer();
+        int32 spirit = player->GetStat(STAT_SPIRIT);
+
+        if (!roll_chance_f(lround((float)spirit / 50)))
+            return;
+
+        GetTarget()->CastSpell(victim, 31934, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_blessed_life::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 94289 - Crucible of Faith
 class spell_talent_cruicible_of_faith : public AuraScript
 {
@@ -2089,4 +2115,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_drw_debuff);
     RegisterSpellScript(spell_talent_basilisk_bite);
     RegisterSpellScript(spell_talent_cruicible_of_faith);
+    RegisterSpellScript(spell_talent_blessed_life);
 };
