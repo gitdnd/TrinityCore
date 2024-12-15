@@ -110,13 +110,13 @@ public:
             if (caster->GetAura(SPELL_TALENT_BOOMING_VOICE))
             {
                 CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                args.AddSpellMod(SPELLVALUE_AURA_STACK, 2);
+                args.AddSpellMod(SPELLVALUE_AURA_STACK, 1);
                 caster->CastSpell(caster, SPELL_CLASS_EMPOWERED_ATTACK_STACKS, args);
             }
             else
             {
                 CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
-                args.AddSpellMod(SPELLVALUE_AURA_STACK, 1);
+                args.AddSpellMod(SPELLVALUE_AURA_STACK, 0);
                 caster->CastSpell(caster, SPELL_CLASS_EMPOWERED_ATTACK_STACKS, args);
             }
         }
