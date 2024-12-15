@@ -56,8 +56,81 @@ enum CustomClassSpells
     SPELL_TALENT_DRUID_OF_THE_MYCELIUM_DUMMY = 94287,
     SPELL_TALENT_BASILISK_BITE_PASSIVE = 94288,
     SPELL_TALENT_BASILISK_BITE = 97331,
-    SPELL_TALENT_CRUICIBLE_OF_FAITH = 94290
+    SPELL_TALENT_CRUICIBLE_OF_FAITH = 94290,
+    SPELL_CLASS_EMPOWERED_ATTACK = 96560,
+    SPELL_CLASS_EMPOWERED_ATTACK_STACKS = 96561,
+    SPELL_TALENT_BOOMING_VOICE = 93194
 
+};
+
+// Empowered Attacks Stacks - 96561
+class spell_class_empowered_attack_stacks : public AuraScript
+{
+    PrepareAuraScript(spell_class_empowered_attack_stacks);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CLASS_EMPOWERED_ATTACK });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->RemoveAuraFromStack(GetId());
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_CLASS_EMPOWERED_ATTACK);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_class_empowered_attack_stacks::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_class_empowered_attack_stacks::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// Empowered Attacks - 96560
+class spell_class_empowered_attack : public SpellScriptLoader
+{
+public:
+    spell_class_empowered_attack() : SpellScriptLoader("spell_class_empowered_attack") { }
+
+    class spell_class_empowered_attack_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_empowered_attack_SpellScript);
+
+        void HandleOnCast()
+        {
+
+            Unit* caster = GetCaster();
+
+
+            if (caster->GetAura(SPELL_TALENT_BOOMING_VOICE))
+            {
+                CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+                args.AddSpellMod(SPELLVALUE_AURA_STACK, 2);
+                caster->CastSpell(caster, SPELL_CLASS_EMPOWERED_ATTACK_STACKS, args);
+            }
+            else
+            {
+                CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+                args.AddSpellMod(SPELLVALUE_AURA_STACK, 1);
+                caster->CastSpell(caster, SPELL_CLASS_EMPOWERED_ATTACK_STACKS, args);
+            }
+        }
+
+        void Register() override
+        {
+            OnCast += SpellCastFn(spell_class_empowered_attack_SpellScript::HandleOnCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_empowered_attack_SpellScript();
+    }
 };
 
 // 94291 - Blessed Life
@@ -2076,6 +2149,7 @@ void AddSC_Spells_Custom_Class_scripts()
     new spell_class_frost_strike_damage_frozen();
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
     new spell_talent_left_handed_passive();
+    new spell_class_empowered_attack();
     RegisterSpellScript(spell_class_seal_of_righteousness);
     RegisterSpellScript(spell_class_seal_of_command);
     RegisterSpellScript(spell_class_seal_of_rockbiter);
@@ -2116,4 +2190,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_basilisk_bite);
     RegisterSpellScript(spell_talent_cruicible_of_faith);
     RegisterSpellScript(spell_talent_blessed_life);
+    RegisterSpellScript(spell_class_empowered_attack_stacks);
 };
