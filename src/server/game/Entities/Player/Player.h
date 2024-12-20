@@ -2347,7 +2347,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetCraftingComponents(uint32 recipe, uint32 material, uint32 primaryCatalyst = 0, uint32 secondaryCatalyst = 0)
         {
             craftingComponents[CRAFTING_RECIPE] = recipe;
-            craftingComponents[CRAAFTING_MATERIAL] = material;
+            craftingComponents[CRAFTING_MATERIAL] = material;
             craftingComponents[CRAFTING_PRIMARY_CATALYST] = primaryCatalyst;
             craftingComponents[CRAFTING_SECONDARY_CATALYST] = secondaryCatalyst;
         }
