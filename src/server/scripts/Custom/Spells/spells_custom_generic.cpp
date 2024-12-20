@@ -387,25 +387,29 @@ class spell_ebb_and_flow_hub : public AuraScript
     }
 };
 
-class spell_gen_craft_item : public SpellScript
+class spell_craft_item_forge : public SpellScript
 {
-    PrepareSpellScript(spell_gen_craft_item);
+    PrepareSpellScript(spell_craft_item_forge);
 
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
+public:
+    spell_craft_item_forge()
     {
-        if (Player* plr = GetHitPlayer())
-        {
-            //@todo: Crafting Logic
+    }
 
-            sWorld->GetEluna()->OnCraftingComplete(plr);
-            plr->ClearCraftingComoponents();
-        }
+private:
+    void CraftItem()
+    {
+        auto player = GetCaster()->ToPlayer();
+        if (!player)
+            return;
+
+        sWorld->GetEluna()->OnCraftingComplete(player);
+        player->ClearCraftingComoponents();
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_gen_craft_item::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnHit += SpellHitFn(spell_craft_item_forge::CraftItem);
     }
 };
 
@@ -420,5 +424,5 @@ void AddSC_Spells_Custom_Generic()
     RegisterSpellScript(spell_igb_incinerating_blast);
     RegisterSpellScript(spell_igb_overheat);
     RegisterSpellScript(spell_ebb_and_flow_hub);
-    RegisterSpellScript(spell_gen_craft_item);
+    RegisterSpellScript(spell_craft_item_forge);
 }
