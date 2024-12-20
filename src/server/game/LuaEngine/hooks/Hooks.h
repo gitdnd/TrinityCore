@@ -220,7 +220,7 @@ namespace Hooks
         // UNUSED                               =     53,       // (event, player)
         PLAYER_EVENT_ON_QUEST_STATUS_CHANGED    =     54,       // (event, player, questId, status)
 
-        PLAYER_EVENT_HOT_ON_CRAFT               =     55,       // (event, player, data1, data2, dat3, data4)
+        PLAYER_EVENT_HOT_ON_CRAFT               =     65,       // (event, player, data1, data2, dat3, data4)
         PLAYER_EVENT_COUNT
     };
 

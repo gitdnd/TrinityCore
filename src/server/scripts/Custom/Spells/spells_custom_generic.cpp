@@ -403,8 +403,6 @@ private:
         if (!player)
             return;
 
-        player->Say("Crafted!", LANG_UNIVERSAL); // debug
-
         sWorld->GetEluna()->OnCraftingComplete(player);
         player->ClearCraftingComoponents();
     }
