@@ -2006,7 +2006,7 @@ namespace LuaCustom
         { "SetTimeSpeed", &LuaCustom::SetTimeSpeed },
         { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
         { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
-        { "SetCratingComponents", &LuaCustom::SetCraftingComponents },
+        { "SetCraftingComponents", &LuaCustom::SetCraftingComponents },
         { "ClearCratingComponents", &LuaCustom::ClearCraftingComponents },
     };
     
