@@ -606,6 +606,11 @@ public:
 
     /* Spell */
     void OnSpellCast(Spell* pSpell, bool skipCheck);
+
+
+    // Custom
+
+    void OnCraftingComplete(Player* player);
 };
 template<> Unit* Eluna::CHECKOBJ<Unit>(int narg, bool error);
 template<> Object* Eluna::CHECKOBJ<Object>(int narg, bool error);

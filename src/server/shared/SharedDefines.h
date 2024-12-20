@@ -3980,7 +3980,7 @@ enum CustomHardCodedQuestIds : uint32
 enum CustomCrafting : uint8
 {
     CRAFTING_RECIPE = 0,
-    CRAAFTING_MATERIAL = 1,
+    CRAFTING_MATERIAL = 1,
     CRAFTING_PRIMARY_CATALYST = 2,
     CRAFTING_SECONDARY_CATALYST = 3,
     CRAFTING_TOTAL

@@ -696,3 +696,14 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
     CleanUpStack(5);
     return result;
 }
+
+void Eluna::OnCraftingComplete(Player* player)
+{
+    START_HOOK(PLAYER_EVENT_HOT_ON_CRAFT);
+    HookPush(player);
+    HookPush(player->GetCraftingComponent(CRAFTING_RECIPE));
+    HookPush(player->GetCraftingComponent(CRAFTING_MATERIAL));
+    HookPush(player->GetCraftingComponent(CRAFTING_PRIMARY_CATALYST));
+    HookPush(player->GetCraftingComponent(CRAFTING_SECONDARY_CATALYST));
+    CallAllFunctions(PlayerEventBindings, key);
+}

@@ -11,6 +11,7 @@
 #include "Guild.h"
 #include "CreatureTextMgr.h"
 #include "Vehicle.h"
+#include "LuaEngine.h"
 
 class spell_gen_between_cast_periodic : public AuraScript
 {
@@ -386,6 +387,28 @@ class spell_ebb_and_flow_hub : public AuraScript
     }
 };
 
+class spell_gen_craft_item : public SpellScript
+{
+    PrepareSpellScript(spell_gen_craft_item);
+
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* plr = GetHitPlayer())
+        {
+            //@todo: Crafting Logic
+
+            sWorld->GetEluna()->OnCraftingComplete(plr);
+            plr->ClearCraftingComoponents();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_craft_item::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_Spells_Custom_Generic()
 {
     RegisterSpellScript(spell_gen_between_cast_periodic);
@@ -397,4 +420,5 @@ void AddSC_Spells_Custom_Generic()
     RegisterSpellScript(spell_igb_incinerating_blast);
     RegisterSpellScript(spell_igb_overheat);
     RegisterSpellScript(spell_ebb_and_flow_hub);
+    RegisterSpellScript(spell_gen_craft_item);
 }
