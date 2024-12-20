@@ -403,13 +403,15 @@ private:
         if (!player)
             return;
 
+        player->Say("Crafted!", LANG_UNIVERSAL); // debug
+
         sWorld->GetEluna()->OnCraftingComplete(player);
         player->ClearCraftingComoponents();
     }
 
     void Register() override
     {
-        OnHit += SpellHitFn(spell_craft_item_forge::CraftItem);
+        AfterCast += SpellCastFn(spell_craft_item_forge::CraftItem);
     }
 };
 
