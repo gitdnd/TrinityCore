@@ -405,6 +405,7 @@ Player::Player(WorldSession* session): Unit(true)
     m_canTeleport = false;
     subClass = 0;
     lootPreference = 0;
+    ClearCraftingComoponents();
 }
 
 Player::~Player()

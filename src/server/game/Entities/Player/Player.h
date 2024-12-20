@@ -2342,6 +2342,22 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited, uint32 depth);
 
         void CustomAutoLoot(Creature* target);
+
+        uint32 GetCraftingComponent(uint8 slot) const { if (slot >= CRAFTING_TOTAL) return 0; return craftingComponents[slot]; }
+        void SetCraftingComponents(uint32 recipe, uint32 material, uint32 primaryCatalyst = 0, uint32 secondaryCatalyst = 0)
+        {
+            craftingComponents[CRAFTING_RECIPE] = recipe;
+            craftingComponents[CRAAFTING_MATERIAL] = material;
+            craftingComponents[CRAFTING_PRIMARY_CATALYST] = primaryCatalyst;
+            craftingComponents[CRAFTING_SECONDARY_CATALYST] = secondaryCatalyst;
+        }
+
+        void ClearCraftingComoponents()
+        {
+            for (uint8 i = 0; i < CRAFTING_TOTAL; ++i)
+                craftingComponents[i] = 0;
+        }
+
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;
@@ -2682,6 +2698,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::vector<uint32> customTalents[MAX_CUSTOM_TALENT_LOADOUTS];
         uint32 currentTalentLoadout;
         uint8 lootPreference;
+        uint32 craftingComponents[CRAFTING_TOTAL];
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

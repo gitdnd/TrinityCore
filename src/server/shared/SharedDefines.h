@@ -3977,6 +3977,15 @@ enum CustomHardCodedQuestIds : uint32
 
 #define MAX_AFFIXES 4
 
+enum CustomCrafting : uint8
+{
+    CRAFTING_RECIPE = 0,
+    CRAAFTING_MATERIAL = 1,
+    CRAFTING_PRIMARY_CATALYST = 2,
+    CRAFTING_SECONDARY_CATALYST = 3,
+    CRAFTING_TOTAL
+};
+
 namespace Trinity
 {
 namespace Impl

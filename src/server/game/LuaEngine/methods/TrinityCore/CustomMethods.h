@@ -1887,6 +1887,23 @@ namespace LuaCustom
         return 0;
     }
 
+    int SetCraftingComponents(Eluna* E, Player* player)
+    {
+        uint32 recipe = E->CHECKVAL<uint32>(2);
+        uint32 material = E->CHECKVAL<uint32>(3);
+        uint32 primaryCatalyst = E->CHECKVAL<uint32>(4, 0);
+        uint32 secondaryCatalyst = E->CHECKVAL<uint32>(5, 0);
+
+        player->SetCraftingComponents(recipe, material, primaryCatalyst, secondaryCatalyst);
+        return 0;
+    }
+
+    int ClearCraaftingComponents(Eluna* /*E*/, Player* player)
+    {
+        player->ClearCraftingComoponents();
+        return 0;
+    }
+
     // REGISTERS
     
     ElunaRegister<> GlobalMethods[] =
@@ -1988,7 +2005,9 @@ namespace LuaCustom
         { "SendListInventory", &LuaCustom::SendListInventory },
         { "SetTimeSpeed", &LuaCustom::SetTimeSpeed },
         { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
-        { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack }
+        { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
+        { "SetCratingComponents", &LuaCustom::SetCraftingComponents },
+        { "ClearCratingComponents", &LuaCustom::SetCraftingComponents },
     };
     
     ElunaRegister<Creature> CreatureMethods[] =
