@@ -1898,7 +1898,7 @@ namespace LuaCustom
         return 0;
     }
 
-    int ClearCraaftingComponents(Eluna* /*E*/, Player* player)
+    int ClearCraftingComponents(Eluna* /*E*/, Player* player)
     {
         player->ClearCraftingComoponents();
         return 0;
@@ -2007,7 +2007,7 @@ namespace LuaCustom
         { "ResetTimeSpeed", &LuaCustom::ResetTimeSpeed },
         { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
         { "SetCratingComponents", &LuaCustom::SetCraftingComponents },
-        { "ClearCratingComponents", &LuaCustom::SetCraftingComponents },
+        { "ClearCratingComponents", &LuaCustom::ClearCraftingComponents },
     };
     
     ElunaRegister<Creature> CreatureMethods[] =
