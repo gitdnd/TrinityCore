@@ -439,20 +439,21 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
 
     // only award at half rate when > 300 (maxLevel) when the item is not crafted (affixes)
     // allow ilevel bonuses to add to the top of crafted max level (catalysts)
-    if (!modifier.isCrafted && (ilevel + modifier.ilevelBonus) > softMaxItemLevel)
+    if (!modifier.isCrafted)
     {
-        uint32 actualTotal = ilevel + modifier.ilevelBonus;
-        uint32 overshotTotal = actualTotal - softMaxItemLevel;
-        ilevel += overshotTotal / 2;
+        ilevel += modifier.ilevelBonus;
+        if (ilevel > softMaxItemLevel) {
+            uint32 overshotTotal = ilevel - softMaxItemLevel;
+            ilevel = softMaxItemLevel + (overshotTotal / 2);
 
-        // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
-        if (ilevel > modifier.dungeonLevel)
-        {
-            ilevel = modifier.dungeonLevel;
+            // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
+            if (ilevel > modifier.dungeonLevel)
+            {
+                ilevel = modifier.dungeonLevel;
+            }
         }
     }
-    else
-        ilevel += modifier.ilevelBonus;
+        
 
     // If ilevel modifier is set, override all ilevel generation
     if (modifier.ilevel)
