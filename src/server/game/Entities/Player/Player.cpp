@@ -12687,7 +12687,9 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
 
     // Realm First achievement (criteria data seems to be buggy so code here)
-    if (new_value >= 300 && !sAchievementMgr->IsRealmCompleted(sAchievementMgr->GetAchievement(50091)))
+    if (new_value >= 300 &&
+        !sAchievementMgr->IsRealmCompleted(sAchievementMgr->GetAchievement(50091)) &&
+        GetSession()->GetSecurity() < SEC_GAMEMASTER)
     {
         CompletedAchievement(50091);
     }
