@@ -1906,7 +1906,7 @@ namespace LuaCustom
 
     int HasRealmFirstCompleted(Eluna* E)
     {
-        uint32 achievementId = E->CHECKVAL<uint32>(2);
+        uint32 achievementId = E->CHECKVAL<uint32>(1);
         const AchievementEntry* achievement = sAchievementMgr->GetAchievement(achievementId);
         if (!achievement)
         {
