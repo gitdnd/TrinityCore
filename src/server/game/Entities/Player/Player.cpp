@@ -12686,6 +12686,12 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     UpdateSkillEnchantments(skillId, SkillValue, new_value);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skillId);
 
+    // Realm First achievement (criteria data seems to be buggy so code here)
+    if (new_value >= 300 && !sAchievementMgr->IsRealmCompleted(sAchievementMgr->GetAchievement(50091)))
+    {
+        CompletedAchievement(50091);
+    }
+
     // Reach Crafting Item Level 10
     const uint32 craftingLevelQuest = 60036;
     if (IsActiveQuest(craftingLevelQuest))

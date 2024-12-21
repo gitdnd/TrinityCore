@@ -436,11 +436,11 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     // if the item is crafted and the generated item level is > soft cap, set ilevel to soft cap
     if (modifier.isCrafted && ilevel > softMaxItemLevel)
         ilevel = softMaxItemLevel;
-
     // only award at half rate when > 300 (maxLevel) when the item is not crafted (affixes)
     // allow ilevel bonuses to add to the top of crafted max level (catalysts)
-    if (!modifier.isCrafted)
+    else if (!modifier.isCrafted)
     {
+        // ilevelBonus = affix bonus
         ilevel += modifier.ilevelBonus;
         if (ilevel > softMaxItemLevel) {
             uint32 overshotTotal = ilevel - softMaxItemLevel;
