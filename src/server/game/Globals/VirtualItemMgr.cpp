@@ -442,14 +442,13 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     if (!modifier.isCrafted && (ilevel + modifier.ilevelBonus) > softMaxItemLevel)
     {
         uint32 actualTotal = ilevel + modifier.ilevelBonus;
-        uint32 overshotTotal = uint32(round((actualTotal - softMaxItemLevel) / 2));
-        ilevel += overshotTotal;
+        uint32 overshotTotal = actualTotal - softMaxItemLevel;
+        ilevel += overshotTotal / 2;
 
         // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
-        if (modifier.dungeonLevel > softMaxItemLevel)
+        if (ilevel > modifier.dungeonLevel)
         {
-            uint32 adjustedDungeonLevel = modifier.dungeonLevel - overshotTotal;
-            ilevel = std::min(ilevel, adjustedDungeonLevel);
+            ilevel = modifier.dungeonLevel;
         }
     }
     else
