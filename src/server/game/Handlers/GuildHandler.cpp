@@ -254,6 +254,46 @@ void WorldSession::HandleGuildBankActivate(WorldPackets::Guild::GuildBankActivat
     TC_LOG_DEBUG("guild", "CMSG_GUILD_BANKER_ACTIVATE [{}]: [{}] AllSlots: {}"
         , GetPlayerInfo(), packet.Banker.ToString(), packet.FullUpdate);
 
+    WorldPackets::Guild::GuildBankQueryResults debugTestPacket;
+
+    debugTestPacket.Money = 69420;
+    debugTestPacket.Tab = int32(0);
+    debugTestPacket.FullUpdate = true;
+
+    if (debugTestPacket.FullUpdate && !debugTestPacket.Tab)
+    {
+        debugTestPacket.TabInfo.reserve(GUILD_BANK_MAX_TABS);
+        for (uint8 i = 0; i < GUILD_BANK_MAX_TABS; ++i)
+        {
+            WorldPackets::Guild::GuildBankTabInfo tabInfo;
+            tabInfo.Name = "Test" + i;
+            tabInfo.Icon = "";
+            debugTestPacket.TabInfo.push_back(tabInfo);
+        }
+    }
+
+    for (uint8 i = 0; i < GUILD_BANK_MAX_TABS; ++i)
+    {
+        for (uint8 x = 0; x < GUILD_BANK_MAX_SLOTS; ++x)
+        {
+            WorldPackets::Guild::GuildBankItemInfo itemInfo;
+
+            itemInfo.Slot = x;
+            itemInfo.ItemID = 37837;
+            itemInfo.RandomPropertiesID = 0;
+            itemInfo.RandomPropertiesSeed = 0;
+            itemInfo.Count = 1;
+            itemInfo.Charges =0;
+            itemInfo.EnchantmentID = 0;
+            itemInfo.Flags = 0;
+
+            debugTestPacket.ItemInfo.push_back(itemInfo);
+        }
+    }
+    debugTestPacket.WithdrawalsRemaining = -1;
+    SendPacket(debugTestPacket.Write());
+    /*
+
     GameObject const* const go = GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK);
     if (!go)
         return;
@@ -265,7 +305,7 @@ void WorldSession::HandleGuildBankActivate(WorldPackets::Guild::GuildBankActivat
         return;
     }
 
-    guild->SendBankTabsInfo(this, packet.FullUpdate);
+    guild->SendBankTabsInfo(this, packet.FullUpdate);*/
 }
 
 // Called when opening guild bank tab only (first one)
