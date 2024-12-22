@@ -1092,14 +1092,14 @@ struct MapEntry
     // Helpers
     uint32 Expansion() const { return ExpansionID; }
 
-    bool IsDungeon() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || ID == 768 || ID == 770; } // 768 The Timeways, 770 The Ring of Valor
+    bool IsDungeon() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || ID == 768 || ID == 770 || ID == 44; } // 768 The Timeways, 770 The Ring of Valor, 44 Scarlet Monastery
     bool IsNonRaidDungeon() const { return InstanceType == MAP_INSTANCE || ID == 768; } // 768 The Timeways
-    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA || ID == 768 || ID == 770; } // 768 The Timeways, 770 The Ring of Valor
+    bool Instanceable() const { return InstanceType == MAP_INSTANCE || InstanceType == MAP_RAID || InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA || ID == 768 || ID == 770 || ID == 44; } // 768 The Timeways, 770 The Ring of Valor, 44 Scarlet Monastery
     bool IsRaid() const { return InstanceType == MAP_RAID; }
     bool IsBattleground() const { return InstanceType == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return InstanceType == MAP_ARENA; }
     bool IsBattlegroundOrArena() const { return InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA; }
-    bool IsWorldMap() const { return InstanceType == MAP_COMMON && ID != 768 && ID != 770; } // 768 The Timeways, 770 The Ring of Valor
+    bool IsWorldMap() const { return InstanceType == MAP_COMMON && ID != 768 && ID != 770 && ID != 44; } // 768 The Timeways, 770 The Ring of Valor, 44 Scarlet Monastery
 
     bool GetEntrancePos(int32 &mapid, float &x, float &y) const
     {
