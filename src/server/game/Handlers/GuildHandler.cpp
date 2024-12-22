@@ -267,7 +267,7 @@ void WorldSession::HandleGuildBankActivate(WorldPackets::Guild::GuildBankActivat
         {
             WorldPackets::Guild::GuildBankTabInfo tabInfo;
             tabInfo.Name = "Test" + i;
-            tabInfo.Icon = 0;
+            tabInfo.Icon = "";
             debugTestPacket.TabInfo.push_back(tabInfo);
         }
     }
