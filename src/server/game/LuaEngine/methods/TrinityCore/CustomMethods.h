@@ -1904,6 +1904,19 @@ namespace LuaCustom
         return 0;
     }
 
+    int HasRealmFirstCompleted(Eluna* E)
+    {
+        uint32 achievementId = E->CHECKVAL<uint32>(1);
+        const AchievementEntry* achievement = sAchievementMgr->GetAchievement(achievementId);
+        if (!achievement)
+        {
+            E->Push(false);
+            return 1;
+        }
+        E->Push(sAchievementMgr->IsRealmCompleted(achievement));
+        return 1;
+    }
+
     // REGISTERS
     
     ElunaRegister<> GlobalMethods[] =
@@ -1915,6 +1928,7 @@ namespace LuaCustom
         { "VendorRemoveItem", &LuaCustom::VendorRemoveItem },
         { "AddVendorItem", &LuaCustom::AddVendorItem },
         { "GetElunaMapId", &LuaCustom::GetElunaMapId },
+        { "HasRealmFirstCompleted", &LuaCustom::HasRealmFirstCompleted },
     };
     
     ElunaRegister<Object> ObjectMethods[] =

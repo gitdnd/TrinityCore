@@ -417,7 +417,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     int32 vLevel = GetVirtualLevel(float(modifier.plrAvgLvl));
 
     // Mod the virtual item level to allow higher or lower virtual item levels 
-    vLevel += irand(-1, 4, generator);
+    vLevel += irand(-1, 3, generator);
 
     // Add all vLvl mods before generating a new ilevel
     vLevel += int32(modifier.vLvlMod);
@@ -426,7 +426,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     ilevel = uint32(round(GenerateItemLevel(vLevel)));
 
     // Modify the returned, newly generated iLevel based on quality
-    ilevel += (output->Quality * 2);
+    ilevel += round(output->Quality * 1.5f);
 
     // One last mod to the ilevel to try to smooth out any ilevel groups and spikes
     ilevel += irand(-3, 2, generator);
@@ -436,11 +436,11 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     // if the item is crafted and the generated item level is > soft cap, set ilevel to soft cap
     if (modifier.isCrafted && ilevel > softMaxItemLevel)
         ilevel = softMaxItemLevel;
-
     // only award at half rate when > 300 (maxLevel) when the item is not crafted (affixes)
     // allow ilevel bonuses to add to the top of crafted max level (catalysts)
-    if (!modifier.isCrafted)
+    else if (!modifier.isCrafted)
     {
+        // ilevelBonus = affix bonus
         ilevel += modifier.ilevelBonus;
         if (ilevel > softMaxItemLevel) {
             uint32 overshotTotal = ilevel - softMaxItemLevel;
