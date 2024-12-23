@@ -1436,7 +1436,7 @@ public:
             if (target && !target->HasAura(180479))
             {
                 CastSpellExtraArgs args;
-                args.AddSpellBP0((int32)(target->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL)) / -2);
+                args.AddSpellBP0((int32)(target->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + AsUnderlyingType(CR_HASTE_SPELL))) / -2);
                 target->CastSpell(target, 180479, args);
             }
         }

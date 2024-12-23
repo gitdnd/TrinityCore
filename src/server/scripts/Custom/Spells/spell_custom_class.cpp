@@ -73,7 +73,7 @@ class spell_class_empowered_attack_stacks : public AuraScript
         return ValidateSpellInfo({ SPELL_CLASS_EMPOWERED_ATTACK });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         eventInfo.GetActor()->RemoveAuraFromStack(GetId());
@@ -138,7 +138,7 @@ class spell_talent_blessed_life : public AuraScript
 {
     PrepareAuraScript(spell_talent_blessed_life);
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
@@ -164,7 +164,7 @@ class spell_talent_cruicible_of_faith : public AuraScript
 {
     PrepareAuraScript(spell_talent_cruicible_of_faith);
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         Unit* caster = GetCaster();
         if (!caster || !caster->IsPlayer())
@@ -463,7 +463,7 @@ class spell_talent_champion : public AuraScript
         Player* player = GetCaster()->ToPlayer();
         player->SetCanDodge(true);
     }
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         Player* player = GetCaster()->ToPlayer();
         int32 dodgeRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 2);
@@ -487,7 +487,7 @@ class spell_talent_energy_shield : public AuraScript
     PrepareAuraScript(spell_talent_energy_shield);
 
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         if (Aura* aura = GetAura())
         {
@@ -561,7 +561,7 @@ class spell_talent_left_handed : public AuraScript
         return eventInfo.GetProcTarget() != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
@@ -680,7 +680,7 @@ class spell_blood_drive_reduction : public AuraScript
 {
     PrepareAuraScript(spell_blood_drive_reduction);
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         Unit* player = GetCaster();
 
@@ -750,7 +750,7 @@ class spell_talent_secrets_of_mana_reduction : public AuraScript
 {
     PrepareAuraScript(spell_talent_secrets_of_mana_reduction);
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         Unit* player = GetCaster();
 
@@ -898,11 +898,11 @@ class spell_talent_acclimation : public AuraScript
         return eventInfo.GetProcTarget() != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        Player* player = eventInfo.GetActor()->ToPlayer();
+        //Player* player = eventInfo.GetActor()->ToPlayer();
         Unit* victim = eventInfo.GetProcTarget();
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
@@ -941,7 +941,7 @@ class spell_talent_spelleater : public AuraScript
 {
     PrepareAuraScript(spell_talent_spelleater);
 
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         PreventDefaultAction();
 
@@ -980,7 +980,7 @@ class spell_class_maelstrom_weapon : public AuraScript
         return eventInfo.GetProcTarget() != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         
             PreventDefaultAction();
@@ -1036,7 +1036,7 @@ class spell_talent_lightning_overload : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         Player* player = eventInfo.GetActor()->ToPlayer();
-        Unit* target = GetTarget();
+        //Unit* target = GetTarget();
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
         if (!procSpell)
@@ -1257,7 +1257,7 @@ class spell_class_seal_of_spellblade : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        Unit* caster = eventInfo.GetActor();
+        //Unit* caster = eventInfo.GetActor();
         return eventInfo.GetProcTarget() != nullptr;
 
     }
@@ -2078,7 +2078,7 @@ class spell_talent_drw_passive : public AuraScript
 {
     PrepareAuraScript(spell_talent_drw_passive);
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         int32 currentFocus = GetTarget()->GetPower(POWER_FOCUS);
         Unit* caster = GetCaster();
@@ -2114,7 +2114,7 @@ class spell_talent_drw_debuff : public AuraScript
 {
     PrepareAuraScript(spell_talent_drw_debuff);
 
-    void OnTick(AuraEffect const* aurEff)
+    void OnTick(AuraEffect const* /*aurEff*/)
     {
         Unit* caster = GetCaster();
         if (Aura* existingBuff = caster->GetAura(SPELL_TALENT_RUNE_WEAPON))

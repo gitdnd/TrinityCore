@@ -36,6 +36,9 @@ class spell_affix_avenging_wrath_aura : public AuraScript
         uint32 spellId = GetSpellInfo()->_effects[0].TriggerSpell;
         for (std::list<Creature*>::const_iterator it = creatureList.begin(); it != creatureList.end(); ++it)
         {
+            if ((*it)->IsIgnoringAFfixesFlagged())
+                continue;
+
             if (caster->GetFactionReactionTo((*it)->GetFactionTemplateEntry(), *it) >= REP_NEUTRAL)
             {
                 for (uint32 i = 0; i < stackAmount; ++i)
@@ -130,17 +133,18 @@ class spell_affix_ordinance_aura : public AuraScript
     void OnPeriodicProc(AuraEffect const* aurEff)
     {
         auto caster = GetCaster();
+        PreventDefaultAction();
+
         if (!caster || !caster->ToCreature() || !aurEff->GetBase() || !GetSpellInfo() || !caster->IsInCombat())
         {
-            PreventDefaultAction();
             return;
         }
+
         if (!roll_chance_i(GetSpellInfo()->ProcChance))
         {
-            PreventDefaultAction();
             return;
         }
-        PreventDefaultAction();
+        
         auto creature = caster->ToCreature();
         auto aura = aurEff->GetBase();
         auto spellId = GetSpellInfo()->_effects[0].TriggerSpell;
@@ -181,7 +185,8 @@ class spell_affix_corpse_explosion_aura : public AuraScript
                 creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
                 creature->IsPet() ||
                 (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
-                (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM))
+                (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
+                creature->IsIgnoringAFfixesFlagged())
             {
                 return;
             }
@@ -325,7 +330,7 @@ class spell_affix_wild_magic_aura : public AuraScript
                         creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
                         (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
                         (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
-                        !creature->IsAlive())
+                        !creature->IsAlive() ||  creature->IsIgnoringAFfixesFlagged())
                         continue;
                 }
                 target->CastSpell(target, spellId, true);

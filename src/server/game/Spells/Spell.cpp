@@ -7338,12 +7338,12 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                         return SPELL_FAILED_NO_VALID_TARGETS;
 
                     if (spellEffectInfo.MiscValue)
-                        if (vTemp->Quality > spellEffectInfo.MiscValue)
+                        if (vTemp->Quality > (uint32)spellEffectInfo.MiscValue)
                             return SPELL_FAILED_NO_VALID_TARGETS;
 
                     if (spellEffectInfo.MiscValueB)
                     {
-                        if (vTemp->Class != spellEffectInfo.MiscValueB)
+                        if (vTemp->Class != (uint32)spellEffectInfo.MiscValueB)
                             return SPELL_FAILED_NO_VALID_TARGETS;
                         else
                             if (spellEffectInfo.MiscValueB == ITEM_CLASS_ARMOR && (vTemp->InventoryType == INVTYPE_TRINKET || vTemp->InventoryType == INVTYPE_FINGER || vTemp->InventoryType == INVTYPE_NECK))

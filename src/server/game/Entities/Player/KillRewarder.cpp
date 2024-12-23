@@ -133,7 +133,7 @@ inline void KillRewarder::_RewardHonor(Player* player)
         player->RewardHonor(_victim, _count, -1, true);
 }
 
-inline void KillRewarder::_RewardXP(Player* player, float rate)
+inline void KillRewarder::_RewardXP(Player* player, float /*rate*/)
 {
     uint32 xp(_xp);
     /*if (_group)
@@ -242,7 +242,7 @@ void KillRewarder::_RewardGroup()
             if (!_isBattleGround)
             {
                 // 3.1.2. Alter group rate if group is in raid (not for battlegrounds).
-                bool const isRaid = !_isPvP && sMapStore.LookupEntry(_killer->GetMapId())->IsRaid() && _group->isRaidGroup();
+                //bool const isRaid = !_isPvP && sMapStore.LookupEntry(_killer->GetMapId())->IsRaid() && _group->isRaidGroup();
                 _groupRate = 1.0f; // Trinity::XP::xp_in_group_rate(_count, isRaid);
             }
 
