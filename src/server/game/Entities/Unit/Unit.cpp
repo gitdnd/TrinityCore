@@ -14339,6 +14339,7 @@ bool Unit::ShouldIgnoreAiSwitch(uint32 entry)
     case 52090:
     case 52104:
     case 52123:
+    case 52223:
     {
         return true;
         break;
