@@ -7272,7 +7272,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             case SPELL_EFFECT_VIRTUAL_ITEM_STAT_MODIFIER_UPGRADE:
             case SPELL_EFFECT_REROLL_VIRTUAL_ITEM:
             {
-                if (!IsVirtualItemTargetValid())
+                if (!IsVirtualItemTargetValid(false))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (spellEffectInfo.BasePoints > 0 && spellEffectInfo.BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
@@ -7282,7 +7282,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_REROLL_VIRTUAL_ITEM_SOCKETS:
             {
-                if (!IsVirtualItemTargetValid())
+                if (!IsVirtualItemTargetValid(false))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (spellEffectInfo.BasePoints > 0 && spellEffectInfo.BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
@@ -7306,7 +7306,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_VIRTUAL_ITEM_QUALITY_UPGRADE:
             {
-                if (!IsVirtualItemTargetValid())
+                if (!IsVirtualItemTargetValid(false))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (m_targets.GetItemTarget()->GetTemplate()->Quality != (uint32)spellEffectInfo.MiscValue - 1)
@@ -7316,7 +7316,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_EXTRACT_GEMS:
             {
-                if (!IsVirtualItemTargetValid())
+                if (!IsVirtualItemTargetValid(true))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (spellEffectInfo.BasePoints > 0 && spellEffectInfo.BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
@@ -7328,7 +7328,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_HONE_VIRTUAL_ITEM:
             {
-                if (!IsVirtualItemTargetValid())
+                if (!IsVirtualItemTargetValid(false))
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
@@ -8095,7 +8095,7 @@ void Spell::AssertEffectExecuteData() const
         ASSERT(!m_effectExecuteData[i]);
 }
 
-bool Spell::IsVirtualItemTargetValid() const
+bool Spell::IsVirtualItemTargetValid(bool checkArtifact) const
 {
     if (!m_targets.GetItemTarget())
         return false;
@@ -8112,6 +8112,9 @@ bool Spell::IsVirtualItemTargetValid() const
         if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
             return false;
     }
+    // Allow artifact quality to be targeted despite not being virtual
+    else if (m_targets.GetItemTarget()->GetProto()->Quality == ITEM_QUALITY_HEIRLOOM)
+        return true;
     else
         return false;
 

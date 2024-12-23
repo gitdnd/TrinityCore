@@ -478,7 +478,7 @@ class TC_GAME_API Spell
 
         bool HasCastWhileMovingOverride() const;
 
-        bool IsVirtualItemTargetValid() const;
+        bool IsVirtualItemTargetValid(bool checkArtifact) const;
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
