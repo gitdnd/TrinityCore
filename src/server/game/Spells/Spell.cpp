@@ -8113,7 +8113,9 @@ bool Spell::IsVirtualItemTargetValid(bool checkArtifact) const
             return false;
     }
     // Allow artifact quality to be targeted despite not being virtual
-    else if (m_targets.GetItemTarget()->GetTemplate()->Quality != ITEM_QUALITY_HEIRLOOM)
+    else if (m_targets.GetItemTarget()->GetProto()->Quality == ITEM_QUALITY_HEIRLOOM)
+        return true;
+    else
         return false;
 
     return true;
