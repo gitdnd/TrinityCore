@@ -7316,7 +7316,8 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
             }
             case SPELL_EFFECT_EXTRACT_GEMS:
             {
-                if (!IsVirtualItemTargetValid())
+                Item* item = m_targets.GetItemTarget();
+                if (!item)
                     return SPELL_FAILED_NO_VALID_TARGETS;
 
                 if (spellEffectInfo.BasePoints > 0 && spellEffectInfo.BasePoints < int(m_targets.GetItemTarget()->GetTemplate()->ItemLevel))
