@@ -59,9 +59,68 @@ enum CustomClassSpells
     SPELL_TALENT_CRUICIBLE_OF_FAITH = 94290,
     SPELL_CLASS_EMPOWERED_ATTACK = 96560,
     SPELL_CLASS_EMPOWERED_ATTACK_STACKS = 96561,
-    SPELL_TALENT_BOOMING_VOICE = 93194
+    SPELL_TALENT_BOOMING_VOICE = 93194,
+    SPELL_ITEM_LOTUS_RESTORE   = 91048
 
 };
+
+// 91047 - Lotus Restore
+class spell_item_lotus_restore : public AuraScript
+{
+    PrepareAuraScript(spell_item_lotus_restore);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_ITEM_LOTUS_RESTORE
+            });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+
+        Unit* target = eventInfo.GetActor();
+
+        int32 percRestored = GetAura()->GetEffect(EFFECT_0)->GetAmount();
+
+        CastSpellExtraArgs args(aurEff);
+        CastSpellExtraArgs args1(aurEff);
+        CastSpellExtraArgs args2(aurEff);
+        int32 cost = procSpell->CalcPowerCost(GetTarget(), eventInfo.GetSchoolMask());
+
+        args.AddSpellMod(SPELLVALUE_BASE_POINT0, cost * percRestored / 100);
+        args1.AddSpellMod(SPELLVALUE_BASE_POINT1, cost * percRestored / 100);
+        args1.AddSpellMod(SPELLVALUE_BASE_POINT2, cost * percRestored / 100);
+
+        if (procSpell->PowerType == POWER_HEALTH)
+        {
+            target->CastSpell(target, SPELL_ITEM_LOTUS_RESTORE, args);
+        }
+
+        else if (procSpell->PowerType == POWER_MANA)
+        {
+            target->CastSpell(target, SPELL_ITEM_LOTUS_RESTORE, args1);
+        }
+
+        else if (procSpell->PowerType == POWER_FOCUS)
+        {
+            target->CastSpell(target, SPELL_ITEM_LOTUS_RESTORE, args2);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_item_lotus_restore::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 
 // Empowered Attacks Stacks - 96561
 class spell_class_empowered_attack_stacks : public AuraScript
@@ -2191,4 +2250,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_cruicible_of_faith);
     RegisterSpellScript(spell_talent_blessed_life);
     RegisterSpellScript(spell_class_empowered_attack_stacks);
+    RegisterSpellScript(spell_item_lotus_restore);
 };
