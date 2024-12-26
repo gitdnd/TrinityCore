@@ -600,6 +600,46 @@ class spell_item_require_virtual_item : public SpellScript
     }
 };
 
+class spell_item_require_virtual_item_or_heirloom : public SpellScript
+{
+    PrepareSpellScript(spell_item_require_virtual_item_or_heirloom);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        const Item* it = GetExplTargetItem();
+        if (!it)
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        // prevent disenchanting in trade slot
+        if (it->GetOwnerGUID() != GetCaster()->GetGUID())
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        if (it->IsBroken())
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+
+        if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(it->GetEntry()))
+        {
+            if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
+                return SPELL_FAILED_NO_VALID_TARGETS;
+        }
+        else if(it->GetTemplate()->Quality != ITEM_QUALITY_HEIRLOOM)
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_require_virtual_item_or_heirloom::CheckRequirement);
+    }
+};
+
 
 void AddSC_Spells_Custom_Items()
 {
@@ -617,4 +657,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_metamorph_gem);
     RegisterSpellScript(spell_tobenamedlegendary_dodge_thing);
     RegisterSpellScript(spell_item_require_virtual_item);
+    RegisterSpellScript(spell_item_require_virtual_item_or_heirloom);
 }
