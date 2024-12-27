@@ -746,7 +746,7 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
 
             // hard coded behavior for weapons with spell power, except ranged weapons
             // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
-            if (primarystatgroup[i] == ITEM_MOD_SPELL_POWER || primarystatgroup[i] == ITEM_MOD_SPELL_HEALING_DONE)
+            if (primarystatgroup[i] == ITEM_MOD_SPELL_DAMAGE_DONE || primarystatgroup[i] == ITEM_MOD_SPELL_HEALING_DONE)
                 if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED && output->InventoryType != INVTYPE_RANGEDRIGHT)
                     statPoints *= 4.0f;
 
