@@ -444,7 +444,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
         ilevel += modifier.ilevelBonus;
         if (ilevel > softMaxItemLevel) {
             uint32 overshotTotal = ilevel - softMaxItemLevel;
-            ilevel = softMaxItemLevel + std::round(overshotTotal / 2);
+            ilevel = softMaxItemLevel + std::round(float(overshotTotal) * 0.25f);
 
             // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
             if (ilevel > modifier.dungeonLevel)
@@ -458,7 +458,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
     if (modifier.ilevel)
         ilevel = modifier.ilevel;
 
-    // Hard cap of 325 across all items FIXME
+    // Hard cap of 325 across all items
     if (ilevel > sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL))
         ilevel = sWorld->getIntConfig(CONFIG_HARD_MAX_ITEM_LEVEL);
 
