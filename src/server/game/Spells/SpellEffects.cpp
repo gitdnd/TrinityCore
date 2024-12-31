@@ -1797,6 +1797,7 @@ void Spell::EffectEnergize()
         case 31930:                                         // Judgements of the Wise
         case 63375:                                         // Improved Stormstrike
         case 68082:                                         // Glyph of Seal of Command
+        case 94476:                                         // Replenishing Attacks
             damage = int32(CalculatePct(unitTarget->GetCreateMana(), damage));
             break;
         case 48542:                                         // Revitalize

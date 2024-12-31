@@ -64,6 +64,51 @@ enum CustomClassSpells
 
 };
 
+// aura 220- SPELL_AURA_MOD_RATING_FROM_STAT does not work properly for haste rating
+class spell_item_stat_to_haste : public AuraScript
+{
+    PrepareAuraScript(spell_item_stat_to_haste);
+
+    void OnTick(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        Player* player = caster->ToPlayer();
+
+        uint32 statType = GetAura()->GetEffect(EFFECT_1)->GetMiscValue();
+        int32 stat = 0;
+
+        switch (statType)
+        {
+        case 0: stat = player->GetStat(STAT_STRENGTH); break;
+        case 1: stat = player->GetStat(STAT_AGILITY); break;
+        case 2: stat = player->GetStat(STAT_STAMINA); break;
+        case 3: stat = player->GetStat(STAT_INTELLECT); break;
+        case 4: stat = player->GetStat(STAT_SPIRIT); break;
+        default:
+            return;
+        }
+
+        int32 statPerc = GetAura()->GetEffect(EFFECT_1)->GetAmount();
+
+        if (Aura* aura = player->GetAura(GetSpellInfo()->Id))
+        {
+            if (AuraEffect* effect = aura->GetEffect(EFFECT_0))
+            {
+                effect->ChangeAmount(stat * statPerc / 100);
+            }
+        }
+
+    }
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_stat_to_haste::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+};
+
 // 91047 - Lotus Restore
 class spell_item_lotus_restore : public AuraScript
 {
@@ -2251,4 +2296,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_blessed_life);
     RegisterSpellScript(spell_class_empowered_attack_stacks);
     RegisterSpellScript(spell_item_lotus_restore);
+    RegisterSpellScript(spell_item_stat_to_haste);
 };
