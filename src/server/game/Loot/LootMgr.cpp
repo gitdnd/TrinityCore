@@ -134,7 +134,7 @@ uint32 LootStore::LoadLootTable()
     Clear();
 
     //                                                  0     1            2               3         4         5             6
-    QueryResult result = WorldDatabase.PQuery("SELECT Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount FROM {}", GetName());
+    QueryResult result = WorldDatabase.PQuery("SELECT Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount, RequiredDungeonLevel FROM {}", GetName());
 
     if (!result)
         return 0;
@@ -154,6 +154,7 @@ uint32 LootStore::LoadLootTable()
         uint8  groupid             = fields[6].GetUInt8();
         uint8  mincount            = fields[7].GetUInt8();
         uint8  maxcount            = fields[8].GetUInt8();
+        uint32 requiredDungeonLevel = fields[9].GetUInt32();
 
         if (groupid >= 1 << 7)                                     // it stored in 7 bit field
         {
@@ -161,7 +162,7 @@ uint32 LootStore::LoadLootTable()
             return 0;
         }
 
-        LootStoreItem* storeitem = new LootStoreItem(item, reference, chance, needsquest, lootmode, groupid, mincount, maxcount);
+        LootStoreItem* storeitem = new LootStoreItem(item, reference, chance, needsquest, lootmode, groupid, mincount, maxcount, requiredDungeonLevel);
 
         if (!storeitem->IsValid(*this, entry))            // Validity checks
         {
@@ -384,6 +385,10 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, uint16 lootMode) 
         for (LootStoreItemList::const_iterator itr = possibleLoot.begin(); itr != possibleLoot.end(); ++itr)   // check each explicitly chanced entry in the template and modify its chance based on quality.
         {
             LootStoreItem* item = *itr;
+
+            if (loot.dungeonLevel < item->requiredDungeonLevel)
+                continue;
+
             if (item->chance >= 100.0f)
                 return item;
 
@@ -578,6 +583,9 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId
     {
         LootStoreItem* item = *i;
         if (!(item->lootmode & lootMode))                       // Do not add if mode mismatch
+            continue;
+
+        if (item->requiredDungeonLevel < loot.dungeonLevel)
             continue;
 
         if (!item->Roll(rate))

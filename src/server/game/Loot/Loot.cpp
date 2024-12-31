@@ -332,7 +332,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         return false;
 
     lootOwnerGUID = lootOwner->GetGUID();
-
+    dungeonLevel = lootOwner->GetMap()->GetDungeonLevel();
     LootTemplate const* tab = store.GetLootFor(lootId);
 
     if (!tab)
