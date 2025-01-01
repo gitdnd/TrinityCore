@@ -18343,8 +18343,8 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     SetTalentResetCost(fields[29].GetUInt32());
     SetTalentResetTime(time_t(fields[30].GetUInt32()));
 
-    if (!m_taxi.LoadTaxiMask(fields[22].GetString()))                // must be before InitTaxiNodesForLevel
-        TC_LOG_WARN("entities.player.loading", "Player::LoadFromDB: Player ({}) has invalid taximask ({}) in DB. Forced partial load.", GetGUID().ToString(), fields[22].GetString());
+    //if (!m_taxi.LoadTaxiMask(fields[22].GetString()))                // must be before InitTaxiNodesForLevel
+        //TC_LOG_WARN("entities.player.loading", "Player::LoadFromDB: Player ({}) has invalid taximask ({}) in DB. Forced partial load.", GetGUID().ToString(), fields[22].GetString());
 
     uint32 extraflags = fields[36].GetUInt16();
 
