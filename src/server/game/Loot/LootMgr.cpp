@@ -585,7 +585,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId
         if (!(item->lootmode & lootMode))                       // Do not add if mode mismatch
             continue;
 
-        if (item->requiredDungeonLevel < loot.dungeonLevel)
+        if (loot.dungeonLevel < item->requiredDungeonLevel)
             continue;
 
         if (!item->Roll(rate))
