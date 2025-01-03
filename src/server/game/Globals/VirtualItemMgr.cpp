@@ -744,12 +744,6 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                 }
             }
 
-            // hard coded behavior for weapons with spell power, except ranged weapons
-            // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
-            if (primarystatgroup[i] == ITEM_MOD_SPELL_DAMAGE_DONE || primarystatgroup[i] == ITEM_MOD_SPELL_HEALING_DONE)
-                if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED && output->InventoryType != INVTYPE_RANGEDRIGHT)
-                    statPoints *= 4.0f;
-
             if (i < primaryStatSlots && primaryStatSlots > 0)
                 selectedStats.push_back(std::pair(primarystatgroup[i], statPoints));
         }
@@ -796,7 +790,11 @@ void VirtualItemMgr::GenerateItemStats(VirtualItemTemplate* output, VirtualModif
                     }
                     continue;
                 }
-
+                // hard coded behavior for weapons with spell power, except ranged weapons
+                // one-handed weapons needs a bigger modifier to be balanced to blizz levels of SP
+                if (secondarystatgroup[i] == ITEM_MOD_SPELL_DAMAGE_DONE || secondarystatgroup[i] == ITEM_MOD_SPELL_HEALING_DONE)
+                    if (output->Class == ITEM_CLASS_WEAPON && output->InventoryType != INVTYPE_RANGED && output->InventoryType != INVTYPE_RANGEDRIGHT)
+                        statPoints *= 4.0f;
                 // push stat back to the selected stat vector
                 selectedStats.push_back(std::pair(secondarystatgroup[i], statPoints));
             }
