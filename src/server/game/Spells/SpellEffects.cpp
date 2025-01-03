@@ -6086,7 +6086,7 @@ void Spell::EffectHoneVirtualItem()
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
 
-    modifier.statPoolPctModifier = (100.0f + (float(honeLevel) / 2.0f)) / 100.0f;
+    modifier.statPoolPctModifier = (100.0f + float(honeLevel)) / 100.0f;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
