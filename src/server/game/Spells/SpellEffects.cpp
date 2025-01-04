@@ -6032,6 +6032,8 @@ void Spell::EffectItemLevelUpgrade()
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
     //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
     sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
+    if (vItem->honeLevel > 0)
+        sVirtualItemMgr.UpdateHoneDisplaySpell(vItem);
 
     vItem->seed = modifier.seed;
     vItem->displaySeed = modifier.displaySeed;
