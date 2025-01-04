@@ -6068,8 +6068,8 @@ void Spell::EffectHoneVirtualItem()
 
     uint32 honeLevel = damage + vItem->honeLevel;
 
-    if (honeLevel > 20) // cap, make this not some magic number
-        honeLevel = 20;
+    if (honeLevel > 10) // cap, make this not some magic number
+        honeLevel = 10;
 
     itemTarget->ToogleStats(false);
 
