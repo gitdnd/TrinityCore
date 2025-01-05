@@ -6032,6 +6032,8 @@ void Spell::EffectItemLevelUpgrade()
     sVirtualItemMgr.GenerateItemName(vItem, modifier);
     //sVirtualItemMgr.GenerateSpells(vItem, modifier, true);
     sVirtualItemMgr.GenerateItemDisplay(vItem, modifier);
+    if (vItem->honeLevel > 0)
+        sVirtualItemMgr.UpdateHoneDisplaySpell(vItem);
 
     vItem->seed = modifier.seed;
     vItem->displaySeed = modifier.displaySeed;
@@ -6066,8 +6068,8 @@ void Spell::EffectHoneVirtualItem()
 
     uint32 honeLevel = damage + vItem->honeLevel;
 
-    if (honeLevel > 20) // cap, make this not some magic number
-        honeLevel = 20;
+    if (honeLevel > 10) // cap, make this not some magic number
+        honeLevel = 10;
 
     itemTarget->ToogleStats(false);
 
@@ -6086,7 +6088,7 @@ void Spell::EffectHoneVirtualItem()
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
 
-    modifier.statPoolPctModifier = (100.0f + (float(honeLevel) / 2.0f)) / 100.0f;
+    modifier.statPoolPctModifier = (100.0f + float(honeLevel)) / 100.0f;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);

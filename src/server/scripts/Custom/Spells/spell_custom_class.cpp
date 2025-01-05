@@ -60,8 +60,102 @@ enum CustomClassSpells
     SPELL_CLASS_EMPOWERED_ATTACK = 96560,
     SPELL_CLASS_EMPOWERED_ATTACK_STACKS = 96561,
     SPELL_TALENT_BOOMING_VOICE = 93194,
-    SPELL_ITEM_LOTUS_RESTORE   = 91048
+    SPELL_ITEM_LOTUS_RESTORE   = 91048,
+    SPELL_CLASS_FINGERS_OF_FROST     = 97332,
+    SPELL_CLASS_FINGERS_OF_FROST_STACKS = 97333,
+    SPELL_FREEZE               = 97334
 
+};
+
+// 94201 - Absolute Zero
+class spell_talent_absolute_zero : public AuraScript
+{
+    PrepareAuraScript(spell_talent_absolute_zero);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetProcTarget();
+
+        if (!caster || !target)
+            return;
+
+        SpellInfo const* ccSpellInfo = sSpellMgr->GetSpellInfo(SPELL_FREEZE);
+
+        if (target->IsImmunedToSpell(ccSpellInfo, caster))
+        {
+            caster->CastSpell(caster, SPELL_CLASS_FINGERS_OF_FROST, true);
+        }
+        else
+        {
+            caster->CastSpell(target, SPELL_FREEZE, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_absolute_zero::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 97333 - Fingers of Frost Stacks
+class spell_class_fingers_of_frost_stacks : public AuraScript
+{
+    PrepareAuraScript(spell_class_fingers_of_frost_stacks);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CLASS_FINGERS_OF_FROST });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->RemoveAuraFromStack(GetId());
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_CLASS_FINGERS_OF_FROST);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_class_fingers_of_frost_stacks::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_class_fingers_of_frost_stacks::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 97332 Fingers of Frost Hidden Proc
+class spell_class_fingers_of_frost : public SpellScriptLoader
+{
+public:
+    spell_class_fingers_of_frost() : SpellScriptLoader("spell_class_fingers_of_frost") { }
+
+    class spell_class_fingers_of_frost_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_fingers_of_frost_SpellScript);
+
+        void HandleOnCast()
+        {
+            Unit* caster = GetCaster();
+
+            CastSpellExtraArgs args(TRIGGERED_FULL_MASK);
+            args.AddSpellMod(SPELLVALUE_AURA_STACK, 1);
+            caster->CastSpell(caster, SPELL_CLASS_FINGERS_OF_FROST_STACKS, args);
+        }
+
+        void Register() override
+        {
+            OnCast += SpellCastFn(spell_class_fingers_of_frost_SpellScript::HandleOnCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_fingers_of_frost_SpellScript();
+    }
 };
 
 // aura 220- SPELL_AURA_MOD_RATING_FROM_STAT does not work properly for haste rating
@@ -2254,6 +2348,7 @@ void AddSC_Spells_Custom_Class_scripts()
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
     new spell_talent_left_handed_passive();
     new spell_class_empowered_attack();
+    new spell_class_fingers_of_frost();
     RegisterSpellScript(spell_class_seal_of_righteousness);
     RegisterSpellScript(spell_class_seal_of_command);
     RegisterSpellScript(spell_class_seal_of_rockbiter);
@@ -2297,4 +2392,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_empowered_attack_stacks);
     RegisterSpellScript(spell_item_lotus_restore);
     RegisterSpellScript(spell_item_stat_to_haste);
+    RegisterSpellScript(spell_talent_absolute_zero);
+    RegisterSpellScript(spell_class_fingers_of_frost_stacks);
 };
