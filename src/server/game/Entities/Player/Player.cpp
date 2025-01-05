@@ -4630,7 +4630,8 @@ void Player::RemoveGhoul()
 
 void Player::KillPlayer()
 {
-    if (IsFlying() && !GetTransport())
+    float tz = GetMapHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
+    if (IsFlying() && !GetTransport() || tz < INVALID_HEIGHT &&  tz >= 2.f)
         GetMotionMaster()->MoveFall();
 
     SetRooted(true);
