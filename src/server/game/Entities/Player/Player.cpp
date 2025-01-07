@@ -19613,7 +19613,7 @@ void Player::UnbindInstance(BoundInstancesMap::iterator &itr, Difficulty difficu
 
 InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, BindExtensionState extendState, bool load)
 {
-    if (GetSession()->GetSecurity() >= SEC_MODERATOR)
+    if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         return nullptr;
 
     if (save)
@@ -19682,7 +19682,7 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, B
 
 void Player::BindToInstance()
 {
-    if (GetSession()->GetSecurity() >= SEC_MODERATOR)
+    if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         return;
 
     InstanceSave* mapSave = sInstanceSaveMgr->GetInstanceSave(_pendingBindId);
@@ -19701,7 +19701,7 @@ void Player::BindToInstance()
 
 void Player::SetPendingBind(uint32 instanceId, uint32 bindTimer)
 {
-    if (GetSession()->GetSecurity() >= SEC_MODERATOR)
+    if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
         return;
 
     _pendingBindId = instanceId;
@@ -22642,7 +22642,7 @@ uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
 void Player::UpdateHomebindTime(uint32 time)
 {
     // GMs never get homebind timer online
-    if (m_InstanceValid || IsGameMaster())
+    if (m_InstanceValid || IsGameMaster() || GetSession()->GetSecurity() >= SEC_GAMEMASTER)
     {
         if (m_HomebindTimer)                                 // instance valid, but timer not reset
         {
@@ -22668,7 +22668,7 @@ void Player::UpdateHomebindTime(uint32 time)
     else
     {
         // instance is invalid, start homebind timer
-        m_HomebindTimer = 60000;
+        m_HomebindTimer = 30000;
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4+4);
         data << uint32(m_HomebindTimer);
