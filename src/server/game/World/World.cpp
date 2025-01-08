@@ -665,6 +665,22 @@ void World::LoadConfigSettings(bool reload)
         TC_LOG_ERROR("server.loading", "Rate.Quest.Money.Max.Level.Reward ({}) must be >=0. Using 0 instead.", rate_values[RATE_MONEY_MAX_LEVEL_QUEST]);
         rate_values[RATE_MONEY_MAX_LEVEL_QUEST] = 0.0f;
     }
+
+    //Custom:
+    rate_values[RATE_CREATURE_SPELL_DMG_50] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.50", 0.33f);
+    rate_values[RATE_CREATURE_SPELL_DMG_65] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.65", 0.5f);
+    rate_values[RATE_CREATURE_SPELL_DMG_100] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.100", 0.75f);
+    rate_values[RATE_CREATURE_SPELL_DMG_150] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.150", 1.f);
+    rate_values[RATE_CREATURE_SPELL_DMG_200] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.200", 1.f);
+    rate_values[RATE_CREATURE_SPELL_DMG_250] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.250", 1.f);
+    rate_values[RATE_CREATURE_SPELL_DMG_300] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.300", 1.f);
+    rate_values[RATE_CREATURE_SPELL_DMG_310] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.310", 1.f);
+    rate_values[RATE_CREATURE_SPELL_DMG_320] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.320", 1.f);
+    rate_values[RATE_CREATURE_SPELL_DMG_325] = sConfigMgr->GetFloatDefault("Rate.Creature.SpellDamage.325", 1.f);
+
+    rate_values[RATE_PLAYER_PET_ITEM_SCALE] = sConfigMgr->GetFloatDefault("Rate.Player.Pet.ItemLevelScale", 0.25f);
+
+
     ///- Read other configuration items from the config file
 
     m_bool_configs[CONFIG_DURABILITY_LOSS_IN_PVP] = sConfigMgr->GetBoolDefault("DurabilityLoss.InPvP", false);

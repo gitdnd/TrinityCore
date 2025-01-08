@@ -368,24 +368,38 @@ void Spell::EffectSchoolDMG()
     if (unitTarget && unitTarget->IsAlive())
     {
         Unit* unitCaster = GetUnitCasterForEffectHandlers();
-        // FIXME(Harry): This should be configurable
         // Try to scale base damage effect based on ilevel
-        if (unitCaster->ToCreature())
+        if (Creature * cCaster = unitCaster->ToCreature())
         {
-            int dungeonLevel = unitCaster->ToCreature()->GetDungeonLevel();
-            if (dungeonLevel > 0)
+            if (!cCaster->IsCharmedOwnedByPlayerOrPlayer()) // Don't scale player owned pets
             {
-                float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
-                if (dungeonLevel < 50)
-                    modifier = modifier * 0.33;
-                else if (dungeonLevel < 65)
-                    modifier = modifier * 0.5;
-                else if (dungeonLevel < 100)
-                    modifier = modifier * 0.75;
-                //else if (dungeonLevel > 250)
-                //    modifier = modifier * 1.25;
+                int dungeonLevel = unitCaster->ToCreature()->GetDungeonLevel();
+                if (dungeonLevel > 0)
+                {
+                    float modifier = (std::pow(float(dungeonLevel), 2) / 40000.0f) + 0.35f;
+                    if (dungeonLevel < 50)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_50);
+                    else if (dungeonLevel < 65)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_65);
+                    else if (dungeonLevel < 100)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_100);
+                    else if (dungeonLevel < 150)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_150);
+                    else if (dungeonLevel < 200)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_200);
+                    else if (dungeonLevel < 250)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_250);
+                    else if (dungeonLevel < 300)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_300);
+                    else if (dungeonLevel < 310)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_310);
+                    else if (dungeonLevel < 320)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_320);
+                    else if (dungeonLevel < 325)
+                        modifier = modifier * sWorld->getRate(RATE_CREATURE_SPELL_DMG_325);
 
-                damage = damage * modifier;
+                    damage = damage * modifier;
+                }
             }
         }
         else if (unitCaster->ToPlayer() && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)

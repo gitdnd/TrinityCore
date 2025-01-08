@@ -407,7 +407,7 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         bool IsMarkOfTheAbsoluteEnabled();
         bool IsAffectedByScaling()
         {
-            if (IsPet() || (IsSummon() && IsCharmedOwnedByPlayerOrPlayer()) || IsTrigger() || !IsAlive())
+            if (IsCharmedOwnedByPlayerOrPlayer() || IsTrigger() || !IsAlive())
                 return false;
 
             return true;
