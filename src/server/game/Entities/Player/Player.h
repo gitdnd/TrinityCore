@@ -2358,6 +2358,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
                 craftingComponents[i] = 0;
         }
 
+        void UnbindInstances(uint32 mapId);
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

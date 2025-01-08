@@ -22659,7 +22659,7 @@ void Player::UpdateHomebindTime(uint32 time)
     else
     {
         // instance is invalid, start homebind timer
-        m_HomebindTimer = 60000;
+        m_HomebindTimer = 30000;
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4+4);
         data << uint32(m_HomebindTimer);
@@ -26705,6 +26705,8 @@ void Player::SetMap(Map* map)
 {
     Unit::SetMap(map);
     m_mapRef.link(map, this);
+    if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        UnbindInstances(map->GetId());
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)
@@ -28436,4 +28438,23 @@ void Player::CustomAutoLoot(Creature * target)
 
     if(loot->isLooted())
         GetSession()->DoLootRelease(target->GetGUID());
+}
+
+void Player::UnbindInstances(uint32 mapId)
+{
+    for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+    {
+        Player::BoundInstancesMap& binds = GetBoundInstances(Difficulty(i));
+        for (Player::BoundInstancesMap::iterator itr = binds.begin(); itr != binds.end();)
+        {
+            InstanceSave const* save = itr->second.save;
+            if (itr->first != mapId)
+            {
+                std::string timeleft = secsToTimeString(save->GetResetTime() - GameTime::GetGameTime(), TimeFormat::ShortText);
+                UnbindInstance(itr, Difficulty(i));
+            }
+            else
+                ++itr;
+        }
+    }
 }
