@@ -19613,9 +19613,6 @@ void Player::UnbindInstance(BoundInstancesMap::iterator &itr, Difficulty difficu
 
 InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, BindExtensionState extendState, bool load)
 {
-    if (GetSession()->GetSecurity() >= SEC_MODERATOR)
-        return nullptr;
-
     if (save)
     {
         InstancePlayerBind& bind = m_boundInstances[save->GetDifficulty()][save->GetMapId()];
@@ -19682,9 +19679,6 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, B
 
 void Player::BindToInstance()
 {
-    if (GetSession()->GetSecurity() >= SEC_MODERATOR)
-        return;
-
     InstanceSave* mapSave = sInstanceSaveMgr->GetInstanceSave(_pendingBindId);
     if (!mapSave) //it seems sometimes mapSave is nullptr, but I did not check why
         return;
@@ -19701,9 +19695,6 @@ void Player::BindToInstance()
 
 void Player::SetPendingBind(uint32 instanceId, uint32 bindTimer)
 {
-    if (GetSession()->GetSecurity() >= SEC_MODERATOR)
-        return;
-
     _pendingBindId = instanceId;
     _pendingBindTimer = bindTimer;
 }
