@@ -67,6 +67,48 @@ enum CustomClassSpells
 
 };
 
+// deep freeze
+class spell_class_deep_freeze : public SpellScriptLoader
+{
+public:
+    spell_class_deep_freeze() : SpellScriptLoader("spell_class_deep_freeze") { }
+
+    class spell_class_deep_freeze_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_deep_freeze_SpellScript);
+
+        void HandleDamage(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+
+            if (target->HasAuraState(AURA_STATE_FROZEN) || caster->GetAura(SPELL_CLASS_FINGERS_OF_FROST))
+            {
+                SetHitDamage(GetHitDamage() * 2);
+                caster->CastSpell(target, 97712, true);
+            }
+
+            SpellInfo const* ccSpellInfo = sSpellMgr->GetSpellInfo(97712);
+
+            if (target->IsImmunedToSpell(ccSpellInfo, caster) || caster->GetAura(SPELL_CLASS_FINGERS_OF_FROST))
+            {
+                SetHitDamage(GetHitDamage() * 2);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_class_deep_freeze_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_deep_freeze_SpellScript();
+    }
+};
+
 // 94201 - Absolute Zero
 class spell_talent_absolute_zero : public AuraScript
 {
@@ -2112,12 +2154,13 @@ public:
 
         void HandleDamage(SpellEffIndex /*effIndex*/)
         {
-            if (Unit* target = GetHitUnit())
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+
+            if (target->HasAuraState(AURA_STATE_FROZEN) || caster->GetAura(SPELL_CLASS_FINGERS_OF_FROST))
             {
-                if (target->HasAuraState(AURA_STATE_FROZEN))
-                {
-                    SetHitDamage(GetHitDamage() * 3);
-                }
+                SetHitDamage(GetHitDamage() * 2);
             }
         }
 
@@ -2145,13 +2188,15 @@ public:
 
         void HandleOnHit()
         {
-            if (Unit* target = GetHitUnit())
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+
+            if (target->HasAuraState(AURA_STATE_FROZEN) || caster->GetAura(SPELL_CLASS_FINGERS_OF_FROST))
             {
-                if (target->HasAuraState(AURA_STATE_FROZEN))
-                {
-                    GetCaster()->CastSpell(target, 55095, true);
-                }
+                GetCaster()->CastSpell(target, 55095, true);
             }
+
         }
 
         void Register() override
@@ -2349,6 +2394,7 @@ void AddSC_Spells_Custom_Class_scripts()
     new spell_talent_left_handed_passive();
     new spell_class_empowered_attack();
     new spell_class_fingers_of_frost();
+    new spell_class_deep_freeze();
     RegisterSpellScript(spell_class_seal_of_righteousness);
     RegisterSpellScript(spell_class_seal_of_command);
     RegisterSpellScript(spell_class_seal_of_rockbiter);
