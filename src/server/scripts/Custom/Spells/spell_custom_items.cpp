@@ -654,8 +654,11 @@ class spell_item_grant_fishing_quest : public SpellScript
     {
         if (Player* plrTarget = GetCaster()->ToPlayer())
         {
-            if (plrTarget->GetQuestStatus(62900) == QUEST_STATUS_NONE)
-                plrTarget->AddQuest(sObjectMgr->GetQuestTemplate(62900), GetCaster());
+            if (plrTarget->HasItemCount(62900) && plrTarget->HasItemCount(62901) && plrTarget->HasItemCount(62902))
+            {
+                if (plrTarget->GetQuestStatus(62900) == QUEST_STATUS_NONE)
+                    plrTarget->AddQuest(sObjectMgr->GetQuestTemplate(62900), GetCaster());
+            }
         }
     }
 
