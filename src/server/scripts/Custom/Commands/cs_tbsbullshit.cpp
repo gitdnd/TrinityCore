@@ -235,6 +235,13 @@ public:
 
         return true;
     }
+
+    static bool HandleDebugSpellMods(ChatHandler* handler, uint32 spellId)
+    {
+        Player* plr = handler->getSelectedPlayerOrSelf();
+        
+        return true;
+    }
 };
 
 void AddSC_TbsBullshit_commandscript()

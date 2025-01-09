@@ -1594,7 +1594,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // continent limitation (virtual continent)
     if (HasAttribute(SPELL_ATTR4_CAST_ONLY_IN_OUTLAND))
     {
-        bool ignore = (map_id == 775 || map_id == 765) && player->HasSpell(450010));
+        bool ignore = (map_id == 775 || map_id == 765) && player->HasSpell(450010);
         if (!ignore)
         {
             if (strict)
