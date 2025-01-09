@@ -1,6 +1,7 @@
 #include "ScriptMgr.h"
 #include "DBCStores.h"
 #include "Player.h"
+#include "ObjectMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
 #include "SpellMgr.h"
@@ -640,6 +641,29 @@ class spell_item_require_virtual_item_or_heirloom : public SpellScript
     }
 };
 
+class spell_item_grant_fishing_quest : public SpellScript
+{
+    PrepareSpellScript(spell_item_grant_fishing_quest);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* plrTarget = GetCaster()->ToPlayer())
+        {
+            if (plrTarget->GetQuestStatus(62900) == QUEST_STATUS_NONE)
+                plrTarget->AddQuest(sObjectMgr->GetQuestTemplate(62900), GetCaster());
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_grant_fishing_quest::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
 
 void AddSC_Spells_Custom_Items()
 {
@@ -658,4 +682,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_tobenamedlegendary_dodge_thing);
     RegisterSpellScript(spell_item_require_virtual_item);
     RegisterSpellScript(spell_item_require_virtual_item_or_heirloom);
+    RegisterSpellScript(spell_item_grant_fishing_quest);
 }
