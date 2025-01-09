@@ -473,7 +473,8 @@ public:
 
     bool OnTrigger(Player* player, AreaTriggerEntry const* /* trigger */) override
     {
-        player->CastSpell(player, 90563, true);
+        if(!player->IsMounted())
+            player->CastSpell(player, 90563, true);
         return true;
     }
 };
