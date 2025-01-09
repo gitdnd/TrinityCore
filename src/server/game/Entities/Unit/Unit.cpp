@@ -6976,7 +6976,7 @@ float Unit::SpellDamagePctDone(Unit* victim, SpellInfo const* spellProto, Damage
             if (owner->HasAura(56377) && victim->GetLevel() > owner->GetLevel())
                 DoneTotalMod *= 4.0f;
             else
-                DoneTotalMod *= 3.0f;
+                DoneTotalMod *= 4.0f;
         }
     }
     // Custom scripted damage
