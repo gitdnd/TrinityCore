@@ -433,24 +433,21 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
 
     uint32 softMaxItemLevel = sWorld->getIntConfig(CONFIG_SOFT_MAX_ITEM_LEVEL);
 
-    // if the item is crafted and the generated item level is > soft cap, set ilevel to soft cap
-    if (modifier.isCrafted && ilevel > softMaxItemLevel)
-        ilevel = softMaxItemLevel;
-    // only award at half rate when > 300 (maxLevel) when the item is not crafted (affixes)
-    // allow ilevel bonuses to add to the top of crafted max level (catalysts)
-    else if (!modifier.isCrafted)
-    {
-        // ilevelBonus = affix bonus
-        ilevel += modifier.ilevelBonus;
-        if (ilevel > softMaxItemLevel) {
-            uint32 overshotTotal = ilevel - softMaxItemLevel;
-            ilevel = softMaxItemLevel + std::round(float(overshotTotal) * 0.25f);
+    bool isCrafted = modifier.isCrafted;
 
-            // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
-            if (ilevel > modifier.dungeonLevel)
-            {
-                ilevel = modifier.dungeonLevel;
-            }
+    // allow ilevel bonuses to add to the top of crafted max level (catalysts)
+    // ilevelBonus = affix bonus or catalyst bonus
+    ilevel += modifier.ilevelBonus;
+    // only award at 25% rate when > 300 (softMaxLevel)
+    if (ilevel > softMaxItemLevel)
+    {
+        uint32 overshotTotal = ilevel - softMaxItemLevel;
+        ilevel = softMaxItemLevel + std::round(float(overshotTotal) * 0.25f);
+
+        // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
+        if (!isCrafted && ilevel > modifier.dungeonLevel)
+        {
+            ilevel = modifier.dungeonLevel;
         }
     }
 
