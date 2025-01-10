@@ -1922,6 +1922,12 @@ namespace LuaCustom
         return 1;
     }
 
+    int GetIpAddress(Eluna* E, Player* player)
+    {
+        E->Push(player->GetSession() ? player->GetSession()->GetRemoteAddress() : "");
+        return 1;
+    }
+
     // REGISTERS
     
     ElunaRegister<> GlobalMethods[] =
@@ -2027,6 +2033,7 @@ namespace LuaCustom
         { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
         { "SetCraftingComponents", &LuaCustom::SetCraftingComponents },
         { "ClearCratingComponents", &LuaCustom::ClearCraftingComponents },
+        { "GetIpAddress", &LuaCustom::GetIpAddress }
     };
     
     ElunaRegister<Creature> CreatureMethods[] =
