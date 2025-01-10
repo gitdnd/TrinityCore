@@ -58,6 +58,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
+#include "Bag.h"
+#include "GuildPackets.h"
 #include <boost/circular_buffer.hpp>
 #include <zlib.h>
 
@@ -1920,4 +1922,173 @@ bool WorldSession::IsRightUnitBeingMoved(ObjectGuid guid)
     }
 
     return true;
+}
+
+void WorldSession::LoadBankTabFromDB(Field* fields)
+{
+    uint8 tabId = fields[1].GetUInt8();
+    if (tabId >= _GetPurchasedTabsSize())
+        TC_LOG_ERROR("guild", "Invalid tab (tabId: {}) in guild bank, skipped.", tabId);
+    else
+        m_bankTabs[tabId].LoadFromDB(fields);
+}
+
+bool WorldSession::LoadBankItemFromDB(Field* fields)
+{
+    uint8 tabId = fields[12].GetUInt8();
+    if (tabId >= _GetPurchasedTabsSize())
+    {
+        TC_LOG_ERROR("guild", "Invalid tab for item (GUID: {}, id: #{}) in guild bank, skipped.",
+            fields[14].GetUInt32(), fields[15].GetUInt32());
+        return false;
+    }
+    return m_bankTabs[tabId].LoadItemFromDB(fields);
+}
+
+WorldSession::AccountBankTab::AccountBankTab(ObjectGuid::LowType guildId, uint8 tabId) : m_guildId(guildId), m_tabId(tabId)
+{
+}
+
+void WorldSession::AccountBankTab::LoadFromDB(Field* fields)
+{
+    m_name = fields[2].GetString();
+    m_icon = fields[3].GetString();
+    m_text = fields[4].GetString();
+}
+
+bool WorldSession::AccountBankTab::LoadItemFromDB(Field* fields)
+{
+    uint8 slotId = fields[13].GetUInt8();
+    ObjectGuid::LowType itemGuid = fields[14].GetUInt32();
+    uint32 itemEntry = fields[15].GetUInt32();
+    if (slotId >= GUILD_BANK_MAX_SLOTS)
+    {
+        TC_LOG_ERROR("guild", "Invalid slot for item (GUID: {}, id: {}) in guild bank, skipped.", itemGuid, itemEntry);
+        return false;
+    }
+
+    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
+    if (!proto)
+    {
+        TC_LOG_ERROR("guild", "Unknown item (GUID: {}, id: {}) in guild bank, skipped.", itemGuid, itemEntry);
+        return false;
+    }
+
+    Item* pItem = NewItemOrBag(proto);
+    if (!pItem->LoadFromDB(itemGuid, ObjectGuid::Empty, fields, itemEntry))
+    {
+        TC_LOG_ERROR("guild", "Item (GUID {}, id: {}) not found in item_instance, deleting from guild bank!", itemGuid, itemEntry);
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NONEXISTENT_GUILD_BANK_ITEM);
+        stmt->setUInt32(0, m_guildId);
+        stmt->setUInt8(1, m_tabId);
+        stmt->setUInt8(2, slotId);
+        CharacterDatabase.Execute(stmt);
+
+        delete pItem;
+        return false;
+    }
+
+    pItem->AddToWorld();
+    m_items[slotId] = pItem;
+    return true;
+}
+
+// Deletes contents of the tab from the world (and from DB if necessary)
+void WorldSession::AccountBankTab::Delete(CharacterDatabaseTransaction trans, bool removeItemsFromDB)
+{
+    for (uint8 slotId = 0; slotId < GUILD_BANK_MAX_SLOTS; ++slotId)
+    {
+        if (Item* pItem = m_items[slotId])
+        {
+            pItem->RemoveFromWorld();
+            if (removeItemsFromDB)
+                pItem->DeleteFromDB(trans);
+            delete pItem;
+            pItem = nullptr;
+        }
+    }
+}
+
+void WorldSession::AccountBankTab::SetInfo(std::string_view name, std::string_view icon)
+{
+    if ((m_name == name) && (m_icon == icon))
+        return;
+
+    m_name = name;
+    m_icon = icon;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_BANK_TAB_INFO);
+    stmt->setString(0, m_name);
+    stmt->setString(1, m_icon);
+    stmt->setUInt32(2, m_guildId);
+    stmt->setUInt8(3, m_tabId);
+    CharacterDatabase.Execute(stmt);
+}
+
+void WorldSession::AccountBankTab::SetText(std::string_view text)
+{
+    if (m_text == text)
+        return;
+
+    m_text = text;
+    utf8truncate(m_text, 500);          // DB and client size limitation
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_BANK_TAB_TEXT);
+    stmt->setString(0, m_text);
+    stmt->setUInt32(1, m_guildId);
+    stmt->setUInt8(2, m_tabId);
+    CharacterDatabase.Execute(stmt);
+}
+
+// Sets/removes contents of specified slot.
+// If pItem == nullptr contents are removed.
+bool WorldSession::AccountBankTab::SetItem(CharacterDatabaseTransaction trans, uint8 slotId, Item* item)
+{
+    if (slotId >= GUILD_BANK_MAX_SLOTS)
+        return false;
+
+    m_items[slotId] = item;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_ITEM);
+    stmt->setUInt32(0, m_guildId);
+    stmt->setUInt8(1, m_tabId);
+    stmt->setUInt8(2, slotId);
+    trans->Append(stmt);
+
+    if (item)
+    {
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_BANK_ITEM);
+        stmt->setUInt32(0, m_guildId);
+        stmt->setUInt8(1, m_tabId);
+        stmt->setUInt8(2, slotId);
+        stmt->setUInt32(3, item->GetGUID().GetCounter());
+        trans->Append(stmt);
+
+        item->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid::Empty);
+        item->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid::Empty);
+        item->FSetState(ITEM_NEW);
+        item->SaveToDB(trans);                                 // Not in inventory and can be saved standalone
+    }
+
+    return true;
+}
+
+void WorldSession::AccountBankTab::SendText(Guild const* guild, WorldSession* session) const
+{
+    WorldPackets::Guild::GuildBankTextQueryResult textQuery;
+    textQuery.Tab = m_tabId;
+    textQuery.Text = m_text;
+
+    if (session)
+    {
+        TC_LOG_DEBUG("guild", "MSG_QUERY_GUILD_BANK_TEXT [{}]: Tabid: {}, Text: {}"
+            , session->GetPlayerInfo(), m_tabId, m_text);
+        session->SendPacket(textQuery.Write());
+    }
+    else
+    {
+        TC_LOG_DEBUG("guild", "MSG_QUERY_GUILD_BANK_TEXT [Broadcast]: Tabid: {}, Text: {}", m_tabId, m_text);
+        guild->BroadcastPacket(textQuery.Write());
+    }
 }

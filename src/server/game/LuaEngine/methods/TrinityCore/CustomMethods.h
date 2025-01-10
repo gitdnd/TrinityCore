@@ -435,7 +435,8 @@ namespace LuaCustom
         int8 statGroup = E->CHECKVAL<int8>(8, -1);
         bool isCrafted = E->CHECKVAL<bool>(9, false);
         uint32 ilevelBonus = E->CHECKVAL<uint32>(10, 0);
-
+        uint32 legendaryOverride = E->CHECKVAL<uint32>(11, 0);
+        uint32 setOverride = E->CHECKVAL<uint32>(12, 0);
         VirtualModifier modifier;
 
         if(displayId > 0)
@@ -461,6 +462,10 @@ namespace LuaCustom
 
         if (ilevelBonus > 0)
             modifier.ilevelBonus = ilevelBonus;
+
+        modifier.legendaryOverride = legendaryOverride;
+
+        modifier.setOverride = setOverride;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;

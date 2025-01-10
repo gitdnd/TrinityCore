@@ -1316,7 +1316,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
     std::mt19937 generator(modifier.setSeed);
 
     itemSetInfo set = GenerateSet(output, modifier);
-
+    
     uint32 qualityChance = VirtualModifier::GetSetChance(output);
 
     ASSERT(qualityChance <= 100);
@@ -1325,7 +1325,7 @@ void VirtualItemMgr::GenerateItemSet(VirtualItemTemplate* output, VirtualModifie
 
     if (set.setId > 0 && (chanceRng <= qualityChance || modifier.generateSet == true))
     {
-        output->ItemSet = set.setId;
+        output->ItemSet = modifier.setOverride ? modifier.setOverride : set.setId;
 
         if (set.displayOverride)
             modifier.displayId = set.displayOverride;
@@ -2068,6 +2068,12 @@ legendaryItemInfo const* VirtualItemMgr::GetLegendaryItemInfo(uint32 id) const
 
 void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier)
 {
+    if (modifier.legendaryOverride)
+    {
+        ApplyLegendaryItemEffect(output, modifier.legendaryOverride);
+        return;
+    }
+
     if (output->Quality != ITEM_QUALITY_LEGENDARY)
         return;
 
@@ -2109,17 +2115,29 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 
     auto selectedLegendary = std::begin(legList);
     std::advance(selectedLegendary, urand(0, uint32(std::size(legList)) - 1, generator));
+    ApplyLegendaryItemEffect(output, selectedLegendary->legendaryId);
+}
 
-    output->legendaryId = selectedLegendary->legendaryId;
+void VirtualItemMgr::ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId)
+{
+    auto leg = GetLegendaryItemInfo(legId);
 
-    if (selectedLegendary->statGroupOverride != -1)
-        output->statGroup = static_cast<StatGroup>(selectedLegendary->statGroupOverride);
+    if (!leg)
+    {
+        //@todo: error
+        return;
+    }
+
+    output->legendaryId = leg->legendaryId;
+
+    if (leg->statGroupOverride != -1)
+        output->statGroup = static_cast<StatGroup>(leg->statGroupOverride);
 
     for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
     {
-        if (selectedLegendary->legendarySpells[i].SpellId != 0)
+        if (leg->legendarySpells[i].SpellId != 0)
         {
-            output->Spells[i + MAX_GENERATED_SPELLS] = selectedLegendary->legendarySpells[i];
+            output->Spells[i + MAX_GENERATED_SPELLS] = leg->legendarySpells[i];
         }
     }
 }

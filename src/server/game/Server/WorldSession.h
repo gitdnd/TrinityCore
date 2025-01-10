@@ -643,6 +643,10 @@ class TC_GAME_API WorldSession
         time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
         void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
+        void LoadBankTabFromDB(Field* fields);
+        bool LoadBankItemFromDB(Field* fields);
+
+
     public:                                                 // opcodes handlers
 
         void Handle_NULL(WorldPacket& recvPacket);          // not used
@@ -1306,6 +1310,45 @@ class TC_GAME_API WorldSession
 
         WorldSession(WorldSession const& right) = delete;
         WorldSession& operator=(WorldSession const& right) = delete;
+
+
+        class AccountBankTab
+        {
+        public:
+            AccountBankTab(ObjectGuid::LowType guildId, uint8 tabId);
+
+            void LoadFromDB(Field* fields);
+            bool LoadItemFromDB(Field* fields);
+            void Delete(CharacterDatabaseTransaction trans, bool removeItemsFromDB = false);
+
+            void SetInfo(std::string_view name, std::string_view icon);
+            void SetText(std::string_view text);
+            void SendText(Guild const* guild, WorldSession* session) const;
+
+            std::string const& GetName() const { return m_name; }
+            std::string const& GetIcon() const { return m_icon; }
+            std::string const& GetText() const { return m_text; }
+            // GUILD_BANK_MAX_SLOTS
+            inline Item* GetItem(uint8 slotId) const { return slotId < 98 ? m_items[slotId] : nullptr; }
+            bool SetItem(CharacterDatabaseTransaction trans, uint8 slotId, Item* pItem);
+
+        private:
+            ObjectGuid::LowType m_guildId;
+            uint8 m_tabId;
+            // GUILD_BANK_MAX_SLOTS
+            std::array<Item*, 6> m_items = {};
+            std::string m_name;
+            std::string m_icon;
+            std::string m_text;
+        };
+
+        std::vector<AccountBankTab> m_bankTabs;
+        inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
+
+        inline AccountBankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
+        inline AccountBankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
+
+
 };
 #endif
 /// @}

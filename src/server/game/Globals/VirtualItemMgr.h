@@ -136,6 +136,8 @@ struct VirtualModifier
         lowYield = false;
         ilevelBonus = 0;
         dungeonLevel = 0;
+        legendaryOverride = 0;
+        setOverride = 0;
     }
 
     /**
@@ -169,6 +171,8 @@ struct VirtualModifier
     bool lowYield;
     uint32 ilevelBonus;
     uint32 dungeonLevel;
+    uint32 legendaryOverride;
+    uint32 setOverride;
     /**
      * Fetches the rate (point*rate = stat_amount) for the given item quality.
      * Returns the stat rate.
@@ -473,6 +477,7 @@ public:
     legendaryItemInfo const* GetLegendaryItemInfo(uint32 id) const;
     void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier);
     void UpdateHoneDisplaySpell(VirtualItemTemplate* output);
+    void ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId);
 private:
 
     class StatGroupData
