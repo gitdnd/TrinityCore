@@ -18464,7 +18464,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     //{
         //_talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
     //}
-    InitTalentForLevel();
+    //InitTalentForLevel();
     LearnDefaultSkills();
     LearnCustomSpells();
 
@@ -28292,6 +28292,7 @@ void Player::LoadCustomTalentLoadout()
         }
     }
     _talentMgr->UsedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    InitTalentForLevel();
 }
 
 void Player::LoadCustomTalents(PreparedQueryResult result)

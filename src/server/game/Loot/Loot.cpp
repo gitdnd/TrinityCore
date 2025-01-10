@@ -30,6 +30,7 @@
 //Remove when debug is done
 #include "SpellAuras.h"
 #include "Unit.h"
+#include "Chat.h"
 
 // VirtualItem
 #include "VirtualItemMgr.h"
@@ -335,6 +336,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     dungeonLevel = lootOwner->GetMap()->GetDungeonLevel();
     if (store.GetName() == "item_loot_template" || store.GetName() == "spell_loot_template")
         dungeonLevel = lootOwner->GetAverageItemLevel();
+    ChatHandler(lootOwner).PSendSysMessage("%s %s", store.GetName(), store.GetEntryName())
     LootTemplate const* tab = store.GetLootFor(lootId);
 
     if (!tab)
