@@ -333,6 +333,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     lootOwnerGUID = lootOwner->GetGUID();
     dungeonLevel = lootOwner->GetMap()->GetDungeonLevel();
+    if (store.GetName() == "item_loot_template")
+        dungeonLevel = lootOwner->GetAverageItemLevel();
     LootTemplate const* tab = store.GetLootFor(lootId);
 
     if (!tab)
