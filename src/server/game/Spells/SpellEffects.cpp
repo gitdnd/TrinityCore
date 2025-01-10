@@ -5898,6 +5898,8 @@ void Spell::EffectVirtualItemQualityUpgrade()
     modifier.statGroupSeed = vItem->statGroupSeed;
     modifier.ilevel = vItem->ItemLevel;
     modifier.statgroup = vItem->statGroup;
+    modifier.legendaryOverride = vItem->legendaryId;
+    modifier.setOverride = vItem->ItemSet;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
@@ -5949,6 +5951,8 @@ void Spell::EffectReRollVirtualItem()
     mod.statSeed = vItem->statSeed;
     mod.statgroup = StatGroup(effectInfo->MiscValue);
     mod.statpool = effectInfo->MiscValueB != 0 ? effectInfo->MiscValueB : -1;
+    mod.legendaryOverride = vItem->legendaryId;
+    mod.setOverride = vItem->ItemSet;
     sVirtualItemMgr.GenerateBaseStats(vItem, mod);
     sVirtualItemMgr.GenerateItemStats(vItem, mod);
     vItem->InitializeQueryData();
@@ -6036,6 +6040,8 @@ void Spell::EffectItemLevelUpgrade()
     modifier.statGroupSeed = vItem->statGroupSeed;
     modifier.quality = vItem->Quality;
     modifier.statgroup = vItem->statGroup;
+    modifier.legendaryOverride = vItem->legendaryId;
+    modifier.setOverride = vItem->ItemSet;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
@@ -6082,8 +6088,8 @@ void Spell::EffectHoneVirtualItem()
 
     uint32 honeLevel = damage + vItem->honeLevel;
 
-    if (honeLevel > 10) // cap, make this not some magic number
-        honeLevel = 10;
+    if (honeLevel > sWorld->getIntConfig(CONFIG_MAX_HONE_PCT)) // cap
+        honeLevel = sWorld->getIntConfig(CONFIG_MAX_HONE_PCT);
 
     itemTarget->ToogleStats(false);
 
@@ -6103,6 +6109,8 @@ void Spell::EffectHoneVirtualItem()
     modifier.statgroup = vItem->statGroup;
 
     modifier.statPoolPctModifier = (100.0f + float(honeLevel)) / 100.0f;
+    modifier.legendaryOverride = vItem->legendaryId;
+    modifier.setOverride = vItem->ItemSet;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);

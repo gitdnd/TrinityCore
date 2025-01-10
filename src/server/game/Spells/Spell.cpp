@@ -7335,7 +7335,7 @@ SpellCastResult Spell::CheckItems(uint32* param1 /*= nullptr*/, uint32* param2 /
                 if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(m_targets.GetItemTarget()->GetEntry()))
                 {
                     // make 10 config value and not some magic number
-                    if (vTemp->honeLevel >= 10)
+                    if (vTemp->honeLevel >= sWorld->getIntConfig(CONFIG_MAX_HONE_PCT))
                         return SPELL_FAILED_NO_VALID_TARGETS;
 
                     if (spellEffectInfo.MiscValue)

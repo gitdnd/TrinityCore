@@ -1575,6 +1575,7 @@ void World::LoadConfigSettings(bool reload)
 
     // Custom stats
     m_int_configs[CONFIG_MAX_MAGIC_FIND] = sConfigMgr->GetIntDefault("CustomStats.MaxMagicFind", 300);
+    m_int_configs[CONFIG_MAX_HONE_PCT] = sConfigMgr->GetIntDefault("CustomStats.HoneMax", 10);
 
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 1);
