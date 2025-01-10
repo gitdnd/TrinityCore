@@ -196,12 +196,16 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 
                             uint32 dungeonLevel = member->GetMap()->GetDungeonLevel();
                             uint32 playerLevel = uint32(member->GetCappedItemLevel());
-
-                            if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                            if (ignoreMapLevels)
+                                dungeonLevel = playerLevel;
+                            else
                             {
-                                modifier.vLvlMod = inst->vLvlMod;
-                                // if player is in an instance, we want to increase the softcap if there is a softcap modifier
-                                playerLevel = uint32(member->GetCappedItemLevel(inst->softcapMod));
+                                if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                                {
+                                    modifier.vLvlMod = inst->vLvlMod;
+                                    // if player is in an instance, we want to increase the softcap if there is a softcap modifier
+                                    playerLevel = uint32(member->GetCappedItemLevel(inst->softcapMod));
+                                }
                             }
 
                             // is this calculation what we really want? really need to double check this logic
@@ -210,8 +214,8 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
 
                             modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
-
-                            modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
+                            if(!ignoreMapLevels)
+                                modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
 
                             modifier.dungeonLevel = dungeonLevel;
 
@@ -271,14 +275,17 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                 modifier.magicFind = player->GetMagicFind();
 
                 // if player is in dungeon, override avg level and apply vLvl mod
-                if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
+                if (!ignoreMapLevels)
                 {
-                    uint32 cappedDungeonLevel = player->GetMap()->GetCappedDungeonLevel(inst->softcapMod);
+                    if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(player->GetMapId()))
+                    {
+                        uint32 cappedDungeonLevel = player->GetMap()->GetCappedDungeonLevel(inst->softcapMod);
 
-                    modifier.dungeonLevel = cappedDungeonLevel;
-                    modifier.vLvlMod = inst->vLvlMod;
-                    modifier.plrAvgLvl = cappedDungeonLevel;
-                    modifier.lowYield = player->GetCappedItemLevel(inst->softcapMod) - 50.0f > float(cappedDungeonLevel) ? true : false;
+                        modifier.dungeonLevel = cappedDungeonLevel;
+                        modifier.vLvlMod = inst->vLvlMod;
+                        modifier.plrAvgLvl = cappedDungeonLevel;
+                        modifier.lowYield = player->GetCappedItemLevel(inst->softcapMod) - 50.0f > float(cappedDungeonLevel) ? true : false;
+                    }
                 }
             }
 
@@ -334,7 +341,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     lootOwnerGUID = lootOwner->GetGUID();
     dungeonLevel = lootOwner->GetMap()->GetDungeonLevel();
-    if (store.GetName() == "item_loot_template" || store.GetName() == "spell_loot_template")
+    ignoreMapLevels = store.GetName() == "item_loot_template" || store.GetName() == "loot_loot_template" || store.GetName() == "fishing_loot_template" || lootOwner->GetMap()->GetEntry()->IsContinent();
+    if (ignoreMapLevels)
         dungeonLevel = lootOwner->GetAverageItemLevel();
     ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s %s", store.GetName(), store.GetEntryName());
     LootTemplate const* tab = store.GetLootFor(lootId);
