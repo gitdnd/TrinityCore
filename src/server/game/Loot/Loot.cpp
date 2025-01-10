@@ -340,10 +340,10 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         return false;
 
     lootOwnerGUID = lootOwner->GetGUID();
-    dungeonLevel = lootOwner->GetMap()->GetDungeonLevel();
     ignoreMapLevels = store.GetName() == "item_loot_template" || store.GetName() == "spell_loot_template" || store.GetName() == "fishing_loot_template";
-    if (ignoreMapLevels)
-        dungeonLevel = lootOwner->GetAverageItemLevel();
+    dungeonLevel = ignoreMapLevels ?
+        lootOwner->GetCappedItemLevel() :
+        lootOwner->GetMap()->GetDungeonLevel();
     ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s | %s | %s", store.GetName(), store.GetEntryName(), ignoreMapLevels ? "yes" : "i hate derpl");
     LootTemplate const* tab = store.GetLootFor(lootId);
 
