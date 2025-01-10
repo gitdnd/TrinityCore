@@ -279,7 +279,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(itemProto))
     {
-        owner->Say("modifier level, owner level: " + modifier.plrAvgLvl + ", " + owner->GetCappedItemLevel(), LANG_UNIVERSAL);
+        owner->Say("modifier level, owner level: " + std::to_string(modifier.plrAvgLvl) + ", " + std::to_string(owner->GetCappedItemLevel()), LANG_UNIVERSAL);
 
         // pass the players' average item level to the item generator
         if(modifier.plrAvgLvl == 0)
