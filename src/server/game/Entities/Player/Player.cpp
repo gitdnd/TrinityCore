@@ -18459,11 +18459,11 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
     // after spell and quest load
     // Override free talents with new system
-    PreparedQueryResult usedTalentResult = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
-    if (usedTalentResult)
-    {
-        _talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
-    }
+    //PreparedQueryResult usedTalentResult = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_NUM_LEARNT_TALENTS);
+    //if (usedTalentResult)
+    //{
+        //_talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
+    //}
     InitTalentForLevel();
     LearnDefaultSkills();
     LearnCustomSpells();
@@ -28291,6 +28291,7 @@ void Player::LoadCustomTalentLoadout()
                     CastSpell(this, nodeInfo->spellId, false);
         }
     }
+    _talentMgr->UsedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
 }
 
 void Player::LoadCustomTalents(PreparedQueryResult result)
