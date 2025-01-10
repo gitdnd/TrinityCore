@@ -2667,7 +2667,7 @@ void Player::InitTalentForLevel()
     uint32 level = GetXPTalentLevel();
     uint32 bonusLevel = GetBonusTalentLevel();
     int32 newTalentPoints = (level + bonusLevel) - GetUsedTalentCount();
-    ChatHandler(GetSession()).PSendSysMessage("Debug: level %u, bonus level %u, used points %u, new points %i", level, bonusLevel, GetUsedTalentCount(), newTalentPoints);
+    //ChatHandler(GetSession()).PSendSysMessage("Debug: level %u, bonus level %u, used points %u, new points %i", level, bonusLevel, GetUsedTalentCount(), newTalentPoints);
     if (newTalentPoints < 0)
     {
         newTalentPoints = 0;
@@ -18464,7 +18464,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     //{
         //_talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
     //}
-    InitTalentForLevel();
+    //InitTalentForLevel();
     LearnDefaultSkills();
     LearnCustomSpells();
 
