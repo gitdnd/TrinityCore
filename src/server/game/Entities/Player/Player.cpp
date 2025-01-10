@@ -2667,6 +2667,7 @@ void Player::InitTalentForLevel()
     uint32 level = GetXPTalentLevel();
     uint32 bonusLevel = GetBonusTalentLevel();
     int32 newTalentPoints = (level + bonusLevel) - GetUsedTalentCount();
+    ChatHandler(GetSession()).PSendSysMessage("Debug: level {}, bonus level {}, used points {}, new points {}", level, bonusLevel, GetUsedTalentCount(), newTalentPoints);
     if (newTalentPoints < 0)
     {
         newTalentPoints = 0;
