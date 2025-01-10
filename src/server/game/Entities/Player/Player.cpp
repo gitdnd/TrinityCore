@@ -124,7 +124,7 @@
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
-#define MAX_TALENT_LEVEL 150
+#define MAX_TALENT_LEVEL 100
 
 enum CharacterFlags
 {
@@ -2540,7 +2540,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         // FIXME(Harry): Disabled temporarily
         //if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         //    GiveLevel(level + 1);
-        if (talent_level + 1 <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
+        if ((talent_level + 1) <= sWorld->getIntConfig(CONFIG_MAX_TALENT_LEVEL))
         {
             talent_level += 1;
             CastSpell(this, 90299, true); // Talent level up visual
@@ -28292,6 +28292,7 @@ void Player::LoadCustomTalentLoadout()
         }
     }
     _talentMgr->UsedTalentCount = customTalents[GetCurrentTalentLoadout()].size();
+    InitTalentForLevel();
 }
 
 void Player::LoadCustomTalents(PreparedQueryResult result)
