@@ -94,7 +94,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
-    lootSlot = loot->lootSlotFromIndex(lootSlot, player);
+    if(!lguid.IsItem())
+        lootSlot = loot->lootSlotFromIndex(lootSlot, player);
     if (lootSlot == -1)
     {
         TC_LOG_DEBUG("loot", "lootSlotFromIndex returned -1 for player {}", GetPlayer()->GetName().c_str());
