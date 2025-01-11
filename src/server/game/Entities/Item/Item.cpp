@@ -272,9 +272,21 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
 {
     Object::_Create(guidlow, 0, HighGuid::Item);
 
+    if (owner)
+    {
+        const_cast<Player*>(owner)->Say(std::string("itemId: ") +
+            std::to_string(itemId), (Language)0);
+    }
+
     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemId);
     if (!itemProto)
         return false;
+
+    if (owner)
+    {
+        const_cast<Player*>(owner)->Say(std::string("isVirtual: ") +
+            std::to_string(VirtualItemMgr::IsVirtualTemplate(itemProto)), (Language)0);
+    }
 
     // VirtualItem
     if (VirtualItemMgr::IsVirtualTemplate(itemProto))
