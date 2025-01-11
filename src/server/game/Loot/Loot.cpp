@@ -209,12 +209,14 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                             }
 
                             // is this calculation what we really want? really need to double check this logic
-                            modifier.plrAvgLvl = int32(playerLevel) - 50 > int32(dungeonLevel) ? dungeonLevel : playerLevel;
-                            modifier.lowYield = int32(playerLevel) - 50 > int32(dungeonLevel) ? true : false;
-
+                            if (!ignoreMapLevels)
+                            {
+                                modifier.plrAvgLvl = int32(playerLevel) - 50 > int32(dungeonLevel) ? dungeonLevel : playerLevel;
+                                modifier.lowYield = int32(playerLevel) - 50 > int32(dungeonLevel) ? true : false;
+                            }
                             modifier.lootPreference = member->GetActiveLootPreference();
                             modifier.magicFind = member->GetMagicFind();
-                            if(!ignoreMapLevels)
+                            if (!ignoreMapLevels)
                                 modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
 
                             modifier.dungeonLevel = dungeonLevel;
@@ -344,7 +346,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     dungeonLevel = ignoreMapLevels ?
         lootOwner->GetCappedItemLevel() :
         lootOwner->GetMap()->GetDungeonLevel();
-    ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s | %s | %s | %s", store.GetName(), store.GetEntryName(), ignoreMapLevels ? "yes" : "i hate derpl", std::to_string(dungeonLevel));
+    ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s | %s | %s | %s", store.GetName(), store.GetEntryName(), ignoreMapLevels ? "usePlayerLevel" : "useMapLevel", std::to_string(dungeonLevel));
     LootTemplate const* tab = store.GetLootFor(lootId);
 
     if (!tab)
