@@ -344,7 +344,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     dungeonLevel = ignoreMapLevels ?
         lootOwner->GetCappedItemLevel() :
         lootOwner->GetMap()->GetDungeonLevel();
-    ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s | %s | %s", store.GetName(), store.GetEntryName(), ignoreMapLevels ? "yes" : "i hate derpl");
+    ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s | %s | %s | %s", store.GetName(), store.GetEntryName(), ignoreMapLevels ? "yes" : "i hate derpl", std::to_string(dungeonLevel));
     LootTemplate const* tab = store.GetLootFor(lootId);
 
     if (!tab)
