@@ -289,6 +289,11 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
                         modifier.lowYield = player->GetCappedItemLevel(inst->softcapMod) - 50.0f > float(cappedDungeonLevel) ? true : false;
                     }
                 }
+                else
+                {
+                    modifier.dungeonLevel = player->GetCappedItemLevel();
+                    modifier.plrAvgLvl = player->GetCappedItemLevel();
+                }
             }
 
             if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
@@ -346,7 +351,6 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     dungeonLevel = ignoreMapLevels ?
         lootOwner->GetCappedItemLevel() :
         lootOwner->GetMap()->GetDungeonLevel();
-    ChatHandler(lootOwner->GetSession()).PSendSysMessage("%s | %s | %s | %s", store.GetName(), store.GetEntryName(), ignoreMapLevels ? "usePlayerLevel" : "useMapLevel", std::to_string(dungeonLevel));
     LootTemplate const* tab = store.GetLootFor(lootId);
 
     if (!tab)
