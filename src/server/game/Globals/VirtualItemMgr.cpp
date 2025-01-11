@@ -447,7 +447,7 @@ void VirtualItemMgr::GenerateItemLevel(VirtualItemTemplate* output, VirtualModif
         // if the total ilevel exceeds the dungeonLevel, clamp it to dungeon level, which isn't the actual dungeon level, but what do I know
         if (!isCrafted && ilevel > modifier.dungeonLevel)
         {
-            ilevel = modifier.dungeonLevel;
+            //ilevel = modifier.dungeonLevel;
         }
     }
 
