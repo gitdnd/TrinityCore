@@ -668,6 +668,21 @@ class spell_item_grant_fishing_quest : public SpellScript
     }
 };
 
+class spell_item_cataclysm : public SpellScript
+{
+    PrepareSpellScript(spell_item_cataclysm);
+
+    void HandleImmolate(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetHitUnit(), this->GetSpellInfo()->GetEffect(EFFECT_1).TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_item_cataclysm::HandleImmolate, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -686,4 +701,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_require_virtual_item);
     RegisterSpellScript(spell_item_require_virtual_item_or_heirloom);
     RegisterSpellScript(spell_item_grant_fishing_quest);
+    RegisterSpellScript(spell_item_cataclysm);
 }
