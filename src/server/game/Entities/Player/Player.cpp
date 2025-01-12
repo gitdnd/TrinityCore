@@ -7238,7 +7238,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         DestroyZoneLimitedItem(true, newZone);
 
     // check some item equip limitations (in result lost CanTitanGrip at talent reset, for example)
-    AutoUnequipOffhandIfNeed();
+    //AutoUnequipOffhandIfNeed();
 
     // recent client version not send leave/join channel packets for built-in local channels
     UpdateLocalChannels(newZone);
