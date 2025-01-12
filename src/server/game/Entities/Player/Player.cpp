@@ -18465,6 +18465,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
         //_talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
     //}
     //InitTalentForLevel();
+    LoadCustomTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
     LearnDefaultSkills();
     LearnCustomSpells();
 
@@ -18589,7 +18590,6 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
-    LoadCustomTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
 
 
     return true;
