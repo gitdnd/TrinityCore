@@ -18438,6 +18438,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
     }
 
     UpdateDisplayPower();
+    LoadCustomTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
     _LoadTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
     _LoadSpells(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELLS));
 
@@ -18465,7 +18466,6 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
         //_talentMgr->UsedTalentCount = usedTalentResult->Fetch()[0].GetUInt32();
     //}
     //InitTalentForLevel();
-    LoadCustomTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CUSTOM_TALENTS));
     LearnDefaultSkills();
     LearnCustomSpells();
 
