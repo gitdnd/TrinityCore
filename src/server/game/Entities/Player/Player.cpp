@@ -28470,6 +28470,7 @@ void Player::HandleSpecialTalentUnlearn(uint32 spellId)
     {
     case 94540:
     {
+        RemoveAurasDueToSpell(m_titanGripPenaltySpellId);
         SetCanTitanGrip(false);
         AutoUnequipOffhandIfNeed();
     } break;
