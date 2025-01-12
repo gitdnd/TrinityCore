@@ -314,12 +314,13 @@ float Player::GetHealthBonusFromStamina()
 
 float Player::GetManaBonusFromIntellect()
 {
-    float intellect = GetStat(STAT_INTELLECT);
+    //float intellect = GetStat(STAT_INTELLECT);
 
-    float baseInt = std::min(20.0f, intellect);
-    float moreInt = intellect - baseInt;
+    //float baseInt = std::min(20.0f, intellect);
+    //float moreInt = intellect - baseInt;
 
-    return baseInt + (moreInt * 10.0f);
+    //return baseInt + (moreInt * 10.0f);
+    return GetStat(STAT_INTELLECT) * 10.f;
 }
 
 void Player::UpdateMaxHealth()
