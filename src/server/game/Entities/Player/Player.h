@@ -2340,7 +2340,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool HasTalentWithMask(uint32 mask);
         std::vector<uint32> GetCustomTalents() { return customTalents[GetCurrentTalentLoadout()]; }
         bool CanStillReachRootTalentNode(const TalentNodeInfo* nodeInfo, std::vector<uint32>& visited, uint32 depth);
-
+        void HandleSpecialTalentUnlearn(uint32 spellId);
         void CustomAutoLoot(Creature* target);
 
         uint32 GetCraftingComponent(uint8 slot) const { if (slot >= CRAFTING_TOTAL) return 0; return craftingComponents[slot]; }

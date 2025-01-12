@@ -28076,6 +28076,7 @@ void Player::DeactivateTalentLoadout()
         //RemoveSpell(nodeInfo->spellId);
         RemoveTemporarySpell(nodeInfo->spellId);
         RemoveOwnedAura(nodeInfo->spellId, GetGUID());
+        HandleSpecialTalentUnlearn(nodeInfo->spellId);
     }
 }
 
@@ -28216,7 +28217,7 @@ bool Player::UnlearnCustomTalent(uint32 id)
     stmt->setUInt32(1, id);
     stmt->setUInt32(2, GetCurrentTalentLoadout());
     CharacterDatabase.Execute(stmt);
-
+    HandleSpecialTalentUnlearn(nodeInfo->spellId);
     return true;
 }
 
@@ -28460,5 +28461,19 @@ void Player::UnbindInstances(uint32 mapId)
             else
                 ++itr;
         }
+    }
+}
+
+void Player::HandleSpecialTalentUnlearn(uint32 spellId)
+{
+    switch (spellId)
+    {
+    case 94540:
+    {
+        SetCanTitanGrip(false);
+        AutoUnequipOffhandIfNeed();
+    } break;
+    default:
+        break;
     }
 }
