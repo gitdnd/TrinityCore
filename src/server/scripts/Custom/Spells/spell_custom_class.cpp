@@ -2399,7 +2399,7 @@ class spell_talent_blade_barrier : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        Unit* caster = eventInfo.GetProcTarget();
+        Unit* caster = GetTarget();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), aurEff->GetAmount()));
         caster->CastSpell(caster, aurEff->GetSpellEffectInfo().TriggerSpell, args);
