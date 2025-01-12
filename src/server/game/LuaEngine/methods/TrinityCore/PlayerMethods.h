@@ -2905,7 +2905,7 @@ namespace LuaPlayer
         }
 
         E->Push(player->EquipItem(dest, item, true));
-        player->AutoUnequipOffhandIfNeed();
+        //player->AutoUnequipOffhandIfNeed();
         return 1;
     }
 
