@@ -10,6 +10,7 @@
 #include "SpellScript.h"
 #include "ItemTemplate.h"
 #include "Creature.h"
+#include "WorldSession.h"
 
 
 enum CustomClassSpells
@@ -584,6 +585,8 @@ class spell_talent_titans_grip : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Player* player = GetCaster()->ToPlayer();
+        if (player->GetSession()->isLogingOut())
+            return;
         player->SetCanTitanGrip(false);
         player->AutoUnequipOffhandIfNeed(true);
     }

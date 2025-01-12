@@ -3777,8 +3777,8 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
             SetCanDualWield(false);
     }
 
-    if (sWorld->getBoolConfig(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN))
-        AutoUnequipOffhandIfNeed();
+    //if (sWorld->getBoolConfig(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN))
+        //AutoUnequipOffhandIfNeed();
 
     if (needsUnlearnSpellsPacket)
         SendUnlearnSpells();
