@@ -687,10 +687,11 @@ class spell_talent_thunderous_roar: public AuraScript
 {
     PrepareAuraScript(spell_talent_thunderous_roar);
 
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
     {
         PreventDefaultAction();
         amount = CalculatePct(GetCaster()->GetMaxHealth(), aurEff->GetMiscValue()) / (aurEff->GetAmplitude() / 1000);
+        canBeRecalculated = false;
     }
     void Register() override
     {
