@@ -593,7 +593,7 @@ class spell_talent_titans_grip : public AuraScript
     void Register() override
     {
         AfterEffectApply += AuraEffectApplyFn(spell_talent_titans_grip::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_talent_titans_grip::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        //AfterEffectRemove += AuraEffectRemoveFn(spell_talent_titans_grip::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
