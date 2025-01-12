@@ -683,6 +683,21 @@ class spell_item_cataclysm : public SpellScript
     }
 };
 
+class spell_talent_thunderous_roar: public AuraScript
+{
+    PrepareAuraScript(spell_talent_thunderous_roar);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        PreventDefaultAction();
+        amount += CalculatePct(GetCaster()->GetMaxHealth(), aurEff->GetMiscValue());
+    }
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_talent_thunderous_roar::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -702,4 +717,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_require_virtual_item_or_heirloom);
     RegisterSpellScript(spell_item_grant_fishing_quest);
     RegisterSpellScript(spell_item_cataclysm);
+    RegisterSpellScript(spell_talent_thunderous_roar);
 }

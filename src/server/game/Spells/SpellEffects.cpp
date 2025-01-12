@@ -782,6 +782,11 @@ void Spell::EffectSchoolDMG()
                 damage += int32(CalculatePct(unitCaster->ToPlayer()->GetComboPoints() * ap, 7));
                 break;
             }
+            case 450073:
+            {
+                damage += CalculatePct(unitCaster->GetMaxHealth(), effectInfo->MiscValue);
+                break;
+            }
             case 42873: // Fire Blast
             {
                 float critChance = unitCaster->SpellCritChanceDone(m_spellInfo, m_spellSchoolMask, m_attackType, false);
