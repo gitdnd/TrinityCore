@@ -784,7 +784,7 @@ void Spell::EffectSchoolDMG()
             }
             case 450073:
             {
-                damage += CalculatePct(unitCaster->GetMaxHealth(), effectInfo->MiscValue);
+                damage = CalculatePct(unitCaster->GetMaxHealth(), effectInfo->MiscValue);
                 break;
             }
             case 42873: // Fire Blast
