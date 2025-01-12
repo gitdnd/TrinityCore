@@ -679,7 +679,7 @@ class spell_item_cataclysm : public SpellScript
 
     void Register() override
     {
-        OnEffectHit += SpellEffectFn(spell_item_cataclysm::HandleImmolate, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_item_cataclysm::HandleImmolate, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
