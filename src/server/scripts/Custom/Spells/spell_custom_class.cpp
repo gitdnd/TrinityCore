@@ -2402,7 +2402,7 @@ class spell_talent_blade_barrier : public AuraScript
         Unit* caster = eventInfo.GetActor();
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), aurEff->GetAmount()));
-        caster->CastSpell(nullptr, aurEff->GetSpellEffectInfo().TriggerSpell, args);
+        caster->CastSpell(caster, aurEff->GetSpellEffectInfo().TriggerSpell, args);
     }
 
     void Register() override
