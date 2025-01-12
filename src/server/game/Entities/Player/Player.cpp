@@ -685,7 +685,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
             break;
 
         EquipNewItem(eDest, titem_id, true);
-        AutoUnequipOffhandIfNeed();
+        //AutoUnequipOffhandIfNeed();
         --titem_amount;
     }
 
@@ -8002,7 +8002,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         {
             RemoveAurasDueToSpell(m_titanGripPenaltySpellId);
             SetCanTitanGrip(false);
-            AutoUnequipOffhandIfNeed();
+            //AutoUnequipOffhandIfNeed();
         }
 
         // wrong triggering type
@@ -9805,7 +9805,7 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
                 {
                     if (mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF)
                     {
-                        const_cast<Player*>(this)->AutoUnequipOffhandIfNeed(true);
+                        //const_cast<Player*>(this)->AutoUnequipOffhandIfNeed(true);
                         break;
                     }
                 }
@@ -9815,7 +9815,7 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             {
                 if (proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || proto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF)
                 {
-                    const_cast<Player*>(this)->AutoUnequipOffhandIfNeed(true);
+                    //const_cast<Player*>(this)->AutoUnequipOffhandIfNeed(true);
                     break;
                 }
             }
@@ -13409,7 +13409,7 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
             pSrcItem->SendUpdateToPlayer(this);
         pSrcItem->SetState(ITEM_CHANGED, this);
         EquipItem(dest, pNewItem, true);
-        AutoUnequipOffhandIfNeed();
+        //AutoUnequipOffhandIfNeed();
     }
 }
 
@@ -13528,7 +13528,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
             RemoveItem(srcbag, srcslot, true);
             EquipItem(dest, pSrcItem, true);
-            AutoUnequipOffhandIfNeed();
+            //AutoUnequipOffhandIfNeed();
         }
 
         return;
@@ -13563,7 +13563,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
                 else if (IsEquipmentPos(dst))
                 {
                     EquipItem(eDest, pSrcItem, true);
-                    AutoUnequipOffhandIfNeed();
+                    //AutoUnequipOffhandIfNeed();
                 }
             }
             else
@@ -13757,7 +13757,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
         }
     }
 
-    AutoUnequipOffhandIfNeed();
+    //AutoUnequipOffhandIfNeed();
 }
 
 void Player::AddItemToBuyBackSlot(Item* pItem)
@@ -22414,8 +22414,8 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         SendDirectMessage(&data);
         SendNewItem(it, pProto->BuyCount * count, true, false, false);
 
-        if (!bStore)
-            AutoUnequipOffhandIfNeed();
+        //if (!bStore)
+            //AutoUnequipOffhandIfNeed();
 
         if (pProto->HasFlag(ITEM_FLAG_ITEM_PURCHASE_RECORD) && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
         {
