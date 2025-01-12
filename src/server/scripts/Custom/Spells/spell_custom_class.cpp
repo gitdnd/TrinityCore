@@ -2386,6 +2386,31 @@ class spell_talent_drw_debuff : public AuraScript
     }
 };
 
+// 94592 - Blade Barrier
+class spell_talent_blade_barrier : public AuraScript
+{
+    PrepareAuraScript(spell_talent_blade_barrier);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->GetEffect(EFFECT_0).TriggerSpell });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), aurEff->GetAmount()));
+        caster->CastSpell(nullptr, aurEff->GetSpellEffectInfo().TriggerSpell, args);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_blade_barrier::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_howling_blast_frozen();
@@ -2440,4 +2465,5 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_item_stat_to_haste);
     RegisterSpellScript(spell_talent_absolute_zero);
     RegisterSpellScript(spell_class_fingers_of_frost_stacks);
+    RegisterSpellScript(spell_talent_blade_barrier);
 };
