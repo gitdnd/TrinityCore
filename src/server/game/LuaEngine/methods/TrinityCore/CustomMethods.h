@@ -2088,7 +2088,7 @@ namespace LuaCustom
         { "SummonPassenger", &SummonPassenger }
     };
 
-    inline void RegisterCustomFunctions(Eluna* E)
+    inline void RegisterCustomMethods(Eluna* E)
     {
         ElunaTemplate<>::SetMethods(E, GlobalMethods);
 
