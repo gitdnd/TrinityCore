@@ -293,7 +293,7 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
     Clock::time_point curTime = GameTime::GetSystemTime();
     Clock::time_point catrecTime;
     Clock::time_point recTime;
-    bool needsCooldownPacket = false;
+    bool needsCooldownPacket = true;
 
     // overwrite time for selected category
     if (onHold)
