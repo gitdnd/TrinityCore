@@ -1785,6 +1785,23 @@ namespace LuaCustom
         return 1;
     }
 
+    int SendToTransport(Eluna* E, Transport* transport)
+    {
+        WorldObject* player = E->CHECKOBJ<WorldObject>(2);
+
+        if (!player)
+            return;
+
+        float x, y, z, o;
+
+        transport->CalculatePassengerPosition(x, y, z, &o);
+
+        player->Relocate(x, y, z, o);
+        transport->AddPassenger(player);
+
+        return 0;
+    }
+
     int ChannelSpell(Eluna* E, Unit* unit)
     {
         Unit* target = E->CHECKOBJ<Unit>(2);
@@ -2085,7 +2102,8 @@ namespace LuaCustom
         { "EnableMovement", &EnableMovement },
         { "AddPassenger", &AddPassenger },
         { "GetPassengers", &GetPassengers },
-        { "SummonPassenger", &SummonPassenger }
+        { "SummonPassenger", &SummonPassenger },
+        { "SendToTransport", &SendToTransport },
     };
 
     inline void RegisterCustomMethods(Eluna* E)
