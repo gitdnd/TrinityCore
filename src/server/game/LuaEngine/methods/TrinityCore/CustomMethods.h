@@ -1790,7 +1790,7 @@ namespace LuaCustom
         WorldObject* player = E->CHECKOBJ<WorldObject>(2);
 
         if (!player)
-            return;
+            return 0;
 
         float x, y, z, o;
 
@@ -2103,7 +2103,7 @@ namespace LuaCustom
         { "AddPassenger", &AddPassenger },
         { "GetPassengers", &GetPassengers },
         { "SummonPassenger", &SummonPassenger },
-        { "SendToTransport", &SendToTransport },
+        { "SendToTransport", &SendToTransport }
     };
 
     inline void RegisterCustomMethods(Eluna* E)
