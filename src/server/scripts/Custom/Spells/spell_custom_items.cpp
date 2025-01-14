@@ -767,6 +767,7 @@ class spell_item_reroll_legendary : public SpellScript
                 vTemp->Spells[i].SpellId = 0;
             }
             uint32 oldLegId = vTemp->legendaryId;
+            vTemp->legendaryId = 0;
             VirtualModifier modifier;
             modifier.quality = vTemp->Quality;
             modifier.seed = vTemp->seed;
