@@ -2013,14 +2013,18 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.itemSubClass = fields[4].GetInt8();
         legTemp.itemInventoryType = fields[5].GetInt8();
         legTemp.itemStatGroup = fields[6].GetInt8();
-        legTemp.primaryStatModifier = fields[7].GetFloat();
-        legTemp.secondaryStatModifier = fields[8].GetFloat();
-        legTemp.socketMod = fields[9].GetInt8();
-        legTemp.generatePrismatic = fields[10].GetBool();
-        legTemp.primaryStatCountMod = fields[11].GetInt8();
-        legTemp.secondaryStatCountMod = fields[12].GetInt8();
-        legTemp.statGroupOverride = fields[13].GetInt8();
-        legTemp.limitCatagory = fields[14].GetUInt32();
+        legTemp.itemStatGroupGroup = fields[7].GetInt32();
+        legTemp.primaryStatModifier = fields[8].GetFloat();
+        legTemp.secondaryStatModifier = fields[9].GetFloat();
+        legTemp.socketMod = fields[10].GetInt8();
+        legTemp.generatePrismatic = fields[11].GetBool();
+        legTemp.primaryStatCountMod = fields[12].GetInt8();
+        legTemp.secondaryStatCountMod = fields[13].GetInt8();
+        legTemp.statGroupOverride = fields[14].GetInt8();
+        legTemp.limitCatagory = fields[15].GetUInt32();
+        legTemp.essenceItemId = fields[16].GetUInt32();
+        legTemp.legendarySpellTemplateId = fields[17].GetUInt32();
+        legTemp.legendaryFlags = fields[18].GetUInt32();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
@@ -2040,7 +2044,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
             spell.SpellCategory = 0;
             spell.SpellCategoryCooldown = -1;
             if (QueryResult spellEntry = WorldDatabase.PQuery("SELECT SpellId, SpellTrigger, SpellCharges, SpellPPMRate, SpellCooldown, SpellCategory, SpellCategoryCooldown"
-                " FROM item_generator_legendary_spell_entry WHERE legendaryIndex = {} AND spellIndex = {}", legTemp.legendaryId, i))
+                " FROM item_generator_legendary_spell_entry WHERE legendaryIndex = {} AND spellIndex = {}", legTemp.legendarySpellTemplateId, i))
             {
                 Field* spellFields = spellEntry->Fetch();
                 spell.SpellId = spellFields[0].GetUInt32();
@@ -2090,15 +2094,30 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     {
         if (skipLeg && itr.second.legendaryId == skipLeg)
             continue;
+
+        if (itr.second.legendaryFlags && (itr.second.legendaryFlags & LEGENDARY_FLAG_DROP_DISABLED))
+            continue;
+
         SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, int32(output->ItemLevel));
+
         if (SelectSkipDebug(itr.second.itemClass, output->Class, "[Class]"))
             continue;
+
         if (SelectSkipDebug(itr.second.itemSubClass, output->SubClass, "[SubClass]"))
             continue;
+
         if (SelectSkipDebug(itr.second.itemInventoryType, output->InventoryType, "[InventoryType]"))
             continue;
+
         if (SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
             continue;
+
+        if(itr.second.itemStatGroupGroup && !(itr.second.itemStatGroupGroup & StatGroupToMask(output->statGroup)))
+            continue;
+
+        if (itr.second.legendaryFlags && (itr.second.legendaryFlags & LEGENDARY_FLAG_CRAFTED_ONLY) && !modifier.isCrafted)
+            continue;
+
         bool skip = false;
         for (uint8 i = 0; i < MAX_LEGENDARY_SPELLS; ++i)
         {
@@ -2159,6 +2178,69 @@ uint32 VirtualItemTemplate::GetDBCDisplay()
     if (ItemEntry const* dbcitem = sItemStore.LookupEntry(ItemId))
         return dbcitem->DisplayInfoID;
 
+    return 0;
+}
+
+uint32 VirtualItemMgr::StatGroupToMask(uint32 statGroupId)
+{
+    switch (statGroupId)
+    {
+    case STAT_GROUP_INT_HEALING:
+    {
+        return STAT_GROUP_GROUP_HEALING | STAT_GROUP_GROUP_INT | STAT_GROUP_GROUP_CASTER;
+    }break;
+    case STAT_GROUP_INT_DPS:
+    {
+        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_INT | STAT_GROUP_GROUP_CASTER;
+    }break;
+    case STAT_GROUP_STR_DPS_NO_HIT:
+    {
+        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+    }break;
+    case STAT_GROUP_STR_PARRY_TANK:
+    {
+        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+    }break;
+    case STAT_GROUP_AGI_DPS_NO_HIT:
+    {
+        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_MELEE;
+    }break;
+    case STAT_GROUP_AGI_DODGE_TANK:
+    {
+        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_MELEE;
+    }break;
+    case STAT_GROUP_SPI_DPS:
+    {
+        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_SPI | STAT_GROUP_GROUP_CASTER;
+    }break;
+    case STAT_GROUP_SPI_HEALING:
+    {
+        return STAT_GROUP_GROUP_HEALING | STAT_GROUP_GROUP_SPI | STAT_GROUP_GROUP_CASTER;
+    }break;
+    case STAT_GROUP_STR_DPS_NO_EXP:
+    {
+        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_RANGED;
+    }break;
+    case STAT_GROUP_STR_BLOCK_TANK:
+    {
+        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+    }break;
+    case STAT_GROUP_AGI_DPS_NO_EXP:
+    {
+        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_RANGED;
+    }break;
+    case STAT_GROUP_AGI_BLOCK_TANK:
+    {
+        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+    }break;
+    case STAT_GROUP_ALL:
+    case STAT_GROUP_ALL_EXTENDED:
+    default:
+    {
+        return STAT_GROUP_GROUP_HEALING | STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_INT |
+            STAT_GROUP_GROUP_SPI | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_CASTER | STAT_GROUP_GROUP_MELEE | STAT_GROUP_GROUP_RANGED;
+    }break;
+    }
     return 0;
 }
 

@@ -34,6 +34,20 @@ enum StatGroup
     STAT_GROUP_RANDOM = STAT_GROUP_COUNT,
 };
 
+enum StatGroupGroup : uint32
+{
+    STAT_GROUP_GROUP_HEALING = 1,
+    STAT_GROUP_GROUP_DPS = 2,
+    STAT_GROUP_GROUP_TANK = 4,
+    STAT_GROUP_GROUP_INT = 8,
+    STAT_GROUP_GROUP_SPI = 16,
+    STAT_GROUP_GROUP_STR = 32,
+    STAT_GROUP_GROUP_AGI = 64,
+    STAT_GROUP_GROUP_CASTER = 128,
+    STAT_GROUP_GROUP_MELEE = 256,
+    STAT_GROUP_GROUP_RANGED = 512,
+};
+
 enum StatGroupType
 {
     STAT_GROUP_TYPE_PRIMARY,
@@ -264,6 +278,12 @@ struct itemSetInfo
     std::string flavorOverride;
 };
 
+enum LegendaryFlags : uint32
+{
+    LEGENDARY_FLAG_CRAFTED_ONLY = 1, // legendary can only be gained in crafted items.
+    LEGENDARY_FLAG_DROP_DISABLED = 2 // legendary can only be gained through essences.
+};
+
 struct legendaryItemInfo
 {
     uint32 legendaryId;
@@ -273,6 +293,7 @@ struct legendaryItemInfo
     int8 itemSubClass;
     int8 itemInventoryType;
     int8 itemStatGroup;
+    int32 itemStatGroupGroup;
     _Spell legendarySpells[MAX_LEGENDARY_SPELLS];
     float primaryStatModifier;
     float secondaryStatModifier;
@@ -282,6 +303,10 @@ struct legendaryItemInfo
     int8 secondaryStatCountMod;
     int8 statGroupOverride;
     uint32 limitCatagory;
+    uint32 essenceItemId;
+    uint32 legendaryFlags;
+    uint32 legendarySpellTemplateId;
+    
     /*
     @Todo:
     float damageScaleModifier;
@@ -478,6 +503,8 @@ public:
     void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier, uint32 skipLeg = 0);
     void UpdateHoneDisplaySpell(VirtualItemTemplate* output);
     void ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId);
+
+    uint32 StatGroupToMask(uint32 statGroupId);
 private:
 
     class StatGroupData
