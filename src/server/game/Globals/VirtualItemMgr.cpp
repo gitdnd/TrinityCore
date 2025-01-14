@@ -993,17 +993,17 @@ void VirtualItemMgr::GenerateItemDisplay(VirtualItemTemplate* output, VirtualMod
     if (modifier.displayId)
         display = modifier.displayId;
 
+    // If an item is flagged as static display, use the static display
+    if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
+        display = output->DisplayInfoID;
+
     // randomize sheath position if the item is a 1h sword, axe or dagger
-    if (output->Class == ITEM_CLASS_WEAPON && (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || output->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
+    else if (output->Class == ITEM_CLASS_WEAPON && (output->SubClass == ITEM_SUBCLASS_WEAPON_AXE || output->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || output->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
     {
         // 50% chance for back sheath
         if (urand(0, 1, generator) < 1)
             output->Sheath = 1;
     }
-
-    // If an item is flagged as static display, use the static display
-    else if (output->HasFlag(VIRTUAL_ITEM_FLAG_DISPLAY_STATIC))
-        display = output->DisplayInfoID;
 
     output->DisplayInfoID = display;
 }
@@ -2064,7 +2064,7 @@ legendaryItemInfo const* VirtualItemMgr::GetLegendaryItemInfo(uint32 id) const
     return Trinity::Containers::MapGetValuePtr(_LegendaryTemplateStore, id);
 }
 
-void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier)
+void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier, uint32 skipLeg)
 {
     if (modifier.legendaryOverride)
     {
@@ -2088,6 +2088,8 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
     }
     for (auto const& itr : _LegendaryTemplateStore)
     {
+        if (skipLeg && itr.second.legendaryId == skipLeg)
+            continue;
         SelectMinMaxSkip(itr.second.minItemLevel, itr.second.maxItemLevel, int32(output->ItemLevel));
         if (SelectSkipDebug(itr.second.itemClass, output->Class, "[Class]"))
             continue;

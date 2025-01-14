@@ -475,7 +475,7 @@ public:
 
     void LoadLegendaryTemplate();
     legendaryItemInfo const* GetLegendaryItemInfo(uint32 id) const;
-    void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier);
+    void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier, uint32 skipLeg = 0);
     void UpdateHoneDisplaySpell(VirtualItemTemplate* output);
     void ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId);
 private:

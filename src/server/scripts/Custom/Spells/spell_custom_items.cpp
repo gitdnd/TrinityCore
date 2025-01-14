@@ -699,6 +699,131 @@ class spell_talent_thunderous_roar: public AuraScript
     }
 };
 
+class spell_item_reroll_legendary : public SpellScript
+{
+    PrepareSpellScript(spell_item_reroll_legendary);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        const Item* it = GetExplTargetItem();
+        if (!it)
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        // prevent disenchanting in trade slot
+        if (it->GetOwnerGUID() != GetCaster()->GetGUID())
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        if (it->IsBroken())
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(it->GetEntry()))
+        {
+            if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
+                return SPELL_FAILED_NO_VALID_TARGETS;
+
+            if(!vTemp->legendaryId)
+                return SPELL_FAILED_NO_VALID_TARGETS;
+        }
+        else
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Item* itemTarget = GetExplTargetItem();
+        Player* player = GetCaster()->ToPlayer();
+        if (!itemTarget || !player)
+            return;
+
+        if (VirtualItemTemplate* vTemp = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry()))
+        {
+            itemTarget->ToogleStats(false);
+            for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+            {
+                uint32 enchant_id = itemTarget->GetEnchantmentId(EnchantmentSlot(enchant_slot));
+                if (!enchant_id)
+                    continue;
+
+                SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                if (!enchantEntry)
+                    continue;
+
+                player->ApplyEnchantment(itemTarget, EnchantmentSlot(enchant_slot), false);
+                itemTarget->SetEnchantment(EnchantmentSlot(enchant_slot), 0, 0, 0, player->GetGUID());
+            }
+            player->ApplyEnchantment(itemTarget, PRISMATIC_ENCHANTMENT_SLOT, false);
+
+            itemTarget->SetEnchantment(PRISMATIC_ENCHANTMENT_SLOT, 0, 0, 0, player->GetGUID());
+
+            for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+            {
+                vTemp->Spells[i].SpellId = 0;
+            }
+            uint32 oldLegId = vTemp->legendaryId;
+            VirtualModifier modifier;
+            modifier.quality = vTemp->Quality;
+            modifier.seed = vTemp->seed;
+            modifier.displaySeed = vTemp->displaySeed;
+            modifier.nameSeed = vTemp->nameSeed;
+            modifier.qualitySeed = vTemp->qualitySeed;
+            modifier.socketSeed = vTemp->socketSeed;
+            modifier.spellSeed = vTemp->spellSeed;
+            modifier.statSeed = vTemp->statSeed;
+            modifier.statValueSeed = vTemp->statValueSeed;
+            modifier.statGroupSeed = vTemp->statGroupSeed;
+            modifier.ilevel = vTemp->ItemLevel;
+            modifier.statgroup = vTemp->statGroup;
+            modifier.setOverride = vTemp->ItemSet;
+            modifier.legendarySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
+
+            sVirtualItemMgr.InitSeedGen(modifier);
+            sVirtualItemMgr.GenerateQuality(vTemp, modifier);
+            sVirtualItemMgr.GenerateLegendaryItemEffect(vTemp, modifier, oldLegId);
+            player->ApplyVirtualItemLegendayEffects(itemTarget);
+            sVirtualItemMgr.GenerateStatGroup(vTemp, modifier);
+            sVirtualItemMgr.GenerateBaseStats(vTemp, modifier);
+            sVirtualItemMgr.GenerateItemStats(vTemp, modifier);
+            sVirtualItemMgr.GenerateSockets(vTemp, modifier);
+            sVirtualItemMgr.GenerateItemName(vTemp, modifier);
+            sVirtualItemMgr.GenerateSpells(vTemp, modifier);
+            sVirtualItemMgr.GenerateItemDisplay(vTemp, modifier);
+            sVirtualItemMgr.UpdateDisenchantId(vTemp, modifier);
+            if (vTemp->honeLevel > 0)
+                sVirtualItemMgr.UpdateHoneDisplaySpell(vTemp);
+
+            vTemp->seed = modifier.seed;
+            vTemp->displaySeed = modifier.displaySeed;
+            vTemp->nameSeed = modifier.nameSeed;
+            vTemp->socketSeed = modifier.socketSeed;
+            vTemp->spellSeed = modifier.spellSeed;
+            vTemp->statSeed = modifier.statSeed;
+            vTemp->statValueSeed = modifier.statValueSeed;
+            vTemp->statGroupSeed = modifier.statGroupSeed;
+
+            vTemp->InitializeQueryData();
+            WorldPacket response = vTemp->BuildQueryData(LOCALE_enUS);
+            sWorld->SendGlobalMessage(&response);
+            itemTarget->SaveVirtualItemInfo();
+            itemTarget->ToogleStats(true);
+        }
+
+        
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_reroll_legendary::CheckRequirement);
+        OnEffectHit += SpellEffectFn(spell_item_reroll_legendary::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -719,4 +844,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_item_grant_fishing_quest);
     RegisterSpellScript(spell_item_cataclysm);
     RegisterSpellScript(spell_talent_thunderous_roar);
+    RegisterSpellScript(spell_item_reroll_legendary);
 }
