@@ -64,8 +64,135 @@ enum CustomClassSpells
     SPELL_ITEM_LOTUS_RESTORE   = 91048,
     SPELL_CLASS_FINGERS_OF_FROST     = 97332,
     SPELL_CLASS_FINGERS_OF_FROST_STACKS = 97333,
-    SPELL_FREEZE               = 97334
+    SPELL_FREEZE               = 97334,
+    SPELL_TALENT_UNINSPIRED = 1006127,
+    SPELL_TALENT_BRAINSTORM = 1006131
 
+};
+
+namespace SharedData
+{
+    static std::map<uint64, std::deque<uint32>> playerSpellHistory;
+}
+
+// 94292 - Prodigy
+class spell_talent_prodigy : public AuraScript
+{
+    PrepareAuraScript(spell_talent_prodigy);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetTarget();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        SpellInfo const* triggeredSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+        if (!triggeredSpell)
+            return;
+
+        uint32 currentSpellId = triggeredSpell->Id;
+        uint64 playerGUID = caster->GetGUID();
+
+
+        auto& history = SharedData::playerSpellHistory[playerGUID];
+        int stacksToAdd = 1;
+
+
+        int stacks = 0;
+        auto itr = std::find(history.begin(), history.end(), currentSpellId);
+
+        if (itr != history.end())
+        {
+            int distance = std::distance(itr, history.end()) - 1;
+
+            if (distance == 0)
+                stacks = 4;
+            else if (distance == 1)
+                stacks = 3;
+            else if (distance == 2)
+                stacks = 2;
+            else if (distance == 3)
+                stacks = 1;
+        }
+
+        if (stacks == 0)
+        {
+            caster->CastSpell(caster, SPELL_TALENT_BRAINSTORM, true);
+        }
+        else
+        {
+            for (int i = 0; i < stacks; i++)
+            {
+                caster->CastSpell(caster, SPELL_TALENT_UNINSPIRED, true);
+            }
+            GetTarget()->RemoveAurasDueToSpell(SPELL_TALENT_BRAINSTORM);
+        }
+
+        if (itr != history.end())
+            history.erase(itr);
+
+        history.push_back(currentSpellId);
+        if (history.size() > 4)
+            history.pop_front();
+
+    }
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_prodigy::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+
+};
+
+
+// 94294 - Brainstorm
+class spell_talent_brainstorm : public AuraScript
+{
+    PrepareAuraScript(spell_talent_brainstorm);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CLASS_EMPOWERED_ATTACK });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetTarget();
+        Unit* target = eventInfo.GetProcTarget();
+        if (!caster || !caster->IsPlayer())
+            return;
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+
+        Aura* newAura = caster->GetAura(SPELL_TALENT_BRAINSTORM);
+        uint32 stacks = newAura->GetStackAmount();
+        uint32 spellId = eventInfo.GetSpellInfo()->Id;
+
+        if (stacks >= 5)
+        {
+            if (caster->GetSpellHistory()->HasCooldown(spellId))
+            {
+                caster->GetSpellHistory()->ResetCooldown(spellId, true);
+                GetTarget()->RemoveAurasDueToSpell(GetId());
+
+                uint64 playerGUID = caster->GetGUID();
+                SharedData::playerSpellHistory.erase(playerGUID);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_talent_brainstorm::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
 };
 
 // deep freeze
@@ -2469,4 +2596,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_absolute_zero);
     RegisterSpellScript(spell_class_fingers_of_frost_stacks);
     RegisterSpellScript(spell_talent_blade_barrier);
+    RegisterSpellScript(spell_talent_prodigy);
+    RegisterSpellScript(spell_talent_brainstorm);
 };
