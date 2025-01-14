@@ -766,6 +766,13 @@ class spell_item_reroll_legendary : public SpellScript
             {
                 vTemp->Spells[i].SpellId = 0;
             }
+
+            for (uint8 i = 0; i < MAX_GEM_SOCKETS; ++i)
+            {
+                vTemp->Socket[i].Color = 0;
+                vTemp->Socket[i].Content = 0;
+            }
+
             uint32 oldLegId = vTemp->legendaryId;
             vTemp->legendaryId = 0;
             VirtualModifier modifier;
@@ -892,6 +899,12 @@ class spell_item_remove_legendary : public SpellScript
             for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
             {
                 vTemp->Spells[i].SpellId = 0;
+            }
+
+            for (uint8 i = 0; i < MAX_GEM_SOCKETS; ++i)
+            {
+                vTemp->Socket[i].Color = 0;
+                vTemp->Socket[i].Content = 0;
             }
             uint32 oldLegId = vTemp->legendaryId;
             vTemp->legendaryId = 0;
