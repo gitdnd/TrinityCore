@@ -5954,12 +5954,9 @@ void Spell::EffectReRollVirtualItem()
     itemTarget->ToogleStats(false);
 
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
-    VirtualModifier mod;
-    mod.statSeed = vItem->statSeed;
+    VirtualModifier mod = sVirtualItemMgr.GetModifierFromTemplate(vItem);
     mod.statgroup = StatGroup(effectInfo->MiscValue);
     mod.statpool = effectInfo->MiscValueB != 0 ? effectInfo->MiscValueB : -1;
-    mod.legendaryOverride = vItem->legendaryId;
-    mod.setOverride = vItem->ItemSet;
     sVirtualItemMgr.GenerateBaseStats(vItem, mod);
     sVirtualItemMgr.GenerateItemStats(vItem, mod);
     vItem->InitializeQueryData();
@@ -6032,23 +6029,10 @@ void Spell::EffectItemLevelUpgrade()
     itemTarget->ToogleStats(false);
 
 
-    VirtualModifier modifier;
     VirtualItemTemplate* vItem = sVirtualItemMgr.GetVirtualTemplate(itemTarget->GetEntry());
+    VirtualModifier modifier = sVirtualItemMgr.GetModifierFromTemplate(vItem);
 
     modifier.ilevel = effectInfo->MiscValue;
-    modifier.seed = vItem->seed;
-    modifier.displaySeed = vItem->displaySeed;
-    modifier.nameSeed = vItem->nameSeed;
-    modifier.qualitySeed = vItem->qualitySeed;
-    modifier.socketSeed = vItem->socketSeed;
-    modifier.spellSeed = vItem->spellSeed;
-    modifier.statSeed = vItem->statSeed;
-    modifier.statValueSeed = vItem->statValueSeed;
-    modifier.statGroupSeed = vItem->statGroupSeed;
-    modifier.quality = vItem->Quality;
-    modifier.statgroup = vItem->statGroup;
-    modifier.legendaryOverride = vItem->legendaryId;
-    modifier.setOverride = vItem->ItemSet;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);
@@ -6100,24 +6084,8 @@ void Spell::EffectHoneVirtualItem()
 
     itemTarget->ToogleStats(false);
 
-    VirtualModifier modifier;
-
-    modifier.quality = vItem->Quality;
-    modifier.seed = vItem->seed;
-    modifier.displaySeed = vItem->displaySeed;
-    modifier.nameSeed = vItem->nameSeed;
-    modifier.qualitySeed = vItem->qualitySeed;
-    modifier.socketSeed = vItem->socketSeed;
-    modifier.spellSeed = vItem->spellSeed;
-    modifier.statSeed = vItem->statSeed;
-    modifier.statValueSeed = vItem->statValueSeed;
-    modifier.statGroupSeed = vItem->statGroupSeed;
-    modifier.ilevel = vItem->ItemLevel;
-    modifier.statgroup = vItem->statGroup;
-
+    VirtualModifier modifier = sVirtualItemMgr.GetModifierFromTemplate(vItem);
     modifier.statPoolPctModifier = (100.0f + float(honeLevel)) / 100.0f;
-    modifier.legendaryOverride = vItem->legendaryId;
-    modifier.setOverride = vItem->ItemSet;
 
     sVirtualItemMgr.InitSeedGen(modifier);
     sVirtualItemMgr.GenerateQuality(vItem, modifier);

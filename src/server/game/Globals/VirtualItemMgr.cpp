@@ -224,6 +224,29 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateItemDisplay(output, modifier);
 }
 
+VirtualModifier VirtualItemMgr::GetModifierFromTemplate(VirtualItemTemplate* output)
+{
+    VirtualModifier modifier;
+
+    modifier.quality = output->Quality;
+    modifier.seed = output->seed;
+    modifier.displaySeed = output->displaySeed;
+    modifier.nameSeed = output->nameSeed;
+    modifier.qualitySeed = output->qualitySeed;
+    modifier.socketSeed = output->socketSeed;
+    modifier.spellSeed = output->spellSeed;
+    modifier.statSeed = output->statSeed;
+    modifier.statValueSeed = output->statValueSeed;
+    modifier.statGroupSeed = output->statGroupSeed;
+    modifier.ilevel = output->ItemLevel;
+    modifier.statgroup = output->statGroup;
+
+    modifier.statPoolPctModifier = (100.0f + float(output->honeLevel)) / 100.0f;
+    modifier.legendaryOverride = output->legendaryId;
+    modifier.setOverride = output->ItemSet;
+    return modifier;
+}
+
 void initSeed(uint32& val, std::mt19937& generator)
 {
     if (!val)

@@ -775,20 +775,8 @@ class spell_item_reroll_legendary : public SpellScript
 
             uint32 oldLegId = vTemp->legendaryId;
             vTemp->legendaryId = 0;
-            VirtualModifier modifier;
-            modifier.quality = vTemp->Quality;
-            modifier.seed = vTemp->seed;
-            modifier.displaySeed = vTemp->displaySeed;
-            modifier.nameSeed = vTemp->nameSeed;
-            modifier.qualitySeed = vTemp->qualitySeed;
-            modifier.socketSeed = vTemp->socketSeed;
-            modifier.spellSeed = vTemp->spellSeed;
-            modifier.statSeed = vTemp->statSeed;
-            modifier.statValueSeed = vTemp->statValueSeed;
-            modifier.statGroupSeed = vTemp->statGroupSeed;
-            modifier.ilevel = vTemp->ItemLevel;
-            modifier.statgroup = vTemp->statGroup;
-            modifier.setOverride = vTemp->ItemSet;
+            VirtualModifier modifier = sVirtualItemMgr.GetModifierFromTemplate(vTemp);;
+            modifier.legendaryOverride = 0;
             modifier.legendarySeed = urand(std::numeric_limits<uint32>::min(), std::numeric_limits<uint32>::max());
 
             sVirtualItemMgr.InitSeedGen(modifier);
@@ -908,20 +896,8 @@ class spell_item_remove_legendary : public SpellScript
             }
             uint32 oldLegId = vTemp->legendaryId;
             vTemp->legendaryId = 0;
-            VirtualModifier modifier;
-            modifier.quality = vTemp->Quality;
-            modifier.seed = vTemp->seed;
-            modifier.displaySeed = vTemp->displaySeed;
-            modifier.nameSeed = vTemp->nameSeed;
-            modifier.qualitySeed = vTemp->qualitySeed;
-            modifier.socketSeed = vTemp->socketSeed;
-            modifier.spellSeed = vTemp->spellSeed;
-            modifier.statSeed = vTemp->statSeed;
-            modifier.statValueSeed = vTemp->statValueSeed;
-            modifier.statGroupSeed = vTemp->statGroupSeed;
-            modifier.ilevel = vTemp->ItemLevel;
-            modifier.statgroup = vTemp->statGroup;
-            modifier.setOverride = vTemp->ItemSet;
+            VirtualModifier modifier = sVirtualItemMgr.GetModifierFromTemplate(vTemp);;
+            modifier.legendaryOverride = 0;
 
             sVirtualItemMgr.InitSeedGen(modifier);
             sVirtualItemMgr.GenerateQuality(vTemp, modifier);

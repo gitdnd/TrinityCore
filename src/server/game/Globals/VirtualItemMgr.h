@@ -454,6 +454,9 @@ public:
      */
     void RegenerateItemInfo(VirtualItemTemplate* output, VirtualModifier modifier);
 
+
+    VirtualModifier GetModifierFromTemplate(VirtualItemTemplate* output);
+
     /**
      * Uses passed modifier to generate stats and edits output to have the generated stats.
      */
