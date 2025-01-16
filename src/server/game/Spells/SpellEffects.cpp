@@ -5583,7 +5583,7 @@ void Spell::SummonGuardian(SpellEffectInfo const& spellEffectInfo, uint32 entry,
                 case ITEM_SUBCLASS_WEAPON_DAGGER:
                     visualId = 51868;
                     break;
-                case ITEM_SUBCLASS_WEAPON_FIST:
+                case ITEM_SUBCLASS_WEAPON_FIST_WEAPON:
                     visualId = 51801;
                     break;
                 case ITEM_SUBCLASS_WEAPON_POLEARM:
