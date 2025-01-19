@@ -28479,4 +28479,6 @@ void Player::HandleSpecialTalentUnlearn(uint32 spellId)
     default:
         break;
     }
+    UpdateAttackPowerAndDamage();
+    UpdateAttackPowerAndDamage(true);
 }
