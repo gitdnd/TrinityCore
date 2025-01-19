@@ -2202,6 +2202,7 @@ class spell_class_serrated_shot_bleed : public AuraScript
             uint32 damage = amount;
             if (Player* modOwner = caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(spellId, SPELLMOD_DOT, damage);
+            amount = damage;
         }
     }
 
