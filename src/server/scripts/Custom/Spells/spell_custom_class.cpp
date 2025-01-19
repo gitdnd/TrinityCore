@@ -2298,7 +2298,6 @@ class spell_talent_ignite : public AuraScript
 
         int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct));
 
-        SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_TALENT_IGNITE);
         Aura* existingDot = victim->GetAura(SPELL_TALENT_IGNITE, caster->GetGUID());
         if (existingDot)
         {
