@@ -2198,7 +2198,10 @@ class spell_class_serrated_shot_bleed : public AuraScript
 
             float rwb = ((rwbMin + rwbMax) / 2 + rap * rws / 14000) * 0.2f;
             amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), rwb));
-
+            uint32 spellId = GetSpellInfo()->Id;
+            uint32 damage = amount;
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(spellId, SPELLMOD_DOT, damage);
         }
     }
 

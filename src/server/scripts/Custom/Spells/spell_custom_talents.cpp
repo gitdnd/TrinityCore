@@ -555,7 +555,7 @@ public:
 
             CastSpellExtraArgs args(aurEff);
             args.AddSpellBP0(damage * 0.05);
-            actor->CastSpell(eventInfo.GetProcTarget(), GetSpellInfo()->_effects[EFFECT_0].TriggerSpell, args);
+            actor->CastSpell(eventInfo.GetProcTarget(), GetSpellInfo()->GetEffect(EFFECT_0).TriggerSpell, args);
         }
 
         void Register() override

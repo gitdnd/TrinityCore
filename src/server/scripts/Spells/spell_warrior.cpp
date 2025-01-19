@@ -600,6 +600,11 @@ class spell_warr_rend : public AuraScript
                 if (GetUnitOwner()->HasAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, GetSpellInfo(), caster))
                     AddPct(amount, GetEffectInfo(EFFECT_2).CalcValue(caster));
             }
+            uint32 spellId = GetSpellInfo()->Id;
+            uint32 damage = amount;
+            if(Player * modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(spellId, SPELLMOD_DOT, damage);
+            amount = damage;
         }
     }
 
