@@ -5557,7 +5557,43 @@ void Spell::SummonGuardian(SpellEffectInfo const& spellEffectInfo, uint32 entry,
             if (Item* weapon = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
             {
                 summon->SetDisplayId(11686); // modelid2
-                summon->SetVirtualItem(0, weapon->GetEntry());
+                //summon->SetVirtualItem(0, weapon->GetEntry());
+                uint32 visualId = 0;
+
+                switch (weapon->GetTemplate()->SubClass)
+                {
+                case ITEM_SUBCLASS_WEAPON_SWORD2:
+                    visualId = 38632;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_AXE2:
+                    visualId = 38633;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_MACE2:
+                    visualId = 28393;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_SWORD:
+                    visualId = 50047;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_AXE:
+                    visualId = 50737;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_MACE:
+                    visualId = 45147;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_DAGGER:
+                    visualId = 51868;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_FIST_WEAPON:
+                    visualId = 51801;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_POLEARM:
+                    visualId = 51022;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_STAFF:
+                    visualId = 50725;
+                    break;
+                }
+                summon->SetVirtualItem(0, visualId);
             }
             else
                 summon->SetDisplayId(1126); // modelid1
