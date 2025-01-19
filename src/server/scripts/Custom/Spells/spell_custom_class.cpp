@@ -2148,7 +2148,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
 
         int bp = std::lroundf(mws * (0.1 * usedAp));
 
-        /*
+        
         SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
         Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
         if (existingDot)
@@ -2165,7 +2165,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
                 bp += addedDamage;
             }
         }
-        */
+        
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         caster->CastSpell(victim, SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, args);
