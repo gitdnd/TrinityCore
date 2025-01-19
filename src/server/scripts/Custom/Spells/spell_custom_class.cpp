@@ -1407,22 +1407,17 @@ class spell_talent_lightning_overload : public AuraScript
     {
         Player* player = eventInfo.GetActor()->ToPlayer();
         //Unit* target = GetTarget();
+        int32 intel = player->GetStat(STAT_INTELLECT);
+
+        if (!roll_chance_f(lround((float)intel / 100 + 5)))
+            return;
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
         if (!procSpell)
             return;
         uint32 spellId = eventInfo.GetSpellInfo()->Id;
 
-
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        uint32 damage = CalculatePct(damageInfo->GetDamage(), aurEff->GetAmount());
-        CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(damage / 2);
-
-        player->CastSpell(eventInfo.GetProcTarget(), spellId, args);
+        player->CastSpell(eventInfo.GetProcTarget(), spellId, true);
 
     }
     void Register() override
