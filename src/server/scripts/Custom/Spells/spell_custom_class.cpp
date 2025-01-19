@@ -32,7 +32,7 @@ enum CustomClassSpells
     SPELL_CLASS_SEAL_OF_WINDFURY_MH = 97092,
     SPELL_CLASS_SEAL_OF_WINDFURY_OH = 97093,
     SPELL_CLASS_SEAL_OF_WINDFURY_RANGED = 97094,
-    SPELL_CLASS_SEAL_OF_BLOODGRIP_MAINHAND = 97102,
+    SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED = 97102,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND = 97103,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104,
     SPELL_TALENT_IGNITE = 97307,
@@ -2099,9 +2099,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CLASS_SEAL_OF_BLOODGRIP_MAINHAND,
-                                   SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND,
-                                   SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED });
+        return ValidateSpellInfo({ SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -2109,34 +2107,69 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         return eventInfo.GetProcTarget() != nullptr;
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
 
+        Unit* caster = GetTarget();
+        Unit* victim = eventInfo.GetProcTarget();
 
-        uint32 spellId = 0;
+        int ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+        ap += victim->GetTotalAuraModifier(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
 
-        spellId = SPELL_CLASS_SEAL_OF_BLOODGRIP_MAINHAND;
+        int rAp = GetTarget()->GetTotalAttackPowerValue(RANGED_ATTACK);
+        rAp += victim->GetTotalAuraModifier(SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS);
 
-        // Offhand and Ranged Proc
+
+        float mws = caster->GetAttackTime(BASE_ATTACK);
+        mws /= 1000.0f;
+        int usedAp = ap;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_OFFHAND_ATTACK)
         {
-            spellId = SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND;
+            mws = caster->GetAttackTime(OFF_ATTACK);
+            mws /= 1000.0f;
         }
-
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_RANGED_AUTO_ATTACK)
         {
-            spellId = SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED;
+            mws = caster->GetAttackTime(RANGED_ATTACK);
+            mws /= 1000.0f;
+            usedAp = rAp;
         }
-
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS)
         {
-            spellId = SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED;
+            mws = caster->GetAttackTime(RANGED_ATTACK);
+            mws /= 1000.0f;
+            usedAp = rAp;
         }
+        //int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
-        GetTarget()->CastSpell(eventInfo.GetProcTarget(), spellId);
+
+        int bp = std::lroundf(mws * (0.03 * usedAp));
+
+        
+        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
+        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
+        if (existingDot)
+        {
+            AuraEffect* existingBleed = existingDot->GetEffect(EFFECT_0);
+            if (existingBleed)
+            {
+                int remainingTicks = existingBleed->GetRemainingTicks();
+
+                int tickAmount = existingBleed->GetAmount();
+                int remainingDamage = tickAmount * remainingTicks;
+                int addedDamage = remainingDamage / bloodGripDot->GetMaxTicks();
+
+                bp += addedDamage;
+            }
+        }
+        
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(bp);
+        caster->CastSpell(victim, SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, args);
+
     }
 
     void Register() override
