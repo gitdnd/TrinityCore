@@ -2131,7 +2131,13 @@ class spell_class_seal_of_bloodgrip : public AuraScript
             mws = caster->GetAttackTime(OFF_ATTACK);
             mws /= 1000.0f;
         }
-        if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_RANGED_AUTO_ATTACK || PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS)
+        if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_RANGED_AUTO_ATTACK)
+        {
+            mws = caster->GetAttackTime(RANGED_ATTACK);
+            mws /= 1000.0f;
+            usedAp = rAp;
+        }
+        if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS)
         {
             mws = caster->GetAttackTime(RANGED_ATTACK);
             mws /= 1000.0f;
@@ -2140,10 +2146,10 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
 
-        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
-
         int bp = std::lroundf(mws * (apScaling * 0.01 * usedAp));
 
+        /*
+        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
         Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
         if (existingDot)
         {
@@ -2159,7 +2165,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
                 bp += addedDamage;
             }
         }
-
+        */
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         caster->CastSpell(victim, SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, args);
