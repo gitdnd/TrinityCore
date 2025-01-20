@@ -1406,7 +1406,6 @@ class spell_talent_lightning_overload : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         Player* player = eventInfo.GetActor()->ToPlayer();
-        //Unit* target = GetTarget();
         int32 intel = player->GetStat(STAT_INTELLECT);
 
         if (!roll_chance_f(lround((float)intel * 0.05)))
@@ -1417,6 +1416,7 @@ class spell_talent_lightning_overload : public AuraScript
             return;
         uint32 spellId = eventInfo.GetSpellInfo()->Id;
 
+        player->GetSpellHistory()->ResetCooldown(spellId);
         player->CastSpell(eventInfo.GetProcTarget(), spellId, true);
 
     }
