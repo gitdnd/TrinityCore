@@ -1409,7 +1409,7 @@ class spell_talent_lightning_overload : public AuraScript
         //Unit* target = GetTarget();
         int32 intel = player->GetStat(STAT_INTELLECT);
 
-        if (!roll_chance_f(lround((float)intel / 100 + 5)))
+        if (!roll_chance_f(lround((float)intel * 0.05)))
             return;
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
