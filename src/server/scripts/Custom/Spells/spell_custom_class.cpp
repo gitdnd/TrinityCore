@@ -1406,23 +1406,18 @@ class spell_talent_lightning_overload : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         Player* player = eventInfo.GetActor()->ToPlayer();
-        //Unit* target = GetTarget();
+        int32 intel = player->GetStat(STAT_INTELLECT);
+
+        if (!roll_chance_f(lround((float)intel * 0.05)))
+            return;
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
         if (!procSpell)
             return;
         uint32 spellId = eventInfo.GetSpellInfo()->Id;
 
-
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        uint32 damage = CalculatePct(damageInfo->GetDamage(), aurEff->GetAmount());
-        CastSpellExtraArgs args(aurEff);
-        args.AddSpellBP0(damage / 2);
-
-        player->CastSpell(eventInfo.GetProcTarget(), spellId, args);
+        player->GetSpellHistory()->ResetCooldown(spellId);
+        player->CastSpell(eventInfo.GetProcTarget(), spellId, true);
 
     }
     void Register() override
@@ -2146,7 +2141,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         //int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
 
-        int bp = std::lroundf(mws * (0.03 * usedAp));
+        int bp = std::lroundf(mws * (0.015 * usedAp));
 
         
         SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
@@ -2292,14 +2287,31 @@ class spell_talent_ignite : public AuraScript
         PreventDefaultAction();
 
         SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_TALENT_IGNITE);
-        int32 pct = 20;
+        int32 pct = 5;
+        Unit* victim = eventInfo.GetProcTarget();
+        Unit* caster = GetTarget();
 
-        ASSERT(igniteDot->GetMaxTicks() > 0);
-        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
+        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct));
+
+        Aura* existingDot = victim->GetAura(SPELL_TALENT_IGNITE, caster->GetGUID());
+        if (existingDot)
+        {
+            AuraEffect* existingIgnite = existingDot->GetEffect(EFFECT_0);
+            if (existingIgnite)
+            {
+                int remainingTicks = existingIgnite->GetRemainingTicks();
+
+                int tickAmount = existingIgnite->GetAmount();
+                int remainingDamage = tickAmount * remainingTicks;
+                int addedDamage = remainingDamage / igniteDot->GetMaxTicks();
+
+                amount += addedDamage;
+            }
+        }
 
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(amount);
-        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_TALENT_IGNITE, args);
+        caster->CastSpell(victim, SPELL_TALENT_IGNITE, args);
     }
 
     void Register() override
