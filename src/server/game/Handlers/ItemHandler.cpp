@@ -195,7 +195,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     {
         _player->RemoveItem(srcbag, srcslot, true);
         _player->EquipItem(dest, pSrcItem, true);
-        //_player->AutoUnequipOffhandIfNeed();
+        _player->AutoUnequipOffhandIfNeed();
     }
     else                                                    // have currently equipped item, not simple case
     {
@@ -256,7 +256,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
         else if (_player->IsEquipmentPos(src))
             _player->EquipItem(eSrc, pDstItem, true);
 
-        //_player->AutoUnequipOffhandIfNeed();
+        _player->AutoUnequipOffhandIfNeed();
 
         // if inventory item was moved, check if we can remove dependent auras, because they were not removed in Player::RemoveItem (update was set to false)
         // do this after swaps are done, we pass nullptr because both weapons could be swapped and none of them should be ignored
