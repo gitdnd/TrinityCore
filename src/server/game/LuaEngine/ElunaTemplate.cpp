@@ -53,7 +53,7 @@ ElunaConstrainedObjectRef<Vehicle> GetWeakPtrFor(Vehicle const* obj)
 
 // Template by Mud from http://stackoverflow.com/questions/4484437/lua-integer-type/4485511#4485511
 template<> int ElunaTemplate<unsigned long long>::Add(lua_State* L) { Eluna* E = Eluna::GetEluna(L); E->Push(E->CHECKVAL<unsigned long long>(1) + E->CHECKVAL<unsigned long long>(2)); return 1; }
-template<> int ElunaTemplate<unsigned long long>::Substract(lua_State* L) { Eluna* E = Eluna::GetEluna(L); E->Push(E->CHECKVAL<unsigned long long>(1) - E->CHECKVAL<unsigned long long>(2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Subtract(lua_State* L) { Eluna* E = Eluna::GetEluna(L); E->Push(E->CHECKVAL<unsigned long long>(1) - E->CHECKVAL<unsigned long long>(2)); return 1; }
 template<> int ElunaTemplate<unsigned long long>::Multiply(lua_State* L) { Eluna* E = Eluna::GetEluna(L); E->Push(E->CHECKVAL<unsigned long long>(1) * E->CHECKVAL<unsigned long long>(2)); return 1; }
 template<> int ElunaTemplate<unsigned long long>::Divide(lua_State* L) { Eluna* E = Eluna::GetEluna(L); E->Push(E->CHECKVAL<unsigned long long>(1) / E->CHECKVAL<unsigned long long>(2)); return 1; }
 template<> int ElunaTemplate<unsigned long long>::Mod(lua_State* L) { Eluna* E = Eluna::GetEluna(L); E->Push(E->CHECKVAL<unsigned long long>(1) % E->CHECKVAL<unsigned long long>(2)); return 1; }
