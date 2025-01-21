@@ -232,17 +232,20 @@ namespace LuaItem
     /**
      * Returns the chat link of the [Item]
      *
-     * @table
-     * @columns [Locale, ID]
-     * @values [LOCALE_enUS, 0]
-     * @values [LOCALE_koKR, 1]
-     * @values [LOCALE_frFR, 2]
-     * @values [LOCALE_deDE, 3]
-     * @values [LOCALE_zhCN, 4]
-     * @values [LOCALE_zhTW, 5]
-     * @values [LOCALE_esES, 6]
-     * @values [LOCALE_esMX, 7]
-     * @values [LOCALE_ruRU, 8]
+     * <pre>
+     * enum LocaleConstant
+     * {
+     *     LOCALE_enUS = 0,
+     *     LOCALE_koKR = 1,
+     *     LOCALE_frFR = 2,
+     *     LOCALE_deDE = 3,
+     *     LOCALE_zhCN = 4,
+     *     LOCALE_zhTW = 5,
+     *     LOCALE_esES = 6,
+     *     LOCALE_esMX = 7,
+     *     LOCALE_ruRU = 8
+     * };
+     * </pre>
      *
      * @param [LocaleConstant] locale = DEFAULT_LOCALE : locale to return the [Item]'s name in
      * @return string itemLink

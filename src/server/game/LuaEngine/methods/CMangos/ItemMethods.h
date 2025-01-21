@@ -257,7 +257,7 @@ namespace LuaItem
         const ItemTemplate* temp = item->GetTemplate();
         std::string name = temp->Name1;
         if (ItemLocale const* il = eObjectMgr->GetItemLocale(temp->ItemId))
-            eObjectMgr->GetItemLocaleStrings(temp->ItemId, locale, &name);
+            ObjectMgr::GetLocaleString(il->Name, static_cast<LocaleConstant>(locale), name);
 
 #if ELUNA_EXPANSION >= EXP_TBC
         if (int32 itemRandPropId = item->GetItemRandomPropertyId())

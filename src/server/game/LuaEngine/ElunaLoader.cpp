@@ -12,7 +12,6 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
-#include <charconv>
 
 #if defined USING_BOOST
 #include <boost/filesystem.hpp>
@@ -216,18 +215,25 @@ void ElunaLoader::ReadFiles(lua_State* L, std::string path)
 
             if (fs::is_regular_file(dir_iter->status()))
             {
-                // default to all maps
-                int32 mapId = -1;
+                int32 mapId;
 
                 // strip base folder path and trailing slash from fullpath
                 std::string subfolder = dir_iter->path().generic_string();
                 subfolder = subfolder.erase(0, lua_folderpath.size() + 1);
 
-                // convert subfolder name to an integer
-                auto [ptr, ec] = std::from_chars(subfolder.data(), subfolder.data() + subfolder.size(), mapId);
+                // stringstream used for conversion
+                std::stringstream ss;
 
-                // default to all maps on invalid map id or map id less than -1
-                if (ec == std::errc::invalid_argument || ec == std::errc::result_out_of_range || mapId < -1)
+                // push subfolder int to subMapId
+                ss << subfolder;
+                ss >> mapId;
+
+                // if this failed, then we load the script for all maps
+                if (ss.fail())
+                    mapId = -1;
+
+                // just in case we have a subfolder named an int less than all..
+                if (mapId < -1)
                     mapId = -1;
 
                 // was file, try add

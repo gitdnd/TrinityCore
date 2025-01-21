@@ -435,8 +435,7 @@ namespace LuaCustom
         int8 statGroup = E->CHECKVAL<int8>(8, -1);
         bool isCrafted = E->CHECKVAL<bool>(9, false);
         uint32 ilevelBonus = E->CHECKVAL<uint32>(10, 0);
-        uint32 legendaryOverride = E->CHECKVAL<uint32>(11, 0);
-        uint32 setOverride = E->CHECKVAL<uint32>(12, 0);
+
         VirtualModifier modifier;
 
         if(displayId > 0)
@@ -462,10 +461,6 @@ namespace LuaCustom
 
         if (ilevelBonus > 0)
             modifier.ilevelBonus = ilevelBonus;
-
-        modifier.legendaryOverride = legendaryOverride;
-
-        modifier.setOverride = setOverride;
 
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
@@ -1785,23 +1780,6 @@ namespace LuaCustom
         return 1;
     }
 
-    int SendToTransport(Eluna* E, Transport* transport)
-    {
-        WorldObject* player = E->CHECKOBJ<WorldObject>(2);
-
-        if (!player)
-            return 0;
-
-        float x, y, z, o;
-
-        transport->CalculatePassengerPosition(x, y, z, &o);
-
-        player->Relocate(x, y, z, o);
-        transport->AddPassenger(player);
-
-        return 0;
-    }
-
     int ChannelSpell(Eluna* E, Unit* unit)
     {
         Unit* target = E->CHECKOBJ<Unit>(2);
@@ -1939,12 +1917,6 @@ namespace LuaCustom
         return 1;
     }
 
-    int GetIpAddress(Eluna* E, Player* player)
-    {
-        E->Push(player->GetSession() ? player->GetSession()->GetRemoteAddress() : "");
-        return 1;
-    }
-
     // REGISTERS
     
     ElunaRegister<> GlobalMethods[] =
@@ -2050,7 +2022,6 @@ namespace LuaCustom
         { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
         { "SetCraftingComponents", &LuaCustom::SetCraftingComponents },
         { "ClearCratingComponents", &LuaCustom::ClearCraftingComponents },
-        { "GetIpAddress", &LuaCustom::GetIpAddress }
     };
     
     ElunaRegister<Creature> CreatureMethods[] =
@@ -2102,11 +2073,10 @@ namespace LuaCustom
         { "EnableMovement", &EnableMovement },
         { "AddPassenger", &AddPassenger },
         { "GetPassengers", &GetPassengers },
-        { "SummonPassenger", &SummonPassenger },
-        { "SendToTransport", &SendToTransport }
+        { "SummonPassenger", &SummonPassenger }
     };
 
-    inline void RegisterCustomMethods(Eluna* E)
+    inline void RegisterCustomFunctions(Eluna* E)
     {
         ElunaTemplate<>::SetMethods(E, GlobalMethods);
 
@@ -2146,9 +2116,6 @@ namespace LuaCustom
         ElunaTemplate<Transport>::SetMethods(E, TransportMethods);
         ElunaTemplate<Transport>::SetMethods(E, ObjectMethods);
         ElunaTemplate<Transport>::SetMethods(E, WorldObjectMethods);
-        ElunaTemplate<Transport>::SetMethods(E, LuaObject::ObjectMethods);
-        ElunaTemplate<Transport>::SetMethods(E, LuaWorldObject::WorldObjectMethods);
-        ElunaTemplate<Transport>::SetMethods(E, LuaGameObject::GameObjectMethods);
     };
 };
     

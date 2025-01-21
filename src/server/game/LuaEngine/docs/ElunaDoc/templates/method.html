@@ -47,9 +47,11 @@
         <p>For temporary documentation, please check the <a href="https://github.com/ElunaLuaEngine/Eluna/blob/master/LuaFunctions.cpp">LuaFunctions</a> source file.</p>
         {%- endif %}
         
-        {%- if current_method.tables %}
+        {%- if current_method.table %}
         <div class="table-container">
-            {{ current_method.tables }}
+        <p>
+            {{ current_method.table }}
+        </p>
         </div>
         {%- endif %}
         
