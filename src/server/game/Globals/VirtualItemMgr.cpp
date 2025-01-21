@@ -1149,13 +1149,13 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             socketCount = 3;
             break;
         case ITEM_QUALITY_EPIC:
-            socketCount = 2;
+            socketCount = 3;
             break;
         case ITEM_QUALITY_RARE:
             socketCount = 2;
             break;
         default:
-            socketCount = 1;
+            socketCount = 2;
             break;
     }
 
