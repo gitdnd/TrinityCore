@@ -2430,7 +2430,7 @@ VirtualItemMgr::StatGroupData::StatGroupData()
     // Agi Dodge Tank Data
     stat_group_primary_stats[STAT_GROUP_AGI_DODGE_TANK] = {
         ITEM_MOD_STAMINA,
-        ITEM_MOD_STRENGTH
+        ITEM_MOD_AGILITY
     };
     stat_group_secondary_stats[STAT_GROUP_AGI_DODGE_TANK] = {
         ITEM_MOD_DEFENSE_SKILL_RATING,
