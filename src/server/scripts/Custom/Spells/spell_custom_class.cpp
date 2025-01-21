@@ -66,7 +66,11 @@ enum CustomClassSpells
     SPELL_CLASS_FINGERS_OF_FROST_STACKS = 97333,
     SPELL_FREEZE               = 97334,
     SPELL_TALENT_UNINSPIRED = 94293,
-    SPELL_TALENT_BRAINSTORM = 94294
+    SPELL_TALENT_BRAINSTORM = 94294,
+    SPELL_ITEM_MIRAGE_TALON_INT = 91231,
+    SPELL_ITEM_MIRAGE_TALON_AGI = 91233,
+    SPELL_ITEM_CINDERBREAKER_STR = 91235,
+    SPELL_ITEM_GOLEMS_EMBRACE = 91237
 
 };
 
@@ -2590,6 +2594,156 @@ class spell_talent_blade_barrier : public AuraScript
     }
 };
 
+// Mirage Talon - Damage - Int
+class spell_item_mirage_talon_int : public AuraScript
+{
+    PrepareAuraScript(spell_item_mirage_talon_int);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ITEM_MIRAGE_TALON_INT });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = eventInfo.GetProcTarget();
+
+        float intellect = GetTarget()->GetStat(STAT_INTELLECT);
+
+        float dmg = intellect * 0.1;
+
+        int32 bp = static_cast<int32>(std::lroundf(dmg)) * (std::rand() % 10 + 1);
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(bp);
+        GetTarget()->CastSpell(victim, SPELL_ITEM_MIRAGE_TALON_INT, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_mirage_talon_int::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_item_mirage_talon_int::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// Mirage Talon - Attackspeed - Agi
+class spell_item_mirage_talon_agi : public AuraScript
+{
+    PrepareAuraScript(spell_item_mirage_talon_agi);
+
+    void OnTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        Player* player = caster->ToPlayer();
+        int32 agility = player->GetStat(STAT_AGILITY);
+
+        if (Aura* existingBuff = player->GetAura(SPELL_ITEM_MIRAGE_TALON_AGI))
+        {
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(agility * 0.01);
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_mirage_talon_agi::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// Cinderbreaker - Damage - Str
+class spell_item_cinderbreaker_str : public AuraScript
+{
+    PrepareAuraScript(spell_item_cinderbreaker_str);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ITEM_CINDERBREAKER_STR });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetProcTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* victim = eventInfo.GetProcTarget();
+
+        float str = GetTarget()->GetStat(STAT_STRENGTH);
+
+        float dmg = str * 0.1;
+
+        int32 bp = static_cast<int32>(std::lroundf(dmg)) * (std::rand() % 7 + 4);
+        CastSpellExtraArgs args(aurEff);
+        args.AddSpellBP0(bp);
+        GetTarget()->CastSpell(victim, SPELL_ITEM_CINDERBREAKER_STR, args);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_cinderbreaker_str::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_item_cinderbreaker_str::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// Golem's Embrace
+class spell_item_golems_embrace : public AuraScript
+{
+    PrepareAuraScript(spell_item_golems_embrace);
+
+    void OnTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        Player* player = caster->ToPlayer();
+        int32 strength = player->GetStat(STAT_STRENGTH);
+
+
+        if (Aura* existingBuff = player->GetAura(SPELL_ITEM_GOLEMS_EMBRACE))
+        {
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(strength * 0.02);
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_golems_embrace::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// Kinetic Bolt
+class spell_class_kinetic_bolt : public SpellScript
+{
+    PrepareSpellScript(spell_class_kinetic_bolt);
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        int32 mana = GetCaster()->GetMaxPower(POWER_MANA);
+        if (Unit* victim = GetHitUnit())
+
+            SetEffectValue(mana * 0.1);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_class_kinetic_bolt::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_howling_blast_frozen();
@@ -2647,4 +2801,9 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_talent_blade_barrier);
     RegisterSpellScript(spell_talent_prodigy);
     RegisterSpellScript(spell_talent_brainstorm);
+    RegisterSpellScript(spell_item_mirage_talon_int);
+    RegisterSpellScript(spell_item_mirage_talon_agi);
+    RegisterSpellScript(spell_item_cinderbreaker_str);
+    RegisterSpellScript(spell_item_golems_embrace);
+    RegisterSpellScript(spell_class_kinetic_bolt);
 };
