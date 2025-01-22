@@ -519,7 +519,7 @@ class spell_talent_blessed_life : public AuraScript
         Player* player = caster->ToPlayer();
         int32 spirit = player->GetStat(STAT_SPIRIT);
 
-        if (!roll_chance_f(lround((float)spirit / 50)))
+        if (!roll_chance_f(lround((float)spirit / 20)))
             return;
 
         GetTarget()->CastSpell(victim, 31934, true);
@@ -2206,7 +2206,7 @@ class spell_class_seal_of_bloodgrip_passive : public AuraScript
 };
 
 
-// 700051 Serrated Shot - Bleed
+// 96521 Serrated Shot - Bleed
 class spell_class_serrated_shot_bleed : public AuraScript
 {
     PrepareAuraScript(spell_class_serrated_shot_bleed);
@@ -2217,7 +2217,7 @@ class spell_class_serrated_shot_bleed : public AuraScript
         {
             canBeRecalculated = false;
 
-            // $0.2 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS) bonus per tick
+            // $0.3 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS) bonus per tick
             float rap = caster->GetTotalAttackPowerValue(RANGED_ATTACK);
             int32 rws = caster->GetAttackTime(RANGED_ATTACK);
             float rwbMin = 0.f;
@@ -2228,7 +2228,7 @@ class spell_class_serrated_shot_bleed : public AuraScript
                 rwbMax += caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE, i);
             }
 
-            float rwb = ((rwbMin + rwbMax) / 2 + rap * rws / 14000) * 0.2f;
+            float rwb = ((rwbMin + rwbMax) / 2 + rap * rws / 14000) * 0.3f;
             amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), rwb));
             uint32 spellId = GetSpellInfo()->Id;
             uint32 damage = amount;
