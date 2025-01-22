@@ -283,6 +283,12 @@ void SpellHistory::WritePacket<Player>(WorldPacket& packet) const
 
 void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spell* spell /*= nullptr*/, bool onHold /*= false*/)
 {
+    if (Player* playerOwner = GetPlayerOwner())
+    {
+        if (playerOwner->GetCommandStatus(CHEAT_COOLDOWN))
+            return;
+    }
+
     // init cooldown values
     uint32 categoryId = 0;
     int32 cooldown = -1;
@@ -293,7 +299,7 @@ void SpellHistory::StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spel
     Clock::time_point curTime = GameTime::GetSystemTime();
     Clock::time_point catrecTime;
     Clock::time_point recTime;
-    bool needsCooldownPacket = true;
+    bool needsCooldownPacket = false;
 
     // overwrite time for selected category
     if (onHold)
