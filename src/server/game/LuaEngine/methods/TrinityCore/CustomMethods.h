@@ -831,7 +831,9 @@ namespace LuaCustom
 
     int IsDeveloper(Eluna* E, Player* player)
     {
-        E->Push(player->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR);
+        bool isNotReynoldsOrGmOn = player->GetSession()->GetAccountId() != 189 || player->IsGameMaster();
+        bool isDev = player->GetSession()->GetSecurity() >= SEC_ADMINISTRATOR;
+        E->Push(isDev && isNotReynoldsOrGmOn);
         return 1;
     }
 
