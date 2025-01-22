@@ -445,10 +445,10 @@ public:
         if (CheckModifySpeed(handler, args, target, allSpeed, 0.1f, 50.0f))
         {
             NotifyModification(handler, target, LANG_YOU_CHANGE_ASPEED, LANG_YOURS_ASPEED_CHANGED, allSpeed);
-            target->SetSpeedRate(MOVE_WALK, allSpeed);
-            target->SetSpeedRate(MOVE_RUN, allSpeed);
-            target->SetSpeedRate(MOVE_SWIM, allSpeed);
-            target->SetSpeedRate(MOVE_FLIGHT, allSpeed);
+            for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
+            {
+                target->SetSpeedRate(UnitMoveType(i), allSpeed);
+            }
             return true;
         }
         return false;
