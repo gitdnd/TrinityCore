@@ -859,7 +859,7 @@ class spell_talent_champion : public AuraScript
             existingBuff->GetEffect(EFFECT_2)->ChangeAmount(dodgeRating + defRating * 0.2);
         }
 
-        float parryChance = player->GetUInt32Value(PLAYER_PARRY_PERCENTAGE);
+        float parryChance = player->GetFloatValue(PLAYER_PARRY_PERCENTAGE);
         if (Aura* existingBuff = player->GetAura(champion_DR))
 
         {
