@@ -70,7 +70,9 @@ enum CustomClassSpells
     SPELL_ITEM_MIRAGE_TALON_INT = 91231,
     SPELL_ITEM_MIRAGE_TALON_AGI = 91233,
     SPELL_ITEM_CINDERBREAKER_STR = 91235,
-    SPELL_ITEM_GOLEMS_EMBRACE = 91237
+    SPELL_ITEM_GOLEMS_EMBRACE = 91237,
+    SPELL_TALENT_PROFICIENCY = 94609,
+    SPELL_TALENT_DEADLY_CALM = 94610
 
 };
 
@@ -827,6 +829,16 @@ class spell_talent_champion : public AuraScript
 {
     PrepareAuraScript(spell_talent_champion);
 
+    enum Spell
+    {
+        champion_DR = 94611
+    };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ champion_DR });
+    }
+
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Player* player = GetCaster()->ToPlayer();
@@ -845,6 +857,13 @@ class spell_talent_champion : public AuraScript
         if (Aura* existingBuff = player->GetAura(SPELL_TALENT_CHAMPION))
         {
             existingBuff->GetEffect(EFFECT_2)->ChangeAmount(dodgeRating + defRating * 0.2);
+        }
+
+        int32 parryChance = player->GetUInt32Value(PLAYER_PARRY_PERCENTAGE);
+        if (Aura* existingBuff = player->GetAura(champion_DR))
+
+        {
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(-(parryChance / 30));
         }
     }
     void Register() override
@@ -2744,6 +2763,65 @@ class spell_class_kinetic_bolt : public SpellScript
     }
 };
 
+// 93012 - Proficiency
+class spell_talent_proficiency : public AuraScript
+{
+    PrepareAuraScript(spell_talent_proficiency);
+
+    void OnTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        Player* player = caster->ToPlayer();
+        int32 expertiseMH = player->GetUInt32Value(PLAYER_EXPERTISE);
+        int32 expertiseOH = player->GetUInt32Value(PLAYER_OFFHAND_EXPERTISE);
+        int32 higherExpertise = (expertiseMH > expertiseOH) ? expertiseMH : expertiseOH;
+
+        if (Aura* existingBuff = player->GetAura(SPELL_TALENT_PROFICIENCY))
+        {
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(higherExpertise * 10);
+            existingBuff->GetEffect(EFFECT_1)->ChangeAmount(higherExpertise * 10);
+            existingBuff->GetEffect(EFFECT_2)->ChangeAmount(higherExpertise * (-10));
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_proficiency::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// 93138 - Deadly Calm
+class spell_talent_deadly_calm : public AuraScript
+{
+    PrepareAuraScript(spell_talent_deadly_calm);
+
+    void OnTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return;
+
+        Player* player = caster->ToPlayer();
+        int32 maxFocus = GetCaster()->GetMaxPower(POWER_FOCUS);
+
+        if (Aura* existingBuff = player->GetAura(SPELL_TALENT_DEADLY_CALM))
+        {
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(maxFocus / 2);
+            existingBuff->GetEffect(EFFECT_1)->ChangeAmount(maxFocus / 2);
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_talent_deadly_calm::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_howling_blast_frozen();
@@ -2806,4 +2884,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_item_cinderbreaker_str);
     RegisterSpellScript(spell_item_golems_embrace);
     RegisterSpellScript(spell_class_kinetic_bolt);
+    RegisterSpellScript(spell_talent_proficiency);
+    RegisterSpellScript(spell_talent_deadly_calm);
 };
