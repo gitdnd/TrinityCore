@@ -2145,7 +2145,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         //int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
 
-        int bp = std::lroundf(10 + (mws * (0.0075 * usedAp)));
+        int bp = std::lroundf(mws * 30  + mws * 0.015 * usedAp);
 
         
         SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
