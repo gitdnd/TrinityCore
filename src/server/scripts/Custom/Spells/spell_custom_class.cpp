@@ -863,7 +863,7 @@ class spell_talent_champion : public AuraScript
         if (Aura* existingBuff = player->GetAura(champion_DR))
 
         {
-            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(-(parryChance * 0,3));
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(-(parryChance * 100 * 0, 3));
         }
     }
     void Register() override
