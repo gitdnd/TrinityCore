@@ -2836,11 +2836,13 @@ class spell_custom_ilvlmanacost : public AuraScript
                 int32 bp = 0;
 
                 if (ilvl < 100)
-                    bp = 100 - ilvl * -1
-                    if bp < -50
-                        bp = -50
+                {
+                    bp = 100 - ilvl * -1;
+                    if (bp < -50)
+                        bp = -50;
                     else
-                        bp = 0
+                        bp = 0;
+                }
 
                 amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
             }
@@ -2850,12 +2852,6 @@ class spell_custom_ilvlmanacost : public AuraScript
             }
         }
     }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_custom_ilvlmanacost::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
-    }
-};
 
 void AddSC_Spells_Custom_Class_scripts()
 {
