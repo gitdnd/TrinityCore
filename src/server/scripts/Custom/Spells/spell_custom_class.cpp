@@ -2840,8 +2840,6 @@ class spell_custom_ilvlmanacost : public AuraScript
                     bp = 100 - ilvl * -1;
                     if (bp < -50)
                         bp = -50;
-                    else
-                        bp = 0;
                 }
 
                 amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
