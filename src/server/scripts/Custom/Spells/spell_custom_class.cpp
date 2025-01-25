@@ -2822,6 +2822,55 @@ class spell_talent_deadly_calm : public AuraScript
     }
 };
 
+class spell_custom_ilvlmanacost : public AuraScript
+{
+    PrepareAuraScript(spell_custom_ilvlmanacost);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Player* player = caster->ToPlayer())
+            {
+                float ilvl = player->GetAverageItemLevel();
+                int32 bp = 0;
+
+                // Calculate the %reduction based on item level
+                if (ilvl <= 50) bp = -50;
+                else if (ilvl <= 55) bp = -45;
+                else if (ilvl <= 60) bp = -40;
+                else if (ilvl <= 65) bp = -35;
+                else if (ilvl <= 70) bp = -30;
+                else if (ilvl <= 75) bp = -25;
+                else if (ilvl <= 80) bp = -20;
+                else if (ilvl <= 85) bp = -15;
+                else if (ilvl <= 90) bp = -10;
+                else if (ilvl <= 91) bp = -9;
+                else if (ilvl <= 92) bp = -8;
+                else if (ilvl <= 93) bp = -7;
+                else if (ilvl <= 94) bp = -6;
+                else if (ilvl <= 95) bp = -5;
+                else if (ilvl <= 96) bp = -4;
+                else if (ilvl <= 97) bp = -3;
+                else if (ilvl <= 98) bp = -2;
+                else if (ilvl <= 99) bp = -1;
+                else bp = 0; // For ilvl 100 or more
+
+                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
+            }
+            else
+            {
+                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), 50));
+            }
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_custom_ilvlmanacost::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
+    }
+};
+
 void AddSC_Spells_Custom_Class_scripts()
 {
     new spell_class_howling_blast_frozen();
@@ -2886,4 +2935,6 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_kinetic_bolt);
     RegisterSpellScript(spell_talent_proficiency);
     RegisterSpellScript(spell_talent_deadly_calm);
+    RegisterSpellScript(spell_custom_ilvlmanacost);
+
 };
