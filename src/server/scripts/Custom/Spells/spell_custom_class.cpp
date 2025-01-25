@@ -2835,26 +2835,12 @@ class spell_custom_ilvlmanacost : public AuraScript
                 float ilvl = player->GetAverageItemLevel();
                 int32 bp = 0;
 
-                // Calculate the %reduction based on item level
-                if (ilvl <= 50) bp = -50;
-                else if (ilvl <= 55) bp = -45;
-                else if (ilvl <= 60) bp = -40;
-                else if (ilvl <= 65) bp = -35;
-                else if (ilvl <= 70) bp = -30;
-                else if (ilvl <= 75) bp = -25;
-                else if (ilvl <= 80) bp = -20;
-                else if (ilvl <= 85) bp = -15;
-                else if (ilvl <= 90) bp = -10;
-                else if (ilvl <= 91) bp = -9;
-                else if (ilvl <= 92) bp = -8;
-                else if (ilvl <= 93) bp = -7;
-                else if (ilvl <= 94) bp = -6;
-                else if (ilvl <= 95) bp = -5;
-                else if (ilvl <= 96) bp = -4;
-                else if (ilvl <= 97) bp = -3;
-                else if (ilvl <= 98) bp = -2;
-                else if (ilvl <= 99) bp = -1;
-                else bp = 0; // For ilvl 100 or more
+                if (ilvl < 100)
+                    bp = 100 - ilvl * -1
+                    if bp < -50
+                        bp = -50
+                    else
+                        bp = 0
 
                 amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
             }
