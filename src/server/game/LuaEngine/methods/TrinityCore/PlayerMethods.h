@@ -3726,6 +3726,12 @@ namespace LuaPlayer
         return 0;
     }
 
+    int GetIpAddress(Eluna* E, Player* player)
+    {
+        E->Push(player->GetSession()->GetRemoteAddress());
+        return 1;
+    }
+
     ElunaRegister<Player> PlayerMethods[] =
     {
         // Getters
@@ -4004,7 +4010,9 @@ namespace LuaPlayer
         { "UpdateHonor", METHOD_REG_NONE }, // classic only
         { "ResetHonor", METHOD_REG_NONE }, // classic only
         { "ClearHonorInfo", METHOD_REG_NONE }, // classic only
-        { "GainSpellComboPoints", METHOD_REG_NONE } // not implemented
+        { "GainSpellComboPoints", METHOD_REG_NONE }, // not implemented
+
+        { "GetIpAddress", &LuaPlayer::GetIpAddress }
     };
 };
 #endif
