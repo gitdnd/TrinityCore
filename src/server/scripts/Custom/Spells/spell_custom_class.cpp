@@ -2837,7 +2837,7 @@ class spell_custom_ilvlmanacost : public AuraScript
 
                 if (ilvl < 100)
                 {
-                    bp = 100 - ilvl * -1;
+                    bp = (100 - ilvl) * -1;
                     if (bp < -50)
                         bp = -50;
                 }
