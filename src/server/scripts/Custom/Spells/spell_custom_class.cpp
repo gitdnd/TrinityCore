@@ -2844,12 +2844,14 @@ class spell_custom_ilvlmanacost : public AuraScript
 
                 amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
             }
-            else
-            {
-                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), 50));
-            }
         }
     }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_custom_ilvlmanacost::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
+    }
+};
 
 void AddSC_Spells_Custom_Class_scripts()
 {
