@@ -1146,7 +1146,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
 
     switch (output->Quality) {
         case ITEM_QUALITY_LEGENDARY:
-            socketCount = 3;
+            socketCount = 4;
             break;
         case ITEM_QUALITY_EPIC:
             socketCount = 3;
@@ -1166,6 +1166,8 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         {
             case INVTYPE_LEGS:
             case INVTYPE_CHEST:
+                if (socketCount > 3)
+                    socketCount = 3;
                 break;
             case INVTYPE_HEAD:
             case INVTYPE_SHOULDERS:
@@ -1202,8 +1204,8 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
         if (leg->socketMod && leg->socketMod != 0)
             socketCount += leg->socketMod;
 
-        if (leg->generatePrismatic && socketCount >= 3)
-            socketCount = 2;
+        if (leg->generatePrismatic && socketCount >= 4)
+            socketCount = 3;
     }
 
     // set socket colors
