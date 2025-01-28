@@ -22739,6 +22739,7 @@ void Player::UpdatePvP(bool state, bool _override)
 
 void Player::UpdatePotionCooldown(Spell* spell)
 {
+    /*
     // no potion used i combat or still in combat
     if (!m_lastPotionId || IsInCombat())
         return;
@@ -22762,7 +22763,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
             GetSpellHistory()->SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
     }
 
-    m_lastPotionId = 0;
+    m_lastPotionId = 0;*/
 }
 
 void Player::SetResurrectRequestData(WorldObject const* caster, uint32 health, uint32 mana, uint32 appliedAura)

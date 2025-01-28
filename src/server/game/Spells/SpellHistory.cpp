@@ -169,7 +169,7 @@ void SpellHistory::HandleCooldowns(SpellInfo const* spellInfo, uint32 itemID, Sp
     if (spell && spell->IsIgnoringCooldowns())
         return;
 
-    if (Player* player = _owner->ToPlayer())
+    /*if (Player* player = _owner->ToPlayer())
     {
         // potions start cooldown until exiting combat
         if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemID))
@@ -180,7 +180,7 @@ void SpellHistory::HandleCooldowns(SpellInfo const* spellInfo, uint32 itemID, Sp
                 return;
             }
         }
-    }
+    }*/
 
     if (spellInfo->IsCooldownStartedOnEvent() || spellInfo->IsPassive())
         return;
