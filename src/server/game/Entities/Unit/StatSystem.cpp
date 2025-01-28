@@ -159,6 +159,7 @@ bool Player::UpdateStats(Stats stat)
 
     UpdateSpellDamageAndHealingBonus();
     UpdatePowerRegen(POWER_MANA);
+    UpdatePowerRegen(POWER_FOCUS);
 
     // Update ratings in exist SPELL_AURA_MOD_RATING_FROM_STAT and only depends from stat
     uint32 mask = 0;
@@ -248,6 +249,7 @@ bool Player::UpdateAllStats()
     UpdatePowerRegen(POWER_RAGE);
     UpdatePowerRegen(POWER_ENERGY);
     UpdatePowerRegen(POWER_RUNIC_POWER);
+    UpdatePowerRegen(POWER_FOCUS);
     UpdateExpertise(BASE_ATTACK);
     UpdateExpertise(OFF_ATTACK);
     RecalculateRating(CR_ARMOR_PENETRATION);
