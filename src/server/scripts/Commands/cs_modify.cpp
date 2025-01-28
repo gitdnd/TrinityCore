@@ -447,7 +447,8 @@ public:
             NotifyModification(handler, target, LANG_YOU_CHANGE_ASPEED, LANG_YOURS_ASPEED_CHANGED, allSpeed);
             for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
             {
-                target->SetSpeedRate(UnitMoveType(i), allSpeed);
+                if(i != MOVE_TURN_RATE)
+                    target->SetSpeedRate(UnitMoveType(i), allSpeed);
             }
             return true;
         }
