@@ -1431,7 +1431,7 @@ class spell_talent_lightning_overload : public AuraScript
         Player* player = eventInfo.GetActor()->ToPlayer();
         int32 intel = player->GetStat(STAT_INTELLECT);
 
-        if (!roll_chance_f(lround((float)intel * 0.05)))
+        if (!roll_chance_f(lround(5 + (float)intel * 0.02)))
             return;
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
