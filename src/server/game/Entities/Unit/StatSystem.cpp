@@ -1068,7 +1068,7 @@ void Player::UpdatePowerRegen(Powers power)
     if (power != POWER_MANA)
         result_regen -= powerRegenInfo[AsUnderlyingType(power)].first;
 
-    if (power == POWER_ENERGY)
+    if (power == POWER_ENERGY || power == POWER_FOCUS)
         result_regen_interrupted = result_regen;
 
     SetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER + AsUnderlyingType(power), result_regen);
