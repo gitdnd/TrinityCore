@@ -2036,7 +2036,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.itemSubClass = fields[4].GetInt8();
         legTemp.itemInventoryType = fields[5].GetInt8();
         legTemp.itemStatGroup = fields[6].GetInt8();
-        legTemp.itemStatGroupGroup = fields[7].GetInt32();
+        legTemp.itemStatGroupMask = fields[7].GetInt32();
         legTemp.primaryStatModifier = fields[8].GetFloat();
         legTemp.secondaryStatModifier = fields[9].GetFloat();
         legTemp.socketMod = fields[10].GetInt8();
@@ -2135,7 +2135,7 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
         if (SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
             continue;
 
-        if(itr.second.itemStatGroupGroup && !(itr.second.itemStatGroupGroup & StatGroupToMask(output->statGroup)))
+        if(itr.second.itemStatGroupMask && !(itr.second.itemStatGroupMask & StatGroupToMask(output->statGroup)))
             continue;
 
         if (itr.second.legendaryFlags && (itr.second.legendaryFlags & LEGENDARY_FLAG_CRAFTED_ONLY) && !modifier.isCrafted)
@@ -2210,58 +2210,58 @@ uint32 VirtualItemMgr::StatGroupToMask(uint32 statGroupId)
     {
     case STAT_GROUP_INT_HEALING:
     {
-        return STAT_GROUP_GROUP_HEALING | STAT_GROUP_GROUP_INT | STAT_GROUP_GROUP_CASTER;
+        return STAT_GROUP_MASK_HEALING | STAT_GROUP_MASK_INT | STAT_GROUP_MASK_CASTER;
     }break;
     case STAT_GROUP_INT_DPS:
     {
-        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_INT | STAT_GROUP_GROUP_CASTER;
+        return STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_INT | STAT_GROUP_MASK_CASTER;
     }break;
     case STAT_GROUP_STR_DPS_NO_HIT:
     {
-        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+        return STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_STR | STAT_GROUP_MASK_MELEE | STAT_GROUP_MASK_MELEE_DPS;
     }break;
     case STAT_GROUP_STR_PARRY_TANK:
     {
-        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+        return STAT_GROUP_MASK_TANK | STAT_GROUP_MASK_STR | STAT_GROUP_MASK_MELEE;
     }break;
     case STAT_GROUP_AGI_DPS_NO_HIT:
     {
-        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_MELEE;
+        return STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_AGI | STAT_GROUP_MASK_MELEE | STAT_GROUP_MASK_MELEE_DPS;
     }break;
     case STAT_GROUP_AGI_DODGE_TANK:
     {
-        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_MELEE;
+        return STAT_GROUP_MASK_TANK | STAT_GROUP_MASK_AGI | STAT_GROUP_MASK_MELEE;
     }break;
     case STAT_GROUP_SPI_DPS:
     {
-        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_SPI | STAT_GROUP_GROUP_CASTER;
+        return STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_SPI | STAT_GROUP_MASK_CASTER;
     }break;
     case STAT_GROUP_SPI_HEALING:
     {
-        return STAT_GROUP_GROUP_HEALING | STAT_GROUP_GROUP_SPI | STAT_GROUP_GROUP_CASTER;
+        return STAT_GROUP_MASK_HEALING | STAT_GROUP_MASK_SPI | STAT_GROUP_MASK_CASTER;
     }break;
     case STAT_GROUP_STR_DPS_NO_EXP:
     {
-        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_RANGED;
+        return STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_STR | STAT_GROUP_MASK_MELEE_DPS;
     }break;
     case STAT_GROUP_STR_BLOCK_TANK:
     {
-        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+        return STAT_GROUP_MASK_TANK | STAT_GROUP_MASK_STR | STAT_GROUP_MASK_MELEE;
     }break;
     case STAT_GROUP_AGI_DPS_NO_EXP:
     {
-        return STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_RANGED;
+        return STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_AGI | STAT_GROUP_MASK_RANGED;
     }break;
     case STAT_GROUP_AGI_BLOCK_TANK:
     {
-        return STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_MELEE;
+        return STAT_GROUP_MASK_TANK | STAT_GROUP_MASK_STR | STAT_GROUP_MASK_MELEE;
     }break;
     case STAT_GROUP_ALL:
     case STAT_GROUP_ALL_EXTENDED:
     default:
     {
-        return STAT_GROUP_GROUP_HEALING | STAT_GROUP_GROUP_DPS | STAT_GROUP_GROUP_TANK | STAT_GROUP_GROUP_INT |
-            STAT_GROUP_GROUP_SPI | STAT_GROUP_GROUP_STR | STAT_GROUP_GROUP_AGI | STAT_GROUP_GROUP_CASTER | STAT_GROUP_GROUP_MELEE | STAT_GROUP_GROUP_RANGED;
+        return STAT_GROUP_MASK_HEALING | STAT_GROUP_MASK_DPS | STAT_GROUP_MASK_TANK | STAT_GROUP_MASK_INT |
+            STAT_GROUP_MASK_SPI | STAT_GROUP_MASK_STR | STAT_GROUP_MASK_AGI | STAT_GROUP_MASK_CASTER | STAT_GROUP_MASK_MELEE | STAT_GROUP_MASK_RANGED | STAT_GROUP_MASK_MELEE_DPS;
     }break;
     }
     return 0;

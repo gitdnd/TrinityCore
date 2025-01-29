@@ -36,16 +36,17 @@ enum StatGroup
 
 enum StatGroupGroup : uint32
 {
-    STAT_GROUP_GROUP_HEALING = 1,
-    STAT_GROUP_GROUP_DPS = 2,
-    STAT_GROUP_GROUP_TANK = 4,
-    STAT_GROUP_GROUP_INT = 8,
-    STAT_GROUP_GROUP_SPI = 16,
-    STAT_GROUP_GROUP_STR = 32,
-    STAT_GROUP_GROUP_AGI = 64,
-    STAT_GROUP_GROUP_CASTER = 128,
-    STAT_GROUP_GROUP_MELEE = 256,
-    STAT_GROUP_GROUP_RANGED = 512,
+    STAT_GROUP_MASK_HEALING = 1,
+    STAT_GROUP_MASK_DPS = 2,
+    STAT_GROUP_MASK_TANK = 4,
+    STAT_GROUP_MASK_INT = 8,
+    STAT_GROUP_MASK_SPI = 16,
+    STAT_GROUP_MASK_STR = 32,
+    STAT_GROUP_MASK_AGI = 64,
+    STAT_GROUP_MASK_CASTER = 128,
+    STAT_GROUP_MASK_MELEE = 256,
+    STAT_GROUP_MASK_RANGED = 512,
+    STAT_GROUP_MASK_MELEE_DPS = 1024,
 };
 
 enum StatGroupType
@@ -293,7 +294,7 @@ struct legendaryItemInfo
     int8 itemSubClass;
     int8 itemInventoryType;
     int8 itemStatGroup;
-    int32 itemStatGroupGroup;
+    int32 itemStatGroupMask;
     _Spell legendarySpells[MAX_LEGENDARY_SPELLS];
     float primaryStatModifier;
     float secondaryStatModifier;
