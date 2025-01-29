@@ -32,8 +32,8 @@ enum CustomClassSpells
     SPELL_CLASS_SEAL_OF_WINDFURY_MH = 97092,
     SPELL_CLASS_SEAL_OF_WINDFURY_OH = 97093,
     SPELL_CLASS_SEAL_OF_WINDFURY_RANGED = 97094,
-    SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED = 97102,
-    SPELL_CLASS_SEAL_OF_BLOODGRIP_OFFHAND = 97103,
+    SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY = 97102,
+    SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED = 97103,
     SPELL_CLASS_SEAL_OF_BLOODGRIP_RANGED = 97104,
     SPELL_TALENT_IGNITE = 97307,
     SPELL_TALENT_OVERLOAD = 94206,
@@ -2117,7 +2117,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED });
+        return ValidateSpellInfo({ SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -2167,8 +2167,8 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         int bp = std::lroundf(mws * 30  + mws * 0.015 * usedAp);
 
         
-        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED);
-        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
+        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
+        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY, caster->GetGUID());
         if (existingDot)
         {
             AuraEffect* existingBleed = existingDot->GetEffect(EFFECT_0);
@@ -2186,8 +2186,8 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
-        caster->CastSpell(victim, SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, args);
-
+        caster->CastSpell(victim, SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY, args);
+        caster->CastSpell(victim, SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, true);
     }
 
     void Register() override
@@ -2196,31 +2196,34 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         OnEffectProc += AuraEffectProcFn(spell_class_seal_of_bloodgrip::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
-// Blodgrip Passive
-class spell_class_seal_of_bloodgrip_passive : public AuraScript
-{
-    PrepareAuraScript(spell_class_seal_of_bloodgrip_passive);
 
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+
+//97103 - Blodgrip dot
+class spell_class_seal_of_bloodgrip_dot : public AuraScript
+{
+    PrepareAuraScript(spell_class_seal_of_bloodgrip_dot);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* caster = GetCaster())
+        Unit* caster = GetCaster();
+        Unit* victim = GetTarget();
+
+        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
+        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY, caster->GetGUID());
+        if (existingDot)
         {
-            if (Player* player = caster->ToPlayer())
+            AuraEffect* existingBleed = existingDot->GetEffect(EFFECT_0);
+            if (existingBleed)
             {
-                float ilvl = player->GetAverageItemLevel();
-                int32 bp = std::lroundf(25 + ilvl * 0.25f);
-                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bp));
-            }
-            else
-            {
-                amount += int32(caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), 50));
+                int tickAmount = existingBleed->GetAmount();
+                GetAura()->GetEffect(EFFECT_0)->ChangeAmount(tickAmount);
             }
         }
     }
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_class_seal_of_bloodgrip_passive::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_DONE);
+        AfterEffectApply += AuraEffectApplyFn(spell_class_seal_of_bloodgrip_dot::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2874,7 +2877,7 @@ void AddSC_Spells_Custom_Class_scripts()
     RegisterSpellScript(spell_class_seal_of_light_heal);
     RegisterSpellScript(spell_class_seal_of_windfury);
     RegisterSpellScript(spell_class_seal_of_bloodgrip);
-    RegisterSpellScript(spell_class_seal_of_bloodgrip_passive);
+    RegisterSpellScript(spell_class_seal_of_bloodgrip_dot);
     RegisterSpellScript(spell_class_serrated_shot_bleed);
     RegisterSpellScript(spell_class_aura_of_steel);
     RegisterSpellScript(spell_talent_ignite);
