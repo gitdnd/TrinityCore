@@ -241,6 +241,8 @@ enum VirtualItemFlags
     VIRTUAL_ITEM_FLAG_DISPLAY_STATIC = 0x0002, // Display is static so custom overrides don't get overidden.
     VIRTUAL_ITEM_FLAG_REGENERATE = 0x0004, //Regenerates the item server startup.
     VIRTUAL_ITEM_FLAG_HOOK_ON_PLAYER_LOOT = 0x0008, // Makes a spell function call upon looting.
+    VIRTUAL_ITEM_FLAG_LEGENDARY_REMOVED = 0x0010, // Legendary effect was removed, don't regen.
+    VIRTUAL_ITEM_FLAG_LEGENDARY_OVERRIDE = 0x0020, // Legendary effect was rerolled, don't use leg seed for reroll.
 };
 
 enum BAG_FAMILY_MASK

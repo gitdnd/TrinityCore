@@ -307,6 +307,7 @@ struct legendaryItemInfo
     uint32 essenceItemId;
     uint32 legendaryFlags;
     uint32 legendarySpellTemplateId;
+    std::string nameOverride;
     
     /*
     @Todo:
@@ -506,7 +507,7 @@ public:
     legendaryItemInfo const* GetLegendaryItemInfo(uint32 id) const;
     void GenerateLegendaryItemEffect(VirtualItemTemplate* output, VirtualModifier& modifier, uint32 skipLeg = 0);
     void UpdateHoneDisplaySpell(VirtualItemTemplate* output);
-    void ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId);
+    void ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId, VirtualModifier& modifier);
 
     uint32 StatGroupToMask(uint32 statGroupId);
 private:

@@ -213,7 +213,8 @@ void VirtualItemMgr::RegenerateItemInfo(VirtualItemTemplate* output, VirtualModi
     GenerateQuality(output, modifier);
     GenerateStatGroup(output, modifier);
     GenerateItemLevel(output, modifier);
-    GenerateLegendaryItemEffect(output, modifier);
+    if(!output->HasFlag(VIRTUAL_ITEM_FLAG_LEGENDARY_REMOVED))
+        GenerateLegendaryItemEffect(output, modifier);
     GenerateBaseStats(output, modifier);
     GenerateItemName(output, modifier);
     UpdateDisenchantId(output, modifier);
@@ -2048,6 +2049,7 @@ void VirtualItemMgr::LoadLegendaryTemplate()
         legTemp.essenceItemId = fields[16].GetUInt32();
         legTemp.legendarySpellTemplateId = fields[17].GetUInt32();
         legTemp.legendaryFlags = fields[18].GetUInt32();
+        legTemp.nameOverride = fields[19].GetString();
 
         if (legTemp.socketMod > 3)
             legTemp.socketMod = 3;
@@ -2095,7 +2097,9 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 {
     if (modifier.legendaryOverride)
     {
-        ApplyLegendaryItemEffect(output, modifier.legendaryOverride);
+        ApplyLegendaryItemEffect(output, modifier.legendaryOverride, modifier);
+        if (!output->HasFlag(VIRTUAL_ITEM_FLAG_LEGENDARY_OVERRIDE))
+            output->customFlags &= VIRTUAL_ITEM_FLAG_LEGENDARY_OVERRIDE;
         return;
     }
 
@@ -2157,10 +2161,10 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
 
     auto selectedLegendary = std::begin(legList);
     std::advance(selectedLegendary, urand(0, uint32(std::size(legList)) - 1, generator));
-    ApplyLegendaryItemEffect(output, selectedLegendary->legendaryId);
+    ApplyLegendaryItemEffect(output, selectedLegendary->legendaryId, modifier);
 }
 
-void VirtualItemMgr::ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId)
+void VirtualItemMgr::ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint32 legId, VirtualModifier& modifier)
 {
     auto leg = GetLegendaryItemInfo(legId);
 
@@ -2182,6 +2186,8 @@ void VirtualItemMgr::ApplyLegendaryItemEffect(VirtualItemTemplate* output, uint3
             output->Spells[i + MAX_GENERATED_SPELLS] = leg->legendarySpells[i];
         }
     }
+
+    modifier.nameOverride = leg->nameOverride;
 }
 
 void VirtualItemMgr::UpdateHoneDisplaySpell(VirtualItemTemplate* output)

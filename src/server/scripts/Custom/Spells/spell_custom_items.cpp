@@ -726,7 +726,7 @@ class spell_item_reroll_legendary : public SpellScript
             if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
                 return SPELL_FAILED_NO_VALID_TARGETS;
 
-            if(!vTemp->legendaryId)
+            if(!vTemp->legendaryId || vTemp->HasFlag(VIRTUAL_ITEM_FLAG_LEGENDARY_REMOVED))
                 return SPELL_FAILED_NO_VALID_TARGETS;
         }
         else
@@ -803,7 +803,8 @@ class spell_item_reroll_legendary : public SpellScript
             vTemp->statSeed = modifier.statSeed;
             vTemp->statValueSeed = modifier.statValueSeed;
             vTemp->statGroupSeed = modifier.statGroupSeed;
-
+            if(!vTemp->HasFlag(VIRTUAL_ITEM_FLAG_LEGENDARY_OVERRIDE))
+                vTemp->customFlags &= VIRTUAL_ITEM_FLAG_LEGENDARY_OVERRIDE;
             vTemp->InitializeQueryData();
             WorldPacket response = vTemp->BuildQueryData(LOCALE_enUS);
             sWorld->SendGlobalMessage(&response);
@@ -848,7 +849,7 @@ class spell_item_remove_legendary : public SpellScript
             if (vTemp->HasFlag(VIRTUAL_ITEM_FLAG_STATIC))
                 return SPELL_FAILED_NO_VALID_TARGETS;
 
-            if (!vTemp->legendaryId)
+            if (!vTemp->legendaryId || vTemp->HasFlag(VIRTUAL_ITEM_FLAG_LEGENDARY_REMOVED))
                 return SPELL_FAILED_NO_VALID_TARGETS;
         }
         else
@@ -896,6 +897,7 @@ class spell_item_remove_legendary : public SpellScript
             }
             uint32 oldLegId = vTemp->legendaryId;
             vTemp->legendaryId = 0;
+            vTemp->customFlags &= VIRTUAL_ITEM_FLAG_LEGENDARY_REMOVED;
             VirtualModifier modifier = sVirtualItemMgr.GetModifierFromTemplate(vTemp);;
             modifier.legendaryOverride = 0;
 
@@ -911,8 +913,6 @@ class spell_item_remove_legendary : public SpellScript
             sVirtualItemMgr.UpdateDisenchantId(vTemp, modifier);
             if (vTemp->honeLevel > 0)
                 sVirtualItemMgr.UpdateHoneDisplaySpell(vTemp);
-
-            player->ApplyVirtualItemLegendayEffects(itemTarget);
 
             vTemp->seed = modifier.seed;
             vTemp->displaySeed = modifier.displaySeed;
