@@ -2198,32 +2198,31 @@ class spell_class_seal_of_bloodgrip : public AuraScript
 };
 
 
-//97103 - Blodgrip dot
+//97102 - Blodgrip dot
 class spell_class_seal_of_bloodgrip_dot : public AuraScript
 {
     PrepareAuraScript(spell_class_seal_of_bloodgrip_dot);
 
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnTick(AuraEffect const* aurEff)
     {
         Unit* caster = GetCaster();
         Unit* victim = GetTarget();
 
-        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
-        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY, caster->GetGUID());
+        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
         if (existingDot)
         {
-            AuraEffect* existingBleed = existingDot->GetEffect(EFFECT_0);
-            if (existingBleed)
+            AuraEffect* currentValue = GetAura()->GetEffect(EFFECT_0);
+            if (currentValue)
             {
-                int tickAmount = existingBleed->GetAmount();
-                GetAura()->GetEffect(EFFECT_0)->ChangeAmount(tickAmount);
+                int tickAmount = currentValue->GetAmount();
+                existingDot->GetEffect(EFFECT_0)->ChangeAmount(tickAmount);
             }
         }
     }
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_class_seal_of_bloodgrip_dot::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_class_seal_of_bloodgrip_dot::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
