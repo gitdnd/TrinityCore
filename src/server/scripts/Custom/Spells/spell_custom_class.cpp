@@ -1431,7 +1431,7 @@ class spell_talent_lightning_overload : public AuraScript
         Player* player = eventInfo.GetActor()->ToPlayer();
         int32 intel = player->GetStat(STAT_INTELLECT);
 
-        if (!roll_chance_f(lround(5 + (float)intel * 0.02)))
+        if (!roll_chance_f(lround(10 + (float)intel * 0.02)))
             return;
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
@@ -2164,7 +2164,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         //int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
 
-        int bp = std::lroundf(mws * 30  + mws * 0.015 * usedAp);
+        int bp = std::lroundf(mws * 45  + mws * 0.045 * usedAp);
 
         
         SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
