@@ -12704,7 +12704,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     {
         SetQuestObjective(craftingLevelQuest, 0, new_value > 10 ? 10 : new_value);
     }
-
+    UpdateDerplsNoGoodVeryBadHorribleTatteredRag();
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '{}' ({}), SkillID: {}",
         GetName().c_str(), GetGUID().ToString().c_str(), skillId);
 }
@@ -28482,4 +28482,26 @@ void Player::HandleSpecialTalentUnlearn(uint32 spellId)
     }
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
+}
+
+void Player::UpdateDerplsNoGoodVeryBadHorribleTatteredRag()
+{
+    uint32 iLvl = GetPureSkillValue(333);
+    if (iLvl > 100)
+    {
+        if (HasAura(94612))
+            RemoveAura(94612);
+    }
+    uint32 stacks = 101 - iLvl;
+    if (Aura* aura = GetAura(94612))
+        aura->SetStackAmount(stacks);
+    else
+    {
+        AuraCreateInfo createInfo(sSpellMgr->GetSpellInfo(94612), MAX_EFFECT_MASK, this);
+        createInfo.SetCaster(this);
+        if (Aura* aura = Aura::TryRefreshStackOrCreate(createInfo))
+        {
+            aura->SetStackAmount(stacks);
+        }
+    }
 }

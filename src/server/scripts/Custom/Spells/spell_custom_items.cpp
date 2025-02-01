@@ -941,6 +941,41 @@ class spell_item_remove_legendary : public SpellScript
     }
 };
 
+class spell_item_swapblaster : public SpellScript
+{
+    PrepareSpellScript(spell_item_swapblaster);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* u = GetExplTargetUnit())
+            if (u->IsPlayer())
+                return SPELL_CAST_OK;
+        return SPELL_FAILED_TARGET_NOT_PLAYER;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Position targ = GetHitUnit()->GetPosition();
+        Position cast = GetCaster()->GetPosition();
+        GetHitUnit()->NearTeleportTo(cast);
+        GetCaster()->NearTeleportTo(targ);
+        //require double confirm?
+        //GetHitUnit()->ToPlayer()->SendSummonRequestFrom(GetCaster());
+        //GetCaster()->ToPlayer()->SendSummonRequestFrom(GetHitUnit());
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_swapblaster::CheckRequirement);
+        OnEffectHit += SpellEffectFn(spell_item_swapblaster::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
