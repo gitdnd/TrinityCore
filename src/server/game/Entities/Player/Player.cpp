@@ -28486,7 +28486,7 @@ void Player::HandleSpecialTalentUnlearn(uint32 spellId)
 
 void Player::UpdateDerplsNoGoodVeryBadHorribleTatteredRag()
 {
-    uint32 iLvl = GetPureSkillValue(333);
+    uint32 iLvl = GetAverageItemLevel();
     if (iLvl > 100)
     {
         if (HasAura(94612))
