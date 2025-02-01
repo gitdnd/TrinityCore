@@ -76,6 +76,107 @@ enum CustomClassSpells
 
 };
 
+// 57993 - Envenom
+class spell_class_envenom : public SpellScriptLoader
+{
+public:
+    spell_class_envenom() : SpellScriptLoader("spell_class_envenom") { }
+    class spell_class_envenom_spellscript : public SpellScript
+    {
+
+        PrepareSpellScript(spell_class_envenom_spellscript);
+
+        void HandleEffect(SpellEffIndex)
+        {
+            if (Unit* caster = GetCaster())
+            {
+
+
+                float const spellPowerPerCombo[6] =
+                {
+                    0.0f,
+                    0.4f,    
+                    0.8f,   
+                    1.2f,    
+                    1.6f,    
+                    2.f      
+                };
+
+                float const attackPowerPerCombo[6] =
+                {
+                    0.0f,
+                    0.12f,
+                    0.24f,
+                    0.36f,
+                    0.48f,
+                    0.6f
+                };
+
+                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                if (cp > 5)
+                    cp = 5;
+                int32 amount = ((caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE) * spellPowerPerCombo[cp]) + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * attackPowerPerCombo[cp]));
+                SetEffectValue(amount);
+            }
+        }
+        void Register() override
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_class_envenom_spellscript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_envenom_spellscript();
+    }
+};
+
+//  48668 - Eviscerate
+class spell_class_eviscerate : public SpellScriptLoader
+{
+public:
+    spell_class_eviscerate() : SpellScriptLoader("spell_class_eviscerate") { }
+    class spell_class_eviscerate_spellscript : public SpellScript
+    {
+
+        PrepareSpellScript(spell_class_eviscerate_spellscript);
+
+        void HandleEffect(SpellEffIndex)
+        {
+            if (Unit* caster = GetCaster())
+            {
+
+
+                float const attackPowerPerCombo[6] =
+                {
+                    0.0f,
+                    0.2f,   
+                    0.4f,  
+                    0.6f,   
+                    0.8f,   
+                    1.f     
+                };
+
+                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                if (cp > 5)
+                    cp = 5;
+
+                int32 amount = (caster->GetTotalAttackPowerValue(BASE_ATTACK) * attackPowerPerCombo[cp]);
+                SetEffectValue(amount);
+            }
+        }
+        void Register() override
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_class_eviscerate_spellscript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_eviscerate_spellscript();
+    }
+};
+
 namespace SharedData
 {
     static std::map<uint64, std::deque<uint32>> playerSpellHistory;
@@ -1431,7 +1532,7 @@ class spell_talent_lightning_overload : public AuraScript
         Player* player = eventInfo.GetActor()->ToPlayer();
         int32 intel = player->GetStat(STAT_INTELLECT);
 
-        if (!roll_chance_f(lround(5 + (float)intel * 0.02)))
+        if (!roll_chance_f(lround(10 + (float)intel * 0.02)))
             return;
 
         SpellInfo const* procSpell = eventInfo.GetSpellInfo();
@@ -2164,7 +2265,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         //int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
 
-        int bp = std::lroundf(mws * 30  + mws * 0.015 * usedAp);
+        int bp = std::lroundf(mws * 70  + mws * 0.06 * usedAp);
 
         
         SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
@@ -2198,32 +2299,31 @@ class spell_class_seal_of_bloodgrip : public AuraScript
 };
 
 
-//97103 - Blodgrip dot
+//97102 - Blodgrip dot
 class spell_class_seal_of_bloodgrip_dot : public AuraScript
 {
     PrepareAuraScript(spell_class_seal_of_bloodgrip_dot);
 
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnTick(AuraEffect const* aurEff)
     {
         Unit* caster = GetCaster();
         Unit* victim = GetTarget();
 
-        SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
-        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY, caster->GetGUID());
+        Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
         if (existingDot)
         {
-            AuraEffect* existingBleed = existingDot->GetEffect(EFFECT_0);
-            if (existingBleed)
+            AuraEffect* currentValue = GetAura()->GetEffect(EFFECT_0);
+            if (currentValue)
             {
-                int tickAmount = existingBleed->GetAmount();
-                GetAura()->GetEffect(EFFECT_0)->ChangeAmount(tickAmount);
+                int tickAmount = currentValue->GetAmount();
+                existingDot->GetEffect(EFFECT_0)->ChangeAmount(tickAmount);
             }
         }
     }
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_class_seal_of_bloodgrip_dot::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_class_seal_of_bloodgrip_dot::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -2858,6 +2958,8 @@ class spell_custom_ilvlmanacost : public AuraScript
 
 void AddSC_Spells_Custom_Class_scripts()
 {
+    new spell_class_envenom();
+    new spell_class_eviscerate();
     new spell_class_howling_blast_frozen();
     new spell_class_frost_strike_damage_frozen();
     new spell_class_seal_of_venomstrike<SPELL_CLASS_DEADLY, SPELL_CLASS_SEAL_OF_VENOMSTRIKE_DAMAGE>("spell_class_seal_of_venomstrike");
