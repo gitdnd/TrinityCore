@@ -12637,7 +12637,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
 
-    UpdateLowLevelCasterBuff();
+    //UpdateLowLevelCasterBuff();
 
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
@@ -27341,6 +27341,7 @@ float Player::UpdateCachedItemLevel(bool /*isLogin*/)
         result = currentItemLevel;
     }
     _averageItemLevel = result;
+    UpdateLowLevelCasterBuff();
     return result;
 }
 
