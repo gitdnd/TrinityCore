@@ -2359,7 +2359,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         }
 
         void UnbindInstances(uint32 mapId);
-        void UpdateDerplsNoGoodVeryBadHorribleTatteredRag();
+        void UpdateLowLevelCasterBuff();
     protected:
         // Gamemaster whisper whitelist
         GuidList WhisperList;

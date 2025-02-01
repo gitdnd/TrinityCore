@@ -12637,7 +12637,7 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
 
-    UpdateDerplsNoGoodVeryBadHorribleTatteredRag();
+    UpdateLowLevelCasterBuff();
 
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
@@ -28485,15 +28485,15 @@ void Player::HandleSpecialTalentUnlearn(uint32 spellId)
     UpdateAttackPowerAndDamage(true);
 }
 
-void Player::UpdateDerplsNoGoodVeryBadHorribleTatteredRag()
+void Player::UpdateLowLevelCasterBuff()
 {
     uint32 iLvl = GetAverageItemLevel();
-    if (iLvl > 100)
+    if (iLvl >= 100)
     {
         if (HasAura(94612))
             RemoveAura(94612);
     }
-    uint32 stacks = 101 - iLvl;
+    uint32 stacks = 100 - iLvl;
     if (Aura* aura = GetAura(94612))
         aura->SetStackAmount(stacks);
     else
