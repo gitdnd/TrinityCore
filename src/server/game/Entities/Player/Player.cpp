@@ -28493,7 +28493,7 @@ void Player::UpdateLowLevelCasterBuff()
         if (HasAura(94612))
             RemoveAura(94612);
     }
-    uint32 stacks = 100 - iLvl;
+    uint32 stacks = std::min(50u, 100u - iLvl);
     if (Aura* aura = GetAura(94612))
         aura->SetStackAmount(stacks);
     else
