@@ -4878,7 +4878,7 @@ void Spell::TakePower()
         if (powerType == POWER_MANA)
             m_powerCost *= 2.f;
         else if (powerType == POWER_FOCUS)
-            m_powerCost *= 200.f;
+            m_powerCost *= 20.f;
         powerType = POWER_HEALTH;
         bloodMagic = true;
     }
