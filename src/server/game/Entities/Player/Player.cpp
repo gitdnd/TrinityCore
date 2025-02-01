@@ -12637,6 +12637,8 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     if (Group* group = GetGroup())
         group->UpdateDungeonLevel();
 
+    UpdateDerplsNoGoodVeryBadHorribleTatteredRag();
+
     const uint32 skillId = 333;
     SkillStatusMap::iterator itr = mSkillStatus.find(skillId);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
@@ -12704,7 +12706,6 @@ void Player::UpdateCraftingSkill(Item* item, uint8 slot)
     {
         SetQuestObjective(craftingLevelQuest, 0, new_value > 10 ? 10 : new_value);
     }
-    UpdateDerplsNoGoodVeryBadHorribleTatteredRag();
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateCraftSkill: Player '{}' ({}), SkillID: {}",
         GetName().c_str(), GetGUID().ToString().c_str(), skillId);
 }
