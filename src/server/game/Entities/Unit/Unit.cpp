@@ -1271,9 +1271,9 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         damage += CalculateDamage(damageInfo->AttackType, false, addPctMods, itemDamagesMask);
         if (Player* plr = ToPlayer())
         {
-            if (HasAura(SPELL_FIST_OF_FURY) && (damageInfo->AttackType == BASE_ATTACK || damageInfo->AttackType == OFF_ATTACK))
-                if(!plr->GetWeaponForAttack(BASE_ATTACK, true) && !plr->GetWeaponForAttack(OFF_ATTACK, true))
-                    damage *= 3;
+            //if (HasAura(SPELL_FIST_OF_FURY) && (damageInfo->AttackType == BASE_ATTACK || damageInfo->AttackType == OFF_ATTACK))
+                //if(!plr->GetWeaponForAttack(BASE_ATTACK, true) && !plr->GetWeaponForAttack(OFF_ATTACK, true))
+                   //damage *= 3;
 
             if (HasAura(SPELL_HEAVY_BLOWS) && (damageInfo->AttackType == BASE_ATTACK))
             {

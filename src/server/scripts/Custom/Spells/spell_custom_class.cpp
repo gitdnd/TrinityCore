@@ -2913,8 +2913,8 @@ class spell_talent_deadly_calm : public AuraScript
 
         if (Aura* existingBuff = player->GetAura(SPELL_TALENT_DEADLY_CALM))
         {
-            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(maxFocus / 2);
-            existingBuff->GetEffect(EFFECT_1)->ChangeAmount(maxFocus / 2);
+            existingBuff->GetEffect(EFFECT_0)->ChangeAmount(maxFocus);
+            existingBuff->GetEffect(EFFECT_1)->ChangeAmount(maxFocus);
         }
 
     }
