@@ -1919,6 +1919,12 @@ namespace LuaCustom
         return 1;
     }
 
+    int UpdateLowLevelCasterBuff(Eluna* /*E*/, Player* player)
+    {
+        player->UpdateLowLevelCasterBuff();
+        return 0;
+    }
+
     // REGISTERS
     
     ElunaRegister<> GlobalMethods[] =
@@ -2024,6 +2030,7 @@ namespace LuaCustom
         { "NukePlayerIntroQuestHack", &LuaCustom::NukePlayerIntroQuestHack },
         { "SetCraftingComponents", &LuaCustom::SetCraftingComponents },
         { "ClearCratingComponents", &LuaCustom::ClearCraftingComponents },
+        { "UpdateLowLevelCasterBuff", &LuaCustom::UpdateLowLevelCasterBuff }
     };
     
     ElunaRegister<Creature> CreatureMethods[] =

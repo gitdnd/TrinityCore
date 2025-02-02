@@ -28488,7 +28488,7 @@ void Player::HandleSpecialTalentUnlearn(uint32 spellId)
 
 void Player::UpdateLowLevelCasterBuff()
 {
-    uint32 iLvl = GetAverageItemLevel();
+    uint32 iLvl = GetCappedItemLevel();
     if (iLvl >= 100)
     {
         if (HasAura(94612))
