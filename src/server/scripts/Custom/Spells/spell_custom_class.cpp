@@ -363,6 +363,7 @@ class spell_talent_absolute_zero : public AuraScript
         if (target->IsImmunedToSpell(ccSpellInfo, caster))
         {
             caster->CastSpell(caster, SPELL_CLASS_FINGERS_OF_FROST, true);
+            caster->CastSpell(caster, SPELL_CLASS_FINGERS_OF_FROST, true);
         }
         else
         {
