@@ -18594,7 +18594,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
 
-
+    UpdateLowLevelCasterBuff();
     return true;
 }
 
