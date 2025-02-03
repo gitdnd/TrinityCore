@@ -327,6 +327,9 @@ class spell_evokers_intellect_aura : public AuraScript
         PreventDefaultAction();
         uint32 spell = eventInfo.GetSpellInfo()->Id;
 
+        if(!GetCaster()->HasAura(450002))
+            uniqueSpells.clear();
+
         if (std::find(uniqueSpells.begin(), uniqueSpells.end(), spell) != uniqueSpells.end())
             uniqueSpells.clear();
 
