@@ -62,7 +62,7 @@ struct TradeStatusInfo;
 enum AuctionAction : uint8;
 enum AuctionError : uint8;
 enum InventoryResult : uint8;
-
+struct ItemPosCount;
 namespace lfg
 {
     struct LfgJoinResultData;
