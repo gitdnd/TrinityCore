@@ -1947,8 +1947,11 @@ void WorldSession::LoadAccountBank()
     }
 
     QueryResult result = CharacterDatabase.PQuery("SELECT TabId, TabName, TabIcon, TabText FROM account_bank_tab where accountid = {} ORDER BY TabId ASC", GetAccountId());
-    if (Field* f = result->Fetch())
-        LoadBankTabFromDB(f);
+    if (result)
+    {
+        if (Field* f = result->Fetch())
+            LoadBankTabFromDB(f);
+    }
 }
 
 void WorldSession::LoadBankTabFromDB(Field* fields)
