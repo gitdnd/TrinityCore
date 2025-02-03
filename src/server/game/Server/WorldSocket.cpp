@@ -619,7 +619,6 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
         account.Expansion, mutetime, account.TimezoneOffset, account.Locale, account.Recruiter, account.IsRectuiter);
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
-    _worldSession->LoadAccountBank();
     // Initialize Warden system only if it is enabled by config
     if (wardenActive)
         _worldSession->InitWarden(account.SessionKey, account.OS);

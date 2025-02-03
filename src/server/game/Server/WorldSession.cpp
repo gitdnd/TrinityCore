@@ -1943,6 +1943,7 @@ void WorldSession::LoadAccountBank()
         stmt->setUInt32(0, GetAccountId());
         stmt->setUInt8(1, tabId);
         trans->Append(stmt);
+        CharacterDatabase.CommitTransaction(trans);
     }
 
     QueryResult result = CharacterDatabase.PQuery("SELECT TabId, TabName, TabIcon, TabText FROM account_bank_tab where accountid = {} ORDER BY TabId ASC", GetAccountId());

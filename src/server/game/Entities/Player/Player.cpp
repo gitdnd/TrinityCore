@@ -18595,6 +18595,7 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
 
     UpdateLowLevelCasterBuff();
+    GetSession()->LoadAccountBank();
     return true;
 }
 
