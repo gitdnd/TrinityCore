@@ -433,6 +433,8 @@ struct PacketCounter
     uint32 amountCounter;
 };
 
+using GSlotIds = std::set<uint8>;
+
 /// Player session in the World
 class TC_GAME_API WorldSession
 {
@@ -643,9 +645,15 @@ class TC_GAME_API WorldSession
         time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
         void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
+        void LoadAccountBank();
         void LoadBankTabFromDB(Field* fields);
         bool LoadBankItemFromDB(Field* fields);
-
+        void SendBankTabData(uint8 tabId, bool sendAllSlots);
+        void SendBankTabText(uint8 tabId);
+        void _SendBankContent(uint8 tabId, bool sendAllSlots);
+        void _SendBankList(uint8 tabId = 0, bool sendAllSlots = false, GSlotIds* slots = nullptr);
+        void SwapItems(uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);
+        void SwapItemsWithInventory(bool toChar, uint8 tabId, uint8 slotId, uint8 playerBag, uint8 playerSlotId, uint32 splitedAmount);
 
     public:                                                 // opcodes handlers
 
@@ -1315,7 +1323,7 @@ class TC_GAME_API WorldSession
         class AccountBankTab
         {
         public:
-            AccountBankTab(ObjectGuid::LowType guildId, uint8 tabId);
+            AccountBankTab(uint32 accountId, uint8 tabId);
 
             void LoadFromDB(Field* fields);
             bool LoadItemFromDB(Field* fields);
@@ -1323,7 +1331,7 @@ class TC_GAME_API WorldSession
 
             void SetInfo(std::string_view name, std::string_view icon);
             void SetText(std::string_view text);
-            void SendText(Guild const* guild, WorldSession* session) const;
+            void SendText(WorldSession* session);
 
             std::string const& GetName() const { return m_name; }
             std::string const& GetIcon() const { return m_icon; }
@@ -1333,7 +1341,7 @@ class TC_GAME_API WorldSession
             bool SetItem(CharacterDatabaseTransaction trans, uint8 slotId, Item* pItem);
 
         private:
-            ObjectGuid::LowType m_guildId;
+            uint32 accountId;
             uint8 m_tabId;
             // GUILD_BANK_MAX_SLOTS
             std::array<Item*, 6> m_items = {};
@@ -1341,13 +1349,90 @@ class TC_GAME_API WorldSession
             std::string m_icon;
             std::string m_text;
         };
+        // Movement data
+        class AccountMoveItemData
+        {
+        public:
+            AccountMoveItemData(Player* player, uint8 container, uint8 slotId);
+            virtual ~AccountMoveItemData();
+
+            virtual bool IsBank() const = 0;
+            // Initializes item pointer. Returns true, if item exists, false otherwise.
+            virtual bool InitItem() = 0;
+            // Checks splited amount against item. Splited amount cannot be more that number of items in stack.
+            virtual bool CheckItem(uint32& splitedAmount);
+            // Checks if container can store specified item
+            bool CanStore(Item* pItem, bool swap, bool sendError);
+            // Clones stored item
+            bool CloneItem(uint32 count);
+            // Remove item from container (if splited update items fields)
+            virtual void RemoveItem(CharacterDatabaseTransaction trans, AccountMoveItemData* pOther, uint32 splitedAmount = 0) = 0;
+            // Saves item to container
+            virtual Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) = 0;
+            // Copy slots id from position vector
+            void CopySlots(GSlotIds& ids) const;
+
+            Item* GetItem(bool isCloned = false) const { return isCloned ? m_pClonedItem : m_pItem; }
+            uint8 GetContainer() const { return m_container; }
+            uint8 GetSlotId() const { return m_slotId; }
+
+        protected:
+            virtual InventoryResult CanStore(Item* pItem, bool swap) = 0;
+
+            Player* m_pPlayer;
+            uint8 m_container;
+            uint8 m_slotId;
+            Item* m_pItem;
+            Item* m_pClonedItem;
+            std::vector<ItemPosCount> m_vec;
+        };
+        class PlayerAccountMoveItemData : public AccountMoveItemData
+        {
+        public:
+            PlayerAccountMoveItemData(Player* player, uint8 container, uint8 slotId) :
+                AccountMoveItemData(player, container, slotId) {
+            }
+
+            bool IsBank() const override { return false; }
+            bool InitItem() override;
+            void RemoveItem(CharacterDatabaseTransaction trans, AccountMoveItemData* pOther, uint32 splitedAmount = 0) override;
+            Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) override;
+        protected:
+            InventoryResult CanStore(Item* pItem, bool swap) override;
+        };
+
+        class BankAccountMoveItemData : public AccountMoveItemData
+        {
+        public:
+            BankAccountMoveItemData(Player* player, uint8 container, uint8 slotId) :
+                AccountMoveItemData(player, container, slotId) {
+            }
+
+            bool IsBank() const override { return true; }
+            bool InitItem() override;
+            void RemoveItem(CharacterDatabaseTransaction trans, AccountMoveItemData* pOther, uint32 splitedAmount) override;
+            Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) override;
+
+        protected:
+            InventoryResult CanStore(Item* pItem, bool swap) override;
+
+        private:
+            Item* _StoreItem(CharacterDatabaseTransaction trans, AccountBankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const;
+            bool _ReserveSpace(uint8 slotId, Item* pItem, Item* pItemDest, uint32& count);
+            void CanStoreItemInTab(Item* pItem, uint8 skipSlotId, bool merge, uint32& count);
+        };
 
         std::vector<AccountBankTab> m_bankTabs;
         inline uint8 _GetPurchasedTabsSize() const { return uint8(m_bankTabs.size()); }
 
         inline AccountBankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
         inline AccountBankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
-
+        Item* _GetItem(uint8 tabId, uint8 slotId) const;
+        void _RemoveItem(CharacterDatabaseTransaction trans, uint8 tabId, uint8 slotId);
+        void _MoveItems(AccountMoveItemData* pSrc, AccountMoveItemData* pDest, uint32 splitedAmount);
+        bool _DoItemsMove(AccountMoveItemData* pSrc, AccountMoveItemData* pDest, bool sendError, uint32 splitedAmount = 0);
+        void _SendBankContentUpdate(AccountMoveItemData* pSrc, AccountMoveItemData* pDest);
+        void _SendBankContentUpdate(uint8 tabId, GSlotIds slots);
 
 };
 #endif

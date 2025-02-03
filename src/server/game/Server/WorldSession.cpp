@@ -62,6 +62,7 @@
 #include "GuildPackets.h"
 #include <boost/circular_buffer.hpp>
 #include <zlib.h>
+#include <boost/iterator/counting_iterator.hpp>
 
 namespace {
 
@@ -1924,13 +1925,45 @@ bool WorldSession::IsRightUnitBeingMoved(ObjectGuid guid)
     return true;
 }
 
+void WorldSession::LoadAccountBank()
+{
+    m_bankTabs.clear();
+    m_bankTabs.reserve(6); // @todo: purchase
+    for (uint8 tabId = 0; tabId < 6; ++tabId)
+    {
+        m_bankTabs.emplace_back(GetAccountId(), tabId);
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_BANK_TAB);
+        stmt->setUInt32(0, GetAccountId());
+        stmt->setUInt8(1, tabId);
+        trans->Append(stmt);
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_BANK_TAB);
+        stmt->setUInt32(0, GetAccountId());
+        stmt->setUInt8(1, tabId);
+        trans->Append(stmt);
+    }
+
+    QueryResult result = CharacterDatabase.PQuery("SELECT TabId, TabName, TabIcon, TabText FROM account_bank_tab where accountid = {} ORDER BY TabId ASC", GetAccountId());
+    if (Field* f = result->Fetch())
+        LoadBankTabFromDB(f);
+}
+
 void WorldSession::LoadBankTabFromDB(Field* fields)
 {
-    uint8 tabId = fields[1].GetUInt8();
+    uint8 tabId = fields[0].GetUInt8();
     if (tabId >= _GetPurchasedTabsSize())
         TC_LOG_ERROR("guild", "Invalid tab (tabId: {}) in guild bank, skipped.", tabId);
     else
+    {
         m_bankTabs[tabId].LoadFromDB(fields);
+        //          0            1                2      3         4        5      6             7                 8           9           10
+        QueryResult result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, "
+            //   11       12     13      14         15
+            "guildid, TabId, SlotId, item_guid, itemEntry FROM account_bank_item gbi INNER JOIN item_instance ii ON gbi.item_guid = ii.guid");
+        m_bankTabs[tabId].LoadItemFromDB(result->Fetch());
+    }
 }
 
 bool WorldSession::LoadBankItemFromDB(Field* fields)
@@ -1945,15 +1978,15 @@ bool WorldSession::LoadBankItemFromDB(Field* fields)
     return m_bankTabs[tabId].LoadItemFromDB(fields);
 }
 
-WorldSession::AccountBankTab::AccountBankTab(ObjectGuid::LowType guildId, uint8 tabId) : m_guildId(guildId), m_tabId(tabId)
+WorldSession::AccountBankTab::AccountBankTab(uint32 m_accountId, uint8 tabId) : accountId(m_accountId), m_tabId(tabId)
 {
 }
 
 void WorldSession::AccountBankTab::LoadFromDB(Field* fields)
 {
-    m_name = fields[2].GetString();
-    m_icon = fields[3].GetString();
-    m_text = fields[4].GetString();
+    m_name = fields[1].GetString();
+    m_icon = fields[2].GetString();
+    m_text = fields[3].GetString();
 }
 
 bool WorldSession::AccountBankTab::LoadItemFromDB(Field* fields)
@@ -1980,7 +2013,7 @@ bool WorldSession::AccountBankTab::LoadItemFromDB(Field* fields)
         TC_LOG_ERROR("guild", "Item (GUID {}, id: {}) not found in item_instance, deleting from guild bank!", itemGuid, itemEntry);
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NONEXISTENT_GUILD_BANK_ITEM);
-        stmt->setUInt32(0, m_guildId);
+        stmt->setUInt32(0, accountId);
         stmt->setUInt8(1, m_tabId);
         stmt->setUInt8(2, slotId);
         CharacterDatabase.Execute(stmt);
@@ -2018,10 +2051,10 @@ void WorldSession::AccountBankTab::SetInfo(std::string_view name, std::string_vi
     m_name = name;
     m_icon = icon;
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_BANK_TAB_INFO);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_BANK_TAB_INFO);
     stmt->setString(0, m_name);
     stmt->setString(1, m_icon);
-    stmt->setUInt32(2, m_guildId);
+    stmt->setUInt32(2, accountId);
     stmt->setUInt8(3, m_tabId);
     CharacterDatabase.Execute(stmt);
 }
@@ -2034,9 +2067,9 @@ void WorldSession::AccountBankTab::SetText(std::string_view text)
     m_text = text;
     utf8truncate(m_text, 500);          // DB and client size limitation
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_BANK_TAB_TEXT);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_BANK_TAB_TEXT);
     stmt->setString(0, m_text);
-    stmt->setUInt32(1, m_guildId);
+    stmt->setUInt32(1, accountId);
     stmt->setUInt8(2, m_tabId);
     CharacterDatabase.Execute(stmt);
 }
@@ -2050,16 +2083,16 @@ bool WorldSession::AccountBankTab::SetItem(CharacterDatabaseTransaction trans, u
 
     m_items[slotId] = item;
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_ITEM);
-    stmt->setUInt32(0, m_guildId);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_BANK_ITEM);
+    stmt->setUInt32(0, accountId);
     stmt->setUInt8(1, m_tabId);
     stmt->setUInt8(2, slotId);
     trans->Append(stmt);
 
     if (item)
     {
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_BANK_ITEM);
-        stmt->setUInt32(0, m_guildId);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_BANK_ITEM);
+        stmt->setUInt32(0, accountId);
         stmt->setUInt8(1, m_tabId);
         stmt->setUInt8(2, slotId);
         stmt->setUInt32(3, item->GetGUID().GetCounter());
@@ -2074,21 +2107,520 @@ bool WorldSession::AccountBankTab::SetItem(CharacterDatabaseTransaction trans, u
     return true;
 }
 
-void WorldSession::AccountBankTab::SendText(Guild const* guild, WorldSession* session) const
+void WorldSession::AccountBankTab::SendText(WorldSession* session)
 {
     WorldPackets::Guild::GuildBankTextQueryResult textQuery;
     textQuery.Tab = m_tabId;
     textQuery.Text = m_text;
+    session->SendPacket(textQuery.Write());
+}
 
-    if (session)
+void WorldSession::SendBankTabData(uint8 tabId, bool sendAllSlots)
+{
+    if (tabId < _GetPurchasedTabsSize())
+        _SendBankContent(tabId, sendAllSlots);
+}
+
+void WorldSession::SendBankTabText(uint8 tabId)
+{
+    if (AccountBankTab * tab = GetBankTab(tabId))
+        tab->SendText(this);
+}
+
+void WorldSession::_SendBankContent(uint8 tabId, bool sendAllSlots)
+{
+    _SendBankList(tabId, sendAllSlots);
+}
+
+void WorldSession::_SendBankList(uint8 tabId /*= 0*/, bool sendAllSlots /*= false*/, GSlotIds* slots /*= nullptr*/)
+{
+    WorldPackets::Guild::GuildBankQueryResults packet;
+
+    packet.Money = 0;
+    packet.Tab = int32(tabId);
+    packet.FullUpdate = sendAllSlots;
+
+    if (sendAllSlots && !tabId)
     {
-        TC_LOG_DEBUG("guild", "MSG_QUERY_GUILD_BANK_TEXT [{}]: Tabid: {}, Text: {}"
-            , session->GetPlayerInfo(), m_tabId, m_text);
-        session->SendPacket(textQuery.Write());
+        packet.TabInfo.reserve(_GetPurchasedTabsSize());
+        for (uint8 i = 0; i < _GetPurchasedTabsSize(); ++i)
+        {
+            WorldPackets::Guild::GuildBankTabInfo tabInfo;
+            tabInfo.Name = m_bankTabs[i].GetName();
+            tabInfo.Icon = m_bankTabs[i].GetIcon();
+            packet.TabInfo.push_back(tabInfo);
+        }
+    }
+
+    if (AccountBankTab const* tab = GetBankTab(tabId))
+    {
+        auto fillItems = [&](auto begin, auto end, bool skipEmpty)
+            {
+                for (auto itr = begin; itr != end; ++itr)
+                {
+                    if (Item* tabItem = tab->GetItem(*itr))
+                    {
+                        WorldPackets::Guild::GuildBankItemInfo itemInfo;
+
+                        itemInfo.Slot = *itr;
+                        itemInfo.ItemID = tabItem->GetEntry();
+                        itemInfo.RandomPropertiesID = tabItem->GetItemRandomPropertyId();
+                        itemInfo.RandomPropertiesSeed = tabItem->GetItemSuffixFactor();
+                        itemInfo.Count = int32(tabItem->GetCount());
+                        itemInfo.Charges = int32(abs(tabItem->GetSpellCharges()));
+                        itemInfo.EnchantmentID = int32(tabItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
+                        itemInfo.Flags = tabItem->GetInt32Value(ITEM_FIELD_FLAGS);
+
+                        for (uint32 socketSlot = 0; socketSlot < MAX_GEM_SOCKETS; ++socketSlot)
+                        {
+                            if (uint32 enchId = tabItem->GetEnchantmentId(EnchantmentSlot(SOCK_ENCHANTMENT_SLOT + socketSlot)))
+                            {
+                                WorldPackets::Guild::GuildBankSocketEnchant gem;
+                                gem.SocketIndex = socketSlot;
+                                gem.SocketEnchantID = int32(enchId);
+                                itemInfo.SocketEnchant.push_back(gem);
+                            }
+                        }
+
+                        packet.ItemInfo.push_back(itemInfo);
+                    }
+                    else if (!skipEmpty)
+                    {
+                        WorldPackets::Guild::GuildBankItemInfo itemInfo;
+
+                        itemInfo.Slot = *itr;
+                        itemInfo.ItemID = 0;
+
+                        packet.ItemInfo.push_back(itemInfo);
+                    }
+                }
+
+            };
+
+        if (sendAllSlots)
+            fillItems(boost::make_counting_iterator(uint8(0)), boost::make_counting_iterator(uint8(98)), true);
+        else if (slots && !slots->empty())
+            fillItems(slots->begin(), slots->end(), false);
+    }
+    packet.WithdrawalsRemaining = -1;
+    SendPacket(packet.Write());
+}
+
+inline Item* WorldSession::_GetItem(uint8 tabId, uint8 slotId) const
+{
+    if (AccountBankTab const* tab = GetBankTab(tabId))
+        return tab->GetItem(slotId);
+    return nullptr;
+}
+
+inline void WorldSession::_RemoveItem(CharacterDatabaseTransaction trans, uint8 tabId, uint8 slotId)
+{
+    if (AccountBankTab* pTab = GetBankTab(tabId))
+        pTab->SetItem(trans, slotId, nullptr);
+}
+
+void WorldSession::_MoveItems(AccountMoveItemData* pSrc, AccountMoveItemData* pDest, uint32 splitedAmount)
+{
+    // 1. Initialize source item
+    if (!pSrc->InitItem())
+        return; // No source item
+
+    // 2. Check source item
+    if (!pSrc->CheckItem(splitedAmount))
+        return; // Source item or splited amount is invalid
+
+    // 5. Check split
+    if (splitedAmount)
+    {
+        // 5.1. Clone source item
+        if (!pSrc->CloneItem(splitedAmount))
+            return; // Item could not be cloned
+
+        // 5.2. Move splited item to destination
+        _DoItemsMove(pSrc, pDest, true, splitedAmount);
+    }
+    else // 6. No split
+    {
+        // 6.1. Try to merge items in destination (pDest->GetItem() == nullptr)
+        if (!_DoItemsMove(pSrc, pDest, false)) // Item could not be merged
+        {
+            // 6.2. Try to swap items
+            // 6.2.1. Initialize destination item
+            if (!pDest->InitItem())
+                return;
+
+            // 6.2.3. Swap items (pDest->GetItem() != nullptr)
+            _DoItemsMove(pSrc, pDest, true);
+        }
+    }
+    // 7. Send changes
+    _SendBankContentUpdate(pSrc, pDest);
+}
+
+
+void WorldSession::_SendBankContentUpdate(AccountMoveItemData* pSrc, AccountMoveItemData* pDest)
+{
+    ASSERT(pSrc->IsBank() || pDest->IsBank());
+
+    uint8 tabId = 0;
+    SlotIds slots;
+    if (pSrc->IsBank()) // B ->
+    {
+        tabId = pSrc->GetContainer();
+        slots.insert(pSrc->GetSlotId());
+        if (pDest->IsBank()) // B -> B
+        {
+            // Same tab - add destination slots to collection
+            if (pDest->GetContainer() == pSrc->GetContainer())
+                pDest->CopySlots(slots);
+            else // Different tabs - send second message
+            {
+                SlotIds destSlots;
+                pDest->CopySlots(destSlots);
+                _SendBankContentUpdate(pDest->GetContainer(), destSlots);
+            }
+        }
+    }
+    else if (pDest->IsBank()) // C -> B
+    {
+        tabId = pDest->GetContainer();
+        pDest->CopySlots(slots);
+    }
+
+    _SendBankContentUpdate(tabId, slots);
+}
+
+void WorldSession::_SendBankContentUpdate(uint8 tabId, GSlotIds slots)
+{
+    _SendBankList(tabId, false, &slots);
+}
+
+bool WorldSession::_DoItemsMove(AccountMoveItemData* pSrc, AccountMoveItemData* pDest, bool sendError, uint32 splitedAmount)
+{
+    Item* pDestItem = pDest->GetItem();
+    bool swap = (pDestItem != nullptr);
+
+    Item* pSrcItem = pSrc->GetItem(splitedAmount != 0);
+    // 1. Can store source item in destination
+    if (!pDest->CanStore(pSrcItem, swap, sendError))
+        return false;
+
+    // 2. Can store destination item in source
+    if (swap)
+        if (!pSrc->CanStore(pDestItem, true, true))
+            return false;
+
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    // 4. Remove item from source
+    pSrc->RemoveItem(trans, pDest, splitedAmount);
+
+    // 5. Remove item from destination
+    if (swap)
+        pDest->RemoveItem(trans, pSrc);
+
+    // 6. Store item in destination
+    pDest->StoreItem(trans, pSrcItem);
+
+    // 7. Store item in source
+    if (swap)
+        pSrc->StoreItem(trans, pDestItem);
+
+    CharacterDatabase.CommitTransaction(trans);
+    return true;
+}
+
+void WorldSession::SwapItems(uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount)
+{
+    if (tabId >= _GetPurchasedTabsSize() || slotId >= GUILD_BANK_MAX_SLOTS ||
+        destTabId >= _GetPurchasedTabsSize() || destSlotId >= GUILD_BANK_MAX_SLOTS)
+        return;
+
+    if (tabId == destTabId && slotId == destSlotId)
+        return;
+
+    BankAccountMoveItemData from(GetPlayer(), tabId, slotId);
+    BankAccountMoveItemData to(GetPlayer(), destTabId, destSlotId);
+    _MoveItems(&from, &to, splitedAmount);
+}
+
+void WorldSession::SwapItemsWithInventory(bool toChar, uint8 tabId, uint8 slotId, uint8 playerBag, uint8 playerSlotId, uint32 splitedAmount)
+{
+    if ((slotId >= GUILD_BANK_MAX_SLOTS && slotId != NULL_SLOT) || tabId >= _GetPurchasedTabsSize())
+        return;
+
+    BankAccountMoveItemData bankData(GetPlayer(), tabId, slotId);
+    PlayerAccountMoveItemData charData(GetPlayer(), playerBag, playerSlotId);
+    if (toChar)
+        _MoveItems(&bankData, &charData, splitedAmount);
+    else
+        _MoveItems(&charData, &bankData, splitedAmount);
+}
+
+// AccountMoveItemData
+WorldSession::AccountMoveItemData::AccountMoveItemData(Player* player, uint8 container, uint8 slotId) : m_pPlayer(player),
+m_container(container), m_slotId(slotId), m_pItem(nullptr), m_pClonedItem(nullptr)
+{
+}
+
+WorldSession::AccountMoveItemData::~AccountMoveItemData()
+{
+}
+
+bool WorldSession::AccountMoveItemData::CheckItem(uint32& splitedAmount)
+{
+    ASSERT(m_pItem);
+    if (splitedAmount > m_pItem->GetCount())
+        return false;
+    if (splitedAmount == m_pItem->GetCount())
+        splitedAmount = 0;
+    return true;
+}
+
+bool WorldSession::AccountMoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
+{
+    m_vec.clear();
+    InventoryResult msg = CanStore(pItem, swap);
+    if (sendError && msg != EQUIP_ERR_OK)
+        m_pPlayer->SendEquipError(msg, pItem);
+    return (msg == EQUIP_ERR_OK);
+}
+
+bool WorldSession::AccountMoveItemData::CloneItem(uint32 count)
+{
+    ASSERT(m_pItem);
+    m_pClonedItem = m_pItem->CloneItem(count);
+    if (!m_pClonedItem)
+    {
+        m_pPlayer->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, m_pItem);
+        return false;
+    }
+    return true;
+}
+
+inline void WorldSession::AccountMoveItemData::CopySlots(GSlotIds& ids) const
+{
+    for (auto itr = m_vec.begin(); itr != m_vec.end(); ++itr)
+        ids.insert(uint8(itr->pos));
+}
+
+// PlayerAccountMoveItemData
+bool WorldSession::PlayerAccountMoveItemData::InitItem()
+{
+    m_pItem = m_pPlayer->GetItemByPos(m_container, m_slotId);
+    if (m_pItem)
+    {
+        // Anti-WPE protection. Do not move non-empty bags to bank.
+        if (m_pItem->IsNotEmptyBag())
+        {
+            m_pPlayer->SendEquipError(EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS, m_pItem);
+            m_pItem = nullptr;
+        }
+        // Bound items cannot be put into bank.
+        else if (!m_pItem->CanBeTraded())
+        {
+            m_pPlayer->SendEquipError(EQUIP_ERR_ITEMS_CANT_BE_SWAPPED, m_pItem);
+            m_pItem = nullptr;
+        }
+    }
+    return (m_pItem != nullptr);
+}
+
+void WorldSession::PlayerAccountMoveItemData::RemoveItem(CharacterDatabaseTransaction trans, AccountMoveItemData* /*pOther*/, uint32 splitedAmount)
+{
+    if (splitedAmount)
+    {
+        m_pItem->SetCount(m_pItem->GetCount() - splitedAmount);
+        m_pItem->SetState(ITEM_CHANGED, m_pPlayer);
+        m_pPlayer->SaveInventoryAndGoldToDB(trans);
     }
     else
     {
-        TC_LOG_DEBUG("guild", "MSG_QUERY_GUILD_BANK_TEXT [Broadcast]: Tabid: {}, Text: {}", m_tabId, m_text);
-        guild->BroadcastPacket(textQuery.Write());
+        m_pPlayer->MoveItemFromInventory(m_container, m_slotId, true);
+        m_pItem->DeleteFromInventoryDB(trans);
+        m_pItem = nullptr;
     }
+}
+
+Item* WorldSession::PlayerAccountMoveItemData::StoreItem(CharacterDatabaseTransaction trans, Item* pItem)
+{
+    ASSERT(pItem);
+    m_pPlayer->MoveItemToInventory(m_vec, pItem, true);
+    m_pPlayer->SaveInventoryAndGoldToDB(trans);
+    return pItem;
+}
+
+inline InventoryResult WorldSession::PlayerAccountMoveItemData::CanStore(Item* pItem, bool swap)
+{
+    return m_pPlayer->CanStoreItem(m_container, m_slotId, m_vec, pItem, swap);
+}
+
+// BankAccountMoveItemData
+bool WorldSession::BankAccountMoveItemData::InitItem()
+{
+    m_pItem = m_pPlayer->GetSession()->_GetItem(m_container, m_slotId);
+    return (m_pItem != nullptr);
+}
+
+void WorldSession::BankAccountMoveItemData::RemoveItem(CharacterDatabaseTransaction trans, AccountMoveItemData* pOther, uint32 splitedAmount)
+{
+    ASSERT(m_pItem);
+    if (splitedAmount)
+    {
+        m_pItem->SetCount(m_pItem->GetCount() - splitedAmount);
+        m_pItem->FSetState(ITEM_CHANGED);
+        m_pItem->SaveToDB(trans);
+    }
+    else
+    {
+        m_pPlayer->GetSession()->_RemoveItem(trans, m_container, m_slotId);
+        m_pItem = nullptr;
+    }
+}
+
+Item* WorldSession::BankAccountMoveItemData::StoreItem(CharacterDatabaseTransaction trans, Item* pItem)
+{
+    if (!pItem)
+        return nullptr;
+
+    AccountBankTab* pTab = m_pPlayer->GetSession()->GetBankTab(m_container);
+    if (!pTab)
+        return nullptr;
+
+    Item* pLastItem = pItem;
+    for (auto itr = m_vec.begin(); itr != m_vec.end(); )
+    {
+        ItemPosCount pos(*itr);
+        ++itr;
+
+        ASSERT(pItem);
+
+        TC_LOG_DEBUG("guild", "GUILD STORAGE: StoreItem tab = {}, slot = {}, item = {}, count = {}",
+            m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
+        pLastItem = _StoreItem(trans, pTab, pItem, pos, itr != m_vec.end());
+    }
+    return pLastItem;
+}
+
+Item* WorldSession::BankAccountMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, AccountBankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const
+{
+    uint8 slotId = uint8(pos.pos);
+    uint32 count = pos.count;
+    if (Item* pItemDest = pTab->GetItem(slotId))
+    {
+        pItemDest->SetCount(pItemDest->GetCount() + count);
+        pItemDest->FSetState(ITEM_CHANGED);
+        pItemDest->SaveToDB(trans);
+        if (!clone)
+        {
+            pItem->RemoveFromWorld();
+            pItem->DeleteFromDB(trans);
+            delete pItem;
+        }
+        return pItemDest;
+    }
+
+    if (clone)
+        pItem = pItem->CloneItem(count);
+    else
+        pItem->SetCount(count);
+
+    if (pItem && pTab->SetItem(trans, slotId, pItem))
+        return pItem;
+
+    return nullptr;
+}
+
+// Tries to reserve space for source item.
+// If item in destination slot exists it must be the item of the same entry
+// and stack must have enough space to take at least one item.
+// Returns false if destination item specified and it cannot be used to reserve space.
+bool WorldSession::BankAccountMoveItemData::_ReserveSpace(uint8 slotId, Item* pItem, Item* pItemDest, uint32& count)
+{
+    uint32 requiredSpace = pItem->GetMaxStackCount();
+    if (pItemDest)
+    {
+        // Make sure source and destination items match and destination item has space for more stacks.
+        if (pItemDest->GetEntry() != pItem->GetEntry() || pItemDest->GetCount() >= pItem->GetMaxStackCount())
+            return false;
+        requiredSpace -= pItemDest->GetCount();
+    }
+    // Let's not be greedy, reserve only required space
+    requiredSpace = std::min(requiredSpace, count);
+
+    // Reserve space
+    ItemPosCount pos(slotId, requiredSpace);
+    if (!pos.isContainedIn(m_vec))
+    {
+        m_vec.push_back(pos);
+        count -= requiredSpace;
+    }
+    return true;
+}
+
+void WorldSession::BankAccountMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, bool merge, uint32& count)
+{
+    for (uint8 slotId = 0; (slotId < GUILD_BANK_MAX_SLOTS) && (count > 0); ++slotId)
+    {
+        // Skip slot already processed in CanStore (when destination slot was specified)
+        if (slotId == skipSlotId)
+            continue;
+
+        Item* pItemDest = m_pPlayer->GetSession()->_GetItem(m_container, slotId);
+        if (pItemDest == pItem)
+            pItemDest = nullptr;
+
+        // If merge skip empty, if not merge skip non-empty
+        if ((pItemDest != nullptr) != merge)
+            continue;
+
+        _ReserveSpace(slotId, pItem, pItemDest, count);
+    }
+}
+
+InventoryResult WorldSession::BankAccountMoveItemData::CanStore(Item* pItem, bool swap)
+{
+    TC_LOG_DEBUG("guild", "GUILD STORAGE: CanStore() tab = {}, slot = {}, item = {}, count = {}",
+        m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
+
+    uint32 count = pItem->GetCount();
+    // Soulbound items cannot be moved
+    if (pItem->IsSoulBound())
+        return EQUIP_ERR_CANT_DROP_SOULBOUND;
+
+    // Make sure destination bank tab exists
+    if (m_container >= m_pPlayer->GetSession()->_GetPurchasedTabsSize())
+        return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
+
+    // Slot explicitely specified. Check it.
+    if (m_slotId != NULL_SLOT)
+    {
+        Item* pItemDest = m_pPlayer->GetSession()->_GetItem(m_container, m_slotId);
+        // Ignore swapped item (this slot will be empty after move)
+        if ((pItemDest == pItem) || swap)
+            pItemDest = nullptr;
+
+        if (!_ReserveSpace(m_slotId, pItem, pItemDest, count))
+            return EQUIP_ERR_ITEM_CANT_STACK;
+
+        if (count == 0)
+            return EQUIP_ERR_OK;
+    }
+
+    // Slot was not specified or it has not enough space for all the items in stack
+    // Search for stacks to merge with
+    if (pItem->GetMaxStackCount() > 1)
+    {
+        CanStoreItemInTab(pItem, m_slotId, true, count);
+        if (count == 0)
+            return EQUIP_ERR_OK;
+    }
+
+    // Search free slot for item
+    CanStoreItemInTab(pItem, m_slotId, false, count);
+    if (count == 0)
+        return EQUIP_ERR_OK;
+
+    return EQUIP_ERR_BANK_FULL;
 }

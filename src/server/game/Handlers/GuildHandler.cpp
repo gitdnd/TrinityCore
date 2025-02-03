@@ -254,50 +254,15 @@ void WorldSession::HandleGuildBankActivate(WorldPackets::Guild::GuildBankActivat
     TC_LOG_DEBUG("guild", "CMSG_GUILD_BANKER_ACTIVATE [{}]: [{}] AllSlots: {}"
         , GetPlayerInfo(), packet.Banker.ToString(), packet.FullUpdate);
 
-    WorldPackets::Guild::GuildBankQueryResults debugTestPacket;
-
-    debugTestPacket.Money = 69420;
-    debugTestPacket.Tab = int32(0);
-    debugTestPacket.FullUpdate = true;
-
-    if (debugTestPacket.FullUpdate && !debugTestPacket.Tab)
-    {
-        debugTestPacket.TabInfo.reserve(GUILD_BANK_MAX_TABS);
-        for (uint8 i = 0; i < GUILD_BANK_MAX_TABS; ++i)
-        {
-            WorldPackets::Guild::GuildBankTabInfo tabInfo;
-            tabInfo.Name = "Test" + i;
-            tabInfo.Icon = "";
-            debugTestPacket.TabInfo.push_back(tabInfo);
-        }
-    }
-
-    for (uint8 i = 0; i < GUILD_BANK_MAX_TABS; ++i)
-    {
-        for (uint8 x = 0; x < GUILD_BANK_MAX_SLOTS; ++x)
-        {
-            WorldPackets::Guild::GuildBankItemInfo itemInfo;
-
-            itemInfo.Slot = x;
-            itemInfo.ItemID = 37837;
-            itemInfo.RandomPropertiesID = 0;
-            itemInfo.RandomPropertiesSeed = 0;
-            itemInfo.Count = 1;
-            itemInfo.Charges =0;
-            itemInfo.EnchantmentID = 0;
-            itemInfo.Flags = 0;
-
-            debugTestPacket.ItemInfo.push_back(itemInfo);
-        }
-    }
-    debugTestPacket.WithdrawalsRemaining = -1;
-    SendPacket(debugTestPacket.Write());
-    /*
-
     GameObject const* const go = GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK);
     if (!go)
         return;
 
+    if (go->GetEntry() == 350000)
+    {
+        _SendBankList(0, true);
+        return;
+    }
     Guild* const guild = GetPlayer()->GetGuild();
     if (!guild)
     {
@@ -305,7 +270,7 @@ void WorldSession::HandleGuildBankActivate(WorldPackets::Guild::GuildBankActivat
         return;
     }
 
-    guild->SendBankTabsInfo(this, packet.FullUpdate);*/
+    guild->SendBankTabsInfo(this, packet.FullUpdate);
 }
 
 // Called when opening guild bank tab only (first one)
@@ -314,9 +279,18 @@ void WorldSession::HandleGuildBankQueryTab(WorldPackets::Guild::GuildBankQueryTa
     TC_LOG_DEBUG("guild", "CMSG_GUILD_BANK_QUERY_TAB [{}]: {}, TabId: {}, ShowTabs: {}"
         , GetPlayerInfo(), packet.Banker.ToString(), packet.Tab, packet.FullUpdate);
 
-    if (GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK))
-        if (Guild* guild = GetPlayer()->GetGuild())
-            guild->SendBankTabData(this, packet.Tab, true /*packet.FullUpdate*/);
+    GameObject const* const go = GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK);
+    if (!go)
+        return;
+
+    if (go->GetEntry() == 350000)
+    {
+        _SendBankList(packet.Tab, true);
+        return;
+    }
+
+    if (Guild* guild = GetPlayer()->GetGuild())
+        guild->SendBankTabData(this, packet.Tab, true /*packet.FullUpdate*/);
                                                           // HACK: client doesn't query entire tab content if it had received SMSG_GUILD_BANK_LIST in this session
                                                           // but we broadcast bank updates to entire guild when *ANYONE* changes anything, incorrectly initializing clients
                                                           // tab content with only data for that change
@@ -326,27 +300,57 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPackets::Guild::GuildBankDep
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_BANK_DEPOSIT_MONEY [{}]: [{}], money: {}",
         GetPlayerInfo(), packet.Banker.ToString(), packet.Money);
-
-    if (GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK))
-        if (packet.Money && GetPlayer()->HasEnoughMoney(packet.Money))
-            if (Guild* guild = GetPlayer()->GetGuild())
-                guild->HandleMemberDepositMoney(this, packet.Money);
+    return;
+    //if (GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK))
+        //if (packet.Money && GetPlayer()->HasEnoughMoney(packet.Money))
+            //if (Guild* guild = GetPlayer()->GetGuild())
+                //guild->HandleMemberDepositMoney(this, packet.Money);
 }
 
 void WorldSession::HandleGuildBankWithdrawMoney(WorldPackets::Guild::GuildBankWithdrawMoney& packet)
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_BANK_WITHDRAW_MONEY [{}]: [{}], money: {}",
         GetPlayerInfo(), packet.Banker.ToString(), packet.Money);
-
-    if (packet.Money && GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK))
-        if (Guild* guild = GetPlayer()->GetGuild())
-            guild->HandleMemberWithdrawMoney(this, packet.Money);
+    return;
+    //if (packet.Money && GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK))
+        //if (Guild* guild = GetPlayer()->GetGuild())
+            //guild->HandleMemberWithdrawMoney(this, packet.Money);
 }
 
 void WorldSession::HandleGuildBankSwapItems(WorldPackets::Guild::GuildBankSwapItems& packet)
 {
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK))
+    GameObject const* const go = GetPlayer()->GetGameObjectIfCanInteractWith(packet.Banker, GAMEOBJECT_TYPE_GUILD_BANK);
+    if (!go)
         return;
+
+    if (go->GetEntry() == 350000)
+    {
+        if (packet.BankOnly)
+            SwapItems(packet.BankTab1, packet.BankSlot1, packet.BankTab, packet.BankSlot, packet.BankItemCount);
+        else
+        {
+            uint8 playerBag = NULL_BAG;
+            uint8 playerSlotId = NULL_SLOT;
+            uint8 toChar = 1;
+            uint32 splitedAmount = 0;
+
+            if (!packet.AutoStore)
+            {
+                playerBag = packet.ContainerSlot;
+                playerSlotId = packet.ContainerItemSlot;
+                toChar = packet.ToSlot;
+                splitedAmount = packet.StackCount;
+            }
+
+            // Player <-> Bank
+            // Allow to work with inventory only
+            if (!Player::IsInventoryPos(playerBag, playerSlotId) && !(playerBag == NULL_BAG && playerSlotId == NULL_SLOT))
+                GetPlayer()->SendEquipError(EQUIP_ERR_NONE, nullptr);
+            else
+                SwapItemsWithInventory(toChar != 0, packet.BankTab, packet.BankSlot, playerBag, playerSlotId, splitedAmount);
+        }
+        return;
+    }
 
     Guild* guild = GetPlayer()->GetGuild();
     if (!guild)
