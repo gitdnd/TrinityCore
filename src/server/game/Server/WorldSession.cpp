@@ -1966,7 +1966,8 @@ void WorldSession::LoadBankTabFromDB(Field* fields)
         QueryResult result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, "
             //   11       12     13      14         15
             "guildid, TabId, SlotId, item_guid, itemEntry FROM account_bank_item gbi INNER JOIN item_instance ii ON gbi.item_guid = ii.guid");
-        m_bankTabs[tabId].LoadItemFromDB(result->Fetch());
+        if(result)
+            m_bankTabs[tabId].LoadItemFromDB(result->Fetch());
     }
 }
 
