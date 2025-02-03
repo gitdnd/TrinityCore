@@ -1951,6 +1951,7 @@ void WorldSession::LoadAccountBank()
     {
         if (Field* f = result->Fetch())
             LoadBankTabFromDB(f);
+        return;
     }
 }
 
