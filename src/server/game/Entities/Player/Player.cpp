@@ -5430,9 +5430,9 @@ uint32 Player::GetSpellPowerFromPrimaryStats() const
 {
     uint32 spellPower = 0;
 
-    // get half of intellect and spirit as spell power
+    // get spirit and half of intellectas spell power
     spellPower += uint32(GetStat(STAT_INTELLECT) / 2.0f);
-    spellPower += uint32(GetStat(STAT_SPIRIT) / 2.0f);
+    spellPower += uint32(GetStat(STAT_SPIRIT));
 
     return spellPower;
 }

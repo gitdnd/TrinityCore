@@ -514,7 +514,7 @@ class spell_item_lotus_restore : public AuraScript
 
         args.AddSpellMod(SPELLVALUE_BASE_POINT0, cost * percRestored / 100);
         args1.AddSpellMod(SPELLVALUE_BASE_POINT1, cost * percRestored / 100);
-        args1.AddSpellMod(SPELLVALUE_BASE_POINT2, cost * percRestored / 100);
+        args2.AddSpellMod(SPELLVALUE_BASE_POINT2, cost * percRestored / 100);
 
         if (procSpell->PowerType == POWER_HEALTH)
         {
