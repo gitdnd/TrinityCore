@@ -627,7 +627,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_LEADOUT, "DELETE FROM player_talents WHERE guid = ? AND loadout = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_CUSTOM_TALENT_BY_LOADOUT, "DELETE FROM player_talents WHERE guid = ? AND node_index = ? AND loadout = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_CHAR_CUSTOM_TALENT, "INSERT INTO player_talents (guid, node_index, loadout) VALUES (?, ?, ?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_UPD_ACCOUNT_BANK_TAB_INFO, "UPDATE account_bank_tab SET TabName = ?, TabIcon = ? WHERE acccountid = ? AND TabId = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UPD_ACCOUNT_BANK_TAB_INFO, "UPDATE account_bank_tab SET TabName = ?, TabIcon = ? WHERE accountid = ? AND TabId = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_ACCOUNT_BANK_TAB_TEXT, "UPDATE account_bank_tab SET TabText = ? WHERE accountid = ? AND TabId = ?", CONNECTION_ASYNC); // 0: string, 1: uint32, 2: uint8
     PrepareStatement(CHAR_DEL_ACCOUNT_BANK_ITEM, "DELETE FROM account_bank_item WHERE accountid = ? AND TabId = ? AND SlotId = ?", CONNECTION_ASYNC); // 0: uint32, 1: uint8, 2: uint8
     PrepareStatement(CHAR_INS_ACCOUNT_BANK_ITEM, "INSERT INTO account_bank_item (accountid, TabId, SlotId, item_guid) VALUES (?, ?, ?, ?)", CONNECTION_ASYNC);
