@@ -2139,10 +2139,10 @@ void VirtualItemMgr::GenerateLegendaryItemEffect(VirtualItemTemplate* output, Vi
         if (SelectSkipDebug(itr.second.itemStatGroup, output->statGroup, "[StatGroup]"))
             continue;
 
-        if(itr.second.itemStatGroupMask && output->HasStatGroupMask(StatGroupGroup(itr.second.itemStatGroupMask)))
+        if(itr.second.itemStatGroupMask && !(itr.second.itemStatGroupMask & StatGroupToMask(output->statGroup)))
             continue;
 
-        if (itr.second.legendaryFlags && (itr.second.legendaryFlags & LEGENDARY_FLAG_CRAFTED_ONLY) != 0 && !modifier.isCrafted)
+        if (itr.second.legendaryFlags && (itr.second.legendaryFlags & LEGENDARY_FLAG_CRAFTED_ONLY) && !modifier.isCrafted)
             continue;
 
         bool skip = false;

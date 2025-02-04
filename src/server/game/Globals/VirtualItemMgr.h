@@ -127,7 +127,6 @@ struct VirtualItemTemplate : ItemTemplate
     uint32 honeLevel;
     inline bool HasFlag(VirtualItemFlags flag) const { return (customFlags & flag) != 0; }
     inline bool HasFlag(ItemFlags flag) const { return (Flags & flag) != 0; }
-    inline bool HasStatGroupMask(StatGroupGroup mask) { return (VirtualItemMgr::instance().StatGroupToMask(statGroup) & mask) != 0; }
 };
 
 struct VirtualModifier
