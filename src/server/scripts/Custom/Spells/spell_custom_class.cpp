@@ -76,6 +76,83 @@ enum CustomClassSpells
 
 };
 
+// 97200 - scourge strike
+class spell_class_scourge_strike : public SpellScriptLoader
+{
+public:
+    spell_class_scourge_strike() : SpellScriptLoader("spell_class_scourge_strike") { }
+
+
+    class spell_class_scourge_strike_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_scourge_strike_SpellScript);
+
+
+        void HandleDamage(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                if (target->HasAuraState(AURA_STATE_FROZEN))
+                {
+                    SetHitDamage(GetHitDamage() * 4);
+                }
+            }
+
+            if (Unit* caster = GetCaster())
+            {
+
+                if (Unit* target = GetHitUnit())
+                {
+
+                    int32 bonusDamage = 0;
+
+                    uint32 shadowDotCount = 0;
+
+                    Unit::AuraApplicationMap const& auras = target->GetAppliedAuras();
+
+                    for (auto const& auraPair : auras)
+                    {
+
+                        Aura* aura = auraPair.second->GetBase();
+
+                        if (!aura || aura->GetCasterGUID() != caster->GetGUID())
+                            continue;
+
+                        SpellInfo const* spellInfo = aura->GetSpellInfo();
+
+                        if (!spellInfo)
+                            continue;
+
+                        if ((spellInfo->SchoolMask & SPELL_SCHOOL_MASK_SHADOW) == 0)
+                            continue;
+
+                        if (spellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE)) shadowDotCount++;
+
+                    }
+                    if (shadowDotCount > 0)
+                    {
+                        SetHitDamage(GetHitDamage() * (1 + shadowDotCount * 0.10f));
+
+                    }
+                }
+            }
+        }
+
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_class_scourge_strike_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_scourge_strike_SpellScript();
+    }
+
+};
+
 // 57993 - Envenom
 class spell_class_envenom : public SpellScriptLoader
 {
@@ -2961,6 +3038,7 @@ class spell_custom_ilvlmanacost : public AuraScript
 
 void AddSC_Spells_Custom_Class_scripts()
 {
+    new spell_class_scourge_strike();
     new spell_class_envenom();
     new spell_class_eviscerate();
     new spell_class_howling_blast_frozen();
