@@ -3999,7 +3999,7 @@ void Spell::finish(bool ok)
             }
         }
 
-        if (!found && !m_spellInfo->HasAttribute(SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS))
+        if (!found && !m_spellInfo->HasAttribute(SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS) && unitCaster->HasAura(450082))
         {
             unitCaster->resetAttackTimer(BASE_ATTACK);
             if (unitCaster->haveOffhandWeapon())
