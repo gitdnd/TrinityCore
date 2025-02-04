@@ -1359,8 +1359,10 @@ class spell_talent_wandering_affliction : public AuraScript
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
         Unit* target = eventInfo.GetProcTarget();
-        //if (!roll_chance_f(caster->GetUnitCriticalChanceAgainst(BASE_ATTACK, target)))
-        //    return;
+        int32 spirit = caster->GetStat(STAT_SPIRIT);
+
+        if (!roll_chance_f(lround((float)spirit / 100 + 15)))
+            return;
 
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
         if (!damageInfo || !damageInfo->GetDamage())
