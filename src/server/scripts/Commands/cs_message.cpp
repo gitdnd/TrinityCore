@@ -124,7 +124,7 @@ public:
         if (message.empty())
             return false;
 
-        std::string name("Console");
+        std::string name("Chromie");
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
@@ -137,7 +137,7 @@ public:
         if (message.empty())
             return false;
 
-        std::string name("Console");
+        std::string name("Chromie");
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
