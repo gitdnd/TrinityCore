@@ -1927,6 +1927,8 @@ bool WorldSession::IsRightUnitBeingMoved(ObjectGuid guid)
 
 void WorldSession::LoadAccountBank()
 {
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+        return;
     m_bankTabs.clear();
     m_bankTabs.reserve(6); // @todo: purchase
     for (uint8 tabId = 0; tabId < 6; ++tabId)
