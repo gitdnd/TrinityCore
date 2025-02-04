@@ -2539,13 +2539,15 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_HASTE_SPELL_RATING,
         ITEM_MOD_SPELL_PENETRATION,
         ITEM_MOD_HIT_SPELL_RATING,
-        //ITEM_MOD_SPELL_HEALING_DONE,
-        //ITEM_MOD_SPELL_DAMAGE_DONE
+        ITEM_MOD_SPELL_HEALING_DONE,
+        ITEM_MOD_SPELL_DAMAGE_DONE
     };
     stat_group_sockets[STAT_GROUP_ALL_EXTENDED] = {
         SOCKET_COLOR_YELLOW,
         SOCKET_COLOR_RED,
-        SOCKET_COLOR_BLUE
+        SOCKET_COLOR_BLUE,
+        SOCKET_COLOR_YELLOW,
+        SOCKET_COLOR_GREEN
     };
 
     //preference stat groups
