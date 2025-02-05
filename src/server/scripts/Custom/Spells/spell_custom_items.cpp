@@ -979,6 +979,33 @@ class spell_item_swapblaster : public SpellScript
     }
 };
 
+class spell_legendary_eternal_paradox : public AuraScript
+{
+    PrepareAuraScript(spell_legendary_eternal_paradox);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (const SpellInfo* procInfo = eventInfo.GetSpellInfo())
+        {
+            uint32 castSpell = 0;
+            if (procInfo->PowerType == POWER_MANA)
+                castSpell = 450085;
+            else if (procInfo->PowerType == POWER_FOCUS)
+                castSpell = 450086;
+            if (!castSpell)
+                return;
+
+            eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), castSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_legendary_eternal_paradox::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_Spells_Custom_Items()
 {
     RegisterSpellScript(spell_item_trinket_reset_cds);
@@ -1001,4 +1028,5 @@ void AddSC_Spells_Custom_Items()
     RegisterSpellScript(spell_talent_thunderous_roar);
     RegisterSpellScript(spell_item_reroll_legendary);
     RegisterSpellScript(spell_item_remove_legendary);
+    RegisterSpellScript(spell_legendary_eternal_paradox);
 }
