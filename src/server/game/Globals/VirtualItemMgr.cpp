@@ -1150,7 +1150,7 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
             socketCount = 3;
             break;
         case ITEM_QUALITY_EPIC:
-            socketCount = 3;
+            socketCount = 2;
             break;
         case ITEM_QUALITY_RARE:
             socketCount = 2;
