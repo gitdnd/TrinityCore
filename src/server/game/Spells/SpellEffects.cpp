@@ -650,8 +650,7 @@ void Spell::EffectSchoolDMG()
             }
             case 61411: // Shield of Righteousness	
             {
-                uint8 level = unitCaster->GetLevel();
-                uint32 block_value = unitCaster->GetShieldBlockValue(uint32(float(level) * 29.5f), uint32(float(level) * 39.5f));
+                uint32 block_value = unitCaster->GetShieldBlockValue();
                 damage += CalculatePct(block_value, m_spellInfo->GetEffect(EFFECT_1).CalcValue());
                 break;
             }
@@ -741,18 +740,17 @@ void Spell::EffectSchoolDMG()
                 }
                 break;
             }*/
-            case 46968: // Shockwave
+            /*/case 46968: // Shockwave
             {
                 int32 pct = unitCaster->CalculateSpellDamage(m_spellInfo->GetEffect(EFFECT_2));
                 if (pct > 0)
                     damage += int32(CalculatePct(unitCaster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
                 break;
-            }
+            }*/
             case 47488: // Shield Slam
             {
-                uint8 level = unitCaster->GetLevel();
-                uint32 block_value = unitCaster->GetShieldBlockValue(uint32(float(level) * 24.5f), uint32(float(level) * 34.5f));
-                damage += int32(unitCaster->ApplyEffectModifiers(m_spellInfo, effectInfo->EffectIndex, float(block_value)));
+                uint32 block_value = unitCaster->GetShieldBlockValue();
+                damage += int32(unitCaster->ApplyEffectModifiers(m_spellInfo, effectInfo->EffectIndex, block_value));
                 break;
             }
             case 47838: // Incinerate
