@@ -1196,6 +1196,8 @@ void VirtualItemMgr::GenerateSockets(VirtualItemTemplate* output, VirtualModifie
                 socketCount = 2;
             break;
         }
+        if (output->InventoryType != INVTYPE_2HWEAPON)
+            socketCount = 1;
     }
 
     if (legendaryItemInfo const* leg = GetLegendaryItemInfo(output->legendaryId))
