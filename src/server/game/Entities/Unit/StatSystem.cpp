@@ -1556,7 +1556,7 @@ void Guardian::UpdateAttackPowerAndDamage(bool ranged)
             int32 maximum = (holy > shadow) ? holy : shadow;
             if (maximum < 0)
                 maximum = 0;
-            SetBonusDamage(int32(maximum * 05));
+            SetBonusDamage(int32(maximum * 0.5));
         }
         else if (IsSpiritWolf()) //wolf benefit from shaman's attack power
         {
