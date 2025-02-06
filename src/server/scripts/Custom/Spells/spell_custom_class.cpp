@@ -1071,12 +1071,12 @@ class spell_talent_champion : public AuraScript
         Player* player = GetCaster()->ToPlayer();
         int32 dodgeRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 2);
         int32 defRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 1);
-        /*
+
         if (Aura* existingBuff = player->GetAura(SPELL_TALENT_CHAMPION))
         {
             existingBuff->GetEffect(EFFECT_2)->ChangeAmount(dodgeRating + defRating * 0.2);
         }
-        
+        /*
         float parryChance = player->GetFloatValue(PLAYER_PARRY_PERCENTAGE);
         if (Aura* existingBuff = player->GetAura(champion_DR))
 
