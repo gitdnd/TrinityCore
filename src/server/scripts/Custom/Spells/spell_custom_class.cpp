@@ -1012,7 +1012,7 @@ class spell_talent_turret_totems : public AuraScript
         if (!caster)
             return;
 
-        if (!IsNearTotem(caster))
+        if (!IsNearTotem(caster) && caster->IsInCombat())
         {
             if (!caster->HasAura(SPELL_TOTEM_TOTEM_WITHDRAWAL))
                 caster->CastSpell(caster, SPELL_TOTEM_TOTEM_WITHDRAWAL, true);
