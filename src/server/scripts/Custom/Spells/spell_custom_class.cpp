@@ -1691,7 +1691,6 @@ class spell_class_seal_of_righteousness : public AuraScript
         PreventDefaultAction();
 
         Unit* victim = eventInfo.GetProcTarget();
-        Player* player = eventInfo.GetActor()->GetCharmerOrOwnerPlayerOrPlayerItself();
 
         float ap = GetTarget()->GetTotalAttackPowerValue(BASE_ATTACK);
         ap += victim->GetTotalAuraModifier(SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS);
@@ -1700,7 +1699,7 @@ class spell_class_seal_of_righteousness : public AuraScript
         sph += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_HOLY);
 
         // Taking Weapon Speed of the Caster
-        float mws = player->GetAttackTime(BASE_ATTACK);
+        float mws = GetTarget()->GetAttackTime(BASE_ATTACK);
         mws /= 1000.0f;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_OFFHAND_ATTACK)
@@ -1953,7 +1952,6 @@ class spell_class_seal_of_darktide : public AuraScript
     {
         PreventDefaultAction();
 
-        Player* player = eventInfo.GetActor()->GetCharmerOrOwnerPlayerOrPlayerItself();
         Unit* victim = eventInfo.GetProcTarget();
         //Unit* caster = eventInfo.GetActor();
 
@@ -1963,7 +1961,7 @@ class spell_class_seal_of_darktide : public AuraScript
 
 
         // Taking Weapon Speed of the Caster
-        float mws = player->GetAttackTime(BASE_ATTACK);
+        float mws = GetTarget()->GetAttackTime(BASE_ATTACK);
         mws /= 1000.0f;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_OFFHAND_ATTACK)
@@ -2019,7 +2017,6 @@ class spell_class_seal_of_flametongue : public AuraScript
     {
         PreventDefaultAction();
 
-        Player* player = eventInfo.GetActor()->GetCharmerOrOwnerPlayerOrPlayerItself();
         Unit* victim = eventInfo.GetProcTarget();
 
 
@@ -2028,7 +2025,7 @@ class spell_class_seal_of_flametongue : public AuraScript
         spf += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_TAKEN, SPELL_SCHOOL_MASK_FIRE);
 
         // Taking Weapon Speed of the Caster
-        float mws = player->GetAttackTime(BASE_ATTACK);
+        float mws = GetTarget()->GetAttackTime(BASE_ATTACK);
         mws /= 1000.0f;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_OFFHAND_ATTACK)
