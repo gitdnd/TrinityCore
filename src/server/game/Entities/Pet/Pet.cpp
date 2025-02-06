@@ -1120,8 +1120,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
 
                     SetAttackTime(BASE_ATTACK, weaponSpeed);
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(minDamage * 0.2));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(maxDamage * 0.2));
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(minDamage));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(maxDamage));
                     break;
                 }
                 default:

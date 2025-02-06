@@ -2691,6 +2691,8 @@ class spell_talent_dancing_rune_weapon : public AuraScript
                 uint32 spellId = matchingAura->GetId();
                 temp->CastSpell(temp, spellId, true);
             }
+            temp->CastSpell(temp, 61017, true);
+            temp->CastSpell(temp, 35695, true);
         }
     }
 
