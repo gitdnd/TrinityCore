@@ -102,7 +102,7 @@ public:
 
         void Register() override
         {
-            OnEffectLaunchTarget += SpellEffectFn(spell_class_chaos_strike_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+            OnEffectLaunchTarget += SpellEffectFn(spell_class_chaos_strike_SpellScript::HandleEffect, EFFECT_2, SPELL_EFFECT_TRIGGER_SPELL);
         }
     };
     SpellScript* GetSpellScript() const override
