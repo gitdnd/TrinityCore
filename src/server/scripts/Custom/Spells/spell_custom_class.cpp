@@ -76,6 +76,42 @@ enum CustomClassSpells
 
 };
 
+// 97803 - Chaos Strike
+class spell_class_chaos_strike : public SpellScriptLoader
+{
+public:
+    spell_class_chaos_strike() : SpellScriptLoader("spell_class_chaos_strike") { }
+
+    class spell_class_chaos_strike_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_class_chaos_strike_SpellScript);
+
+        void HandleEffect(SpellEffIndex)
+        {
+            Unit* caster = GetCaster();
+
+            int holySp = caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
+            int sp = caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC);
+
+            float mws = caster->GetAttackTime(BASE_ATTACK);
+            mws /= 1000.0f;
+
+            SetEffectValue(mws * sp * 0.2);
+
+        }
+
+        void Register() override
+        {
+            OnEffectLaunchTarget += SpellEffectFn(spell_class_chaos_strike_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_class_chaos_strike_SpellScript();
+    }
+
+};
+
 // 97200 - scourge strike
 class spell_class_scourge_strike : public SpellScriptLoader
 {
@@ -1008,16 +1044,18 @@ class spell_talent_champion : public AuraScript
 {
     PrepareAuraScript(spell_talent_champion);
 
+
+    /*
     enum Spell
     {
         champion_DR = 94611
     };
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    bool Validate(SpellInfo const* ) override
     {
         return ValidateSpellInfo({ champion_DR });
     }
-
+    */
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Player* player = GetCaster()->ToPlayer();
@@ -1033,17 +1071,19 @@ class spell_talent_champion : public AuraScript
         Player* player = GetCaster()->ToPlayer();
         int32 dodgeRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 2);
         int32 defRating = player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + 1);
+        /*
         if (Aura* existingBuff = player->GetAura(SPELL_TALENT_CHAMPION))
         {
             existingBuff->GetEffect(EFFECT_2)->ChangeAmount(dodgeRating + defRating * 0.2);
         }
-
+        
         float parryChance = player->GetFloatValue(PLAYER_PARRY_PERCENTAGE);
         if (Aura* existingBuff = player->GetAura(champion_DR))
 
         {
             existingBuff->GetEffect(EFFECT_0)->ChangeAmount(-(parryChance * 100 * 0, 3));
         }
+        */
     }
     void Register() override
     {
@@ -3038,6 +3078,7 @@ class spell_custom_ilvlmanacost : public AuraScript
 
 void AddSC_Spells_Custom_Class_scripts()
 {
+    new spell_class_chaos_strike();
     new spell_class_scourge_strike();
     new spell_class_envenom();
     new spell_class_eviscerate();
