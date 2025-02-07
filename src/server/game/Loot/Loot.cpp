@@ -182,80 +182,83 @@ void Loot::AddItem(LootStoreItem const& item, bool canBePersonal)
     {
         if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
         {
-            if (Group* group = player->GetGroup())
+            if (!ignoreGroup)
             {
-                isGroup = true;
-                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                if (Group* group = player->GetGroup())
                 {
-                    if (Player* member = itr->GetSource())
+                    isGroup = true;
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
-                        ItemTemplate const* personalProto;
-                        if (VirtualItemMgr::IsVirtualTemplate(proto))
+                        if (Player* member = itr->GetSource())
                         {
-                            VirtualModifier modifier = VirtualModifier();
-
-                            uint32 dungeonLevel = member->GetMap()->GetDungeonLevel();
-                            uint32 playerLevel = uint32(member->GetCappedItemLevel());
-                            if (ignoreMapLevels)
-                                dungeonLevel = playerLevel;
-                            else
+                            ItemTemplate const* personalProto;
+                            if (VirtualItemMgr::IsVirtualTemplate(proto))
                             {
-                                if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                                VirtualModifier modifier = VirtualModifier();
+
+                                uint32 dungeonLevel = member->GetMap()->GetDungeonLevel();
+                                uint32 playerLevel = uint32(member->GetCappedItemLevel());
+                                if (ignoreMapLevels)
+                                    dungeonLevel = playerLevel;
+                                else
                                 {
-                                    modifier.vLvlMod = inst->vLvlMod;
-                                    // if player is in an instance, we want to increase the softcap if there is a softcap modifier
-                                    playerLevel = uint32(member->GetCappedItemLevel(inst->softcapMod));
+                                    if (const InstanceTemplate* inst = sObjectMgr->GetInstanceTemplate(member->GetMapId()))
+                                    {
+                                        modifier.vLvlMod = inst->vLvlMod;
+                                        // if player is in an instance, we want to increase the softcap if there is a softcap modifier
+                                        playerLevel = uint32(member->GetCappedItemLevel(inst->softcapMod));
+                                    }
                                 }
-                            }
 
-                            // is this calculation what we really want? really need to double check this logic
-                            if (!ignoreMapLevels)
+                                // is this calculation what we really want? really need to double check this logic
+                                if (!ignoreMapLevels)
+                                {
+                                    modifier.plrAvgLvl = int32(playerLevel) - 50 > int32(dungeonLevel) ? dungeonLevel : playerLevel;
+                                    modifier.lowYield = int32(playerLevel) - 50 > int32(dungeonLevel) ? true : false;
+                                }
+                                modifier.lootPreference = member->GetActiveLootPreference();
+                                modifier.magicFind = member->GetMagicFind();
+                                if (!ignoreMapLevels)
+                                    modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
+
+                                modifier.dungeonLevel = dungeonLevel;
+
+                                if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
+                                    personalProto = newProto;
+                            }
+                            else
+                                personalProto = proto;
+
+                            uint32 actualCount = count;
+
+                            // Disabled check, because of the personal item filter the client should never receive more than 16
+                            for (uint32 i = 0; i < stacks /*&& lootItems.size() < limit*/; ++i)
                             {
-                                modifier.plrAvgLvl = int32(playerLevel) - 50 > int32(dungeonLevel) ? dungeonLevel : playerLevel;
-                                modifier.lowYield = int32(playerLevel) - 50 > int32(dungeonLevel) ? true : false;
+                                LootItem generatedLoot(item);
+
+                                if (item.itemid != personalProto->ItemId)
+                                    generatedLoot.itemid = personalProto->ItemId;
+
+                                generatedLoot.personalLootOwner = member->GetGUID();
+                                generatedLoot.freeforall = true;
+
+                                generatedLoot.count = std::min(actualCount, personalProto->GetMaxStackSize());
+                                items.push_back(generatedLoot);
+                                actualCount -= personalProto->GetMaxStackSize();
+
+                                // In some cases, a dropped item should be visible/lootable only for some players in group
+                                bool canSeeItemInLootWindow = false;
+                                if (generatedLoot.AllowedForPlayer(member))
+                                    canSeeItemInLootWindow = true;
+                                if (!canSeeItemInLootWindow)
+                                    continue;
+
+                                // non-conditional one-player only items are counted here,
+                                // free for all items are counted in FillFFALoot(),
+                                // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
+                                if (!item.needs_quest && item.conditions.empty() && !personalProto->HasFlag(ITEM_FLAG_MULTI_DROP))
+                                    ++unlootedCount;
                             }
-                            modifier.lootPreference = member->GetActiveLootPreference();
-                            modifier.magicFind = member->GetMagicFind();
-                            if (!ignoreMapLevels)
-                                modifier.ilevelBonus = sAffixMgr->GetDungeonLevelBonus(member->GetMap()->GetAffixes());
-
-                            modifier.dungeonLevel = dungeonLevel;
-
-                            if (ItemTemplate const* newProto = sVirtualItemMgr.GenerateVirtualTemplate(proto, modifier))
-                                personalProto = newProto;
-                        }
-                        else
-                            personalProto = proto;
-
-                        uint32 actualCount = count;
-
-                        // Disabled check, because of the personal item filter the client should never receive more than 16
-                        for (uint32 i = 0; i < stacks /*&& lootItems.size() < limit*/; ++i)
-                        {
-                            LootItem generatedLoot(item);
-
-                            if (item.itemid != personalProto->ItemId)
-                                generatedLoot.itemid = personalProto->ItemId;
-
-                            generatedLoot.personalLootOwner = member->GetGUID();
-                            generatedLoot.freeforall = true;
-
-                            generatedLoot.count = std::min(actualCount, personalProto->GetMaxStackSize());
-                            items.push_back(generatedLoot);
-                            actualCount -= personalProto->GetMaxStackSize();
-
-                            // In some cases, a dropped item should be visible/lootable only for some players in group
-                            bool canSeeItemInLootWindow = false;
-                            if (generatedLoot.AllowedForPlayer(member))
-                                canSeeItemInLootWindow = true;
-                            if (!canSeeItemInLootWindow)
-                                continue;
-
-                            // non-conditional one-player only items are counted here,
-                            // free for all items are counted in FillFFALoot(),
-                            // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-                            if (!item.needs_quest && item.conditions.empty() && !personalProto->HasFlag(ITEM_FLAG_MULTI_DROP))
-                                ++unlootedCount;
                         }
                     }
                 }
@@ -347,7 +350,9 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         return false;
 
     lootOwnerGUID = lootOwner->GetGUID();
+    ignoreGroup = false;
     ignoreMapLevels = store.GetName() == "item_loot_template" || store.GetName() == "spell_loot_template" || store.GetName() == "fishing_loot_template";
+    ignoreGroup = store.GetName() == "item_loot_template" || store.GetName() == "spell_loot_template" || store.GetName() == "fishing_loot_template";
     dungeonLevel = ignoreMapLevels ?
         lootOwner->GetCappedItemLevel() :
         lootOwner->GetMap()->GetDungeonLevel();
