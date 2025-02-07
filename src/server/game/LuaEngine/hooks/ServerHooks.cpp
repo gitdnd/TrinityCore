@@ -58,6 +58,40 @@ bool Eluna::OnAddonMessage(Player* sender, uint32 type, std::string& msg, Player
     return CallAllFunctionsBool(ServerEventBindings, key, true);
 }
 
+bool Eluna::OnAddonMessageNew(ObjectGuid sender, uint32 type, std::string& msg, ObjectGuid receiver, Guild* guild, Group* group, Channel* channel)
+{
+    START_HOOK_WITH_RETVAL(ADDON_EVENT_ON_MESSAGE_NEW, true);
+    HookPush(sender);
+    HookPush(type);
+
+    auto delimeter_position = msg.find('\t');
+    if (delimeter_position == std::string::npos)
+    {
+        HookPush(msg); // prefix
+        HookPush(); // msg
+    }
+    else
+    {
+        std::string prefix = msg.substr(0, delimeter_position);
+        std::string content = msg.substr(delimeter_position + 1, std::string::npos);
+        HookPush(prefix);
+        HookPush(content);
+    }
+
+    if (!receiver.IsEmpty())
+        HookPush(receiver);
+    else if (guild)
+        HookPush(guild);
+    else if (group)
+        HookPush(group);
+    else if (channel)
+        HookPush(channel->GetChannelId());
+    else
+        HookPush();
+
+    return CallAllFunctionsBool(ServerEventBindings, key, true);
+}
+
 void Eluna::OnTimedEvent(int funcRef, uint32 delay, uint32 calls, WorldObject* obj)
 {
     ASSERT(!event_level);

@@ -157,7 +157,7 @@ namespace Hooks
         GAME_EVENT_STOP                         =     35,       // (event, gameeventid)
         ON_FREE_INSTANCE                        =     36,       // (instanceId)
         ON_SCORED_CREATURE_DIED                 =     37,       // (map, creature)
-
+        ADDON_EVENT_ON_MESSAGE_NEW              =     38,       // (event, sender, type, prefix, msg, target) - target can be nil/whisper_target/guild/group/channel. Can return false
         SERVER_EVENT_COUNT
     };
 
