@@ -2429,6 +2429,9 @@ class spell_class_seal_of_bloodgrip_dot : public AuraScript
         Unit* caster = GetCaster();
         Unit* victim = GetTarget();
 
+        if (!caster || !victim)
+            return;
+
         Aura* existingDot = victim->GetAura(SPELL_CLASS_SEAL_OF_BLOODGRIP_BLEED, caster->GetGUID());
         if (existingDot)
         {
