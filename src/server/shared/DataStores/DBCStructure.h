@@ -1099,8 +1099,8 @@ struct MapEntry
     bool IsBattleground() const { return InstanceType == MAP_BATTLEGROUND; }
     bool IsBattleArena() const { return InstanceType == MAP_ARENA; }
     bool IsBattlegroundOrArena() const { return InstanceType == MAP_BATTLEGROUND || InstanceType == MAP_ARENA; }
-    bool IsWorldMap() const { return InstanceType == MAP_COMMON && ID != 768 && ID != 770 && ID != 44 && ID != 776; } // 768 The Timeways, 770 The Ring of Valor, 44 Scarlet Monastery, 776 Venture Co. Mine
-
+    bool IsWorldMap() const { return InstanceType == MAP_COMMON && !IsDungeonOverriden(); } // 768 The Timeways, 770 The Ring of Valor, 44 Scarlet Monastery, 776 Venture Co. Mine
+    bool IsDungeonOverriden() const { return  ID == 768 || ID == 770 || ID == 44 || ID == 776; }  // 768 The Timeways, 770 The Ring of Valor, 44 Scarlet Monastery, 776 Venture Co. Mine
     bool GetEntrancePos(int32 &mapid, float &x, float &y) const
     {
         if (CorpseMapID < 0)

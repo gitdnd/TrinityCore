@@ -19881,7 +19881,8 @@ bool Player::CheckInstanceValidity(bool /*isLogin*/)
         if (!GetGroup() || !GetGroup()->isRaidGroup())
             return false;
 
-    if (Group* group = GetGroup())
+    Group* group = GetGroup();
+    if (group && !map->GetEntry()->IsDungeonOverriden())
     {
         // check if player's group is bound to this instance
         InstanceGroupBind* bind = group->GetBoundInstance(map->GetDifficulty(), map->GetId());
