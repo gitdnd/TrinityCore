@@ -93,7 +93,7 @@ public:
     void* GetObjIfValid() const override
     {
         if (TRACKABLE_PTR_NAMESPACE unique_strong_ref_ptr<T> obj = _obj.Obj.lock())
-            if (!E->GetBoundMap() || !_obj.BoundMap || E->GetBoundMap() == _obj.BoundMap)
+            if (!E->GetBoundMap() || !_obj.BoundMap || E->GetBoundMap() /*==_obj.BoundMap*/)
                 return obj.get();
 
         return nullptr;
