@@ -1143,6 +1143,9 @@ bool Aura::CanBeSaved() const
             return false;
     }
 
+    if ((GetSpellInfo()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_CHANGE_MAP) != 0)
+        return false;
+
     if (GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CANNOT_BE_SAVED))
         return false;
 
