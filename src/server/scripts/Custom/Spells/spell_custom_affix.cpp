@@ -184,8 +184,11 @@ class spell_affix_corpse_explosion_aura : public AuraScript
             if (creature->IsTrigger() ||
                 creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
                 creature->IsPet() ||
+                creature->IsSummon() ||
+                creature->IsGuardian() ||
                 (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
                 (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
+                (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP) ||
                 creature->IsIgnoringAFfixesFlagged())
             {
                 return;
