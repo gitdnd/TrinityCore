@@ -2600,7 +2600,7 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* victim, SpellInfo const* sp
     // 93179 - Whirling Barrier --itswicky
     if (victim->ToPlayer() && victim->ToPlayer()->HasSpell(93179) && victim->ToPlayer()->IsUsingStaff())
     {
-        int blockChance = victim->GetUnitBlockChance(BASE_ATTACK, victim);
+        int blockChance = victim->GetUnitBlockChance(BASE_ATTACK, victim) * 100.0f;
         if (roll_chance_i(blockChance))
             return SPELL_MISS_BLOCK;
     }
