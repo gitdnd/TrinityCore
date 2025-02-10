@@ -203,8 +203,6 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-
-
                 float const spellPowerPerCombo[6] =
                 {
                     0.0f,
@@ -225,9 +223,14 @@ public:
                     0.6f
                 };
 
-                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                uint8 cp = 1;
+
+                if (Player * plrCaster = caster->ToPlayer())
+                    cp = plrCaster->GetComboPoints();
+
                 if (cp > 5)
                     cp = 5;
+
                 int32 amount = ((caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE) * spellPowerPerCombo[cp]) + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * attackPowerPerCombo[cp]));
                 SetEffectValue(amount);
             }
@@ -258,8 +261,6 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-
-
                 float const attackPowerPerCombo[6] =
                 {
                     0.0f,
@@ -270,7 +271,11 @@ public:
                     1.f     
                 };
 
-                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                uint8 cp = 1;
+
+                if (Player* plrCaster = caster->ToPlayer())
+                    cp = plrCaster->GetComboPoints();
+
                 if (cp > 5)
                     cp = 5;
 
@@ -733,8 +738,7 @@ class spell_talent_blessed_life : public AuraScript
 
         Unit* victim = eventInfo.GetProcTarget();
         Unit* caster = GetCaster();
-        Player* player = caster->ToPlayer();
-        int32 spirit = player->GetStat(STAT_SPIRIT);
+        int32 spirit = caster->GetStat(STAT_SPIRIT);
 
         if (!roll_chance_f(lround((float)spirit / 20)))
             return;
