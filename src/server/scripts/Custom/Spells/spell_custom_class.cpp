@@ -352,6 +352,7 @@ class spell_talent_prodigy : public AuraScript
         }
         else
         {
+            history.clear();
             for (int i = 0; i < stacks; i++)
             {
                 caster->CastSpell(caster, SPELL_TALENT_UNINSPIRED, true);
