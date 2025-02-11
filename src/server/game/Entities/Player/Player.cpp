@@ -28408,6 +28408,36 @@ void Player::SetTalentLoadout(uint32 val)
     if (val >= MAX_CUSTOM_TALENT_LOADOUTS)
         return;
 
+    if (IsNonMeleeSpellCast(false))
+        InterruptNonMeleeSpells(false);
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    _SaveActions(trans);
+    CharacterDatabase.CommitTransaction(trans);
+
+    if (Pet* pet = GetPet())
+        RemovePet(pet, PET_SAVE_NOT_IN_SLOT);
+
+    ClearAllReactives();
+    UnsummonAllTotems();
+    ExitVehicle();
+    RemoveAllControlled();
+
+    // remove single target auras at other targets
+    AuraList& scAuras = GetSingleCastAuras();
+    for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
+    {
+        Aura* aura = *iter;
+        if (aura->GetUnitOwner() != this)
+        {
+            aura->Remove();
+            iter = scAuras.begin();
+        }
+        else
+            ++iter;
+    }
+    SendActionButtons(2);
+
     DeactivateTalentLoadout();
     currentTalentLoadout = val;
     LoadCustomTalentLoadout();
