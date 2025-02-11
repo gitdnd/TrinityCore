@@ -3611,7 +3611,7 @@ uint32 Creature::GetDungeonLevel() const
 
 void Creature::UpdateDungeonScaling()
 {
-    if (IsAffectedByScaling())
+    if (!IsAffectedByScaling())
         return;
 
     CreatureTemplate const* cInfo = GetCreatureTemplate();
