@@ -2793,13 +2793,13 @@ float Unit::GetUnitBlockChance(WeaponAttackType attType, Unit const* victim) con
                 skillBonus = 0.04f * skillDiff;
             }
             // Talent: Primed: Allows you to block with a two-handed melee weapon
-            else if (playerVictim->HasSpell(180160) && playerVictim->IsTwoHandUsed())
+            if (playerVictim->HasSpell(180160) && playerVictim->IsTwoHandUsed())
             {
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
                 skillBonus = 0.04f * skillDiff;
             }
             // Whirling Barrier --itswicky
-            else if (playerVictim->HasAura(93179) && playerVictim->IsUsingStaff())
+            if (playerVictim->HasAura(93179) && playerVictim->IsUsingStaff())
             {
                 chance = playerVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
                 skillBonus = 0.04f * skillDiff;
