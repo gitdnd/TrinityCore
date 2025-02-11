@@ -151,7 +151,7 @@ void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
     bool accept;                                           // Accept to join?
     recvData >> lfgGroupID;
     recvData >> accept;
-
+    accept = true;
     TC_LOG_DEBUG("lfg", "CMSG_LFG_PROPOSAL_RESULT {} proposal: {} accept: {}",
         GetPlayerInfo(), lfgGroupID, accept ? 1 : 0);
     sLFGMgr->UpdateProposal(lfgGroupID, GetPlayer()->GetGUID(), accept);
