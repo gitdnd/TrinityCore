@@ -18842,7 +18842,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
             if (Item* item = _LoadItem(trans, zoneId, timeDiff, fields))
             {
                 ObjectGuid::LowType bagGuid = fields[11].GetUInt32();
-                uint8  slot     = fields[12].GetUInt8();
+                uint8  slot = fields[12].GetUInt8();
 
                 InventoryResult err = EQUIP_ERR_OK;
                 // Item is not in bag
@@ -18921,10 +18921,14 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                 {
                     TC_LOG_ERROR("entities.player", "Player::_LoadInventory: Player '{}' ({}) has item ({}, entry: {}) which can't be loaded into inventory (Bag {}, slot: {}) by reason {}. Item will be sent by mail.",
                         GetName(), GetGUID().ToString(), item->GetGUID().ToString(), item->GetEntry(), bagGuid, slot, uint32(err));
+                    TC_LOG_ERROR("sql.sql", "Player::_LoadInventory: Player '{}' ({}) has item ({}, entry: {}) which can't be loaded into inventory (Bag {}, slot: {}) by reason {}. Item will be sent by mail.",
+                        GetName(), GetGUID().ToString(), item->GetGUID().ToString(), item->GetEntry(), bagGuid, slot, uint32(err));
                     item->DeleteFromInventoryDB(trans);
                     problematicItems.push_back(item);
                 }
             }
+            else
+                TC_LOG_ERROR("sql.sql", "Player::_LoadInventory Failed to load item {}, {} from {} {}'s inventory..", fields[13].GetUInt32(), fields[14].GetUInt32(), GetName().c_str(), GetGUID().GetCounter());
         } while (result->NextRow());
 
         m_itemUpdateQueueBlocked = false;

@@ -4170,6 +4170,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
 
         if (!sVirtualItemMgr.InsertEntry(itemTemplate))
         {
+            TC_LOG_ERROR("sql.sql", "item_template_virtual failed to insert entry {} while loading.", itemTemplate->ItemId);
             delete itemTemplate;
             continue;
         }
