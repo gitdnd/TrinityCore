@@ -155,7 +155,7 @@ void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
     TC_LOG_DEBUG("lfg", "CMSG_LFG_PROPOSAL_RESULT {} proposal: {} accept: {}",
         GetPlayerInfo(), lfgGroupID, accept ? 1 : 0);
     sLFGMgr->UpdateProposal(lfgGroupID, GetPlayer()->GetGUID(), accept);
-    if (!accept)
+    /*if (!accept)
     {
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(71041))
         {
@@ -165,7 +165,7 @@ void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
             if (Aura* deserter = Aura::TryRefreshStackOrCreate(createInfo))
                 deserter->SetDuration(300000);
         }
-    }
+    }*/
 }
 
 void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
