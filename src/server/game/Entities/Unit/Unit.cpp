@@ -7651,7 +7651,13 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if (GetTypeId() == TYPEID_UNIT && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, spellEffectInfo, donePctTotal, stack);
+        {
+            uint32 ownerHeal = owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, spellEffectInfo, donePctTotal, stack);
+            if (spellProto->Id != 52402)
+                ownerHeal *= 0.2f;
+
+            return ownerHeal;
+        }
 
     // No bonus healing for potion spells
     if (spellProto->SpellFamilyName == SPELLFAMILY_POTION || ((spellProto->SpellFamilyName == SPELLFAMILY_CLASSLESS) && spellProto->SpellFamilyFlags[2] & 0x1))
