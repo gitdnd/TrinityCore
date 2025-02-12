@@ -4976,8 +4976,15 @@ void Player::DurabilityRepair(uint16 pos, bool takeCost, float discountMod)
         _ApplyItemMods(item, pos & 255, true);
 }
 
-void Player::RepopAtGraveyard(bool ignore_overrides)
+static const WorldLocation hub(775, 75.1375f, 572.9322f, 731.48f, 3.432374f);
+static const WorldLocation cult(769, 12325.34f, 15392.59f, 857.065f, 1.561345f);
+static const WorldLocation vault(35, -1.115f, 65.37f, -27.5f, 1.54559f);
+
+void Player::RepopAtGraveyard()
 {
+    SetPhaseMask(1, true);
+    SetCanSeePhaseOne(true);
+    SetCanSeeUniquePhase(false);
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
 
@@ -4992,28 +4999,57 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
     }
 
     WorldSafeLocsEntry const* ClosestGrave;
-    bool overrideRepopLoc = false;
 
     // Special handle for battleground maps
     if (Battleground* bg = GetBattleground())
         ClosestGrave = bg->GetClosestGraveyard(this);
     else
     {
-        //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
-            //ClosestGrave = bf->GetClosestGraveyard(this);
-        //else
-        {
+        if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
+            ClosestGrave = bf->GetClosestGraveyard(this);
+        else
             ClosestGrave = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
-            overrideRepopLoc = true;
+    }
+    WorldLocation teleport = hub;
+    if (!m_HomebindTimer)
+    {
+        uint32 map = GetMapId();
+        switch (map)
+        {
+        case 769:
+        {
+            teleport = cult;
+            break;
+        }
+        case 35:
+        {
+            teleport = vault;
+            break;
+        }
+        case 772:
+        {
+            teleport = WorldLocation(map, GetPosition());
+            break;
+        }
+        default:
+            break;
         }
     }
-
     // stop countdown until repop
     m_deathTimer = 0;
 
+    TeleportTo(teleport, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
+    if (isDead())                                        // not send if alive, because it used in TeleportTo()
+    {
+        WorldPackets::Misc::DeathReleaseLoc packet;
+        packet.MapID = teleport.GetMapId();
+        packet.Loc = Position(teleport.GetPositionX(), teleport.GetPositionY(), teleport.GetPositionZ());
+        GetSession()->SendPacket(packet.Write());
+    }
+    /*
     // if no grave found, stay at the current location
     // and don't show spirit healer location
-    if (ClosestGrave && !overrideRepopLoc)
+    if (ClosestGrave)
     {
         TeleportTo(ClosestGrave->Continent, ClosestGrave->Loc.X, ClosestGrave->Loc.Y, ClosestGrave->Loc.Z, GetOrientation(), shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
@@ -5024,89 +5060,12 @@ void Player::RepopAtGraveyard(bool ignore_overrides)
             GetSession()->SendPacket(packet.Write());
         }
     }
-    // Override repop location to The Hub
-    else if (ClosestGrave)
-    {
-        // Reset phase to 1 on repop
-        SetPhaseMask(1, true);
-        SetCanSeePhaseOne(true);
-        SetCanSeeUniquePhase(false);
-
-        // Old Hub
-        /*
-        uint32 mapId = 765;
-        float x = 56.48f;
-        float y = 539.11f;
-        float z = 715.5f;
-        float o = 4.305573f;
-        */
-        // New Hub
-        uint32 mapId = 775;
-        float x = 75.1375f;
-        float y = 572.9322f;
-        float z = 731.48f;
-        float o = 3.432374f;
-
-        if (GetMap()->graveyardOverride.GetMapId() != MAPID_INVALID)
-        {
-            mapId = GetMap()->graveyardOverride.GetMapId();
-            x = GetMap()->graveyardOverride.GetPositionX();
-            y = GetMap()->graveyardOverride.GetPositionY();
-            z = GetMap()->graveyardOverride.GetPositionZ();
-            o = GetMap()->graveyardOverride.GetOrientation();
-        }
-        else
-        {
-            // Default Hub map and coords
-
-            // If in Floating Cult
-            if (!ignore_overrides)
-            {
-                // Floating cult
-                if (GetMap() && GetMap()->GetId() == 769)
-                {
-                    mapId = 769;
-                    x = 12325.34f;
-                    y = 15392.59f;
-                    z = 857.065f;
-                    o = 1.561345f;
-                }
-                // If in The Vault
-                else if (GetMap() && GetMap()->GetId() == 35)
-                {
-                    mapId = 35;
-                    x = -1.115f;
-                    y = 65.37f;
-                    z = -27.5f;
-                    o = 1.54559f;
-                }
-                // Icecrown Glacier
-                else if (GetMap() && GetMap()->GetId() == 772)
-                {
-                    mapId = 772;
-                    x = GetPositionX();
-                    y = GetPositionY();
-                    z = GetPositionZ();
-                    o = GetOrientation();
-                }
-            }
-        }
-           
-        TeleportTo(mapId, x, y, z, o, shouldResurrect ? TELE_REVIVE_AT_TELEPORT : 0);
-        if (isDead())                                        // not send if alive, because it used in TeleportTo()
-        {
-            WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4);  // show spirit healer position on minimap
-            // Hub map and coords
-            data << mapId;
-            data << TaggedPosition<Position::XYZ>(x, y, z);
-            SendDirectMessage(&data);
-        }
-    }
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
-        TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
+        TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());*/
 
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
+
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone) const
 {
@@ -22661,7 +22620,7 @@ void Player::UpdateHomebindTime(uint32 time)
         if (time >= m_HomebindTimer)
         {
             // teleport to nearest graveyard
-            RepopAtGraveyard(true);
+            RepopAtGraveyard();
         }
         else
             m_HomebindTimer -= time;
