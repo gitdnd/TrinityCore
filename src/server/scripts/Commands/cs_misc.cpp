@@ -1932,7 +1932,8 @@ public:
             if (totalmail >= 1)
                handler->PSendSysMessage(LANG_PINFO_CHR_MAILS, readmail, totalmail);
         }
-
+        if (target)
+            handler->PSendSysMessage("Debug teleport status near %s, far %s.", target->IsBeingTeleportedNear() ? "yes" : "no", target->IsBeingTeleportedFar() ? "yes" : "no");
         return true;
     }
 
