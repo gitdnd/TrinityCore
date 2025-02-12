@@ -55,6 +55,7 @@ void WorldSession::HandleMoveWorldportAck()
         return;
 
     player->SetSemaphoreTeleportFar(false);
+    player->SetSemaphoreTeleportNear(false); // this shouldn't happen but it is?
 
     // get the teleport destination
     WorldLocation const& loc = player->GetTeleportDest();
