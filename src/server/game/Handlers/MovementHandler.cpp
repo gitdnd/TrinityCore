@@ -40,7 +40,6 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 #include <boost/circular_buffer.hpp>
-#include "Chat.h"
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvPacket*/)
 {
@@ -51,13 +50,9 @@ void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvPacket*/)
 void WorldSession::HandleMoveWorldportAck()
 {
     Player* player = GetPlayer();
-    ChatHandler(this).PSendSysMessage("Got ack teleport status {}", player->IsBeingTeleportedFar());
     // ignore unexpected far teleports
     if (!player->IsBeingTeleportedFar())
-    {
-        ChatHandler(this).PSendSysMessage("Got ack rejected.");
         return;
-    }
 
     player->SetSemaphoreTeleportFar(false);
 
@@ -108,7 +103,6 @@ void WorldSession::HandleMoveWorldportAck()
     player->SendInitialPacketsBeforeAddToMap();
     if (!player->GetMap()->AddPlayerToMap(player))
     {
-        ChatHandler(this).PSendSysMessage("Got map add rejected.");
         TC_LOG_ERROR("network", "WORLD: failed to teleport player {} {} to map {} ({}) because of unknown reason!",
             player->GetName(), player->GetGUID().ToString(), loc.GetMapId(), newMap ? newMap->GetMapName() : "Unknown");
         player->ResetMap();
