@@ -5062,7 +5062,7 @@ void Player::RepopAtGraveyard()
     }
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
         TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());*/
-    m_HomebindTimer = 0;
+    //m_HomebindTimer = 0;
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
 }
 
@@ -22621,6 +22621,8 @@ void Player::UpdateHomebindTime(uint32 time)
         {
             // teleport to nearest graveyard
             RepopAtGraveyard();
+            m_HomebindTimer = 0;
+            m_InstanceValid = true;
         }
         else
             m_HomebindTimer -= time;
