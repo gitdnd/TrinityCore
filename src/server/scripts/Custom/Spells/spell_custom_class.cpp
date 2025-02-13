@@ -360,7 +360,7 @@ class spell_talent_prodigy : public AuraScript
             GetTarget()->RemoveAurasDueToSpell(SPELL_TALENT_BRAINSTORM);
         }
 
-        if (itr != history.end())
+        if (!history.empty() && itr != history.end())
             history.erase(itr);
 
         history.push_back(currentSpellId);
