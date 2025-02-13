@@ -329,7 +329,8 @@ void Eluna::Report(lua_State* _L)
     const char* msg = lua_tostring(_L, -1);
     ELUNA_LOG_ERROR("%s", msg);
     lua_pop(_L, 1);
-    sWorld->SendGMText(LANG_SYSTEMMESSAGE, msg);
+    if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT))
+        sWorld->SendGMText(LANG_SYSTEMMESSAGE, msg);
     std::thread sendWebHook(launchWebHook, msg);
     sendWebHook.detach();
 }
