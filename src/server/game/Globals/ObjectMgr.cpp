@@ -4176,7 +4176,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         }
         if (itemTemplate->HasFlag(VIRTUAL_ITEM_FLAG_REGENERATE))
         {
-            VirtualModifier mod;
+            VirtualModifier mod = sVirtualItemMgr.GetModifierFromTemplate(itemTemplate);
             mod.seed = itemTemplate->seed;
             mod.socketSeed = itemTemplate->socketSeed;
             mod.qualitySeed = itemTemplate->qualitySeed;
