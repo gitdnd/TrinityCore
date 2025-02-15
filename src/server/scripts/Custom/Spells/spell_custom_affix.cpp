@@ -333,7 +333,8 @@ class spell_affix_wild_magic_aura : public AuraScript
                         creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) ||
                         (creature->GetCreatureTemplate()->type == CREATURE_TYPE_CRITTER) ||
                         (creature->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM) ||
-                        !creature->IsAlive() ||  creature->IsIgnoringAFfixesFlagged())
+                        !creature->IsAlive() ||
+                        creature->IsIgnoringAFfixesFlagged())
                         continue;
                 }
                 target->CastSpell(target, spellId, true);

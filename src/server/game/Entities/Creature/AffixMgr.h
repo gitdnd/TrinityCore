@@ -23,9 +23,9 @@ public:
     AffixGroupSlot();
     AffixGroupSlot(uint32 affixId, int numRolls, uint8 rank);
 
-    uint32 const GetAffixId() { return m_affixId; }
-    int const GetNumRolls() { return m_numRolls; }
-    uint8 const GetRank() { return m_rank; }
+    uint32 const GetAffixId() const { return m_affixId; }
+    int const GetNumRolls() const { return m_numRolls; }
+    uint8 const GetRank() const { return m_rank; }
 
 private:
     uint32 m_affixId;
@@ -52,8 +52,8 @@ class AffixItem
 public:
     AffixItem(uint32 id, uint8 rank);
 
-    uint32 const GetId() { return m_id; };
-    uint8 const GetRank() { return m_rank; }
+    uint32 const GetId() const { return m_id; };
+    uint8 const GetRank() const { return m_rank; }
 
 private:
     uint32 m_id;
@@ -63,15 +63,17 @@ private:
 class AffixEffect
 {
 public:
-    AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint32 m_dungeonLevelBonus, uint8 rank);
+    AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint32 m_dungeonLevelBonus, uint8 rank, bool applyToBoss, bool applyToSummon);
 
-    uint32 const GetId() { return m_id; }
-    uint32 const GetBaseSpell() { return m_baseSpell; }
-    uint32 const GetTargetSpell() { return m_targetSpell; }
-    uint32 const GetDungeonLevelBonus() { return m_dungeonLevelBonus; }
-    uint8 const GetRank() { return m_rank; }
+    uint32 const GetId() const { return m_id; }
+    uint32 const GetBaseSpell() const { return m_baseSpell; }
+    uint32 const GetTargetSpell() const { return m_targetSpell; }
+    uint32 const GetDungeonLevelBonus() const { return m_dungeonLevelBonus; }
+    uint8 const GetRank() const { return m_rank; }
+    bool const GetApplyToBoss() const { return m_applyToBoss; }
+    bool const GetApplyToSummon() const { return m_applyToSummon; }
 
-    void Apply(Creature* creature, AffixEvent event);
+    void Apply(Creature* creature, AffixEvent event) const;
 
 private:
     uint32 m_id;
@@ -79,6 +81,8 @@ private:
     uint32 m_targetSpell;
     uint32 m_dungeonLevelBonus;
     uint8 m_rank;
+    bool m_applyToBoss;
+    bool m_applyToSummon;
 };
 
 class AffixMgr
