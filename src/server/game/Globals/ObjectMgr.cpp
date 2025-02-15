@@ -8690,8 +8690,11 @@ uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
     if (level == 0)
         level = 1;
-    // ((ilevel ^ 1.15) / 2) * 1000
-    return (std::pow(level, 1.38) * 0.5) * 1000;
+    double scaleRate = level <= 80 ?
+        1.38 :
+        level * 0.018;
+    // ((ilevel ^ rate) / 2) * 1000
+    return (std::pow(level, scaleRate) * 0.5) * 1000.0;
 }
 
 void ObjectMgr::LoadPetNames()
