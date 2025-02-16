@@ -2593,7 +2593,7 @@ public:
 
             if (target->HasAuraState(AURA_STATE_FROZEN) || caster->GetAura(SPELL_CLASS_FINGERS_OF_FROST))
             {
-                SetHitDamage(GetHitDamage() * 2);
+                SetHitDamage(GetHitDamage() * 3);
             }
         }
 
@@ -2799,7 +2799,7 @@ class spell_talent_drw_debuff : public AuraScript
         {
             caster->RemoveAura(SPELL_TALENT_RUNE_DEBUFF);
         }
-        else
+        else if (!caster->GetAura(SPELL_TALENT_RUNE_WEAPON) && !caster->GetAura(SPELL_TALENT_RUNE_DEBUFF))
         {
             caster->CastSpell(caster, SPELL_TALENT_RUNE_DEBUFF, true);
         }
