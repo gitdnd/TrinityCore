@@ -3867,7 +3867,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         17364, // Stormstrike
-        48278 // Paralyze
+        48278, // Paralyze
+        94000, // Intimidated
+        94621 // Marked for Death
         //53651  // Light's Beacon
     }, [](SpellInfo* spellInfo)
     {
