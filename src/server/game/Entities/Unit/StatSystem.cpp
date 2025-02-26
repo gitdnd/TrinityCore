@@ -1004,7 +1004,7 @@ void Player::UpdatePowerRegen(Powers power)
             float Spirit = GetStat(STAT_SPIRIT);
             // Mana regen from spirit and intellect
             //float power_regen = std::sqrt(Intellect) * OCTRegenMPPerSpirit();
-            float power_regen = Spirit * 0.5;
+            float power_regen = Spirit * 0.1;
             // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
             power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 
