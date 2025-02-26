@@ -5527,7 +5527,8 @@ float Player::OCTRegenMPPerSpirit() const
     // Formula get from PaperDollFrame script
     float spirit    = GetStat(STAT_SPIRIT);
     float regen     = spirit * moreRatio->Data;
-    return regen;
+    //return regen;
+    return;
 }
 
 void Player::ApplyRatingMod(CombatRating combatRating, int32 value, bool apply)
