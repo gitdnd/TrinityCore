@@ -5528,7 +5528,7 @@ float Player::OCTRegenMPPerSpirit() const
     float spirit    = GetStat(STAT_SPIRIT);
     float regen     = spirit * moreRatio->Data;
     //return regen;
-    return;
+    return 0.0f;
 }
 
 void Player::ApplyRatingMod(CombatRating combatRating, int32 value, bool apply)
