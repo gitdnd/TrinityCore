@@ -1024,8 +1024,8 @@ void Player::UpdatePowerRegen(Powers power)
             result_regen                = power_regen_mp5 + power_regen;
             result_regen_interrupted    = power_regen_mp5 + CalculatePct(power_regen, modManaRegenInterrupt);
 
-            if (GetLevel() < 15)
-                modifier *= 2.066f - (GetLevel() * 0.066f);
+            //if (GetLevel() < 15)
+            //    modifier *= 2.066f - (GetLevel() * 0.066f);
             break;
         }
         case POWER_RAGE:
