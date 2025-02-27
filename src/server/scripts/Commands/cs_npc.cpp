@@ -526,6 +526,8 @@ public:
                 handler->PSendSysMessage("* %s (0x%X)", EnumUtils::ToTitle(m), m);
 
         handler->PSendSysMessage("Dungeon level %i.", target->GetDungeonLevel());
+        handler->PSendSysMessage("Resistances: Physical %i, Holy %i, Fire %i, Nature %i, Frost %i, Shadow %i, Arcane %i", target->GetResistance(SPELL_SCHOOL_NORMAL), target->GetResistance(SPELL_SCHOOL_HOLY), target->GetResistance(SPELL_SCHOOL_FIRE),
+            target->GetResistance(SPELL_SCHOOL_NATURE), target->GetResistance(SPELL_SCHOOL_FROST), target->GetResistance(SPELL_SCHOOL_SHADOW), target->GetResistance(SPELL_SCHOOL_ARCANE));
         handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetName().c_str(), target->GetSpawnId(), target->GetGUID().GetCounter(), entry, faction, npcflags, displayid, nativeid);
 
         return true;

@@ -1482,7 +1482,7 @@ std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupPrima
 
     ASSERT(group < STAT_GROUP_COUNT);
 
-    return stat_group_primary_stats[group];
+    return stat_group_primary_stats[AsUnderlyingType(group)];
 }
 
 std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecondaryStats(StatGroup group, std::mt19937& generator) const
@@ -1492,7 +1492,7 @@ std::vector<ItemModType> const& VirtualItemMgr::StatGroupData::GetStatGroupSecon
 
     ASSERT(group < STAT_GROUP_COUNT);
 
-    return stat_group_secondary_stats[group];
+    return stat_group_secondary_stats[AsUnderlyingType(group)];
 }
 
 std::vector<SocketColor> const& VirtualItemMgr::StatGroupData::GetStatGroupSockets(StatGroup group, std::mt19937& generator) const
@@ -1502,7 +1502,7 @@ std::vector<SocketColor> const& VirtualItemMgr::StatGroupData::GetStatGroupSocke
 
     ASSERT(group < STAT_GROUP_COUNT);
 
-    return stat_group_sockets[group];
+    return stat_group_sockets[AsUnderlyingType(group)];
 }
 
 std::vector<StatGroup> const& VirtualItemMgr::StatGroupData::GetPreferenceStatGroups(uint8 preference) const
