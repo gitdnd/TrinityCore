@@ -5345,7 +5345,7 @@ uint32 Player::GetShieldBlockValue() const
         hasTwoHand = true;
     }
 
-    float value = std::max(0.f, (blockValue + m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
+    float value = std::max(0.f, (blockValue + m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f) * m_auraBasePctMod[SHIELD_BLOCK_VALUE]);
 
     // Talent: Shield Superiority: While you have a Shield equipped ... you gain $s1% more block value from your equipped shield...
     if (!hasTwoHand && HasAura(93999))
@@ -5527,7 +5527,8 @@ float Player::OCTRegenMPPerSpirit() const
     // Formula get from PaperDollFrame script
     float spirit    = GetStat(STAT_SPIRIT);
     float regen     = spirit * moreRatio->Data;
-    return regen;
+    //return regen;
+    return 0.0f;
 }
 
 void Player::ApplyRatingMod(CombatRating combatRating, int32 value, bool apply)

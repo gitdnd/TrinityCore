@@ -1511,6 +1511,9 @@ void Creature::UpdateLevelDependantStats()
             dungeonLevelMod = dungeonLevelMod * 0.5;
         else if (dungeonLevel < 60)
             dungeonLevelMod = dungeonLevelMod * 0.65;
+        // Complete hack for solo content
+        else if (GetMapId() == 768 || GetMapId() == 35 || GetMapId() == 776)
+            dungeonLevelMod = dungeonLevelMod * 0.7;
         else if (dungeonLevel < 75)
             dungeonLevelMod = dungeonLevelMod * 0.8;
         else if (dungeonLevel > 290)
@@ -1550,8 +1553,13 @@ void Creature::UpdateLevelDependantStats()
         float dungeonLevelMod = (std::pow(float(dungeonLevel), 2) / 15000.0f) + 1.0f;
         if (dungeonLevel < 50)
             dungeonLevelMod = dungeonLevelMod * 0.5;
+        // Complete hack for solo content
+        else if (GetMapId() == 768 || GetMapId() == 35 || GetMapId() == 776)
+            dungeonLevelMod = dungeonLevelMod * 0.65;
         else if (dungeonLevel > 250)
             dungeonLevelMod = dungeonLevelMod * ((float(std::pow(dungeonLevel, 2)) / 100000.0f) + 0.38f);
+
+        // Another adjustment
         if (dungeonLevel >= 290)
             dungeonLevelMod = dungeonLevelMod * 1.25;
         else if (dungeonLevel > 200)

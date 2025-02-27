@@ -307,11 +307,12 @@ void Player::UpdateArmor()
 
 float Player::GetHealthBonusFromStamina()
 {
-    float stamina = GetStat(STAT_STAMINA);
-    float baseStam = std::min(20.0f, stamina);
-    float moreStam = stamina - baseStam;
+    //float stamina = GetStat(STAT_STAMINA);
+    //float baseStam = std::min(20.0f, stamina);
+    //float moreStam = stamina - baseStam;
 
-    return baseStam + (moreStam*10.0f);
+    //return baseStam + (moreStam*10.0f);
+    return GetStat(STAT_STAMINA) * 10.f;
 }
 
 float Player::GetManaBonusFromIntellect()
@@ -370,7 +371,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
         {
             case CLASS_TIMEWALKER:
             case CLASS_HUNTER:
-                val2 = level * 3.0f + GetStat(STAT_AGILITY) - 10.0f;
+                val2 = GetStat(STAT_AGILITY);
                 break;
             case CLASS_ROGUE:
                 val2 = level + GetStat(STAT_AGILITY) - 10.0f;
@@ -397,7 +398,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
         switch (GetClass())
         {
             case CLASS_TIMEWALKER:
-                val2 = level * 2.0f + (GetStat(STAT_STRENGTH) * 2.0f) + GetStat(STAT_AGILITY) - 20.0f;
+                val2 = (GetStat(STAT_STRENGTH) * 2.0f) + GetStat(STAT_AGILITY);
                 break;
             case CLASS_WARRIOR:
                 val2 = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
@@ -1000,8 +1001,10 @@ void Player::UpdatePowerRegen(Powers power)
         case POWER_MANA:
         {
             float Intellect = GetStat(STAT_INTELLECT);
+            float Spirit = GetStat(STAT_SPIRIT);
             // Mana regen from spirit and intellect
-            float power_regen = std::sqrt(Intellect) * OCTRegenMPPerSpirit();
+            //float power_regen = std::sqrt(Intellect) * OCTRegenMPPerSpirit();
+            float power_regen = Spirit * 0.1;
             // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
             power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 
@@ -1021,8 +1024,8 @@ void Player::UpdatePowerRegen(Powers power)
             result_regen                = power_regen_mp5 + power_regen;
             result_regen_interrupted    = power_regen_mp5 + CalculatePct(power_regen, modManaRegenInterrupt);
 
-            if (GetLevel() < 15)
-                modifier *= 2.066f - (GetLevel() * 0.066f);
+            //if (GetLevel() < 15)
+            //    modifier *= 2.066f - (GetLevel() * 0.066f);
             break;
         }
         case POWER_RAGE:

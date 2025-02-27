@@ -25,7 +25,7 @@ void AffixMgr::LoadDatabaseData()
                     fields[1].GetUInt8()));
         } while (result->NextRow());
     }
-    if (QueryResult result = WorldDatabase.Query("SELECT id, `rank`, baseSpell, targetSpell, dungeonLevelBonus FROM affix_effect"))
+    if (QueryResult result = WorldDatabase.Query("SELECT id, `rank`, baseSpell, targetSpell, dungeonLevelBonus, applyBoss, applyToSummon FROM affix_effect"))
     {
         do
         {
@@ -36,7 +36,9 @@ void AffixMgr::LoadDatabaseData()
                     fields[2].GetUInt32(),
                     fields[3].GetUInt32(),
                     fields[4].GetUInt32(),
-                    fields[1].GetUInt8()));
+                    fields[1].GetUInt8(),
+                    fields[5].GetBool(),
+                    fields[6].GetBool()));
         } while (result->NextRow());
     }
 }
@@ -75,7 +77,7 @@ AffixEffect AffixMgr::GetAffixEffect(uint32 id)
             }
         }
     }
-    return AffixEffect(0, 0, 0, 0, 0);
+    return AffixEffect(0, 0, 0, 0, 0, false, false);
 }
 
 uint32 AffixMgr::GetDungeonLevelBonus(uint32* affixes)
@@ -117,12 +119,12 @@ AffixItem::AffixItem(uint32 id, uint8 rank) :
 // Affix Effect
 ///////////////////////
 
-AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint32 dungeonLevelBonus, uint8 rank) :
-    m_id(id), m_baseSpell(baseSpell), m_targetSpell(targetSpell), m_dungeonLevelBonus(dungeonLevelBonus), m_rank(rank)
+AffixEffect::AffixEffect(uint32 id, uint32 baseSpell, uint32 targetSpell, uint32 dungeonLevelBonus, uint8 rank, bool applyToBoss, bool applyToSummon) :
+    m_id(id), m_baseSpell(baseSpell), m_targetSpell(targetSpell), m_dungeonLevelBonus(dungeonLevelBonus), m_rank(rank), m_applyToBoss(applyToBoss), m_applyToSummon(applyToSummon)
 {
 }
 
-void AffixEffect::Apply(Creature* creature, AffixEvent event)
+void AffixEffect::Apply(Creature* creature, AffixEvent event) const
 {
     if (GetId() == 0)
         return;
@@ -133,8 +135,16 @@ void AffixEffect::Apply(Creature* creature, AffixEvent event)
     if (selfFaction->IsFriendlyTo(*companionFaction))
         return;
 
-    // If unselectable
+    // Common blanket checks
     if (creature->IsIgnoringAffixes())
+        return;
+
+    // Configurable stop affix applying to boss
+    if (!GetApplyToBoss() && (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS))
+        return;
+
+    // Configurable stop affix applying to summons
+    if (!GetApplyToSummon() && (creature->IsSummon() || creature->IsGuardian() || creature->IsPet()))
         return;
 
     // debug
