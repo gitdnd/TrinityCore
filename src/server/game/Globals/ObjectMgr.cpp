@@ -4162,7 +4162,7 @@ void ObjectMgr::LoadVirtualItemTemplates()
         itemTemplate->generatedMagicFind = fields[i++].GetUInt32();
         itemTemplate->honeLevel = fields[i++].GetUInt32();
 
-        itemTemplate->MaxDurability = round(float((itemTemplate->ItemLevel * (itemTemplate->Quality / 10.f)) + 25));;
+        itemTemplate->MaxDurability = 0;
 
         if (legendaryItemInfo const* leg = sVirtualItemMgr.GetLegendaryItemInfo(itemTemplate->legendaryId))
             itemTemplate->ItemLimitCategory = leg->limitCatagory;

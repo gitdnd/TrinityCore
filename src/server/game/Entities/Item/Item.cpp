@@ -510,7 +510,8 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     SetUInt32Value(ITEM_FIELD_DURABILITY, durability);
     // update max durability (and durability) if need
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, proto->MaxDurability);
-
+    if(proto->MaxDurability < durability)
+        SetUInt32Value(ITEM_FIELD_DURABILITY, proto->MaxDurability);
     // do not overwrite durability for wrapped items
     if (durability > proto->MaxDurability && !IsWrapped())
     {
