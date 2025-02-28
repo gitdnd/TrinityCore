@@ -18550,12 +18550,29 @@ bool Player::LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& hol
 
     _LoadEquipmentSets(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS));
 
-    if(sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_DEVELOPMENT) && !AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    {
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
+        if (!HasSpell(450004))
+            LearnSpell(450004, false);
+
+        if (!HasSpell(1908))
+            LearnSpell(1908, false);
+
+        if (!HasSpell(11))
+            LearnSpell(11, false);
+
+        if (!HasSpell(450009))
+            LearnSpell(450009, false);
+
+        if (!HasSpell(450024))
+            LearnSpell(450024, false);
+    }
 
 
     UpdateLowLevelCasterBuff();
     GetSession()->LoadAccountBank();
+
     return true;
 }
 
