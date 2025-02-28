@@ -171,9 +171,7 @@ public:
     static bool HandleAddVirtualItem(ChatHandler* handler, uint32 itemEntry, Optional<uint8> quality, Optional<uint32> itemLevel, Optional<uint32> seed, Optional<int8> statGroup, Optional<bool> isCrafted, Optional<bool> generateSet, Optional<bool> withPreference)
     {
         Player* player = handler->GetSession()->GetPlayer();
-        Player* playerTarget = handler->getSelectedPlayer();
-        if (!playerTarget)
-            playerTarget = player;
+        Player* playerTarget = handler->getSelectedPlayerOrSelf();
 
         if (!sVirtualItemMgr.IsVirtualTemplate(sObjectMgr->GetItemTemplate(itemEntry)))
         {
@@ -214,19 +212,22 @@ public:
         uint8 itemCount = 1;
         uint32 noSpaceForCount = 0;
         ItemPosCountVec dest;
-        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemEntry, itemCount, &noSpaceForCount);
+        InventoryResult msg = playerTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemEntry, itemCount, &noSpaceForCount);
         if (msg != EQUIP_ERR_OK)
             itemCount -= noSpaceForCount;
 
         if (itemCount == 0 || dest.empty())
             return 1;
 
-        Item* item = player->StoreNewItem3(dest, itemEntry, true, GenerateItemRandomPropertyId(itemEntry), GuidSet(), mod);
+        Item* item = playerTarget->StoreNewItem3(dest, itemEntry, true, GenerateItemRandomPropertyId(itemEntry), GuidSet(), mod);
         if (item)
         {
             item->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HighGuid::Player, uint32(2)));
 
-            player->SendNewItem(item, itemCount, true, false);
+            player->SendNewItem(item, itemCount, false, true);
+
+            if (player != playerTarget)
+                playerTarget->SendNewItem(item, itemCount, true, false);
 
             handler->PSendSysMessage("Added item %u, quality %u, iLvl %u, seed %u, statgroup %u, crafted %b, set %b, usedPref %b.", itemEntry, mod.quality, mod.ilevel, mod.seed, uint8(mod.statgroup), mod.isCrafted, mod.generateSet, mod.lootPreference == 0);
         }
