@@ -2510,10 +2510,8 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_AGILITY,
         ITEM_MOD_INTELLECT,
         ITEM_MOD_SPIRIT,
-        ITEM_MOD_STRENGTH
-    };
-    stat_group_secondary_stats[STAT_GROUP_ALL_EXTENDED] = {
-        // generic
+        ITEM_MOD_STRENGTH,
+
         ITEM_MOD_HIT_RATING,
         ITEM_MOD_HASTE_RATING,
         ITEM_MOD_CRIT_RATING,
@@ -2541,8 +2539,43 @@ VirtualItemMgr::StatGroupData::StatGroupData()
         ITEM_MOD_HASTE_SPELL_RATING,
         ITEM_MOD_SPELL_PENETRATION,
         ITEM_MOD_HIT_SPELL_RATING,
-        ITEM_MOD_SPELL_HEALING_DONE,
-        ITEM_MOD_SPELL_DAMAGE_DONE
+        ITEM_MOD_SPELL_HEALING_DONE
+    };
+    stat_group_secondary_stats[STAT_GROUP_ALL_EXTENDED] = {
+        ITEM_MOD_STAMINA,
+        ITEM_MOD_AGILITY,
+        ITEM_MOD_INTELLECT,
+        ITEM_MOD_SPIRIT,
+        ITEM_MOD_STRENGTH,
+
+        ITEM_MOD_HIT_RATING,
+        ITEM_MOD_HASTE_RATING,
+        ITEM_MOD_CRIT_RATING,
+        ITEM_MOD_SPELL_POWER,
+        ITEM_MOD_ATTACK_POWER,
+        ITEM_MOD_MANA_REGENERATION,
+        ITEM_MOD_EXPERTISE_RATING,
+        ITEM_MOD_ARMOR_PENETRATION_RATING,
+        // tank
+        ITEM_MOD_DEFENSE_SKILL_RATING,
+        ITEM_MOD_DODGE_RATING,
+        ITEM_MOD_PARRY_RATING,
+        ITEM_MOD_BLOCK_RATING,
+        ITEM_MOD_BLOCK_VALUE,
+        // melee
+        ITEM_MOD_CRIT_MELEE_RATING,
+        ITEM_MOD_HASTE_MELEE_RATING,
+        ITEM_MOD_HIT_MELEE_RATING,
+        // ranged
+        ITEM_MOD_CRIT_RANGED_RATING,
+        ITEM_MOD_HASTE_RANGED_RATING,
+        ITEM_MOD_HIT_RANGED_RATING,
+        // caster
+        ITEM_MOD_CRIT_SPELL_RATING,
+        ITEM_MOD_HASTE_SPELL_RATING,
+        ITEM_MOD_SPELL_PENETRATION,
+        ITEM_MOD_HIT_SPELL_RATING,
+        ITEM_MOD_SPELL_HEALING_DONE
     };
     stat_group_sockets[STAT_GROUP_ALL_EXTENDED] = {
         SOCKET_COLOR_YELLOW,
