@@ -1989,7 +1989,7 @@ class spell_class_seal_of_darktide : public AuraScript
 
 
         // Damage calculation of the hit
-        int32 bp = std::lroundf(mws * ((0.01f * spa) + 0.004f * hp));
+        int32 bp = std::lroundf(mws * ((0.025f * spa) + 0.006f * hp));
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_DARKTIDE, args);
@@ -2049,7 +2049,7 @@ class spell_class_seal_of_flametongue : public AuraScript
             mws /= 1000.0f;
         }
         // Damage calculation of the hit
-        int32 bp = std::lroundf(mws * (0.08f * spf) + (25 * mws));
+        int32 bp = std::lroundf(mws * (0.1f * spf) + (25 * mws));
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(bp);
         GetTarget()->CastSpell(victim, SPELL_CLASS_SEAL_OF_FLAMETONGUE, args);
