@@ -2390,7 +2390,7 @@ class spell_class_seal_of_bloodgrip : public AuraScript
         //int apScaling = GetEffect(EFFECT_1)->GetAmount();
 
 
-        int bp = std::lroundf(mws * 70  + mws * 0.06 * usedAp);
+        int bp = std::lroundf(mws * 35  + mws * 0.03 * usedAp);
 
         
         SpellInfo const* bloodGripDot = sSpellMgr->AssertSpellInfo(SPELL_CLASS_SEAL_OF_BLOODGRIP_DUMMY);
@@ -2433,6 +2433,7 @@ class spell_class_seal_of_bloodgrip_dot : public AuraScript
     {
         Unit* caster = GetCaster();
         Unit* victim = GetTarget();
+        uint32 spellId = GetSpellInfo()->Id;
 
         if (!caster || !victim)
             return;
@@ -2445,6 +2446,11 @@ class spell_class_seal_of_bloodgrip_dot : public AuraScript
             {
                 int tickAmount = currentValue->GetAmount();
                 existingDot->GetEffect(EFFECT_0)->ChangeAmount(tickAmount);
+
+                int damage = tickAmount;
+                if (Player* modOwner = caster->GetSpellModOwner())
+                    modOwner->ApplySpellMod(spellId, SPELLMOD_DOT, damage);
+                tickAmount = damage;
             }
         }
     }
