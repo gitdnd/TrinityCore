@@ -82,9 +82,15 @@ enum PetAction : int32
     PET_ACTION_ATTACK           = 1
 };
 
-#define PET_FOLLOW_DIST  1.0f
-#define PET_FOLLOW_ANGLE float(M_PI/2)
 
+inline float RandomPetFollowDist()
+{
+    return frand(0.f, 3.0f);
+}
+inline float RandomPetFollowAngle()
+{
+    return frand(0.f, M_PI * 1.5f);
+}
 class PetStable
 {
 public:

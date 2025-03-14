@@ -253,6 +253,11 @@ class TC_GAME_API Aura
         void CallScriptAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
         bool CallScriptEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
         void CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
+        
+        bool CallScriptOnResourceChange(Powers power, int amount, PowerChangeReason reason, std::variant<Spell*, Aura*> reasonObj);
+        bool CallScriptAuraAddRemove(Aura* aura, bool added);
+        bool CallScriptBeforeSpellCast(Spell* spell);
+        bool CallScriptOnAuraStack(Aura* aura, int16 amount);
 
         UnitAura* ToUnitAura() { if (GetType() == UNIT_AURA_TYPE) return reinterpret_cast<UnitAura*>(this); else return nullptr; }
         UnitAura const* ToUnitAura() const { if (GetType() == UNIT_AURA_TYPE) return reinterpret_cast<UnitAura const*>(this); else return nullptr; }

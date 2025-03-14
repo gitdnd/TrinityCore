@@ -263,6 +263,8 @@ Item::Item()
     m_refundRecipient = 0;
     m_paidMoney = 0;
     m_paidExtendedCost = 0;
+
+    h_allSupportGems = {};
 }
 
 bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owner)

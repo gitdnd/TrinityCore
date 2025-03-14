@@ -3670,6 +3670,16 @@ enum DuelCompleteType : uint8
     DUEL_FLED        = 2
 };
 
+enum class PowerChangeReason : uint8
+{
+    REASON_NONE,
+    REASON_SPELL_COST,
+    REASON_AURA_EFFECT,
+    REASON_REGENERATION,
+    REASON_SPELL_GENERATED,
+    REASON_ATTACK_GENERATED,
+};
+
 struct BattlegroundQueueTypeId
 {
     uint16 BattlemasterListId;

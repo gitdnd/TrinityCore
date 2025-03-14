@@ -8433,7 +8433,7 @@ int32 Unit::GetHealthGain(int32 dVal)
 }
 
 // returns negative amount on power reduction
-int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*/)
+int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*/, PowerChangeReason reason /*= PowerChangeReason::REASON_NONE*/, std::variant<Spell*, Aura*> reasonObj /*= (Aura*)nullptr*/);
 {
     int32 gain = 0;
 
@@ -8636,7 +8636,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype)
                     float ownerSpeed = followed->GetSpeedRate(mtype);
                     if (speed < ownerSpeed || creature->IsWithinDist3d(followed, 10.0f))
                         speed = ownerSpeed;
-                    speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - PET_FOLLOW_DIST) * 0.05f), 1.3f);
+                    speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - RandomPetFollowDist()) * 0.05f), 1.3f);
                 }
             }
         }

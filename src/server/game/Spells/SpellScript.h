@@ -24,6 +24,7 @@
 #include "Util.h"
 #include <memory>
 #include <stack>
+#include <variant>
 
 class Aura;
 class AuraApplication;
@@ -189,7 +190,12 @@ enum SpellScriptHookType
     SPELL_SCRIPT_HOOK_BEFORE_CAST,
     SPELL_SCRIPT_HOOK_ON_CAST,
     SPELL_SCRIPT_HOOK_ON_RESIST_ABSORB_CALCULATION,
-    SPELL_SCRIPT_HOOK_AFTER_CAST
+    SPELL_SCRIPT_HOOK_AFTER_CAST,
+    // New
+    SPELL_SCRIPT_HOOK_BEFORE_SPELL_LOAD,
+    SPELL_SCRIPT_HOOK_BEFORE_CAST_TIME,
+    SPELL_SCRIPT_HOOK_WHILE_CAST,
+    SPELL_SCRIPT_HOOK_AFTER_FULL_CHANNEL,
 };
 
 #define HOOK_SPELL_HIT_START SPELL_SCRIPT_HOOK_EFFECT_HIT
@@ -356,13 +362,23 @@ class TC_GAME_API SpellScript : public _SpellScript
         // SpellScript interface
         // hooks to which you can attach your functions
         //
+
+        // example: BeforeSpellLoad += SpellCastFn(class::function);
+        HookList<CastHandler> BeforeSpellLoad;
+        // example: BeforeCastTime += SpellCastFn(class::function);
+        HookList<CastHandler> BeforeCastTime;
+
         // example: BeforeCast += SpellCastFn(class::function);
         HookList<CastHandler> BeforeCast;
+        // example: WhileCast += SpellCastFn(class::function);
+        HookList<CastHandler> WhileCast;
         // example: OnCast += SpellCastFn(class::function);
         HookList<CastHandler> OnCast;
         // example: AfterCast += SpellCastFn(class::function);
         HookList<CastHandler> AfterCast;
         #define SpellCastFn(F) CastHandlerFunction(&F)
+        // example: AfterFullChannel += SpellCastFn(class::function);
+        HookList<CastHandler> AfterFullChannel;
 
         // example: OnCheckCast += SpellCheckCastFn();
         // where function is SpellCastResult function()
@@ -529,6 +545,8 @@ class TC_GAME_API SpellScript : public _SpellScript
         void FinishCast(SpellCastResult result, uint32* param1 = nullptr, uint32* param2 = nullptr);
 
         void SetCustomCastResultMessage(SpellCustomErrors result);
+
+        void RememberTriggeringSpell(Spell* spell)
 };
 
 // AuraScript interface - enum used for runtime checks of script function calls
@@ -561,6 +579,10 @@ enum AuraScriptHookType
     AURA_SCRIPT_HOOK_AFTER_PROC,
     /*AURA_SCRIPT_HOOK_APPLY,
     AURA_SCRIPT_HOOK_REMOVE, */
+    AURA_SCRIPT_RESOURCE_CHANGE,
+    AURA_SCRIPT_AURA_ADDREMOVE,
+    AURA_SCRIPT_BEFORE_SPELL_CAST,
+    AURA_SCRIPT_ON_AURA_STACK,
 };
 /*
 #define HOOK_AURA_EFFECT_START HOOK_AURA_EFFECT_APPLY
@@ -588,6 +610,10 @@ class TC_GAME_API AuraScript : public _SpellScript
         typedef bool(CLASSNAME::*AuraCheckEffectProcFnType)(AuraEffect const*, ProcEventInfo&); \
         typedef void(CLASSNAME::*AuraProcFnType)(ProcEventInfo&); \
         typedef void(CLASSNAME::*AuraEffectProcFnType)(AuraEffect const*, ProcEventInfo&); \
+        typedef void(CLASSNAME::*OnResourceChangeFnType)(Powers power, int amount, PowerChangeReason reason, std::variant<Spell*, Aura*> reasonObj); \
+        typedef void(CLASSNAME::*AuraAddRemoveFnType)(Aura* aura, bool added); \
+        typedef void(CLASSNAME::*BeforeSpellCastFnType)(Spell* spell); \
+        typedef void(CLASSNAME::*OnAuraStackFnType)(Aura* aura, int16 amount);
 
         AURASCRIPT_FUNCTION_TYPE_DEFINES(AuraScript)
 
@@ -720,6 +746,45 @@ class TC_GAME_API AuraScript : public _SpellScript
                 AuraEffectProcFnType _EffectHandlerScript;
         };
 
+        class TC_GAME_API OnResourceChangeHandler
+        {
+              public:
+                OnResourceChangeHandler(OnResourceChangeFnType onResourceChangeScript);
+                void Call(AuraScript* auraScript, Powers power, int amount, PowerChangeReason reason,
+                          std::variant<Spell*, Aura*> reasonObj);
+
+              private:
+                OnResourceChangeFnType _OnResouceChangeHandlerScript;
+        };
+         
+        class TC_GAME_API AuraAddRemoveHandler
+        {
+              public:
+                AuraAddRemoveHandler(AuraAddRemoveFnType auraAddRemoveScript);
+                void Call(AuraScript* auraScript, Aura* aura, bool added);
+
+              private:
+                AuraAddRemoveFnType _AuraAddRemoveHandlerScript;
+        };
+        class TC_GAME_API BeforeSpellCastHandler
+        {
+              public:
+                BeforeSpellCastHandler(BeforeSpellCastFnType beforeMoevementPacketScript);
+                void Call(AuraScript* auraScript, Spell* spell);
+
+              private:
+                BeforeSpellCastFnType _BeforeSpellCastHandlerScript;
+        }; 
+
+        class TC_GAME_API OnAuraStackHandler
+        {
+              public:
+                OnAuraStackHandler(OnAuraStackFnType onMoevementPacketScript);
+                void Call(AuraScript* auraScript, Aura* aura, int16 amount);
+
+              private:
+                OnAuraStackFnType _OnAuraStackHandlerScript;
+        };
         #define AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME) \
         class CheckAreaTargetFunction : public AuraScript::CheckAreaTargetHandler { public: explicit CheckAreaTargetFunction(AuraCheckAreaTargetFnType _pHandlerScript) : AuraScript::CheckAreaTargetHandler((AuraScript::AuraCheckAreaTargetFnType)_pHandlerScript) { } }; \
         class AuraDispelFunction : public AuraScript::AuraDispelHandler { public: explicit AuraDispelFunction(AuraDispelFnType _pHandlerScript) : AuraScript::AuraDispelHandler((AuraScript::AuraDispelFnType)_pHandlerScript) { } }; \
@@ -736,6 +801,11 @@ class TC_GAME_API AuraScript : public _SpellScript
         class CheckEffectProcHandlerFunction : public AuraScript::CheckEffectProcHandler { public: explicit CheckEffectProcHandlerFunction(AuraCheckEffectProcFnType handlerScript, uint8 effIndex, uint16 effName) : AuraScript::CheckEffectProcHandler((AuraScript::AuraCheckEffectProcFnType)handlerScript, effIndex, effName) { } }; \
         class AuraProcHandlerFunction : public AuraScript::AuraProcHandler { public: explicit AuraProcHandlerFunction(AuraProcFnType handlerScript) : AuraScript::AuraProcHandler((AuraScript::AuraProcFnType)handlerScript) { } }; \
         class EffectProcHandlerFunction : public AuraScript::EffectProcHandler { public: explicit EffectProcHandlerFunction(AuraEffectProcFnType effectHandlerScript, uint8 effIndex, uint16 effName) : AuraScript::EffectProcHandler((AuraScript::AuraEffectProcFnType)effectHandlerScript, effIndex, effName) { } }
+        
+        class OnResourceChangeFunction : public AuraScript::OnResourceChangeHandler { public: OnResourceChangeFunction(OnResourceChangeFnType onResourceChangeScript) : AuraScript::OnResourceChangeHandler((AuraScript::OnResourceChangeFnType)onResourceChangeScript) {} }; \
+        class AuraAddRemoveFunction : public AuraScript::AuraAddRemoveHandler { public: AuraAddRemoveFunction(AuraAddRemoveFnType auraAddRemoveScript) : AuraScript::AuraAddRemoveHandler((AuraScript::AuraAddRemoveFnType)auraAddRemoveScript) {} }; \
+        class BeforeSpellCastFunction : public AuraScript::BeforeSpellCastHandler { public: BeforeSpellCastFunction(BeforeSpellCastFnType BeforeSpellCastScript) : AuraScript::BeforeSpellCastHandler((AuraScript::BeforeSpellCastFnType)BeforeSpellCastScript) {} }; \
+        class OnAuraStackFunction : public AuraScript::OnAuraStackHandler { public: OnAuraStackFunction(OnAuraStackFnType OnAuraStackScript) : AuraScript::OnAuraStackHandler((AuraScript::OnAuraStackFnType)OnAuraStackScript) {} }; \
 
         #define PrepareAuraScript(CLASSNAME) AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) AURASCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME)
 
@@ -901,6 +971,31 @@ class TC_GAME_API AuraScript : public _SpellScript
         // where function is: void function(AuraEffect const* aurEff, ProcEventInfo& procInfo);
         HookList<EffectProcHandler> AfterEffectProc;
         #define AuraEffectProcFn(F, I, N) EffectProcHandlerFunction(&F, I, N)
+        
+        // executed after resource changes proced
+        // example: OnResourceChange += OnResourceChangeFn(class::function);
+        // where function is: void function (Powers power, int amount, PowerChangeReason reason, std::variant<Spell*, Aura*> reasonObj);
+        HookList<OnResourceChangeHandler> OnResourceChange;
+        #define OnResourceChangeFn(F) OnResourceChangeFunction(&F)
+         
+        // executed on another aura being added or removed
+        // example: AuraAddRemove += AuraAddRemoveFn(class::function);
+        // where function is: void function(Aura* aura, bool added);
+        HookList<AuraAddRemoveHandler> AuraAddRemove;
+        #define AuraAddRemoveFn(F) AuraAddRemoveFunction(&F)
+
+        // executed before spell cast while having this aura
+        // example: BeforeSpellCast += BeforeSpellCastFn(class::function);
+        // where function is: void function(Spell* spell);
+        HookList<BeforeSpellCastHandler> BeforeSpellCast;
+        #define BeforeSpellCastFn(F) BeforeSpellCastFunction(&F)
+         
+        // executed on aura stack change
+        // example: OnAuraStack += OnAuraStackFn(class::function);
+        // where function is: void function(Aura* aura, int16 amount);
+        HookList<OnAuraStackHandler> OnAuraStack;
+        #define OnAuraStackFn(F) OnAuraStackFunction(&F)
+
 
         // AuraScript interface - hook/effect execution manipulators
 

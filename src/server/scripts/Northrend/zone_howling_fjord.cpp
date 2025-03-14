@@ -82,7 +82,7 @@ struct npc_daegarn : public ScriptedAI
             if (Unit* owner = me->GetCharmerOrOwner())
             {
                 me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+                me->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), me->GetFollowAngle());
             }
             else
             {

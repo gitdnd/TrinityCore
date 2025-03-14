@@ -938,7 +938,7 @@ class TC_GAME_API Unit : public WorldObject
         void SetMaxPower(Powers power, uint32 val);
         inline void SetFullPower(Powers power) { SetPower(power, GetMaxPower(power)); }
         // returns the change in power
-        int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true);
+        int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true, PowerChangeReason reason = PowerChangeReason::REASON_NONE, std::variant<Spell*, Aura*> reasonObj = (Aura*)nullptr);
 
         uint32 GetAttackTime(WeaponAttackType att) const;
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME + int32(att), val * m_modAttackSpeedPct[att]); }
@@ -1987,6 +1987,51 @@ class TC_GAME_API Unit : public WorldObject
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
 
         /* Player Movement fields END*/
+
+
+      public:
+          // New Hooks
+          
+        void DoBeforeSpellCastScripts(Spell* spell);
+        void DoOnSpellCastScripts(Spell* spell);
+        void DoOnAuraStackScripts(Aura* aura, int16 amount);
+
+        // Spell Gem Supports
+        struct SpellSupports
+        {
+            SpellSupports(uint32 SpellSupportFunction, uint32 SupportData)
+                : SpellSupportFunction(SpellSupportFunction), SupportData(SupportData)
+            {
+
+            }
+            uint32 SpellSupportFunction = 0;
+            uint32 SupportData = 0;
+            uint8 Amount = 0;
+
+            bool ProcGeneric(float);
+
+            bool Proc20Pct();
+            bool Proc30Pct();
+            bool Proc40Pct();
+
+            using SpellSupportFunc = bool (SpellSupports::*)();
+
+            static inline std::map<uint32, SpellSupportFunc> AllSpellSupports = {   // needs to be bool
+                {1, &SpellSupports::Proc20Pct},
+                {2, &SpellSupports::Proc30Pct},
+                {3, &SpellSupports::Proc40Pct}};
+        };
+        std::map<uint32, SpellSupports> GemSupports = {};
+        std::vector<SpellSupports> GenericSupports = {};
+
+        bool ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 spell = 0, bool add = true);
+        void RecountSpellSupports();
+
+        // Remembering Last Spell used
+        const SpellInfo* _lastSpellUsed = nullptr;
+        void SetLastSpellUsed(const SpellInfo* spell) { _lastSpellUsed = spell; }
+        const SpellInfo* GetLastSpellUsed() { return _lastSpellUsed; }
+
 };
 
 namespace Trinity

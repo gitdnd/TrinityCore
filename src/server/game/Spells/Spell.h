@@ -665,6 +665,11 @@ class TC_GAME_API Spell
         void CallScriptObjectTargetSelectHandlers(WorldObject*& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         void CallScriptDestinationTargetSelectHandlers(SpellDestination& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         bool CheckScriptEffectImplicitTargets(uint32 effIndex, uint32 effIndexToCheck);
+
+        void CallScriptBeforeSpellLoadHandlers();
+        void CallScriptBeforeCastTimeHandlers();
+        void CallScriptWhileCastHandlers();
+        void CallScriptAfterFullChannelHandlers();
         std::vector<SpellScript*> m_loadedScripts;
 
         struct HitTriggerSpell
@@ -708,6 +713,37 @@ class TC_GAME_API Spell
 
         Spell(Spell const& right) = delete;
         Spell& operator=(Spell const& right) = delete;
+
+        // -------------------------------------------
+
+    public:
+
+        float h_bonusRange = 0;
+
+        void SetBonusRange(float range)
+        {
+            h_bonusRange = range;
+        }
+        float GetTotalMaxRange(bool positive = false, WorldObject* caster = nullptr, Spell* spell = nullptr)
+        {
+            return m_spellInfo->GetMaxRange(positive, caster, spell) + h_bonusRange;
+        }
+
+        void SetBonusValue(uint32 amount)
+        {
+            h_bonusValue = amount;
+        }
+        uint32 GetBonusValue()
+        {
+            return h_bonusValue;
+        }
+        uint32 h_bonusValue = 0;
+
+        uint32 h_triggeringSpell = 0;
+        void SetTriggeringSpell(uint32 spell)
+        {
+            h_triggeringSpell = spell;
+        }
 };
 
 namespace Trinity

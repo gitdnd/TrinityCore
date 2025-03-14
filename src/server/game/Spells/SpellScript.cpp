@@ -738,6 +738,12 @@ void SpellScript::SetCustomCastResultMessage(SpellCustomErrors result)
     m_spell->m_customError = result;
 }
 
+void SpellScript::RememberTriggeringSpell(Spell* spell)
+{
+    uint32 spellId = (GetSpellInfo()->Id);
+    spell->SetTriggeringSpell(spellId);
+}
+
 bool AuraScript::_Validate(SpellInfo const* entry)
 {
     for (auto itr = DoCheckAreaTarget.begin(); itr != DoCheckAreaTarget.end();  ++itr)
@@ -998,6 +1004,49 @@ AuraScript::AuraProcHandler::AuraProcHandler(AuraProcFnType handlerScript)
 {
     _HandlerScript = handlerScript;
 }
+
+AuraScript::OnResourceChangeHandler::OnResourceChangeHandler(OnResourceChangeFnType onResourceChangeScript)
+{
+    _OnResouceChangeHandlerScript = onResourceChangeScript;
+}
+
+void AuraScript::OnResourceChangeHandler::Call(AuraScript* auraScript, Powers power, int amount,
+                                               PowerChangeReason reason, std::variant<Spell*, Aura*> reasonObj)
+{
+    (auraScript->*_OnResouceChangeHandlerScript)(power, amount, reason, reasonObj);
+}
+
+AuraScript::AuraAddRemoveHandler::AuraAddRemoveHandler(AuraAddRemoveFnType auraAddRemoveScript)
+{
+    _AuraAddRemoveHandlerScript = auraAddRemoveScript;
+}
+
+void AuraScript::AuraAddRemoveHandler::Call(AuraScript* auraScript, Aura* aura, bool added)
+{
+    (auraScript->*_AuraAddRemoveHandlerScript)(aura, added);
+}
+
+AuraScript::BeforeSpellCastHandler::BeforeSpellCastHandler(BeforeSpellCastFnType BeforeSpellCastScript)
+{
+    _BeforeSpellCastHandlerScript = BeforeSpellCastScript;
+}
+
+void AuraScript::BeforeSpellCastHandler::Call(AuraScript* auraScript, Spell* spell)
+{
+    (auraScript->*_BeforeSpellCastHandlerScript)(spell);
+}
+
+
+AuraScript::OnAuraStackHandler::OnAuraStackHandler(OnAuraStackFnType OnAuraStackHandlerScript)
+{
+    _OnAuraStackHandlerScript = OnAuraStackHandlerScript;
+}
+
+void AuraScript::OnAuraStackHandler::Call(AuraScript* auraScript, Aura* aura, int16 amount)
+{
+    (auraScript->*_OnAuraStackHandlerScript)(aura, amount);
+}
+
 
 void AuraScript::AuraProcHandler::Call(AuraScript* auraScript, ProcEventInfo& eventInfo)
 {

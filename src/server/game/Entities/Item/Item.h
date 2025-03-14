@@ -25,6 +25,7 @@
 #include "ItemEnchantmentMgr.h"
 #include "ItemTemplate.h"
 #include "Loot.h"
+#include "SupportGem.h"
 
 class SpellInfo;
 class Bag;
@@ -220,5 +221,8 @@ class TC_GAME_API Item : public Object
         uint32 m_paidMoney;
         uint32 m_paidExtendedCost;
         GuidSet allowedGUIDs;
+
+    public:
+        std::vector<SupportGem> h_allSupportGems;
 };
 #endif

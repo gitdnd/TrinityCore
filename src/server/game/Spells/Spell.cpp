@@ -1072,17 +1072,17 @@ void Spell::SelectImplicitNearbyTargets(SpellEffectInfo const& spellEffectInfo, 
     switch (targetType.GetCheckType())
     {
         case TARGET_CHECK_ENEMY:
-            range = m_spellInfo->GetMaxRange(false, m_caster, this);
+            range = GetTo   talMaxRange(false, m_caster, this);
             break;
         case TARGET_CHECK_ALLY:
         case TARGET_CHECK_PARTY:
         case TARGET_CHECK_RAID:
         case TARGET_CHECK_RAID_CLASS:
-            range = m_spellInfo->GetMaxRange(true, m_caster, this);
+            range = GetTotalMaxRange(true, m_caster, this);
             break;
         case TARGET_CHECK_ENTRY:
         case TARGET_CHECK_DEFAULT:
-            range = m_spellInfo->GetMaxRange(IsPositive(), m_caster, this);
+            range = GetTotalMaxRange(IsPositive(), m_caster, this);
             break;
         default:
             ABORT_MSG("Spell::SelectImplicitNearbyTargets: received not implemented selection check type");
@@ -1216,7 +1216,7 @@ void Spell::SelectImplicitConeTargets(SpellEffectInfo const& spellEffectInfo, Sp
     float radius = spellEffectInfo.CalcRadius(m_caster);
     // Workaround for some spells that don't have RadiusEntry set in dbc (but SpellRange instead)
     if (G3D::fuzzyEq(radius, 0.f))
-        radius = m_spellInfo->GetMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
+        radius = GetTotalMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
 
     radius *= m_spellValue->RadiusMod;
 
@@ -1307,7 +1307,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffectInfo const& spellEffectInfo, Sp
     float radius = spellEffectInfo.CalcRadius(m_caster);
     // Workaround for some spells that don't have RadiusEntry set in dbc (but SpellRange instead)
     if (G3D::fuzzyEq(radius, 0.f))
-        radius = m_spellInfo->GetMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
+        radius = GetTotalMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
 
     radius *= m_spellValue->RadiusMod;
 
@@ -1368,7 +1368,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffectInfo const& spellEffectIn
         case TARGET_DEST_CASTER_FISHING:
         {
             float minDist = m_spellInfo->GetMinRange(true);
-            float maxDist = m_spellInfo->GetMaxRange(true);
+            float maxDist = GetTotalMaxRange(true);
             float dist = frand(minDist, maxDist);
             float x, y, z;
             float angle = float(rand_norm()) * static_cast<float>(M_PI * 35.0f / 180.0f) - static_cast<float>(M_PI * 17.5f / 180.0f);
@@ -1423,7 +1423,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffectInfo const& spellEffectIn
             switch (targetType.GetTarget())
             {
                 case TARGET_DEST_CASTER_SUMMON:
-                    dist = PET_FOLLOW_DIST;
+                    dist = RandomPetFollowDist();
                     break;
                 case TARGET_DEST_CASTER_RANDOM:
                     if (dist > objSize)
@@ -1671,7 +1671,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffectInfo const& spellEffectInfo, Sp
 
     // We should check if triggered spell has greater range (which is true in many cases, and initial spell has too short max range)
     // limit max range to 300 yards, sometimes triggered spells can have 50000yds
-    float bestDist = m_spellInfo->GetMaxRange(false);
+    float bestDist = GetTotalMaxRange(false);
     if (SpellInfo const* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellEffectInfo.TriggerSpell))
         bestDist = std::min(std::max(bestDist, triggerSpellInfo->GetMaxRange(false)), std::min(dist2d, 300.0f));
 
@@ -2999,7 +2999,7 @@ bool Spell::UpdateChanneledTargetList()
     float range = 0;
     if (channelAuraMask)
     {
-        range = m_spellInfo->GetMaxRange(IsPositive());
+        range = GetTotalMaxRange(IsPositive());
         if (Player* modOwner = m_caster->GetSpellModOwner())
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, range, this);
 
@@ -5643,7 +5643,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                         return SPELL_FAILED_LINE_OF_SIGHT;
 
                     float objSize = target->GetCombatReach();
-                    float range = m_spellInfo->GetMaxRange(true, unitCaster, this) * 1.5f + objSize; // can't be overly strict
+                    float range = GetTotalMaxRange(true, unitCaster, this) * 1.5f + objSize; // can't be overly strict
 
                     m_preGeneratedPath = std::make_unique<PathGenerator>(unitCaster);
                     m_preGeneratedPath->SetPathLengthLimit(range);
@@ -7933,6 +7933,67 @@ void Spell::LoadScripts()
     }
 }
 
+void Spell::CallScriptBeforeSpellLoadHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_SPELL_LOAD);
+        auto hookItrEnd = (*scritr)->BeforeSpellLoad.end(),
+                                                      hookItr    = (*scritr)->BeforeSpellLoad.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptBeforeCastTimeHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_CAST_TIME);
+        auto hookItrEnd = (*scritr)->BeforeCastTime.end(),
+                                                      hookItr    = (*scritr)->BeforeCastTime.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptWhileCastHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_WHILE_CAST);
+        auto hookItrEnd = (*scritr)->WhileCast.end(),
+                                                      hookItr    = (*scritr)->WhileCast.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptAfterFullChannelHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_AFTER_CAST);
+        auto hookItrEnd = (*scritr)->AfterFullChannel.end(),
+                                                      hookItr    = (*scritr)->AfterFullChannel.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            (*hookItr).Call(*scritr);
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
 void Spell::CallScriptBeforeCastHandlers()
 {
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
@@ -7945,7 +8006,6 @@ void Spell::CallScriptBeforeCastHandlers()
         (*scritr)->_FinishScriptCall();
     }
 }
-
 void Spell::CallScriptOnCastHandlers()
 {
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)

@@ -537,6 +537,41 @@ enum ItemSubclassGlyph
     ITEM_SUBCLASS_GLYPH_DRUID                   = 11
 };
 
+enum GemTag
+{
+    TAG_PHYS = 1,
+    TAG_HOLY = 2,
+    TAG_FIRE = 3,
+    TAG_NATURE = 4,
+    TAG_FROST = 5,
+    TAG_SHADOW = 6,
+    TAG_ARCANE = 7,
+
+    TAG_STRIKE = 8,
+    TAG_SHOOT = 9,
+    TAG_BOLT = 10,
+    TAG_HEAL = 11,
+    TAG_ABSORB = 12,
+    TAG_MINIBUFF = 13,
+    TAG_LONGBUFF = 14,
+    TAG_DEFENSIVECD = 15,
+    TAG_OFFENSIVECD = 16,
+
+    TAG_SLAM = 17,
+    TAG_FIELD = 18,
+    TAG_RAIN = 19,
+    TAG_AREAEXPLOSION = 20,
+    TAG_CHAIN = 21, 
+    TAG_SUMMON = 22, // ghoul
+    TAG_MULTIPLICIOUS = 23, // arcane missiles
+    TAG_MASSIVE = 24, // Pyroblast
+    TAG_BLAST = 25, // Shamanshocks, Fireblast
+
+    TAG_BASIC = 28, // Frost Strike
+    TAG_ADVANCED = 29, // Cone of Cold
+    TAG_EXPERT = 30, // Summon Gargoyle
+    TAG_ULTIMATE = 31, // Army of the Dead
+};
 #define MAX_ITEM_SUBCLASS_GLYPH                   12
 
 const uint32 MaxItemSubclassValues[MAX_ITEM_CLASS] =
@@ -717,6 +752,9 @@ private:
 
     // Loading Helpers
     void _LoadTotalAP();
+
+public:
+    std::set<GemTag> GemTags = {};
 };
 
 struct ItemLocale
