@@ -1990,6 +1990,7 @@ class TC_GAME_API Unit : public WorldObject
 
         /* Player Movement fields END*/
 
+        struct SpellSupports;
 
       public:
           // New Hooks
@@ -1998,48 +1999,56 @@ class TC_GAME_API Unit : public WorldObject
         void DoOnSpellCastScripts(Spell* spell);
         void DoOnAuraStackScripts(Aura* aura, int16 amount);
 
-        // Spell Gem Supports
-        struct SpellSupports
-        {
-            SpellSupports(uint32 SpellSupportFunction, uint32 SupportData, uint32 Phase)
-            : SpellSupportFunction(SpellSupportFunction), SupportData(SupportData), Phase(Phase)
-            {
-
-            }
-            enum SupportPhase : uint8
-            {
-                BEFORE_SPELL_LOAD = 1,
-            };
-            uint32 SpellSupportFunction = 0;
-            uint32 SupportData = 0;
-            uint32 Phase = 0;
-            uint8 Amount = 0;
-
-            bool ProcGeneric(float);
-
-            bool Proc20Pct();
-            bool Proc30Pct();
-            bool Proc40Pct();
-
-            using SpellSupportFunc = bool (SpellSupports::*)();
-
-            static inline std::map<uint32, SpellSupportFunc> AllSpellSupports = {   // needs to be bool
-                {1, &SpellSupports::Proc20Pct},
-                {2, &SpellSupports::Proc30Pct},
-                {3, &SpellSupports::Proc40Pct}};
-
-        };
         std::map<uint32, SpellSupports> GemSupports = {};
         std::vector<SpellSupports> GenericSupports = {};
 
+        void CastSpellFromSupport(Spell* spell);
         bool ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase, uint32 spell = 0, bool add = true);
         void RecountSpellSupports();
-
         // Remembering Last Spell used
         const SpellInfo* _lastSpellUsed = nullptr;
         void SetLastSpellUsed(const SpellInfo* spell) { _lastSpellUsed = spell; }
         const SpellInfo* GetLastSpellUsed() { return _lastSpellUsed; }
 
+};
+
+// Spell Gem Supports
+struct SpellSupports
+{
+        Unit* Owner;
+
+        SpellSupports(Unit* Owner, uint32 SpellSupportFunction, uint32 SupportData, uint32 Phase)
+        : Owner(Owner), SpellSupportFunction(SpellSupportFunction), SupportData(SupportData), Phase(Phase)
+        {
+        }
+        enum SupportPhase : uint32
+        {
+            NONE              = 0x00,
+            BEFORE_SPELL_LOAD = (1 << 1),
+            ON_HIT            = (1 << 2),
+            AFTER_CAST_TIME   = (1 << 3),
+        };
+        SupportPhase ConvertEventToPhase(uint32 event);
+        uint32 SpellSupportFunction = 0;
+        uint32 SupportData          = 0;
+        uint32 Phase                = 0;
+        uint8 Amount                = 0;
+
+        void DoSupport(Spell* spell, uint32 phase);
+
+        // SupportList
+        bool ProcGeneric(float);
+
+        bool Proc20Pct();
+        bool Proc30Pct();
+        bool Proc40Pct();
+
+        using SpellSupportFunc = bool (SpellSupports::*)();
+
+        static inline std::map<uint32, SpellSupportFunc> AllSpellSupports = { // needs to be bool
+            {1, &SpellSupports::Proc20Pct},
+            {2, &SpellSupports::Proc30Pct},
+            {3, &SpellSupports::Proc40Pct}};
 };
 
 namespace Trinity

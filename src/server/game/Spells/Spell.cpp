@@ -5181,6 +5181,7 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGoT
 
     if (!preventDefault)
         (this->*SpellEffectHandlers[spellEffectInfo.Effect])();
+
 }
 
 SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint32* param2 /*= nullptr*/)
@@ -8095,6 +8096,19 @@ bool Spell::CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMo
 {
     // execute script effect handler hooks and check if effects was prevented
     bool preventDefault = false;
+    Unit* unit          = GetCaster()->ToUnit();
+    if (unit)
+    {
+        if (unit->GemSupports.contains(GetSpellInfo()->Id))
+        {
+            auto& supp = unit->GemSupports[GetSpellInfo()->Id];
+            supp.DoSupport(this, mode);
+        }
+        for (auto& supp : unit->GenericSupports)
+        {
+            supp.DoSupport(this, mode);
+        }
+    }
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_InitHit();

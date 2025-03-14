@@ -1,24 +1,6 @@
 #include "Unit.h"
 #include "Player.h"
 
-void CastSpell()
-{
-    if (Crit)
-        if (Player* player = GetCaster()->ToPlayer())
-        {
-            if (uint32 critId = player->GetCritCast(m_spellInfo->Id))
-            {
-                TriggerCastFlags static const flags = TriggerCastFlags(
-                    TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY |
-                    TRIGGERED_IGNORE_SET_FACING | TRIGGERED_DONT_REPORT_CAST_ERROR);
-                if (m_targets.GetUnitTarget())
-                    player->CastSpell(m_targets.GetUnitTarget(), critId, flags);
-                else if (WorldLocation const* pos = m_targets.GetDstPos())
-                    player->CastSpell(pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), critId, flags);
-            }
-        }
-}
-}
 void Unit::DoBeforeSpellCastScripts(Spell* spell)
 {
     CallScriptIteration(CallScriptBeforeSpellCast(spell));
@@ -34,25 +16,53 @@ void Unit::DoOnAuraStackScripts(Aura* aura, int16 amount)
     CallScriptIteration(CallScriptOnAuraStack(aura, amount));
 }
 
-bool SpellSupports::ProcGeneric(float chance)
+void Unit::CastSpellFromSupport(Spell* spell, uint32 id)
+{
+    TriggerCastFlags static const flags =
+        TriggerCastFlags(TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY |
+                         TRIGGERED_IGNORE_SET_FACING | TRIGGERED_DONT_REPORT_CAST_ERROR);
+    if (spell->m_targets.GetUnitTarget())
+        CastSpell(spell->m_targets.GetUnitTarget(), id, flags);
+    else if (WorldLocation const* pos = m_targets.GetDstPos())
+        player->CastSpell(spell->pos->GetPositionX(), spell->pos->GetPositionY(), spell->pos->GetPositionZ(), id, flags);
+}
+
+SpellSupports::SupportPhase Unit::ConvertEventToPhase(uint32 event)
+{
+    switch (event)
+    {
+        case SPELL_EFFECT_HANDLE_HIT:
+            return ON_HIT;
+        default:
+            return 0;
+    }
+}
+void SpellSupports::DoSupport(Spell* spell, uint32 phase)
+{
+    if (!ConvertEventToPhase(phase) & Phase)
+        return;
+    AllSupportSpells[SpellSupportFunction](spell);
+}
+bool SpellSupports::ProcGeneric(Spell* spell, float chance)
 {
     if (frand(1.f, 0.f) >= chance)
     {
+        Owner->CastSpellFromSupport(spell, supportData);
         return true
     }
     return false;
 }
-bool SpellSupports::Proc20Pct()
+bool SpellSupports::Proc20Pct(Spell* spell)
 {
-    ProcGeneric(0.2f);
+    return ProcGeneric(0.2f);
 }
-bool SpellSupports::Proc30Pct()
+bool SpellSupports::Proc30Pct(Spell* spell)
 {
-    ProcGeneric(0.3f);
+    return ProcGeneric(0.3f);
 }
-bool SpellSupports::Proc40Pct()
+bool SpellSupports::Proc40Pct(Spell* spell)
 {
-    ProcGeneric(0.4f);
+    return ProcGeneric(0.4f);
 }
 
 bool Unit::ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase, uint32 spell = 0, bool add = true)
@@ -62,7 +72,7 @@ bool Unit::ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase
         if (add)
         {
             if (!GemSupports.count(spell))
-                GemSupports.emplace(spell, SpellSupports(spellSupport, supportData, phase));
+                GemSupports.emplace(spell, SpellSupports(this, spellSupport, supportData, phase));
             GemSupports[spell].Amount++;
             return true;
         }
@@ -90,7 +100,7 @@ bool Unit::ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase
         {
             if (it == GenericSupports.end())
             {
-                GenericSupports.push_back(SpellSupports(spellSupport, supportData, phase));
+                GenericSupports.push_back(SpellSupports(this, spellSupport, supportData, phase));
             }
             it->Amount++;
             return true;

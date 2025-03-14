@@ -594,6 +594,11 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // DeserterTracker
     PrepareStatement(CHAR_INS_DESERTER_TRACK, "INSERT INTO battleground_deserters (guid, type, datetime) VALUES (?, ?, NOW())", CONNECTION_ASYNC);
+
+    // HoT
+
+    PrepareStatement(CHAR_INS_SOCKET_SUPPORT, "INSERT INTO hot_support_gem (guid, spell, support_type, second_data, which_socket, cast_phase) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_SOCKET_SUPPORT, "DELETE FROM hot_support_gem WHERE guid = ?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

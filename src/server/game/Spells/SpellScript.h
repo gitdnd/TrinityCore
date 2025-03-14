@@ -546,7 +546,7 @@ class TC_GAME_API SpellScript : public _SpellScript
 
         void SetCustomCastResultMessage(SpellCustomErrors result);
 
-        void RememberTriggeringSpell(Spell* spell)
+        void RememberTriggeringSpell(Spell* spell);
 };
 
 // AuraScript interface - enum used for runtime checks of script function calls

@@ -358,6 +358,23 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 ssEnchants << GetEnchantmentDuration(EnchantmentSlot(i)) << ' ';
                 ssEnchants << GetEnchantmentCharges(EnchantmentSlot(i)) << ' ';
             }
+
+
+            CharacterDatabasePreparedStatement* stmt2 = nullptr;
+            for (auto itr = h_allSupportGems.begin(); itr != h_allSupportGems.end();)
+            {
+                stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_SOCKET_SUPPORT);
+                //guid, spell, support_type, second_data, which_socket, cast_phase
+                stmt->setUInt32(0, GetGUID().GetCounter());
+                stmt->setUInt32(1, itr->Spell);
+                stmt->setUInt32(2, itr->SupportType);
+                stmt->setUInt32(3, itr->SecondData);
+                stmt->setUInt8(4, itr->WhichSocket);
+                stmt->setUInt32(5, itr->Phase);
+                trans->Append(stmt2);
+                itr++;
+            }
+
             stmt->setString(++index, ssEnchants.str());
 
             stmt->setInt16 (++index, GetItemRandomPropertyId());
@@ -389,6 +406,10 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 stmt->setUInt32(0, guid);
                 trans->Append(stmt);
             }
+
+            CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_DEL_SOCKET_SUPPORT);
+            stmt->setUInt32(0, guid);
+            trans->Append(stmt2);
 
             if (!isInTransaction)
                 CharacterDatabase.CommitTransaction(trans);
@@ -500,6 +521,29 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
         stmt->setUInt32(3, guid);
         CharacterDatabase.Execute(stmt);
     }
+
+    
+    uint32 oldMSTime = getMSTime();
+
+
+    QueryResult result = WorldDatabase.Query("SELECT spell, support_type, second_data, which_socket, cast_phase FROM hot_support_gem WHERE guid = " + GetGUID().GetCounter());
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        SupportGem Gem;
+        Gem.Spell = fields[0].GetUInt32();
+        Gem.SupportType = fields[1].GetUInt32();
+        Gem.SecondData  = fields[2].GetUInt32();
+        Gem.WhichSocket = fields[3].GetUInt8();
+        Gem.Phase       = fields[4].GetUInt32();
+
+
+
+    } while (result->NextRow());
 
     return true;
 }
