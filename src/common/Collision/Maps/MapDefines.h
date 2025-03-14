@@ -47,6 +47,7 @@ static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
                                          sizeof(MmapTileHeader::usesLiquids) +
                                          sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
 
+
 enum NavArea
 {
     NAV_AREA_EMPTY          = 0,

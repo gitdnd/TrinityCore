@@ -2560,6 +2560,19 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         uint32 manaBeforeDuel;
 
         WorldLocation _corpseLocation;
+
+    public:
+        
+        uint8 doubleJumps = 0;
+        uint8 doubleJumpsMax = 0;
+
+        uint8 CanDoubleJump() { return doubleJumps < doubleJumpsMax; }
+        void AddDoubleJump() { doubleJumps++; }
+        void ModDoubleJumpMax(uint8 amount) { doubleJumpsMax += amount; }
+
+        uint32 quedSpell = 0;
+        void SetQuedSpell(uint32 spell) { quedSpell = spell; }
+        uint32 GetQuedSpell() { return quedSpell; }
 };
 
 TC_GAME_API void AddItemsSetItem(Player* player, Item* item);

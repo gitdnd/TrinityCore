@@ -1072,7 +1072,7 @@ void Spell::SelectImplicitNearbyTargets(SpellEffectInfo const& spellEffectInfo, 
     switch (targetType.GetCheckType())
     {
         case TARGET_CHECK_ENEMY:
-            range = GetTo   talMaxRange(false, m_caster, this);
+            range = GetTotalMaxRange(false, m_caster, this);
             break;
         case TARGET_CHECK_ALLY:
         case TARGET_CHECK_PARTY:
@@ -3043,6 +3043,8 @@ bool Spell::UpdateChanneledTargetList()
 
 SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const* triggeredByAura)
 {
+    InitExplicitTargets(targets);
+
     if (m_CastItem)
     {
         m_castItemGUID = m_CastItem->GetGUID();
@@ -3054,7 +3056,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         m_castItemEntry = 0;
     }
 
-    InitExplicitTargets(targets);
 
     // Fill aura scaling information
     if (Unit* unitCaster = m_caster->ToUnit())
@@ -3106,6 +3107,15 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
     }
 
     LoadScripts();
+
+    CallScriptBeforeSpellLoadHandlers();
+    if (h_skip)
+    {
+        SendCastResult(SPELL_FAILED_TRY_AGAIN);
+        finish(false);
+        cancel();
+        return SPELL_FAILED_UNKNOWN;
+    }
 
     // Fill cost data (do not use power for item casts)
     m_powerCost = m_CastItem ? 0 : m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask, this);
@@ -3186,6 +3196,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         }
     }
 
+    CallScriptBeforeCastTimeHandlers();
+    if (h_skip)
+        return SPELL_FAILED_ERROR;
     // set timer base at cast time
     ReSetTimer();
 
@@ -3216,6 +3229,13 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
             }
 
             unitCaster->SetCurrentCastSpell(this);
+            unitCaster->DoBeforeSpellCastScripts(this);
+            if (h_skip)
+            {
+                cancel();
+                return SPELL_FAILED_UNKNOWN;
+            }
+
         }
         SendSpellStart();
 
@@ -3234,7 +3254,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         if (!m_casttime && /*!m_spellInfo->StartRecoveryTime && */ GetCurrentContainer() == CURRENT_GENERIC_SPELL)
             cast(true);
     }
-
     return SPELL_CAST_OK;
 }
 
@@ -3445,8 +3464,8 @@ void Spell::_cast(bool skipCheck)
         SetExecutedCurrently(false);
         return;
     }
-
-    if (Unit* unitCaster = m_caster->ToUnit())
+    Unit* unitCaster = m_caster->ToUnit();
+    if (unitCaster)
         if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
             if (Creature* pet = ObjectAccessor::GetCreature(*m_caster, unitCaster->GetPetGUID()))
                 pet->DespawnOrUnsummon();
@@ -3458,8 +3477,8 @@ void Spell::_cast(bool skipCheck)
     // traded items have trade slot instead of guid in m_itemTargetGUID
     // set to real guid to be sent later to the client
     m_targets.UpdateTradeSlotItem();
-
-    if (Player* player = m_caster->ToPlayer())
+    Player* player = m_caster->ToPlayer();
+    if (player)
     {
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CAST_ITEM) && m_CastItem)
         {
@@ -3525,7 +3544,7 @@ void Spell::_cast(bool skipCheck)
         {
             if (id < 0)
             {
-                if (Unit* unitCaster = m_caster->ToUnit())
+                if (unitCaster = m_caster->ToUnit())
                     unitCaster->RemoveAurasDueToSpell(-id);
             }
             else
@@ -3543,6 +3562,16 @@ void Spell::_cast(bool skipCheck)
     }
 
     SetExecutedCurrently(false);
+
+    if (player)
+    {
+        if (player->GetQuedSpell() != 0)
+        {
+            player->CastSpell(player, playerCaster->GetQuedSpell(), false);
+            player->SetQuedSpell(0);
+        }
+    }
+    unitCaster->SetLastSpellUsed(m_spellInfo);
 
     if (!m_originalCaster)
         return;
@@ -3829,10 +3858,14 @@ void Spell::update(uint32 difftime)
                 if (difftime >= (uint32)m_timer)
                     m_timer = 0;
                 else
+                {
+                    CallScriptWhileCastHandlers();
                     m_timer -= difftime;
+                }
+
             }
 
-            if (m_timer == 0 && !m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat())
+            if (m_timer <= 0 && !m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat())
                 // don't CheckCast for instant spells - done in spell::prepare, skip duplicate checks, needed for range checks for example
                 cast(!m_casttime);
             break;
@@ -3858,11 +3891,14 @@ void Spell::update(uint32 difftime)
                     if (difftime >= (uint32)m_timer)
                         m_timer = 0;
                     else
+                    {
                         m_timer -= difftime;
+                        CallScriptWhileCastHandlers();
+                    }
                 }
             }
 
-            if (m_timer == 0)
+            if (m_timer <= 0)
             {
                 SendChannelUpdate(0);
                 finish();
@@ -3962,6 +3998,10 @@ void Spell::finish(bool ok)
     // Stop Attack for some spells
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET))
         unitCaster->AttackStop();
+
+    CallScriptAfterFullChannelHandlers();
+    CallScriptAfterCastHandlers(); // consider putting this back Idk where it was lmao
+    unitCaster->DoOnSpellCastScripts(this);
 }
 
 void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError, uint32* param1 /*= nullptr*/, uint32* param2 /*= nullptr*/)
@@ -4840,7 +4880,7 @@ void Spell::TakePower()
         return;
     }
 
-    unitCaster->ModifyPower(powerType, -m_powerCost);
+    unitCaster->ModifyPower(powerType, -m_powerCost, true, PowerChangeReason::REASON_SPELL_COST, this);
 
     // Set the five second timer
     if (powerType == POWER_MANA && m_powerCost > 0)

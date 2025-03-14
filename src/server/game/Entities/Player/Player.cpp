@@ -25002,6 +25002,8 @@ void Player::HandleFall(MovementInfo const& movementInfo)
     float z_diff = m_lastFallZ - movementInfo.pos.GetPositionZ();
     //TC_LOG_DEBUG("zDiff = {}", z_diff);
 
+    doubleJumps = 0;
+
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
     if (z_diff >= 14.57f && !isDead() && !IsGameMaster() &&

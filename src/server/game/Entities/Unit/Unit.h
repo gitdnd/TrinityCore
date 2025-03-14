@@ -936,7 +936,10 @@ class TC_GAME_API Unit : public WorldObject
         int32 CountPctFromMaxPower(Powers power, int32 pct) const { return CalculatePct(GetMaxPower(power), pct); }
         void SetPower(Powers power, uint32 val, bool withPowerUpdate = true, bool force = false);
         void SetMaxPower(Powers power, uint32 val);
-        inline void SetFullPower(Powers power) { SetPower(power, GetMaxPower(power)); }
+        inline void SetFullPower(Powers power)
+        {
+            SetPower(power, GetMaxPower(power));
+        };
         // returns the change in power
         int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true, PowerChangeReason reason = PowerChangeReason::REASON_NONE, std::variant<Spell*, Aura*> reasonObj = (Aura*)nullptr);
 
@@ -1176,8 +1179,7 @@ class TC_GAME_API Unit : public WorldObject
         void SendHealSpellLog(HealInfo& healInfo, bool critical = false);
         int32 HealBySpell(HealInfo& healInfo, bool critical = false);
         void SendEnergizeSpellLog(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
-        void EnergizeBySpell(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
-        void EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damage, Powers powerType);
+        void EnergizeBySpell(Unit* victim, Spell* spell, uint32 Damage, Powers powerType);
 
         Aura* AddAura(uint32 spellId, Unit* target);
         Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);

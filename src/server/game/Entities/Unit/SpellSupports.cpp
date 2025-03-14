@@ -1,6 +1,24 @@
 #include "Unit.h"
 #include "Player.h"
 
+void CastSpell()
+{
+    if (Crit)
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (uint32 critId = player->GetCritCast(m_spellInfo->Id))
+            {
+                TriggerCastFlags static const flags = TriggerCastFlags(
+                    TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY |
+                    TRIGGERED_IGNORE_SET_FACING | TRIGGERED_DONT_REPORT_CAST_ERROR);
+                if (m_targets.GetUnitTarget())
+                    player->CastSpell(m_targets.GetUnitTarget(), critId, flags);
+                else if (WorldLocation const* pos = m_targets.GetDstPos())
+                    player->CastSpell(pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), critId, flags);
+            }
+        }
+}
+}
 void Unit::DoBeforeSpellCastScripts(Spell* spell)
 {
     CallScriptIteration(CallScriptBeforeSpellCast(spell));

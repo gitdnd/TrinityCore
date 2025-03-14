@@ -847,7 +847,7 @@ void Aura::Update(uint32 diff, Unit* caster)
                             Remove();
                     }
                     else if (int32(caster->GetPower(powertype)) >= manaPerSecond)
-                        caster->ModifyPower(powertype, -manaPerSecond);
+                        caster->ModifyPower(powertype, -manaPerSecond, true, PowerChangeReason::REASON_AURA_EFFECT, this);
                     else
                         Remove();
                 }
@@ -1017,6 +1017,7 @@ void Aura::SetStackAmount(uint8 stackAmount)
         if (!aurApp->GetRemoveMode())
             HandleAuraSpecificMods(aurApp, caster, true, true);
 
+    GetCaster()->DoOnAuraStackScripts(this, m_stackAmount);
     SetNeedClientUpdateForTargets();
 }
 
@@ -2554,11 +2555,10 @@ void Aura::CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
 bool Aura::CallScriptOnResourceChange(Powers power, int amount, PowerChangeReason reason,
                                       std::variant<Spell*, Aura*> reasonObj)
 {
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_PrepareScriptCall(AURA_SCRIPT_RESOURCE_CHANGE);
-        std::list<AuraScript::OnResourceChangeHandler>::iterator hookItrEnd = (*scritr)->OnResourceChange.end(),
-                                                                 hookItr    = (*scritr)->OnResourceChange.begin();
+        auto hookItrEnd = (*scritr)->OnResourceChange.end(), hookItr = (*scritr)->OnResourceChange.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
             hookItr->Call(*scritr, power, amount, reason, reasonObj);
 
@@ -2570,11 +2570,10 @@ bool Aura::CallScriptOnResourceChange(Powers power, int amount, PowerChangeReaso
 } 
 bool Aura::CallScriptAuraAddRemove(Aura* aura, bool added)
 {
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_PrepareScriptCall(AURA_SCRIPT_AURA_ADDREMOVE);
-        std::list<AuraScript::AuraAddRemoveHandler>::iterator hookItrEnd = (*scritr)->AuraAddRemove.end(),
-                                                              hookItr    = (*scritr)->AuraAddRemove.begin();
+        auto hookItrEnd = (*scritr)->AuraAddRemove.end(), hookItr = (*scritr)->AuraAddRemove.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
             hookItr->Call(*scritr, aura, added);
 
@@ -2586,11 +2585,10 @@ bool Aura::CallScriptAuraAddRemove(Aura* aura, bool added)
 }
 bool Aura::CallScriptBeforeSpellCast(Spell* spell)
 {
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_PrepareScriptCall(AURA_SCRIPT_BEFORE_SPELL_CAST);
-        std::list<AuraScript::BeforeSpellCastHandler>::iterator hookItrEnd = (*scritr)->BeforeSpellCast.end(),
-                                                                hookItr    = (*scritr)->BeforeSpellCast.begin();
+        auto hookItrEnd = (*scritr)->BeforeSpellCast.end(), hookItr = (*scritr)->BeforeSpellCast.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
             hookItr->Call(*scritr, spell);
 
@@ -2602,11 +2600,10 @@ bool Aura::CallScriptBeforeSpellCast(Spell* spell)
 } 
 bool Aura::CallScriptOnAuraStack(Aura* aura, int16 amount)
 {
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_PrepareScriptCall(AURA_SCRIPT_ON_AURA_STACK);
-        std::list<AuraScript::OnAuraStackHandler>::iterator hookItrEnd = (*scritr)->OnAuraStack.end(),
-                                                            hookItr    = (*scritr)->OnAuraStack.begin();
+        auto hookItrEnd = (*scritr)->OnAuraStack.end(), hookItr = (*scritr)->OnAuraStack.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
             hookItr->Call(*scritr, aura, amount);
 

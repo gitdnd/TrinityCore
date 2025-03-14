@@ -3642,6 +3642,8 @@ void Unit::RemoveAura(AuraApplicationMap::iterator &i, AuraRemoveMode mode)
     // Remove aura - for Area and Target auras
     if (aura->GetOwner() == this)
         aura->Remove(mode);
+
+    CallScriptIteration(CallScriptAuraAddRemove(aura, false));
 }
 
 void Unit::RemoveAura(uint32 spellId, ObjectGuid caster, uint8 reqEffMask, AuraRemoveMode removeMode)
@@ -6432,19 +6434,19 @@ void Unit::SendEnergizeSpellLog(Unit* victim, uint32 spellId, int32 damage, Powe
     data << int32(damage);
     SendMessageToSet(&data, true);
 }
-
-void Unit::EnergizeBySpell(Unit* victim, uint32 spellId, int32 damage, Powers powerType)
+void Unit::EnergizeBySpell(Unit* victim, Spell* spell, uint32 damage, Powers powerType)
 {
-    if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
-        EnergizeBySpell(victim, info, damage, powerType);
+    int32 gainedPower = victim->ModifyPower(powerType, damage, false, PowerChangeReason::REASON_SPELL_GENERATED, spell);
+
+    if (powerType != POWER_HAPPINESS && gainedPower)
+    {
+        SpellInfo const* spellInfo = spell->m_spellInfo;
+        victim->GetThreatManager().ForwardThreatForAssistingMe(this, float(damage) / 2, spellInfo, true);
+    }
+
+    SendEnergizeSpellLog(victim, spell->m_spellInfo->Id, damage, powerType);
 }
 
-void Unit::EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damage, Powers powerType)
-{
-    victim->ModifyPower(powerType, damage, false);
-    victim->GetThreatManager().ForwardThreatForAssistingMe(this, float(damage)/2, spellInfo, true);
-    SendEnergizeSpellLog(victim, spellInfo->Id, damage, powerType);
-}
 
 uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 pdamage, DamageEffectType damagetype, SpellEffectInfo const& spellEffectInfo, Optional<float> const& donePctTotal, uint32 stack /*= 1*/) const
 {
@@ -8433,7 +8435,7 @@ int32 Unit::GetHealthGain(int32 dVal)
 }
 
 // returns negative amount on power reduction
-int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*/, PowerChangeReason reason /*= PowerChangeReason::REASON_NONE*/, std::variant<Spell*, Aura*> reasonObj /*= (Aura*)nullptr*/);
+int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*/, PowerChangeReason reason /*= PowerChangeReason::REASON_NONE*/, std::variant<Spell*, Aura*> reasonObj /*= (Aura*)nullptr*/)
 {
     int32 gain = 0;
 
@@ -13102,7 +13104,7 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
-    ModifyPower(POWER_RAGE, uint32(addRage * 10));
+    ModifyPower(POWER_RAGE, uint32(addRage * 10), true, PowerChangeReason::REASON_ATTACK_GENERATED);
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
