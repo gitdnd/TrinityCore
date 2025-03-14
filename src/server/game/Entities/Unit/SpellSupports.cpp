@@ -55,14 +55,14 @@ bool SpellSupports::Proc40Pct()
     ProcGeneric(0.4f);
 }
 
-bool Unit::ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 spell = 0, bool add = true)
+bool Unit::ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase, uint32 spell = 0, bool add = true)
 {
     if (spell)
     {
         if (add)
         {
             if (!GemSupports.count(spell))
-                GemSupports.emplace(spell, SpellSupports(spellSupport, supportData));
+                GemSupports.emplace(spell, SpellSupports(spellSupport, supportData, phase));
             GemSupports[spell].Amount++;
             return true;
         }
@@ -84,13 +84,13 @@ bool Unit::ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 spell
     {
         auto it =
             std::find_if(GenericSupports.begin(), GenericSupports.end(),
-                         [spellSupport, supportData](const SpellSupports& genSup)
-                         { return genSup.SpellSupportFunction == spellSupport && genSup.SupportData == supportData; });
+                         [spellSupport, supportData, phase](const SpellSupports& genSup)
+            { return genSup.SpellSupportFunction == spellSupport && genSup.SupportData == supportData&&, genSup.Phase == phase; });
         if (add)
         {
             if (it == GenericSupports.end())
             {
-                GenericSupports.push_back(SpellSupports(spellSupport, supportData));
+                GenericSupports.push_back(SpellSupports(spellSupport, supportData, phase));
             }
             it->Amount++;
             return true;
@@ -122,7 +122,7 @@ void Unit::RecountSpellSupports()
             if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 for (auto& supp : pItem->h_allSupportGems)
                 {
-                    ModSpellSupport(supp.SupportType, supp.SecondData, supp.Spell);
+                    ModSpellSupport(supp.SupportType, supp.SecondData, supp.Spell, supp.Phase);
                 }
     }
     else

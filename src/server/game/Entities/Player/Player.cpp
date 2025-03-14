@@ -7173,6 +7173,9 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply, bool updateItemA
 
     ApplyEnchantment(item, apply);
 
+    for (auto& supp : item->h_allSupportGems)
+        ModSpellSupport(supp.SupportType, supp.SecondData, supp.Spell, supp.Phase, apply);
+
     TC_LOG_DEBUG("entities.player.items", "Player::_ApplyItemMods: completed");
 }
 
@@ -12039,6 +12042,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             default:
                 break;
         }
+
+
     }
     else
     {
@@ -12229,6 +12234,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
         pItem->SetSlot(NULL_SLOT);
         if (IsInWorld() && update)
             pItem->SendUpdateToPlayer(this);
+
+
     }
 }
 
@@ -13554,8 +13561,6 @@ void Player::ApplyEnchantment(Item* item, bool apply)
     for (uint32 slot = 0; slot < MAX_ENCHANTMENT_SLOT; ++slot)
         ApplyEnchantment(item, EnchantmentSlot(slot), apply);
 
-    for (auto& supp : item->h_allSupportGems)
-        ModSpellSupport(supp.SupportType, supp.SecondData, supp.Spell, apply);
 }
 
 void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition)

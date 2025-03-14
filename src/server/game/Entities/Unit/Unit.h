@@ -2001,13 +2001,18 @@ class TC_GAME_API Unit : public WorldObject
         // Spell Gem Supports
         struct SpellSupports
         {
-            SpellSupports(uint32 SpellSupportFunction, uint32 SupportData)
-                : SpellSupportFunction(SpellSupportFunction), SupportData(SupportData)
+            SpellSupports(uint32 SpellSupportFunction, uint32 SupportData, uint32 Phase)
+            : SpellSupportFunction(SpellSupportFunction), SupportData(SupportData), Phase(Phase)
             {
 
             }
+            enum SupportPhase : uint8
+            {
+                BEFORE_SPELL_LOAD = 1,
+            };
             uint32 SpellSupportFunction = 0;
             uint32 SupportData = 0;
+            uint32 Phase = 0;
             uint8 Amount = 0;
 
             bool ProcGeneric(float);
@@ -2022,11 +2027,12 @@ class TC_GAME_API Unit : public WorldObject
                 {1, &SpellSupports::Proc20Pct},
                 {2, &SpellSupports::Proc30Pct},
                 {3, &SpellSupports::Proc40Pct}};
+
         };
         std::map<uint32, SpellSupports> GemSupports = {};
         std::vector<SpellSupports> GenericSupports = {};
 
-        bool ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 spell = 0, bool add = true);
+        bool ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase, uint32 spell = 0, bool add = true);
         void RecountSpellSupports();
 
         // Remembering Last Spell used
