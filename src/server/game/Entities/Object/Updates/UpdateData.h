@@ -47,7 +47,8 @@ enum OBJECT_UPDATE_FLAGS
     UPDATEFLAG_STATIONARY_POSITION  = 0x0040,
     UPDATEFLAG_VEHICLE              = 0x0080,
     UPDATEFLAG_POSITION             = 0x0100,
-    UPDATEFLAG_ROTATION             = 0x0200
+    UPDATEFLAG_ROTATION             = 0x0200,
+    UPDATEFLAG_NO_BIRTH_ANIM        = 0x0400
 };
 
 class UpdateData
@@ -62,7 +63,8 @@ class UpdateData
 
         void AddOutOfRangeGUID(GuidSet& guids);
         void AddOutOfRangeGUID(ObjectGuid guid);
-        void AddUpdateBlock(ByteBuffer const& block);
+        void AddUpdateBlock() { ++m_blockCount; }
+        ByteBuffer& GetBuffer() { return m_data; }
         bool BuildPacket(WorldPacket* packet);
         bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
         void Clear();

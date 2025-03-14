@@ -186,10 +186,10 @@ struct BattlegroundWGScore final : public BattlegroundScore
             }
         }
 
-        void BuildObjectivesBlock(WorldPacket& data) final override;
+        void BuildObjectivesBlock(WorldPackets::Battleground::PVPLogData_Player& playerData) override;
 
-        uint32 GetAttr1() const final override { return FlagCaptures; }
-        uint32 GetAttr2() const final override { return FlagReturns; }
+        uint32 GetAttr1() const override { return FlagCaptures; }
+        uint32 GetAttr2() const override { return FlagReturns; }
 
         uint32 FlagCaptures;
         uint32 FlagReturns;
@@ -226,6 +226,7 @@ class BattlegroundWS : public Battleground
         void EventPlayerDroppedFlag(Player* player) override;
         void EventPlayerClickedOnFlag(Player* player, GameObject* target_obj) override;
         void EventPlayerCapturedFlag(Player* player);
+        void HandleFlagRoomCapturePoint(int32 team);
 
         void RemovePlayer(Player* player, ObjectGuid guid, uint32 team) override;
         void HandleAreaTrigger(Player* player, uint32 trigger) override;

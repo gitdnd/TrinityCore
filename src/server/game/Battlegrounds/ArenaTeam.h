@@ -129,6 +129,7 @@ class TC_GAME_API ArenaTeam
         uint32 GetType() const { return Type; }
         uint8 GetSlot() const { return GetSlotByType(GetType()); }
         static uint8 GetSlotByType(uint32 type);
+        static uint8 GetTypeBySlot(uint8 slot);
         ObjectGuid GetCaptain() const  { return CaptainGuid; }
         std::string const& GetName() const { return TeamName; }
         ArenaTeamStats const& GetStats() const { return Stats; }
@@ -155,7 +156,7 @@ class TC_GAME_API ArenaTeam
         bool LoadArenaTeamFromDB(QueryResult arenaTeamDataResult);
         bool LoadMembersFromDB(QueryResult arenaTeamMembersResult);
         void LoadStatsFromDB(uint32 ArenaTeamId);
-        void SaveToDB();
+        void SaveToDB(bool forceMemberSave = false);
 
         void BroadcastPacket(WorldPacket* packet);
         void BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);

@@ -17,6 +17,7 @@
 
 #include "BattlegroundWS.h"
 #include "BattlegroundMgr.h"
+#include "BattlegroundPackets.h"
 #include "DBCStores.h"
 #include "GameObject.h"
 #include "Log.h"
@@ -71,11 +72,9 @@ BattlegroundWS::BattlegroundWS()
     _minutesElapsed = 0;
 }
 
-void BattlegroundWGScore::BuildObjectivesBlock(WorldPacket& data)
+void BattlegroundWGScore::BuildObjectivesBlock(WorldPackets::Battleground::PVPLogData_Player& playerData)
 {
-    data << uint32(2); // Objectives Count
-    data << uint32(FlagCaptures);
-    data << uint32(FlagReturns);
+    playerData.Stats = { FlagCaptures, FlagReturns };
 }
 
 BattlegroundWS::~BattlegroundWS() { }
@@ -160,6 +159,7 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
             _flagSpellForceTimer += diff;
             if (_flagDebuffState == 0 && _flagSpellForceTimer >= 10*MINUTE*IN_MILLISECONDS)  //10 minutes
             {
+                // Apply Stage 1 (Focused Assault)
                 if (Player* player = ObjectAccessor::FindPlayer(m_FlagKeepers[0]))
                     player->CastSpell(player, WS_SPELL_FOCUSED_ASSAULT, true);
                 if (Player* player = ObjectAccessor::FindPlayer(m_FlagKeepers[1]))
@@ -168,6 +168,7 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
             }
             else if (_flagDebuffState == 1 && _flagSpellForceTimer >= 15*MINUTE*IN_MILLISECONDS) //15 minutes
             {
+                // Apply Stage 2 (Brutal Assault)
                 if (Player* player = ObjectAccessor::FindPlayer(m_FlagKeepers[0]))
                 {
                     player->RemoveAurasDueToSpell(WS_SPELL_FOCUSED_ASSAULT);
@@ -181,8 +182,12 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
                 _flagDebuffState = 2;
             }
         }
-        else
+        else if ((_flagState[TEAM_ALLIANCE] == BG_WS_FLAG_STATE_ON_BASE || _flagState[TEAM_ALLIANCE] == BG_WS_FLAG_STATE_WAIT_RESPAWN) &&
+         (_flagState[TEAM_HORDE] == BG_WS_FLAG_STATE_ON_BASE || _flagState[TEAM_HORDE] == BG_WS_FLAG_STATE_WAIT_RESPAWN))
         {
+            // Both flags are in base or awaiting respawn.
+            // Remove assault debuffs, reset timers
+
             if (Player* player = ObjectAccessor::FindPlayer(m_FlagKeepers[0]))
             {
                 player->RemoveAurasDueToSpell(WS_SPELL_FOCUSED_ASSAULT);
@@ -282,10 +287,12 @@ void BattlegroundWS::RespawnFlagAfterDrop(uint32 team)
     if (GameObject* obj = GetBgMap()->GetGameObject(GetDroppedFlagGUID(team)))
         obj->Delete();
     else
-        TC_LOG_ERROR("bg.battleground", "unknown dropped flag (%s)", GetDroppedFlagGUID(team).ToString().c_str());
+        TC_LOG_ERROR("bg.battleground", "unknown dropped flag ({})", GetDroppedFlagGUID(team).ToString());
 
     SetDroppedFlagGUID(ObjectGuid::Empty, GetTeamIndexByTeamId(team));
     _bothFlagsKept = false;
+    // Check opposing flag if it is in capture zone; if so, capture it
+    HandleFlagRoomCapturePoint(team == ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
 }
 
 void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
@@ -374,6 +381,13 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
     {
         _flagsTimer[GetTeamIndexByTeamId(player->GetTeam()) ? 0 : 1] = BG_WS_FLAG_RESPAWN_TIME;
     }
+}
+void BattlegroundWS::HandleFlagRoomCapturePoint(int32 team)
+{
+    Player* flagCarrier = ObjectAccessor::GetPlayer(GetBgMap(), GetFlagPickerGUID(team));
+    uint32 areaTrigger = team == TEAM_ALLIANCE ? 3647 : 3646;
+    if (flagCarrier && flagCarrier->IsInAreaTriggerRadius(sAreaTriggerStore.LookupEntry(areaTrigger)))
+        EventPlayerCapturedFlag(flagCarrier);
 }
 
 void BattlegroundWS::EventPlayerDroppedFlag(Player* player)
@@ -485,6 +499,11 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* target
         player->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, BG_WS_SPELL_SILVERWING_FLAG_PICKED);
         if (_flagState[1] == BG_WS_FLAG_STATE_ON_PLAYER)
           _bothFlagsKept = true;
+
+        if (_flagDebuffState == 1)
+          player->CastSpell(player, WS_SPELL_FOCUSED_ASSAULT, true);
+        else if (_flagDebuffState == 2)
+          player->CastSpell(player, WS_SPELL_BRUTAL_ASSAULT, true);
     }
 
     //horde flag picked up from base
@@ -503,6 +522,11 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* target
         player->StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, BG_WS_SPELL_WARSONG_FLAG_PICKED);
         if (_flagState[0] == BG_WS_FLAG_STATE_ON_PLAYER)
           _bothFlagsKept = true;
+
+        if (_flagDebuffState == 1)
+          player->CastSpell(player, WS_SPELL_FOCUSED_ASSAULT, true);
+        else if (_flagDebuffState == 2)
+          player->CastSpell(player, WS_SPELL_BRUTAL_ASSAULT, true);
     }
 
     //Alliance flag on ground(not in base) (returned or picked up again from ground!)
@@ -518,6 +542,7 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* target
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
             UpdatePlayerScore(player, SCORE_FLAG_RETURNS, 1);
             _bothFlagsKept = false;
+            HandleFlagRoomCapturePoint(TEAM_HORDE); // Check Horde flag if it is in capture zone; if so, capture it
         }
         else
         {
@@ -551,6 +576,7 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* target
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
             UpdatePlayerScore(player, SCORE_FLAG_RETURNS, 1);
             _bothFlagsKept = false;
+            HandleFlagRoomCapturePoint(TEAM_ALLIANCE); // Check Alliance flag if it is in capture zone; if so, capture it
         }
         else
         {
