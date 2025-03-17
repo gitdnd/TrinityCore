@@ -399,5 +399,5 @@ void Unit::UpdateHoTMod(HoTMods unitMod, float amount, bool multi)
         case UNIT_MOD_CORRUPTION_RESIST:
         default:
             break;
-    } 
+    }
 }
