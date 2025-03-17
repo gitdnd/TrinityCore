@@ -1666,7 +1666,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void UpdateDefenseBonusesMod();
         void RecalculateRating(CombatRating cr) { ApplyRatingMod(cr, 0, true);}
         float GetMeleeCritFromAgility() const;
-        void GetDodgeFromAgility(float &diminishing, float &nondiminishing) const;
+        float GetDodgeFromAgility() const;
         float GetMissPercentageFromDefense() const;
         float GetSpellCritFromIntellect() const;
         float OCTRegenHPPerSpirit() const;
@@ -2009,7 +2009,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         /*********************************************************/
         /***              ENVIROMENTAL SYSTEM                  ***/
         /*********************************************************/
-
+        
         bool IsImmuneToEnvironmentalDamage() const;
         uint32 EnvironmentalDamage(EnviromentalDamage type, uint32 damage);
 

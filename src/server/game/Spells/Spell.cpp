@@ -8428,6 +8428,10 @@ void Spell::CallScriptOnResistAbsorbCalculateHandlers(DamageInfo const& damageIn
     }
 }
 
+float Spell::GetTotalMaxRange(bool positive = false, WorldObject* caster = nullptr, Spell* spell = nullptr)
+{
+    return m_spellInfo->GetMaxRange(positive, caster, spell) + h_bonusRange;
+}
 namespace Trinity
 {
 

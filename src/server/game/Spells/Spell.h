@@ -730,10 +730,7 @@ class TC_GAME_API Spell
         {
             h_bonusRange = range;
         }
-        float GetTotalMaxRange(bool positive = false, WorldObject* caster = nullptr, Spell* spell = nullptr)
-        {
-            return m_spellInfo->GetMaxRange(positive, caster, spell) + h_bonusRange;
-        }
+        float GetTotalMaxRange(bool positive = false, WorldObject* caster = nullptr, Spell* spell = nullptr);
 
         void SetBonusValue(uint32 amount)
         {

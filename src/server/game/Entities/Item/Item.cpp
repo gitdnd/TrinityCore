@@ -528,7 +528,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
 
     QueryResult result = WorldDatabase.Query("SELECT spell, support_type, second_data, which_socket, cast_phase FROM hot_support_gem WHERE guid = " + GetGUID().GetCounter());
     if (!result)
-        return;
+        return true;
 
     do
     {

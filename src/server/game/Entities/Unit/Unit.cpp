@@ -1617,34 +1617,20 @@ void Unit::HandleEmoteCommand(Emote emoteId)
                 return aurEff->GetSpellInfo()->IsItemFitToSpellRequirements(weapon);
             });
 
-            // no more than 100%
-            RoundToInterval(arpPct, 0.f, 100.f);
+            arpPct /= 100.f;
 
-            float maxArmorPen = 0.f;
-            if (victim->GetLevel() < 60)
-                maxArmorPen = float(400 + 85 * victim->GetLevel());
-            else
-                maxArmorPen = 400 + 85 * victim->GetLevel() + 4.5f * 85 * (victim->GetLevel() - 59);
-
-            // Cap armor penetration to this number
-            maxArmorPen = std::min((armor + maxArmorPen) / 3.f, armor);
-            // Figure out how much armor do we ignore
-            armor -= CalculatePct(maxArmorPen, arpPct);
+            armor *= 1.f - arpPct;
         }
     }
 
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float levelModifier = attacker ? attacker->GetLevel() : attackerLevel;
-    if (levelModifier > 59.f)
-        levelModifier = levelModifier + 4.5f * (levelModifier - 59.f);
+    float dR = (1.f - (((ARMOR_DMG_RED)*armor) / (1 + ARMOR_DMG_RED * abs(armor)))) *
+               (1.f - victim->GetHoTStatAmount(HoTStat::ELE_RED_PHYS_TOTAL));
 
-    float damageReduction = 0.1f * armor / (8.5f * levelModifier + 40.f);
-    damageReduction /= (1.0f + damageReduction);
 
-    RoundToInterval(damageReduction, 0.f, 0.75f);
-    return uint32(std::ceil(std::max(damage * (1.0f - damageReduction), 0.0f)));
+    return uint32(std::ceil(std::max(damage * dR, 0.0f)));
 }
 
 /*static*/ uint32 Unit::CalcSpellResistedDamage(Unit const* attacker, Unit* victim, uint32 damage, SpellSchoolMask schoolMask, SpellInfo const* spellInfo)
@@ -1664,29 +1650,13 @@ void Unit::HandleEmoteCommand(Emote emoteId)
             return 0;
     }
 
-    float const averageResist = Unit::CalculateAverageResistReduction(attacker, schoolMask, victim, spellInfo);
-    float discreteResistProbability[11] = { };
-    if (averageResist <= 0.1f)
-    {
-        discreteResistProbability[0] = 1.0f - 7.5f * averageResist;
-        discreteResistProbability[1] = 5.0f * averageResist;
-        discreteResistProbability[2] = 2.5f * averageResist;
-    }
-    else
-    {
-        for (uint32 i = 0; i < 11; ++i)
-            discreteResistProbability[i] = std::max(0.5f - 2.5f * std::fabs(0.1f * i - averageResist), 0.0f);
-    }
+    float resistance = Unit::CalculateAverageResistReduction(attacker, schoolMask, victim, spellInfo);
 
-    float roll = float(rand_norm());
-    float probabilitySum = 0.0f;
+    resistance = (1.f - resistance) * (1.f - victim->GetHoTStatAmount(HoTStat::PHYS_RED_ELE_TOTAL)) *
+                     (1.f - victim->GetHoTStatAmount(HoTStat::ELE_RED_ELE_TOTAL));
 
-    uint32 resistance = 0;
-    for (; resistance < 11; ++resistance)
-        if (roll < (probabilitySum += discreteResistProbability[resistance]))
-            break;
 
-    float damageResisted = damage * resistance / 10.f;
+    float damageResisted = damage * resistance;
     if (damageResisted > 0.0f) // if any damage was resisted
     {
         int32 ignoredResistance = 0;
@@ -1704,25 +1674,36 @@ void Unit::HandleEmoteCommand(Emote emoteId)
 
         ignoredResistance = std::min<int32>(ignoredResistance, 100);
         ApplyPct(damageResisted, 100 - ignoredResistance);
-
-        // Spells with melee and magic school mask, decide whether resistance or armor absorb is higher
-        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC))
-        {
-            uint32 damageAfterArmor = Unit::CalcArmorReducedDamage(attacker, victim, damage, spellInfo, spellInfo->GetAttackType());
-            float armorReduction = damage - damageAfterArmor;
-
-            // pick the lower one, the weakest resistance counts
-            damageResisted = std::min(damageResisted, armorReduction);
-        }
-    }
+    }    float maxMulti = 1.f;
 
     damageResisted = std::max(damageResisted, 0.f);
     return uint32(damageResisted);
 }
 
-/*static*/ float Unit::CalculateAverageResistReduction(WorldObject const* caster, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo)
+/*static*/ float Unit::CalculateAverageResistReduction(WorldObject const* caster, SpellSchoolMask schoolMask, Unit* victim, SpellInfo const* spellInfo)
 {
-    float victimResistance = float(victim->GetResistance(schoolMask));
+    float victimResistance = 0;
+    float maxRes = 0;
+    uint8 biggestSchool    = 0;
+    for (uint8 i = SPELL_SCHOOL_HOLY; i <= SpellSchoolMask::SPELL_SCHOOL_MASK_ARCANE; i++)
+    {
+        if (schoolMask & i)
+        {
+            float nR  = victim->GetResistance(SpellSchools(i));
+            float nMR = BASE_MAX_RESIST + victim->GetHoTModAmount(HoTMods(UNIT_MOD_RESISTANCE_HOLY_MAX + i));
+            if (nR > nMR)
+                nR = nMR;
+            if (nR > victimResistance)
+            {
+                biggestSchool = i;
+                victimResistance = nR;
+                maxRes = nMR;
+            }
+        }
+    }
+    victim->GetHoTModAmount(UNIT_MOD_RESISTANCE_HOLY_MAX);
+    if (victimResistance > maxRes)
+        victimResistance = maxRes;
     if (caster)
     {
         // pets inherit 100% of masters penetration
@@ -1745,22 +1726,10 @@ void Unit::HandleEmoteCommand(Emote emoteId)
 
     victimResistance = std::max(victimResistance, 0.0f);
 
-    // level-based resistance does not apply to binary spells, and cannot be overcome by spell penetration
-    // gameobject caster -- should it have level based resistance?
-    if (caster && caster->GetTypeId() != TYPEID_GAMEOBJECT && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL)))
-        victimResistance += std::max((float(victim->GetLevelForTarget(caster)) - float(caster->GetLevelForTarget(victim))) * 5.0f, 0.0f);
+    victimResistance *= victim->GetHoTModAmount(HoTMods(UNIT_MOD_RESISTANCE_HOLY_MAX + biggestSchool));
 
-    static uint32 const BOSS_LEVEL = 83;
-    static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
-    uint32 level = victim->GetLevel();
-    float resistanceConstant = 0.0f;
 
-    if (level == BOSS_LEVEL)
-        resistanceConstant = BOSS_RESISTANCE_CONSTANT;
-    else
-        resistanceConstant = level * 5.0f;
-
-    return victimResistance / (victimResistance + resistanceConstant);
+    return victimResistance / 100.f;
 }
 
 /*static*/ void Unit::CalcAbsorbResist(DamageInfo& damageInfo, Spell* spell /*= nullptr*/)
@@ -5008,6 +4977,8 @@ void Unit::UpdateStatBuffMod(Stats stat)
             return true;
         return false;
     });
+
+    factor += GetHoTModAmount(HoTMods(UNIT_MOD_PCT_INC_STRENGTH + stat));
 
     factor *= GetTotalAuraMultiplier(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, [stat](AuraEffect const* aurEff) -> bool
     {
@@ -9138,6 +9109,7 @@ void Unit::UpdateUnitMod(UnitMods unitMod)
     }
 }
 
+
 void Unit::UpdateDamageDoneMods(WeaponAttackType attackType, int32 /*skipEnchantSlot = -1*/)
 {
     UnitMods unitMod;
@@ -10460,6 +10432,9 @@ void Unit::RestoreDisplayId()
 
 void Unit::AddComboPoints(Unit* target, int8 count)
 {
+    if (GetHoTModAmount(UNIT_MOD_EMBERS) != 0)
+        count *= GetHoTModAmount(UNIT_MOD_EMBERS);
+
     if (!count)
         return;
 
@@ -10503,7 +10478,10 @@ void Unit::SendComboPoints()
         WorldPacket data;
         data.Initialize(SMSG_UPDATE_COMBO_POINTS, packGUID.size() + 1);
         data << packGUID;
-        data << uint8(m_comboPoints);
+        if (GetHoTModAmount(UNIT_MOD_EMBERS) != 0)
+            data << uint8(m_comboPoints / EMBERS_PER_COMBO_POINT);
+        else
+            data << uint8(m_comboPoints);
         playerMe->SendDirectMessage(&data);
     }
     Player* movingMe = GetCharmerOrSelfPlayer();
@@ -10517,7 +10495,10 @@ void Unit::SendComboPoints()
         data.Initialize(SMSG_PET_UPDATE_COMBO_POINTS, GetPackGUID().size() + packGUID.size() + 1);
         data << GetPackGUID();
         data << packGUID;
-        data << uint8(m_comboPoints);
+        if (GetHoTModAmount(UNIT_MOD_EMBERS) != 0)
+            data << uint8(m_comboPoints / EMBERS_PER_COMBO_POINT);
+        else
+            data << uint8(m_comboPoints);
         if (movingMe)
             movingMe->SendDirectMessage(&data);
         if (owner && owner != movingMe)

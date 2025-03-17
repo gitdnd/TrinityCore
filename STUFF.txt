@@ -93,7 +93,7 @@ Items and Attributes //////////////////////////////////////
 >>>SpamClick: +1 max spam click on a spell on CD. if you do, it increases its crit chance and dmg by 10% for each spam click. spam clicks regen one per second
 >>>Chain reaction: Each spell cast boosts cast speed and GCD by 75% for the (X) next ones after a finisher once per combat.
 >>>Charisma: Bonus for Shouts, Auras, Charm/Fear/Sleep effects.
->>>X Mana Battery (while on max mana, any mana gain goes into a secondary Mana Battery. After spending ALL mana, restore your mana to full and reset a Mana battery). Really good for 'spend all mana to do X/buff Y skill' pivots
+>>>X Mana Battery (while on max mana, any mana gain goes into a secondary Mana Battery. After spending 50% your max mana, restore your mana to full and reset a Mana battery). Really good for 'spend all mana to do X/buff Y skill' pivots
 >>>Embers: Spells that would generate Combo or Fury now generate 1 Ember. Finishers now consume 10 Embers each to be as effective as if they Had 3 combo points.
 >>>Runes: Focus using abilities grant X max mana (up to 100 times per spell per instance) (+3-7)
 >>>Unholy: Mana using abilities grant 1 Focus (up to X times per spell per insatnce) (+1-2)
