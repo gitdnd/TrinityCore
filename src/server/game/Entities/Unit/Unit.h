@@ -28,6 +28,7 @@
 #include <map>
 #include <memory>
 #include <stack>
+#include <variant>
 #include <queue>
 
 #define VISUAL_WAYPOINT 1 // Creature Entry ID used for waypoints show, visible only for GMs
@@ -66,6 +67,7 @@ struct FactionTemplateEntry;
 struct LiquidData;
 struct LiquidTypeEntry;
 struct SpellValue;
+struct SpellSupports;
 
 class Aura;
 class AuraApplication;
@@ -179,6 +181,8 @@ enum UnitMods
     UNIT_MOD_DAMAGE_MAINHAND,
     UNIT_MOD_DAMAGE_OFFHAND,
     UNIT_MOD_DAMAGE_RANGED,
+
+
     UNIT_MOD_END,
     // synonyms
     UNIT_MOD_STAT_START = UNIT_MOD_STAT_STRENGTH,
@@ -188,7 +192,156 @@ enum UnitMods
     UNIT_MOD_POWER_START = UNIT_MOD_MANA,
     UNIT_MOD_POWER_END = UNIT_MOD_RUNIC_POWER + 1
 };
-
+enum HoTMods
+{
+    UNIT_MOD_EVASION,
+    UNIT_MOD_WINFDURY,
+    UNIT_MOD_RESISTANCE_HOLY_MAX,
+    UNIT_MOD_RESISTANCE_FIRE_MAX,
+    UNIT_MOD_RESISTANCE_NATURE_MAX,
+    UNIT_MOD_RESISTANCE_FROST_MAX,
+    UNIT_MOD_RESISTANCE_SHADOW_MAX,
+    UNIT_MOD_RESISTANCE_ARCANE_MAX,
+    UNIT_MOD_MELEE_CLEAVE_CHANCE,
+    UNIT_MOD_SPELL_CLEAVE_CHANCE,
+    UNIT_MOD_SHOOT_CLEAVE_CHANCE,
+    UNIT_MOD_BONESHIELD_WHEN_HIT_CHANCE,
+    UNIT_MOD_BONESHIELD_MAX,
+    UNIT_MOD_BLOCK_AMOUNT,
+    UNIT_MOD_PARRY_CHANCE,
+    UNIT_MOD_PARRY_CHANCE_MAX,
+    UNIT_MOD_CAST_RANGE,
+    UNIT_MOD_AOE,
+    UNIT_MOD_HEALTH_REGEN,
+    UNIT_MOD_CONVERT_HALF_ATTACK_TO_ELEMENT,
+    UNIT_MOD_PHYS_REDUCES_HOLY,
+    UNIT_MOD_PHYS_REDUCES_FIRE,
+    UNIT_MOD_PHYS_REDUCES_NATURE,
+    UNIT_MOD_PHYS_REDUCES_FROST,
+    UNIT_MOD_PHYS_REDUCES_SHADOW,
+    UNIT_MOD_PHYS_REDUCES_ARCANE,
+    UNIT_MOD_HOLY_REDUCES_PHYS,
+    UNIT_MOD_FIRE_REDUCES_PHYS,
+    UNIT_MOD_NATURE_REDUCES_PHYS,
+    UNIT_MOD_FROST_REDUCES_PHYS,
+    UNIT_MOD_SHADOW_REDUCES_PHYS,
+    UNIT_MOD_ARCANE_REDUCES_PHYS,
+    UNIT_MOD_HOLY_REDUCES_ELEMENTAL,
+    UNIT_MOD_FIRE_REDUCES_ELEMENTAL,
+    UNIT_MOD_NATURE_REDUCES_ELEMENTAL,
+    UNIT_MOD_FROST_REDUCES_ELEMENTAL,
+    UNIT_MOD_SHADOW_REDUCES_ELEMENTAL,
+    UNIT_MOD_ARCANE_REDUCES_ELEMENTAL,
+    UNIT_MOD_PCT_INC_STRENGTH,
+    UNIT_MOD_PCT_INC_AGILITY,
+    UNIT_MOD_PCT_INC_STAMINA,
+    UNIT_MOD_PCT_INC_SPIRIT,
+    UNIT_MOD_PCT_INC_INTELLECT,
+    UNIT_MOD_MANA_SHIELD, // reduce dmg from each instance equal to 80%, draining X damage per 100 Mana
+    UNIT_MOD_GROUND_SPELL_WHILE_STATIONARY,
+    UNIT_MOD_HORNS,           // On hit, negate and reflect attack against you once per combat (+1-3)
+    UNIT_MOD_REFLECT_ELEMENT, // Reflect spell damage by draining 100 focus per spell
+    UNIT_MOD_MAX_CURSES,
+    UNIT_MOD_MAX_MAGE_ARMORS,
+    UNIT_MOD_IGNITE_CHANCE,
+    UNIT_MOD_SHOCK_CHANCE,
+    UNIT_MOD_FREEZE_CHANCE,
+    UNIT_MOD_SANCTIFY_CHANCE,
+    UNIT_MOD_DESECRATE_CHANCE,
+    UNIT_MOD_RESERVATION,
+    UNIT_MOD_GHOUL_MAX,
+    UNIT_MOD_SERPENT_WARD_MAX,
+    UNIT_MOD_SPIRIT_WOLF_MAX,
+    UNIT_MOD_WATER_ELEMENTAL_MAX,
+    UNIT_MOD_LAVA_SPAWN_MAX,
+    UNIT_MOD_SKELETON_MAX,
+    UNIT_MOD_HAWK_MAX,
+    UNIT_MOD_GARGOYLE_MAX,
+    UNIT_MOD_MINION_STR_INHERITANCE,
+    UNIT_MOD_MINION_AGI_INHERITANCE,
+    UNIT_MOD_MINION_STA_INHERITANCE,
+    UNIT_MOD_MINION_INT_INHERITANCE,
+    UNIT_MOD_MINION_SPI_INHERITANCE,
+    UNIT_MOD_MINION_BONUS_RESERVATION,
+    UNIT_MOD_EXECUTE_DAMAGE_PCT,
+    UNIT_MOD_PILLAGE,         // attacks and spells steal Attack and Spell power from the target (15-35)
+    UNIT_MOD_EXPLODE_20_HOLY, // Enemies you kill have a chance to explode, dealing 20% of their life as DMG (10-25%)
+    UNIT_MOD_EXPLODE_20_FIRE,
+    UNIT_MOD_EXPLODE_20_NATURE,
+    UNIT_MOD_EXPLODE_20_FROST,
+    UNIT_MOD_EXPLODE_20_SHADOW,
+    UNIT_MOD_EXPLODE_20_PHYS,
+    UNIT_MOD_RETALIATE_PCT, // After attacking a unit, apply Retaliate to it. After it leaves melee range, do a
+                            // guaranteed attack for (20-50%) of weapon dmg
+    UNIT_MOD_CORRUPT_HEALTH_PCT,
+    UNIT_MOD_CORRUPT_MANA_PCT,
+    UNIT_MOD_DMG_DONE_PER_100_STR,
+    UNIT_MOD_DMG_TAKEN_PER_100_STR,
+    UNIT_MOD_DMG_DONE_PER_100_AGI,
+    UNIT_MOD_DMG_TAKEN_PER_100_AGI,
+    UNIT_MOD_DMG_DONE_PER_100_STA,
+    UNIT_MOD_DMG_TAKEN_PER_100_STA,
+    UNIT_MOD_DMG_DONE_PER_100_INT,
+    UNIT_MOD_DMG_TAKEN_PER_100_INT,
+    UNIT_MOD_DMG_DONE_PER_100_SPI,
+    UNIT_MOD_DMG_TAKEN_PER_100_SPI,
+    UNIT_MOD_SHADOW_DANCE_AFTER_STEALTH,
+    UNIT_MOD_MIND_CHARGE_MAX,
+    UNIT_MOD_MIND_CHARGE_ON_HIT,
+    UNIT_MOD_ENRAGE_CHARGE_MAX,
+    UNIT_MOD_ENRAGE_CHARGE_ON_HIT,
+    UNIT_MOD_ENRAGE_CHARGE_WHEN_HIT,
+    UNIT_MOD_ENRAGE_CHARGE_ON_KILL,
+    UNIT_MOD_LIFESTEAL_3_PCT_RESERVE,
+    UNIT_MOD_LIFESTEAL_5_PCT_RESERVE,
+    UNIT_MOD_SHIV_CHARGE_MAX,
+    UNIT_MOD_ON_SHIV_POISON,
+    UNIT_MOD_ON_SHIV_REND,
+    UNIT_MOD_REAPER_DISCHARGE_ON_HIT,
+    UNIT_MOD_REAPER_THUNDER_ON_HIT,
+    UNIT_MOD_REAPER_LEECH_ON_HIT,
+    UNIT_MOD_REAPER_POISON_ON_HIT,
+    UNIT_MOD_REAPER_THORNY_ON_HIT,
+    UNIT_MOD_SOULSTEAL_PCT,
+    UNIT_MOD_DRAIN_HEALTH_ON_HIT,
+    UNIT_MOD_DRAIN_MANA_ON_HIT,
+    UNIT_MOD_ON_MAX_HEALTH_GAIN_STR,
+    UNIT_MOD_ON_MAX_MANA_GAIN_STR,
+    UNIT_MOD_ON_MAX_HEALTH_GAIN_AGI,
+    UNIT_MOD_ON_MAX_MANA_GAIN_AGI,
+    UNIT_MOD_ON_MAX_HEALTH_GAIN_STA,
+    UNIT_MOD_ON_MAX_MANA_GAIN_STA,
+    UNIT_MOD_ON_MAX_HEALTH_GAIN_INT,
+    UNIT_MOD_ON_MAX_MANA_GAIN_INT,
+    UNIT_MOD_ON_MAX_HEALTH_GAIN_SPI,
+    UNIT_MOD_ON_MAX_MANA_GAIN_SPI,
+    UNIT_MOD_HEALTH_ON_SHOUT,
+    UNIT_MOD_EXERT_ATTACKS_ON_SHOUT,
+    UNIT_MOD_ENERGY_BARRIER_ON_HIT,
+    UNIT_MOD_ENERGY_BARRIER_DURATION,
+    UNIT_MOD_MINIMUM_ENERGY_BARRIER,
+    UNIT_MOD_PROC_CHANCE_MULTI_PCT,
+    UNIT_MOD_MOVE_WHILE_CASTING_SPEED,
+    UNIT_MOD_BRAWL, // Shorten Range but boost damage of Elemental Spells 5-15% range, 10-30% dmg
+    UNIT_MOD_SANDIFY_KILL_PCT,
+    UNIIT_MOD_VERSATILITY,
+    UNIT_MOD_BERSERK,
+    UNIT_MOD_ANTI_DOT,
+    UNIT_MOD_SLOW_RESIST,
+    UNIT_MOD_STATUS_RESIST,
+    UNIT_MOD_OIL_CHANCE,
+    UNIT_MOD_GUARDIAN_SPRINT,
+    UNIT_MOD_RESILIENCE,
+    UNIT_MOD_RESILIENCE_TOKEN_MAX,
+    UNIT_MOD_SPAMCRIT_MAX,
+    UNIT_MOD_CHAIN_REACTION,
+    UNIT_MOD_CHARISMA,
+    UNIT_MOD_MANA_BATTERY,
+    UNIT_MOD_EMBERS,
+    UNIT_MOD_RUNES,
+    UNIT_MOD_UNHOLYNESS,
+    UNIT_MOD_CORRUPTION_RESIST,
+};
 enum BaseModGroup
 {
     CRIT_PERCENTAGE,
@@ -907,7 +1060,7 @@ class TC_GAME_API Unit : public WorldObject
         int32 GetResistance(SpellSchools school) const { return GetInt32Value(UNIT_FIELD_RESISTANCES + int32(school)); }
         int32 GetResistance(SpellSchoolMask mask) const;
         void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(UNIT_FIELD_RESISTANCES + int32(school), val); }
-        static float CalculateAverageResistReduction(WorldObject const* caster, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo = nullptr);
+        static float CalculateAverageResistReduction(WorldObject const* caster, SpellSchoolMask schoolMask, Unit* victim, SpellInfo const* spellInfo = nullptr);
 
         uint32 GetHealth()    const { return GetUInt32Value(UNIT_FIELD_HEALTH); }
         uint32 GetMaxHealth() const { return GetUInt32Value(UNIT_FIELD_MAXHEALTH); }
@@ -936,9 +1089,12 @@ class TC_GAME_API Unit : public WorldObject
         int32 CountPctFromMaxPower(Powers power, int32 pct) const { return CalculatePct(GetMaxPower(power), pct); }
         void SetPower(Powers power, uint32 val, bool withPowerUpdate = true, bool force = false);
         void SetMaxPower(Powers power, uint32 val);
-        inline void SetFullPower(Powers power) { SetPower(power, GetMaxPower(power)); }
+        inline void SetFullPower(Powers power)
+        {
+            SetPower(power, GetMaxPower(power));
+        };
         // returns the change in power
-        int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true);
+        int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true, PowerChangeReason reason = PowerChangeReason::REASON_NONE, std::variant<Spell*, Aura*> reasonObj = (Aura*)nullptr);
 
         bool PowerBelowPct(Powers power, int32 pct) const { return GetPower(power) < CountPctFromMaxPower(power, pct); }
         bool PowerAbovePct(Powers power, int32 pct) const { return GetPower(power) > CountPctFromMaxPower(power, pct); }
@@ -1180,8 +1336,7 @@ class TC_GAME_API Unit : public WorldObject
         void SendHealSpellLog(HealInfo& healInfo, bool critical = false);
         int32 HealBySpell(HealInfo& healInfo, bool critical = false);
         void SendEnergizeSpellLog(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
-        void EnergizeBySpell(Unit* victim, uint32 spellId, int32 damage, Powers powerType);
-        void EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damage, Powers powerType);
+        void EnergizeBySpell(Unit* victim, Spell* spell, uint32 Damage, Powers powerType);
 
         Aura* AddAura(uint32 spellId, Unit* target);
         Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
@@ -1504,6 +1659,7 @@ class TC_GAME_API Unit : public WorldObject
         float m_modSpellHitChance;
         float m_baseSpellCritChance;
 
+
         float m_modAttackSpeedPct[MAX_ATTACK];
         uint32 m_attackTimer[MAX_ATTACK];
 
@@ -1530,6 +1686,7 @@ class TC_GAME_API Unit : public WorldObject
 
         void UpdateDamagePctDoneMods(WeaponAttackType attackType);
         void UpdateAllDamagePctDoneMods();
+
 
         float GetTotalStatValue(Stats stat) const;
         float GetTotalAuraModValue(UnitMods unitMod) const;
@@ -2006,6 +2163,167 @@ class TC_GAME_API Unit : public WorldObject
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
 
         /* Player Movement fields END*/
+
+
+      public:
+
+          // New Stats
+
+        #define ARMOR_DMG_RED 0.0001f
+        #define BASE_MAX_RESIST 50
+        #define BASE_BONESHIELD_CHARGE_MAX 5
+
+        #define CAST_RANGE_SPELL_ID 12345678
+        #define AOE_SPELL_ID 12345678
+        #define MOD_DMG_DONE 12345678
+        #define MOD_DMG_TAKEN 12345678
+
+        #define EMBERS_PER_COMBO_POINT 10
+
+        enum class HoTStat
+        {
+            EVASION,
+            MAX_HOLY_RESIST,
+            MAX_FIRE_RESIST,
+            MAX_NATURE_RESIST,
+            MAX_FROST_RESIST,
+            MAX_SHADOW_RESIST,
+            MAX_ARCANE_RESIST,
+            BONESHIELD_CHARGE_MAX,
+            MANABATTERY_PROGRESS,
+            MANABATTERY_CURRENT,
+
+            DAMAGE_TAKEN_STR,
+            DAMAGE_TAKEN_AGI,
+            DAMAGE_TAKEN_INT,
+            DAMAGE_TAKEN_STA,
+            DAMAGE_TAKEN_SPI,
+            DAMAGE_TAKEN_TOTAL,
+            DAMAGE_DONE_STR,
+            DAMAGE_DONE_AGI,
+            DAMAGE_DONE_INT,
+            DAMAGE_DONE_STA,
+            DAMAGE_DONE_SPI,
+            DAMAGE_DONE_TOTAL,
+
+            PHYS_RED_HOLY,
+            PHYS_RED_FIRE,
+            PHYS_RED_NATURE,
+            PHYS_RED_FROST,
+            PHYS_RED_SHADOW,
+            PHYS_RED_ARCANE,
+            PHYS_RED_ELE_TOTAL, 
+            
+            HOLY_RED_PHYS,
+            FIRE_RED_PHYS,
+            NATURE_RED_PHYS,
+            FROST_RED_PHYS,
+            SHADOW_RED_PHYS,
+            ARCANE_RED_PHYS,
+            ELE_RED_PHYS_TOTAL, 
+            
+            HOLY_RED_ELE,
+            FIRE_RED_ELE,
+            NATURE_RED_ELE,
+            FROST_RED_ELE,
+            SHADOW_RED_ELE,
+            ARCANE_RED_ELE,
+            ELE_RED_ELE_TOTAL, 
+        };
+        std::unordered_map<int32, float> BaseHoTMod  = {};
+        std::unordered_map<int32, float> MultiHoTMod = {};
+        
+        std::unordered_map<int32, int32> TotalHoTMod = {};
+        std::unordered_map<HoTStat, int32> SimpleHoTStat = {};
+
+        void UpdateHoTMod(HoTMods unitMod, float amount, bool multi = false);
+
+        float GetArmorReduction();
+
+        void HoTModDamageTaken(Stats stat);
+
+        void HoTModDamageDone(Stats stat);
+
+        void HoTModPhysReducesEle(SpellSchools school);
+
+        void HoTModEleReducesPhys(SpellSchools school);
+
+        void HoTModEleReducesEle(SpellSchools school);
+
+        float GetHoTModAmount(HoTMods unitMod);
+
+        float GetHoTStatAmount(HoTStat unitStat);
+
+          // New Hooks
+          
+        static inline std::vector<AuraApplicationMap::iterator*> currentAuraIterators = {};
+
+        #define CallScriptIteration(func)                           \
+        AuraApplicationMap::iterator it = m_appliedAuras.begin();   \
+        currentAuraIterators.push_back(&it);                        \
+        while (it != m_appliedAuras.end())                          \
+        {                                                           \
+            it->second->GetBase()->func;                            \
+            if (it != m_appliedAuras.end())                         \
+                it++;                                               \
+        }                                                           \
+        std::erase(currentAuraIterators, &it)                       \
+
+        void DoOnAuraStackScripts(Aura* aura, int16 amount);
+
+        void DoBeforeSpellCastScripts(Spell* spell);
+
+        std::map<uint32, SpellSupports> GemSupports = {};
+        std::vector<SpellSupports> GenericSupports = {};
+
+        void CastSpellFromSupport(Spell* spell, uint32 id);
+        bool ModSpellSupport(uint32 spellSupport, uint32 supportData, uint32 phase, uint32 spell = 0, bool add = true);
+        void RecountSpellSupports();
+
+        // Remembering Last Spell used
+        const SpellInfo* _lastSpellUsed = nullptr;
+        void SetLastSpellUsed(const SpellInfo* spell) { _lastSpellUsed = spell; }
+        const SpellInfo* GetLastSpellUsed() { return _lastSpellUsed; }
+
+};
+
+// Spell Gem Supports
+struct SpellSupports
+{
+        Unit* Owner;
+
+        SpellSupports(Unit* Owner, uint32 SpellSupportFunction, uint32 SupportData, uint32 Phase)
+        : Owner(Owner), SpellSupportFunction(SpellSupportFunction), SupportData(SupportData), Phase(Phase)
+        {
+        }
+        enum SupportPhase
+        {
+            NONE              = 0x00,
+            SUP_PHASE_BEFORE_SPELL_LOAD = (1 << 1),
+            SUP_PHASE_ON_HIT            = (1 << 2),
+            SUP_PHASE_AFTER_CAST_TIME   = (1 << 3),
+        };
+        SupportPhase ConvertEventToPhase(uint32 event);
+        uint32 SpellSupportFunction = 0;
+        uint32 SupportData          = 0;
+        uint32 Phase                = 0;
+        uint8 Amount                = 0;
+
+        void DoSupport(Spell* spell, uint32 phase);
+
+        // SupportList
+        bool ProcGeneric(Spell* spell, float chance);
+
+        bool Proc20Pct(Spell* spell);
+        bool Proc30Pct(Spell* spell);
+        bool Proc40Pct(Spell* spell);
+
+        using SpellSupportFunc = bool (SpellSupports::*)(Spell* spell);
+
+        static inline std::map<uint32, SpellSupportFunc> AllSpellSupports = { // needs to be bool
+            {1, &SpellSupports::Proc20Pct},
+            {2, &SpellSupports::Proc30Pct},
+            {3, &SpellSupports::Proc40Pct}};
 };
 
 namespace Trinity

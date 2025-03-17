@@ -3737,8 +3737,17 @@ enum DuelCompleteType : uint8
     DUEL_FLED        = 2
 };
 
-// handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time
-enum BattlegroundQueueTypeId
+enum class PowerChangeReason : uint8
+{
+    REASON_NONE,
+    REASON_SPELL_COST,
+    REASON_AURA_EFFECT,
+    REASON_REGENERATION,
+    REASON_SPELL_GENERATED,
+    REASON_ATTACK_GENERATED,
+};
+
+struct BattlegroundQueueTypeId
 {
     BATTLEGROUND_QUEUE_NONE     = 0,
     BATTLEGROUND_QUEUE_AV       = 1,

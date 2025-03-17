@@ -106,6 +106,9 @@ bool Player::UpdateStats(Stats stat)
 
     SetStat(stat, int32(value));
 
+    HoTModDamageTaken(stat);
+    HoTModDamageDone(stat);
+
     if (stat == STAT_STAMINA || stat == STAT_INTELLECT || stat == STAT_STRENGTH)
     {
         Pet* pet = GetPet();
@@ -307,23 +310,12 @@ void Player::UpdateArmor()
 
 float Player::GetHealthBonusFromStamina()
 {
-    //float stamina = GetStat(STAT_STAMINA);
-    //float baseStam = std::min(20.0f, stamina);
-    //float moreStam = stamina - baseStam;
-
-    //return baseStam + (moreStam*10.0f);
-    return GetStat(STAT_STAMINA) * 10.f;
+    return 1.f + GetStat(STAT_STAMINA) / 100.f;
 }
 
 float Player::GetManaBonusFromIntellect()
 {
-    //float intellect = GetStat(STAT_INTELLECT);
-
-    //float baseInt = std::min(20.0f, intellect);
-    //float moreInt = intellect - baseInt;
-
-    //return baseInt + (moreInt * 10.0f);
-    return GetStat(STAT_INTELLECT) * 10.f;
+    return 1.f + GetStat(STAT_INTELLECT) / 100.f;
 }
 
 void Player::UpdateMaxHealth()
@@ -332,8 +324,8 @@ void Player::UpdateMaxHealth()
 
     float value = GetFlatModifierValue(unitMod, BASE_VALUE) + GetCreateHealth();
     value *= GetPctModifierValue(unitMod, BASE_PCT);
-    value += GetFlatModifierValue(unitMod, TOTAL_VALUE) + GetHealthBonusFromStamina();
-    value *= GetPctModifierValue(unitMod, TOTAL_PCT);
+    value += GetFlatModifierValue(unitMod, TOTAL_VALUE);
+    value *= GetPctModifierValue(unitMod, TOTAL_PCT) * GetHealthBonusFromStamina();
 
     SetMaxHealth((uint32)value);
 }
@@ -346,9 +338,18 @@ void Player::UpdateMaxPower(Powers power)
 
     float value = GetFlatModifierValue(unitMod, BASE_VALUE) + GetCreatePowerValue(power);
     value *= GetPctModifierValue(unitMod, BASE_PCT);
-    value += GetFlatModifierValue(unitMod, TOTAL_VALUE) +  bonusPower;
+    value += GetFlatModifierValue(unitMod, TOTAL_VALUE);
     value *= GetPctModifierValue(unitMod, TOTAL_PCT);
-
+    if (power == POWER_MANA)
+    {
+        value *= GetManaBonusFromIntellect();
+        float reserve = GetHoTModAmount(HoTMods::UNIT_MOD_RESERVATION) -
+                        GetHoTModAmount(HoTMods::UNIT_MOD_MINION_BONUS_RESERVATION);
+        if (reserve > 0)
+            value -= reserve;
+    }
+    if (value < 0)
+        value = 0;
     SetMaxPower(power, uint32(std::lroundf(value)));
 }
 

@@ -1,0 +1,265 @@
+Items and Attributes //////////////////////////////////////
+//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+>Crunch everything regularly then rebuff creative patterns so that 'everything is intuitive, simple, meaningful but escalating in convergance' (game of Power/Feature Creep and Reverse Power/Feature Creep)
+>More focused stats, no need for 5 different yet not creative '+DPS' stuff like SP, Spell Pen and Crit
+
+>Resistances akin to PoE with breakpoints per level (50% max at lvl 1, increased by 5 after certain quests up to 25 which are based on level)
+>Attributes separate from Secondary Stat
+>>Strength: +1% Atk Pow Mult
+>>Agi: +1% Evasion Mult
+>>Int: +1% Spell Pow Mult
+>>Sta: +1% Max HP Mult
+>>Spi: +1% Mana Mult
+
+>Resists cap out by default at 50%. A common elixirt is 'Elixir of X Resistance' that gives 50% to one resist until death, as a way to ease gearing.
+
+>More 'stattributes' with ranges akin to PoE
+>>>Windfury chance (1-5%)
+>>>Max Res (1-2%)
+>>>Res (10-20%)
+>>>Cleave Spell/Attack/Strike/Shoot Chance (1-5%)
+>>>Boneshield Charge (+10% to gain on hit) // Armor Mult
+>>>Max Boneshield Charge (+1)
+>>>Evasion reworked, now "after evading an attack, reduce evasion chance by amount of damage evaded, and drop a shrinking orb on the ground where you were hit. After you leave the AoE of the Orb, regain the evasion chance"
+>>>Evasion Pct determines amount of damage converted to evasion. Starts at 20%, Most sources give +(3-6%)
+>>>Block is 'active mitigation from universal Spells', that decays/plays out differently. Each Source of Block Decays and can be held down to time propperly.
+>>>>>>Shield Block is normal, hold button down to block DMG but total amount decays
+>>>>>>Avengers Shield Blocks damage and is more rapidly decaying but releases DMG absorbed 
+>>>>>>Power Word: Block makes it so you cant move but Absorbs damage with slow rate of decay
+>>>Parry is 'Negate (Parry Rating, Flat) from attack or spell', chance per item is (15-35%) capped at 50%, max chance is (3-5%) per item
+>>>Cast Range, AoE Bonuses
+>>>HP Regen
+>>>Convert all Crit Attacks to Element X
+>>>Physical/Elemental Damage Reduction equal to % Of Resistance
+>>>Mana Shield (reduce dmg from each instance equal to 80%, draining X damage per 100 Mana)
+>>>% Increased Attribute
+>>>You have consecration while stationary
+>>>Thorns: On hit, negate and reflect attack against you once per combat (+1-3)
+>>>Reflect: Reflect spell damage by reserving 10 max focus per spell. Regens per source. Regen rate (+1-2) per 5secs
+>>>You can have an additional (thing capped at X eg Mage Armor)
+>>>Ignite = Stacking DoT based on Fire Damage Done/Shock = Increased Damage taken based on DMG done/Chill = Slowed Move/ATK/Cast Speed based on DMG done/(Holy) Sanctify = Reduced DMG Done based on DMG done/(Shadow) Desecrate = Stacking Mana Drain based on DMG Done and multipliers
+>>>Reserve Mana to gain a permanent Ghoul that respawns after a minute of being Dead (all respawn together)
+>>>Ghouls count as corpses and leave corpses behind.
+>>>Reserve Mana to gain a permanent Serpent Ward that spawns at start of combat
+>>>Reserve Mana to summon a Spirit Wolf that cant be attacked/damaged
+>>>>>>Other classics like Water Elementals, Lava Spawns, Skeletons, Hawks and Gargoyles	
+>>>Bonus Minion Damage/Healh
+>>>Execute: % Increased damage on enemies below 35% Life (5-15%)
+>>>Raid: Your attacks and spells steal Attack and Spell power from the target (15-35)
+>>>Enemies you kill have a chance to explode, dealing 20% of their life as DMG (10-25%)
+>>>Retaliate: After attacking a unit, apply Retaliate to it. After it leaves melee range, do a guaranteed attack for (20-50%) of weapon dmg
+>>>% Less DMG Done/Taken per (100 of Attribute)
+>>>Most Weapons and Shields now have a basic Active Component: Regular, Powerful Core (Strike/Shoot/Bolt) spell that does lots of DMG on a Cooldown
+>>>+1 second of Shadow Dance after leaving Stealth
+>>>Mind Charges (next spell is free) now has +1 Charge per Use
+>>>Chance to Generate Mind Charge on Attack/Spell/Hit (1-5%)
+>>>Enrage Charges on Attack/Spell (1-5%) or on Kill that boost attack speed (10%) that reset after 30 seconds.
+>>>On Enrage Stacks end, gain (BUFF)
+>>>Consume all Enrage Charges to gain Boneshield Charges/Mind Charges instead
+>>>Obtainment Effect: On (Condition) gain +1 (Stat) until you leave the instance. Stacks infinitely
+>>>Reserve % Health to gain Lifesteal
+>>>Gain Shiv Charge (Universal Dagger throw Ability that can be used after gaining a charge)
+>>>On Shiv, apply XYZ (eg 1 stack of poison or Rend)
+>>>Burst: On Burst condition (each one has 1 minute Cooldown), reset your current Focus
+>>>(X) Discharge: Like stacking universal Charges that replace lots of similar repeating effects, added in quantities
+>>>>>>Reaper Discharge: Reduce enemy % healing and regen by 1 per Discharge 
+>>>>>>Thunder Discharge: Reduce enemy movement and Attack Speed per Discharge
+>>>>>>Leech Discharge: Heal attackers for X per stack of Discharge
+>>>>>>Poison Discharge: Every 3 sec deal 100 per stack of poison on target, then remove 1 Discharge
+>>>>>>Thorn Discharge: Target takes dmg every attack/spell they cast
+>>>Soul Steal: On killing an enemy, % chance to gain a Soulbound Soul Gem that has the ability to reset your Focus once every 30 seconds. (10-30%)
+>>>Drain Attribute: Reduce Targets max HP/Mana to gain it (+1-4)
+>>>While full HP/mana, gain X stat.
+>>>Shouts restore HP on use
+>>>Shouts Exert Attacks on use but have half duration per attack exerted
+>>>Spells/Attacks generate X barrier. Lasts 5s or until refreshed. Many Gems interact with barrier, increasing/extending duration.
+>>>Summons gain HP equal to % of (attribute)
+>>>Barrier Minimum: after not taking damage for 20s regen Energy barrier to minimum of X.
+>>>Proc Chance Multi: (10-30%)
+>>>Move while casting% (5-9%)
+>>>Shorten Range but boost damage of Elemental Spells (5-15% rage, 10-30% dmg)
+>>>Sandify: % of max HP of target you kill is added to Sandify. Sandify decays with time at a rate of 3% of current. Spells will refund their cost equal to 50% of Sand and will deal extra damage equal to that amount.
+>>>Versatility: +Stats for each different Gem spell used in the past minute (counts Procd spells).
+>>>Berserk: ATK/SPL Pow per missing HP, synergizes with 'cant heal back over X HP in combat' Talent.
+>>>AntiDot: X Less DoT DMG
+>>>Slow Resist: Reduces effectivenss of enemy slows by a flat amount.
+>>>Chance to Oil Up: Oil (physical gems only)
+>>>Guardian Sprint: While not moving, gain X% fading sprint. Every second while moving, sprint effectiveness goes down by 3%.
+>>>Airborne: +1 double jump per, and 10% hit damage while airborne
+>>>Resilience: All units generate 1 Resilience per second (+X). At 100, gain maximum number of resilience tokens.
+>>>Resilience Max Tokens: Start with +1, some gear adds more. Each Resilience Token will, when you are Hard CCd, reduce duration of Hard CC by 1 per 1 token.
+>>>SpamClick: +1 max spam click on a spell on CD. if you do, it increases its crit chance and dmg by 10% for each spam click. spam clicks regen one per second
+>>>Chain reaction: Each spell cast boosts cast speed and GCD by 75% for the (X) next ones after a finisher once per combat.
+>>>Charisma: Bonus for Shouts, Auras, Charm/Fear/Sleep effects.
+>>>X Mana Battery (while on max mana, any mana gain goes into a secondary Mana Battery. After spending 50% your max mana, restore your mana to full and reset a Mana battery). Really good for 'spend all mana to do X/buff Y skill' pivots
+>>>Embers: Spells that would generate Combo or Fury now generate 1 Ember. Finishers now consume 10 Embers each to be as effective as if they Had 3 combo points.
+>>>Runes: Focus using abilities grant X max mana (up to 100 times per spell per instance) (+3-7)
+>>>Unholy: Mana using abilities grant 1 Focus (up to X times per spell per insatnce) (+1-2)
+>>>Corruption Resistance: Reduces impact of 'Max HP and Mana reduction' Corruption (2-5%) 
+	
+
+>low tier items have low stat ranges, high tier ones higher stat ranges
+>Looted Items start UNID, will instead list what you will 'find' on uniding the item.
+>>>Improve Tiers of Stats on Item by X
+>>>Give more sockets/Meta sockets
+>>>Guaranteed open Stat/Attribute you can craft anything of your choice on
+>>>Guarantee one of X type mod (Eg Socketed Gem Support)
+>>>Guarantee quality on UNID (incl over 50%)
+>>>All modifiers are set to 50% max value
+>>>One mod is guaranteed to be 150% max value
+>Crafting Blueprints: Instead of just rolling items and using templates, after an item is crafted, it has 'crafting potential' of X allowing X uses of Targeted Modifier Currency on it (some consume more than one Crafting Potential) eg Exalt Orb, Annul Orb, Vaal Orb, Orb of Undo (expensive), Recombinate, Divine Orb, Ancient Orb (make item legendary, giving it one legendary suffix)
+
+>Legendaries
+>Come with Pros and Cons
+>>>Instead of Phys Attack, On Attack gain (Elemental DMG) as Attack DMG based on % attribute
+>>>Instead of Phys Attack, On Attack cast spell (unique spells like shockwave that does 50% of your attack dmg in a cone, or cone of cold or Bladestorm)
+>>>No sockets, but gives +1000 Health
+>>>You have no mana, plus +1000 Atk Pow
+>>>80% reduced Boneshield Charge duration, on Boneshield Charge end cast Blood Boil
+>>>You have no life Regen, double Leech.
+>>>-50% ele res, Armor Applies to Ele DMG
+>>>-10% max ele res, +10000 Armor
+>>>Reserve 50% max Life to gain +3 to all Max Charges
+>>>Gain max all charges on max Enrage, lose Enrage on max enrage
+>>>Always count as being Full mana and Life
+>>>On kill effects happen thrice but lose 3% max HP per one that procs 
+>>>Immune to Potions, Immune to Exposure, Immune to Discharge
+>>>All hits you do and take apply Ignite/Chill/Shock/Sanctify/Desecrate
+>>>Corpse Explosion on Shout
+>>>+1 to all attributes per item level. No other stats.
+>>>Steal Affix on Kill
+>>>Cull against Chilled enemies. Ignited enemies count as being on Low life. You are disarmed.
+>>>Curses have no cooldown or GCD. +1 max curse per target. Cant use totems or Mage Armors
+>>>+All attributes. Item breaks on removal.
+>>>+1000 attack power. Lost on Death.
+>>>While Missing life, based on element of damage taken, gain +1% max resist of that element per 5% missing HP.
+>>>Experience Leech: Leeches XP from kills, granting Atk Power per 1000 XP. Resets on changing instance
+>>>Self Poison but gain Charges every time you take poison DMG.
+
+>New Skills
+>>>Sunder: Wave of Explosions (5) going forward
+>>>Raze: Wave of Explosions (3) going backward from the tip
+>>>Defiance: Wave of Explosions (10) but has a cast time.
+>>>Starstorm: Spellcaster Bladestorm, hold down to use, draining mana per tick
+>>>Volley: Fire Arrows in a 3 meter AoE 8 meters in front of you after cast time
+>>>Runic Combo: Now a combo of 3 attacks by holding down the button, 3rd one guarantees a crit on your next "Strike" afterwards 
+>>>Throw Explosive: Hold down button, throw explosive based on amount held 
+>>>Thunderclap: If used in air, leap slightly forward to clap and do more damage based on distance
+>>>Arcane Missiles: Hold down button to launch. The longer you hold, the faster it launches but costs more mana.
+>>>Oil: Launch Oil in an area. If a target in area takes fire damage, or a Flame Area spell overlaps with the oil, Activate a powerful critical flamestrike on the location
+>>>Rail: Hold down button. On release, do massive damage to all enemies 
+>>>Rot: Toggle, cast a free blood boil every 3 seconds but also take dmg from it yourself. Each tick boosts next strike dmg, up to a max of 5 stacks
+>>>Blinkstab: Blink and execute low HP enemy (visible if you have this attuned and are hovering the target), granting a Shiv Charge.
+>>>Thunder Combo: Hold down or tap 5 Attacks, 4th and 5th attack casts thunder claps
+>>>Curse of Frost: If target dies, explodes to deal dmg and freeze nearby enemies
+>>>Whirling Assault: Spin forward while holding the button down, doing an attack for each second or until you collide with terrain
+>>>Summon Skeletal Archer: Reserve mana to summon a skeletal archer. Cast the spell to make them all cast toxic shock, adding 1 Poison Discharge to the target.
+>>>Mind Blast: Consume all Mind Charges to deal double damage per Charge. 
+>>>Smite: If this kills an enemy, gain a Mind Charge
+>>>Disengage: Also shoots explosive arrow forward when disengaging after .5 seconds.
+>>>Caustic Arrow: Apply growths to target, when target is shot with poison: Spread growths to nearby targets and apply poison to them all.
+>>>Shock Rods: spawn shock rods. If a nature spell does dmg to a unit near it or a shock aoe spell overlaps with it, activate the shock rod to deal dmg in an aoe and apply shock to units.
+>>>Infernal Shout: Nearby enemies explode on Death for Fire damage and will boost your Fire/Molten Armor Effectiveness for 1 minute.
+>>>Earthstrike: Spawn a rock in the area that taunts and do dmg to enemies in area. If the Rock is destroyed, it explodes and you gain an Earth Shield Charge. Shouts and Sunder will blow up the Rocks.
+>>>Toxic Spray: HOld to keep spraying Poison Stacks on targets. Any that die while Sprayed give Boneshield Charges.
+>>>Fireblast: Can be held down to deal more damage and make it have a bigger AoE
+>>>Sinister Strike: Now if outsdie melee range, will leap to the target (akin to heroic leap)
+>>>Righteous Fire: Just like PoE. Does more damage at the Tip of the spell.
+>>>Vampiric Blood: Consumes corpses to gain permanent Max health 
+>>>Death Coil: Consumes all nearby corpses to deal more damage.
+>>>Death Strie: Stronger per Nearby corpse.
+>>>Plague Strike: Spawns a corpse of a Ghoul.
+>>>Death and Decay: Does more damage for each corpse in area on spawn.
+>>>Horn of Winter: If you have consumed 20 Corpses recently, also summons a Frost Wyrm for 2 minutes.
+>>>Cheat Death: After 10s, gain barrier equal to Damage Taken.
+>>>Seal System: Seals start at 100 Power. Attacks add Stacks, as do Holy Spells + Skills supported by 'of Ensealing' add extra. Seals add effects on attack + passively grant max HP/Mana/Atk Pow/Spell Pow based on Power.
+>>>Judgement System, now only exist in Supports: Of Crimson/Gold/Wise Judgement: Consume 100%/50%/Add 30 power to your seal as well.
+>>>Avenging Wrath: Spells extend the duraion by 1 seconds and adds stacking buff that increase the cost and spell power of all Holy Spells by 10%/2%. Also adds triple jump.
+>>>Juggernaut: Limited to 30% movement speed for 1s after casting a spell, but deal 30% increased damage until end of combat and take 30% reduced dmg.
+
+
+
+
+
+>Controls:
+>>>WASD Movement, Q and E no longer turn. Instead, camera is moved by mouse and you can press tab to alternate between Camera to move mouse vs to move screen
+>>>LMB and RMB are keybinds for spells and E is for targeting, no basic auto attacks.
+>>>Q for quick potion (has a cast time of 1s and slows you while using it, taking dmg interrupts it, limited amount per spawn)
+>>>Sideways + A/D for invulnerabiltiy to Damage and to quickly dodge sideways
+
+>Gems now have Tags
+>>>Gear and Talents can now react to Gems depending on tags, eg Core Gems (Strike Skills and basic Balls) have half GCD thrice every minute.
+>Spells such as Oil and Shock Rods that activate IF: You do ele DMG to a unit near it, if you do a ground area effect that overlaps it, or if you cast a Fire/Nature spell while in the zone. Can proc multiple times
+>Weapons can give socketed Gems generic supports
+
+>Support Gems 	>Devotion Aura affects enemies; 
+>>>Gem of Boost (Spell1): Frost Strike Node that boosts Death Strike DMG passively by 30%. Only one counts at a time Max.
+>>>Gem of Auraboost (Spell1): Aura Now boosts (Spell1)
+>>>Gem of Compoind Interest: Each cast raises Cost and Dmg
+>>>Gem of Compound Tempo: Each cast raises cost but resets CD and makes it have no cast time.
+>>>Multistrike/cast: Hits multiple Targets in an AoE
+>>>Opener: Always crits vs full HP targets
+>>>Hemmorage: DMG vs Bleedin
+>>>Stunning: When hit while affected/after hitting enemy with this, build stun 
+>>>X Charge: On use, gain Boneshield/Mind/Shiv/Enrage Charge 
+>>>X Element: Do only dmg of X element, dont do dmg with any other school
+>>>Combo: Builds combo points 
+>>>Finisher: Now also a finisher consuming combo for 20% more damage/heal per.
+>>>Gem of do X: Applies Aura (eg regen aura) while cast time, removes it after cast time.
+>>>Reset on DMG: Reset CD after taking X dmg/a shield
+>>>Gem of Summon Proc: on proc summon X
+>>^ requirement system eg if dmgs, use dmg one, if heals, use heal one, if has procs on gem, gain on proc summon subskill
+>>>Consume Charge X: Consumes charges for more amplitude
+>>>Using skill X resets this ones CD.
+>>>Do more dmg at max range
+>>>Minions/wards from spell have an aura
+>>>Gain X on kill (life, buff, CD reset)
+>>>Proc: Your next (spellA) crits/heals you/stuns/summons X/is free and instant
+>>>Crit Cast: when this crits, cast (spellB)
+>>>On Autoattack: Cast this on auto attack
+>>>Explosive Minions: Minions from this jewel explode 
+>>>More Charge: More Damage/Heal per X charge
+>>>Of Corpses: Consumes a corpse for effectiveness
+>>>Of Incubation: Incubates (X Minion) by being used, at a rate of (cooldown x mana cost) to (Minion max HP). Minions cast one special spell when spawned and recast it on cooldown. Undead ones have on death effects. Massive variety of pokemon.
+>>>Of double Incubation: Double incubation needed, Double spawns.
+>>>Of Nurture: Gives all incubators you have socketed (cooldown x mana cost x 3) progress split between them all.
+>>>Of Good Concurrance: Spells that generate Charges on use (eg, Avenging Wrath: For each attack during Avenging Wrath, gain SpellPower) will, on expiring, explode into DMG/Healing at their end.
+>>>Of Dispel: Dispels One buff/debuff. Only appears on spells with at least 15s CD.
+>>>Of Stride: After using spell, track last known position. After reusing spell, gain bonus DMG/Heal based on how long you walked since last using it.
+>>>Of Berserking: Gains power when used below 35% max HP.
+>>>Of Aura Mastery: Once every minute (per aura), after changing an Aura, boost the effectiveness of your Aura's by 300% for 10 seconds.
+>>>Of Great Cool: Once this long CD ability ends, regain max mana.
+>>>Of Extension: Your Spell extends your (Element) buff/debuffs on target by 1-2s.
+
+
+>Traps and Rewards
+>>>Wellstones: Click to heal and regen mana to full, once per dungeon
+>>>Lockpickable chest: chance to gain reward or spawn mobs/cast spell on you depending on your skill.
+>>>Friendly/Enemy Portals of (X) Element you can cast spells on that steal mana to spawn enemies that drop loot.
+>>>50% chance for each enemy spawn to be duplicated (recursable) and given extra random patrol routes
+>>>Abyss, Ritual and Beyond mechanics using mobs from the dungeon template (these are simplest)
+>>>Droppable 'survival' encounters with rewards, money risks and mobs listed.
+
+
+>Timeways and Enemies
+>>>Instead of static spawns, quantity can range from 25% to 500% as can enemy stat multi (inverted of quantity, then multiplied by 50% to 200%)
+>>>All enemies in timeways can use socketed spells and have supports. these are generated at the start of the timeway and can be seen in a small popup board at the start.
+>>>Some enemies may or may not spawn per dungeon.
+>>>Most enemies have dodgable spells, spells that need interrupting, fast burst, no burst or active mitigation, or killing a lot of small mobs (AoE works)
+>>>More 'slow tanky enemies' you need to kite. Some of them have long CD Intercept.
+>>>Rare mobs w/ spell system akin to ArchNem with combos, each sequence of combos affects next one. These enemies respawn like mini bossess if killed and come back stronger with one more random ability.
+>>>Ele Resists to %s with break points. gain 5 max resist per 20 levels.
+>>>Enemy Barracks that spawn enemies that path towards you and if you don't destroy them, will research tech buffing enemies on a timer.
+>>>Stunnable Enemies: On X DMG taken, enemy is stunned
+>>>Some mobs are really tanky at start, then after X DMG become fast and high DMG.
+>>>No evade mode/evade regen
+>>>Enemy spells can inflict Instance lasting "Injuries" to your stats if you fail a mechanic
+>>>Timeway Invasions
+>>>HoMM3 Boons: Pick one of 3, Gold/XP or 2 Temporary Perks for the dungeon like nerfing enemies, a buff, different Adventure Helpers have different Boons Available and there's a good few.
+>>>Timeways have "Timerips". Each one is hidden until you get near it, and is a 'encounter' or 'trap' of sorts you have 10 seconds to decide if you want to trigger it. After you do, in your next same timeway, the Timerip will be replaced with a reward but also an even Harder encounter.
+>>>Mobs dont just deal DMG, all enemies have a "Corruption%" that makes it so DMG dealt reduces max HP/Mana. Some spells inflict Extra Corruption.
+
+>Rare Soulbound Tome Drop (perma +1 to specific Attribute, but 36 Hour cooldown on use)
+>Gain +1 Glyph of X type nodes, these take in Glyphs of different tiers whose effects are revealed after insertion.

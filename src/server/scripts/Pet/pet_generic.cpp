@@ -95,7 +95,7 @@ struct npc_pet_gen_pandaren_monk : public NullCreatureAI
                 break;
             case EVENT_FOLLOW:
                 if (Unit* owner = me->GetCharmerOrOwner())
-                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                    me->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), RandomPetFollowAngle());
                 break;
             case EVENT_DRINK:
                 me->CastSpell(me, SPELL_PANDAREN_MONK, false);

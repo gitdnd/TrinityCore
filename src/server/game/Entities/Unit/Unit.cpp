@@ -1722,34 +1722,20 @@ void Unit::HandleEmoteCommand(Emote emoteId)
                 return aurEff->GetSpellInfo()->IsItemFitToSpellRequirements(weapon);
             });
 
-            // no more than 100%
-            RoundToInterval(arpPct, 0.f, 100.f);
+            arpPct /= 100.f;
 
-            float maxArmorPen = 0.f;
-            if (victim->GetLevel() < 60)
-                maxArmorPen = float(400 + 85 * victim->GetLevel());
-            else
-                maxArmorPen = 400 + 85 * victim->GetLevel() + 4.5f * 85 * (victim->GetLevel() - 59);
-
-            // Cap armor penetration to this number
-            maxArmorPen = std::min((armor + maxArmorPen) / 3.f, armor);
-            // Figure out how much armor do we ignore
-            armor -= CalculatePct(maxArmorPen, arpPct);
+            armor *= 1.f - arpPct;
         }
     }
 
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float levelModifier = attacker ? attacker->GetLevel() : attackerLevel;
-    if (levelModifier > 59.f)
-        levelModifier = levelModifier + 4.5f * (levelModifier - 59.f);
+    float dR = (1.f - (((ARMOR_DMG_RED)*armor) / (1 + ARMOR_DMG_RED * abs(armor)))) *
+               (1.f - victim->GetHoTStatAmount(HoTStat::ELE_RED_PHYS_TOTAL));
 
-    float damageReduction = 0.1f * armor / (8.5f * levelModifier + 40.f);
-    damageReduction /= (1.0f + damageReduction);
 
-    RoundToInterval(damageReduction, 0.f, 0.75f);
-    return uint32(std::ceil(std::max(damage * (1.0f - damageReduction), 0.0f)));
+    return uint32(std::ceil(std::max(damage * dR, 0.0f)));
 }
 
 /*static*/ uint32 Unit::CalcSpellResistedDamage(Unit const* attacker, Unit* victim, uint32 damage, SpellSchoolMask schoolMask, SpellInfo const* spellInfo)
@@ -1769,29 +1755,13 @@ void Unit::HandleEmoteCommand(Emote emoteId)
             return 0;
     }
 
-    float const averageResist = Unit::CalculateAverageResistReduction(attacker, schoolMask, victim, spellInfo);
-    float discreteResistProbability[11] = { };
-    if (averageResist <= 0.1f)
-    {
-        discreteResistProbability[0] = 1.0f - 7.5f * averageResist;
-        discreteResistProbability[1] = 5.0f * averageResist;
-        discreteResistProbability[2] = 2.5f * averageResist;
-    }
-    else
-    {
-        for (uint32 i = 0; i < 11; ++i)
-            discreteResistProbability[i] = std::max(0.5f - 2.5f * std::fabs(0.1f * i - averageResist), 0.0f);
-    }
+    float resistance = Unit::CalculateAverageResistReduction(attacker, schoolMask, victim, spellInfo);
 
-    float roll = float(rand_norm());
-    float probabilitySum = 0.0f;
+    resistance = (1.f - resistance) * (1.f - victim->GetHoTStatAmount(HoTStat::PHYS_RED_ELE_TOTAL)) *
+                     (1.f - victim->GetHoTStatAmount(HoTStat::ELE_RED_ELE_TOTAL));
 
-    uint32 resistance = 0;
-    for (; resistance < 11; ++resistance)
-        if (roll < (probabilitySum += discreteResistProbability[resistance]))
-            break;
 
-    float damageResisted = damage * resistance / 10.f;
+    float damageResisted = damage * resistance;
     if (damageResisted > 0.0f) // if any damage was resisted
     {
         int32 ignoredResistance = 0;
@@ -1809,25 +1779,36 @@ void Unit::HandleEmoteCommand(Emote emoteId)
 
         ignoredResistance = std::min<int32>(ignoredResistance, 100);
         ApplyPct(damageResisted, 100 - ignoredResistance);
-
-        // Spells with melee and magic school mask, decide whether resistance or armor absorb is higher
-        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC))
-        {
-            uint32 damageAfterArmor = Unit::CalcArmorReducedDamage(attacker, victim, damage, spellInfo, spellInfo->GetAttackType());
-            float armorReduction = damage - damageAfterArmor;
-
-            // pick the lower one, the weakest resistance counts
-            damageResisted = std::min(damageResisted, armorReduction);
-        }
-    }
+    }    float maxMulti = 1.f;
 
     damageResisted = std::max(damageResisted, 0.f);
     return uint32(damageResisted);
 }
 
-/*static*/ float Unit::CalculateAverageResistReduction(WorldObject const* caster, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo)
+/*static*/ float Unit::CalculateAverageResistReduction(WorldObject const* caster, SpellSchoolMask schoolMask, Unit* victim, SpellInfo const* spellInfo)
 {
-    float victimResistance = float(victim->GetResistance(schoolMask));
+    float victimResistance = 0;
+    float maxRes = 0;
+    uint8 biggestSchool    = 0;
+    for (uint8 i = SPELL_SCHOOL_HOLY; i <= SpellSchoolMask::SPELL_SCHOOL_MASK_ARCANE; i++)
+    {
+        if (schoolMask & i)
+        {
+            float nR  = victim->GetResistance(SpellSchools(i));
+            float nMR = BASE_MAX_RESIST + victim->GetHoTModAmount(HoTMods(UNIT_MOD_RESISTANCE_HOLY_MAX + i));
+            if (nR > nMR)
+                nR = nMR;
+            if (nR > victimResistance)
+            {
+                biggestSchool = i;
+                victimResistance = nR;
+                maxRes = nMR;
+            }
+        }
+    }
+    victim->GetHoTModAmount(UNIT_MOD_RESISTANCE_HOLY_MAX);
+    if (victimResistance > maxRes)
+        victimResistance = maxRes;
     if (caster)
     {
         // pets inherit 100% of masters penetration
@@ -1850,22 +1831,10 @@ void Unit::HandleEmoteCommand(Emote emoteId)
 
     victimResistance = std::max(victimResistance, 0.0f);
 
-    // level-based resistance does not apply to binary spells, and cannot be overcome by spell penetration
-    // gameobject caster -- should it have level based resistance?
-    if (caster && caster->GetTypeId() != TYPEID_GAMEOBJECT && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL)))
-        victimResistance += std::max((float(victim->GetLevelForTarget(caster)) - float(caster->GetLevelForTarget(victim))) * 5.0f, 0.0f);
+    victimResistance *= victim->GetHoTModAmount(HoTMods(UNIT_MOD_RESISTANCE_HOLY_MAX + biggestSchool));
 
-    static uint32 const BOSS_LEVEL = 83;
-    static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
-    uint32 level = victim->GetLevel();
-    float resistanceConstant = 0.0f;
 
-    if (level == BOSS_LEVEL)
-        resistanceConstant = BOSS_RESISTANCE_CONSTANT;
-    else
-        resistanceConstant = level * 5.0f;
-
-    return victimResistance / (victimResistance + resistanceConstant);
+    return victimResistance / 100.f;
 }
 
 /*static*/ void Unit::CalcAbsorbResist(DamageInfo& damageInfo, Spell* spell /*= nullptr*/)
@@ -3788,6 +3757,8 @@ void Unit::RemoveAura(AuraApplicationMap::iterator &i, AuraRemoveMode mode)
     // Remove aura - for Area and Target auras
     if (aura->GetOwner() == this)
         aura->Remove(mode);
+
+    CallScriptIteration(CallScriptAuraAddRemove(aura, false));
 }
 
 void Unit::RemoveAura(uint32 spellId, ObjectGuid caster, uint8 reqEffMask, AuraRemoveMode removeMode)
@@ -5152,6 +5123,8 @@ void Unit::UpdateStatBuffMod(Stats stat)
             return true;
         return false;
     });
+
+    factor += GetHoTModAmount(HoTMods(UNIT_MOD_PCT_INC_STRENGTH + stat));
 
     factor *= GetTotalAuraMultiplier(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, [stat](AuraEffect const* aurEff) -> bool
     {
@@ -6581,19 +6554,19 @@ void Unit::SendEnergizeSpellLog(Unit* victim, uint32 spellId, int32 damage, Powe
     data << int32(damage);
     SendMessageToSet(&data, true);
 }
-
-void Unit::EnergizeBySpell(Unit* victim, uint32 spellId, int32 damage, Powers powerType)
+void Unit::EnergizeBySpell(Unit* victim, Spell* spell, uint32 damage, Powers powerType)
 {
-    if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
-        EnergizeBySpell(victim, info, damage, powerType);
+    int32 gainedPower = victim->ModifyPower(powerType, damage, false, PowerChangeReason::REASON_SPELL_GENERATED, spell);
+
+    if (powerType != POWER_HAPPINESS && gainedPower)
+    {
+        SpellInfo const* spellInfo = spell->m_spellInfo;
+        victim->GetThreatManager().ForwardThreatForAssistingMe(this, float(damage) / 2, spellInfo, true);
+    }
+
+    SendEnergizeSpellLog(victim, spell->m_spellInfo->Id, damage, powerType);
 }
 
-void Unit::EnergizeBySpell(Unit* victim, SpellInfo const* spellInfo, int32 damage, Powers powerType)
-{
-    victim->ModifyPower(powerType, damage, false);
-    victim->GetThreatManager().ForwardThreatForAssistingMe(this, float(damage)/2, spellInfo, true);
-    SendEnergizeSpellLog(victim, spellInfo->Id, damage, powerType);
-}
 
 uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 pdamage, DamageEffectType damagetype, SpellEffectInfo const& spellEffectInfo, Optional<float> const& donePctTotal, uint32 stack /*= 1*/) const
 {
@@ -8805,7 +8778,7 @@ int32 Unit::GetHealthGain(int32 dVal)
 }
 
 // returns negative amount on power reduction
-int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*/)
+int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*/, PowerChangeReason reason /*= PowerChangeReason::REASON_NONE*/, std::variant<Spell*, Aura*> reasonObj /*= (Aura*)nullptr*/)
 {
     int32 gain = 0;
 
@@ -8832,6 +8805,11 @@ int32 Unit::ModifyPower(Powers power, int32 dVal, bool withPowerUpdate /*= true*
     {
         SetPower(power, maxPower, withPowerUpdate);
         gain = maxPower - curPower;
+    }
+    if (gain != 0)
+    {
+
+        CallScriptIteration(CallScriptOnResourceChange(power, gain, reason, reasonObj));
     }
 
     return gain;
@@ -9008,7 +8986,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype)
                     float ownerSpeed = followed->GetSpeedRate(mtype);
                     if (speed < ownerSpeed || creature->IsWithinDist3d(followed, 10.0f))
                         speed = ownerSpeed;
-                    speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - PET_FOLLOW_DIST) * 0.05f), 1.3f);
+                    speed *= std::min(std::max(1.0f, 0.75f + (GetDistance(followed) - RandomPetFollowDist()) * 0.05f), 1.3f);
                 }
             }
         }
@@ -9523,6 +9501,7 @@ void Unit::UpdateUnitMod(UnitMods unitMod)
             break;
     }
 }
+
 
 void Unit::UpdateDamageDoneMods(WeaponAttackType attackType, int32 /*skipEnchantSlot = -1*/)
 {
@@ -10852,6 +10831,9 @@ void Unit::RestoreDisplayId()
 
 void Unit::AddComboPoints(Unit* target, int8 count)
 {
+    if (GetHoTModAmount(UNIT_MOD_EMBERS) != 0)
+        count *= GetHoTModAmount(UNIT_MOD_EMBERS);
+
     if (!count)
         return;
 
@@ -10901,7 +10883,10 @@ void Unit::SendComboPoints()
         WorldPacket data;
         data.Initialize(SMSG_UPDATE_COMBO_POINTS, packGUID.size() + 1);
         data << packGUID;
-        data << uint8(m_comboPoints);
+        if (GetHoTModAmount(UNIT_MOD_EMBERS) != 0)
+            data << uint8(m_comboPoints / EMBERS_PER_COMBO_POINT);
+        else
+            data << uint8(m_comboPoints);
         playerMe->SendDirectMessage(&data);
     }
     Player* movingMe = GetCharmerOrSelfPlayer();
@@ -10915,7 +10900,10 @@ void Unit::SendComboPoints()
         data.Initialize(SMSG_PET_UPDATE_COMBO_POINTS, GetPackGUID().size() + packGUID.size() + 1);
         data << GetPackGUID();
         data << packGUID;
-        data << uint8(m_comboPoints);
+        if (GetHoTModAmount(UNIT_MOD_EMBERS) != 0)
+            data << uint8(m_comboPoints / EMBERS_PER_COMBO_POINT);
+        else
+            data << uint8(m_comboPoints);
         if (movingMe)
             movingMe->SendDirectMessage(&data);
         if (owner && owner != movingMe)
@@ -12448,6 +12436,8 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
     if (Aura* aura = Aura::TryRefreshStackOrCreate(createInfo))
     {
         aura->ApplyForTargets();
+        CallScriptIteration(CallScriptAuraAddRemove(aura, true));
+
         return aura;
     }
     return nullptr;
@@ -13520,12 +13510,7 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
-    if (GetTypeId() != TYPEID_PLAYER)
-        ModifyPower(POWER_RAGE, uint32(addRage * 10));
-    /*
-    if (GetTypeId() == TYPEID_PLAYER)
-        ModifyPower(POWER_FOCUS, uint32(addRage / 2));
-        */
+    ModifyPower(POWER_RAGE, uint32(addRage * 10), true, PowerChangeReason::REASON_ATTACK_GENERATED);
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)

@@ -198,7 +198,7 @@ void CreatureAI::JustAppeared()
                 if (Unit* owner = summon->GetCharmerOrOwner())
                 {
                     summon->GetMotionMaster()->Clear();
-                    summon->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, summon->GetFollowAngle());
+                    summon->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), summon->GetFollowAngle());
                 }
             }
         }
@@ -223,7 +223,7 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
         if (Unit* owner = me->GetCharmerOrOwner())
         {
             me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+            me->GetMotionMaster()->MoveFollow(owner, RandomPetFollowDist(), me->GetFollowAngle());
         }
         else
         {

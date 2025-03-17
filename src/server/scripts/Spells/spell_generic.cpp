@@ -3105,7 +3105,8 @@ class spell_gen_restoration : public AuraScript
         if (int32 mana = target->GetMaxPower(POWER_MANA))
         {
             mana /= 10;
-            target->EnergizeBySpell(target, GetId(), mana, POWER_MANA);
+            target->ModifyPower(POWER_MANA, mana);
+            target->SendEnergizeSpellLog(target, GetSpellInfo()->Id, mana, POWER_MANA);
         }
     }
 

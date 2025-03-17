@@ -2169,6 +2169,8 @@ void Player::RegenerateHealth()
     addValue += GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT);
     addValue += m_baseHealthRegen / 2.5f;
 
+    addValue += TotalHoTMod[UNIT_MOD_HEALTH_REGEN];
+
     if (addValue < 0.0f)
         addValue = 0.0f;
 
@@ -5385,67 +5387,9 @@ float Player::GetMeleeCritFromAgility() const
     return crit*100.0f;
 }
 
-uint32 Player::GetSpellPowerFromPrimaryStats() const
+float Player::GetDodgeFromAgility() const
 {
-    uint32 spellPower = 0;
-
-    // get spirit and half of intellectas spell power
-    spellPower += uint32(GetStat(STAT_INTELLECT) / 2.0f);
-    spellPower += uint32(GetStat(STAT_SPIRIT));
-
-    return spellPower;
-}
-
-void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing) const
-{
-    // Table for base dodge values
-    const float dodge_base[MAX_CLASSES] =
-    {
-         0.036640f, // Warrior
-         0.034943f, // Paladin
-        -0.040873f, // Hunter
-         0.020957f, // Rogue
-         0.034178f, // Priest
-         0.036640f, // DK
-         0.021080f, // Shaman
-         0.036587f, // Mage
-         0.024211f, // Warlock
-         0.0f,      // ??
-         0.056097f, // Druid
-         0.036640f  // Adventurer
-    };
-    // Crit/agility to dodge/agility coefficient multipliers; 3.2.0 increased required agility by 15%
-    const float crit_to_dodge[MAX_CLASSES] =
-    {
-         0.85f/1.15f,    // Warrior
-         1.00f/1.15f,    // Paladin
-         1.11f/1.15f,    // Hunter
-         2.00f/1.15f,    // Rogue
-         1.00f/1.15f,    // Priest
-         0.85f/1.15f,    // DK
-         1.60f/1.15f,    // Shaman
-         1.00f/1.15f,    // Mage
-         0.97f/1.15f,    // Warlock (?)
-         0.0f,           // ??
-         2.00f/1.15f,    // Druid
-         2.00f/1.15f     // Adventurer
-    };
-
-    uint8 level = 80;//GetAverageItemLevel() > 80 ? 80 : uint8(GetAverageItemLevel());
-    uint32 pclass = GetClass();
-
-    // Dodge per agility is proportional to crit per agility, which is available from DBC files
-    GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    if (dodgeRatio == nullptr || pclass > MAX_CLASSES)
-        return;
-
-    /// @todo research if talents/effects that increase total agility by x% should increase non-diminishing part
-    float base_agility = GetCreateStat(STAT_AGILITY) * GetPctModifierValue(UnitMods(UNIT_MOD_STAT_START + AsUnderlyingType(STAT_AGILITY)), BASE_PCT);
-    float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
-
-    // calculate diminishing (green in char screen) and non-diminishing (white) contribution
-    diminishing = 100.0f * bonus_agility * dodgeRatio->Data * crit_to_dodge[pclass-1];
-    nondiminishing = 100.0f * (dodge_base[pclass-1] + base_agility * dodgeRatio->Data * crit_to_dodge[pclass-1]);
+    return 1.f + GetStat(STAT_AGILITY) / 100.f;
 }
 
 float Player::GetSpellCritFromIntellect() const
@@ -7412,6 +7356,9 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply, bool updateItemA
 
     ApplyEnchantment(item, apply);
 
+    for (auto& supp : item->h_allSupportGems)
+        ModSpellSupport(supp.SupportType, supp.SecondData, supp.Spell, supp.Phase, apply);
+
     TC_LOG_DEBUG("entities.player.items", "Player::_ApplyItemMods: completed");
 }
 
@@ -7713,6 +7660,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         if (feral_bonus)
             ApplyFeralAPBonus(feral_bonus, apply);
     }
+
 }
 
 void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, bool apply)
@@ -12492,6 +12440,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             default:
                 break;
         }
+
+
     }
     else
     {
@@ -12806,6 +12756,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
         pItem->SetSlot(NULL_SLOT);
         if (IsInWorld() && update)
             pItem->SendUpdateToPlayer(this);
+
+
     }
 }
 
@@ -14150,6 +14102,7 @@ void Player::ApplyEnchantment(Item* item, bool apply)
 {
     for (uint32 slot = 0; slot < MAX_ENCHANTMENT_SLOT; ++slot)
         ApplyEnchantment(item, EnchantmentSlot(slot), apply);
+
 }
 
 void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition)
@@ -25903,6 +25856,8 @@ void Player::HandleFall(MovementInfo const& movementInfo)
     // calculate total z distance of the fall
     float z_diff = m_lastFallZ - movementInfo.pos.GetPositionZ();
     //TC_LOG_DEBUG("zDiff = {}", z_diff);
+
+    doubleJumps = 0;
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0

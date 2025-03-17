@@ -449,7 +449,7 @@ public:
         }
 
         // Follow player - Using pet's default dist and angle
-        creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, creature->GetFollowAngle());
+        creature->GetMotionMaster()->MoveFollow(player, RandomPetFollowDist(), creature->GetFollowAngle());
 
         handler->PSendSysMessage(LANG_CREATURE_FOLLOW_YOU_NOW, creature->GetName().c_str());
         return true;

@@ -635,6 +635,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_ACCOUNT_BANK_TAB, "DELETE FROM account_bank_tab WHERE accountid = ? AND TabId = ?", CONNECTION_ASYNC); // 0: uint32, 1: uint8
 
 
+    // HoT
+
+    PrepareStatement(CHAR_INS_SOCKET_SUPPORT, "INSERT INTO hot_support_gem (guid, spell, support_type, second_data, which_socket, cast_phase) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_SOCKET_SUPPORT, "DELETE FROM hot_support_gem WHERE guid = ?", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

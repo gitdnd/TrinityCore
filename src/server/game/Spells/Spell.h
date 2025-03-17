@@ -430,6 +430,12 @@ class TC_GAME_API Spell
         int32 GetCastTime() const { return m_casttime; }
         bool IsAutoRepeat() const { return m_autoRepeat; }
         void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
+        int32 GetChannelTime() const { return m_channeledDuration; }
+        void SetChannelTime(uint32 time)
+        {
+            m_channeledDuration = time;
+            SendChannelUpdate(m_channeledDuration);
+        };
         void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
         bool IsTriggered() const;
         bool IsIgnoringCooldowns() const;
@@ -681,6 +687,11 @@ class TC_GAME_API Spell
         void CallScriptObjectTargetSelectHandlers(WorldObject*& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         void CallScriptDestinationTargetSelectHandlers(SpellDestination& target, SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType);
         bool CheckScriptEffectImplicitTargets(uint32 effIndex, uint32 effIndexToCheck);
+
+        void CallScriptBeforeSpellLoadHandlers();
+        void CallScriptBeforeCastTimeHandlers();
+        void CallScriptWhileCastHandlers();
+        void CallScriptAfterFullChannelHandlers();
         std::vector<SpellScript*> m_loadedScripts;
 
         struct HitTriggerSpell
@@ -724,6 +735,36 @@ class TC_GAME_API Spell
 
         Spell(Spell const& right) = delete;
         Spell& operator=(Spell const& right) = delete;
+
+        // -------------------------------------------
+
+    public:
+
+        float h_bonusRange = 0;
+
+        void SetBonusRange(float range)
+        {
+            h_bonusRange = range;
+        }
+        float GetTotalMaxRange(bool positive = false, WorldObject* caster = nullptr, Spell* spell = nullptr);
+
+        void SetBonusValue(uint32 amount)
+        {
+            h_bonusValue = amount;
+        }
+        uint32 GetBonusValue()
+        {
+            return h_bonusValue;
+        }
+        uint32 h_bonusValue = 0;
+
+        uint32 h_triggeringSpell = 0;
+        void SetTriggeringSpell(uint32 spell)
+        {
+            h_triggeringSpell = spell;
+        }
+
+        bool h_skip = false;
 };
 
 namespace Trinity

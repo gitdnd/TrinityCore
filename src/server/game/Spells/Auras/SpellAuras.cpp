@@ -856,7 +856,7 @@ void Aura::Update(uint32 diff, Unit* caster)
                             Remove();
                     }
                     else if (int32(caster->GetPower(powertype)) >= manaPerSecond)
-                        caster->ModifyPower(powertype, -manaPerSecond);
+                        caster->ModifyPower(powertype, -manaPerSecond, true, PowerChangeReason::REASON_AURA_EFFECT, this);
                     else
                         Remove();
                 }
@@ -1041,6 +1041,7 @@ void Aura::SetStackAmount(uint8 stackAmount)
         if (!aurApp->GetRemoveMode())
             HandleAuraSpecificMods(aurApp, caster, true, true);
 
+    GetCaster()->DoOnAuraStackScripts(this, m_stackAmount);
     SetNeedClientUpdateForTargets();
 }
 
@@ -2666,6 +2667,68 @@ void Aura::CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
     }
 }
 
+
+bool Aura::CallScriptOnResourceChange(Powers power, int amount, PowerChangeReason reason,
+                                      std::variant<Spell*, Aura*> reasonObj)
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_RESOURCE_CHANGE);
+        auto hookItrEnd = (*scritr)->OnResourceChange.end(), hookItr = (*scritr)->OnResourceChange.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            hookItr->Call(*scritr, power, amount, reason, reasonObj);
+
+        (*scritr)->_FinishScriptCall();
+    }
+    if (IsRemoved())
+        return false;
+    return true;
+} 
+bool Aura::CallScriptAuraAddRemove(Aura* aura, bool added)
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_AURA_ADDREMOVE);
+        auto hookItrEnd = (*scritr)->AuraAddRemove.end(), hookItr = (*scritr)->AuraAddRemove.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            hookItr->Call(*scritr, aura, added);
+
+        (*scritr)->_FinishScriptCall();
+    }
+    if (IsRemoved())
+        return false;
+    return true;
+}
+bool Aura::CallScriptBeforeSpellCast(Spell* spell)
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_BEFORE_SPELL_CAST);
+        auto hookItrEnd = (*scritr)->BeforeSpellCast.end(), hookItr = (*scritr)->BeforeSpellCast.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            hookItr->Call(*scritr, spell);
+
+        (*scritr)->_FinishScriptCall();
+    }
+    if (IsRemoved())
+        return false;
+    return true;
+} 
+bool Aura::CallScriptOnAuraStack(Aura* aura, int16 amount)
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_ON_AURA_STACK);
+        auto hookItrEnd = (*scritr)->OnAuraStack.end(), hookItr = (*scritr)->OnAuraStack.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            hookItr->Call(*scritr, aura, amount);
+
+        (*scritr)->_FinishScriptCall();
+    }
+    if (IsRemoved())
+        return false;
+    return true;
+}
 std::string Aura::GetDebugInfo() const
 {
     std::stringstream sstr;

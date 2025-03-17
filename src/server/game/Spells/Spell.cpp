@@ -1075,18 +1075,17 @@ void Spell::SelectImplicitNearbyTargets(SpellEffectInfo const& spellEffectInfo, 
     switch (targetType.GetCheckType())
     {
         case TARGET_CHECK_ENEMY:
-            range = m_spellInfo->GetMaxRange(false, m_caster, this);
+            range = GetTotalMaxRange(false, m_caster, this);
             break;
         case TARGET_CHECK_ALLY:
         case TARGET_CHECK_PARTY:
         case TARGET_CHECK_RAID:
         case TARGET_CHECK_RAID_CLASS:
-        case TARGET_CHECK_OWN_SUMMON:
-            range = m_spellInfo->GetMaxRange(true, m_caster, this);
+            range = GetTotalMaxRange(true, m_caster, this);
             break;
         case TARGET_CHECK_ENTRY:
         case TARGET_CHECK_DEFAULT:
-            range = m_spellInfo->GetMaxRange(IsPositive(), m_caster, this);
+            range = GetTotalMaxRange(IsPositive(), m_caster, this);
             break;
         default:
             ABORT_MSG("Spell::SelectImplicitNearbyTargets: received not implemented selection check type");
@@ -1220,7 +1219,7 @@ void Spell::SelectImplicitConeTargets(SpellEffectInfo const& spellEffectInfo, Sp
     float radius = spellEffectInfo.CalcRadius(m_caster);
     // Workaround for some spells that don't have RadiusEntry set in dbc (but SpellRange instead)
     if (G3D::fuzzyEq(radius, 0.f))
-        radius = m_spellInfo->GetMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
+        radius = GetTotalMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
 
     radius *= m_spellValue->RadiusMod;
 
@@ -1311,7 +1310,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffectInfo const& spellEffectInfo, Sp
     float radius = spellEffectInfo.CalcRadius(m_caster);
     // Workaround for some spells that don't have RadiusEntry set in dbc (but SpellRange instead)
     if (G3D::fuzzyEq(radius, 0.f))
-        radius = m_spellInfo->GetMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
+        radius = GetTotalMaxRange(m_spellInfo->IsPositiveEffect(spellEffectInfo.EffectIndex), m_caster, this);
 
     radius *= m_spellValue->RadiusMod;
 
@@ -1372,7 +1371,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffectInfo const& spellEffectIn
         case TARGET_DEST_CASTER_FISHING:
         {
             float minDist = m_spellInfo->GetMinRange(true);
-            float maxDist = m_spellInfo->GetMaxRange(true);
+            float maxDist = GetTotalMaxRange(true);
             float dist = frand(minDist, maxDist);
             float x, y, z;
             float angle = float(rand_norm()) * static_cast<float>(M_PI * 35.0f / 180.0f) - static_cast<float>(M_PI * 17.5f / 180.0f);
@@ -1427,7 +1426,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffectInfo const& spellEffectIn
             switch (targetType.GetTarget())
             {
                 case TARGET_DEST_CASTER_SUMMON:
-                    dist = PET_FOLLOW_DIST;
+                    dist = RandomPetFollowDist();
                     break;
                 case TARGET_DEST_CASTER_RANDOM:
                     if (dist > objSize)
@@ -1675,7 +1674,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffectInfo const& spellEffectInfo, Sp
 
     // We should check if triggered spell has greater range (which is true in many cases, and initial spell has too short max range)
     // limit max range to 300 yards, sometimes triggered spells can have 50000yds
-    float bestDist = m_spellInfo->GetMaxRange(false);
+    float bestDist = GetTotalMaxRange(false);
     if (SpellInfo const* triggerSpellInfo = sSpellMgr->GetSpellInfo(spellEffectInfo.TriggerSpell))
         bestDist = std::min(std::max(bestDist, triggerSpellInfo->GetMaxRange(false)), std::min(dist2d, 300.0f));
 
@@ -3044,7 +3043,7 @@ bool Spell::UpdateChanneledTargetList()
     float range = 0;
     if (channelAuraMask)
     {
-        range = m_spellInfo->GetMaxRange(IsPositive());
+        range = GetTotalMaxRange(IsPositive());
         if (Player* modOwner = m_caster->GetSpellModOwner())
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, range, this);
 
@@ -3088,6 +3087,8 @@ bool Spell::UpdateChanneledTargetList()
 
 SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const* triggeredByAura)
 {
+    InitExplicitTargets(targets);
+
     if (m_CastItem)
     {
         m_castItemGUID = m_CastItem->GetGUID();
@@ -3099,7 +3100,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         m_castItemEntry = 0;
     }
 
-    InitExplicitTargets(targets);
 
     // Fill aura scaling information
     if (Unit* unitCaster = m_caster->ToUnit())
@@ -3151,6 +3151,15 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
     }
 
     LoadScripts();
+
+    CallScriptBeforeSpellLoadHandlers();
+    if (h_skip)
+    {
+        SendCastResult(SPELL_FAILED_TRY_AGAIN);
+        finish(false);
+        cancel();
+        return SPELL_FAILED_UNKNOWN;
+    }
 
     // Fill cost data (do not use power for item casts)
     m_powerCost = m_CastItem ? 0 : m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask, this);
@@ -3234,6 +3243,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         }
     }
 
+    CallScriptBeforeCastTimeHandlers();
+    if (h_skip)
+        return SPELL_FAILED_ERROR;
     // set timer base at cast time
     ReSetTimer();
 
@@ -3264,6 +3276,13 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
             }
 
             unitCaster->SetCurrentCastSpell(this);
+            unitCaster->DoBeforeSpellCastScripts(this);
+            if (h_skip)
+            {
+                cancel();
+                return SPELL_FAILED_UNKNOWN;
+            }
+
         }
         SendSpellStart();
 
@@ -3282,7 +3301,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const& targets, AuraEffect const
         if (!m_casttime && /*!m_spellInfo->StartRecoveryTime && */ GetCurrentContainer() == CURRENT_GENERIC_SPELL)
             cast(true);
     }
-
     return SPELL_CAST_OK;
 }
 
@@ -3498,8 +3516,8 @@ void Spell::_cast(bool skipCheck)
         SetExecutedCurrently(false);
         return;
     }
-
-    if (Unit* unitCaster = m_caster->ToUnit())
+    Unit* unitCaster = m_caster->ToUnit();
+    if (unitCaster)
         if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
             if (Creature* pet = ObjectAccessor::GetCreature(*m_caster, unitCaster->GetPetGUID()))
                 pet->DespawnOrUnsummon();
@@ -3511,8 +3529,8 @@ void Spell::_cast(bool skipCheck)
     // traded items have trade slot instead of guid in m_itemTargetGUID
     // set to real guid to be sent later to the client
     m_targets.UpdateTradeSlotItem();
-
-    if (Player* player = m_caster->ToPlayer())
+    Player* player = m_caster->ToPlayer();
+    if (player)
     {
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CAST_ITEM) && m_CastItem)
         {
@@ -3578,7 +3596,7 @@ void Spell::_cast(bool skipCheck)
         {
             if (id < 0)
             {
-                if (Unit* unitCaster = m_caster->ToUnit())
+                if (unitCaster = m_caster->ToUnit())
                     unitCaster->RemoveAurasDueToSpell(-id);
             }
             else
@@ -3596,6 +3614,16 @@ void Spell::_cast(bool skipCheck)
     }
 
     SetExecutedCurrently(false);
+
+    if (player)
+    {
+        if (player->GetQuedSpell() != 0)
+        {
+            player->CastSpell(player, playerCaster->GetQuedSpell(), false);
+            player->SetQuedSpell(0);
+        }
+    }
+    unitCaster->SetLastSpellUsed(m_spellInfo);
 
     if (!m_originalCaster)
         return;
@@ -3885,10 +3913,14 @@ void Spell::update(uint32 difftime)
                 if (difftime >= (uint32)m_timer)
                     m_timer = 0;
                 else
+                {
+                    CallScriptWhileCastHandlers();
                     m_timer -= difftime;
+                }
+
             }
 
-            if (m_timer == 0 && !m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat())
+            if (m_timer <= 0 && !m_spellInfo->IsNextMeleeSwingSpell() && !IsAutoRepeat())
                 // don't CheckCast for instant spells - done in spell::prepare, skip duplicate checks, needed for range checks for example
                 cast(!m_casttime);
             break;
@@ -3914,11 +3946,14 @@ void Spell::update(uint32 difftime)
                     if (difftime >= (uint32)m_timer)
                         m_timer = 0;
                     else
+                    {
                         m_timer -= difftime;
+                        CallScriptWhileCastHandlers();
+                    }
                 }
             }
 
-            if (m_timer == 0)
+            if (m_timer <= 0)
             {
                 SendChannelUpdate(0);
                 finish();
@@ -4018,6 +4053,10 @@ void Spell::finish(bool ok)
     // Stop Attack for some spells
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET))
         unitCaster->AttackStop();
+
+    CallScriptAfterFullChannelHandlers();
+    CallScriptAfterCastHandlers(); // consider putting this back Idk where it was lmao
+    unitCaster->DoOnSpellCastScripts(this);
 }
 
 void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError, uint32* param1 /*= nullptr*/, uint32* param2 /*= nullptr*/)
@@ -4927,7 +4966,7 @@ void Spell::TakePower()
         return;
     }
 
-    unitCaster->ModifyPower(powerType, -m_powerCost);
+    unitCaster->ModifyPower(powerType, -m_powerCost, true, PowerChangeReason::REASON_SPELL_COST, this);
 
     // Set the five second timer
     if (powerType == POWER_MANA && m_powerCost > 0)
@@ -5229,6 +5268,7 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGoT
 
     if (!preventDefault)
         (this->*SpellEffectHandlers[spellEffectInfo.Effect])();
+
 }
 
 SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint32* param2 /*= nullptr*/)
@@ -5734,7 +5774,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
                         return SPELL_FAILED_LINE_OF_SIGHT;
 
                     float objSize = target->GetCombatReach();
-                    float range = m_spellInfo->GetMaxRange(true, unitCaster, this) * 1.5f + objSize; // can't be overly strict
+                    float range = GetTotalMaxRange(true, unitCaster, this) * 1.5f + objSize; // can't be overly strict
 
                     m_preGeneratedPath = std::make_unique<PathGenerator>(unitCaster);
                     m_preGeneratedPath->SetPathLengthLimit(range);
@@ -8143,6 +8183,67 @@ void Spell::LoadScripts()
     }
 }
 
+void Spell::CallScriptBeforeSpellLoadHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_SPELL_LOAD);
+        auto hookItrEnd = (*scritr)->BeforeSpellLoad.end(),
+                                                      hookItr    = (*scritr)->BeforeSpellLoad.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptBeforeCastTimeHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_BEFORE_CAST_TIME);
+        auto hookItrEnd = (*scritr)->BeforeCastTime.end(),
+                                                      hookItr    = (*scritr)->BeforeCastTime.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptWhileCastHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_WHILE_CAST);
+        auto hookItrEnd = (*scritr)->WhileCast.end(),
+                                                      hookItr    = (*scritr)->WhileCast.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+        {
+            (*hookItr).Call(*scritr);
+        }
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Spell::CallScriptAfterFullChannelHandlers()
+{
+    for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(SPELL_SCRIPT_HOOK_AFTER_CAST);
+        auto hookItrEnd = (*scritr)->AfterFullChannel.end(),
+                                                      hookItr    = (*scritr)->AfterFullChannel.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            (*hookItr).Call(*scritr);
+
+        (*scritr)->_FinishScriptCall();
+    }
+}
 void Spell::CallScriptBeforeCastHandlers()
 {
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
@@ -8155,7 +8256,6 @@ void Spell::CallScriptBeforeCastHandlers()
         (*scritr)->_FinishScriptCall();
     }
 }
-
 void Spell::CallScriptOnCastHandlers()
 {
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
@@ -8205,6 +8305,19 @@ bool Spell::CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMo
 {
     // execute script effect handler hooks and check if effects was prevented
     bool preventDefault = false;
+    Unit* unit          = GetCaster()->ToUnit();
+    if (unit)
+    {
+        if (unit->GemSupports.contains(GetSpellInfo()->Id))
+        {
+            auto& supp = unit->GemSupports[GetSpellInfo()->Id];
+            supp.DoSupport(this, mode);
+        }
+        for (auto& supp : unit->GenericSupports)
+        {
+            supp.DoSupport(this, mode);
+        }
+    }
     for (auto scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
     {
         (*scritr)->_InitHit();
@@ -8548,6 +8661,10 @@ bool Spell::HasCastWhileMovingOverride() const
     return found;
 }
 
+float Spell::GetTotalMaxRange(bool positive = false, WorldObject* caster = nullptr, Spell* spell = nullptr)
+{
+    return m_spellInfo->GetMaxRange(positive, caster, spell) + h_bonusRange;
+}
 namespace Trinity
 {
 
